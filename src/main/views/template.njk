@@ -1,7 +1,15 @@
 {% extends "govuk/template.njk" %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
 
 {% block head %}
   {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    containerClasses: "govuk-width-container",
+    serviceName: "Find a Court or Tribunal"
+  }) }}
 {% endblock %}
 
 {% block bodyEnd %}

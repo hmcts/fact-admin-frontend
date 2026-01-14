@@ -13,11 +13,12 @@ export class Nunjucks {
     const govukTemplates = path.dirname(require.resolve('govuk-frontend/package.json')) + '/dist';
     const viewsPath = path.join(__dirname, '..', '..', 'views');
 
-    nunjucks.configure([govukTemplates, viewsPath], {
+    const env = nunjucks.configure([govukTemplates, viewsPath], {
       autoescape: true,
       watch: this.developmentMode,
       express: app,
     });
+    env.addGlobal('govukRebrand', true);
 
     app.use((req, res, next) => {
       res.locals.pagePath = req.path;

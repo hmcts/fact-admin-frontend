@@ -10,5 +10,10 @@
       "includeSubDomains": true,
       "preload": true
     }
+  },
+  "secrets": {
+    "fact-kv": {
+      "APP_INSIGHTS_CONNECTION_STRING": ""
+    }
   }
 }

@@ -1,20 +1,16 @@
 # ---- Base image ----
 FROM hmctspublic.azurecr.io/base/node:22-alpine as base
-
+COPY --chown=hmcts:hmcts . .
 USER root
 RUN corepack enable
+WORKDIR /opt/app
 USER hmcts
-
-COPY --chown=hmcts:hmcts . .
 
 # ---- Build image ----
 FROM base as build
-
-RUN yarn build:prod && \
-    rm -rf webpack/ webpack.config.js
+RUN yarn install && yarn build:prod
 
 # ---- Runtime image ----
-FROM base as runtime
-
-COPY --from=build $WORKDIR/src/main ./src/main
+FROM build as runtime
+RUN rm -rf webpack/ webpack.config.js
 EXPOSE 3355
