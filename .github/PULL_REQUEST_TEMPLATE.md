@@ -7,9 +7,9 @@
 
 Please remove this line and everything above and fill the following sections:
 
-### JIRA link ###
+### JIRA link
 
-### Change description ###
+### Change description
 
 **Does this PR require manual testing?** (check one with "x")
 
