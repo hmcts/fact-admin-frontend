@@ -9,7 +9,6 @@
 !version
 !.yarn/**
 !.yarnrc.yml
-!.pnp.cjs
 
 !tsconfig.json
 !webpack/**

@@ -1,5 +1,5 @@
 # ---- Base image ----
-FROM hmctspublic.azurecr.io/base/node:20-alpine as base
+FROM hmctspublic.azurecr.io/base/node:22-alpine as base
 
 USER root
 RUN corepack enable
@@ -17,5 +17,4 @@ RUN yarn build:prod && \
 FROM base as runtime
 
 COPY --from=build $WORKDIR/src/main ./src/main
-# TODO: expose the right port for your application
-EXPOSE 3100
+EXPOSE 3355
