@@ -1,3 +1,10 @@
+locals {
+  is_prod                   = var.env == "prod"
+  redis_family              = local.is_prod ? "P" : "C"
+  redis_memory_reserve_mb   = local.is_prod ? "642" : "200"
+  redis_zone_redundancy     = local.is_prod ? ["1", "2", "3"] : []
+}
+
 module "redis-v6" {
   source        = "git@github.com:hmcts/cnp-module-redis?ref=master"
   product       = "${var.product}-${var.component}"
@@ -8,14 +15,15 @@ module "redis-v6" {
   business_area = "cft"
   redis_version = "6"
   sku_name      = var.redis_sku
-  family        = var.env == "prod" ? "P" : "C"
+  family        = local.redis_family
+  zones         = local.redis_zone_redundancy
 
   private_endpoint_enabled      = true
   public_network_access_enabled = false
 
-  maxmemory_reserved              = var.env == "prod" ? "642" : "200"
-  maxfragmentationmemory_reserved = var.env == "prod" ? "642" : "200"
-  maxmemory_delta                 = var.env == "prod" ? "642" : "200"
+  maxmemory_reserved              = local.redis_memory_reserve_mb
+  maxfragmentationmemory_reserved = local.redis_memory_reserve_mb
+  maxmemory_delta                 = local.redis_memory_reserve_mb
 }
 
 module "keyvault_redis_v6_secrets" {
