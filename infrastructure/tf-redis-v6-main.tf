@@ -1,8 +1,7 @@
 locals {
   is_prod                   = var.env == "prod"
-  redis_family              = local.is_prod ? "P" : "C"
   redis_memory_reserve_mb   = local.is_prod ? "642" : "200"
-  redis_zone_redundancy     = local.is_prod ? ["1", "2", "3"] : []
+  redis_availability_zones  = local.is_prod ? ["1", "2", "3"] : null
 }
 
 module "redis-v6" {
@@ -14,9 +13,10 @@ module "redis-v6" {
   common_tags   = var.common_tags
   business_area = "cft"
   redis_version = "6"
-  sku_name      = var.redis_sku
-  family        = local.redis_family
-  zones         = local.redis_zone_redundancy
+  sku_name      = var.sku_name
+  family        = var.family
+  capacity      = var.capacity
+  availability_zones = local.redis_availability_zones
 
   private_endpoint_enabled      = true
   public_network_access_enabled = false

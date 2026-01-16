@@ -1,2 +1,4 @@
-env       = "demo"
-redis_sku = "Basic"
+env      = "demo"
+sku_name = "Basic"
+family   = "C"
+capacity = "1"

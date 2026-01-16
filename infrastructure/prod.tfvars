@@ -1,2 +1,4 @@
-env       = "prod"
-redis_sku = "Premium"
+env      = "prod"
+sku_name = "Premium"
+family   = "P"
+capacity = "1"

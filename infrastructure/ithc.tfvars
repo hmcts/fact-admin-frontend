@@ -1,2 +1,4 @@
-env       = "ithc"
-redis_sku = "Basic"
+env      = "ithc"
+sku_name = "Basic"
+family   = "C"
+capacity = "1"
