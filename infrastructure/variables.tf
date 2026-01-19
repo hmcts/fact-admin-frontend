@@ -37,18 +37,6 @@ variable "capacity" {
   description = "The size of the Redis cache to deploy. Valid values are 1, 2, 3, 4, 5"
 }
 
-variable "network_prefix" {
-  type        = string
-  default     = "cft"
-  description = "Prefix for shared network resources (e.g. cft)."
-}
-
-variable "subnet_name" {
-  type        = string
-  default     = "iaas"
-  description = "Subnet used for the Redis private endpoint."
-}
-
 variable "key_vault_name" {
   type        = string
   default     = ""

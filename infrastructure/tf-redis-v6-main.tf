@@ -3,7 +3,6 @@ module "redis-v6" {
   product            = "${var.product}-${var.component}"
   location           = var.location
   env                = var.env
-  subnetid           = data.azurerm_subnet.iaas.id
   common_tags        = var.common_tags
   business_area      = "cft"
   redis_version      = "6"
