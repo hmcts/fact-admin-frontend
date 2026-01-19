@@ -1,7 +1,7 @@
 locals {
   key_vault_name                = var.key_vault_name != "" ? var.key_vault_name : "${var.product}-kv-${var.env}"
   key_vault_resource_group_name = var.key_vault_resource_group_name != "" ? var.key_vault_resource_group_name : "${var.product}-${var.env}-rg"
-  secret_expiry                 = "2026-03-01T01:00:00Z"
+  secret_expiry                 = timeadd(timestamp(), "17520h")
 }
 
 data "azurerm_subnet" "iaas" {

@@ -1,9 +1,3 @@
-locals {
-  is_prod                   = var.env == "prod"
-  redis_memory_reserve_mb   = local.is_prod ? "642" : "200"
-  redis_availability_zones  = local.is_prod ? ["1", "2", "3"] : null
-}
-
 module "redis-v6" {
   source        = "git@github.com:hmcts/cnp-module-redis?ref=master"
   product       = "${var.product}-${var.component}"
@@ -16,52 +10,40 @@ module "redis-v6" {
   sku_name      = var.sku_name
   family        = var.family
   capacity      = var.capacity
-  availability_zones = local.redis_availability_zones
+  availability_zones = var.env == "prod" ? ["1", "2", "3"] : null
+  rdb_backup_enabled = var.rdb_backup_enabled
 
   private_endpoint_enabled      = true
   public_network_access_enabled = false
 
-  maxmemory_reserved              = local.redis_memory_reserve_mb
-  maxfragmentationmemory_reserved = local.redis_memory_reserve_mb
-  maxmemory_delta                 = local.redis_memory_reserve_mb
+  maxmemory_reserved              = var.env == "prod" ? "642" : "200"
+  maxfragmentationmemory_reserved = var.env == "prod" ? "642" : "200"
+  maxmemory_delta                 = var.env == "prod" ? "642" : "200"
 }
 
-module "keyvault_redis_v6_secrets" {
-  source = "./modules/kv_secrets"
+resource "azurerm_key_vault_secret" "redis_v6_host" {
+  name            = "REDIS-V6-HOST"
+  value           = module.redis-v6.host_name
+  key_vault_id    = data.azurerm_key_vault.app_kv.id
+  content_type    = ""
+  expiration_date = local.secret_expiry
+  tags            = merge(var.common_tags, { source = "Redis" })
+}
 
-  key_vault_id = data.azurerm_key_vault.app_kv.id
-  tags         = var.common_tags
-  secrets = [
-    {
-      name  = "REDIS-V6-HOST"
-      value = module.redis-v6.host_name
-      tags = {
-        "source" : "Redis"
-      }
-      content_type    = ""
-      expiration_date = local.secret_expiry
-    },
-    {
-      name  = "REDIS-V6-PORT"
-      value = module.redis-v6.redis_port
-      tags = {
-        "source" : "Redis"
-      }
-      content_type    = "",
-      expiration_date = local.secret_expiry
-    },
-    {
-      name  = "REDIS-V6-PASSWORD"
-      value = module.redis-v6.access_key
-      tags = {
-        "source" : "Redis"
-      }
-      content_type    = ""
-      expiration_date = local.secret_expiry
-    }
-  ]
+resource "azurerm_key_vault_secret" "redis_v6_port" {
+  name            = "REDIS-V6-PORT"
+  value           = module.redis-v6.redis_port
+  key_vault_id    = data.azurerm_key_vault.app_kv.id
+  content_type    = ""
+  expiration_date = local.secret_expiry
+  tags            = merge(var.common_tags, { source = "Redis" })
+}
 
-  depends_on = [
-    module.redis-v6
-  ]
+resource "azurerm_key_vault_secret" "redis_v6_password" {
+  name            = "REDIS-V6-PASSWORD"
+  value           = module.redis-v6.access_key
+  key_vault_id    = data.azurerm_key_vault.app_kv.id
+  content_type    = ""
+  expiration_date = local.secret_expiry
+  tags            = merge(var.common_tags, { source = "Redis" })
 }
