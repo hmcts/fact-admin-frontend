@@ -1,17 +1,16 @@
 module "redis-v6" {
-  source        = "git@github.com:hmcts/cnp-module-redis?ref=master"
-  product       = "${var.product}-${var.component}"
-  location      = var.location
-  env           = var.env
-  subnetid      = data.azurerm_subnet.iaas.id
-  common_tags   = var.common_tags
-  business_area = "cft"
-  redis_version = "6"
-  sku_name      = var.sku_name
-  family        = var.family
-  capacity      = var.capacity
+  source             = "git@github.com:hmcts/cnp-module-redis?ref=master"
+  product            = "${var.product}-${var.component}"
+  location           = var.location
+  env                = var.env
+  subnetid           = data.azurerm_subnet.iaas.id
+  common_tags        = var.common_tags
+  business_area      = "cft"
+  redis_version      = "6"
+  sku_name           = var.sku_name
+  family             = var.family
+  capacity           = var.capacity
   availability_zones = var.env == "prod" ? ["1", "2", "3"] : null
-  rdb_backup_enabled = var.rdb_backup_enabled
 
   private_endpoint_enabled      = true
   public_network_access_enabled = false

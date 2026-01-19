@@ -37,12 +37,6 @@ variable "capacity" {
   description = "The size of the Redis cache to deploy. Valid values are 1, 2, 3, 4, 5"
 }
 
-variable "rdb_backup_enabled" {
-  type        = bool
-  default     = false
-  description = "Enable RDB backups for Premium Redis (requires a storage account)."
-}
-
 variable "network_prefix" {
   type        = string
   default     = "cft"
