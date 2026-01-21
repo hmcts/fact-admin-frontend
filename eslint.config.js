@@ -64,7 +64,7 @@ module.exports = [
   {
     files: tsFiles,
     languageOptions: {
-      ecmaVersion: 2018,
+      ecmaVersion: 2026,
       sourceType: 'module',
       parser: require('@typescript-eslint/parser'),
       parserOptions: {
@@ -167,7 +167,7 @@ module.exports = [
   {
     files: jsFiles,
     languageOptions: {
-      ecmaVersion: 2018,
+      ecmaVersion: 2026,
       sourceType: 'script',
       globals: {
         ...globals.node,
