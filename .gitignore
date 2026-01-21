@@ -35,3 +35,4 @@ version
 !.yarn/patches
 !.yarn/patches/*
 !.yarn/releases
+install-state.gz
