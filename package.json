@@ -7,7 +7,7 @@
     "node": ">=22.21.1"
   },
   "scripts": {
-    "start": "NODE_ENV=production ts-node -r --transpile-only tsconfig-paths/register src/main/server.ts",
+    "start": "NODE_ENV=production ts-node --transpile-only -r tsconfig-paths/register src/main/server.ts",
     "start:dev": "nodemon --config nodemon.json",
     "lint": "NODE_OPTIONS=--no-warnings stylelint **/*.scss -v -q && eslint . --ext .js,.ts && prettier --check .",
     "lint:fix": "prettier --write . .github && eslint --fix .",
@@ -105,9 +105,7 @@
   "resolutions": {
     "qs": "6.14.1",
     "brace-expansion": "2.0.2",
-    "diff": "8.0.3",
-    "winston@npm:^2.4.5": "patch:winston@npm%3A2.4.7#~/.yarn/patches/winston-npm-2.4.7-f6df5db564.patch",
-    "winston@npm:^3.17.0": "patch:winston@npm%3A2.4.7#~/.yarn/patches/winston-npm-2.4.7-f6df5db564.patch"
+    "diff": "8.0.3"
   },
   "packageManager": "yarn@4.12.0"
 }
