@@ -18,7 +18,9 @@
     "paths": {
       "router/*": ["router/*"],
       "routes/*": ["routes/*"]
-    }
+    },
+    "typeRoots": ["./src/main/types", "./node_modules/@types"]
   },
+  "include": ["src/main/**/*.ts", "src/main/types/**/*.d.ts", "src/test/**/*.ts"],
   "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*"]
 }

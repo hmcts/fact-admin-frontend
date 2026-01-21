@@ -1,21 +1,21 @@
 import * as path from 'path';
 
+import { Logger } from '@hmcts/nodejs-logging';
 import * as bodyParser from 'body-parser';
-import config = require('config');
+import config from 'config';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import RateLimit from 'express-rate-limit';
-import { glob } from 'glob';
 
 import { HTTPError } from './HttpError';
+import { setupDev } from './development';
 import { AppInsights } from './modules/appinsights';
 import { Helmet } from './modules/helmet';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
-
-const { Logger } = require('@hmcts/nodejs-logging');
-
-const { setupDev } = require('./development');
+import healthRoute from './routes/health';
+import homeRoute from './routes/home';
+import infoRoute from './routes/info';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
@@ -49,10 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 
-glob
-  .sync(__dirname + '/routes/**/*.+(ts|js)')
-  .map(filename => require(filename))
-  .forEach(route => route.default(app));
+[homeRoute, healthRoute, infoRoute].forEach(route => route(app));
 
 setupDev(app, developmentMode);
 // returning "not found" page for requests with paths not resolved by the router

@@ -1,6 +1,6 @@
-import { config as testConfig } from './src/test/config';
+import { setHeadlessWhen } from '@codeceptjs/configure';
 
-const { setHeadlessWhen } = require('@codeceptjs/configure');
+import { config as testConfig } from './src/test/config';
 
 setHeadlessWhen(testConfig.TestHeadlessBrowser);
 export const config: CodeceptJS.MainConfig = {
