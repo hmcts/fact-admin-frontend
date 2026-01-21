@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.6",
+    "@babel/preset-env": "^7.28.6",
     "@codeceptjs/allure-legacy": "^1.0.2",
     "@codeceptjs/configure": "1.0.6",
     "@eslint/eslintrc": "3.3.3",
@@ -61,6 +62,7 @@
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "8.53.1",
     "@typescript-eslint/parser": "8.53.1",
+    "babel-jest": "^30.2.0",
     "chai": "6.2.2",
     "codeceptjs": "^3.7.6",
     "copy-webpack-plugin": "13.0.1",
@@ -103,6 +105,7 @@
   "resolutions": {
     "qs": "6.14.1",
     "brace-expansion": "2.0.2",
+    "diff": "8.0.3",
     "winston@npm:^2.4.5": "patch:winston@npm%3A2.4.7#~/.yarn/patches/winston-npm-2.4.7-f6df5db564.patch",
     "winston@npm:^3.17.0": "patch:winston@npm%3A2.4.7#~/.yarn/patches/winston-npm-2.4.7-f6df5db564.patch"
   },

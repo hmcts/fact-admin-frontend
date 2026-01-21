@@ -14,7 +14,7 @@ describe('Smoke Test', () => {
             'Accept-Encoding': 'gzip',
           },
         });
-        expect(response.data).includes('<h1 class="govuk-heading-xl">Default Page Template</h1>');
+        expect(response.data).to.include('<h1 class="govuk-heading-xl">Default Page Template</h1>');
       } catch {
         fail('Heading not present and/or correct');
       }
