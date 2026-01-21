@@ -1,10 +1,11 @@
 import { Server } from 'http';
 import { AddressInfo } from 'net';
 
-import pa11y from 'pa11y';
 import supertest from 'supertest';
 
 import { app } from '../../main/app';
+
+const pa11y = require('pa11y');
 
 let server: Server;
 let port: number;

@@ -87,8 +87,9 @@ module.exports = [
       '@typescript-eslint/array-type': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      // This can be changed to error once we move to webpackdevmiddleware
       '@typescript-eslint/no-require-imports': [
-        'error',
+        'warn',
         {
           allow: ['^\\.\\./\\.\\./webpack\\.config(\\.js)?$'],
         },

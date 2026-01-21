@@ -1,8 +1,7 @@
 import * as path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import * as bodyParser from 'body-parser';
-import config from 'config';
+import config = require('config');
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import RateLimit from 'express-rate-limit';
@@ -16,6 +15,8 @@ import { PropertiesVolume } from './modules/properties-volume';
 import healthRoute from './routes/health';
 import homeRoute from './routes/home';
 import infoRoute from './routes/info';
+
+const { Logger } = require('@hmcts/nodejs-logging');
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
