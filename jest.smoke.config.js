@@ -5,8 +5,10 @@ module.exports = {
   testRunner: 'jest-circus/runner',
   transform: {
     '^.+\\.ts$': 'ts-jest',
+    '^.+\\.js$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
+  transformIgnorePatterns: ['/node_modules/(?!chai)'],
   reporters: [
     'default',
     [
