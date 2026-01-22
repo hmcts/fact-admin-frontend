@@ -5,6 +5,8 @@
 - [ ] tests have been updated / new tests has been added (if needed)
 - [ ] The Jira link is just the ticket number e.g. FACT-1234
 
+<b>If this PR changes any UI screen the ```enable_keep_helm``` label must be added before it is reviewed.</b>
+
 Please remove this line and everything above and fill the following sections:
 
 ### JIRA link
