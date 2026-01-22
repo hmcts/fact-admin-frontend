@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": ">=22.21.1"
+    "node": ">=22.22.0"
   },
   "scripts": {
     "start": "NODE_ENV=production ts-node --transpile-only -r tsconfig-paths/register src/main/server.ts",
@@ -40,7 +40,7 @@
     "express-rate-limit": "8.2.1",
     "govuk-frontend": "5.14.0",
     "helmet": "8.1.0",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "nunjucks": "3.2.4",
     "stylelint": "17.0.0",
     "ts-node": "10.9.2",
@@ -57,7 +57,7 @@
     "@types/chai-as-promised": "8.0.2",
     "@types/express": "5.0.6",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.19.7",
     "@types/pa11y": "^5.3.7",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "8.53.1",
@@ -83,7 +83,7 @@
     "pa11y": "9.0.1",
     "playwright": "1.57.0",
     "prettier": "3.8.0",
-    "sass": "1.97.2",
+    "sass": "1.97.3",
     "sass-loader": "16.0.6",
     "style-loader": "4.0.0",
     "supertest": "^7.2.2",
@@ -105,7 +105,8 @@
   "resolutions": {
     "qs": "6.14.1",
     "brace-expansion": "2.0.2",
-    "diff": "8.0.3"
+    "diff": "8.0.3",
+    "lodash": "4.17.23"
   },
   "packageManager": "yarn@4.12.0"
 }
