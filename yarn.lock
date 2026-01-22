@@ -4071,7 +4071,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.14.1":
+"@types/node@npm:^22.19.7":
   version: 22.19.7
   resolution: "@types/node@npm:22.19.7"
   dependencies:
@@ -8003,7 +8003,7 @@ __metadata:
     "@types/express": "npm:5.0.6"
     "@types/jest": "npm:^30.0.0"
     "@types/lodash": "npm:4.17.23"
-    "@types/node": "npm:^22.14.1"
+    "@types/node": "npm:^22.19.7"
     "@types/nunjucks": "npm:3.2.6"
     "@types/pa11y": "npm:^5.3.7"
     "@types/supertest": "npm:^6.0.3"
