@@ -1,3 +1,4 @@
+import type { Response } from 'express';
 import { mock } from 'sinon';
 
 import HomeController from '../../../main/controllers/HomeController';
