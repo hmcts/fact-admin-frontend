@@ -6,19 +6,15 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2024",
     "strict": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
     "noImplicitThis": false,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "experimentalDecorators": true,
-    "useUnknownInCatchVariables": false,
     "skipLibCheck": true,
     "lib": ["es2024", "dom", "dom.iterable"],
     "baseUrl": "src/main",
-    "paths": {
-      "router/*": ["router/*"],
-      "routes/*": ["routes/*"]
-    },
     "typeRoots": ["./src/main/types", "./node_modules/@types"]
   },
   "include": ["src/main/**/*.ts", "src/main/types/**/*.d.ts", "src/test/**/*.ts"],
