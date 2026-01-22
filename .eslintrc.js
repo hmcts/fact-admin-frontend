@@ -15,7 +15,7 @@ module.exports = {
     'prettier',
   ],
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2026,
     sourceType: 'module',
     project: './tsconfig.eslint.json',
   },
