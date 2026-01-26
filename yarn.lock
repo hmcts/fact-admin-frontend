@@ -5307,6 +5307,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:1.13.3":
+  version: 1.13.3
+  resolution: "axios@npm:1.13.3"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.4"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/2ceca9215671f9c2bcd5d8a0a1a667e9a35f9f7cfae88f25bba773ed9612de6cac50b2bf8be5e6918cbd2db601b4431ca87a00bffd9682939a8b85da9c89345a
+  languageName: node
+  linkType: hard
+
 "b4a@npm:^1.6.4":
   version: 1.7.3
   resolution: "b4a@npm:1.7.3"
@@ -8060,7 +8071,7 @@ __metadata:
     applicationinsights: "npm:3.13.0"
     awilix: "npm:12.0.5"
     awilix-express: "npm:9.0.2"
-    axios: "npm:1.13.2"
+    axios: "npm:1.13.3"
     babel-jest: "npm:^30.2.0"
     chai: "npm:6.2.2"
     codeceptjs: "npm:^3.7.6"
