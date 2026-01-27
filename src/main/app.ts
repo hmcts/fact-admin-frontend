@@ -34,7 +34,7 @@ new PropertiesVolume().enableFor(app);
 new AppInsights().enable();
 new Nunjucks(developmentMode).enableFor(app);
 // secure the application by adding various HTTP headers to its responses
-new Helmet(config.get('security')).enableFor(app);
+new Helmet(config.get('security'), developmentMode).enableFor(app);
 new Container().enableFor(app);
 
 app.use(scopePerRequest(app.locals.container));
