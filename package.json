@@ -44,7 +44,7 @@
     "helmet": "8.1.0",
     "lodash": "4.17.23",
     "nunjucks": "3.2.4",
-    "stylelint": "17.0.0",
+    "stylelint": "17.1.0",
     "ts-node": "10.9.2",
     "typescript": "5.9.3"
   },
