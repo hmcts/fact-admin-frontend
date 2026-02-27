@@ -27,6 +27,8 @@ src/main/views/govuk
 coverage/
 smoke-output/
 functional-output/
+playwright-report/
+test-results/
 version
 
 .eslintcache

@@ -26,7 +26,6 @@ const globalIgnores = [
   'src/main/views/govuk/**',
   'src/main/public/**',
   'src/main/types/**',
-  'src/test/config.ts',
   'jest.*config.js',
   '.eslintrc.js',
 ];
