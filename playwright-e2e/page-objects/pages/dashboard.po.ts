@@ -17,7 +17,7 @@ export class DashboardPage extends Base {
     super(page);
   }
 
-  async goto(section: DashboardSection) {
+  async goto(section: DashboardSection): Promise<void> {
     await this.page.goto(config.urls.homePageUrl + section);
   }
 }

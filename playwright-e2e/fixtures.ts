@@ -17,6 +17,7 @@ export const test = baseTest.extend<CustomFixtures, CustomWorkerFixtures>({
   ...utilsWorkerFixtures,
   // Worker scoped fixtures need to be defined separately
   lighthousePort: [
+    // eslint-disable-next-line no-empty-pattern
     async ({}, use) => {
       const port = await getPort();
       await use(port);

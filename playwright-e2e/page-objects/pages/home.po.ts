@@ -8,7 +8,7 @@ export class HomePage extends Base {
     super(page);
   }
 
-  async goto() {
+  async goto(): Promise<void> {
     await this.page.goto(config.urls.homePageUrl);
   }
 }

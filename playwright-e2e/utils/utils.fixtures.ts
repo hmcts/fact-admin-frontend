@@ -149,8 +149,8 @@ export const utilsFixtures = {
    * Winston logger instance configured for test execution.
    * Test-scoped: creates a new logger for each test with test metadata.
    */
-
-  logger: async ({}, use, testInfo) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  logger: async ({}, use, testInfo): Promise<void> => {
     const logger = createLogger({
       serviceName: 'fact-admin-frontend',
       defaultMeta: {
@@ -177,8 +177,8 @@ export const utilsFixtures = {
    * @see {@link shouldAttachApiLogs} for attachment logic
    * @see {@link shouldIncludeRawBodies} for security controls
    */
-
-  apiRecorder: async ({}, use, testInfo) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  apiRecorder: async ({}, use, testInfo): Promise<void> => {
     const includeRawBodies = shouldIncludeRawBodies(process.env);
     const recorder = new ApiRecorder(includeRawBodies, {
       maxEntries: resolveApiMaxLogs(process.env),
@@ -206,11 +206,12 @@ export const utilsFixtures = {
    * Builder function for XSRF headers from session files.
    * Test-scoped: provides fresh header builder for each test.
    */
-
-  xsrfHeaders: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  xsrfHeaders: async ({}, use): Promise<void> => {
     await use(buildXsrfHeaders);
   },
-  createApiClient: async ({ logger, apiRecorder }, use, testInfo) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  createApiClient: async ({ logger, apiRecorder }, use, testInfo): Promise<void> => {
     const clients: ApiClient[] = [];
     await use(options => {
       const clientLogger = createChildLogger(logger, {
@@ -229,45 +230,50 @@ export const utilsFixtures = {
 
     await Promise.all(clients.map(client => client.dispose()));
   },
-
-  config: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  config: async ({}, use): Promise<void> => {
     await use(config);
   },
-
-  cookieUtils: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  cookieUtils: async ({}, use): Promise<void> => {
     await use(new CookieUtils());
   },
-
-  waitUtils: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  waitUtils: async ({}, use): Promise<void> => {
     await use(new WaitUtils());
   },
-
-  tableUtils: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  tableUtils: async ({}, use): Promise<void> => {
     await use(new TableUtils());
   },
-
-  validatorUtils: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  validatorUtils: async ({}, use): Promise<void> => {
     await use(new ValidatorUtils());
   },
-  lighthouseUtils: async ({ lighthousePage, lighthousePort }, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  lighthouseUtils: async ({ lighthousePage, lighthousePort }, use): Promise<void> => {
     await use(new LighthouseUtils(lighthousePage, lighthousePort));
   },
-  axeUtils: async ({ page }, use, testInfo) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  axeUtils: async ({ page }, use, testInfo): Promise<void> => {
     const axeUtils = new AxeUtils(page);
     await use(axeUtils);
     await axeUtils.generateReport(testInfo);
   },
-
-  SessionUtils: async ({}, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
+  SessionUtils: async ({}, use): Promise<void> => {
     await use(SessionUtils);
   },
-  browserUtils: async ({ browser }, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  browserUtils: async ({ browser }, use): Promise<void> => {
     await use(new BrowserUtils(browser));
   },
-  localeUtils: async ({ page }, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  localeUtils: async ({ page }, use): Promise<void> => {
     await use(new LocaleUtils(page));
   },
-  lighthousePage: async ({ lighthousePort, page, SessionUtils, logger }, use, testInfo) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-shadow
+  lighthousePage: async ({ lighthousePort, page, SessionUtils, logger }, use, testInfo): Promise<void> => {
     // TODO: FACT-2582: look at whether we need this
     // Prevent creating performance page if not needed
     if (testInfo.tags.includes('@performance')) {
@@ -299,7 +305,8 @@ export const utilsWorkerFixtures = {
    * Fails fast if manifest is missing or invalid.
    */
   seedManifest: [
-    async ({}, use: (manifest: SeedManifest) => Promise<void>) => {
+    // eslint-disable-next-line no-empty-pattern
+    async ({}, use: (manifest: SeedManifest) => Promise<void>): Promise<void> => {
       const manifest = loadSeedManifest();
       await use(manifest);
     },

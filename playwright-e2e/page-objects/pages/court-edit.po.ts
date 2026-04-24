@@ -8,7 +8,7 @@ export class CourtEditPage extends Base {
     super(page);
   }
 
-  async goto(courtSlug: string) {
+  async goto(courtSlug: string): Promise<void> {
     await this.page.goto(config.urls.homePageUrl + `/courts/${courtSlug}/edit#general}`);
   }
 }

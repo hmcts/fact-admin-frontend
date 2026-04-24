@@ -30,7 +30,7 @@ const globalIgnores = [
   'src/test/config.ts',
   'jest.*config.js',
   // playwright additions
-  'playwrihght.config.ts',
+  'playwright.config.ts',
   'playwright-report/**',
   'test-results/**',
   'functional-output/**',

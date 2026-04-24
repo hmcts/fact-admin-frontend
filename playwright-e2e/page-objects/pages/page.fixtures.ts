@@ -17,23 +17,27 @@ export interface PageFixtures {
  */
 export const pageFixtures = {
   // If a performance test is executed, use the lighthouse created page instead
-  determinePage: async ({ page, lighthousePage }, use, testInfo) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  determinePage: async ({ page, lighthousePage }, use, testInfo): Promise<void> => {
     if (testInfo.tags.includes('@performance')) {
       await use(lighthousePage);
     } else {
       await use(page);
     }
   },
-  homePage: async ({ determinePage }, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  homePage: async ({ determinePage }, use): Promise<void> => {
     const homePage = new HomePage(determinePage);
     await homePage.goto();
     await use(homePage);
   },
-  dashboardPage: async ({ determinePage }, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  dashboardPage: async ({ determinePage }, use): Promise<void> => {
     const adminDashboardPage = new DashboardPage(determinePage);
     await use(adminDashboardPage);
   },
-  courtEditPage: async ({ determinePage }, use) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  courtEditPage: async ({ determinePage }, use): Promise<void> => {
     const courtEditPage = new CourtEditPage(determinePage);
     await use(courtEditPage);
   },

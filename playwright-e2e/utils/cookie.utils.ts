@@ -10,20 +10,19 @@ export class CookieUtils {
   //     await this.addManageCasesAnalyticsCookie(user.sessionFile);
   //   }
   // }
-
-  private resolveHostname(url: string): string {
-    try {
-      return new URL(url).hostname;
-    } catch {
-      try {
-        return new URL(`https://${url}`).hostname;
-      } catch (fallbackError) {
-        throw new Error(
-          `Failed to resolve hostname from URL "${url}": ${
-            fallbackError instanceof Error ? fallbackError.message : fallbackError
-          }`
-        );
-      }
-    }
-  }
+  // private resolveHostname(url: string): string {
+  //   try {
+  //     return new URL(url).hostname;
+  //   } catch {
+  //     try {
+  //       return new URL(`https://${url}`).hostname;
+  //     } catch (fallbackError) {
+  //       throw new Error(
+  //         `Failed to resolve hostname from URL "${url}": ${
+  //           fallbackError instanceof Error ? fallbackError.message : fallbackError
+  //         }`
+  //       );
+  //     }
+  //   }
+  // }
 }
