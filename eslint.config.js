@@ -36,7 +36,7 @@ const globalIgnores = [
   'functional-output/**',
 ];
 const tsFiles = ['**/*.ts'];
-const testFiles = ['src/test/**/*.{js,ts}', 'playwright-e2e/**/*.{js,ts}'];
+const testFiles = ['src/test/**/*.{js,ts}'];
 const jsFiles = ['src/**/*.js'];
 
 const withFiles = files => config => ({

@@ -3,7 +3,6 @@ import { defineConfig, type ReporterDescription } from '@playwright/test';
 import { cpus } from 'node:os';
 const { version: appVersion } = require('./package.json') as { version: string };
 
-const apiSpecPattern = /tests\/api\/.*\.spec\.ts/;
 const TRUTHY_FLAGS = new Set(['1', 'true', 'yes', 'on', 'all']);
 const FALSY_FLAGS = new Set(['0', 'false', 'no', 'off']);
 
@@ -108,13 +107,13 @@ const resolveReporters = (): ReporterDescription[] => {
           {
             outputFolder: process.env.PW_ODHIN_OUTPUT ?? 'test-results/odhin-report',
             indexFilename: process.env.PW_ODHIN_INDEX ?? 'playwright-odhin.html',
-            title: process.env.PW_ODHIN_TITLE ?? 'tcoe-playwright-example Playwright',
+            title: process.env.PW_ODHIN_TITLE ?? 'fact-admin-frontend Playwright',
             testEnvironment:
               process.env.PW_ODHIN_ENV ??
               `${process.env.TEST_ENVIRONMENT ?? (process.env.CI ? 'ci' : 'local')} | workers=${resolveWorkerCount()}`,
-            project: process.env.PW_ODHIN_PROJECT ?? 'tcoe-playwright-example',
+            project: process.env.PW_ODHIN_PROJECT ?? 'fact-admin-frontend',
             release: process.env.PW_ODHIN_RELEASE ?? `${appVersion} | branch=${process.env.GIT_BRANCH ?? 'local'}`,
-            testFolder: process.env.PW_ODHIN_TEST_FOLDER ?? 'playwright-e2e',
+            testFolder: process.env.PW_ODHIN_TEST_FOLDER ?? 'src/test/functional',
             startServer: safeBoolean(process.env.PW_ODHIN_START_SERVER, false),
             consoleLog: safeBoolean(process.env.PW_ODHIN_CONSOLE_LOG, true),
             consoleError: safeBoolean(process.env.PW_ODHIN_CONSOLE_ERROR, true),
@@ -164,8 +163,8 @@ const resolveVideoMode = (): 'off' | 'on' | 'retain-on-failure' | 'on-first-retr
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './playwright-e2e',
-  snapshotDir: './playwright-e2e/snapshots',
+  testDir: './src/test/functional',
+  snapshotDir: './src/test/functional/snapshots',
   ...CommonConfig.recommended,
   reporter: resolveReporters(),
   use: {
@@ -181,48 +180,20 @@ export default defineConfig({
       testMatch: /global\.setup\.ts/,
     },
     {
-      name: 'teardown',
-      testMatch: /global\.teardown\.ts/,
-    },
-    {
-      name: 'api',
-      testMatch: apiSpecPattern,
-      retries: 0,
-    },
-    {
       ...ProjectsConfig.chrome,
       dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
-    },
-    {
-      ...ProjectsConfig.chromium,
-      dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
     },
     {
       ...ProjectsConfig.edge,
       dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
     },
     {
       ...ProjectsConfig.firefox,
       dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
     },
     {
       ...ProjectsConfig.webkit,
       dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
-    },
-    {
-      ...ProjectsConfig.tabletChrome,
-      dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
-    },
-    {
-      ...ProjectsConfig.tabletWebkit,
-      dependencies: ['setup'],
-      testIgnore: apiSpecPattern,
     },
   ],
 });

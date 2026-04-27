@@ -12,7 +12,7 @@ export type SeedManifest = {
   };
 };
 
-const DEFAULT_MANIFEST_PATH = path.resolve(process.cwd(), 'playwright-e2e', 'data', 'seed-manifest.json');
+const DEFAULT_MANIFEST_PATH = path.resolve(process.cwd(), 'src/test/functional', 'data', 'seed-manifest.json');
 
 const REQUIRED_DATA_KEYS = ['caseId', 'taskId', 'userId'] as const;
 

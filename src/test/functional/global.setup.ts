@@ -14,15 +14,8 @@ setup.describe('Global playwright setup', () => {
     // URL for the fact-data-api
     requireEnvVar('DATA_API_URL');
 
-    // Required for Azure authentication to retrieve tokens for API access
-    requireEnvVar('AZURE_TENANT_ID');
-    requireEnvVar('AZURE_CLIENT_ID');
-    requireEnvVar('AZURE_CLIENT_SECRET');
-    requireEnvVar('API_APP_REG_ID');
-
     // Access URLs for Admin pages
     requireEnvVar('ADMIN_URL');
-    requireEnvVar('ADMIN_DASHBOARD_URL');
 
     // User SSO ids
     requireEnvVar('ADMIN_SSO_ID');

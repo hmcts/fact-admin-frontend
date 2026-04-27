@@ -35,7 +35,8 @@ const apiEndpointsOutput =
   process.env.PW_API_ENDPOINTS_OUTPUT ??
   process.env.API_ENDPOINTS_REPORT ??
   path.join('coverage', 'api-endpoints.json');
-const apiRoot = path.resolve(process.env.API_TEST_ROOT ?? path.join('playwright-e2e', 'tests', 'api'));
+const apiRoot = path.resolve(process.env.API_TEST_ROOT ??
+                             path.join('src','test','functional','tests', 'api'));
 
 async function main() {
   const common = await import('@hmcts/playwright-common');
