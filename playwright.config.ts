@@ -222,7 +222,7 @@ export default defineConfig({
     {
       ...ProjectsConfig.tabletWebkit,
       dependencies: ['setup'],
-      testIgnore: /tests\/api\/.*\.spec\.ts/,
+      testIgnore: apiSpecPattern,
     },
   ],
 });

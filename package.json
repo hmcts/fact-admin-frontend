@@ -20,7 +20,7 @@
     "test:smoke": "yarn playwright test --grep @smoke",
     "test:functional": "yarn playwright test --grep-invert='(@smoke)|(@a11y)|(@performance)'",
     "test:a11y": "yarn playwright test --grep @a11y --project=chrome",
-    "test:performance": "yarn playwright test --grep @performance",
+    "test:performance": "yarn playwright test --grep @performance --project=chrome",
     "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
     "prepare": "husky install"
   },
