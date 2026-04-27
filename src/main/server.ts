@@ -5,6 +5,7 @@ import * as path from 'path';
 
 import { app } from './app';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { Logger } = require('@hmcts/nodejs-logging');
 
 const logger = Logger.getLogger('server');
