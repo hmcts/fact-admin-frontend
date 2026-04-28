@@ -1,18 +1,18 @@
 import { WaitUtils } from '@hmcts/playwright-common';
 import { Locator, Page, expect } from '@playwright/test';
 
-export class HeadingComponent {
-  readonly heading: Locator;
+export class TitleComponent {
+  readonly title: Locator;
   private readonly waitUtils = new WaitUtils();
 
   constructor(private readonly page: Page) {
-    this.heading = this.page.locator('h1.govuk-heading-xl');
+    this.title = this.page.locator('section.govuk-service-navigation');
   }
 
   public async checkIsVisible(): Promise<void> {
-    await this.waitUtils.waitForLocatorVisibility(this.heading, {
+    await this.waitUtils.waitForLocatorVisibility(this.title, {
       visibility: true,
     });
-    await expect(this.heading).toBeVisible();
+    await expect(this.title).toBeVisible();
   }
 }

@@ -6,10 +6,10 @@ import dotenv from 'dotenv';
 // This needs to be placed somewhere before attempting to access any environment variables
 dotenv.config({ quiet: true });
 
-// TODO: FACT-2582: either continue with this or remove it. While the admin frontend doesn't talk to the api
-//       using a specific set of user credentials, it does need to let the API know which user is
-//       is logged in, so we may need to persist some user details in the session.
-//       Most obvious use-case for this will be auditing within the API
+// TODO: While the admin frontend doesn't talk to the api using a specific set of user credentials,
+//       once SSO is in place we will need to perform user authentication as part of the functional
+//       test process. The ssoID is just a placeholder - we'll likley just need credentials to allow
+//       us to perform the sso login.
 export interface UserDetails {
   ssoId: string;
   // this is used during lighthouse (performance) config
@@ -41,7 +41,7 @@ export const config: Config = {
     },
   },
   urls: {
-    homePageUrl: getEnvVar('ADMIN_URL', 'https://fact-admin-frontend.aat.platform.hmcts.net'),
+    homePageUrl: getEnvVar('ADMIN_URL', getEnvVar('TEST_URL', 'https://fact-admin-frontend.aat.platform.hmcts.net')),
   },
 };
 

@@ -1,2 +1,2 @@
 export * from './page.fixtures';
-export { DashboardSection } from './dashboard.po';
+export { PageSection } from './home.po';
