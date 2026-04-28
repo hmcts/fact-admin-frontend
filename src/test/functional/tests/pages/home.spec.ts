@@ -2,7 +2,6 @@ import { expect, test } from '../../fixtures';
 import { PageSection } from '../../page-objects/pages';
 
 test.describe('Home Page Tests', () => {
-
   test(
     'smoke test',
     {
