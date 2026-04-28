@@ -7,5 +7,5 @@ module.exports = {
     '^.+\\.ts?$': 'ts-jest',
     '^.+\\.js$': 'babel-jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!chai)'],
+  transformIgnorePatterns: ['/node_modules/(?!chai|uuid)'],
 };

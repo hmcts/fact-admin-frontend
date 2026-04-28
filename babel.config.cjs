@@ -1,5 +1,9 @@
-// Required so Jest can transpile Chai v6's ESM output when running CJS tests.
-// Jest configs opt into babel-jest for .js and allow transforming chai in node_modules.
+// Required so Jest can transpile selected ESM packages from node_modules when
+// running the repo's CommonJS-oriented test setup.
 module.exports = {
-  presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+  presets: [
+    ['@babel/preset-env', { targets: { node: 'current' } }],
+    '@babel/preset-typescript',
+  ],
+  plugins: [['@babel/plugin-proposal-decorators', { version: '2023-11' }]],
 };

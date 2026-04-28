@@ -1,0 +1,10 @@
+{
+  "secrets": {
+    "fact-kv": {
+      "API_APP_REG_ID": "API_APP_REG_ID"
+    }
+  },
+  "auth": {
+    "azure-identity-token": "AZURE_FEDERATED_TOKEN_FILE"
+  }
+}

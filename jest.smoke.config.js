@@ -8,7 +8,7 @@ module.exports = {
     '^.+\\.js$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
-  transformIgnorePatterns: ['/node_modules/(?!chai)'],
+  transformIgnorePatterns: ['/node_modules/(?!chai|uuid)'],
   reporters: [
     'default',
     [
