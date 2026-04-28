@@ -32,4 +32,15 @@ withPipeline(type, product, component) {
       reportName            : 'Functional Test Report',
     ]
   }
+
+  afterAlways('functionalTest:aat') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results/odhin-report',
+      reportFiles           : 'index.html',
+      reportName            : 'Functional Test Report',
+    ]
+  }
 }
