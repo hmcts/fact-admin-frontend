@@ -1,10 +1,13 @@
 import path from 'node:path';
 
+import { Logger } from '@hmcts/nodejs-logging';
 import { ConfigUtils } from '@hmcts/playwright-common';
 import dotenv from 'dotenv';
 
 // This needs to be placed somewhere before attempting to access any environment variables
 dotenv.config({ quiet: true });
+
+const logger = Logger.getLogger('functional-tests');
 
 // TODO: While the admin frontend doesn't talk to the api using a specific set of user credentials,
 //       once SSO is in place we will need to perform user authentication as part of the functional
@@ -51,7 +54,7 @@ function getEnvVar(name: string, fallback = ''): string {
     if (fallback) {
       return fallback;
     }
-    console.warn(`Warning: ${name} environment variable is not set; using empty string.`);
+    logger.warn(`Warning: ${name} environment variable is not set; using empty string.`);
     return '';
   }
   return value;

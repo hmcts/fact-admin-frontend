@@ -5,7 +5,6 @@ import { dataApi } from './utils/axiosConfig';
 const logger = Logger.getLogger('app');
 
 export class DataApiRequests {
-
   /**
    * Request to data API to check health
    */

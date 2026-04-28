@@ -15,6 +15,7 @@ jest.mock('@hmcts/info-provider', () => {
 });
 
 describe('InfoController', () => {
+  // eslint-disable-next-line jest/expect-expect
   test('delegates to infoRequestHandler', async () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const infoProvider = require('@hmcts/info-provider');
