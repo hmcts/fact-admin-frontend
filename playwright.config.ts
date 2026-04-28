@@ -1,7 +1,29 @@
 import { CommonConfig, ProjectsConfig } from '@hmcts/playwright-common';
-import { defineConfig, type ReporterDescription } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import { cpus } from 'node:os';
-const { version: appVersion } = require('./package.json') as { version: string };
+const { version: appVersion, name: appName } = require('./package.json') as { version: string; name: string };
+import * as dotenv from 'dotenv';
+
+// Load .env file
+dotenv.config({ quiet: true });
+
+// Helper to safely serialize config (removes functions and unserializable values)
+function safeSerialize(obj: any, depth = 0) {
+  if (depth > 6) return '[MaxDepth]';
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(item => safeSerialize(item, depth + 1));
+  const result: Record<string, any> = {};
+  for (const key of Object.keys(obj)) {
+    const value = obj[key];
+    if (typeof value === 'function') continue;
+    try {
+      result[key] = safeSerialize(value, depth + 1);
+    } catch {
+      result[key] = '[Unserializable]';
+    }
+  }
+  return result;
+}
 
 const TRUTHY_FLAGS = new Set(['1', 'true', 'yes', 'on', 'all']);
 const FALSY_FLAGS = new Set(['0', 'false', 'no', 'off']);
@@ -60,7 +82,7 @@ const resolveWorkerCount = () => {
   return Math.min(8, Math.max(2, approxPhysical));
 };
 
-const resolveReporters = (): ReporterDescription[] => {
+const resolveReporters = (): Readonly<[string] | [string, any]>[] => {
   const configured = process.env.PLAYWRIGHT_REPORTERS?.split(',')
     .map(name => name.trim())
     .filter(Boolean);
@@ -69,7 +91,7 @@ const resolveReporters = (): ReporterDescription[] => {
   const normalizedNames = new Set(reporterNames.map(name => name.toLowerCase()));
   const shouldEmitHtmlLinks = normalizedNames.has('html');
   const shouldEmitOdhinLinks = normalizedNames.has('odhin') || normalizedNames.has('odhin-reports-playwright');
-  const reporters: ReporterDescription[] = [];
+  const reporters: Readonly<[string] | [string, any]>[] = [];
 
   for (const name of reporterNames) {
     const normalised = name.toLowerCase();
@@ -105,18 +127,19 @@ const resolveReporters = (): ReporterDescription[] => {
         reporters.push([
           'odhin-reports-playwright',
           {
-            outputFolder: process.env.PW_ODHIN_OUTPUT ?? 'test-results/odhin-report',
-            indexFilename: process.env.PW_ODHIN_INDEX ?? 'playwright-odhin.html',
-            title: process.env.PW_ODHIN_TITLE ?? 'fact-admin-frontend Playwright',
+            outputFolder: process.env.PW_ODHIN_OUTPUT ?? './test-results/odhin-report',
+            indexFilename: process.env.PW_ODHIN_INDEX ?? 'index.html',
+            title: process.env.PW_ODHIN_TITLE ?? `${appName} Playwright`,
             testEnvironment:
               process.env.PW_ODHIN_ENV ??
               `${process.env.TEST_ENVIRONMENT ?? (process.env.CI ? 'ci' : 'local')} | workers=${resolveWorkerCount()}`,
-            project: process.env.PW_ODHIN_PROJECT ?? 'fact-admin-frontend',
+            project: process.env.PW_ODHIN_PROJECT ?? appName,
             release: process.env.PW_ODHIN_RELEASE ?? `${appVersion} | branch=${process.env.GIT_BRANCH ?? 'local'}`,
-            testFolder: process.env.PW_ODHIN_TEST_FOLDER ?? 'src/test/functional',
+            testFolder: process.env.PW_ODHIN_TEST_FOLDER ?? './src/test/functional',
             startServer: safeBoolean(process.env.PW_ODHIN_START_SERVER, false),
-            consoleLog: safeBoolean(process.env.PW_ODHIN_CONSOLE_LOG, true),
+            consoleLog: safeBoolean(process.env.PW_ODHIN_CONSOLE_LOG, false),
             consoleError: safeBoolean(process.env.PW_ODHIN_CONSOLE_ERROR, true),
+            consoleTestOutput: safeBoolean(process.env.PW_ODHIN_TEST_CONSOLE_OUTPUT, false),
             testOutput: resolveOdhinTestOutput(),
           },
         ]);
@@ -135,8 +158,8 @@ const resolveReporters = (): ReporterDescription[] => {
         emitOdhin: shouldEmitOdhinLinks,
         htmlOutput: process.env.PLAYWRIGHT_HTML_OUTPUT ?? 'playwright-report',
         htmlIndex: 'index.html',
-        odhinOutput: process.env.PW_ODHIN_OUTPUT ?? 'test-results/odhin-report',
-        odhinIndex: process.env.PW_ODHIN_INDEX ?? 'playwright-odhin.html',
+        odhinOutput: process.env.PW_ODHIN_OUTPUT ?? './test-results/odhin-report',
+        odhinIndex: process.env.PW_ODHIN_INDEX ?? 'index.html',
       },
     ]);
   }
@@ -162,18 +185,18 @@ const resolveVideoMode = (): 'off' | 'on' | 'retain-on-failure' | 'on-first-retr
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+const config = defineConfig({
   testDir: './src/test/functional',
   snapshotDir: './src/test/functional/snapshots',
   ...CommonConfig.recommended,
   reporter: resolveReporters(),
+  workers: resolveWorkerCount(),
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: resolveVideoMode(),
     ignoreHTTPSErrors: true,
   },
-
   projects: [
     {
       name: 'setup',
@@ -197,3 +220,9 @@ export default defineConfig({
     },
   ],
 });
+
+if (safeBoolean(process.env.PW_DUMP_CONFIG, false)) {
+  console.log('[playwright.config.ts] Loaded configuration:', JSON.stringify(safeSerialize(config), null, 2));
+}
+
+export default config;

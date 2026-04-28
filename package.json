@@ -19,8 +19,7 @@
     "test:routes": "jest -c jest.routes.config.js",
     "test:smoke": "yarn playwright test --grep @smoke",
     "test:functional": "yarn playwright test --grep-invert='(@smoke)|(@a11y)|(@performance)'",
-    "test:a11y": "yarn playwright test --grep @a11y --project=chrome",
-    "test:performance": "yarn playwright test --grep @performance --project=chrome",
+    "test:a11y": "yarn playwright test --grep @a11y|@performance --project=chrome",
     "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
     "prepare": "husky install"
   },
@@ -89,7 +88,7 @@
     "lint-staged": "16.2.7",
     "mini-css-extract-plugin": "2.10.0",
     "nodemon": "3.1.11",
-    "odhin-reports-playwright": "^1.1.8",
+    "odhin-reports-playwright": "1.1.8",
     "pa11y": "9.1.0",
     "playwright": "^1.58.1",
     "playwright-core": "^1.58.1",
