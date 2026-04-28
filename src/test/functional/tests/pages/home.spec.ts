@@ -1,18 +1,23 @@
 import { expect, test } from '../../fixtures';
+import { PageSection } from '../../page-objects/pages';
 
-test.describe('HomePage Tests', () => {
+test.describe('Home Page Tests', () => {
+
   test(
     'smoke test',
     {
       tag: '@smoke',
     },
     async ({ homePage }) => {
-      await homePage.heading.checkIsVisible();
-      await expect(homePage.heading.heading).toContainText('Default Page Template');
+      await expect(homePage.heading).toContainText('Default Page Template');
     }
   );
 
   test('visibility test', async ({ homePage }) => {
     await homePage.expectVisibleElements();
+    await expect(homePage.heading).toContainText('Default Page Template');
+    // FIXME: This is currently not implemented, so we're expecting a not found
+    await homePage.gotoSection(PageSection.COURTS);
+    await expect(homePage.heading).toContainText('Page Not Found');
   });
 });

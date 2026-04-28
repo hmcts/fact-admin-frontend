@@ -41,7 +41,7 @@ export const config: Config = {
     },
   },
   urls: {
-    homePageUrl: getEnvVar('ADMIN_URL', 'https://fact-admin-frontend.aat.platform.hmcts.net'),
+    homePageUrl: getEnvVar('ADMIN_URL', getEnvVar('TEST_URL', 'https://fact-admin-frontend.aat.platform.hmcts.net')),
   },
 };
 
