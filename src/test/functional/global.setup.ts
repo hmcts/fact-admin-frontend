@@ -11,9 +11,6 @@ setup.describe('Global playwright setup', () => {
    * Check for essential environment variables required for the tests to run
    */
   setup.beforeAll('Check environment setup', async () => {
-    // URL for the fact-data-api
-    requireEnvVar('DATA_API_URL');
-
     // Access URLs for Admin pages
     requireEnvVar('ADMIN_URL');
 

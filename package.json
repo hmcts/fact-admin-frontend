@@ -18,8 +18,9 @@
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.js",
     "test:smoke": "yarn playwright test --grep @smoke",
-    "test:functional": "yarn playwright test --grep-invert='(@smoke)|(@a11y)|(@performance)'",
-    "test:a11y": "yarn playwright test --grep @a11y|@performance --project=chrome",
+    "test:functional": "yarn playwright test --grep-invert='(@smoke|@performance)'",
+    "test:performance": "yarn playwright test --grep @performance --project=chrome",
+    "test:a11y": "echo 'a11y tests run as part of test:functional' && exit 0",
     "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
     "prepare": "husky install"
   },

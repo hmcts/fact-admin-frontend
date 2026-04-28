@@ -1,5 +1,5 @@
 import { CommonConfig, ProjectsConfig } from '@hmcts/playwright-common';
-import { defineConfig } from '@playwright/test';
+import { defineConfig, ReporterDescription } from '@playwright/test';
 import { cpus } from 'node:os';
 const { version: appVersion, name: appName } = require('./package.json') as { version: string; name: string };
 import * as dotenv from 'dotenv';
@@ -82,7 +82,7 @@ const resolveWorkerCount = () => {
   return Math.min(8, Math.max(2, approxPhysical));
 };
 
-const resolveReporters = (): Readonly<[string] | [string, any]>[] => {
+const resolveReporters = (): ReporterDescription[] => {
   const configured = process.env.PLAYWRIGHT_REPORTERS?.split(',')
     .map(name => name.trim())
     .filter(Boolean);
@@ -91,7 +91,7 @@ const resolveReporters = (): Readonly<[string] | [string, any]>[] => {
   const normalizedNames = new Set(reporterNames.map(name => name.toLowerCase()));
   const shouldEmitHtmlLinks = normalizedNames.has('html');
   const shouldEmitOdhinLinks = normalizedNames.has('odhin') || normalizedNames.has('odhin-reports-playwright');
-  const reporters: Readonly<[string] | [string, any]>[] = [];
+  const reporters: ReporterDescription[] = [];
 
   for (const name of reporterNames) {
     const normalised = name.toLowerCase();
