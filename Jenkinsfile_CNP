@@ -19,4 +19,15 @@ withPipeline(type, product, component) {
     yarnBuilder.yarn('rebuild puppeteer')
     yarnBuilder.yarn('build')
   }
+
+  afterAlways('functionalTest') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results/odhin-report',
+      reportFiles           : 'index.html',
+      reportName            : 'Functional Test Report',
+    ]
+  }
 }
