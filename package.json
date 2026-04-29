@@ -87,7 +87,7 @@
     "jest-html-reporter": "4.3.0",
     "lighthouse": "^13.1.0",
     "lint-staged": "16.2.7",
-    "mini-css-extract-plugin": "2.10.0",
+    "mini-css-extract-plugin": "2.10.2",
     "nodemon": "3.1.11",
     "odhin-reports-playwright": "1.1.8",
     "pa11y": "9.1.0",
