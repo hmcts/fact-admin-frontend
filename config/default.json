@@ -13,7 +13,13 @@
   },
   "secrets": {
     "fact-kv": {
-      "APP_INSIGHTS_CONNECTION_STRING": ""
+      "APP_INSIGHTS_CONNECTION_STRING": "",
+      "FRONTEND_APP_REG_ID": "",
+      "FRONTEND_APP_REG_SECRET": "",
+      "API_APP_REG_ID": ""
     }
+  },
+  "auth": {
+    "azure-identity-token-path": "/var/run/secrets/azure/tokens/azure-identity-token"
   }
 }

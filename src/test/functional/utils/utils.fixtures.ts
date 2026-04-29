@@ -118,7 +118,7 @@ function emitApiLogsToStdout(recorder: ApiRecorder, testInfo: TestInfo, includeR
   }
 
   logLines.push('[API CALLS][END]');
-  console.log(logLines.filter(Boolean).join('\n'));
+  process.stdout.write(`${logLines.filter(Boolean).join('\n')}\n`);
 }
 
 export interface UtilsFixtures {

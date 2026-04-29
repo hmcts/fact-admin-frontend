@@ -5,6 +5,7 @@ import HomeController from '../../../main/controllers/HomeController';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('HomeController', () => {
+  // eslint-disable-next-line jest/expect-expect
   test('renders the home view', () => {
     const controller = new HomeController();
     const response = {
