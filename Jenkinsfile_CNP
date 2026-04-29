@@ -23,7 +23,6 @@ withPipeline(type, product, component) {
 
   env.PLAYWRIGHT_REPORTERS = 'list,odhin'
   env.PLAYWRIGHT_VIDEO_MODE = 'retain-on-failure'
-  env.PW_DUMP_CONFIG = 'true'
 
   afterAlways('functionalTest:preview') {
     publishHTML target: [
