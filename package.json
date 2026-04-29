@@ -61,7 +61,7 @@
     "@types/express": "5.0.6",
     "@types/govuk-frontend": "^5.11.0",
     "@types/jest": "^30.0.0",
-    "@types/lodash": "4.17.23",
+    "@types/lodash": "4.17.24",
     "@types/node": "^22.19.7",
     "@types/nunjucks": "3.2.6",
     "@types/pa11y": "^5.3.7",
