@@ -5,12 +5,14 @@ import type { SinonStub } from 'sinon';
 import InfoController from '../../../main/controllers/InfoController';
 
 jest.mock('@hmcts/info-provider', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const sinonLib = require('sinon');
   return { infoRequestHandler: sinonLib.stub() };
 });
 
 describe('InfoController', () => {
   test('delegates to infoRequestHandler', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const infoProvider = require('@hmcts/info-provider');
     const infoRequestHandlerStub = infoProvider.infoRequestHandler as SinonStub;
     const handler = stub();

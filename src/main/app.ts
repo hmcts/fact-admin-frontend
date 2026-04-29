@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { loadControllers, scopePerRequest } from 'awilix-express';
 import * as bodyParser from 'body-parser';
-import config = require('config');
+import config from 'config';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import RateLimit from 'express-rate-limit';
@@ -15,6 +15,7 @@ import { Helmet } from './modules/helmet';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { Logger } = require('@hmcts/nodejs-logging');
 
 const env = process.env.NODE_ENV || 'development';

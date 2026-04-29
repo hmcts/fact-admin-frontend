@@ -7,6 +7,7 @@
  * Jest rules are scoped to tests under src/test, and a single require() is
  * allowed to lazy-load the webpack config in development.
  */
+
 const { FlatCompat } = require('@eslint/eslintrc');
 const js = require('@eslint/js');
 const globals = require('globals');
@@ -28,7 +29,11 @@ const globalIgnores = [
   'src/main/types/**',
   'src/test/config.ts',
   'jest.*config.js',
-  '.eslintrc.js',
+  // playwright additions
+  'playwright.config.ts',
+  'playwright-report/**',
+  'test-results/**',
+  'functional-output/**',
 ];
 const tsFiles = ['**/*.ts'];
 const testFiles = ['src/test/**/*.{js,ts}'];
@@ -147,6 +152,8 @@ module.exports = [
           ignoreMemberSort: false,
         },
       ],
+      // playwright additions
+      '@typescript-eslint/no-floating-promises': 'error',
     },
   },
   {
