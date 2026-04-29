@@ -11,9 +11,6 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 withPipeline(type, product, component) {
 
   env.DATA_API_URL = 'https://fact-data-api.aat.platform.hmcts.net/'
-  env.PLAYWRIGHT_REPORTERS = 'list,odhin'
-  env.PLAYWRIGHT_VIDEO_MODE = 'retain-on-failure'
-  env.PW_DUMP_CONFIG = 'true'
 
   // TODO: Once SSO is in, we will need to inject the SSO test setup via keyvault secrets
 
@@ -22,13 +19,19 @@ withPipeline(type, product, component) {
     yarnBuilder.yarn('build')
   }
 
+  // Report publishing
+
+  env.PLAYWRIGHT_REPORTERS = 'list,odhin'
+  env.PLAYWRIGHT_VIDEO_MODE = 'retain-on-failure'
+  env.PW_DUMP_CONFIG = 'true'
+
   afterAlways('functionalTest:preview') {
     publishHTML target: [
       allowMissing          : true,
       alwaysLinkToLastBuild : true,
       keepAll               : true,
-      reportDir             : 'test-results/odhin-report',
-      reportFiles           : 'index.html',
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html,lighthouse-report-*.html',
       reportName            : 'Functional Test Report',
     ]
   }
@@ -38,8 +41,8 @@ withPipeline(type, product, component) {
       allowMissing          : true,
       alwaysLinkToLastBuild : true,
       keepAll               : true,
-      reportDir             : 'test-results/odhin-report',
-      reportFiles           : 'index.html',
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html,lighthouse-report-*.html',
       reportName            : 'Functional Test Report',
     ]
   }
