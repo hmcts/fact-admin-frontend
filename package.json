@@ -50,7 +50,7 @@
     "@babel/preset-env": "^7.28.6",
     "@codeceptjs/allure-legacy": "^1.0.2",
     "@codeceptjs/configure": "1.0.6",
-    "@eslint/eslintrc": "3.3.3",
+    "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.39.2",
     "@hmcts/playwright-common": "^1.1.0",
     "@playwright/test": "^1.59.1",
