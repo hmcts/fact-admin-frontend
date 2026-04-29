@@ -11,7 +11,29 @@
   }) }}
   {{ govukServiceNavigation({
     serviceName: "Find a Court or Tribunal Admin",
-    serviceUrl: "/"
+    serviceUrl: "/",
+    navigation: [
+      {
+        href: "/",
+        text: "Courts"
+      },
+      {
+        href: "/download",
+        text: "Download csv"
+      },
+      {
+        href: "/add-court",
+        text: "Add new court"
+      },
+      {
+        href: "/audits",
+        text: "Audit"
+      },
+      {
+        href: "/users",
+        text: "Users"
+      }
+    ]
   }) }}
 {% endblock %}
 
