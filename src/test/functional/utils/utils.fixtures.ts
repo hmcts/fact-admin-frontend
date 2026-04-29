@@ -34,7 +34,6 @@ import {
   truncateApiLogPayload,
 } from './api-telemetry';
 import { Config, config } from './config.utils';
-import { CookieUtils } from './cookie.utils';
 import { type SeedManifest, loadSeedManifest } from './seed-manifest';
 import { ValidatorUtils } from './validator.utils';
 import { type XsrfHeaderBuilder, buildXsrfHeaders } from './xsrf.utils';
@@ -124,7 +123,6 @@ function emitApiLogsToStdout(recorder: ApiRecorder, testInfo: TestInfo, includeR
 
 export interface UtilsFixtures {
   config: Config;
-  cookieUtils: CookieUtils;
   validatorUtils: ValidatorUtils;
   waitUtils: WaitUtils;
   tableUtils: TableUtils;
@@ -233,10 +231,6 @@ export const utilsFixtures = {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
   config: async ({}, use): Promise<void> => {
     await use(config);
-  },
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
-  cookieUtils: async ({}, use): Promise<void> => {
-    await use(new CookieUtils());
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, no-empty-pattern
   waitUtils: async ({}, use): Promise<void> => {

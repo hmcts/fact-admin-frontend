@@ -16,7 +16,33 @@ withPipeline(type, product, component) {
 
   afterSuccess('build') {
     yarnBuilder.yarn('playwright install')
-    yarnBuilder.yarn('rebuild puppeteer')
     yarnBuilder.yarn('build')
+  }
+
+  // Report publishing
+
+  env.PLAYWRIGHT_REPORTERS = 'list,odhin'
+  env.PLAYWRIGHT_VIDEO_MODE = 'retain-on-failure'
+
+  afterAlways('functionalTest:preview') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html,lighthouse-report-*.html',
+      reportName            : 'Functional Test Report',
+    ]
+  }
+
+  afterAlways('functionalTest:aat') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html,lighthouse-report-*.html',
+      reportName            : 'Functional Test Report',
+    ]
   }
 }

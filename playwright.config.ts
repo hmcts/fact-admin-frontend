@@ -209,14 +209,17 @@ const config = defineConfig({
     {
       ...ProjectsConfig.edge,
       dependencies: ['setup'],
+      grepInvert: /@performance/,
     },
     {
       ...ProjectsConfig.firefox,
       dependencies: ['setup'],
+      grepInvert: /@performance/,
     },
     {
       ...ProjectsConfig.webkit,
       dependencies: ['setup'],
+      grepInvert: /@performance/,
     },
   ],
 });
