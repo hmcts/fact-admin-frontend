@@ -172,6 +172,12 @@ module.exports = [
     },
   },
   {
+    files: ['src/test/unit/controllers/**/*.test.ts', 'src/test/routes/**/*.ts'],
+    rules: {
+      'jest/expect-expect': 'off',
+    },
+  },
+  {
     files: jsFiles,
     languageOptions: {
       ecmaVersion: 2026,

@@ -4,4 +4,6 @@ export type GetCourtsParams = {
   pageSize?: number;
   partialCourtName?: string;
   regionId?: string;
+  sortBy?: 'lastUpdated' | 'name';
+  sortOrder?: 'asc' | 'desc';
 };

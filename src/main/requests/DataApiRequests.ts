@@ -2,6 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
+import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 
@@ -49,6 +50,21 @@ export class DataApiRequests {
       return pagedCourtsSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching courts:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get court details by id
+   */
+  public async getCourtById(courtId: string): Promise<CourtEntity | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/entity/v1`);
+      return courtEntitySchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court details for id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

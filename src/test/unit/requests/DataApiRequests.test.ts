@@ -1,5 +1,5 @@
-import sinon, { restore, stub } from 'sinon';
 import { HttpStatusCode } from 'axios';
+import sinon, { restore, stub } from 'sinon';
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
@@ -96,6 +96,8 @@ describe('DataApiRequests', () => {
       pageSize: 25,
       partialCourtName: 'London',
       regionId: '33333333-3333-4333-8333-333333333333',
+      sortBy: 'name' as const,
+      sortOrder: 'desc' as const,
     };
     const courts = {
       content: [
@@ -158,6 +160,53 @@ describe('DataApiRequests', () => {
     });
 
     const response = await dataApiRequests.getCourts();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court details when the court by id response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const court = {
+      createdAt: '2026-04-29T09:00:00Z',
+      id: courtId,
+      isServiceCentre: false,
+      lastUpdatedAt: '2026-04-29T10:00:00Z',
+      mrdId: 'MRD-123',
+      name: 'London Civil and Family Court',
+      open: true,
+      openOnCath: true,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      slug: 'london-civil-and-family-court',
+      warningNotice: null,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/entity/v1`).resolves({ data: court });
+
+    const response = await dataApiRequests.getCourtById(courtId);
+
+    expect(response).toEqual(court);
+  });
+
+  it('returns not found when the court by id endpoint returns a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/entity/v1`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtById(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when the court by id response fails schema validation', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/entity/v1`).resolves({
+      data: {
+        name: 'Incomplete Court',
+      },
+    });
+
+    const response = await dataApiRequests.getCourtById(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });

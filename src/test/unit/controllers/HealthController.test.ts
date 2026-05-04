@@ -59,7 +59,6 @@ describe('HealthController', () => {
     downMock.resetHistory();
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('delegates /health to healthcheck routes', () => {
     const controller = new HealthController();
     const request = {} as never;
@@ -74,7 +73,6 @@ describe('HealthController', () => {
     assert.calledWith(configureHandler, request, response);
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('returns liveness status', () => {
     const controller = new HealthController();
     const response = {
@@ -89,7 +87,6 @@ describe('HealthController', () => {
     responseMock.verify();
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('delegates /health/readiness to readiness checks', () => {
     const controller = new HealthController();
     const request = {} as never;

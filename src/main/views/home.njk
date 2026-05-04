@@ -1,5 +1,145 @@
 {% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-xl">Default Page Template</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">Courts and tribunals</h1>
+
+      {% if errorSummary.length %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      {% if errorMessage %}
+        <p class="govuk-error-message">{{ errorMessage }}</p>
+      {% endif %}
+
+      <form method="get" action="/" class="govuk-!-margin-bottom-6">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">
+            {{ govukInput({
+              id: "partialCourtName",
+              name: "partialCourtName",
+              label: {
+                text: "Search courts and tribunals"
+              },
+              errorMessage: {
+                text: partialCourtNameError
+              } if partialCourtNameError else undefined,
+              type: "search",
+              value: filters.partialCourtName
+            }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {{ govukSelect({
+              id: "regionId",
+              name: "regionId",
+              label: {
+                text: "Region"
+              },
+              items: regionOptions
+            }) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter govuk-!-padding-top-6">
+            {{ govukCheckboxes({
+              idPrefix: "includeClosed",
+              name: "includeClosed",
+              items: [
+                {
+                  checked: filters.includeClosed,
+                  text: "Include closed",
+                  value: "true"
+                }
+              ]
+            }) }}
+          </div>
+        </div>
+        <input type="hidden" name="pageSize" value="{{ filters.pageSize }}">
+        {% if filters.sortBy %}
+          <input type="hidden" name="sortBy" value="{{ filters.sortBy }}">
+          <input type="hidden" name="sortOrder" value="{{ filters.sortOrder }}">
+        {% endif %}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Apply filters"
+          }) }}
+          {{ govukButton({
+            classes: "govuk-button--secondary",
+            href: "/",
+            text: "Clear filters"
+          }) }}
+        </div>
+      </form>
+
+      {% set courtsTableHtml %}
+        <p class="govuk-body">{{ resultsMessage }}</p>
+        {% if courtTableRows.length %}
+          {% if includeStatusColumn %}
+            {{ govukTable({
+              classes: "homepage-courts-table",
+              firstCellIsHeader: false,
+              head: courtTableHead,
+              rows: courtTableRows
+            }) }}
+          {% else %}
+            {{ govukTable({
+              classes: "homepage-courts-table",
+              firstCellIsHeader: false,
+              head: courtTableHead,
+              rows: courtTableRows
+            }) }}
+          {% endif %}
+        {% else %}
+          <p class="govuk-body">No courts match the current filters.</p>
+        {% endif %}
+
+        {% if pagination.totalPages > 1 %}
+          {{ govukPagination({
+            classes: "homepage-pagination",
+            items: pagination.items,
+            next: pagination.next,
+            previous: pagination.previous
+          }) }}
+        {% endif %}
+      {% endset %}
+
+      {% set favouritesTabHtml %}
+        <p class="govuk-body">Coming soon.</p>
+      {% endset %}
+
+      {{ govukTabs({
+        items: [
+          {
+            id: "courts",
+            label: "Courts",
+            current: true,
+            panel: {
+              html: courtsTableHtml
+            }
+          },
+          {
+            id: "favourites",
+            label: "Favourites",
+            panel: {
+              html: favouritesTabHtml
+            }
+          }
+        ]
+      }) }}
+    </div>
+  </div>
 {% endblock %}

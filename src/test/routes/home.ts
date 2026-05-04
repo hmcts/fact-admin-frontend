@@ -1,16 +1,63 @@
-import { expect } from 'chai';
+import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
+import { HomePageService } from '../../main/services/HomePageService';
 
-// TODO: replace this sample test with proper route tests for your application
-/* eslint-disable jest/expect-expect */
 describe('Home page', () => {
-  describe('on GET', () => {
-    test('should return sample home page', async () => {
-      await request(app)
-        .get('/')
-        .expect(res => expect(res.status).to.equal(200));
+  beforeEach(() => {
+    restore();
+  });
+
+  test('renders the homepage', async () => {
+    stub(HomePageService.prototype, 'getFilters').returns({
+      includeClosed: false,
+      pageNumber: 0,
+      pageSize: 25,
+      partialCourtName: '',
+      regionId: '',
+      sortBy: '',
+      sortOrder: 'asc',
+      rawIncludeClosed: undefined,
+      rawPageNumber: undefined,
+      rawPageSize: undefined,
+      rawSortBy: undefined,
+      rawSortOrder: undefined,
     });
+    stub(HomePageService.prototype, 'getHomePageViewModel').resolves({
+      courtTableHead: [],
+      courtTableRows: [],
+      errorSummary: [],
+      filters: {
+        includeClosed: false,
+        pageNumber: 0,
+        pageSize: 25,
+        partialCourtName: '',
+        regionId: '',
+        sortBy: '',
+        sortOrder: 'asc',
+        rawIncludeClosed: undefined,
+        rawPageNumber: undefined,
+        rawPageSize: undefined,
+        rawSortBy: undefined,
+        rawSortOrder: undefined,
+      },
+      includeStatusColumn: false,
+      pageTitle: 'Courts and tribunals',
+      pagination: {
+        currentPage: 0,
+        items: [],
+        totalPages: 0,
+      },
+      partialCourtNameError: undefined,
+      regionOptions: [{ selected: true, text: 'All regions', value: '' }],
+      resultsMessage: 'No courts found.',
+    });
+
+    const response = await request(app).get('/');
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('Courts and tribunals');
+    expect(response.text).toContain('Apply filters');
   });
 });

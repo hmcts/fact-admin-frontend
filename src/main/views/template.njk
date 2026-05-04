@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block header %}
+  {% set isCourtsPage = pagePath == "/" %}
+  {% set isDownloadPage = pagePath.startsWith("/download") %}
+  {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
+  {% set isAuditPage = pagePath.startsWith("/audits") %}
+  {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
     homepageUrl: "/"
   }) }}
@@ -15,23 +20,28 @@
     navigation: [
       {
         href: "/",
-        text: "Courts"
+        text: "Courts",
+        current: isCourtsPage
       },
       {
         href: "/download",
-        text: "Download csv"
+        text: "Download csv",
+        current: isDownloadPage
       },
       {
         href: "/add-court",
-        text: "Add new court"
+        text: "Add new court",
+        current: isAddCourtPage
       },
       {
         href: "/audits",
-        text: "Audit"
+        text: "Audit",
+        current: isAuditPage
       },
       {
         href: "/users",
-        text: "Users"
+        text: "Users",
+        current: isUsersPage
       }
     ]
   }) }}
