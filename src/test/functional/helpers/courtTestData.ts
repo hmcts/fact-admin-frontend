@@ -7,6 +7,9 @@ type PlaywrightLike = {
     newContext: (options: { baseURL: string; extraHTTPHeaders: { Accept: string } }) => Promise<APIRequestContext>;
   };
 };
+type ApiRequestLike = {
+  newContext: (options: { baseURL: string; extraHTTPHeaders: { Accept: string } }) => Promise<APIRequestContext>;
+};
 
 type CourtResponse = {
   id: string;
@@ -38,8 +41,12 @@ export type TestCourtParams = {
   withTranslations?: boolean;
 };
 
-export async function createTestingSupportApiContext(playwright: PlaywrightLike): Promise<APIRequestContext> {
-  return playwright.request.newContext({
+export async function createTestingSupportApiContext(
+  playwrightOrRequest: PlaywrightLike | ApiRequestLike
+): Promise<APIRequestContext> {
+  const requestContextFactory = 'request' in playwrightOrRequest ? playwrightOrRequest.request : playwrightOrRequest;
+
+  return requestContextFactory.newContext({
     baseURL: config.urls.dataApiUrl,
     extraHTTPHeaders: {
       Accept: 'application/json',

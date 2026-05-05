@@ -188,6 +188,7 @@ const resolveVideoMode = (): 'off' | 'on' | 'retain-on-failure' | 'on-first-retr
 const config = defineConfig({
   testDir: './src/test/functional',
   snapshotDir: './src/test/functional/snapshots',
+  globalTeardown: './src/test/functional/global.teardown.ts',
   ...CommonConfig.recommended,
   reporter: resolveReporters(),
   workers: resolveWorkerCount(),

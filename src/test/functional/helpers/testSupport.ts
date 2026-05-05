@@ -9,6 +9,7 @@ import {
 } from './courtTestData';
 
 type PlaywrightLike = Parameters<typeof createTestingSupportApiContext>[0];
+export const TEST_COURT_PREFIX = 'FaCTAdminTest';
 
 export type TestCourtSupportContext = {
   apiContext: APIRequestContext;
@@ -31,7 +32,7 @@ export async function withTestCourtPrefix(
   run: (context: TestCourtSupportContext) => Promise<void>
 ): Promise<void> {
   const apiContext = await createTestingSupportApiContext(playwright);
-  const courtNamePrefix = `${prefixLabel} ${generateRandomSuffix()}`;
+  const courtNamePrefix = `${TEST_COURT_PREFIX} ${prefixLabel} ${generateRandomSuffix()}`;
 
   try {
     await deleteTestCourtsByNamePrefix(apiContext, courtNamePrefix);
