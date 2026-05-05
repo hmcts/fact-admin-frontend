@@ -51,7 +51,7 @@
     "@axe-core/playwright": "^4.11.2",
     "@babel/core": "7.29.0",
     "@babel/plugin-proposal-decorators": "7.29.0",
-    "@babel/preset-env": "7.29.2",
+    "@babel/preset-env": "7.29.3",
     "@babel/preset-typescript": "7.28.5",
     "@codeceptjs/allure-legacy": "^1.0.2",
     "@codeceptjs/configure": "1.0.6",
@@ -72,8 +72,8 @@
     "@types/nunjucks": "3.2.6",
     "@types/pa11y": "^5.3.7",
     "@types/supertest": "^6.0.3",
-    "@typescript-eslint/eslint-plugin": "8.59.1",
-    "@typescript-eslint/parser": "8.59.1",
+    "@typescript-eslint/eslint-plugin": "8.59.2",
+    "@typescript-eslint/parser": "8.59.2",
     "babel-jest": "30.3.0",
     "chai": "6.2.2",
     "codeceptjs": "^3.7.9",
@@ -114,7 +114,7 @@
   },
   "resolutions": {
     "uuid": "14.0.0",
-    "protobufjs": "7.5.5"
+    "protobufjs": "7.5.6"
   },
   "husky": {
     "hooks": {
