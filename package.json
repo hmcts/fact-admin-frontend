@@ -34,7 +34,7 @@
     "async-mutex": "0.5.0",
     "awilix": "12.1.1",
     "awilix-express": "11.0.1",
-    "axios": "1.15.2",
+    "axios": "1.16.0",
     "config": "4.4.1",
     "cookie-parser": "1.4.7",
     "express": "5.2.1",
