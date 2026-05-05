@@ -60,17 +60,18 @@ export async function createTestCourt(
     withTranslations = true,
   }: TestCourtParams
 ): Promise<CreatedCourt> {
+  const params = {
+    addWarningNotice,
+    courtName,
+    open,
+    serviceCenter,
+    withEnquiriesContact,
+    withServiceAreaAssociation,
+    withTranslations,
+    ...(regionId ? { regionId } : {}),
+  };
   const response = await apiContext.get('/testing-support/courts', {
-    params: {
-      addWarningNotice,
-      courtName,
-      open,
-      regionId,
-      serviceCenter,
-      withEnquiriesContact,
-      withServiceAreaAssociation,
-      withTranslations,
-    },
+    params,
   });
   const responseText = await response.text();
 
