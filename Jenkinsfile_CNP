@@ -10,7 +10,7 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 withPipeline(type, product, component) {
 
-  env.DATA_API_URL = 'https://fact-data-api.aat.platform.hmcts.net/'
+  env.DATA_API_URL = 'https://fact-data-api.aat.platform.hmcts.net'
 
   // TODO: Once SSO is in, we will need to inject the SSO test setup via keyvault secrets
 
