@@ -20,6 +20,7 @@ export interface UserDetails {
 }
 
 interface Urls {
+  dataApiUrl: string;
   homePageUrl: string;
 }
 
@@ -44,7 +45,8 @@ export const config: Config = {
     },
   },
   urls: {
-    homePageUrl: getEnvVar('ADMIN_URL', getEnvVar('TEST_URL', 'https://fact-admin-frontend.aat.platform.hmcts.net')),
+    dataApiUrl: getEnvVar('DATA_API_URL', 'http://localhost:8989'),
+    homePageUrl: getEnvVar('ADMIN_URL', getEnvVar('TEST_URL', 'https://localhost:3355')),
   },
 };
 
