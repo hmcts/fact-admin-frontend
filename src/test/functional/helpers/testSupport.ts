@@ -9,7 +9,8 @@ import {
 } from './courtTestData';
 
 type PlaywrightLike = Parameters<typeof createTestingSupportApiContext>[0];
-export const TEST_COURT_PREFIX = 'FaCTAdminTest';
+const TEST_COURT_RUN_SUFFIX = process.env.PLAYWRIGHT_TEST_COURT_RUN_SUFFIX ?? generateRandomSuffix(4);
+export const TEST_COURT_PREFIX = `FaCTAdminTest${TEST_COURT_RUN_SUFFIX}`;
 
 export type TestCourtSupportContext = {
   apiContext: APIRequestContext;
