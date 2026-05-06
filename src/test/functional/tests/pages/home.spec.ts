@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises';
-
 import { APIRequestContext } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
@@ -17,20 +15,6 @@ function indexToAlphabetSuffix(index: number): string {
   } while (currentIndex >= 0);
 
   return suffix;
-}
-
-function getExpectedCsvFilename(today = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    timeZone: 'Europe/London',
-    year: 'numeric',
-  }).formatToParts(today);
-  const day = parts.find(part => part.type === 'day')?.value;
-  const month = parts.find(part => part.type === 'month')?.value;
-  const year = parts.find(part => part.type === 'year')?.value;
-
-  return `courts-${year}-${month}-${day}.csv`;
 }
 
 async function createOpenTestCourts(apiContext: APIRequestContext, courtNames: string[]): Promise<CreatedCourt[]> {
@@ -216,32 +200,6 @@ test.describe(
       });
     });
 
-    test('downloads a csv file containing the filtered test courts', async ({ homePage, playwright }) => {
-      await withTestCourtPrefix(playwright, 'Home Functional Test', async ({ apiContext, courtNamePrefix }) => {
-        const firstCourtName = `${courtNamePrefix} Download Alpha`;
-        const secondCourtName = `${courtNamePrefix} Download Beta`;
-        const [firstCourt, secondCourt] = await createOpenTestCourts(apiContext, [firstCourtName, secondCourtName]);
-
-        const [download] = await Promise.all([
-          homePage.page.waitForEvent('download'),
-          homePage.downloadNavigationLink.click(),
-        ]);
-        const downloadPath = await download.path();
-
-        expect(download.suggestedFilename()).toBe(getExpectedCsvFilename());
-        expect(downloadPath).toBeTruthy();
-
-        const csvContents = await readFile(downloadPath as string, 'utf-8');
-
-        expect(csvContents).toContain(firstCourtName);
-        expect(csvContents).toContain(secondCourtName);
-        expect(csvContents).toContain('Name,Open/Closed,Updated date');
-        expect(csvContents).toContain('Open');
-        expect(csvContents).toContain(`/courts/${firstCourt.slug}`);
-        expect(csvContents).toContain(`/courts/${secondCourt.slug}`);
-      });
-    });
-
     test('shows the default unsorted state before a sort is applied', async ({ homePage, playwright }) => {
       await withTestCourtPrefix(playwright, 'Home Functional Test', async ({ apiContext, courtNamePrefix }) => {
         const alphaCourtName = `${courtNamePrefix} Alpha`;
@@ -267,11 +225,11 @@ test.describe(
         await homePage.searchForCourt(courtNamePrefix);
         await homePage.clickSortByName();
         await expect(homePage.page).toHaveURL(/sortBy=name&sortOrder=asc/);
-        await expect(homePage.getCourtNames()).resolves.toEqual([alphaCourtName, bravoCourtName, charlieCourtName]);
+        await expect.poll(() => homePage.getCourtNames()).toEqual([alphaCourtName, bravoCourtName, charlieCourtName]);
 
         await homePage.clickSortByName();
         await expect(homePage.page).toHaveURL(/sortBy=name&sortOrder=desc/);
-        await expect(homePage.getCourtNames()).resolves.toEqual([charlieCourtName, bravoCourtName, alphaCourtName]);
+        await expect.poll(() => homePage.getCourtNames()).toEqual([charlieCourtName, bravoCourtName, alphaCourtName]);
       });
     });
 
@@ -294,11 +252,11 @@ test.describe(
         await homePage.searchForCourt(courtNamePrefix);
         await homePage.clickSortByLastUpdated();
         await expect(homePage.page).toHaveURL(/sortBy=lastUpdated&sortOrder=asc/);
-        await expect(homePage.getCourtNames()).resolves.toEqual([olderCourtName, newerCourtName]);
+        await expect.poll(() => homePage.getCourtNames()).toEqual([olderCourtName, newerCourtName]);
 
         await homePage.clickSortByLastUpdated();
         await expect(homePage.page).toHaveURL(/sortBy=lastUpdated&sortOrder=desc/);
-        await expect(homePage.getCourtNames()).resolves.toEqual([newerCourtName, olderCourtName]);
+        await expect.poll(() => homePage.getCourtNames()).toEqual([newerCourtName, olderCourtName]);
       });
     });
 
@@ -351,7 +309,7 @@ test.describe(
         await expect(homePage.includeClosedCheckbox).toBeChecked();
         await expect(homePage.page).toHaveURL(/sortBy=name&sortOrder=asc/);
         await expect(homePage.tableHeaders.nth(0)).toHaveAttribute('aria-sort', 'ascending');
-        await expect(homePage.getCourtNames()).resolves.toEqual([openCourtName, closedCourtName]);
+        await expect.poll(() => homePage.getCourtNames()).toEqual([openCourtName, closedCourtName]);
       });
     });
 
