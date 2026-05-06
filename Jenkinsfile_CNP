@@ -15,6 +15,7 @@ withPipeline(type, product, component) {
   // TODO: Once SSO is in, we will need to inject the SSO test setup via keyvault secrets
 
   afterSuccess('build') {
+    yarnBuilder.yarn('playwright install')
     yarnBuilder.yarn('playwright install ffmpeg')
     yarnBuilder.yarn('build')
   }
