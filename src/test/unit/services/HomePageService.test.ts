@@ -35,6 +35,33 @@ describe('HomePageService', () => {
     });
   });
 
+  test('caps pageNumber and pageSize at 1000 when query values exceed the backend integer limit', () => {
+    const service = new HomePageService({
+      getCourts: jest.fn(),
+      getRegions: jest.fn(),
+    } as never);
+
+    const filters = service.getFilters({
+      pageNumber: '999999999999999999999',
+      pageSize: '999999999999999999999',
+    });
+
+    expect(filters).toEqual({
+      includeClosed: false,
+      pageNumber: 1000,
+      pageSize: 1000,
+      partialCourtName: '',
+      regionId: '',
+      sortBy: '',
+      sortOrder: 'asc',
+      rawIncludeClosed: undefined,
+      rawPageNumber: '999999999999999999999',
+      rawPageSize: '999999999999999999999',
+      rawSortBy: undefined,
+      rawSortOrder: undefined,
+    });
+  });
+
   test('defaults sortOrder to ascending when sortBy is provided without sortOrder', () => {
     const service = new HomePageService({
       getCourts: jest.fn(),
@@ -328,6 +355,37 @@ describe('HomePageService', () => {
     ]);
   });
 
+  test('returns a GOV.UK error summary for pageSize values above 1000 and skips the courts call', async () => {
+    const getCourts = jest.fn();
+    const service = new HomePageService({
+      getCourts,
+      getRegions: jest.fn().mockResolvedValue([]),
+    } as never);
+
+    const viewModel = await service.getHomePageViewModel({
+      includeClosed: false,
+      pageNumber: 0,
+      pageSize: 1000,
+      partialCourtName: '',
+      regionId: '',
+      sortBy: '',
+      sortOrder: 'asc',
+      rawIncludeClosed: undefined,
+      rawPageNumber: undefined,
+      rawPageSize: '1001',
+      rawSortBy: undefined,
+      rawSortOrder: undefined,
+    });
+
+    expect(getCourts).not.toHaveBeenCalled();
+    expect(viewModel.errorSummary).toEqual([
+      {
+        href: '#main-content',
+        text: 'pageSize must be less than or equal to 1000',
+      },
+    ]);
+  });
+
   test('returns a GOV.UK error summary for invalid pageNumber and skips the courts call', async () => {
     const getCourts = jest.fn();
     const service = new HomePageService({
@@ -355,6 +413,37 @@ describe('HomePageService', () => {
       {
         href: '#main-content',
         text: 'pageNumber must be greater than or equal to 0',
+      },
+    ]);
+  });
+
+  test('returns a GOV.UK error summary for pageNumber values above 1000 and skips the courts call', async () => {
+    const getCourts = jest.fn();
+    const service = new HomePageService({
+      getCourts,
+      getRegions: jest.fn().mockResolvedValue([]),
+    } as never);
+
+    const viewModel = await service.getHomePageViewModel({
+      includeClosed: false,
+      pageNumber: 1000,
+      pageSize: 25,
+      partialCourtName: '',
+      regionId: '',
+      sortBy: '',
+      sortOrder: 'asc',
+      rawIncludeClosed: undefined,
+      rawPageNumber: '1001',
+      rawPageSize: undefined,
+      rawSortBy: undefined,
+      rawSortOrder: undefined,
+    });
+
+    expect(getCourts).not.toHaveBeenCalled();
+    expect(viewModel.errorSummary).toEqual([
+      {
+        href: '#main-content',
+        text: 'pageNumber must be less than or equal to 1000',
       },
     ]);
   });

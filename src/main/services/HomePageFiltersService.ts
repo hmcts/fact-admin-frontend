@@ -6,6 +6,7 @@ import { HomePageFilters, HomePageValidationError } from './types/HomePage.types
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
+const MAX_PAGE_PARAM = 1000;
 const DEFAULT_SORT_ORDER = 'asc';
 const PARTIAL_COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 const PARTIAL_COURT_NAME_ERROR =
@@ -27,8 +28,8 @@ export class HomePageFiltersService {
 
     return {
       includeClosed: query.includeClosed === 'true' || query.includeClosed === 'on',
-      pageNumber: parseNumber(query.pageNumber, DEFAULT_PAGE_NUMBER),
-      pageSize: parseNumber(query.pageSize, DEFAULT_PAGE_SIZE),
+      pageNumber: Math.min(parseNumber(query.pageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),
+      pageSize: Math.min(parseNumber(query.pageSize, DEFAULT_PAGE_SIZE), MAX_PAGE_PARAM),
       partialCourtName: parseString(query.partialCourtName),
       regionId: parseString(query.regionId),
       sortBy,
@@ -75,6 +76,11 @@ export class HomePageFiltersService {
           href: '#main-content',
           text: 'pageSize must be greater than 0',
         });
+      } else if (pageSize > MAX_PAGE_PARAM) {
+        errors.push({
+          href: '#main-content',
+          text: `pageSize must be less than or equal to ${MAX_PAGE_PARAM}`,
+        });
       }
     }
 
@@ -84,6 +90,11 @@ export class HomePageFiltersService {
         errors.push({
           href: '#main-content',
           text: 'pageNumber must be greater than or equal to 0',
+        });
+      } else if (pageNumber > MAX_PAGE_PARAM) {
+        errors.push({
+          href: '#main-content',
+          text: `pageNumber must be less than or equal to ${MAX_PAGE_PARAM}`,
         });
       }
     }
