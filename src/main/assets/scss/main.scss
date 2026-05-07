@@ -1,1 +1,58 @@
 @use 'govuk-frontend';
+
+// Homepage pagination
+.homepage-pagination {
+  justify-content: center;
+}
+
+// Homepage courts table actions and sortable headers
+.homepage-courts-table .homepage-courts-table__actions {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.homepage-courts-table .homepage-courts-table__actions .govuk-summary-list__actions-list {
+  white-space: nowrap;
+}
+
+.homepage-courts-table [aria-sort] .homepage-sort-link,
+.homepage-courts-table [aria-sort] .homepage-sort-link:hover {
+  display: inline-flex;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  background-color: transparent;
+  box-shadow: 0 0 0 0;
+  font-family: inherit;
+  font-size: 1em;
+  text-align: inherit;
+  align-items: center;
+  gap: 2px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.homepage-courts-table [aria-sort] .homepage-sort-link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow:
+    0 -2px #ffdd00,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+.homepage-sort-icon {
+  flex-shrink: 0;
+}
+
+// Court edit table layout
+.court-edit-table__wrapper {
+  max-width: 720px;
+}
+
+.court-edit-table td:last-child {
+  white-space: nowrap;
+  width: 1%;
+}

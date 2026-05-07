@@ -24,7 +24,7 @@ export abstract class Base {
     this.mainContent = new MainContentComponent(this.page);
     this.footer = new FooterComponent(this.page);
 
-    this.heading = this.page.locator('h1.govuk-heading-xl');
+    this.heading = this.page.locator('h1.govuk-heading-xl, h1.govuk-heading-l');
   }
 
   async expectVisibleElements(): Promise<void> {

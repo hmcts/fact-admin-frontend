@@ -7,6 +7,14 @@ import * as dotenv from 'dotenv';
 // Load .env file
 dotenv.config({ quiet: true });
 
+function generateAlphabeticSuffix(length = 4): string {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+
+  return Array.from({ length }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+}
+
+process.env.PLAYWRIGHT_TEST_COURT_RUN_SUFFIX ??= generateAlphabeticSuffix(4);
+
 // Helper to safely serialize config (removes functions and unserializable values)
 function safeSerialize(obj: any, depth = 0) {
   if (depth > 6) return '[MaxDepth]';
@@ -188,6 +196,7 @@ const resolveVideoMode = (): 'off' | 'on' | 'retain-on-failure' | 'on-first-retr
 const config = defineConfig({
   testDir: './src/test/functional',
   snapshotDir: './src/test/functional/snapshots',
+  globalTeardown: './src/test/functional/global.teardown.ts',
   ...CommonConfig.recommended,
   reporter: resolveReporters(),
   workers: resolveWorkerCount(),

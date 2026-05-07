@@ -1,7 +1,7 @@
 import { ChainedTokenCredential, EnvironmentCredential, WorkloadIdentityCredential } from '@azure/identity';
 import { Logger } from '@hmcts/nodejs-logging';
 import { Mutex } from 'async-mutex';
-import axios, { InternalAxiosRequestConfig } from 'axios';
+import { InternalAxiosRequestConfig, create } from 'axios';
 import config from 'config';
 
 const tokenMutex = new Mutex();
@@ -16,7 +16,7 @@ const logger = Logger.getLogger('server');
 
 export const dataApiUrl = process.env.DATA_API_URL || 'http://localhost:8989';
 
-export const dataApi = axios.create({
+export const dataApi = create({
   baseURL: dataApiUrl,
   timeout: 20000,
 });
