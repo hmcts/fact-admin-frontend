@@ -1,5 +1,4 @@
 {% extends "template.njk" %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
@@ -12,10 +11,6 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ govukBackLink({
-        href: '/courts/' + courtId + '/edit',
-        text: 'Back'
-      }) }}
       {% if errorSummary.length %}
         {{ govukErrorSummary({
           titleText: "There is a problem",
@@ -26,7 +21,7 @@
       {{ govukWarningText({
         text: "If you have set up local authority config for Adoption, Children and/or Divorce, and you remove these case types here, this will remove the local authority config and will effect search results"
       }) }}
-      <form method="post" action="/courts/{{ courtId }}/edit/cases-heard">
+      <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
         <fieldset class="govuk-fieldset">
         <div class="govuk-form-group{% if areasOfLawError %} govuk-form-group--error{% endif %}" id="areas-of-law-group">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">

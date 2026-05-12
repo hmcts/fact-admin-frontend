@@ -9,6 +9,7 @@ const casesHeardService = new CasesHeardService();
 
 @route('/courts/:courtId/edit/cases-heard')
 export default class CasesHeardController {
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const { courtId } = req.params;
@@ -37,8 +38,9 @@ export default class CasesHeardController {
     res.render('cases-heard', viewModel);
   }
 
+  @route('/success')
   @POST()
-  public async post(req: Request, res: Response): Promise<void> {
+  public async postSuccess(req: Request, res: Response): Promise<void> {
     const { courtId } = req.params;
     const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
 
@@ -69,6 +71,6 @@ export default class CasesHeardController {
       return;
     }
 
-    res.redirect(`/courts/${resolvedCourtId}/edit/cases-heard`);
+    res.render('cases-heard-success', saveResult.viewModel);
   }
 }

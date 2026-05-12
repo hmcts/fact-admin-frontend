@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
 
-export const areasOfLawValidationMessage = 'Select at least 1 type of case heard at this court.';
+export const areasOfLawValidationMessage = 'Select at least one type of case heard at this court.';
 
 export type CasesHeardViewModel = {
   areasOfLawError?: string;
@@ -15,8 +15,13 @@ export type CasesHeardViewModel = {
   rightColumnAreasOfLawItems: { checked: boolean; text: string; value: string }[];
 };
 
+export type CasesHeardSuccessViewModel = {
+  courtId: string;
+  courtName: string;
+};
+
 export type SaveCasesHeardResult =
-  | { type: 'success' }
+  | { type: 'success'; viewModel: CasesHeardSuccessViewModel }
   | { status: HttpStatusCode; type: 'status' }
   | { type: 'validation_error'; viewModel: CasesHeardViewModel };
 
@@ -92,7 +97,13 @@ export class CasesHeardService {
     });
 
     return updateResponse >= HttpStatusCode.Ok && updateResponse < HttpStatusCode.MultipleChoices
-      ? { type: 'success' }
+      ? {
+          type: 'success',
+          viewModel: {
+            courtId,
+            courtName: courtResponse.name,
+          },
+        }
       : { status: updateResponse, type: 'status' };
   }
 

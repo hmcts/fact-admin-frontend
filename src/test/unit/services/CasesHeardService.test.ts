@@ -18,7 +18,7 @@ describe('CasesHeardService', () => {
       getCourtAreasOfLaw: jest.fn(),
     } as never);
 
-    expect(service.validateSelectedAreasOfLaw([])).toBe('Select at least 1 type of case heard at this court.');
+    expect(service.validateSelectedAreasOfLaw([])).toBe('Select at least one type of case heard at this court.');
     expect(service.validateSelectedAreasOfLaw(['abc'])).toBeUndefined();
   });
 
@@ -97,10 +97,10 @@ describe('CasesHeardService', () => {
     expect(result).toEqual({
       type: 'validation_error',
       viewModel: {
-        areasOfLawError: 'Select at least 1 type of case heard at this court.',
+        areasOfLawError: 'Select at least one type of case heard at this court.',
         courtId: '11111111-1111-4111-8111-111111111111',
         courtName: 'Reading Crown Court',
-        errorSummary: [{ href: '#areas-of-law-group', text: 'Select at least 1 type of case heard at this court.' }],
+        errorSummary: [{ href: '#areas-of-law-group', text: 'Select at least one type of case heard at this court.' }],
         leftColumnAreasOfLawItems: [
           {
             checked: false,
@@ -127,7 +127,13 @@ describe('CasesHeardService', () => {
       '22222222-2222-4222-8222-222222222222',
     ]);
 
-    expect(result).toEqual({ type: 'success' });
+    expect(result).toEqual({
+      type: 'success',
+      viewModel: {
+        courtId: '11111111-1111-4111-8111-111111111111',
+        courtName: 'Reading Crown Court',
+      },
+    });
   });
 
   test('returns the upstream status code when saving fails', async () => {

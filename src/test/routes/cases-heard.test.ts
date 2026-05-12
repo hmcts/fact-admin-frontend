@@ -45,7 +45,7 @@ describe('Cases heard page', () => {
     expect(response.text).toContain('Divorce');
     expect(response.text).toContain('Probate');
     expect(response.text).toContain(
-      '<form method="post" action="/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard">'
+      '<form method="post" action="/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success">'
     );
   });
 
@@ -98,7 +98,7 @@ describe('Cases heard page', () => {
     expect(response.text).toContain('Something went wrong');
   });
 
-  test('updates the selected areas of law and redirects back to the page', async () => {
+  test('updates the selected areas of law and renders the success page', async () => {
     stub(DataApiRequests.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
@@ -108,17 +108,33 @@ describe('Cases heard page', () => {
     );
 
     const response = await request(app)
-      .post('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard')
+      .post('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success')
       .type('form')
       .send('areasOfLaw=22222222-2222-4222-8222-222222222222&areasOfLaw=33333333-3333-4333-8333-333333333333');
 
-    expect(response.status).toBe(HttpStatusCode.Found);
-    expect(response.headers.location).toBe('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('Cases heard saved');
+    expect(response.text).toContain('Cases heard for Reading Crown Court have been saved successfully.');
+    expect(response.text).toContain('Continue updating Reading Crown Court');
     expect(updateCourtAreasOfLawStub.calledOnce).toBe(true);
     expect(updateCourtAreasOfLawStub.firstCall.args[0]).toEqual({
       areasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],
       courtId: '11111111-1111-4111-8111-111111111111',
     });
+  });
+
+  test('does not render the success page for GET requests', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+
+    const response = await request(app).get(
+      '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success'
+    );
+
+    expect(response.status).toBe(HttpStatusCode.NotFound);
+    expect(response.text).not.toContain('Cases heard saved');
   });
 
   test('renders a validation error when no areas of law are selected', async () => {
@@ -139,13 +155,13 @@ describe('Cases heard page', () => {
     const updateCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'updateCourtAreasOfLaw');
 
     const response = await request(app)
-      .post('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard')
+      .post('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success')
       .type('form')
       .send('');
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('There is a problem');
-    expect(response.text).toContain('Select at least 1 type of case heard at this court.');
+    expect(response.text).toContain('Select at least one type of case heard at this court.');
     expect(updateCourtAreasOfLawStub.notCalled).toBe(true);
   });
 });

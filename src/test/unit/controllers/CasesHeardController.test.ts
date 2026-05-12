@@ -185,10 +185,10 @@ describe('CasesHeardController', () => {
     }
   });
 
-  test('updates the selected areas of law and redirects back to the page', async () => {
+  test('updates the selected areas of law and renders the success page', async () => {
     const controller = new CasesHeardController();
     const response = {
-      redirect: () => '',
+      render: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     request.body = {
@@ -204,10 +204,13 @@ describe('CasesHeardController', () => {
       HttpStatusCode.Ok
     );
 
-    responseMock.expects('redirect').once().withArgs('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
+    responseMock.expects('render').once().withArgs('cases-heard-success', {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      courtName: 'Reading Crown Court',
+    });
 
     try {
-      await controller.post(request, response);
+      await controller.postSuccess(request, response);
       assert.calledOnce(getCourtByIdStub);
       assert.calledOnce(updateCourtAreasOfLawStub);
       assert.calledWith(updateCourtAreasOfLawStub, {
@@ -252,10 +255,10 @@ describe('CasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('cases-heard', {
-        areasOfLawError: 'Select at least 1 type of case heard at this court.',
+        areasOfLawError: 'Select at least one type of case heard at this court.',
         courtId: '11111111-1111-4111-8111-111111111111',
         courtName: 'Reading Crown Court',
-        errorSummary: [{ href: '#areas-of-law-group', text: 'Select at least 1 type of case heard at this court.' }],
+        errorSummary: [{ href: '#areas-of-law-group', text: 'Select at least one type of case heard at this court.' }],
         leftColumnAreasOfLawItems: [
           {
             checked: false,
@@ -268,7 +271,7 @@ describe('CasesHeardController', () => {
       });
 
     try {
-      await controller.post(request, response);
+      await controller.postSuccess(request, response);
       assert.calledOnce(getCourtByIdStub);
       assert.calledOnce(getCourtAreasOfLawStub);
       assert.notCalled(updateCourtAreasOfLawStub);
