@@ -1,0 +1,8 @@
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% macro successPanel(title='', text='') %}
+  {{ govukPanel({
+    titleText: title,
+    text: text
+  }) }}
+{% endmacro %}
