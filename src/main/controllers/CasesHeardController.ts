@@ -16,22 +16,19 @@ export default class CasesHeardController {
 
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
       res.status(HttpStatusCode.NotFound);
-      res.render('court-not-found');
-      return;
+      return res.render('court-not-found');
     }
 
     const viewModel = await casesHeardService.getCasesHeardPage(resolvedCourtId);
 
     if (viewModel === HttpStatusCode.NotFound) {
       res.status(HttpStatusCode.NotFound);
-      res.render('court-not-found');
-      return;
+      return res.render('court-not-found');
     }
 
     if (typeof viewModel === 'number') {
       res.status(viewModel);
-      res.render('error');
-      return;
+      return res.render('error');
     }
 
     res.render('cases-heard', viewModel);
@@ -45,8 +42,7 @@ export default class CasesHeardController {
 
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
       res.status(HttpStatusCode.NotFound);
-      res.render('court-not-found');
-      return;
+      return res.render('court-not-found');
     }
 
     const selectedAreasOfLaw = casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
@@ -54,20 +50,17 @@ export default class CasesHeardController {
 
     if (saveResult.type === 'validation_error') {
       res.status(HttpStatusCode.BadRequest);
-      res.render('cases-heard', saveResult.viewModel);
-      return;
+      return res.render('cases-heard', saveResult.viewModel);
     }
 
     if (saveResult.type === 'status' && saveResult.status === HttpStatusCode.NotFound) {
       res.status(HttpStatusCode.NotFound);
-      res.render('court-not-found');
-      return;
+      return res.render('court-not-found');
     }
 
     if (saveResult.type === 'status') {
       res.status(saveResult.status);
-      res.render('error');
-      return;
+      return res.render('error');
     }
 
     res.render('cases-heard-success', saveResult.viewModel);
