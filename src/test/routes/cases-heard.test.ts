@@ -129,9 +129,7 @@ describe('Cases heard page', () => {
       name: 'Reading Crown Court',
     } as never);
 
-    const response = await request(app).get(
-      '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success'
-    );
+    const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success');
 
     expect(response.status).toBe(HttpStatusCode.NotFound);
     expect(response.text).not.toContain('Cases heard saved');

@@ -9,7 +9,6 @@ const casesHeardService = new CasesHeardService();
 
 @route('/courts/:courtId/edit/cases-heard')
 export default class CasesHeardController {
-
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const { courtId } = req.params;

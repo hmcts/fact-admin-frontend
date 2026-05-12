@@ -21,7 +21,7 @@
     "test:functional": "yarn playwright test --grep-invert='@smoke'",
     "test:performance": "yarn playwright test --grep='@performance'",
     "test:a11y": "echo 'a11y tests run as part of test:functional' && exit 0",
-    "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
+    "cichecks": "yarn install && yarn build && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
     "prepare": "husky install"
   },
   "dependencies": {
