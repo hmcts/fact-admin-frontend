@@ -19,18 +19,63 @@ export const courtAreaOfLawSelectionSchema = z.object({
 
 export type CourtAreaOfLawSelection = z.infer<typeof courtAreaOfLawSelectionSchema>;
 
-function parseAreaOfLawTypeStringKey(key: string): AreaOfLawType | null {
-  const match = key.match(/^AreaOfLawType\((.*)\)$/s);
+const AREA_OF_LAW_TYPE_PREFIX = 'AreaOfLawType(';
+const AREA_OF_LAW_TYPE_SUFFIX = ')';
+const AREA_OF_LAW_TYPE_FIELDS = [
+  'id',
+  'name',
+  'nameCy',
+  'externalLink',
+  'externalLinkCy',
+  'displayName',
+  'displayNameCy',
+] as const;
 
-  if (!match) {
+function findNextFieldDelimiterIndex(fieldText: string, valueStartIndex: number): number {
+  return AREA_OF_LAW_TYPE_FIELDS.reduce((earliestIndex, fieldName) => {
+    const delimiterIndex = fieldText.indexOf(`, ${fieldName}=`, valueStartIndex);
+
+    return delimiterIndex !== -1 && (earliestIndex === -1 || delimiterIndex < earliestIndex)
+      ? delimiterIndex
+      : earliestIndex;
+  }, -1);
+}
+
+function parseAreaOfLawTypeStringKey(key: string): AreaOfLawType | null {
+  if (!key.startsWith(AREA_OF_LAW_TYPE_PREFIX) || !key.endsWith(AREA_OF_LAW_TYPE_SUFFIX)) {
     return null;
   }
 
-  const fieldText = match[1];
-  const fieldMatches = fieldText.matchAll(/(\w+)=([\s\S]*?)(?=, \w+=|$)/g);
-  const parsedFields = Object.fromEntries(
-    Array.from(fieldMatches, ([, fieldName, fieldValue]) => [fieldName, fieldValue === 'null' ? null : fieldValue])
-  );
+  const fieldText = key.slice(AREA_OF_LAW_TYPE_PREFIX.length, -AREA_OF_LAW_TYPE_SUFFIX.length);
+  const parsedFields: Record<string, string | null> = {};
+  let fieldStartIndex = 0;
+
+  while (fieldStartIndex < fieldText.length) {
+    const equalsIndex = fieldText.indexOf('=', fieldStartIndex);
+
+    if (equalsIndex === -1) {
+      return null;
+    }
+
+    const fieldName = fieldText.slice(fieldStartIndex, equalsIndex);
+
+    if (!AREA_OF_LAW_TYPE_FIELDS.includes(fieldName as (typeof AREA_OF_LAW_TYPE_FIELDS)[number])) {
+      return null;
+    }
+
+    const valueStartIndex = equalsIndex + 1;
+    const nextDelimiterIndex = findNextFieldDelimiterIndex(fieldText, valueStartIndex);
+    const valueEndIndex = nextDelimiterIndex === -1 ? fieldText.length : nextDelimiterIndex;
+    const fieldValue = fieldText.slice(valueStartIndex, valueEndIndex);
+
+    parsedFields[fieldName] = fieldValue === 'null' ? null : fieldValue;
+
+    if (nextDelimiterIndex === -1) {
+      break;
+    }
+
+    fieldStartIndex = nextDelimiterIndex + 2;
+  }
 
   try {
     return areaOfLawTypeSchema.parse(parsedFields);
