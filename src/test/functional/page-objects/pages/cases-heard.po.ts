@@ -68,4 +68,8 @@ export class CasesHeardPage extends Base {
   buildCasesHeardSuccessUrl(courtId: string): string {
     return config.urls.homePageUrl + `/courts/${courtId}/edit/cases-heard/success`;
   }
+
+  buildCourtEditUrl(courtId: string): string {
+    return config.urls.homePageUrl + `/courts/${courtId}/edit`;
+  }
 }

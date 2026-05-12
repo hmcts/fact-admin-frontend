@@ -153,14 +153,14 @@ test.describe('Cases Heard Page Tests', () => {
         await casesHeardPage.selectFirstCaseType();
         await casesHeardPage.save();
         await casesHeardPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` }).click();
-        await expect(casesHeardPage.page).toHaveURL(new RegExp(`/courts/${createdCourt.id}/edit$`));
+        await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCourtEditUrl(createdCourt.id));
         await expect(casesHeardPage.heading).toContainText(`Editing - ${createdCourt.name}`);
 
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectFirstCaseType();
         await casesHeardPage.save();
         await casesHeardPage.page.getByRole('link', { name: 'Home' }).click();
-        await expect(casesHeardPage.page).toHaveURL(/\/$/);
+        expect(new URL(casesHeardPage.page.url()).pathname).toBe('/');
         await expect(casesHeardPage.heading).toContainText('Courts and tribunals');
       }
     );
