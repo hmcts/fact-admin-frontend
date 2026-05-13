@@ -37,8 +37,8 @@ export type SaveTranslationAndInterpretationResult =
     }
   | HttpStatusCode;
 
-const emailPattern = /^(|[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})$/;
-const phoneNumberPattern = /^(|(\+44|)[0-9 ]{10,20})$/;
+const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 
 export class TranslationAndInterpretationService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
@@ -151,7 +151,7 @@ export class TranslationAndInterpretationService {
         href: '#email',
         text: 'Enter an email address',
       });
-    } else if (!emailPattern.test(viewModel.email)) {
+    } else if (viewModel.email && !emailPattern.test(viewModel.email)) {
       errors.push({
         href: '#email',
         text: 'Enter an email address in the correct format',
@@ -163,7 +163,7 @@ export class TranslationAndInterpretationService {
         href: '#phoneNumber',
         text: 'Enter a telephone number',
       });
-    } else if (!phoneNumberPattern.test(viewModel.phoneNumber)) {
+    } else if (viewModel.phoneNumber && !phoneNumberPattern.test(viewModel.phoneNumber)) {
       errors.push({
         href: '#phoneNumber',
         text: 'Enter a telephone number in the correct format',

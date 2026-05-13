@@ -1,4 +1,4 @@
-import { test } from '../fixtures';
+import { expect, test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
 
 test.describe(
@@ -37,6 +37,7 @@ test.describe(
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.expectVisibleElements();
+          await expect(translationAndInterpretationPage.heading).toContainText('Translation and interpretation');
           await axeUtils.audit();
         }
       );
@@ -56,6 +57,7 @@ test.describe(
           await translationAndInterpretationPage.emailCheckbox.check();
           await translationAndInterpretationPage.phoneNumberCheckbox.check();
           await translationAndInterpretationPage.save();
+          await expect(translationAndInterpretationPage.mainContent.content).toContainText('There is a problem');
           await axeUtils.audit();
         }
       );

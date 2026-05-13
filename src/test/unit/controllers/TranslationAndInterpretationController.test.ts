@@ -49,6 +49,102 @@ describe('TranslationAndInterpretationController', () => {
     }
   });
 
+  test('renders translation and interpretation view when court id param is an array', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId: [courtId] };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    const getTranslationServicesStub = stub(DataApiRequests.prototype, 'getTranslationServices').resolves(null);
+
+    responseMock.expects('render').once().withArgs('translation-and-interpretation');
+
+    try {
+      await controller.get(request, response);
+      assert.calledWith(getCourtByIdStub, courtId);
+      assert.calledWith(getTranslationServicesStub, courtId);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      getTranslationServicesStub.restore();
+    }
+  });
+
+  test('renders court not found when loading with an invalid court id', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId: 'not-a-uuid' };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.get(request, response);
+      assert.notCalled(getCourtByIdStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+    }
+  });
+
+  test('renders court not found when the court lookup returns not found', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.get(request, response);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+    }
+  });
+
+  test('renders the error page when loading fails', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(
+      HttpStatusCode.InternalServerError
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(request, response);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+    }
+  });
+
   test('saves empty strings when no contact methods are selected', async () => {
     const controller = new TranslationAndInterpretationController();
     const response = {
@@ -109,6 +205,86 @@ describe('TranslationAndInterpretationController', () => {
     try {
       await controller.postSuccess(request, response);
       assert.notCalled(saveTranslationServicesStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      saveTranslationServicesStub.restore();
+    }
+  });
+
+  test('renders court not found when saving with an invalid court id', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId: 'not-a-uuid' };
+    request.body = {};
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const saveTranslationServicesStub = stub(DataApiRequests.prototype, 'saveTranslationServices');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.notCalled(getCourtByIdStub);
+      assert.notCalled(saveTranslationServicesStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      saveTranslationServicesStub.restore();
+    }
+  });
+
+  test('renders court not found when saving returns not found', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId };
+    request.body = {};
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.postSuccess(request, response);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+    }
+  });
+
+  test('renders the error page when saving fails', async () => {
+    const controller = new TranslationAndInterpretationController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId };
+    request.body = {};
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    const saveTranslationServicesStub = stub(DataApiRequests.prototype, 'saveTranslationServices').resolves(
+      HttpStatusCode.InternalServerError
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.postSuccess(request, response);
       responseMock.verify();
     } finally {
       getCourtByIdStub.restore();

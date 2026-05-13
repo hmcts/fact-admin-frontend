@@ -102,7 +102,7 @@ export class DataApiRequests {
     } catch (error: unknown) {
       logger.error(`Error fetching translation services for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
+        ? error.response.status
         : HttpStatusCode.InternalServerError;
     }
   }
@@ -125,7 +125,7 @@ export class DataApiRequests {
     } catch (error: unknown) {
       logger.error(`Error saving translation services for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
+        ? error.response.status
         : HttpStatusCode.InternalServerError;
     }
   }
