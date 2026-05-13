@@ -59,7 +59,7 @@ export class CasesHeardService {
   ): Promise<CasesHeardViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
 
-    if (typeof courtResponse === 'number') {
+    if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -72,7 +72,7 @@ export class CasesHeardService {
   public async saveCasesHeard(courtId: string, selectedAreasOfLaw: string[]): Promise<SaveCasesHeardResult> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
 
-    if (typeof courtResponse === 'number') {
+    if (this.isHttpStatusCode(courtResponse)) {
       return { status: courtResponse, type: 'status' };
     }
 
@@ -86,7 +86,7 @@ export class CasesHeardService {
         areasOfLawError
       );
 
-      return typeof viewModel === 'number'
+      return this.isHttpStatusCode(viewModel)
         ? { status: viewModel, type: 'status' }
         : { type: 'validation_error', viewModel };
     }
@@ -118,7 +118,7 @@ export class CasesHeardService {
   ): Promise<CasesHeardViewModel | HttpStatusCode> {
     const courtAreasOfLawResponse = await this.dataApiRequests.getCourtAreasOfLaw(courtId);
 
-    if (typeof courtAreasOfLawResponse === 'number') {
+    if (this.isHttpStatusCode(courtAreasOfLawResponse)) {
       return courtAreasOfLawResponse;
     }
 
@@ -133,6 +133,7 @@ export class CasesHeardService {
       };
     });
     const sortedAreasOfLawItems = [...areasOfLawItems].sort((left, right) => left.text.localeCompare(right.text));
+    // Split the checkbox list evenly for the two-column layout in the page template.
     const midpoint = Math.ceil(sortedAreasOfLawItems.length / 2);
 
     return {
@@ -144,5 +145,9 @@ export class CasesHeardService {
       pageTitle: areasOfLawError ? `Error: Cases heard - ${courtName}` : `Cases heard - ${courtName}`,
       rightColumnAreasOfLawItems: sortedAreasOfLawItems.slice(midpoint),
     };
+  }
+
+  private isHttpStatusCode(response: unknown): response is HttpStatusCode {
+    return typeof response === 'number';
   }
 }

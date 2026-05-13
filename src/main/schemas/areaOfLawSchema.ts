@@ -80,7 +80,7 @@ function parseAreaOfLawTypeStringKey(key: string): AreaOfLawType | null {
   try {
     return areaOfLawTypeSchema.parse(parsedFields);
   } catch {
-    return null;
+    throw new Error('Failed to parse areaOfLawTypeSchema');
   }
 }
 
