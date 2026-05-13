@@ -117,7 +117,7 @@
     "@opentelemetry/sdk-node": "0.217.0",
     "uuid": "14.0.0",
     "protobufjs": "7.5.8",
-    "ip-address": "10.1.1"
+    "ip-address": "10.2.0"
   },
   "husky": {
     "hooks": {
