@@ -5,7 +5,7 @@ __metadata:
   version: 8
   cacheKey: 10
 
-"@axe-core/playwright@npm:^4.11.0, @axe-core/playwright@npm:^4.11.3":
+"@axe-core/playwright@npm:4.11.3, @axe-core/playwright@npm:^4.11.0":
   version: 4.11.3
   resolution: "@axe-core/playwright@npm:4.11.3"
   dependencies:
@@ -4262,7 +4262,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.60.0":
+"@playwright/test@npm:1.60.0":
   version: 1.60.0
   resolution: "@playwright/test@npm:1.60.0"
   dependencies:
@@ -5018,7 +5018,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.19.19":
+"@types/node@npm:22.19.19":
   version: 22.19.19
   resolution: "@types/node@npm:22.19.19"
   dependencies:
@@ -9674,7 +9674,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fact-admin-frontend@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:^4.11.3"
+    "@axe-core/playwright": "npm:4.11.3"
     "@azure/identity": "npm:4.13.1"
     "@babel/core": "npm:7.29.0"
     "@babel/plugin-proposal-decorators": "npm:7.29.0"
@@ -9689,7 +9689,7 @@ __metadata:
     "@hmcts/nodejs-logging": "npm:^4.0.4"
     "@hmcts/playwright-common": "npm:^1.1.2"
     "@hmcts/properties-volume": "npm:1.4.0"
-    "@playwright/test": "npm:^1.60.0"
+    "@playwright/test": "npm:1.60.0"
     "@types/babel__preset-env": "npm:7.10.0"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:8.0.2"
@@ -9699,7 +9699,7 @@ __metadata:
     "@types/govuk-frontend": "npm:^5.11.0"
     "@types/jest": "npm:^30.0.0"
     "@types/lodash": "npm:4.17.24"
-    "@types/node": "npm:^22.19.19"
+    "@types/node": "npm:22.19.19"
     "@types/nunjucks": "npm:3.2.6"
     "@types/pa11y": "npm:^5.3.7"
     "@types/supertest": "npm:^6.0.3"
@@ -9733,15 +9733,15 @@ __metadata:
     husky: "npm:9.1.7"
     jest: "npm:30.4.2"
     jest-html-reporter: "npm:4.4.0"
-    lighthouse: "npm:^13.3.0"
+    lighthouse: "npm:13.3.0"
     lint-staged: "npm:16.4.0"
     lodash: "npm:4.18.1"
     mini-css-extract-plugin: "npm:2.10.2"
     nunjucks: "npm:3.2.4"
     odhin-reports-playwright: "npm:1.1.8"
     pa11y: "npm:9.1.1"
-    playwright: "npm:^1.60.0"
-    playwright-core: "npm:^1.60.0"
+    playwright: "npm:1.60.0"
+    playwright-core: "npm:1.60.0"
     playwright-lighthouse: "npm:^4.0.0"
     prettier: "npm:3.8.3"
     sass: "npm:1.99.0"
@@ -12890,7 +12890,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lighthouse@npm:^13.3.0":
+"lighthouse@npm:13.3.0":
   version: 13.3.0
   resolution: "lighthouse@npm:13.3.0"
   dependencies:
@@ -14859,7 +14859,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.60.0, playwright-core@npm:^1.60.0":
+"playwright-core@npm:1.60.0":
   version: 1.60.0
   resolution: "playwright-core@npm:1.60.0"
   bin:
@@ -14884,7 +14884,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:1.60.0, playwright@npm:^1.60.0":
+"playwright@npm:1.60.0":
   version: 1.60.0
   resolution: "playwright@npm:1.60.0"
   dependencies:
