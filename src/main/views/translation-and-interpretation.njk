@@ -1,0 +1,91 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% block pageTitle %}
+  Translation and interpretation
+{% endblock %}
+
+{% block content %}
+  {% if errorSummary.length %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errorSummary
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Translation and interpretation</h1>
+      <p class="govuk-body">
+        Enter contact details used for organising translation and interpretation services.
+      </p>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/translation-and-interpretation/success" novalidate>
+        {{ govukCheckboxes({
+          name: "contactMethods",
+          hint: {
+            text: "Select all that apply"
+          },
+          items: [
+            {
+              value: "email",
+              text: "Email address",
+              checked: emailSelected,
+              conditional: {
+                html: govukInput({
+                  id: "email",
+                  name: "email",
+                  value: email,
+                  label: {
+                    text: "Enter email address"
+                  },
+                  hint: {
+                    text: "Write email address in full. Use lower case."
+                  },
+                  attributes: {
+                    pattern: "^(|[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})$",
+                    spellcheck: "false"
+                  },
+                  errorMessage: {
+                    text: emailError
+                  } if emailError else null
+                })
+              }
+            },
+            {
+              value: "phoneNumber",
+              text: "Phone number",
+              checked: phoneNumberSelected,
+              conditional: {
+                html: govukInput({
+                  id: "phoneNumber",
+                  name: "phoneNumber",
+                  value: phoneNumber,
+                  label: {
+                    text: "Enter phone number"
+                  },
+                  hint: {
+                    text: "Use spaces between city and local exchange. For example, 01273 800 900 or 020 7450 4000."
+                  },
+                  attributes: {
+                    pattern: "^(|(\\+44|)[0-9 ]{10,20})$"
+                  },
+                  errorMessage: {
+                    text: phoneNumberError
+                  } if phoneNumberError else null
+                })
+              }
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
