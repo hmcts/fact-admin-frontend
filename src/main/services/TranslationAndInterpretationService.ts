@@ -59,7 +59,10 @@ export class TranslationAndInterpretationService {
     return this.buildViewModel(courtId, courtResponse.name, translationServicesResponse);
   }
 
-  public async save(courtId: string, form: TranslationAndInterpretationForm): Promise<SaveTranslationAndInterpretationResult> {
+  public async save(
+    courtId: string,
+    form: TranslationAndInterpretationForm
+  ): Promise<SaveTranslationAndInterpretationResult> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
 
     if (typeof courtResponse === 'number') {
@@ -97,8 +100,11 @@ export class TranslationAndInterpretationService {
     };
   }
 
-  private buildViewModel(courtId: string, courtName: string, translationServices: TranslationServices | null):
-    TranslationAndInterpretationViewModel {
+  private buildViewModel(
+    courtId: string,
+    courtName: string,
+    translationServices: TranslationServices | null
+  ): TranslationAndInterpretationViewModel {
     const email = translationServices?.email || '';
     const phoneNumber = translationServices?.phoneNumber || '';
 
@@ -121,7 +127,11 @@ export class TranslationAndInterpretationService {
     };
   }
 
-  private buildSubmittedViewModel(courtId: string, courtName: string, form: TranslationAndInterpretationForm): TranslationAndInterpretationViewModel {
+  private buildSubmittedViewModel(
+    courtId: string,
+    courtName: string,
+    form: TranslationAndInterpretationForm
+  ): TranslationAndInterpretationViewModel {
     return {
       ...this.buildViewModel(courtId, courtName, this.toTranslationServices(courtId, form)),
       emailSelected: this.isSelected(form.contactMethods, 'email'),

@@ -25,6 +25,42 @@ test.describe(
       );
     });
 
+    test('Translation and Interpretation Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.expectVisibleElements();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Translation and Interpretation Validation Error Accessibility', async ({
+      axeUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.emailCheckbox.check();
+          await translationAndInterpretationPage.phoneNumberCheckbox.check();
+          await translationAndInterpretationPage.save();
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Court Not Found Page Accessibility', async ({ axeUtils, courtEditPage }) => {
       await courtEditPage.goto('not-a-uuid');
       await courtEditPage.expectVisibleElements();

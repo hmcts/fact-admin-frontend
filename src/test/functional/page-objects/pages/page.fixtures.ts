@@ -2,11 +2,13 @@ import { Page } from '@playwright/test';
 
 import { CourtEditPage } from './court-edit.po';
 import { HomePage } from './home.po';
+import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 
 export interface PageFixtures {
   determinePage: Page;
   homePage: HomePage;
   courtEditPage: CourtEditPage;
+  translationAndInterpretationPage: TranslationAndInterpretationPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -31,6 +33,10 @@ export const pageFixtures = {
   courtEditPage: async ({ determinePage }, use): Promise<void> => {
     const courtEditPage = new CourtEditPage(determinePage);
     await use(courtEditPage);
+  },
+  translationAndInterpretationPage: async ({ determinePage }, use): Promise<void> => {
+    const translationAndInterpretationPage = new TranslationAndInterpretationPage(determinePage);
+    await use(translationAndInterpretationPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
