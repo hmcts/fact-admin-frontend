@@ -1,13 +1,16 @@
 import { env } from '../../../testUtils/nunjucksHelper';
 
 describe('Translation and Interpretation View', () => {
+  const courtId = '11111111-1111-4111-8111-111111111111';
+  const pagePath = `/courts/${courtId}/edit/translation-and-interpretation`;
+
   test('renders the empty form with unchecked contact methods', () => {
     const html = env.render('translation-and-interpretation.njk', {
-      courtId: '11111111-1111-4111-8111-111111111111',
+      courtId,
       email: '',
       emailSelected: false,
       errorSummary: [],
-      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/translation-and-interpretation',
+      pagePath,
       phoneNumber: '',
       phoneNumberSelected: false,
     });
@@ -23,11 +26,11 @@ describe('Translation and Interpretation View', () => {
 
   test('renders existing email and phone number as checked contact methods', () => {
     const html = env.render('translation-and-interpretation.njk', {
-      courtId: '11111111-1111-4111-8111-111111111111',
+      courtId,
       email: 'translations@example.com',
       emailSelected: true,
       errorSummary: [],
-      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/translation-and-interpretation',
+      pagePath,
       phoneNumber: '+441234 567890',
       phoneNumberSelected: true,
     });
@@ -39,11 +42,11 @@ describe('Translation and Interpretation View', () => {
 
   test('renders validation errors', () => {
     const html = env.render('translation-and-interpretation.njk', {
-      courtId: '11111111-1111-4111-8111-111111111111',
+      courtId,
       email: 'invalid',
       emailSelected: true,
       errorSummary: [{ href: '#email', text: 'Enter an email address in the correct format' }],
-      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/translation-and-interpretation',
+      pagePath,
       phoneNumber: '',
       phoneNumberSelected: false,
     });

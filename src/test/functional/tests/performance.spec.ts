@@ -7,26 +7,24 @@ const LIGHTHOUSE_THRESHOLDS = {
   performance: 80,
 } as const;
 
-test.describe('Performance Tests', () => {
-  test.describe.configure({ mode: 'serial' });
+test.describe(
+  'Performance Tests',
+  {
+    tag: '@performance',
+  },
+  () => {
+    test.describe.configure({ mode: 'serial' });
 
-  test(
-    'Home Page Performance',
-    {
-      tag: '@performance',
-    },
-    async ({ homePage, lighthouseUtils }) => {
+    test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
       await homePage.header.checkIsVisible();
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-    }
-  );
+    });
 
-  test(
-    'Translation and Interpretation Page Performance',
-    {
-      tag: '@performance',
-    },
-    async ({ lighthouseUtils, playwright, translationAndInterpretationPage }) => {
+    test('Translation and Interpretation Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
       await withCreatedCourt(
         playwright,
         'Translation Performance Test',
@@ -37,6 +35,6 @@ test.describe('Performance Tests', () => {
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
-    }
-  );
-});
+    });
+  }
+);
