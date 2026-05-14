@@ -1,3 +1,11 @@
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% macro successPanel(title='', text='') %}
+  {{ govukPanel({
+    titleText: title,
+    text: text
+  }) }}
+
 {# Address Block #}
 {% macro addressBlock(address) %}
   <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine1 }}</p>
