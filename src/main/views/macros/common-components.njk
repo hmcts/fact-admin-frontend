@@ -1,0 +1,23 @@
+{# Address Block #}
+{% macro addressBlock(address) %}
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine1 }}</p>
+  {% if address.addressLine2 %}
+    <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine2 }}</p>
+  {% endif %}
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ address.townCity }}</p>
+  {% if address.county %}
+    <p class="govuk-body govuk-!-margin-bottom-1">{{ address.county }}</p>
+  {% endif %}
+  <p class="govuk-body govuk-!-margin-bottom-0">{{ address.postcode }}</p>
+{% endmacro %}
+
+{# presentable format of the addressType #}
+{% macro addressType(address) %}
+  {% if address.addressType === "WRITE_TO_US" %}
+    Send documents to
+  {% elseif address.addressType === "VISIT_OR_CONTACT_US" %}
+    Visit and send documents to
+  {% else %} {# visit us #}
+    Visit
+  {% endif %}
+{% endmacro %}

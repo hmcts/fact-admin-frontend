@@ -39,7 +39,6 @@ new Helmet(config.get('security'), developmentMode).enableFor(app);
 new Container().enableFor(app);
 
 app.use(scopePerRequest(app.locals.container));
-app.use(loadControllers('controllers/**/*.+(ts|js)', { cwd: __dirname }));
 
 app.get('/favicon.ico', limiter, (req, res) => {
   res.sendFile(path.join(__dirname, '/public/assets/rebrand/images/favicon.ico'));
@@ -48,6 +47,7 @@ app.get('/favicon.ico', limiter, (req, res) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(loadControllers('controllers/**/*.+(ts|js)', { cwd: __dirname }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');

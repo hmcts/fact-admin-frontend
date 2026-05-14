@@ -1,0 +1,62 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% set actionUrl %}
+  {% if addressId %}
+    /courts/{{ courtId }}/edit/address/select/{{ addressId }}
+  {% else %}
+    /courts/{{ courtId }}/edit/address/select
+  {% endif %}
+{% endset %}
+
+{% set addressDetailsHref %}
+  {% if addressId %}
+    /courts/{{ courtId }}/edit/address/details/{{ addressId }}
+  {% else %}
+    /courts/{{ courtId }}/edit/address/details
+  {% endif %}
+{% endset %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Find address by postcode</h1>
+
+      <form method="GET" action="{{ actionUrl }}">
+
+        <p class="govuk-body">Enter the postcode for the address you are searching for.</p>
+
+        {{ govukInput({
+          label: {
+            text: "Postcode"
+          },
+          classes: "govuk-input--width-10",
+          id: "postcode",
+          name: "postcode",
+          value: postcode
+        }) }}
+
+        {{ govukButton({
+          text: "Find address"
+        }) }}
+
+      </form>
+
+      <form method="POST" action="{{ addressDetailsHref }}">
+
+        {{ govukButton({
+          text: "Enter address manually",
+          classes: "govuk-button--secondary"
+        }) }}
+
+      </form>
+
+      </div>
+  </div>
+{% endblock %}
