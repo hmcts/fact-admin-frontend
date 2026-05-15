@@ -1,32 +1,36 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block pageTitle %}
   {{ pageTitle }}
 {% endblock %}
 
-{% set actionUrl %}
-  {% if addressId %}
-    /courts/{{ courtId }}/edit/address/select/{{ addressId }}
-  {% else %}
-    /courts/{{ courtId }}/edit/address/select
-  {% endif %}
-{% endset %}
-
-{% set addressDetailsHref %}
-  {% if addressId %}
-    /courts/{{ courtId }}/edit/address/details/{{ addressId }}
-  {% else %}
-    /courts/{{ courtId }}/edit/address/details
-  {% endif %}
-{% endset %}
 
 {% block content %}
+
+  {% if error %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{
+        text: error,
+        href: "#postcode"
+      }]
+    }) }}
+  {% endif %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl">Find address by postcode</h1>
+
+      {% set actionUrl %}
+        {% if addressId %}
+          /courts/{{ courtId }}/edit/address/select/{{ addressId }}
+        {% else %}
+          /courts/{{ courtId }}/edit/address/select
+        {% endif %}
+      {% endset %}
 
       <form method="GET" action="{{ actionUrl }}">
 
@@ -36,10 +40,18 @@
           label: {
             text: "Postcode"
           },
+          hint: {
+            text: "Please enter a full UK postcode, for example BS1 6GR"
+          },
           classes: "govuk-input--width-10",
           id: "postcode",
           name: "postcode",
-          value: postcode
+          spellcheck: false,
+          autocomplete: "postal-code",
+          value: postcode,
+          errorMessage: {
+            text: error
+          } if error else null
         }) }}
 
         {{ govukButton({
@@ -48,7 +60,16 @@
 
       </form>
 
-      <form method="POST" action="{{ addressDetailsHref }}">
+
+      {% set manualEditUrl %}
+        {% if addressId %}
+          /courts/{{ courtId }}/edit/address/details/{{ addressId }}
+        {% else %}
+          /courts/{{ courtId }}/edit/address/details
+        {% endif %}
+      {% endset %}
+
+      <form method="POST" action="{{ manualEditUrl }}">
 
         {{ govukButton({
           text: "Enter address manually",
@@ -57,6 +78,24 @@
 
       </form>
 
-      </div>
+    </div>
   </div>
+
+<pre>
+postcode
+{{ postcode | dump(2) }}
+
+courtId
+{{ courtId | dump(2) }}
+
+addressId
+{{ addressId | dump(2) }}
+
+pageTitle
+{{ pageTitle | dump(2) }}
+
+error
+{{ error | dump(2) }}
+</pre>
+
 {% endblock %}

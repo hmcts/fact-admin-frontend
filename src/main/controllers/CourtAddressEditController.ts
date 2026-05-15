@@ -85,7 +85,7 @@ export class CourtAddressEditController {
       res.render('court-address-find', {
         courtId,
         pageTitle: 'Find Address',
-        errorType: courtAddressService.validatePostcode(postcode),
+        error: courtAddressService.validatePostcode(postcode),
       });
       return;
     }
@@ -120,7 +120,7 @@ export class CourtAddressEditController {
         courtId,
         addressId,
         pageTitle: 'Find Address',
-        errorType: courtAddressService.validatePostcode(postcode),
+        error: courtAddressService.validatePostcode(postcode),
       });
       return;
     }
@@ -146,35 +146,7 @@ export class CourtAddressEditController {
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
     }
-    await this.renderAddAddress(res, courtId, undefined, req.body?.address);
-  }
-
-  private async renderAddAddress(
-    res: Response,
-    courtId: string,
-    courtAddress?: CourtAddress,
-    dpaAddressData?: string
-  ): Promise<void> {
-    const areasOfLaw = await typesService.listAreasOfLaw();
-    if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
-      return;
-    }
-
-    const courtTypes = await typesService.listCourtTypes();
-    if (!this.validateServiceResponse(courtTypes, res, 'not-found')) {
-      return;
-    }
-
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData) : (courtAddress ?? {});
-
-    res.render('court-address-edit', {
-      address,
-      errors: address['errors'] ? Object.fromEntries(address['errors']) : null,
-      courtTypes,
-      areasOfLaw,
-      courtId,
-      pageTitle: 'Manage Addresses',
-    });
+    await this.renderAddAddress(res, courtId, false, false, undefined, req.body?.address);
   }
 
   @route('/details/success')
@@ -193,24 +165,58 @@ export class CourtAddressEditController {
       county: req.body.county,
       postcode: req.body.postcode,
       addressType: req.body.addressType,
-      areasOfLaw: req.body.areasOfLaw,
-      courtTypes: req.body.courtTypes,
+      areasOfLaw: req.body['areas-of-law'],
+      courtTypes: req.body['court-types'],
     };
 
-    const saveResult = await courtAddressService.save(courtAddress, courtId);
+    const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
+    const ctSelected = (req.body.courtTypes as string).toLowerCase() === 'yes';
+
+    const saveResult = await courtAddressService.save(courtAddress, courtId, aolSelected, ctSelected);
     // handles HttpResponseCode responses
     if (!this.validateServiceResponse(saveResult, res, 'not-found')) {
       return;
     }
 
     if (saveResult['status'] === 'invalid') {
-      await this.renderAddAddress(res, courtId, saveResult['address'] as CourtAddress);
+      await this.renderAddAddress(res, courtId, aolSelected, ctSelected, saveResult['address'] as CourtAddress);
       return;
     }
 
     if (saveResult['status'] === 'saved') {
       res.render('court-address-edit-success', { courtName: saveResult['courtName'], courtId });
     }
+  }
+
+  private async renderAddAddress(
+    res: Response,
+    courtId: string,
+    aolSelected: boolean,
+    ctSelected: boolean,
+    courtAddress?: CourtAddress,
+    dpaAddressData?: string
+  ): Promise<void> {
+    const areasOfLaw = await typesService.listAreasOfLaw();
+    if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
+      return;
+    }
+
+    const courtTypes = await typesService.listCourtTypes();
+    if (!this.validateServiceResponse(courtTypes, res, 'not-found')) {
+      return;
+    }
+
+    const address = dpaAddressData ? this.buildAddressData(dpaAddressData) : (courtAddress ?? {});
+
+    res.render('court-address-edit', {
+      address,
+      courtTypes,
+      areasOfLaw,
+      aolSelected: aolSelected || address.areasOfLaw?.[0],
+      ctSelected: ctSelected || address.courtTypes?.[0],
+      courtId,
+      pageTitle: 'Manage Addresses',
+    });
   }
 
   @route('/details/:addressId')
@@ -228,38 +234,19 @@ export class CourtAddressEditController {
     if (!this.validateServiceResponse(courtAddress, res, 'not-found')) {
       return;
     }
-    await this.renderEditAddress(res, courtId, addressId, courtAddress as CourtAddress, req.body?.address);
-  }
 
-  private async renderEditAddress(
-    res: Response,
-    courtId: string,
-    addressId: string,
-    courtAddress: CourtAddress,
-    dpaAddressData?: string
-  ) {
-    const areasOfLaw = await typesService.listAreasOfLaw();
-    if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
-      return;
-    }
+    const aolSelected = courtAddress['areasOfLaw']?.[0];
+    const ctSelected = courtAddress['courtTypes']?.[0];
 
-    const courtTypes = await typesService.listCourtTypes();
-    if (!this.validateServiceResponse(courtTypes, res, 'not-found')) {
-      return;
-    }
-
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData, courtAddress) : courtAddress;
-    const errors = address['errors'] ? Object.fromEntries(address['errors']) : null;
-
-    res.render('court-address-edit', {
-      address,
-      errors,
-      courtTypes,
-      areasOfLaw,
+    await this.renderEditAddress(
+      res,
       courtId,
       addressId,
-      pageTitle: 'Manage Addresses',
-    });
+      courtAddress as CourtAddress,
+      aolSelected,
+      ctSelected,
+      req.body?.address
+    );
   }
 
   @route('/details/success/:addressId')
@@ -282,24 +269,67 @@ export class CourtAddressEditController {
       county: req.body.county,
       postcode: req.body.postcode,
       addressType: req.body.addressType,
-      areasOfLaw: req.body.areasOfLaw,
-      courtTypes: req.body.courtTypes,
+      areasOfLaw: req.body['areas-of-law'],
+      courtTypes: req.body['court-types'],
     };
 
-    const saveResult = await courtAddressService.save(courtAddress, courtId, addressId);
+    const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
+    const ctSelected = (req.body.courtTypes as string).toLowerCase() === 'yes';
+
+    const saveResult = await courtAddressService.save(courtAddress, courtId, aolSelected, ctSelected, addressId);
     // handles HttpResponseCode responses
     if (!this.validateServiceResponse(saveResult, res, 'not-found')) {
       return;
     }
 
     if (saveResult['status'] === 'invalid') {
-      await this.renderEditAddress(res, courtId, addressId, saveResult['address'] as CourtAddress);
+      await this.renderEditAddress(
+        res,
+        courtId,
+        addressId,
+        saveResult['address'] as CourtAddress,
+        aolSelected,
+        ctSelected
+      );
       return;
     }
 
     if (saveResult['status'] === 'saved') {
       res.render('court-address-edit-success', { courtName: saveResult['courtName'], courtId });
     }
+  }
+
+  private async renderEditAddress(
+    res: Response,
+    courtId: string,
+    addressId: string,
+    courtAddress: CourtAddress,
+    aolSelected: boolean,
+    ctSelected: boolean,
+    dpaAddressData?: string
+  ): Promise<void> {
+    const areasOfLaw = await typesService.listAreasOfLaw();
+    if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
+      return;
+    }
+
+    const courtTypes = await typesService.listCourtTypes();
+    if (!this.validateServiceResponse(courtTypes, res, 'not-found')) {
+      return;
+    }
+
+    const address = dpaAddressData ? this.buildAddressData(dpaAddressData, courtAddress) : courtAddress;
+
+    res.render('court-address-edit', {
+      address,
+      courtTypes,
+      areasOfLaw,
+      aolSelected: aolSelected || address.areasOfLaw?.[0],
+      ctSelected: ctSelected || address.courtTypes?.[0],
+      courtId,
+      addressId,
+      pageTitle: 'Manage Addresses',
+    });
   }
 
   @route('/delete/:addressId')
@@ -357,17 +387,17 @@ export class CourtAddressEditController {
     return { courtId, addressId: '' };
   }
 
-  private validateUuid(param: string, res: Response, errorView: string): boolean {
+  private validateUuid(param: string, res: Response, notFoundView: string): boolean {
     if (!param || !isUuid(param)) {
       res.status(HttpStatusCode.NotFound);
-      res.render(errorView);
+      res.render(notFoundView);
       return false;
     }
     return true;
   }
 
-  private validateServiceResponse(response: unknown, res: Response, notFoundView: string): boolean {
-    if (response === HttpStatusCode.NotFound) {
+  private validateServiceResponse(response: unknown, res: Response, notFoundView?: string): boolean {
+    if (notFoundView && response === HttpStatusCode.NotFound) {
       res.status(HttpStatusCode.NotFound);
       res.render(notFoundView);
       return false;

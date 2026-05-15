@@ -12,4 +12,13 @@
     <li><a href="/courts/{{ courtId }}/edit" class="govuk-link govuk-link--no-visited-state">Continue updating {{ courtName }}</a></li>
     <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
   </ul>
+
+<pre>
+courtName
+{{ courtName | dump(2) }}
+
+courtId
+{{ courtId | dump(2) }}
+</pre>
+
 {% endblock %}
