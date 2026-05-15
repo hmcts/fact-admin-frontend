@@ -127,12 +127,15 @@ export class DataApiRequests {
   public async saveCourtAddress(
     address: Partial<CourtAddress>,
     courtId: string
-  ): Promise<CourtAddress | HttpStatusCode> {
+  ): Promise<CourtAddress | HttpStatusCode | Map<string, string>> {
     try {
-      const response = await dataApi.post(`/courts/${courtId}/v1/address`, JSON.stringify(address));
+      const response = await dataApi.post(`/courts/${courtId}/v1/address`, address);
       return courtAddressSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error update court address details:', error);
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error adding court address details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -146,12 +149,15 @@ export class DataApiRequests {
     address: Partial<CourtAddress>,
     courtId: string,
     addressId: string
-  ): Promise<CourtAddress | HttpStatusCode> {
+  ): Promise<CourtAddress | HttpStatusCode | Map<string, string>> {
     try {
       const response = await dataApi.put(`/courts/${courtId}/v1/address/${addressId}`, address);
       return courtAddressSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error update court address details:', error);
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error updating court address details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -161,19 +167,16 @@ export class DataApiRequests {
   /**
    * Request to data API to delete an existing address
    */
-  public async deleteCourtAddress(
-    courtId: string,
-    addressId: string
-  ): Promise<boolean | HttpStatusCode> {
+  public async deleteCourtAddress(courtId: string, addressId: string): Promise<HttpStatusCode> {
     try {
       const response = await dataApi.delete(`/courts/${courtId}/v1/address/${addressId}`);
       if (response.status === HttpStatusCode.NoContent) {
-        return true;
+        return response.status;
       }
       logger.error('Unexpected response status when deleting court address:', response.status);
       return HttpStatusCode.InternalServerError;
     } catch (error: unknown) {
-      logger.error('Error update court address details:', error);
+      logger.error('Error deleting court address details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

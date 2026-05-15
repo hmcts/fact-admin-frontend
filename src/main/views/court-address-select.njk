@@ -15,10 +15,10 @@
 {% endset -%}
 
 {% set addressOptions = [] %}
-{% if osResults.length %}
-  {% for row in osResults %}
+{% if addresses.length %}
+  {% for row in addresses %}
     {% set addressOptions = (addressOptions.push(
-      { value: row.DPA | dump, text: row.DPA.ADDRESS }
+      { value: row | dump, text: row.ADDRESS }
     ), addressOptions) %}
   {% endfor %}
 {% endif %}
@@ -55,4 +55,8 @@
 
     </div>
   </div>
+
+  <pre>
+    {{ addresses | dump(2) }}
+  </pre>
 {% endblock %}

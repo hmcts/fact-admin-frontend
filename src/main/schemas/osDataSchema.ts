@@ -24,3 +24,4 @@ export const osDataSchema = z.object({
 });
 
 export type OsData = z.infer<typeof osDataSchema>;
+export type DpaAddress = z.infer<typeof dpaAddressSchema>;
