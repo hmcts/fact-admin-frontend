@@ -17,7 +17,7 @@ export const dpaAddressSchema = z.object({
 });
 
 const resultItemSchema = z.object({
-  DPA: dpaAddressSchema.nullable()
+  DPA: dpaAddressSchema.nullable(),
 });
 
 export const osDataSchema = z.object({

@@ -13,7 +13,6 @@ import { Region, regionsSchema } from '../schemas/regionSchema';
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { dataApi } from './utils/axiosConfig';
 
-
 const logger = Logger.getLogger('app');
 
 export class DataApiRequests {
