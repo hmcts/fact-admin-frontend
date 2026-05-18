@@ -6,6 +6,7 @@ export const dpaAddressSchema = z.object({
   ADDRESS: z.string().nullable(),
   ORGANISATION_NAME: z.string().nullable(),
   BUILDING_NUMBER: z.string().nullable(),
+  BUILDING_NAME: z.string().nullable(),
   THOROUGHFARE_NAME: z.string().nullable(),
   POST_TOWN: z.string().nullable(),
   POSTCODE: z.string().nullable(),

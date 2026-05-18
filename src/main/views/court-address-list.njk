@@ -44,7 +44,7 @@
             {
               href: '/courts/' + address.courtId + '/edit/address/delete/' + address.id,
               text: 'Delete'
-            }
+            } if courtAddresses.length > 1 else null
           ])
         }
       ]), addressTableRows) %}
@@ -54,12 +54,13 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">Addresses</h1>
+      <span class="govuk-caption-l">You can have between one and three addresses per court</span>
       {% if addressTableRows.length %}
         {{ govukTable({
           firstCellIsHeader: false,
           head: [
             {
-              text: "Description",
+              text: "Address type",
               classes: "govuk-!-width-one-quarter"
             },
             {
@@ -77,10 +78,12 @@
         <p class="govuk-body">No addresses are currently configured.</p>
       {% endif %}
 
-      {{ govukButton({
-        text: "Add address",
-        href: '/courts/' + courtId + '/edit/address/find/'
-      }) }}
+      {%  if courtAddresses.length < 3 %}
+        {{ govukButton({
+          text: "Add address",
+          href: '/courts/' + courtId + '/edit/address/find/'
+        }) }}
+      {% endif %}
 
     </div>
   </div>

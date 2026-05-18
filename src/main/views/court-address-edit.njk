@@ -204,6 +204,20 @@
             } if address.errors.postcode else null
           }) }}
 
+          {{ govukInput({
+            label: {
+              text: "ePIMS Ref ID (optional)"
+            },
+            classes: "govuk-input--width-10",
+            id: "epimId",
+            name: "epimId",
+            spellcheck: false,
+            value: address.epimId,
+            errorMessage: {
+              text: address.errors.epimId[0]
+            } if address.errors.epimId else null
+          }) }}
+
         {% endcall %}
 
         {% call govukFieldset({

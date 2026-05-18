@@ -162,8 +162,9 @@ export class CourtAddressEditController {
       addressLine1: req.body.addressLine1,
       addressLine2: req.body.addressLine2,
       townCity: req.body.townCity,
-      county: req.body.county,
+      county: req.body.county?.trim() === '' ? undefined : req.body.county?.trim(),
       postcode: req.body.postcode,
+      epimId: req.body.epimId?.trim() === '' ? undefined : req.body.epimId?.trim(),
       addressType: req.body.addressType,
       areasOfLaw: req.body['areas-of-law'],
       courtTypes: req.body['court-types'],
@@ -184,7 +185,11 @@ export class CourtAddressEditController {
     }
 
     if (saveResult['status'] === 'saved') {
-      res.render('court-address-edit-success', { courtName: saveResult['courtName'], courtId });
+      res.render('court-address-edit-success', {
+        courtName: saveResult['courtName'],
+        address: saveResult['address'] as CourtAddress,
+        courtId
+      });
     }
   }
 
@@ -266,8 +271,9 @@ export class CourtAddressEditController {
       addressLine1: req.body.addressLine1,
       addressLine2: req.body.addressLine2,
       townCity: req.body.townCity,
-      county: req.body.county,
+      county: req.body.county?.trim() === '' ? undefined : req.body.county?.trim(),
       postcode: req.body.postcode,
+      epimId: req.body.epimId?.trim() === '' ? undefined : req.body.epimId?.trim(),
       addressType: req.body.addressType,
       areasOfLaw: req.body['areas-of-law'],
       courtTypes: req.body['court-types'],
@@ -295,7 +301,11 @@ export class CourtAddressEditController {
     }
 
     if (saveResult['status'] === 'saved') {
-      res.render('court-address-edit-success', { courtName: saveResult['courtName'], courtId });
+      res.render('court-address-edit-success', {
+        courtName: saveResult['courtName'],
+        address: saveResult['address'] as CourtAddress,
+        courtId
+      });
     }
   }
 
@@ -343,6 +353,11 @@ export class CourtAddressEditController {
       return;
     }
 
+    const courtName = await courtAddressService.retrieveCourtName(courtId);
+    if (!this.validateServiceResponse(courtName, res, 'court-not-found')) {
+      return;
+    }
+
     const courtAddressResponse = await courtAddressService.retrieve(courtId, addressId);
     if (!this.validateServiceResponse(courtAddressResponse, res, 'not-found')) {
       return;
@@ -350,6 +365,7 @@ export class CourtAddressEditController {
 
     res.render('court-address-delete', {
       address: courtAddressResponse,
+      courtName,
       pageTitle: 'Delete Address',
     });
   }
@@ -372,7 +388,11 @@ export class CourtAddressEditController {
     }
 
     // The only other option is 'deleted'
-    res.render('court-address-delete-success', { courtName: deleteResult['courtName'], courtId });
+    res.render('court-address-delete-success', {
+      courtName: deleteResult['courtName'],
+      address: deleteResult['address'],
+      courtId
+    });
   }
 
   // --------------------------------------------------------------------------
@@ -422,9 +442,17 @@ export class CourtAddressEditController {
       // merge in the new address data
       if (dpaAddress.ORGANISATION_NAME) {
         result.addressLine1 = dpaAddress.ORGANISATION_NAME;
-        result.addressLine2 = ((dpaAddress.BUILDING_NUMBER ?? '') + ' ' + dpaAddress.THOROUGHFARE_NAME).trim();
+        result.addressLine2 = (
+          (dpaAddress.BUILDING_NUMBER ?? dpaAddress.BUILDING_NAME ?? '') +
+          ' ' +
+          dpaAddress.THOROUGHFARE_NAME
+        ).trim();
       } else {
-        result.addressLine1 = ((dpaAddress.BUILDING_NUMBER ?? '') + ' ' + dpaAddress.THOROUGHFARE_NAME).trim();
+        result.addressLine1 = (
+          (dpaAddress.BUILDING_NUMBER ?? dpaAddress.BUILDING_NAME ?? '') +
+          ' ' +
+          dpaAddress.THOROUGHFARE_NAME
+        ).trim();
       }
       result.townCity = dpaAddress.POST_TOWN ?? undefined;
       result.postcode = dpaAddress.POSTCODE ?? undefined;

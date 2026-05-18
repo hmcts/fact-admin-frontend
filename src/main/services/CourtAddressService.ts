@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CourtAddress } from '../schemas/courtAddressSchema';
+import { CourtAddress, CourtAddressType } from '../schemas/courtAddressSchema';
 import { DpaAddress } from '../schemas/osDataSchema';
 
 export type SaveCourtAddressResponse =
@@ -20,11 +20,13 @@ export type DeleteCourtAddressResponse =
   | {
       status: 'deleted';
       courtName: string;
+      address: Partial<CourtAddress>;
     }
   | HttpStatusCode;
 
 const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
 const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
+const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 
 const JURISDICTION_ERROR_REGEXES = {
   northernIrelandPostcode: /^(BT)/i,
@@ -68,8 +70,18 @@ export class CourtAddressService {
     courtTypesSelected: boolean,
     addressId?: string
   ): Promise<SaveCourtAddressResponse> {
+    const existingAddresses = await this.list(courtId);
+    if (typeof existingAddresses === 'number') {
+      return existingAddresses;
+    }
+
     // validate for obvious errors before attempting to save
-    const validationErrors = this.validateAddress(address, aolSelected, courtTypesSelected);
+    const validationErrors = this.validateAddress(
+      address,
+      existingAddresses,
+      aolSelected,
+      courtTypesSelected
+    );
     if (validationErrors) {
       return { status: 'invalid', address: { ...address, errors: validationErrors } };
     }
@@ -106,10 +118,16 @@ export class CourtAddressService {
   }
 
   public async delete(courtId: string, addressId: string): Promise<DeleteCourtAddressResponse> {
-    // retrieve the court as we'll need it's name
+    // retrieve the court as we'll need its name
     const courtResponse = await dataApiRequests.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
+    }
+
+    // retrieve the address as we'll need it
+    const courtAddressResponse = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+    if (typeof courtAddressResponse === 'number') {
+      return courtAddressResponse;
     }
 
     // delete the address
@@ -117,7 +135,15 @@ export class CourtAddressService {
     if (response !== HttpStatusCode.NoContent) {
       return response;
     }
-    return { status: 'deleted', courtName: courtResponse.name };
+    return { status: 'deleted', courtName: courtResponse.name, address: courtAddressResponse };
+  }
+
+  public async retrieveCourtName(courtId: string): Promise<string | HttpStatusCode> {
+    const courtResponse = await dataApiRequests.getCourtById(courtId);
+    if (typeof courtResponse === 'number') {
+      return courtResponse;
+    }
+    return courtResponse.name;
   }
 
   /**
@@ -127,16 +153,24 @@ export class CourtAddressService {
    * public facing client.
    *
    * @param address the CourtAddress that's being saved
+   * @param existingAddresses the list of existing addresses for the court
    * @param aolSelected flag that indicates aol were selected on the form before saving
    * @param courtTypesSelected flag that indicates court types were selected on the form before saving
    * @private
    */
   private validateAddress(
     address: Partial<CourtAddress>,
+    existingAddresses: CourtAddress[],
     aolSelected: boolean,
     courtTypesSelected: boolean
   ): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
+
+    // addressType
+    const addressTypeErrors = this.validateAddressType(address, existingAddresses);
+    if (addressTypeErrors.length > 0) {
+      errors.addressType = addressTypeErrors;
+    }
 
     // addressLine1 (mandatory)
     const addressLine1Errors = this.validateAddressLine1(address);
@@ -168,21 +202,45 @@ export class CourtAddressService {
       errors.postcode = [postcodeValidation];
     }
 
+    // validate epimId
+    const epimIdValidation = this.validateEpimId(address);
+    if (epimIdValidation.length > 0) {
+      errors.epimId = epimIdValidation;
+    }
+
     // validate areas of law
     if (aolSelected && (!address.areasOfLaw || address.areasOfLaw.length === 0 || address.areasOfLaw.length > 5)) {
       errors.areasOfLaw = ['Please select between 1 and 5 areas of law that this address is relevant for'];
     }
 
     // validate courtTypes
-    if (courtTypesSelected
-      && (!address.courtTypes || address.courtTypes.length === 0 || address.courtTypes.length > 5)) {
+    if (
+      courtTypesSelected &&
+      (!address.courtTypes || address.courtTypes.length === 0 || address.courtTypes.length > 5)
+    ) {
       errors.courtTypes = ['Please select at least one court type that this address is relevant for'];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
   }
 
-  private validateAddressLine1(address: Partial<CourtAddress>) {
+  private validateAddressType(address: Partial<CourtAddress>, existingAddresses: CourtAddress[]): string[] {
+    const addressTypeErrors: string[] = [];
+    if (!address.addressType) {
+      addressTypeErrors.push('Select an address type');
+    } else if (
+      address.addressType === CourtAddressType.VISIT_US &&
+      existingAddresses.some(existingAddress => existingAddress.addressType === address.addressType)
+    ) {
+      addressTypeErrors.push(
+        'A court can only have one listed address for visiting and this court already has one.' +
+          '  Please edit the other visit address first.'
+      );
+    }
+    return addressTypeErrors;
+  }
+
+  private validateAddressLine1(address: Partial<CourtAddress>): string[] {
     const addressLine1Errors: string[] = [];
     if (!address.addressLine1 || address.addressLine1.trim().length === 0) {
       addressLine1Errors.push('Enter address line 1, typically the building and street');
@@ -197,7 +255,7 @@ export class CourtAddressService {
     return addressLine1Errors;
   }
 
-  private validateAddressLine2(address: Partial<CourtAddress>, addressLine1Errors: string[]) {
+  private validateAddressLine2(address: Partial<CourtAddress>, addressLine1Errors: string[]): string[] {
     const addressLine2Errors: string[] = [];
     if (address.addressLine2 && address.addressLine2.length > 255) {
       addressLine1Errors.push('Address line 2 must be 255 characters or less');
@@ -210,7 +268,7 @@ export class CourtAddressService {
     return addressLine2Errors;
   }
 
-  private validateTownCity(address: Partial<CourtAddress>) {
+  private validateTownCity(address: Partial<CourtAddress>): string[] {
     const townCityErrors: string[] = [];
     if (!address.townCity || address.townCity.trim().length === 0) {
       townCityErrors.push('Enter a town or city');
@@ -225,7 +283,7 @@ export class CourtAddressService {
     return townCityErrors;
   }
 
-  private validateCounty(address: Partial<CourtAddress>) {
+  private validateCounty(address: Partial<CourtAddress>): string[] {
     const countyErrors: string[] = [];
     if (address.county && address.county.length > 255) {
       countyErrors.push('County must be 255 characters or less');
@@ -234,6 +292,17 @@ export class CourtAddressService {
       countyErrors.push("County must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
     }
     return countyErrors;
+  }
+
+  private validateEpimId(address: Partial<CourtAddress>): string[] {
+    const epimIdErrors: string[] = [];
+    if (address.epimId && address.epimId.length > 10) {
+      epimIdErrors.push('ePIMS Ref ID must be 10 characters or less');
+    }
+    if (address.epimId && !VALID_EPIM_ID_REGEX.test(address.epimId.trim())) {
+      epimIdErrors.push('ePIMS Ref ID must only include letters a to z, spaces and dashes.');
+    }
+    return epimIdErrors;
   }
 
   /**

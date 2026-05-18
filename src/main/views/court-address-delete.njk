@@ -18,7 +18,11 @@
         {{ govukSummaryList({
           rows: [
             {
-              key: { text: "Description" },
+              key: { text: "Court name" },
+              value: { text: courtName }
+            },
+            {
+              key: { text: "Address type" },
               value: { text: addressType(address) }
             },
             {

@@ -29,13 +29,15 @@
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-xl">Select an address</h1>
 
+      <p class="govuk-body">Postcode: {{ postcode }}.</p>
+
       <form method="POST" action="{{ actionUrl }}">
 
         {{ govukSelect({
           id: "address",
           name: "address",
           label: {
-            text: "Select an address from the list"
+            text: "Choose an address"
           },
           items: addressOptions
         }) }}

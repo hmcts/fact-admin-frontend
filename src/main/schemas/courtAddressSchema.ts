@@ -21,4 +21,4 @@ export const courtAddressSchema = z.object({
 export const courtAddressListSchema = z.array(courtAddressSchema);
 
 export type CourtAddress = z.infer<typeof courtAddressSchema>;
-export type CourtAddressType = z.infer<typeof courtAddressTypeSchema>;
+export const CourtAddressType = courtAddressTypeSchema.enum;
