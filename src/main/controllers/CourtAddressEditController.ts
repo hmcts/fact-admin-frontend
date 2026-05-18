@@ -27,8 +27,14 @@ export class CourtAddressEditController {
       return;
     }
 
+    const courtAddresses = (courtAddressListResponse as CourtAddress[]);
+    // take advantage of the fact that the order we want the addresses in just so happens
+    // to be the same as the order they'd be in if we sort by the length of the addressType
+    // string value (VISIT_US < WRITE_TO_US < VISIT_OR_CONTACT_US)
+    courtAddresses.sort((a, b) => a.addressType.length - b.addressType.length);
+
     res.render('court-address-list', {
-      courtAddresses: courtAddressListResponse,
+      courtAddresses,
       courtId,
       pageTitle: 'Manage Addresses',
     });
