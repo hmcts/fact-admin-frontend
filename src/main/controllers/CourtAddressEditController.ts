@@ -27,11 +27,13 @@ export class CourtAddressEditController {
       return;
     }
 
-    const courtAddresses = (courtAddressListResponse as CourtAddress[]);
-    // take advantage of the fact that the order we want the addresses in just so happens
-    // to be the same as the order they'd be in if we sort by the length of the addressType
-    // string value (VISIT_US < WRITE_TO_US < VISIT_OR_CONTACT_US)
-    courtAddresses.sort((a, b) => a.addressType.length - b.addressType.length);
+    const courtAddresses = courtAddressListResponse as CourtAddress[];
+    const addressTypeRank: Record<string, number> = {
+      VISIT_US: 1,
+      WRITE_TO_US: 2,
+      VISIT_OR_CONTACT_US: 3,
+    };
+    courtAddresses.sort((a, b) => (addressTypeRank[a.addressType] ?? 99) - (addressTypeRank[b.addressType] ?? 99));
 
     res.render('court-address-list', {
       courtAddresses,
@@ -114,9 +116,8 @@ export class CourtAddressEditController {
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
-      pageTitle: 'Select Address'
+      pageTitle: 'Select Address',
     });
-
   }
 
   @route('/select/:addressId')
@@ -183,18 +184,7 @@ export class CourtAddressEditController {
       return;
     }
 
-    const courtAddress: Partial<CourtAddress> = {
-      courtId,
-      addressLine1: req.body.addressLine1,
-      addressLine2: req.body.addressLine2,
-      townCity: req.body.townCity,
-      county: req.body.county?.trim() === '' ? undefined : req.body.county?.trim(),
-      postcode: req.body.postcode,
-      epimId: req.body.epimId?.trim() === '' ? undefined : req.body.epimId?.trim(),
-      addressType: req.body.addressType,
-      areasOfLaw: req.body['areas-of-law'] ? [req.body['areas-of-law']].flat() : undefined,
-      courtTypes: req.body['court-types'] ? [req.body['court-types']].flat() : undefined,
-    };
+    const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId);
 
     const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
     const ctSelected = (req.body.courtTypes as string).toLowerCase() === 'yes';
@@ -214,7 +204,7 @@ export class CourtAddressEditController {
       res.render('court-address-edit-success', {
         courtName: saveResult['courtName'],
         address: saveResult['address'] as CourtAddress,
-        courtId
+        courtId,
       });
     }
   }
@@ -291,19 +281,7 @@ export class CourtAddressEditController {
       return;
     }
 
-    const courtAddress: Partial<CourtAddress> = {
-      id: addressId,
-      courtId,
-      addressLine1: req.body.addressLine1,
-      addressLine2: req.body.addressLine2,
-      townCity: req.body.townCity,
-      county: req.body.county?.trim() === '' ? undefined : req.body.county?.trim(),
-      postcode: req.body.postcode,
-      epimId: req.body.epimId?.trim() === '' ? undefined : req.body.epimId?.trim(),
-      addressType: req.body.addressType,
-      areasOfLaw: req.body['areas-of-law'] ? [req.body['areas-of-law']].flat() : undefined,
-      courtTypes: req.body['court-types'] ? [req.body['court-types']].flat() : undefined,
-    };
+    const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId, addressId);
 
     const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
     const ctSelected = (req.body.courtTypes as string).toLowerCase() === 'yes';
@@ -330,7 +308,7 @@ export class CourtAddressEditController {
       res.render('court-address-edit-success', {
         courtName: saveResult['courtName'],
         address: saveResult['address'] as CourtAddress,
-        courtId
+        courtId,
       });
     }
   }
@@ -417,7 +395,7 @@ export class CourtAddressEditController {
     res.render('court-address-delete-success', {
       courtName: deleteResult['courtName'],
       address: deleteResult['address'],
-      courtId
+      courtId,
     });
   }
 
@@ -443,17 +421,46 @@ export class CourtAddressEditController {
   }
 
   private validateServiceResponse(response: unknown, res: Response, notFoundView?: string): boolean {
-    if (notFoundView && response === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      res.render(notFoundView);
-      return false;
-    }
-    if (typeof response === 'number') {
-      res.status(response);
-      res.render('error');
+    if (this.isHttpStatus(response)) {
+      this.renderServiceError(res, response, notFoundView);
       return false;
     }
     return true;
+  }
+
+  private isHttpStatus(result: unknown): result is number {
+    return typeof result === 'number';
+  }
+
+  private renderServiceError(res: Response, status: number, notFoundView?: string): void {
+    if (status === HttpStatusCode.NotFound && notFoundView) {
+      res.status(HttpStatusCode.NotFound);
+      res.render(notFoundView);
+      return;
+    }
+
+    res.status(status);
+    res.render('error');
+  }
+
+  private buildCourtAddressFromRequestBody(
+    body: Request['body'],
+    courtId: string,
+    addressId?: string
+  ): Partial<CourtAddress> {
+    return {
+      id: addressId,
+      courtId,
+      addressLine1: body.addressLine1,
+      addressLine2: body.addressLine2,
+      townCity: body.townCity,
+      county: body.county?.trim() === '' ? undefined : body.county?.trim(),
+      postcode: body.postcode,
+      epimId: body.epimId?.trim() === '' ? undefined : body.epimId?.trim(),
+      addressType: body.addressType,
+      areasOfLaw: body['areas-of-law'] ? [body['areas-of-law']].flat() : undefined,
+      courtTypes: body['court-types'] ? [body['court-types']].flat() : undefined,
+    };
   }
 
   private buildAddressData(dpaAddressData: string, existingAddress?: CourtAddress): Partial<CourtAddress> {
