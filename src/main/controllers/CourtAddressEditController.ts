@@ -95,12 +95,22 @@ export class CourtAddressEditController {
       return;
     }
 
+    if (postcodeSearchResponse['status'] === 'invalid') {
+      res.render('court-address-find', {
+        courtId,
+        pageTitle: 'Find Address',
+        error: postcodeSearchResponse['error'],
+      });
+      return;
+    }
+
     res.render('court-address-select', {
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
-      pageTitle: 'Select Address',
+      pageTitle: 'Select Address'
     });
+
   }
 
   @route('/select/:addressId')
@@ -127,6 +137,16 @@ export class CourtAddressEditController {
 
     const postcodeSearchResponse = await courtAddressService.retrieveAddressOptions(postcode);
     if (!this.validateServiceResponse(postcodeSearchResponse, res, 'not-found')) {
+      return;
+    }
+
+    if (postcodeSearchResponse['status'] === 'invalid') {
+      res.render('court-address-find', {
+        courtId,
+        addressId,
+        pageTitle: 'Find Address',
+        error: postcodeSearchResponse['error'],
+      });
       return;
     }
 
@@ -166,8 +186,8 @@ export class CourtAddressEditController {
       postcode: req.body.postcode,
       epimId: req.body.epimId?.trim() === '' ? undefined : req.body.epimId?.trim(),
       addressType: req.body.addressType,
-      areasOfLaw: req.body['areas-of-law'],
-      courtTypes: req.body['court-types'],
+      areasOfLaw: req.body['areas-of-law'] ? [req.body['areas-of-law']].flat() : undefined,
+      courtTypes: req.body['court-types'] ? [req.body['court-types']].flat() : undefined,
     };
 
     const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
@@ -275,8 +295,8 @@ export class CourtAddressEditController {
       postcode: req.body.postcode,
       epimId: req.body.epimId?.trim() === '' ? undefined : req.body.epimId?.trim(),
       addressType: req.body.addressType,
-      areasOfLaw: req.body['areas-of-law'],
-      courtTypes: req.body['court-types'],
+      areasOfLaw: req.body['areas-of-law'] ? [req.body['areas-of-law']].flat() : undefined,
+      courtTypes: req.body['court-types'] ? [req.body['court-types']].flat() : undefined,
     };
 
     const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';

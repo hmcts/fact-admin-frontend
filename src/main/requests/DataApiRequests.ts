@@ -186,11 +186,14 @@ export class DataApiRequests {
   /**
    * Request to data API to perform a postcode based address search (O|S)
    */
-  public async getAddressesForPostcode(postcode: string): Promise<OsData | HttpStatusCode> {
+  public async getAddressesForPostcode(postcode: string): Promise<OsData | Map<string, string> | HttpStatusCode> {
     try {
       const response = await dataApi.get(`/search/address/v1/postcode/${postcode}`);
       return osDataSchema.parse(response.data);
     } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
       logger.error('Error fetching OS postcode search results:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)

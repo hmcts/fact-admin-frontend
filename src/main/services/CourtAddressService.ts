@@ -16,6 +16,14 @@ export type SaveCourtAddressResponse =
     }
   | HttpStatusCode;
 
+export type RetrieveAddressOptionsResponse =
+  | DpaAddress[]
+  | {
+      status: 'invalid';
+      error: string;
+    }
+  | HttpStatusCode;
+
 export type DeleteCourtAddressResponse =
   | {
       status: 'deleted';
@@ -55,11 +63,19 @@ export class CourtAddressService {
     return dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
   }
 
-  public async retrieveAddressOptions(postcode: string): Promise<DpaAddress[] | HttpStatusCode> {
+  public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
     const result = await dataApiRequests.getAddressesForPostcode(postcode);
     if (typeof result === 'number') {
       return result;
     }
+    if (result instanceof Map) {
+      if (result.has('message')) {
+        return { status: 'invalid', error: result.get('message') as string };
+      } else {
+        return HttpStatusCode.BadRequest;
+      }
+    }
+
     return result.results.map(resultItem => resultItem.DPA).filter((dpa): dpa is DpaAddress => dpa !== null);
   }
 
@@ -76,12 +92,7 @@ export class CourtAddressService {
     }
 
     // validate for obvious errors before attempting to save
-    const validationErrors = this.validateAddress(
-      address,
-      existingAddresses,
-      aolSelected,
-      courtTypesSelected
-    );
+    const validationErrors = this.validateAddress(address, existingAddresses, aolSelected, courtTypesSelected);
     if (validationErrors) {
       return { status: 'invalid', address: { ...address, errors: validationErrors } };
     }
@@ -230,7 +241,9 @@ export class CourtAddressService {
       addressTypeErrors.push('Select an address type');
     } else if (
       address.addressType === CourtAddressType.VISIT_US &&
-      existingAddresses.some(existingAddress => existingAddress.addressType === address.addressType)
+      existingAddresses.some(
+        existingAddress => existingAddress.addressType === address.addressType && existingAddress.id !== address.id
+      )
     ) {
       addressTypeErrors.push(
         'A court can only have one listed address for visiting and this court already has one.' +
