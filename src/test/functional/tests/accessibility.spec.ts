@@ -30,5 +30,44 @@ test.describe(
       await courtEditPage.expectVisibleElements();
       await axeUtils.audit();
     });
+
+    test('Address List Page Accessibility', async ({ axeUtils, courtAddressListPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressListPage.goto(createdCourt.id);
+          await courtAddressListPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Address Find Page Accessibility', async ({ axeUtils, playwright, courtAddressFindPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressFindPage.goto(createdCourt.id);
+          await courtAddressFindPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Address Select Page Accessibility', async ({ axeUtils, playwright, courtAddressSelectPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
+          await courtAddressSelectPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
   }
 );

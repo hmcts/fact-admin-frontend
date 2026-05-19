@@ -89,7 +89,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h2 class="govuk-heading-l">Address</h2>
+      <h1 class="govuk-heading-l">Address</h1>
 
       {% set actionUrl %}
         {% if addressId %}
@@ -227,9 +227,6 @@
             isPageHeading: false
           }
         }) %}
-
-          {% set aolYesChecked = true if aolSelected else false %}
-          {% set aolNoChecked = not aolYesChecked %}
 
           {{ govukRadios({
             idPrefix: "areasOfLaw",

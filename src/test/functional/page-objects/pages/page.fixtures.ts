@@ -1,5 +1,12 @@
 import { Page } from '@playwright/test';
 
+import { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
+import { CourtAddressDeletePage } from './court-address-delete.po';
+import { CourtAddressEditSuccessPage } from './court-address-edit-success.po';
+import { CourtAddressEditPage } from './court-address-edit.po';
+import { CourtAddressFindPage } from './court-address-find.po';
+import { CourtAddressListPage } from './court-address-list.po';
+import { CourtAddressSelectPage } from './court-address-select.po';
 import { CourtEditPage } from './court-edit.po';
 import { HomePage } from './home.po';
 
@@ -7,6 +14,13 @@ export interface PageFixtures {
   determinePage: Page;
   homePage: HomePage;
   courtEditPage: CourtEditPage;
+  courtAddressListPage: CourtAddressListPage;
+  courtAddressFindPage: CourtAddressFindPage;
+  courtAddressSelectPage: CourtAddressSelectPage;
+  courtAddressEditPage: CourtAddressEditPage;
+  courtAddressDeletePage: CourtAddressDeletePage;
+  courtAddressEditSuccessPage: CourtAddressEditSuccessPage;
+  courtAddressDeleteSuccessPage: CourtAddressDeleteSuccessPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -31,6 +45,34 @@ export const pageFixtures = {
   courtEditPage: async ({ determinePage }, use): Promise<void> => {
     const courtEditPage = new CourtEditPage(determinePage);
     await use(courtEditPage);
+  },
+  courtAddressListPage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressListPage = new CourtAddressListPage(determinePage);
+    await use(courtAddressListPage);
+  },
+  courtAddressFindPage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressFindPage = new CourtAddressFindPage(determinePage);
+    await use(courtAddressFindPage);
+  },
+  courtAddressSelectPage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressSelectPage = new CourtAddressSelectPage(determinePage);
+    await use(courtAddressSelectPage);
+  },
+  courtAddressEditPage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressEditPage = new CourtAddressEditPage(determinePage);
+    await use(courtAddressEditPage);
+  },
+  courtAddressDeletePage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressDeletePage = new CourtAddressDeletePage(determinePage);
+    await use(courtAddressDeletePage);
+  },
+  courtAddressEditSuccessPage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressEditSuccessPage = new CourtAddressEditSuccessPage(determinePage);
+    await use(courtAddressEditSuccessPage);
+  },
+  courtAddressDeleteSuccessPage: async ({ determinePage }, use): Promise<void> => {
+    const courtAddressDeleteSuccessPage = new CourtAddressDeleteSuccessPage(determinePage);
+    await use(courtAddressDeleteSuccessPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };

@@ -9,9 +9,11 @@
 {% macro rowActions(items) %}
   <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">
     {% for item in items %}
-      <li class="govuk-summary-list__actions-list-item">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
-      </li>
+      {%- if item.href %}
+        <li class="govuk-summary-list__actions-list-item">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
+        </li>
+      {% endif -%}
     {% endfor %}
   </ul>
 {% endmacro %}

@@ -9,16 +9,8 @@
 
 {# Address Block #}
 {% macro addressBlock(address, asRow=false) %}
-  {% if asRow %}
-    {{ address.addressLine1 }},
-    {% if address.addressLine2 %}
-      {{ address.addressLine2 }},
-    {% endif %}
-    {{ address.townCity }},
-    {% if address.county %}
-      {{ address.county }},
-    {% endif %}
-    {{ address.postcode }}
+  {%- if asRow %}
+    {{ address.addressLine1 }}, {%- if address.addressLine2 %} {{ address.addressLine2 }}, {% endif -%} {{ address.townCity }}, {%- if address.county %} {{ address.county }}, {% endif -%} {{ address.postcode }}
   {% else %}
     <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine1 }}
     {% if address.addressLine2 %}
@@ -29,16 +21,16 @@
       <p class="govuk-body govuk-!-margin-bottom-1">{{ address.county }}</p>
     {% endif %}
     <p class="govuk-body govuk-!-margin-bottom-0">{{ address.postcode }}</p>
-  {% endif %}
+  {% endif -%}
 {% endmacro %}
 
 {# presentable format of the addressType #}
 {% macro addressType(address) %}
-  {% if address.addressType === "WRITE_TO_US" %}
+  {%- if address.addressType === "WRITE_TO_US" %}
     Send documents to
   {% elseif address.addressType === "VISIT_OR_CONTACT_US" %}
     Visit and send documents to
   {% else %} {# visit us #}
     Visit
-  {% endif %}
+  {% endif -%}
 {% endmacro %}

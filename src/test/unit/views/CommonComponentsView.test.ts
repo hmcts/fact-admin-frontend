@@ -1,8 +1,6 @@
 import { env } from '../../../testUtils/nunjucksHelper';
 
 describe('Common Components View', () => {
-  const normaliseWhitespace = (value: string): string => value.replace(/\s+/g, ' ').trim();
-
   test('renders a success panel with title and text', () => {
     const html = env.renderString(
       `
@@ -34,9 +32,7 @@ describe('Common Components View', () => {
       }
     );
 
-    expect(normaliseWhitespace(html)).toContain(
-      '10 Downing Street, Westminster, London, Greater London, SW1A 2AA'
-    );
+    expect(html).toContain('10 Downing Street, Westminster, London, Greater London, SW1A 2AA');
   });
 
   test('renders address block in stacked format without optional fields', () => {
@@ -74,6 +70,6 @@ describe('Common Components View', () => {
       { address: { addressType } }
     );
 
-    expect(normaliseWhitespace(html)).toBe(expectedLabel);
+    expect(html.trim()).toBe(expectedLabel);
   });
 });
