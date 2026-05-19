@@ -98,10 +98,10 @@ export async function reduceAddressesCount(
   courtId: string,
   reduceTo: number
 ): Promise<void> {
-  // occasionally, the test court generator will add three addresses, which
-  // has the downside of causing the add button to be removed from view.
-  // As this visibility test is for the whole page, this just makes sure we
-  // have some addresses, but not three addresses.
+  // test court generator will add up to three addresses, which
+  // has the downside of causing the pages to sometimes render with unwanted
+  // side effects (missing add button / no delete action). this just lets
+  // us reduce the number of addresses so that we can perform empirical tests
   await courtAddressListPage.goto(courtId);
   while ((await courtAddressListPage.getAddressCount()) > reduceTo) {
     const addressId = await getFirstDeleteAddressId(page, courtId);
