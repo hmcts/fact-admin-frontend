@@ -31,7 +31,36 @@ test.describe(
       );
     });
 
-    test('shows validation errors when required fields are missing', async ({
+    test('shows validation error when address type is missing', async ({
+      courtAddressFindPage,
+      courtAddressEditPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Court Address Edit Functional Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          const address = buildTestAddress('ValidationAddressType');
+
+          await courtAddressFindPage.goto(createdCourt.id);
+          await courtAddressFindPage.clickEnterAddressManually();
+
+          await courtAddressEditPage.addressLine1Input.fill(address.addressLine1);
+          await courtAddressEditPage.addressLine2Input.fill(address.addressLine2);
+          await courtAddressEditPage.townCityInput.fill(address.townCity);
+          await courtAddressEditPage.countyInput.fill(address.county);
+          await courtAddressEditPage.postcodeInput.fill(address.postcode);
+          await courtAddressEditPage.epimIdInput.fill(address.epimId);
+          await courtAddressEditPage.clickSave();
+
+          await expect(courtAddressEditPage.errorSummary).toBeVisible();
+          await expect(courtAddressEditPage.mainContent.content).toContainText('Select an address type');
+        }
+      );
+    });
+
+    test('shows validation error when address line 1 is missing', async ({
       courtAddressFindPage,
       courtAddressEditPage,
       playwright,
@@ -43,10 +72,61 @@ test.describe(
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.clickEnterAddressManually();
+
+          await courtAddressEditPage.fillAddressForm(buildTestAddress('ValidationAddressLine1'));
+          await courtAddressEditPage.addressLine1Input.fill('');
           await courtAddressEditPage.clickSave();
 
           await expect(courtAddressEditPage.errorSummary).toBeVisible();
-          await expect(courtAddressEditPage.mainContent.content).toContainText('There is a problem');
+          await expect(courtAddressEditPage.mainContent.content).toContainText(
+            'Enter address line 1, typically the building and street'
+          );
+        }
+      );
+    });
+
+    test('shows validation error when town or city is missing', async ({
+      courtAddressFindPage,
+      courtAddressEditPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Court Address Edit Functional Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await courtAddressFindPage.goto(createdCourt.id);
+          await courtAddressFindPage.clickEnterAddressManually();
+
+          await courtAddressEditPage.fillAddressForm(buildTestAddress('ValidationTownCity'));
+          await courtAddressEditPage.townCityInput.fill('');
+          await courtAddressEditPage.clickSave();
+
+          await expect(courtAddressEditPage.errorSummary).toBeVisible();
+          await expect(courtAddressEditPage.mainContent.content).toContainText('Enter a town or city');
+        }
+      );
+    });
+
+    test('shows validation error when postcode is missing', async ({
+      courtAddressFindPage,
+      courtAddressEditPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Court Address Edit Functional Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await courtAddressFindPage.goto(createdCourt.id);
+          await courtAddressFindPage.clickEnterAddressManually();
+
+          await courtAddressEditPage.fillAddressForm(buildTestAddress('ValidationPostcode'));
+          await courtAddressEditPage.postcodeInput.fill('');
+          await courtAddressEditPage.clickSave();
+
+          await expect(courtAddressEditPage.errorSummary).toBeVisible();
+          await expect(courtAddressEditPage.mainContent.content).toContainText('Enter a postcode');
         }
       );
     });
