@@ -10,6 +10,8 @@ import { mockRequest } from '../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 const ADDRESS_ID = '22222222-2222-4222-8222-222222222222';
+const AREA_OF_LAW_ID = '33333333-3333-4333-8333-333333333333';
+const COURT_TYPE_ID = '44444444-4444-4444-8444-444444444444';
 
 const buildAddress = (overrides?: Partial<CourtAddress>): CourtAddress => ({
   id: ADDRESS_ID,
@@ -183,8 +185,8 @@ describe('CourtAddressEditController', () => {
       postcode: 'RG1 2AA',
       epimId: ' EP-22 ',
       addressType: CourtAddressType.VISIT_US,
-      'areas-of-law': ['Immigration and Asylum'],
-      'court-types': ['Crown Court'],
+      'areas-of-law': [AREA_OF_LAW_ID],
+      'court-types': [COURT_TYPE_ID],
       areasOfLaw: 'yes',
       courtTypes: 'yes',
     };
@@ -215,8 +217,8 @@ describe('CourtAddressEditController', () => {
           courtId: COURT_ID,
           county: undefined,
           epimId: 'EP-22',
-          areasOfLaw: ['Immigration and Asylum'],
-          courtTypes: ['Crown Court'],
+          areasOfLaw: [AREA_OF_LAW_ID],
+          courtTypes: [COURT_TYPE_ID],
         },
         COURT_ID,
         true,
@@ -254,10 +256,10 @@ describe('CourtAddressEditController', () => {
 
     const saveStub = stub(CourtAddressService.prototype, 'save').resolves(invalidSaveResponse);
     const listAreasOfLawStub = stub(TypesService.prototype, 'listAreasOfLaw').resolves([
-      { id: 'aol-1', name: 'Family' },
+      { id: AREA_OF_LAW_ID, name: 'Family' },
     ] as never);
     const listCourtTypesStub = stub(TypesService.prototype, 'listCourtTypes').resolves([
-      { id: 'ct-1', name: 'Crown Court' },
+      { id: COURT_TYPE_ID, name: 'Crown Court' },
     ] as never);
 
     responseMock
@@ -552,8 +554,8 @@ describe('CourtAddressEditController', () => {
 
     const retrieveStub = stub(CourtAddressService.prototype, 'retrieve').resolves(
       buildAddress({
-        areasOfLaw: ['aol-1'],
-        courtTypes: ['ct-1'],
+        areasOfLaw: [AREA_OF_LAW_ID],
+        courtTypes: [COURT_TYPE_ID],
       })
     );
     const listAreasOfLawStub = stub(TypesService.prototype, 'listAreasOfLaw').resolves([] as never);
@@ -605,8 +607,8 @@ describe('CourtAddressEditController', () => {
       postcode: 'RG1 2AA',
       epimId: ' EPIM-22 ',
       addressType: CourtAddressType.WRITE_TO_US,
-      'areas-of-law': ['Family'],
-      'court-types': ['County Court'],
+      'areas-of-law': [AREA_OF_LAW_ID],
+      'court-types': [COURT_TYPE_ID],
       areasOfLaw: 'no',
       courtTypes: 'yes',
     };
@@ -635,8 +637,8 @@ describe('CourtAddressEditController', () => {
           courtId: COURT_ID,
           county: undefined,
           epimId: 'EPIM-22',
-          areasOfLaw: ['Family'],
-          courtTypes: ['County Court'],
+          areasOfLaw: [AREA_OF_LAW_ID],
+          courtTypes: [COURT_TYPE_ID],
         },
         COURT_ID,
         false,
