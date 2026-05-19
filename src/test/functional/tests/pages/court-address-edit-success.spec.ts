@@ -9,7 +9,7 @@ test.describe(
     tag: '@functional',
   },
   () => {
-    test('shows success messaging and navigation links after saving an address', async ({
+    test('shows success message and navigation links after saving an address', async ({
       courtAddressFindPage,
       courtAddressEditPage,
       courtAddressEditSuccessPage,

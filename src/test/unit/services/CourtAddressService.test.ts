@@ -105,6 +105,17 @@ describe('CourtAddressService', () => {
     expect(result).toBe(HttpStatusCode.BadRequest);
   });
 
+  test('returns status code when postcode search API returns an http status', async () => {
+    jest
+      .spyOn(DataApiRequests.prototype, 'getAddressesForPostcode')
+      .mockResolvedValue(HttpStatusCode.InternalServerError);
+
+    const service = new CourtAddressService();
+    const result = await service.retrieveAddressOptions('SW1A 1AA');
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
   test('returns invalid response from local validation and does not call save API', async () => {
     const getCourtAddressDetails = jest
       .spyOn(DataApiRequests.prototype, 'getCourtAddressDetails')
@@ -188,6 +199,38 @@ describe('CourtAddressService', () => {
     });
   });
 
+  test('returns status code when create address API returns an error status', async () => {
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress').mockResolvedValue(HttpStatusCode.InternalServerError);
+
+    const service = new CourtAddressService();
+    const result = await service.save(buildAddress({ id: null }), courtId, false, false);
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('creates a new address when addressId is not provided', async () => {
+    const createdAddress = buildAddress({ id: null });
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    const saveCourtAddress = jest
+      .spyOn(DataApiRequests.prototype, 'saveCourtAddress')
+      .mockResolvedValue(createdAddress);
+    const updateCourtAddress = jest.spyOn(DataApiRequests.prototype, 'updateCourtAddress');
+
+    const service = new CourtAddressService();
+    const result = await service.save(createdAddress, courtId, false, false);
+
+    expect(saveCourtAddress).toHaveBeenCalledWith(createdAddress, courtId);
+    expect(updateCourtAddress).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'saved',
+      courtName: 'Reading Crown Court',
+      address: createdAddress,
+    });
+  });
+
   test('updates an existing address when addressId is provided', async () => {
     const existingAddress = buildAddress();
     const updatedAddress = buildAddress({ addressLine1: '2 High Street' });
@@ -252,6 +295,31 @@ describe('CourtAddressService', () => {
     expect(result).toBe(HttpStatusCode.InternalServerError);
   });
 
+  test('returns status code when loading court fails during delete', async () => {
+    const getCourtAddressDetailsById = jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetailsById');
+    const deleteCourtAddress = jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress');
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(HttpStatusCode.NotFound);
+
+    const service = new CourtAddressService();
+    const result = await service.delete(courtId, addressId);
+
+    expect(result).toBe(HttpStatusCode.NotFound);
+    expect(getCourtAddressDetailsById).not.toHaveBeenCalled();
+    expect(deleteCourtAddress).not.toHaveBeenCalled();
+  });
+
+  test('returns status code when loading address fails during delete', async () => {
+    const deleteCourtAddress = jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress');
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetailsById').mockResolvedValue(HttpStatusCode.NotFound);
+
+    const service = new CourtAddressService();
+    const result = await service.delete(courtId, addressId);
+
+    expect(result).toBe(HttpStatusCode.NotFound);
+    expect(deleteCourtAddress).not.toHaveBeenCalled();
+  });
+
   test('returns court name when retrieveCourtName succeeds', async () => {
     jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
 
@@ -274,8 +342,11 @@ describe('CourtAddressService', () => {
     const service = new CourtAddressService();
 
     expect(service.validatePostcode(undefined)).toBe(POSTCODE_ERROR_MESSAGES.blankPostcode);
+    expect(service.validatePostcode('   ')).toBe(POSTCODE_ERROR_MESSAGES.blankPostcode);
     expect(service.validatePostcode('abc')).toBe(POSTCODE_ERROR_MESSAGES.invalidPostcode);
     expect(service.validatePostcode('BT1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.northernIrelandPostcode);
+    expect(service.validatePostcode('JE1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.jerseyPostcode);
+    expect(service.validatePostcode('IM1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.isleOfManPostcode);
     expect(service.isValidPostcode('SW1A 1AA')).toBe(true);
     expect(service.isValidPostcode('GY1 1AA')).toBe(false);
   });

@@ -9,7 +9,7 @@ test.describe(
     tag: '@functional',
   },
   () => {
-    test('shows success messaging and navigation links after deleting an address', async ({
+    test('shows success message and navigation links after deleting an address', async ({
       courtAddressDeletePage,
       courtAddressDeleteSuccessPage,
       playwright,
