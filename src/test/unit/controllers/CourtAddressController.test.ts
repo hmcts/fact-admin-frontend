@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import { CourtAddressEditController } from '../../../main/controllers/CourtAddressEditController';
+import { CourtAddressController } from '../../../main/controllers/CourtAddressController';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
 import { CourtAddressService, POSTCODE_ERROR_MESSAGES } from '../../../main/services/CourtAddressService';
 import { TypesService } from '../../../main/services/TypesService';
@@ -30,9 +30,9 @@ const buildAddress = (overrides?: Partial<CourtAddress>): CourtAddress => ({
   ...overrides,
 });
 
-describe('CourtAddressEditController', () => {
+describe('CourtAddressController', () => {
   test('renders the address list sorted by address type rank', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -74,7 +74,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -97,7 +97,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders postcode validation error on select new when postcode is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -123,7 +123,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders select page when postcode lookup succeeds', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -170,7 +170,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders success page when saving a new address succeeds', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -231,7 +231,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('re-renders edit form when saving a new address returns validation errors', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -293,7 +293,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found for update when addressId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -316,7 +316,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders delete success page when delete succeeds', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -347,7 +347,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('maps DPA address data when rendering add address details page', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -404,7 +404,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders find page for updating an address', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -432,7 +432,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found when updating find route receives not found from service', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -456,7 +456,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders postcode validation error on select for update when postcode is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -484,7 +484,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders select page for updating address when postcode lookup succeeds', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -527,7 +527,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders edit form for existing address and maps DPA address without organisation name', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -592,7 +592,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders success page when updating an address succeeds', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -652,7 +652,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders error page when save new address service call fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -684,7 +684,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders delete confirmation page with court name and address', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -715,7 +715,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found when delete confirmation court lookup fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -744,7 +744,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('stops add address flow and renders court-not-found when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -768,7 +768,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('handles malformed DPA JSON when rendering add address details page', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -804,7 +804,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('supports array path params and returns first values', () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const request = mockRequest({});
     request.params = {
       courtId: [COURT_ID, 'ignored'] as unknown as string,
@@ -818,7 +818,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders find page for adding a new address', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -836,7 +836,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found for add find page when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -853,7 +853,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found when address list service returns not found', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -877,7 +877,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders find page with validation error when select new returns invalid search response', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -907,7 +907,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found when edit address retrieve fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -934,7 +934,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found when add-address lookup of areas of law fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -962,7 +962,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found when add-address lookup of court types fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -990,7 +990,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders error page when delete operation fails with non-not-found status', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1014,7 +1014,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found when deleting address and courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1038,7 +1038,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found when deleting address and addressId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1062,7 +1062,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found in find-for-update when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1085,7 +1085,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in find-for-update when addressId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1108,7 +1108,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found in select-new when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1131,7 +1131,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in select-new when postcode lookup returns not found', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1157,7 +1157,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found in select-for-update when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1180,7 +1180,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in select-for-update when addressId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1203,7 +1203,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in select-for-update when postcode lookup returns not found', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1229,7 +1229,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders find page in select-for-update when lookup response is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -1259,7 +1259,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found when save-new receives invalid courtId', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1282,7 +1282,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found in edit-address when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1305,7 +1305,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in edit-address when addressId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1328,7 +1328,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found in update-existing-address when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1351,7 +1351,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in update-existing-address when save returns not found', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1382,7 +1382,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in update-existing-address invalid flow when areas-of-law lookup fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1423,7 +1423,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in update-existing-address invalid flow when court-types lookup fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1464,7 +1464,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders court-not-found in delete confirmation when courtId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1488,7 +1488,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in delete confirmation when addressId is invalid', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1512,7 +1512,7 @@ describe('CourtAddressEditController', () => {
   });
 
   test('renders not-found in delete confirmation when address retrieval fails', async () => {
-    const controller = new CourtAddressEditController();
+    const controller = new CourtAddressController();
     const response = {
       render: () => '',
       status: () => response,

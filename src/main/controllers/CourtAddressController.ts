@@ -14,7 +14,7 @@ const courtAddressService = new CourtAddressService();
 const typesService = new TypesService();
 
 @route('/courts/:courtId/edit/address')
-export class CourtAddressEditController {
+export class CourtAddressController {
   @GET()
   public async renderAddressList(req: Request, res: Response): Promise<void> {
     const { courtId } = this.resolvePathParams(req);
