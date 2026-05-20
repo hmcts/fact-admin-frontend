@@ -186,8 +186,8 @@ export class CourtAddressEditController {
 
     const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId);
 
-    const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
-    const ctSelected = (req.body.courtTypes as string).toLowerCase() === 'yes';
+    const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
+    const ctSelected = ((req.body.courtTypes as string) ?? '').toLowerCase() === 'yes';
 
     const saveResult = await courtAddressService.save(courtAddress, courtId, aolSelected, ctSelected);
     // handles HttpResponseCode responses
@@ -283,8 +283,8 @@ export class CourtAddressEditController {
 
     const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId, addressId);
 
-    const aolSelected = (req.body.areasOfLaw as string).toLowerCase() === 'yes';
-    const ctSelected = (req.body.courtTypes as string).toLowerCase() === 'yes';
+    const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
+    const ctSelected = ((req.body.courtTypes as string) ?? '').toLowerCase() === 'yes';
 
     const saveResult = await courtAddressService.save(courtAddress, courtId, aolSelected, ctSelected, addressId);
     // handles HttpResponseCode responses

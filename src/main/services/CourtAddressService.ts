@@ -190,7 +190,7 @@ export class CourtAddressService {
     }
 
     // addressLine2 (optional, but if you've added one it needs to be right)
-    const addressLine2Errors = this.validateAddressLine2(address, addressLine1Errors);
+    const addressLine2Errors = this.validateAddressLine2(address);
     if (addressLine2Errors.length > 0) {
       errors.addressLine2 = addressLine2Errors;
     }
@@ -268,13 +268,13 @@ export class CourtAddressService {
     return addressLine1Errors;
   }
 
-  private validateAddressLine2(address: Partial<CourtAddress>, addressLine1Errors: string[]): string[] {
+  private validateAddressLine2(address: Partial<CourtAddress>): string[] {
     const addressLine2Errors: string[] = [];
     if (address.addressLine2 && address.addressLine2.length > 255) {
-      addressLine1Errors.push('Address line 2 must be 255 characters or less');
+      addressLine2Errors.push('Address line 2 must be 255 characters or less');
     }
     if (address.addressLine2 && !VALID_ADDRESS_LINE_REGEX.test(address.addressLine2.trim())) {
-      addressLine1Errors.push(
+      addressLine2Errors.push(
         "Address line 2 must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
       );
     }
@@ -286,7 +286,7 @@ export class CourtAddressService {
     if (!address.townCity || address.townCity.trim().length === 0) {
       townCityErrors.push('Enter a town or city');
     } else if (address.townCity.length > 100) {
-      townCityErrors.push('Town or city must be 255 characters or less');
+      townCityErrors.push('Town or city must be 100 characters or less');
     }
     if (address.townCity && !VALID_ADDRESS_LINE_REGEX.test(address.townCity.trim())) {
       townCityErrors.push(

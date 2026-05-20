@@ -12,7 +12,7 @@
   {%- if asRow %}
     {{ address.addressLine1 }}, {%- if address.addressLine2 %} {{ address.addressLine2 }}, {% endif -%} {{ address.townCity }}, {%- if address.county %} {{ address.county }}, {% endif -%} {{ address.postcode }}
   {% else %}
-    <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine1 }}
+    <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine1 }}</p>
     {% if address.addressLine2 %}
       <p class="govuk-body govuk-!-margin-bottom-1">{{ address.addressLine2 }}</p>
     {% endif %}
