@@ -1,0 +1,15 @@
+{% extends "template.njk" %}
+{% from "macros/common-components.njk" import successPanel %}
+
+{% block pageTitle %}
+  Cases heard saved - {{ courtName }}
+{% endblock %}
+
+{% block content %}
+  {{ successPanel("Cases heard saved", "Cases heard for " + courtName + " have been saved successfully.") }}
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a href="/courts/{{ courtId }}/edit" class="govuk-link govuk-link--no-visited-state">Continue updating {{ courtName }}</a></li>
+    <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
+  </ul>
+{% endblock %}

@@ -11,6 +11,7 @@ describe('Court Edit View', () => {
 
     expect(html).toContain('Editing - Reading Crown Court');
     expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/accessibility');
+    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
     expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/general');
     expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/warning-notice');
     expect(html).toContain('TODO');

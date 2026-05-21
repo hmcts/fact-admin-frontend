@@ -20,10 +20,12 @@ const errorMessage = {
 
 describe('DataApiRequests', () => {
   let getStub: sinon.SinonStub;
+  let putStub: sinon.SinonStub;
 
   beforeEach(() => {
     restore();
     getStub = stub(dataApi, 'get');
+    putStub = stub(dataApi, 'put');
   });
 
   it('returns true when health status is UP', async () => {
@@ -209,6 +211,104 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getCourtById(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court areas of law when the response uses java toString map keys', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const areasOfLaw = {
+      'AreaOfLawType(id=66666666-6666-4666-8666-666666666666, name=Divorce, nameCy=Ysgariad, externalLink=null, externalLinkCy=null, displayName=Divorce and separation, displayNameCy=Ysgariad a gwahanu)': true,
+      'AreaOfLawType(id=77777777-7777-4777-8777-777777777777, name=Probate, nameCy=Profiant, externalLink=null, externalLinkCy=null, displayName=null, displayNameCy=null)': false,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).resolves({ data: areasOfLaw });
+
+    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+
+    expect(response).toEqual([
+      {
+        areaOfLawType: {
+          displayName: 'Divorce and separation',
+          displayNameCy: 'Ysgariad a gwahanu',
+          externalLink: null,
+          externalLinkCy: null,
+          id: '66666666-6666-4666-8666-666666666666',
+          name: 'Divorce',
+          nameCy: 'Ysgariad',
+        },
+        selected: true,
+      },
+      {
+        areaOfLawType: {
+          displayName: null,
+          displayNameCy: null,
+          externalLink: null,
+          externalLinkCy: null,
+          id: '77777777-7777-4777-8777-777777777777',
+          name: 'Probate',
+          nameCy: 'Profiant',
+        },
+        selected: false,
+      },
+    ]);
+  });
+
+  it('returns not found when the court areas of law endpoint returns a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when the court areas of law response fails schema validation', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).resolves({
+      data: {
+        '{"name":"Divorce"}': true,
+      },
+    });
+
+    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns ok when court areas of law are updated successfully', async () => {
+    const payload = {
+      areasOfLaw: ['66666666-6666-4666-8666-666666666666'],
+      courtId: '55555555-5555-4555-8555-555555555555',
+    };
+
+    putStub
+      .withArgs('/courts/55555555-5555-4555-8555-555555555555/v1/areas-of-law', payload)
+      .resolves({ status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.updateCourtAreasOfLaw(payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns bad request when updating court areas of law fails', async () => {
+    const payload = {
+      areasOfLaw: ['66666666-6666-4666-8666-666666666666'],
+      courtId: '55555555-5555-4555-8555-555555555555',
+    };
+    const badRequestError = {
+      isAxiosError: true,
+      response: {
+        data: 'bad request',
+        status: 400,
+      },
+    };
+
+    putStub.withArgs('/courts/55555555-5555-4555-8555-555555555555/v1/areas-of-law', payload).rejects(badRequestError);
+
+    const response = await dataApiRequests.updateCourtAreasOfLaw(payload);
+
+    expect(response).toBe(HttpStatusCode.BadRequest);
   });
 
   it('returns parsed court details when the bulk court response is valid', async () => {
