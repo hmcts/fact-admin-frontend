@@ -1,0 +1,121 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{# MACROS - maybe add to common components? #}
+{% macro modelDrivenErrorSummary(model) %}
+  {% set errorList = [] %}
+  {% for field, errors in model.errors %}
+    {% if field !== "timestamp" %}
+      {% set fieldErrors = [] %}
+      {% for error in errors %}
+        {% set href = "#" + field if field !== "message" else null %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: href
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
+{% endmacro %}
+{#  END MACROS #}
+
+{% set regionOptions = [] %}
+{% if model.regions.length %}
+  {% for row in model.regions %}
+    {% set regionOptions = (regionOptions.push(
+      { value: row.id, text: row.name, selected: row.id == model.regionId }
+    ), regionOptions) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">General</h1>
+
+      <form method="post" action="/courts/{{ model.id }}/edit/general/success">
+
+          {{ govukInput({
+            label: {
+              text: "Name",
+              classes: "govuk-fieldset__legend--m"
+            },
+            hint: {
+              text: "Enter the name of the court. Only capitalise the first letter."
+            },
+            spellcheck: false,
+            id: "name",
+            name: "name",
+            spellcheck: true,
+            value: model.name,
+            errorMessage: {
+              text: model.errors.name[0]
+            } if model.errors.name else null
+          }) }}
+
+        {{ govukRadios({
+          classes: "govuk-radios--inline",
+          id: "open",
+          name: "open",
+          fieldset: {
+            legend: {
+              text: "Open/closed status",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: "Select the open/closed status of the court. This will affect whether the court is visible to users on the public website."
+          },
+          items: [
+            {
+              value: "true",
+              text: "Open",
+              checked: true if model.open else false
+            },
+            {
+              value: "false",
+              text: "Closed",
+              checked: false if model.open else true
+            }
+          ]
+        }) }}
+
+        {{ govukSelect({
+          id: "regionId",
+          name: "regionId",
+          label: {
+            text: "Region",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Select the region in which the court is located."
+          },
+          items: regionOptions
+        }) }}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+
+      </form>
+    </div>
+  </div>
+{% endblock %}
