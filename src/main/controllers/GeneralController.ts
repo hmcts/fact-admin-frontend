@@ -30,7 +30,10 @@ export default class GeneralController {
       return res.render('error');
     }
 
-    res.render('general-edit', { model });
+    res.render('general-edit', {
+      model,
+      pageTitle: `General - ${model.name}`,
+    });
   }
 
   @route('/success')
@@ -62,7 +65,10 @@ export default class GeneralController {
     }
 
     if (updateResponse.errors) {
-      res.render('general-edit', { model: updateResponse });
+      res.render('general-edit', {
+        model: updateResponse,
+        pageTitle: `Error: General - ${updateResponse.name}`,
+      });
       return;
     }
 
