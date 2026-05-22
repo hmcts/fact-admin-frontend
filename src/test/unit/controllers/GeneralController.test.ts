@@ -141,7 +141,7 @@ describe('GeneralController', () => {
     } as unknown as Response;
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
-    request.body = { name: 'Reading Crown Court', open: true, regionId: '22222222-2222-4222-8222-222222222222' };
+    request.body = { name: 'Reading Crown Court', open: 'true', regionId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
     const saveStub = stub(GeneralService.prototype, 'save').resolves(HttpStatusCode.NotFound);
 

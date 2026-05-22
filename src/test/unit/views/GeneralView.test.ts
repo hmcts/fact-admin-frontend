@@ -53,6 +53,49 @@ describe('General View', () => {
     expect(html).not.toContain('ignored timestamp error');
   });
 
+  test('renders court status validation errors correctly', () => {
+    const html = env.render('general-edit.njk', {
+      model: {
+        errors: {
+          open: ['Select whether the court is open or closed'],
+        },
+        id: courtId,
+        name: '',
+        open: false,
+        regionId: '22222222-2222-4222-8222-222222222222',
+        regions: [{ id: '22222222-2222-4222-8222-222222222222', name: 'South East' }],
+      },
+      pagePath: `/courts/${courtId}/edit/general`,
+      pageTitle: 'General - Reading Crown Court',
+    });
+
+    expect(html).toContain('There is a problem');
+    expect(html).toContain('Select whether the court is open or closed');
+    expect(html).toContain('href="#open"');
+    expect(html).not.toContain('ignored timestamp error');
+  });
+
+  test('renders region validation errors correctly', () => {
+    const html = env.render('general-edit.njk', {
+      model: {
+        errors: {
+          regionId: ['Some made up issue with the selected region'],
+        },
+        id: courtId,
+        name: '',
+        open: false,
+        regionId: '22222222-2222-4222-8222-222222222222',
+        regions: [{ id: '22222222-2222-4222-8222-222222222222', name: 'South East' }],
+      },
+      pagePath: `/courts/${courtId}/edit/general`,
+      pageTitle: 'General - Reading Crown Court',
+    });
+
+    expect(html).toContain('There is a problem');
+    expect(html).toContain('Some made up issue with the selected region');
+    expect(html).toContain('href="#regionId"');
+    expect(html).not.toContain('ignored timestamp error');
+  });
   test('renders the general success page', () => {
     const html = env.render('general-edit-success.njk', {
       courtId,

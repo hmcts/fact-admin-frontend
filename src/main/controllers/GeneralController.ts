@@ -46,10 +46,25 @@ export default class GeneralController {
       return res.render('court-not-found');
     }
 
+    // parse the open field. The body contains a string, which we need to
+    // turn into a boolean or an undefined if nothing was set. Sonar doesn't
+    // like nested ternaries, so we have to do this the long way.
+    const open = req.body?.open;
+    let resolvedOpen: boolean | undefined = undefined;
+    if (open !== undefined) {
+      if (open === 'true') {
+        resolvedOpen = true;
+      } else if (open === 'false') {
+        resolvedOpen = false;
+      } else {
+        resolvedOpen = undefined;
+      }
+    }
+
     const model: GeneralViewModel = {
-      id: courtId as string,
+      id: resolvedCourtId,
       name: req.body?.name ?? undefined,
-      open: req.body?.open ?? undefined,
+      open: resolvedOpen,
       regionId: req.body?.regionId ?? undefined,
     };
 
@@ -73,8 +88,8 @@ export default class GeneralController {
     }
 
     res.render('general-edit-success', {
-      courtId,
-      courtName: model.name,
+      courtId: resolvedCourtId,
+      courtName: updateResponse.name ?? model.name,
     });
   }
 }

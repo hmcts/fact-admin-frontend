@@ -76,7 +76,7 @@ export class GeneralService {
     // if it's been specified, regardless of other errors, ensure it's content is valid
     if (model.name && !VALID_COURT_NAME_REGEX.test(model.name)) {
       nameErrors.push(
-        'Court name must only include letters letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+        'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
       );
     }
     if (nameErrors.length > 0) {

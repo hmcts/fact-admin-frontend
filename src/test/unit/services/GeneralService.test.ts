@@ -104,7 +104,7 @@ describe('GeneralService', () => {
       regions,
       errors: {
         name: [
-          'Court name must only include letters letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
         ],
       },
     });
