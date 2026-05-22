@@ -61,14 +61,13 @@
             hint: {
               text: "Enter the name of the court. Only capitalise the first letter."
             },
-            spellcheck: false,
             id: "name",
             name: "name",
             spellcheck: true,
             value: model.name,
             errorMessage: {
               text: model.errors.name[0]
-            } if model.errors.name else null
+            } if model.errors and model.errors.name else null
           }) }}
 
         {{ govukRadios({
@@ -95,7 +94,10 @@
               text: "Closed",
               checked: false if model.open else true
             }
-          ]
+          ],
+          errorMessage: {
+            text: model.errors.open[0]
+          } if model.errors and model.errors.open else null
         }) }}
 
         {{ govukSelect({
@@ -108,7 +110,10 @@
           hint: {
             text: "Select the region in which the court is located."
           },
-          items: regionOptions
+          items: regionOptions,
+          errorMessage: {
+            text: model.errors.regionId[0]
+          } if model.errors and model.errors.regionId else null
         }) }}
 
         {{ govukButton({
