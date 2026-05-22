@@ -103,9 +103,7 @@ describe('GeneralService', () => {
       ...courtEntity,
       regions,
       errors: {
-        name: [
-          'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
-        ],
+        name: ['Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
       },
     });
     expect(requests.updateCourt).not.toHaveBeenCalled();
