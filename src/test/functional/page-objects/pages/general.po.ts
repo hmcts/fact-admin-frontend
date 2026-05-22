@@ -51,4 +51,3 @@ export class GeneralPage extends Base {
     return config.urls.homePageUrl + `/courts/${courtId}/edit`;
   }
 }
-

@@ -34,9 +34,7 @@ describe('General page', () => {
     expect(response.text).toContain('Region');
     expect(response.text).toContain('South East');
     expect(response.text).toContain('North West');
-    expect(response.text).toContain(
-      `<form method="post" action="/courts/${COURT_ID}/edit/general/success">`
-    );
+    expect(response.text).toContain(`<form method="post" action="/courts/${COURT_ID}/edit/general/success">`);
   });
 
   test('renders the dedicated court not found page for an invalid UUID on GET', async () => {
@@ -204,4 +202,3 @@ describe('General page', () => {
     expect(response.text).not.toContain('General details saved');
   });
 });
-

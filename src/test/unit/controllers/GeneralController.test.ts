@@ -201,7 +201,7 @@ describe('GeneralController', () => {
       name: 'bob',
       errors: {
         name: ['Enter a name for the court'],
-      }
+      },
     };
     const saveStub = stub(GeneralService.prototype, 'save').resolves(saveResult);
 
@@ -251,4 +251,3 @@ describe('GeneralController', () => {
     }
   });
 });
-
