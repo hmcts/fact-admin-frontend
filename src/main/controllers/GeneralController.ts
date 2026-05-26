@@ -89,6 +89,7 @@ export default class GeneralController {
 
     res.render('general-edit-success', {
       courtId: resolvedCourtId,
+      // prefer the court name from the updated model
       courtName: updateResponse.name ?? model.name,
     });
   }
