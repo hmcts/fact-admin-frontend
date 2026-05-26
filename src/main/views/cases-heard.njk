@@ -1,0 +1,61 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if errorSummary.length %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+      <h1 class="govuk-heading-l">Cases heard</h1>
+      {{ govukWarningText({
+        text: "If you have set up local authority config for Adoption, Children and/or Divorce, and you remove these case types here, this will remove the local authority config and will affect search results"
+      }) }}
+      <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
+        <fieldset class="govuk-fieldset">
+        <div class="govuk-form-group{% if areasOfLawError %} govuk-form-group--error{% endif %}" id="areas-of-law-group">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            Select the types of cases heard at this court.
+          </legend>
+          {% if areasOfLawError %}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ areasOfLawError }}
+            </p>
+          {% endif %}
+        <div class="govuk-grid-row cases-heard-columns">
+          <div class="govuk-grid-column-one-half">
+            {{ govukCheckboxes({
+              classes: "cases-heard-checkboxes",
+              idPrefix: "areasOfLaw-left",
+              name: "areasOfLaw",
+              items: leftColumnAreasOfLawItems
+            }) }}
+          </div>
+          <div class="govuk-grid-column-one-half">
+            {{ govukCheckboxes({
+              classes: "cases-heard-checkboxes",
+              idPrefix: "areasOfLaw-right",
+              name: "areasOfLaw",
+              items: rightColumnAreasOfLawItems
+            }) }}
+          </div>
+        </div>
+        </div>
+        </fieldset>
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

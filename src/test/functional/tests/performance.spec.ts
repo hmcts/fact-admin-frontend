@@ -18,6 +18,25 @@ test.describe(
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
+    test(
+      'Cases Heard Page Performance',
+      {
+        tag: '@performance',
+      },
+      async ({ casesHeardPage, lighthouseUtils, playwright }) => {
+        await withCreatedCourt(
+          playwright,
+          'Cases Heard Performance Test',
+          { serviceCenter: false },
+          async ({ createdCourt }) => {
+            await casesHeardPage.goto(createdCourt.id);
+            await casesHeardPage.header.checkIsVisible();
+            await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+          }
+        );
+      }
+    );
+
     test('Address List Page Performance', async ({ lighthouseUtils, playwright, courtAddressListPage }) => {
       await withCreatedCourt(
         playwright,

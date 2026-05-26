@@ -1,7 +1,13 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
-import { AreaOfLaw, areaOfLawListSchema } from '../schemas/areaOfLawSchema';
+import {
+  AreaOfLawType,
+  CourtAreaOfLawSelection,
+  CourtAreasOfLawUpdate,
+  areaOfLawListSchema,
+  parseCourtAreasOfLawResponse,
+} from '../schemas/areaOfLawSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
@@ -69,6 +75,36 @@ export class DataApiRequests {
       return courtEntitySchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching court details for id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get area of law selections by court id
+   */
+  public async getCourtAreasOfLaw(courtId: string): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/areas-of-law`);
+      return parseCourtAreasOfLawResponse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching areas of law for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update area of law selections for a court
+   */
+  public async updateCourtAreasOfLaw(payload: CourtAreasOfLawUpdate): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.put(`/courts/${payload.courtId}/v1/areas-of-law`, payload);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      logger.error(`Error updating areas of law for court id ${payload.courtId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -203,7 +239,7 @@ export class DataApiRequests {
   /**
    * Request to data API to retrieve areas of law
    */
-  public async getAreasOfLaw(): Promise<AreaOfLaw[] | HttpStatusCode> {
+  public async getAreasOfLaw(): Promise<AreaOfLawType[] | HttpStatusCode> {
     try {
       const response = await dataApi.get('/types/v1/areas-of-law');
       return areaOfLawListSchema.parse(response.data);
