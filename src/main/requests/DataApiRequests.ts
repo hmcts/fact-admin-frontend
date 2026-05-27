@@ -12,14 +12,16 @@ import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../sch
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
+import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
 import { CourtProfessionalInformation, courtProfessionalInformationSchema } from '../schemas/courtProfessionalInformationSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
-import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/localAuthoritiesSchema';
+import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { dataApi } from './utils/axiosConfig';
+
 
 const logger = Logger.getLogger('app');
 
@@ -261,7 +263,22 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/court-types');
       return courtTypeListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching area of law type details:', error);
+      logger.error('Error fetching court type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve local authority types
+   */
+  public async getLocalAuthorities(): Promise<LocalAuthorityType[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/types/v1/local-authorities');
+      return localAuthorityTypeListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching local authority type details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -286,7 +303,9 @@ export class DataApiRequests {
   /**
    * Request to data API to get professional information data by court id
    */
-  public async getCourtProfessionalInformation(courtId: string): Promise<CourtProfessionalInformation | HttpStatusCode> {
+  public async getCourtProfessionalInformation(
+    courtId: string
+  ): Promise<CourtProfessionalInformation | HttpStatusCode> {
     try {
       const response = await dataApi.get(`/courts/${courtId}/v1/professional-information`);
       return courtProfessionalInformationSchema.parse(response.data);
