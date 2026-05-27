@@ -17,10 +17,7 @@
     {% set items = (items.push({
       value: selection.id,
       text: selection.name,
-      checked: selection.selected,
-      attributes: {
-        classes: "test-thing"
-      }
+      checked: selection.selected
     }), items) %}
   {% endfor %}
 
