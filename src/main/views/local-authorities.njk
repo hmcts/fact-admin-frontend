@@ -1,0 +1,61 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    {%- if not hasFamilyCourtType or (not hasAdoptionCasesHeard and not hasChildcareCasesHeard and not hasDivorceCasesHeard) %}
+
+      {{ govukWarningText({
+        text: "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court and the 'Cases heard' as childcare arrangements, adoption and/or divorce."
+      }) }}
+
+    {% else %}
+
+      <div class="govuk-grid-column-full">
+        {% if model.errors %}
+          {{ modelDrivenErrorSummary(model) }}
+        {% endif %}
+
+        <h1 class="govuk-heading-l">Local Authorities</h1>
+
+        {{ govukWarningText({
+          text: "If you set a local authority for a court, when a user searches for a postcode within that local authority, it will show them the closest court to the entered postcode that has the local authority selected. This will affect users search results."
+        }) }}
+
+        <form method="post" action="/courts/{{ model.id }}/edit/local-authorities/success">
+
+          <h2 class="govuk-heading-m">Some components</h2>
+
+          {{ govukButton({
+            text: "Save"
+          }) }}
+
+        </form>
+      </div>
+
+    {% endif -%}
+  </div>
+
+  <pre>
+    courLocalAuthorities:
+      {{ courLocalAuthorities | dump(2) }}
+    hasFamilyCourtType: {{ hasFamilyCourtType | dump(2) }}
+    hasAdoptionCasesHeard: {{ hasAdoptionCasesHeard | dump(2) }}
+    hasChildcareCasesHeard: {{ hasChildcareCasesHeard | dump(2) }}
+    hasDivorceCasesHeard: {{ hasDivorceCasesHeard | dump(2) }}
+    errors:
+      {{ errors | dump(2) }}
+  </pre>
+{% endblock %}

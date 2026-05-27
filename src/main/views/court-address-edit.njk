@@ -1,11 +1,10 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
 
 {# MACROS #}
 
@@ -68,23 +67,7 @@
 {% block content %}
 
   {% if address.errors %}
-    {% set errorList = [] %}
-    {% for field, errors in address.errors %}
-      {% if field !== "timestamp" %}
-        {% set fieldErrors = [] %}
-        {% for error in errors %}
-          {% set href = "#" + field if field !== "message" else null %}
-          {% set errorList = (errorList.push({
-            text: error,
-            href: href
-          }), errorList) %}
-        {% endfor %}
-      {% endif %}
-    {% endfor %}
-    {{ govukErrorSummary({
-      titleText: "There is a problem",
-      errorList: errorList
-    }) }}
+    {{ modelDrivenErrorSummary(address) }}
   {% endif %}
 
   <div class="govuk-grid-row">
