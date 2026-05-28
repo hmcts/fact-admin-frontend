@@ -1,4 +1,4 @@
-import { z  } from 'zod';
+import { z } from 'zod';
 
 const localAuthorityTypeSchema = z.object({
   id: z.string(),

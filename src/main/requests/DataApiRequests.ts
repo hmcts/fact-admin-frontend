@@ -13,7 +13,10 @@ import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSch
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
-import { CourtProfessionalInformation, courtProfessionalInformationSchema } from '../schemas/courtProfessionalInformationSchema';
+import {
+  CourtProfessionalInformation,
+  courtProfessionalInformationSchema,
+} from '../schemas/courtProfessionalInformationSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
@@ -21,7 +24,6 @@ import { Region, regionsSchema } from '../schemas/regionSchema';
 
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { dataApi } from './utils/axiosConfig';
-
 
 const logger = Logger.getLogger('app');
 

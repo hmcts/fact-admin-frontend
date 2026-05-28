@@ -86,7 +86,7 @@ export class LocalAuthoritiesService {
       courtTypes: {
         family: !!professionalInformationResponse.codes?.familyCourtCode,
       },
-      casesHeard
+      casesHeard,
     };
   }
 
@@ -119,7 +119,7 @@ export class LocalAuthoritiesService {
 
       // start again...
       const retrieveResponse = await this.retrieve(courtId);
-      if(typeof retrieveResponse === 'number') {
+      if (typeof retrieveResponse === 'number') {
         return retrieveResponse;
       }
 
