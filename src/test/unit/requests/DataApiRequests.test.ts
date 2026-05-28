@@ -1,6 +1,15 @@
 import { HttpStatusCode } from 'axios';
 import sinon, { restore, stub } from 'sinon';
 
+jest.mock('@hmcts/nodejs-logging', () => ({
+  Logger: {
+    getLogger: jest.fn().mockReturnValue({
+      error: jest.fn(),
+      info: jest.fn(),
+    }),
+  },
+}));
+
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 
