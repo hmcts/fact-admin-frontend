@@ -110,10 +110,6 @@ export async function processRequest(cfg: InternalAxiosRequestConfig): Promise<I
 }
 
 function shouldAddUserIdHeader(cfg: InternalAxiosRequestConfig): boolean {
-  if (cfg.method?.toUpperCase() !== 'POST') {
-    return true;
-  }
-
   return !USER_ID_EXCLUDED_ENDPOINTS.has(getUrlPathname(cfg.url ?? ''));
 }
 

@@ -54,6 +54,14 @@ describe('processRequest', () => {
     expect(result.headers?.['X-User-Id']).toBeUndefined();
   });
 
+  it('adds X-User-Id header to POST requests outside excluded endpoints', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/courts/123/entity/v1' };
+
+    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
+
+    expect(result.headers?.['X-User-Id']).toBe('user-123');
+  });
+
   it('does not add X-User-Id header to the data API user creation/update POST', async () => {
     const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/user/v1' };
 
