@@ -34,7 +34,9 @@ async function cleanupSession(sessionFile: string): Promise<void> {
       try {
         await page.goto(config.urls.homePageUrl);
         await page.getByRole('link', { name: /sign out/i }).click({ timeout: 10_000 });
-        await page.waitForURL(url => !url.href.startsWith(config.urls.homePageUrl), { timeout: 10_000 }).catch(() => {});
+        await page
+          .waitForURL(url => !url.href.startsWith(config.urls.homePageUrl), { timeout: 10_000 })
+          .catch(() => {});
       } finally {
         await context.close();
         await browser.close();

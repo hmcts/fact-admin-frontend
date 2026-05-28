@@ -10,7 +10,12 @@ const APP_SESSION_COOKIE = 'appSession';
 export async function loginAs(page: Page, user: UserDetails): Promise<void> {
   await page.goto(config.urls.homePageUrl);
 
-  if (await page.getByRole('link', { name: /sign out/i }).isVisible().catch(() => false)) {
+  if (
+    await page
+      .getByRole('link', { name: /sign out/i })
+      .isVisible()
+      .catch(() => false)
+  ) {
     return;
   }
 
@@ -48,7 +53,9 @@ function isSessionFileCurrent(sessionFile: string): boolean {
   try {
     const data = JSON.parse(fs.readFileSync(sessionFile, 'utf-8'));
     const cookies = Array.isArray(data?.cookies) ? data.cookies : [];
-    const appSession = cookies.find((cookie: { name?: string; expires?: number }) => cookie.name === APP_SESSION_COOKIE);
+    const appSession = cookies.find(
+      (cookie: { name?: string; expires?: number }) => cookie.name === APP_SESSION_COOKIE
+    );
 
     if (!appSession || typeof appSession.expires !== 'number') {
       return false;
