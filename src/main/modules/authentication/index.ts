@@ -14,8 +14,6 @@ export class Authentication {
     const tenantId = process.env.SSO_APP_REG_TENANT_ID ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_TENANT_ID');
     const sessionSecret = (process.env.SESSION_SECRET ?? config.get('secrets.fact-kv.SESSION_SECRET')) as string;
 
-    console.log(`This is the session s: ${sessionSecret}`);
-
     app.use(
       auth({
         issuerBaseURL: `https://login.microsoftonline.com/${tenantId}/v2.0`,

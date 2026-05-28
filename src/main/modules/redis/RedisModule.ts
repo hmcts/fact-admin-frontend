@@ -94,13 +94,23 @@ export class RedisModule {
       throw new Error('REDIS_HOST and REDIS_PORT must be set as environment variables or mounted Key Vault secrets');
     }
 
+    let connectionString = '';
+    if (process.env.REDIS_LOCAL) {
+      console.log('local');
+      // for running local dev environment (i.e. 'start:dev' profile)
+      connectionString = `redis://:${password}@${host}:${port}`;
+    } else {
+      console.log('into the one we want for now');
+      // double s is required when using TLS connection (i.e. 'start' profile)
+      connectionString = `rediss://:${password}@${host}:${port}`;
+    }
+
     const client: RedisClientType = createClient({
+      url: connectionString,
+      pingInterval: 300000,
       socket: {
-        host,
-        port,
         connectTimeout: 10000,
       },
-      password,
     });
 
     client.on('error', error => {
