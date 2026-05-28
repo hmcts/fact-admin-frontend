@@ -81,17 +81,18 @@ export class RedisModule {
   public enableFor(app: Application): void {
     const host =
       process.env.REDIS_HOST ||
-      (config.has('secrets.fact-kv.REDIS_HOST') ? config.get<string>('secrets.fact-kv.REDIS_HOST') : '') ||
-      config.get<string>('redis.host');
+      (config.has('secrets.fact-kv.REDIS_HOST') ? config.get<string>('secrets.fact-kv.REDIS_HOST') : '');
     const password =
       process.env.REDIS_PASSWORD ||
-      (config.has('secrets.fact-kv.REDIS_PASSWORD') ? config.get<string>('secrets.fact-kv.REDIS_PASSWORD') : '') ||
-      config.get<string>('redis.password');
-    const port = Number(
+      (config.has('secrets.fact-kv.REDIS_PASSWORD') ? config.get<string>('secrets.fact-kv.REDIS_PASSWORD') : '');
+    const portValue =
       process.env.REDIS_PORT ||
-        (config.has('secrets.fact-kv.REDIS_PORT') ? config.get<string>('secrets.fact-kv.REDIS_PORT') : '') ||
-        config.get<string | number>('redis.port')
-    );
+      (config.has('secrets.fact-kv.REDIS_PORT') ? config.get<string>('secrets.fact-kv.REDIS_PORT') : '');
+    const port = Number(portValue);
+
+    if (!host || !portValue) {
+      throw new Error('REDIS_HOST and REDIS_PORT must be set as environment variables or mounted Key Vault secrets');
+    }
 
     const client: RedisClientType = createClient({
       socket: {

@@ -1,4 +1,16 @@
 process.env.ALLOW_CONFIG_MUTATIONS = 'true';
+process.env.REDIS_HOST = '127.0.0.1';
+process.env.REDIS_PORT = '6379';
+
+jest.mock('redis', () => ({
+  createClient: () => ({
+    connect: jest.fn().mockResolvedValue(undefined),
+    del: jest.fn().mockResolvedValue(undefined),
+    get: jest.fn().mockResolvedValue(null),
+    on: jest.fn(),
+    set: jest.fn().mockResolvedValue(undefined),
+  }),
+}));
 
 jest.mock('express-openid-connect', () => ({
   auth: () => (req, res, next) => {
