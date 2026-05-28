@@ -79,10 +79,18 @@ export class RedisModule {
   public constructor(private readonly logger: Logger) {}
 
   public enableFor(app: Application): void {
-    const host = process.env.REDIS_HOST ?? config.get<string>('redis.host');
-    const password = process.env.REDIS_PASSWORD ?? config.get<string>('redis.password');
+    const host =
+      process.env.REDIS_HOST ||
+      (config.has('secrets.fact-kv.REDIS_HOST') ? config.get<string>('secrets.fact-kv.REDIS_HOST') : '') ||
+      config.get<string>('redis.host');
+    const password =
+      process.env.REDIS_PASSWORD ||
+      (config.has('secrets.fact-kv.REDIS_PASSWORD') ? config.get<string>('secrets.fact-kv.REDIS_PASSWORD') : '') ||
+      config.get<string>('redis.password');
     const port = Number(
-      process.env.REDIS_PORT ?? (config.has('redis.port') ? config.get<string | number>('redis.port') : 6379)
+      process.env.REDIS_PORT ||
+        (config.has('secrets.fact-kv.REDIS_PORT') ? config.get<string>('secrets.fact-kv.REDIS_PORT') : '') ||
+        config.get<string | number>('redis.port')
     );
 
     const client: RedisClientType = createClient({
