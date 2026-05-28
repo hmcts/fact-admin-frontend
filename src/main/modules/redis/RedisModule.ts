@@ -96,11 +96,9 @@ export class RedisModule {
 
     let connectionString = '';
     if (process.env.REDIS_LOCAL) {
-      console.log('local');
       // for running local dev environment (i.e. 'start:dev' profile)
       connectionString = `redis://:${password}@${host}:${port}`;
     } else {
-      console.log('into the one we want for now');
       // double s is required when using TLS connection (i.e. 'start' profile)
       connectionString = `rediss://:${password}@${host}:${port}`;
     }

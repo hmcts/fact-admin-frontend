@@ -22,6 +22,16 @@ This is configured in the [app.js](./src/main/app.js) file.
 
 Alongside this, the local unit / route tests use a Mock version of redis to simulate the interactions.
 
+For local development against the Redis container in `docker-compose.yml`, set:
+
+```bash
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_LOCAL=true
+```
+
+`REDIS_PASSWORD` is only needed when connecting to an environment Redis instance that requires authentication.
+
 ```bash
 yarn install
 ```
