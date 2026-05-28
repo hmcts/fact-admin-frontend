@@ -17,7 +17,6 @@ import { getFactUser, getFactUserId, isAdmin, isSuperAdmin } from './modules/aut
 import { Container } from './modules/awilix';
 import { Helmet } from './modules/helmet';
 import { Nunjucks } from './modules/nunjucks';
-import { PropertiesVolume } from './modules/properties-volume';
 import { RedisModule } from './modules/redis/RedisModule';
 import { runWithDataApiUserId } from './requests/utils/axiosConfig';
 
@@ -38,7 +37,6 @@ app.locals.ENV = env;
 
 const logger = Logger.getLogger('app');
 
-new PropertiesVolume().enableFor(app);
 new AppInsights().enable();
 new Nunjucks(developmentMode).enableFor(app);
 // secure the application by adding various HTTP headers to its responses

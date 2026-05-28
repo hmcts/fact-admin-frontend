@@ -1,5 +1,3 @@
-process.env.ALLOW_CONFIG_MUTATIONS = 'true';
-
 jest.mock('express-openid-connect', () => ({
   auth: () => (req, res, next) => {
     const unauthenticated = req.headers['x-test-unauthenticated'] === 'true';
