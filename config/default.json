@@ -11,15 +11,27 @@
       "preload": true
     }
   },
+  "session": {
+    "secret": "arandomthing"
+  },
   "secrets": {
     "fact-kv": {
       "APP_INSIGHTS_CONNECTION_STRING": "",
       "FRONTEND_APP_REG_ID": "",
       "FRONTEND_APP_REG_SECRET": "",
-      "API_APP_REG_ID": ""
+      "API_APP_REG_ID": "",
+      "SSO_APP_REG_ID": "",
+      "SSO_APP_REG_SECRET": "",
+      "SSO_APP_REG_TENANT_ID": "",
+      "SESSION_SECRET": "local-development-session-secret"
     }
   },
   "auth": {
     "azure-identity-token-path": "/var/run/secrets/azure/tokens/azure-identity-token"
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": "6379",
+    "password": ""
   }
 }

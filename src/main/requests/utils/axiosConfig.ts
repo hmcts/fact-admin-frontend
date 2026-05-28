@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from 'async_hooks';
+
 import { ChainedTokenCredential, EnvironmentCredential, WorkloadIdentityCredential } from '@azure/identity';
 import { Logger } from '@hmcts/nodejs-logging';
 import { Mutex } from 'async-mutex';
@@ -7,6 +9,14 @@ import config from 'config';
 const tokenMutex = new Mutex();
 
 const OPEN_URLS = new Set<string>(['/health']);
+const USER_ID_HEADER = 'X-User-Id';
+const USER_ID_EXCLUDED_ENDPOINTS = new Set<string>(['/user/v1', '/users']);
+
+type DataApiRequestContext = {
+  userId?: string;
+};
+
+const dataApiRequestContext = new AsyncLocalStorage<DataApiRequestContext>();
 
 const clientAppRegId: string = config.get('secrets.fact-kv.FRONTEND_APP_REG_ID');
 const apiAppRegId: string = config.get('secrets.fact-kv.API_APP_REG_ID');
@@ -25,6 +35,10 @@ let cachedTokenRefreshTS: number = 0;
 let cachedToken: string | null = null;
 
 let authDetailsLogged = false;
+
+export function runWithDataApiUserId<T>(userId: string | undefined, callback: () => T): T {
+  return dataApiRequestContext.run({ userId }, callback);
+}
 
 function logAuthDetails() {
   if (!authDetailsLogged) {
@@ -78,15 +92,37 @@ function getToken(): Promise<string> {
 
 export async function processRequest(cfg: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> {
   const url = cfg.url ?? '';
+  cfg.headers = cfg.headers ?? {};
+
+  const userId = dataApiRequestContext.getStore()?.userId;
+  if (userId && shouldAddUserIdHeader(cfg)) {
+    cfg.headers[USER_ID_HEADER] = userId;
+  }
+
   // don't add a bearer token for open paths
   if (!OPEN_URLS.has(url)) {
     const token = await getToken();
     if (token) {
-      cfg.headers = cfg.headers ?? {};
       cfg.headers.Authorization = `Bearer ${token}`;
     }
   }
   return cfg;
+}
+
+function shouldAddUserIdHeader(cfg: InternalAxiosRequestConfig): boolean {
+  if (cfg.method?.toUpperCase() !== 'POST') {
+    return true;
+  }
+
+  return !USER_ID_EXCLUDED_ENDPOINTS.has(getUrlPathname(cfg.url ?? ''));
+}
+
+function getUrlPathname(url: string): string {
+  try {
+    return new URL(url, dataApiUrl).pathname.replace(/\/$/, '') || '/';
+  } catch {
+    return url.split('?')[0].replace(/\/$/, '') || '/';
+  }
 }
 
 dataApi.interceptors.request.use(async cfg => {

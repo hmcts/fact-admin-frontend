@@ -12,7 +12,14 @@
   {% set isAuditPage = pagePath.startsWith("/audits") %}
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
-    homepageUrl: "/"
+    homepageUrl: "/",
+    navigationClasses: "govuk-header__navigation--end",
+    navigation: [
+      {
+        href: "/sso/logout",
+        html: "<strong>Sign out</strong>"
+      }
+    ]
   }) }}
   {{ govukServiceNavigation({
     serviceName: "Find a Court or Tribunal Admin",
@@ -37,12 +44,12 @@
         href: "/audits",
         text: "Audit",
         current: isAuditPage
-      },
+      } if isSuperAdmin else false,
       {
         href: "/users",
         text: "Users",
         current: isUsersPage
-      }
+      } if isSuperAdmin else false
     ]
   }) }}
 {% endblock %}

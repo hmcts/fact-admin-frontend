@@ -1,12 +1,12 @@
-version: '2'
-
 services:
-  admin-frontend:
-    build:
-      context: .
-      args:
-        - http_proxy
-        - https_proxy
-        - no_proxy
+  redis:
+    container_name: redis
+    image: hmctsprod.azurecr.io/imported/redis:8.2.1
+    restart: unless-stopped
+    volumes:
+      - redis:/data
     ports:
-      - '3355:3355'
+      - '6379:6379'
+volumes:
+  redis:
+    driver: local

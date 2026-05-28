@@ -14,6 +14,14 @@ Running the application requires the following tools to be installed in your env
 
 Install dependencies by executing the following command:
 
+## Session Management
+
+We use Redis to store session data to ensure sessions are shared across multiple frontend instances.
+
+This is configured in the [app.js](./src/main/app.js) file.
+
+Alongside this, the local unit / route tests use a Mock version of redis to simulate the interactions.
+
 ```bash
 yarn install
 ```
