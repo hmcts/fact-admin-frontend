@@ -43,7 +43,7 @@ export const config: Config = {
   },
   urls: {
     dataApiUrl: getEnvVar('DATA_API_URL', 'http://localhost:8989'),
-    homePageUrl: getEnvVar('ADMIN_URL', getEnvVar('TEST_URL', 'https://localhost:3355')),
+    homePageUrl: getEnvVar('FRONTEND_URL', getEnvVar('TEST_URL', 'https://localhost:3355')),
   },
 };
 
