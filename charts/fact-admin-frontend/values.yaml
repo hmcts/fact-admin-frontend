@@ -10,7 +10,7 @@ nodejs:
   keyVaults:
     fact-kv:
       secrets:
-        - name: session-key
+        - name: session-secret
           alias: SESSION_SECRET # TODO: add this in kv
         - name: REDIS-V6-HOST
           alias: REDIS_HOST # TODO: check this in kv
@@ -18,6 +18,12 @@ nodejs:
           alias: REDIS_PASSWORD # TODO: check this in kv
         - name: REDIS-V6-PORT
           alias: REDIS_PORT # TODO: check this in kv
+        - name: bstrap-sso-client-id
+          alias: SSO_APP_REG_ID
+        - name: bstrap-sso-client-secret
+          alias: SSO_APP_REG_SECRET
+        - name: bstrap-sso-tenant-id
+          alias: SSO_APP_REG_TENANT_ID
         - name: app-insights-connection-string
           alias: APP_INSIGHTS_CONNECTION_STRING
         - name: admin-frontend-app-reg-id
