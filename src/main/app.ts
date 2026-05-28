@@ -56,7 +56,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(loadControllers('controllers/**/*.+(ts|js)', { cwd: __dirname }));
+app.use(loadControllers('controllers/{HealthController,InfoController}.+(ts|js)', { cwd: __dirname }));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
