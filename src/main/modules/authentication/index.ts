@@ -3,17 +3,17 @@ import * as express from 'express';
 import { auth } from 'express-openid-connect';
 
 import { FRONTEND_URL } from '../../envUrls';
-import { DataApiRequests } from '../../requests/DataApiRequests';
+import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
 
-const clientId = process.env.SSO_APP_REG_ID ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_ID');
-const clientSecret = process.env.SSO_APP_REG_SECRET ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_SECRET');
-const tenantId = process.env.SSO_APP_REG_TENANT_ID ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_TENANT_ID');
-
-const sessionSecret = (process.env.SESSION_SECRET ?? config.get('secrets.fact-kv.SESSION_SECRET')) as string;
-const dataApiRequests = new DataApiRequests();
+let dataApiRequests: DataApiRequestsType | undefined;
 
 export class Authentication {
   public enableFor(app: express.Express): void {
+    const clientId = process.env.SSO_APP_REG_ID ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_ID');
+    const clientSecret = process.env.SSO_APP_REG_SECRET ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_SECRET');
+    const tenantId = process.env.SSO_APP_REG_TENANT_ID ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_TENANT_ID');
+    const sessionSecret = (process.env.SESSION_SECRET ?? config.get('secrets.fact-kv.SESSION_SECRET')) as string;
+
     app.use(
       auth({
         issuerBaseURL: `https://login.microsoftonline.com/${tenantId}/v2.0`,
@@ -50,7 +50,9 @@ export class Authentication {
             throw new Error('Unable to determine user role');
           }
 
-          session.factUser = await dataApiRequests.createUpdateUser({
+          const dataApi = await getDataApiRequests();
+
+          session.factUser = await dataApi.createUpdateUser({
             email: user.preferred_username,
             ssoId: user.oid,
             role: roles.includes('SuperAdmin') ? 'SuperAdmin' : 'Admin',
@@ -61,4 +63,13 @@ export class Authentication {
       })
     );
   }
+}
+
+async function getDataApiRequests(): Promise<DataApiRequestsType> {
+  if (!dataApiRequests) {
+    const { DataApiRequests } = await import('../../requests/DataApiRequests');
+    dataApiRequests = new DataApiRequests();
+  }
+
+  return dataApiRequests;
 }

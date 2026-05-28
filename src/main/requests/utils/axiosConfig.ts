@@ -1,22 +1,16 @@
-import { AsyncLocalStorage } from 'async_hooks';
-
 import { ChainedTokenCredential, EnvironmentCredential, WorkloadIdentityCredential } from '@azure/identity';
 import { Logger } from '@hmcts/nodejs-logging';
 import { Mutex } from 'async-mutex';
 import { InternalAxiosRequestConfig, create } from 'axios';
 import config from 'config';
 
+import { dataApiRequestContext, runWithDataApiUserId } from './dataApiRequestContext';
+
 const tokenMutex = new Mutex();
 
 const OPEN_URLS = new Set<string>(['/health']);
 const USER_ID_HEADER = 'X-User-Id';
 const USER_ID_EXCLUDED_ENDPOINTS = new Set<string>(['/user/v1', '/users']);
-
-type DataApiRequestContext = {
-  userId?: string;
-};
-
-const dataApiRequestContext = new AsyncLocalStorage<DataApiRequestContext>();
 
 const clientAppRegId: string = config.get('secrets.fact-kv.FRONTEND_APP_REG_ID');
 const apiAppRegId: string = config.get('secrets.fact-kv.API_APP_REG_ID');
@@ -36,9 +30,7 @@ let cachedToken: string | null = null;
 
 let authDetailsLogged = false;
 
-export function runWithDataApiUserId<T>(userId: string | undefined, callback: () => T): T {
-  return dataApiRequestContext.run({ userId }, callback);
-}
+export { runWithDataApiUserId };
 
 function logAuthDetails() {
   if (!authDetailsLogged) {
