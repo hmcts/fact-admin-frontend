@@ -11,13 +11,13 @@ nodejs:
     fact-kv:
       secrets:
         - name: session-secret
-          alias: SESSION_SECRET # TODO: add this in kv
+          alias: SESSION_SECRET
         - name: REDIS-V6-HOST
-          alias: REDIS_HOST # TODO: check this in kv
+          alias: REDIS_HOST
         - name: REDIS-V6-PASSWORD
-          alias: REDIS_PASSWORD # TODO: check this in kv
+          alias: REDIS_PASSWORD
         - name: REDIS-V6-PORT
-          alias: REDIS_PORT # TODO: check this in kv
+          alias: REDIS_PORT
         - name: bstrap-sso-client-id
           alias: SSO_APP_REG_ID
         - name: bstrap-sso-client-secret
