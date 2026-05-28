@@ -12,7 +12,7 @@ setup.describe('Global playwright setup', () => {
    */
   setup.beforeAll('Check environment setup', async () => {
     // Access URLs for Admin pages
-    requireEnvVar('FRONTEND_URL');
+    requireEnvVar('TEST_URL');
 
     requireEnvVar('SSO_TEST_ADMIN_EMAIL');
     requireEnvVar('SSO_TEST_ADMIN_PASSWORD');
