@@ -67,7 +67,7 @@
 {% block content %}
 
   {% if address.errors %}
-    {{ modelDrivenErrorSummary(address) }}
+    {{ modelDrivenErrorSummary(address.errors) }}
   {% endif %}
 
   <div class="govuk-grid-row">

@@ -2,7 +2,11 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { AreaOfLawType, CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
-import { CourtLocalAuthoritiesList, LocalAuthoritySelection } from '../schemas/courtLocalAuthoritiesSchema';
+import {
+  CourtLocalAuthorities,
+  CourtLocalAuthoritiesList,
+  LocalAuthoritySelection,
+} from '../schemas/courtLocalAuthoritiesSchema';
 import { LocalAuthorityType } from '../schemas/localAuthorityTypeSchema';
 
 type CasesHeard = {
@@ -15,35 +19,30 @@ type CourtTypes = {
   family: boolean;
 };
 
-type LocalAuthoritySelections = {
-  Adoption?: {
-    id: string;
-    selections: LocalAuthoritySelection[];
-  };
-  Children?: {
-    id: string;
-    selections: LocalAuthoritySelection[];
-  };
-  Divorce?: {
-    id: string;
-    selections: LocalAuthoritySelection[];
-  };
+export type LocalAuthoritySelections = {
+  Adoption?: CourtLocalAuthorities;
+  Children?: CourtLocalAuthorities;
+  Divorce?: CourtLocalAuthorities;
 };
 
-export type LocalAuthoritiesViewModel =
-  | {
-      courtId: string;
-      courtTypes: CourtTypes;
-      casesHeard: CasesHeard;
-      localAuthoritySelections: LocalAuthoritySelections;
-      errors?: Record<string, string[]>;
-    }
-  | HttpStatusCode;
+export type LocalAuthoritiesViewModel = {
+  courtId: string;
+  courtTypes: CourtTypes;
+  casesHeard: CasesHeard;
+  localAuthoritySelections: LocalAuthoritySelections;
+  errors?: Record<string, string[]>;
+};
+
+export type LocalAuthoritiesSaveModel = {
+  status: 'saved' | 'invalid';
+  courtName: string;
+  viewModel?: LocalAuthoritiesViewModel;
+};
 
 export class LocalAuthoritiesService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
-  public async retrieve(courtId: string): Promise<LocalAuthoritiesViewModel> {
+  public async retrieve(courtId: string): Promise<LocalAuthoritiesViewModel | HttpStatusCode> {
     // we need the complete set of local authorities to ensure we set up the model correctly
     const localAuthoritiesResponse = await this.dataApiRequests.getLocalAuthorities();
     if (typeof localAuthoritiesResponse === 'number') {
@@ -87,16 +86,72 @@ export class LocalAuthoritiesService {
       courtTypes: {
         family: !!professionalInformationResponse.codes?.familyCourtCode,
       },
-      casesHeard,
+      casesHeard
     };
   }
 
-  private extractCasesHeard(casesHeard: CourtAreaOfLawSelection[]): CasesHeard {
+  public async update(
+    courtId: string,
+    selections: LocalAuthoritySelections
+  ): Promise<LocalAuthoritiesSaveModel | HttpStatusCode> {
+    // retrieve the court as we'll need its name
+    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    if (typeof courtResponse === 'number') {
+      return courtResponse;
+    }
+
+    const updatePayload: CourtLocalAuthoritiesList = (['Adoption', 'Children', 'Divorce'] as const)
+      .map(area => selections[area])
+      .filter((selection): selection is CourtLocalAuthorities => !!selection);
+
+    const updateResponse = await this.dataApiRequests.updateCourtLocalAuthorities(courtId, updatePayload);
+    if (typeof updateResponse === 'number') {
+      return updateResponse;
+    }
+
+    // if it's a Map, it's errors from the API
+    if (updateResponse instanceof Map) {
+      // convert the mapped errors into our expected error format
+      const errors: Record<string, string[]> = {};
+      for (const [key, value] of updateResponse) {
+        errors[key] = [value];
+      }
+
+      // start again...
+      const retrieveResponse = await this.retrieve(courtId);
+      if(typeof retrieveResponse === 'number') {
+        return retrieveResponse;
+      }
+
+      // attach the reconstituted view model with the errors attached into
+      // an invalid save response so we can re-render the page with some errors in place
+      return {
+        status: 'invalid',
+        courtName: courtResponse.name,
+        viewModel: {
+          ...retrieveResponse,
+          errors,
+        },
+      };
+    }
+
     return {
-      Adoption: casesHeard.some(selection => selection.areaOfLawType.name === 'Adoption'),
-      Children: casesHeard.some(selection => selection.areaOfLawType.name === 'Children'),
-      Divorce: casesHeard.some(selection => selection.areaOfLawType.name === 'Divorce'),
+      status: 'saved',
+      courtName: courtResponse.name,
     };
+  }
+
+  // extracts cases heard from either the court areas of law response or the local
+  // authority selections, depending on which is passed in
+  private extractCasesHeard(casesHeard: CourtAreaOfLawSelection[] | LocalAuthoritySelections): CasesHeard {
+    if (Array.isArray(casesHeard)) {
+      return {
+        Adoption: casesHeard.some(selection => selection.areaOfLawType.name === 'Adoption'),
+        Children: casesHeard.some(selection => selection.areaOfLawType.name === 'Children'),
+        Divorce: casesHeard.some(selection => selection.areaOfLawType.name === 'Divorce'),
+      };
+    }
+    return { Adoption: !!casesHeard.Adoption, Children: !!casesHeard.Children, Divorce: !!casesHeard.Divorce };
   }
 
   private buildCourtLocalAuthoritiesModelData(
@@ -120,8 +175,8 @@ export class LocalAuthoritiesService {
       }));
 
       localAuthoritySelections[areaOfLaw] = {
-        id: areasOfLaw.find(aol => aol.name === areaOfLaw)?.id ?? '',
-        selections,
+        areaOfLawId: areasOfLaw.find(aol => aol.name === areaOfLaw)?.id ?? '',
+        localAuthorities: selections,
       };
     }
 

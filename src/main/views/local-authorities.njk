@@ -21,13 +21,17 @@
     }), items) %}
   {% endfor %}
 
+  {# this prevents complete omission from the form post when no checkboxes are selected #}
+  <input type="hidden" name="{{ id }}" value="">
   {{ govukCheckboxes({
     idPrefix: id,
     name: id,
     classes: "govuk-checkboxes--small app-checkboxes--two-columns",
     fieldset: {
       legend: {
-        text: legendText
+        text: legendText,
+        isPageHeading: true,
+        classes: "govuk-fieldset__legend--m"
       }
     },
     hint: {
@@ -45,24 +49,24 @@
 {% block content %}
   <div class="govuk-grid-row">
 
+    {{ govukWarningText({
+      text: "If you set a local authority for a court, when a user searches for a postcode within that local authority, it will show them the closest court to the entered postcode that has the local authority selected. This will affect users search results."
+    }) }}
+
     {%- if not courtTypes.family or (not casesHeard.Adoption and not casesHeard.Children and not casesHeard.Divorce) %}
 
-    {{ govukWarningText({
-      text: "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court and the 'Cases heard' as childcare arrangements, adoption and/or divorce."
-    }) }}
+      {{ govukWarningText({
+        text: "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court and the 'Cases heard' as childcare arrangements, adoption and/or divorce."
+      }) }}
 
     {% else %}
 
     <div class="govuk-grid-column-full">
-      {% if model.errors %}
-        {{ modelDrivenErrorSummary(model) }}
+      {% if errors %}
+        {{ modelDrivenErrorSummary(errors) }}
       {% endif %}
 
       <h1 class="govuk-heading-l">Local Authorities</h1>
-
-      {{ govukWarningText({
-        text: "If you set a local authority for a court, when a user searches for a postcode within that local authority, it will show them the closest court to the entered postcode that has the local authority selected. This will affect users search results."
-      }) }}
 
       {% set items = [] %}
       {% if casesHeard.Adoption %}
@@ -71,8 +75,8 @@
           id: "Adoption",
           panel: {
             html: localAuthoritySelection(
-              localAuthoritySelections.Adoption.selections,
-              localAuthoritySelections.Adoption.id,
+              localAuthoritySelections.Adoption.localAuthorities,
+              "Adoption."+localAuthoritySelections.Adoption.areaOfLawId,
               "Adoption",
               "Select all local authorities that have adoption cases heard at this court"
             )
@@ -85,8 +89,8 @@
           id: "Children",
           panel: {
             html: localAuthoritySelection(
-              localAuthoritySelections.Children.selections,
-              localAuthoritySelections.Children.id,
+              localAuthoritySelections.Children.localAuthorities,
+              "Children."+localAuthoritySelections.Children.areaOfLawId,
               "Children",
               "Select all local authorities that have childcare cases heard at this court"
             )
@@ -99,8 +103,8 @@
           id: "Divorce",
           panel: {
             html: localAuthoritySelection(
-              localAuthoritySelections.Divorce.selections,
-              localAuthoritySelections.Divorce.id,
+              localAuthoritySelections.Divorce.localAuthorities,
+              "Divorce."+localAuthoritySelections.Divorce.areaOfLawId,
               "Divorce",
               "Select all local authorities that have divorce cases heard at this court"
             )

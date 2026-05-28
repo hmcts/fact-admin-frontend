@@ -301,6 +301,26 @@ export class DataApiRequests {
   }
 
   /**
+   * Request to data API to update local authority data by court id
+   */
+  public async updateCourtLocalAuthorities(
+    courtId: string,
+    localAuthorities: CourtLocalAuthoritiesList
+  ): Promise<HttpStatusCode | Map<string, string>> {
+    try {
+      return await dataApi.put(`/courts/${courtId}/v1/local-authorities`, localAuthorities);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error updating court local authority details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
    * Request to data API to get professional information data by court id
    */
   public async getCourtProfessionalInformation(

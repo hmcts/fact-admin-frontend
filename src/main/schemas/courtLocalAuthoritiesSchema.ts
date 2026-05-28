@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 export const localAuthoritySelectionSchema = z.object({
   id: z.string(),
-  name: z.string().nullable(),
+  name: z.string().nullable().optional(),
   selected: z.boolean(),
 });
 
 export const courtLocalAuthoritiesSchema = z.object({
   areaOfLawId: z.string(),
-  areaOfLawName: z.string().nullable(),
+  areaOfLawName: z.string().nullable().optional(),
   localAuthorities: z.array(localAuthoritySelectionSchema),
 });
 

@@ -37,10 +37,10 @@
 {% endmacro %}
 
 {# common error summary/linking for templates where we #}
-{# explicitly map the schema model to the view model #}
-{% macro modelDrivenErrorSummary(model) %}
+{# explicitly map field ids to schema keys #}
+{% macro modelDrivenErrorSummary(modelErrors) %}
   {% set errorList = [] %}
-  {% for field, errors in model.errors %}
+  {% for field, errors in modelErrors %}
     {% if field !== "timestamp" %}
       {% set fieldErrors = [] %}
       {% for error in errors %}
