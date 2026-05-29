@@ -3,6 +3,7 @@ import { APIRequestContext } from '@playwright/test';
 import { expect, test } from '../../fixtures';
 import { type CreatedCourt, createTestCourt, getTestingSupportRegions } from '../../helpers/courtTestData';
 import { generateRandomSuffix, withTestCourtPrefix } from '../../helpers/testSupport';
+import { config } from '../../utils';
 
 function indexToAlphabetSuffix(index: number): string {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -55,9 +56,33 @@ test.describe(
       await homePage.header.expectNavigationLink('Courts');
       await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
-      await homePage.header.expectNavigationLink('Audit');
-      await homePage.header.expectNavigationLink('Users');
       await expect(homePage.regionSelect).toBeVisible();
+    });
+
+    test.describe('Super admin role navigation', () => {
+      test.use({ storageState: config.users.superAdmin.sessionFile });
+
+      test('shows super admin navigation links', async ({ homePage }) => {
+        await homePage.expectVisibleElements();
+        await homePage.header.expectNavigationLink('Courts');
+        await homePage.header.expectNavigationLink('Download csv');
+        await homePage.header.expectNavigationLink('Add new court');
+        await homePage.header.expectNavigationLink('Audit');
+        await homePage.header.expectNavigationLink('Users');
+      });
+    });
+
+    test.describe('Admin role navigation', () => {
+      test.use({ storageState: config.users.admin.sessionFile });
+
+      test('does not show super admin navigation links', async ({ homePage }) => {
+        await homePage.expectVisibleElements();
+        await homePage.header.expectNavigationLink('Courts');
+        await homePage.header.expectNavigationLink('Download csv');
+        await homePage.header.expectNavigationLink('Add new court');
+        await expect(homePage.header.navigationLinks.filter({ hasText: 'Audit' })).toHaveCount(0);
+        await expect(homePage.header.navigationLinks.filter({ hasText: 'Users' })).toHaveCount(0);
+      });
     });
 
     test('filters courts by name and only shows closed courts when requested', async ({ homePage, playwright }) => {

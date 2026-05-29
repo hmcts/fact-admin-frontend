@@ -1,21 +1,30 @@
 import { test as setup } from './fixtures';
-import { requireEnvVar } from './utils';
+import { config, createSession, requireEnvVar } from './utils';
 
 /**
- * Login/Bearer Token creating is handled via Azure libraries within the code.
- * In order to ensure that will function, the global setup will ensure that the correct environment
- * variables are in place to allow that to function successfully.
+ * Creates browser sessions for the SSO test users before the browser projects run.
  */
 setup.describe('Global playwright setup', () => {
+  setup.describe.configure({ mode: 'serial' });
+
   /**
    * Check for essential environment variables required for the tests to run
    */
   setup.beforeAll('Check environment setup', async () => {
     // Access URLs for Admin pages
-    requireEnvVar('ADMIN_URL');
+    requireEnvVar('TEST_URL');
 
-    // User SSO ids
-    requireEnvVar('ADMIN_SSO_ID');
-    requireEnvVar('SUPER_ADMIN_SSO_ID');
+    requireEnvVar('SSO_TEST_ADMIN_EMAIL');
+    requireEnvVar('SSO_TEST_ADMIN_PASSWORD');
+    requireEnvVar('SSO_TEST_SUPER_ADMIN_EMAIL');
+    requireEnvVar('SSO_TEST_SUPER_ADMIN_PASSWORD');
+  });
+
+  setup('Create admin session', async ({ page }) => {
+    await createSession(page, config.users.admin);
+  });
+
+  setup('Create super admin session', async ({ page }) => {
+    await createSession(page, config.users.superAdmin);
   });
 });

@@ -1,5 +1,6 @@
 import { test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
+import { config } from '../utils';
 
 test.describe(
   'Accessibility Tests',
@@ -7,6 +8,8 @@ test.describe(
     tag: '@a11y',
   },
   () => {
+    test.use({ storageState: config.users.superAdmin.sessionFile });
+
     test('Home Page Accessibility', async ({ homePage, axeUtils }) => {
       await homePage.expectVisibleElements();
       await axeUtils.audit();

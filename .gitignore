@@ -40,6 +40,7 @@ install-state.gz
 # Playwright
 /test-results/
 /playwright-report/
+/src/test/functional/.sessions/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
