@@ -36,7 +36,7 @@ export type LocalAuthoritiesViewModel = {
 export type LocalAuthoritiesSaveModel = {
   status: 'saved' | 'invalid';
   courtName: string;
-  viewModel?: LocalAuthoritiesViewModel;
+  errors?: Record<string, string[]>;
 };
 
 export class LocalAuthoritiesService {
@@ -117,21 +117,10 @@ export class LocalAuthoritiesService {
         errors[key] = [value];
       }
 
-      // start again...
-      const retrieveResponse = await this.retrieve(courtId);
-      if (typeof retrieveResponse === 'number') {
-        return retrieveResponse;
-      }
-
-      // attach the reconstituted view model with the errors attached into
-      // an invalid save response so we can re-render the page with some errors in place
       return {
         status: 'invalid',
         courtName: courtResponse.name,
-        viewModel: {
-          ...retrieveResponse,
-          errors,
-        },
+        errors,
       };
     }
 

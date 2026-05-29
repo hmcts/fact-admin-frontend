@@ -1,3 +1,4 @@
+import { Logger } from '@hmcts/nodejs-logging';
 import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
@@ -6,6 +7,7 @@ import { LocalAuthoritiesService, LocalAuthoritySelections } from '../services/L
 import { isUuid } from '../utils/valueParsers';
 
 const localAuthoritiesService = new LocalAuthoritiesService();
+const logger = Logger.getLogger('app');
 
 @route('/courts/:courtId/edit/local-authorities')
 export default class LocalAuthoritiesController {
@@ -54,9 +56,19 @@ export default class LocalAuthoritiesController {
       return res.render('error');
     }
 
+    // this will only happen if there's a server-side error that generated something other than just
+    // a raw http response status code, the most likely scenario being that data that backs this
+    // edit has been modified (e.g. an area of law has been removed during the edit process). The
+    // only really safe way to proceed here is to force the user into starting again. The error is
+    // in the save result, but for now we'll just log it and show the general error screen.
     if (saveResult.status === 'invalid') {
-      res.render('local-authorities', saveResult.viewModel);
-      return;
+      if (saveResult.errors) {
+        Object.values(saveResult.errors)
+          .flat()
+          .forEach(error => logger.error(error));
+      }
+      res.status(HttpStatusCode.BadRequest);
+      return res.render('error');
     }
 
     res.render('local-authorities-success', {
