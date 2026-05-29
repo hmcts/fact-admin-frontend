@@ -1,5 +1,6 @@
 import { test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
+import { config } from '../utils';
 
 const LIGHTHOUSE_THRESHOLDS = {
   accessibility: 100,
@@ -8,6 +9,8 @@ const LIGHTHOUSE_THRESHOLDS = {
 } as const;
 
 test.describe('Performance Tests', () => {
+  test.use({ storageState: config.users.superAdmin.sessionFile });
+
   test(
     'Home Page Performance',
     {

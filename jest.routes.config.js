@@ -3,6 +3,7 @@ module.exports = {
   testRegex: '(/src/test/.*|\\.(test|spec))\\.(ts|js)$',
   moduleFileExtensions: ['ts', 'js', 'json'],
   testEnvironment: 'node',
+  setupFiles: ['<rootDir>/src/test/setup/routes.setup.ts'],
   transform: {
     '^.+\\.ts?$': 'ts-jest',
     '^.+\\.js$': 'babel-jest',
