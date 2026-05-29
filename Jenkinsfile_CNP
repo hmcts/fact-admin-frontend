@@ -53,6 +53,17 @@ withPipeline(type, product, component) {
     ]
   }
 
+  afterAlways('smokeTest:preview') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html',
+      reportName            : 'Smoke Test Report',
+    ]
+  }
+
   afterAlways('functionalTest:aat') {
     publishHTML target: [
       allowMissing          : true,
