@@ -28,6 +28,7 @@ export class Authentication {
         clientAuthMethod: 'client_secret_post',
         secret: sessionSecret,
         authRequired: false,
+        idpLogout: true,
         authorizationParams: {
           scope: 'openid profile email',
         },
