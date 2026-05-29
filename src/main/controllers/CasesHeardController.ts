@@ -46,6 +46,23 @@ export default class CasesHeardController {
     }
 
     const selectedAreasOfLaw = casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
+
+    const confirmAdoption = req.body?.adoption && !selectedAreasOfLaw.includes(req.body?.adoption);
+    const confirmChildcare = req.body?.children && !selectedAreasOfLaw.includes(req.body?.children);
+    const confirmDivorce = req.body?.divorce && !selectedAreasOfLaw.includes(req.body?.divorce);
+
+    // if we have any confirmation matches then we need to show the confirmation page
+    if (confirmAdoption || confirmChildcare || confirmDivorce) {
+      return this.renderConfirmationPage(
+        res,
+        confirmAdoption,
+        confirmChildcare,
+        confirmDivorce,
+        resolvedCourtId,
+        selectedAreasOfLaw
+      );
+    }
+
     const saveResult = await casesHeardService.saveCasesHeard(resolvedCourtId, selectedAreasOfLaw);
 
     if (saveResult.type === 'validation_error') {
@@ -65,4 +82,33 @@ export default class CasesHeardController {
 
     res.render('cases-heard-success', saveResult.viewModel);
   }
+
+  private renderConfirmationPage(
+    res: Response,
+    confirmAdoption: boolean,
+    confirmChildcare: boolean,
+    confirmDivorce: boolean,
+    resolvedCourtId: string,
+    selectedAreasOfLaw: string[]
+  ) {
+    const typeList: string[] = [
+      confirmAdoption && 'Adoption',
+      confirmChildcare && 'Children',
+      confirmDivorce && 'Divorce',
+    ].filter(Boolean) as string[];
+
+    let message = '';
+    if (typeList.length > 1) {
+      message = `You are removing the cases heard types: ${typeList.join(',')}. These are being used by the local authorities admin page. If you remove them it will remove the local authority config. Do you want to remove this?`;
+    } else {
+      message = `You are removing the cases heard type of ${typeList[0]}. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?`;
+    }
+
+    return res.render('cases-heard-confirm', {
+      courtId: resolvedCourtId,
+      selectedAreasOfLaw,
+      message,
+    });
+  }
+  
 }

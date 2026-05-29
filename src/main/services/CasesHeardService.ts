@@ -13,6 +13,11 @@ export type CasesHeardViewModel = {
   leftColumnAreasOfLawItems: { checked: boolean; text: string; value: string }[];
   pageTitle: string;
   rightColumnAreasOfLawItems: { checked: boolean; text: string; value: string }[];
+  confirmRemovalAreasOfLaw: {
+    adoption: string | undefined;
+    children: string | undefined;
+    divorce: string | undefined;
+  };
 };
 
 export type CasesHeardSuccessViewModel = {
@@ -39,7 +44,7 @@ export class CasesHeardService {
       return value.filter((selectedValue): selectedValue is string => typeof selectedValue === 'string');
     }
 
-    return typeof value === 'string' ? [value] : [];
+    return typeof value === 'string' ? value.split(',') : [];
   }
 
   /**
@@ -136,6 +141,10 @@ export class CasesHeardService {
     // Split the checkbox list evenly for the two-column layout in the page template.
     const midpoint = Math.ceil(sortedAreasOfLawItems.length / 2);
 
+    const adoption = sortedAreasOfLawItems.find(item => item.text === 'Adoption' && item.checked)?.value;
+    const children = sortedAreasOfLawItems.find(item => item.text === 'Children' && item.checked)?.value;
+    const divorce = sortedAreasOfLawItems.find(item => item.text === 'Divorce' && item.checked)?.value;
+
     return {
       areasOfLawError,
       courtId,
@@ -144,6 +153,11 @@ export class CasesHeardService {
       leftColumnAreasOfLawItems: sortedAreasOfLawItems.slice(0, midpoint),
       pageTitle: areasOfLawError ? `Error: Cases heard - ${courtName}` : `Cases heard - ${courtName}`,
       rightColumnAreasOfLawItems: sortedAreasOfLawItems.slice(midpoint),
+      confirmRemovalAreasOfLaw: {
+        adoption,
+        children,
+        divorce
+      }
     };
   }
 

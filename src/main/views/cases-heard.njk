@@ -22,6 +22,18 @@
         text: "If you have set up local authority config for Adoption, Children and/or Divorce, and you remove these case types here, this will remove the local authority config and will affect search results"
       }) }}
       <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
+
+        {# these values are the ids of the related areas of law #}
+        {%- if confirmRemovalAreasOfLaw.adoption %}
+          <input type="hidden" name="adoption" value="{{ confirmRemovalAreasOfLaw.adoption }}">
+        {% endif -%}
+        {%- if confirmRemovalAreasOfLaw.children %}
+          <input type="hidden" name="children" value="{{ confirmRemovalAreasOfLaw.children }}">
+        {% endif -%}
+        {%- if confirmRemovalAreasOfLaw.divorce %}
+          <input type="hidden" name="divorce" value="{{ confirmRemovalAreasOfLaw.divorce }}">
+        {% endif -%}
+
         <fieldset class="govuk-fieldset">
         <div class="govuk-form-group{% if areasOfLawError %} govuk-form-group--error{% endif %}" id="areas-of-law-group">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">

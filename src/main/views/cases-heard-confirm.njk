@@ -1,0 +1,31 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block pageTitle %}
+  Cases heard confirm update - {{ courtName }}
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% if errorSummary.length %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errorSummary
+      }) }}
+    {% endif %}
+    <h1 class="govuk-heading-l">Cases heard</h1>
+    {{ govukWarningText({
+      text: message
+    }) }}
+    <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
+      <input type="hidden" name="areasOfLaw" value="{{ selectedAreasOfLaw }}">
+      <button class="govuk-button" data-module="govuk-button">Continue</button>
+    </form>
+    <a href="/courts/{{ courtId }}/edit/cases-heard" class="govuk-link">Go back</a>
+  </div>
+</div>
+
+{% endblock %}
