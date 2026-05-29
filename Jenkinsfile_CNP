@@ -76,5 +76,16 @@ withPipeline(type, product, component) {
     ]
   }
 
+  afterAlways('smoketest:aat') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html',
+      reportName            : 'Smoke Test Report',
+    ]
+  }
+
   syncBranchesWithMaster(['demo', 'perftest', 'ithc'])
 }
