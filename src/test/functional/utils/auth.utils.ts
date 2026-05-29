@@ -25,6 +25,7 @@ export async function loginAs(page: Page, user: UserDetails): Promise<void> {
   await page.locator('input[type="password"], input[name="passwd"]').first().fill(user.password);
   await submitMicrosoftForm(page, /sign in/i);
 
+  await skipMfaSetupPrompt(page);
   await answerStaySignedInPrompt(page);
 
   const appUrl = new URL(config.urls.homePageUrl);
@@ -46,6 +47,7 @@ export async function createSession(page: Page, user: UserDetails): Promise<void
 
 export async function logout(page: Page): Promise<void> {
   await page.getByRole('link', { name: /sign out/i }).click();
+  await selectAccountToSignOut(page);
   await expect(page.getByRole('link', { name: /sign out/i })).toHaveCount(0);
 }
 
@@ -86,5 +88,31 @@ async function answerStaySignedInPrompt(page: Page): Promise<void> {
     await noButton.click();
   } catch {
     // The prompt is tenant-dependent and does not always appear.
+  }
+}
+
+async function skipMfaSetupPrompt(page: Page): Promise<void> {
+  try {
+    await page.getByText(/let'?s keep your account secure/i).waitFor({ state: 'visible', timeout: 10_000 });
+    await submitMicrosoftForm(page, /^next$/i);
+
+    await page.getByText(/install microsoft authenticator/i).waitFor({ state: 'visible', timeout: 10_000 });
+    const skipAction = page
+      .getByRole('link', { name: /skip setup/i })
+      .or(page.getByRole('button', { name: /skip setup/i }))
+      .first();
+    await skipAction.waitFor({ state: 'visible', timeout: 10_000 });
+    await skipAction.click();
+  } catch {
+    // The MFA setup prompt is account/tenant-dependent and does not always appear.
+  }
+}
+
+async function selectAccountToSignOut(page: Page): Promise<void> {
+  try {
+    await page.getByText(/which account do you want to sign out of/i).waitFor({ state: 'visible', timeout: 10_000 });
+    await page.getByText(/@/).first().click();
+  } catch {
+    // The Microsoft account picker is tenant/session-dependent and does not always appear.
   }
 }
