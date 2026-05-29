@@ -47,7 +47,6 @@ export async function createSession(page: Page, user: UserDetails): Promise<void
 
 export async function logout(page: Page): Promise<void> {
   await page.getByRole('link', { name: /sign out/i }).click();
-  await selectAccountToSignOut(page);
   await expect(page.getByRole('link', { name: /sign out/i })).toHaveCount(0);
 }
 
@@ -105,14 +104,5 @@ async function skipMfaSetupPrompt(page: Page): Promise<void> {
     await skipAction.click();
   } catch {
     // The MFA setup prompt is account/tenant-dependent and does not always appear.
-  }
-}
-
-async function selectAccountToSignOut(page: Page): Promise<void> {
-  try {
-    await page.getByText(/which account do you want to sign out of/i).waitFor({ state: 'visible', timeout: 10_000 });
-    await page.getByText(/@/).first().click();
-  } catch {
-    // The Microsoft account picker is tenant/session-dependent and does not always appear.
   }
 }
