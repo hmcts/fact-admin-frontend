@@ -55,7 +55,6 @@ app.get('/favicon.ico', limiter, (req, res) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(loadControllers('controllers/**/*.+(ts|js)', { cwd: __dirname }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(loadControllers('controllers/{HealthController,InfoController}.+(ts|js)', { cwd: __dirname }));
 app.use((req, res, next) => {
