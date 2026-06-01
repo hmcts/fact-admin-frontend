@@ -156,8 +156,8 @@ export class CasesHeardService {
       confirmRemovalAreasOfLaw: {
         adoption,
         children,
-        divorce
-      }
+        divorce,
+      },
     };
   }
 

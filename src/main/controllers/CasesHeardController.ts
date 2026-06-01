@@ -51,8 +51,10 @@ export default class CasesHeardController {
     const confirmChildcare = req.body?.children && !selectedAreasOfLaw.includes(req.body?.children);
     const confirmDivorce = req.body?.divorce && !selectedAreasOfLaw.includes(req.body?.divorce);
 
-    // if we have any confirmation matches then we need to show the confirmation page
-    if (confirmAdoption || confirmChildcare || confirmDivorce) {
+    // if we have any confirmation matches then we need to show the confirmation page, provided
+    // there is at least one selected are of law. If no areas of law are selected then we fall
+    // through and let the validation trap the invalid form content.
+    if (selectedAreasOfLaw.length > 0 && (confirmAdoption || confirmChildcare || confirmDivorce)) {
       return this.renderConfirmationPage(
         res,
         confirmAdoption,
@@ -99,7 +101,7 @@ export default class CasesHeardController {
 
     let message = '';
     if (typeList.length > 1) {
-      message = `You are removing the cases heard types: ${typeList.join(',')}. These are being used by the local authorities admin page. If you remove them it will remove the local authority config. Do you want to remove this?`;
+      message = `You are removing the cases heard types: ${typeList.join(',')}. These are being used by the local authorities admin page. If you remove them it will remove the local authority config. Do you want to remove them?`;
     } else {
       message = `You are removing the cases heard type of ${typeList[0]}. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?`;
     }
@@ -110,5 +112,4 @@ export default class CasesHeardController {
       message,
     });
   }
-  
 }

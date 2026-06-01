@@ -27,6 +27,7 @@ export type LocalAuthoritySelections = {
 
 export type LocalAuthoritiesViewModel = {
   courtId: string;
+  courtName: string;
   courtTypes: CourtTypes;
   casesHeard: CasesHeard;
   localAuthoritySelections: LocalAuthoritySelections;
@@ -43,6 +44,11 @@ export class LocalAuthoritiesService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
   public async retrieve(courtId: string): Promise<LocalAuthoritiesViewModel | HttpStatusCode> {
+    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    if (typeof courtResponse === 'number') {
+      return courtResponse;
+    }
+
     // we need the complete set of local authorities to ensure we set up the model correctly
     const localAuthoritiesResponse = await this.dataApiRequests.getLocalAuthorities();
     if (typeof localAuthoritiesResponse === 'number') {
@@ -77,6 +83,7 @@ export class LocalAuthoritiesService {
 
     return {
       courtId,
+      courtName: courtResponse.name,
       localAuthoritySelections: this.buildCourtLocalAuthoritiesModelData(
         localAuthoritiesResponse,
         areasOfLawResponse,

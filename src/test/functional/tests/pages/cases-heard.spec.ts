@@ -69,6 +69,56 @@ test.describe('Cases Heard Page Tests', () => {
     );
   });
 
+  test('shows a confirmation step when removing Adoption, Children or Divorce and saves after continuing', async ({
+    casesHeardPage,
+    playwright,
+  }) => {
+    await withCreatedCourt(
+      playwright,
+      'Cases Heard Functional Test',
+      { serviceCenter: false },
+      async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.selectAllCaseTypes();
+        await casesHeardPage.save();
+        await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+
+        await casesHeardPage.goto(createdCourt.id);
+
+        const removableCaseTypes = ['Adoption', 'Children', 'Divorce'];
+        let removedCaseType: string | undefined;
+
+        for (const caseType of removableCaseTypes) {
+          const checkbox = casesHeardPage.page.getByRole('checkbox', { name: caseType });
+
+          if ((await checkbox.count()) > 0) {
+            await checkbox.first().uncheck();
+            removedCaseType = caseType;
+            break;
+          }
+        }
+
+        expect(removedCaseType).toBeDefined();
+        await casesHeardPage.save();
+
+        await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
+        await expect(casesHeardPage.warningText).toContainText(
+          `You are removing the cases heard type of ${removedCaseType}.`
+        );
+        await expect(casesHeardPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
+        await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit/cases-heard`
+        );
+
+        await casesHeardPage.page.getByRole('button', { name: 'Continue' }).click();
+
+        await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
+        await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+      }
+    );
+  });
+
   test('persists added case types when returning to the form', async ({ casesHeardPage, playwright }) => {
     await withCreatedCourt(
       playwright,

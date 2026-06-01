@@ -17,6 +17,11 @@ describe('CasesHeardController', () => {
     const responseMock = mock(response);
     const viewModel = {
       areasOfLawError: undefined,
+      confirmRemovalAreasOfLaw: {
+        adoption: undefined,
+        children: undefined,
+        divorce: '22222222-2222-4222-8222-222222222222',
+      },
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',
       errorSummary: [],
@@ -224,6 +229,81 @@ describe('CasesHeardController', () => {
     }
   });
 
+  test('renders the confirmation page when removing an adoption case type used by local authorities', async () => {
+    const controller = new CasesHeardController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      adoption: '11111111-1111-4111-8111-111111111111',
+      areasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],
+    };
+    request.params = { courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const updateCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'updateCourtAreasOfLaw');
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('cases-heard-confirm', {
+        courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        message:
+          'You are removing the cases heard type of Adoption. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?',
+        selectedAreasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],
+      });
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.notCalled(getCourtByIdStub);
+      assert.notCalled(updateCourtAreasOfLawStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      updateCourtAreasOfLawStub.restore();
+    }
+  });
+
+  test('saves comma-separated selected areas posted from the confirmation page', async () => {
+    const controller = new CasesHeardController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      areasOfLaw: '22222222-2222-4222-8222-222222222222,33333333-3333-4333-8333-333333333333',
+    };
+    request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    const updateCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'updateCourtAreasOfLaw').resolves(
+      HttpStatusCode.Ok
+    );
+
+    responseMock.expects('render').once().withArgs('cases-heard-success', {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      courtName: 'Reading Crown Court',
+    });
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.calledOnce(getCourtByIdStub);
+      assert.calledOnce(updateCourtAreasOfLawStub);
+      assert.calledWith(updateCourtAreasOfLawStub, {
+        areasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],
+        courtId: '11111111-1111-4111-8111-111111111111',
+      });
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      updateCourtAreasOfLawStub.restore();
+    }
+  });
+
   test('renders a validation error when no areas of law are selected', async () => {
     const controller = new CasesHeardController();
     const response = {
@@ -256,6 +336,11 @@ describe('CasesHeardController', () => {
       .once()
       .withArgs('cases-heard', {
         areasOfLawError: 'Select at least one type of case heard at this court.',
+        confirmRemovalAreasOfLaw: {
+          adoption: undefined,
+          children: undefined,
+          divorce: undefined,
+        },
         courtId: '11111111-1111-4111-8111-111111111111',
         courtName: 'Reading Crown Court',
         errorSummary: [{ href: '#areas-of-law-group', text: 'Select at least one type of case heard at this court.' }],
