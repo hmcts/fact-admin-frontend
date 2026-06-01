@@ -50,6 +50,7 @@ test.describe(
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.clearSelectedCaseTypes();
           await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
@@ -64,6 +65,7 @@ test.describe(
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectFirstCaseType();
           await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
@@ -91,6 +93,7 @@ test.describe(
           await generalPage.goto(createdCourt.id);
           await generalPage.nameInput.clear();
           await generalPage.save();
+          await generalPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
@@ -104,6 +107,7 @@ test.describe(
         async ({ createdCourt }) => {
           await generalPage.goto(createdCourt.id);
           await generalPage.save();
+          await generalPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
