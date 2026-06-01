@@ -268,7 +268,6 @@ export const utilsFixtures = {
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-shadow
   lighthousePage: async ({ lighthousePort, page, SessionUtils, logger }, use, testInfo): Promise<void> => {
-    // TODO: FACT-2582: look at whether we need this
     // Prevent creating performance page if not needed
     if (testInfo.tags.includes('@performance')) {
       // Lighthouse opens a new page and as playwright doesn't share context we need to
@@ -279,7 +278,7 @@ export const utilsFixtures = {
       });
       // Using the cookies from global setup, inject to the new browser
       try {
-        await context.addCookies(SessionUtils.getCookies(config.users.admin.sessionFile));
+        await context.addCookies(SessionUtils.getCookies(config.users.superAdmin.sessionFile));
       } catch {
         logger.warn('Failed to add cookies to Lighthouse browser context');
       }

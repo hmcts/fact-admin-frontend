@@ -8,11 +8,29 @@ def component = "admin-frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
+def secrets = [
+  'fact-bstrap-${env}-kv': [
+    secret('sso-test-admin-email', 'SSO_TEST_ADMIN_EMAIL'),
+    secret('sso-test-admin-password', 'SSO_TEST_ADMIN_PASSWORD'),
+    secret('sso-test-super-admin-email', 'SSO_TEST_SUPER_ADMIN_EMAIL'),
+    secret('sso-test-super-admin-password', 'SSO_TEST_SUPER_ADMIN_PASSWORD'),
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
 withPipeline(type, product, component) {
-
   env.DATA_API_URL = 'https://fact-data-api.aat.platform.hmcts.net'
+  env.PLAYWRIGHT_WORKERS = 4
 
-  // TODO: Once SSO is in, we will need to inject the SSO test setup via keyvault secrets
+  loadVaultSecrets(secrets)
 
   afterSuccess('build') {
     yarnBuilder.yarn('playwright install')
@@ -36,6 +54,17 @@ withPipeline(type, product, component) {
     ]
   }
 
+  afterAlways('smoketest:preview') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html',
+      reportName            : 'Smoke Test Report',
+    ]
+  }
+
   afterAlways('functionalTest:aat') {
     publishHTML target: [
       allowMissing          : true,
@@ -46,4 +75,17 @@ withPipeline(type, product, component) {
       reportName            : 'Functional Test Report',
     ]
   }
+
+  afterAlways('smoketest:aat') {
+    publishHTML target: [
+      allowMissing          : true,
+      alwaysLinkToLastBuild : true,
+      keepAll               : true,
+      reportDir             : 'test-results',
+      reportFiles           : 'odhin-report/index.html',
+      reportName            : 'Smoke Test Report',
+    ]
+  }
+
+  syncBranchesWithMaster(['demo', 'perftest', 'ithc'])
 }

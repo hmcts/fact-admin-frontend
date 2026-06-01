@@ -4,6 +4,8 @@ import { cpus } from 'node:os';
 const { version: appVersion, name: appName } = require('./package.json') as { version: string; name: string };
 import * as dotenv from 'dotenv';
 
+import { config as functionalConfig } from './src/test/functional/utils/config.utils';
+
 // Load .env file
 dotenv.config({ quiet: true });
 
@@ -213,20 +215,36 @@ const config = defineConfig({
     },
     {
       ...ProjectsConfig.chrome,
+      use: {
+        ...ProjectsConfig.chrome.use,
+        storageState: functionalConfig.users.admin.sessionFile,
+      },
       dependencies: ['setup'],
     },
     {
       ...ProjectsConfig.edge,
+      use: {
+        ...ProjectsConfig.edge.use,
+        storageState: functionalConfig.users.admin.sessionFile,
+      },
       dependencies: ['setup'],
       grepInvert: /@performance/,
     },
     {
       ...ProjectsConfig.firefox,
+      use: {
+        ...ProjectsConfig.firefox.use,
+        storageState: functionalConfig.users.admin.sessionFile,
+      },
       dependencies: ['setup'],
       grepInvert: /@performance/,
     },
     {
       ...ProjectsConfig.webkit,
+      use: {
+        ...ProjectsConfig.webkit.use,
+        storageState: functionalConfig.users.admin.sessionFile,
+      },
       dependencies: ['setup'],
       grepInvert: /@performance/,
     },

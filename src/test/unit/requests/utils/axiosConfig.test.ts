@@ -1,7 +1,7 @@
 import { ChainedTokenCredential } from '@azure/identity';
 import { InternalAxiosRequestConfig } from 'axios';
 
-import { processRequest } from '../../../../main/requests/utils/axiosConfig';
+import { processRequest, runWithDataApiUserId } from '../../../../main/requests/utils/axiosConfig';
 
 jest.mock('@azure/identity');
 
@@ -36,5 +36,45 @@ describe('processRequest', () => {
     const cfg: Partial<InternalAxiosRequestConfig> = { url: '/another-protected-url' };
     const result = await processRequest(cfg as InternalAxiosRequestConfig);
     expect(result.headers?.Authorization).toBe(`Bearer ${mockToken}`);
+  });
+
+  it('adds X-User-Id header when a user id is available in the request context', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'put', url: '/courts/123/entity/v1' };
+
+    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
+
+    expect(result.headers?.['X-User-Id']).toBe('user-123');
+  });
+
+  it('does not add X-User-Id header without a user id in the request context', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'put', url: '/courts/123/entity/v1' };
+
+    const result = await processRequest(cfg as InternalAxiosRequestConfig);
+
+    expect(result.headers?.['X-User-Id']).toBeUndefined();
+  });
+
+  it('adds X-User-Id header to POST requests outside excluded endpoints', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/courts/123/entity/v1' };
+
+    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
+
+    expect(result.headers?.['X-User-Id']).toBe('user-123');
+  });
+
+  it('does not add X-User-Id header to the data API user creation/update POST', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/user/v1' };
+
+    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
+
+    expect(result.headers?.['X-User-Id']).toBeUndefined();
+  });
+
+  it('does not add X-User-Id header to a POST to /users', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/users' };
+
+    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
+
+    expect(result.headers?.['X-User-Id']).toBeUndefined();
   });
 });
