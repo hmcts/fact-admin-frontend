@@ -15,7 +15,9 @@ import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
+import { User, userSchema } from '../schemas/userSchema';
 
+import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { dataApi } from './utils/axiosConfig';
 
@@ -260,6 +262,21 @@ export class DataApiRequests {
       return courtTypeListSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching area of law type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create or update a user
+   */
+  public async createUpdateUser(user: CreateUpdateUserRequest): Promise<User | HttpStatusCode> {
+    try {
+      const response = await dataApi.post('/user/v1', user);
+      return userSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error creating/updating user with SSO ID ${user.ssoId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

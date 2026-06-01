@@ -38,11 +38,13 @@
     "config": "4.4.1",
     "cookie-parser": "1.4.7",
     "express": "5.2.1",
+    "express-openid-connect": "3.0.0",
     "express-rate-limit": "8.5.2",
     "govuk-frontend": "5.14.0",
-    "helmet": "8.1.0",
+    "helmet": "8.2.0",
     "lodash": "4.18.1",
     "nunjucks": "3.2.4",
+    "redis": "^5.11.0",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
     "zod": "4.4.3"
@@ -106,7 +108,7 @@
     "style-loader": "4.0.0",
     "stylelint": "17.11.1",
     "supertest": "^7.2.2",
-    "ts-jest": "29.4.10",
+    "ts-jest": "29.4.11",
     "ts-loader": "9.5.7",
     "webpack": "5.106.2",
     "webpack-cli": "^6.0.1",
@@ -128,5 +130,5 @@
     "**/*": "prettier --write --ignore-unknown",
     "**/*.{js,ts}": "eslint --fix"
   },
-  "packageManager": "yarn@4.14.1"
+  "packageManager": "yarn@4.15.0"
 }

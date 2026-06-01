@@ -1,5 +1,6 @@
 import { test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
+import { config } from '../utils';
 
 const LIGHTHOUSE_THRESHOLDS = {
   accessibility: 100,
@@ -13,17 +14,14 @@ test.describe(
     tag: '@performance',
   },
   () => {
+    test.use({ storageState: config.users.superAdmin.sessionFile });
+
     test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
       await homePage.header.checkIsVisible();
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
-    test(
-      'Cases Heard Page Performance',
-      {
-        tag: '@performance',
-      },
-      async ({ casesHeardPage, lighthouseUtils, playwright }) => {
+    test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
         await withCreatedCourt(
           playwright,
           'Cases Heard Performance Test',

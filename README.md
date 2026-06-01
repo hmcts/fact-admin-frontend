@@ -14,6 +14,24 @@ Running the application requires the following tools to be installed in your env
 
 Install dependencies by executing the following command:
 
+## Session Management
+
+We use Redis to store session data to ensure sessions are shared across multiple frontend instances.
+
+This is configured in the [app.js](./src/main/app.js) file.
+
+Alongside this, the local unit / route tests use a Mock version of redis to simulate the interactions.
+
+For local development against the Redis container in `docker-compose.yml`, set:
+
+```bash
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_LOCAL=true
+```
+
+`REDIS_PASSWORD` is only needed when connecting to an environment Redis instance that requires authentication.
+
 ```bash
 yarn install
 ```
@@ -138,6 +156,6 @@ in [health.ts](src/main/routes/health.ts) file. Make sure you adjust it correctl
 In particular, remember to replace the sample check with checks specific to your frontend app,
 e.g. the ones verifying the state of each service it depends on.
 
-## License
+## License.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
