@@ -1,12 +1,19 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
+import {
+  CourtAreaOfLawSelection,
+  CourtAreasOfLawUpdate,
+  parseCourtAreasOfLawResponse,
+} from '../schemas/areaOfLawSchema';
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
+import { User, userSchema } from '../schemas/userSchema';
 
+import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { dataApi } from './utils/axiosConfig';
 
@@ -73,6 +80,36 @@ export class DataApiRequests {
   }
 
   /**
+   * Request to data API to get area of law selections by court id
+   */
+  public async getCourtAreasOfLaw(courtId: string): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/areas-of-law`);
+      return parseCourtAreasOfLawResponse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching areas of law for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update area of law selections for a court
+   */
+  public async updateCourtAreasOfLaw(payload: CourtAreasOfLawUpdate): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.put(`/courts/${payload.courtId}/v1/areas-of-law`, payload);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      logger.error(`Error updating areas of law for court id ${payload.courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
    * Request to data API to get all court details
    */
   public async getAllCourts(): Promise<CourtDetails[] | HttpStatusCode> {
@@ -123,6 +160,21 @@ export class DataApiRequests {
     } catch (error: unknown) {
       logger.error(`Error saving translation services for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create or update a user
+   */
+  public async createUpdateUser(user: CreateUpdateUserRequest): Promise<User | HttpStatusCode> {
+    try {
+      const response = await dataApi.post('/user/v1', user);
+      return userSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error creating/updating user with SSO ID ${user.ssoId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
     }
   }
 }

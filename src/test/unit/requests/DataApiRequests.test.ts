@@ -1,6 +1,15 @@
 import { HttpStatusCode } from 'axios';
 import sinon, { restore, stub } from 'sinon';
 
+jest.mock('@hmcts/nodejs-logging', () => ({
+  Logger: {
+    getLogger: jest.fn().mockReturnValue({
+      error: jest.fn(),
+      info: jest.fn(),
+    }),
+  },
+}));
+
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 
@@ -21,11 +30,13 @@ const errorMessage = {
 describe('DataApiRequests', () => {
   let getStub: sinon.SinonStub;
   let postStub: sinon.SinonStub;
+  let putStub: sinon.SinonStub;
 
   beforeEach(() => {
     restore();
     getStub = stub(dataApi, 'get');
     postStub = stub(dataApi, 'post');
+    putStub = stub(dataApi, 'put');
   });
 
   it('returns true when health status is UP', async () => {
@@ -211,6 +222,104 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getCourtById(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court areas of law when the response uses java toString map keys', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const areasOfLaw = {
+      'AreaOfLawType(id=66666666-6666-4666-8666-666666666666, name=Divorce, nameCy=Ysgariad, externalLink=null, externalLinkCy=null, displayName=Divorce and separation, displayNameCy=Ysgariad a gwahanu)': true,
+      'AreaOfLawType(id=77777777-7777-4777-8777-777777777777, name=Probate, nameCy=Profiant, externalLink=null, externalLinkCy=null, displayName=null, displayNameCy=null)': false,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).resolves({ data: areasOfLaw });
+
+    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+
+    expect(response).toEqual([
+      {
+        areaOfLawType: {
+          displayName: 'Divorce and separation',
+          displayNameCy: 'Ysgariad a gwahanu',
+          externalLink: null,
+          externalLinkCy: null,
+          id: '66666666-6666-4666-8666-666666666666',
+          name: 'Divorce',
+          nameCy: 'Ysgariad',
+        },
+        selected: true,
+      },
+      {
+        areaOfLawType: {
+          displayName: null,
+          displayNameCy: null,
+          externalLink: null,
+          externalLinkCy: null,
+          id: '77777777-7777-4777-8777-777777777777',
+          name: 'Probate',
+          nameCy: 'Profiant',
+        },
+        selected: false,
+      },
+    ]);
+  });
+
+  it('returns not found when the court areas of law endpoint returns a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when the court areas of law response fails schema validation', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).resolves({
+      data: {
+        '{"name":"Divorce"}': true,
+      },
+    });
+
+    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns ok when court areas of law are updated successfully', async () => {
+    const payload = {
+      areasOfLaw: ['66666666-6666-4666-8666-666666666666'],
+      courtId: '55555555-5555-4555-8555-555555555555',
+    };
+
+    putStub
+      .withArgs('/courts/55555555-5555-4555-8555-555555555555/v1/areas-of-law', payload)
+      .resolves({ status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.updateCourtAreasOfLaw(payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns bad request when updating court areas of law fails', async () => {
+    const payload = {
+      areasOfLaw: ['66666666-6666-4666-8666-666666666666'],
+      courtId: '55555555-5555-4555-8555-555555555555',
+    };
+    const badRequestError = {
+      isAxiosError: true,
+      response: {
+        data: 'bad request',
+        status: 400,
+      },
+    };
+
+    putStub.withArgs('/courts/55555555-5555-4555-8555-555555555555/v1/areas-of-law', payload).rejects(badRequestError);
+
+    const response = await dataApiRequests.updateCourtAreasOfLaw(payload);
+
+    expect(response).toBe(HttpStatusCode.BadRequest);
   });
 
   it('returns parsed court details when the bulk court response is valid', async () => {
@@ -412,6 +521,96 @@ describe('DataApiRequests', () => {
     });
 
     const response = await dataApiRequests.getAllCourts();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns the user entity when create/update user succeeds', async () => {
+    const user = {
+      email: 'user@justice.gov.uk',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+      role: 'Admin' as const,
+    };
+    const userEntity = {
+      email: 'user@justice.gov.uk',
+      favouriteCourts: ['3fa85f64-5717-4562-b3fc-2c963f66afa6'],
+      id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      lastLogin: '2026-05-27T10:35:23.406Z',
+      role: 'ADMIN',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+    };
+
+    postStub.withArgs('/user/v1', user).resolves({ data: userEntity });
+
+    const response = await dataApiRequests.createUpdateUser(user);
+
+    expect(response).toEqual(userEntity);
+  });
+
+  it('returns the user entity when create/update user response has no favourite courts', async () => {
+    const user = {
+      email: 'user@justice.gov.uk',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+      role: 'Admin' as const,
+    };
+    const userEntity = {
+      email: 'user@justice.gov.uk',
+      favouriteCourts: null,
+      id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      lastLogin: '2026-05-27T10:35:23.406Z',
+      role: 'ADMIN',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+    };
+
+    postStub.withArgs('/user/v1', user).resolves({ data: userEntity });
+
+    const response = await dataApiRequests.createUpdateUser(user);
+
+    expect(response).toEqual(userEntity);
+  });
+
+  it('returns internal server error when create/update user response fails schema validation', async () => {
+    const user = {
+      email: 'user@justice.gov.uk',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+      role: 'Admin' as const,
+    };
+
+    postStub.withArgs('/user/v1', user).resolves({
+      data: {
+        email: 'not-an-email',
+      },
+    });
+
+    const response = await dataApiRequests.createUpdateUser(user);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns the API status when create/update user fails with an axios response', async () => {
+    const user = {
+      email: 'user@justice.gov.uk',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+      role: 'Admin' as const,
+    };
+
+    postStub.withArgs('/user/v1', user).rejects(errorResponse);
+
+    const response = await dataApiRequests.createUpdateUser(user);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when create/update user fails without an axios response', async () => {
+    const user = {
+      email: 'user@justice.gov.uk',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+      role: 'Admin' as const,
+    };
+
+    postStub.withArgs('/user/v1', user).rejects(errorMessage);
+
+    const response = await dataApiRequests.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });

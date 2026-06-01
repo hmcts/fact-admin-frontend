@@ -9,13 +9,9 @@ dotenv.config({ quiet: true });
 
 const logger = Logger.getLogger('functional-tests');
 
-// TODO: While the admin frontend doesn't talk to the api using a specific set of user credentials,
-//       once SSO is in place we will need to perform user authentication as part of the functional
-//       test process. The ssoID is just a placeholder - we'll likley just need credentials to allow
-//       us to perform the sso login.
 export interface UserDetails {
-  ssoId: string;
-  // this is used during lighthouse (performance) config
+  email: string;
+  password: string;
   sessionFile: string;
 }
 
@@ -34,19 +30,20 @@ export interface Config {
 
 export const config: Config = {
   users: {
-    // TODO: FACT-2582: again, speculation on how users might be required
     admin: {
-      ssoId: getEnvVar('ADMIN_SSO_ID'),
-      sessionFile: path.join(__dirname + '../../.sessions/') + `${getEnvVar('ADMIN_SSO_ID')}.json`,
+      email: getEnvVar('SSO_TEST_ADMIN_EMAIL'),
+      password: getEnvVar('SSO_TEST_ADMIN_PASSWORD'),
+      sessionFile: path.join(__dirname, '..', '.sessions', 'admin.json'),
     },
     superAdmin: {
-      ssoId: getEnvVar('SUPER_ADMIN_SSO_ID'),
-      sessionFile: path.join(__dirname + '../../.sessions/') + `${getEnvVar('SUPER_ADMIN_SSO_ID')}.json`,
+      email: getEnvVar('SSO_TEST_SUPER_ADMIN_EMAIL'),
+      password: getEnvVar('SSO_TEST_SUPER_ADMIN_PASSWORD'),
+      sessionFile: path.join(__dirname, '..', '.sessions', 'super-admin.json'),
     },
   },
   urls: {
     dataApiUrl: getEnvVar('DATA_API_URL', 'http://localhost:8989'),
-    homePageUrl: getEnvVar('ADMIN_URL', getEnvVar('TEST_URL', 'https://localhost:3355')),
+    homePageUrl: getEnvVar('TEST_URL', getEnvVar('TEST_URL', 'https://localhost:3355')),
   },
 };
 

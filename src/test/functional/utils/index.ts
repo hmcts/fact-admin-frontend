@@ -1,3 +1,4 @@
+export * from './auth.utils';
 export * from './config.utils';
 export * from './parallel-requests';
 export * from './seed-manifest';

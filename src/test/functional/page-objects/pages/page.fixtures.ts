@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { CasesHeardPage } from './cases-heard.po';
 import { CourtEditPage } from './court-edit.po';
 import { HomePage } from './home.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
@@ -8,6 +9,7 @@ export interface PageFixtures {
   determinePage: Page;
   homePage: HomePage;
   courtEditPage: CourtEditPage;
+  casesHeardPage: CasesHeardPage;
   translationAndInterpretationPage: TranslationAndInterpretationPage;
 }
 
@@ -37,6 +39,10 @@ export const pageFixtures = {
   translationAndInterpretationPage: async ({ determinePage }, use): Promise<void> => {
     const translationAndInterpretationPage = new TranslationAndInterpretationPage(determinePage);
     await use(translationAndInterpretationPage);
+  },
+  casesHeardPage: async ({ determinePage }, use): Promise<void> => {
+    const casesHeardPage = new CasesHeardPage(determinePage);
+    await use(casesHeardPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
