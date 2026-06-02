@@ -270,8 +270,9 @@ describe('CourtAddressService', () => {
 
   test('deletes an address and returns deleted payload when API deletion succeeds', async () => {
     const address = buildAddress();
+    const address2 = buildAddress({ id: addressId.replaceAll('2', '3') });
     jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
-    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetailsById').mockResolvedValue(address);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([address, address2]);
     jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress').mockResolvedValue(HttpStatusCode.NoContent);
 
     const service = new CourtAddressService();
@@ -311,7 +312,7 @@ describe('CourtAddressService', () => {
   test('returns status code when loading address fails during delete', async () => {
     const deleteCourtAddress = jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress');
     jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
-    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetailsById').mockResolvedValue(HttpStatusCode.NotFound);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue(HttpStatusCode.NotFound);
 
     const service = new CourtAddressService();
     const result = await service.delete(courtId, addressId);
@@ -349,5 +350,27 @@ describe('CourtAddressService', () => {
     expect(service.validatePostcode('IM1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.isleOfManPostcode);
     expect(service.isValidPostcode('SW1A 1AA')).toBe(true);
     expect(service.isValidPostcode('GY1 1AA')).toBe(false);
+  });
+
+  test('returns invalid response when attempting to delete the last address', async () => {
+    const onlyAddress = buildAddress();
+    const deleteCourtAddress = jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress');
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([onlyAddress]);
+
+    const service = new CourtAddressService();
+    const result = await service.delete(courtId, addressId);
+
+    expect(deleteCourtAddress).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'invalid',
+      courtName: 'Reading Crown Court',
+      address: {
+        ...onlyAddress,
+        errors: {
+          message: ['Unable to delete this address: At least one address is required for a court.'],
+        },
+      },
+    });
   });
 });

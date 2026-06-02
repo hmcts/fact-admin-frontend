@@ -391,6 +391,16 @@ export class CourtAddressController {
       return;
     }
 
+    // if we failed to delete the address, re-render the screen and show the error message
+    if (deleteResult['status'] === 'invalid') {
+      res.render('court-address-delete', {
+        address: deleteResult['address'],
+        courtName: deleteResult['courtName'],
+        pageTitle: 'Delete Address',
+      });
+      return;
+    }
+
     // The only other option is 'deleted'
     res.render('court-address-delete-success', {
       courtName: deleteResult['courtName'],
