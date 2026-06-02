@@ -1,0 +1,130 @@
+import { expect, test } from '../../fixtures';
+import { withCreatedCourt } from '../../helpers/testSupport';
+
+test.describe('Local Authorities Page Tests', () => {
+  test(
+    'smoke test',
+    {
+      tag: '@smoke',
+    },
+    async ({ localAuthoritiesPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'Local Authorities Functional Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await localAuthoritiesPage.goto(createdCourt.id);
+
+          await expect(localAuthoritiesPage.warningText).toContainText('If you set a local authority for a court');
+        }
+      );
+    }
+  );
+
+  test('renders the availability warning when local-authority config is not enabled for a court', async ({
+    localAuthoritiesPage,
+    playwright,
+  }) => {
+    await withCreatedCourt(
+      playwright,
+      'Local Authorities Functional Test',
+      { serviceCenter: false },
+      async ({ createdCourt }) => {
+        await localAuthoritiesPage.goto(createdCourt.id);
+
+        await localAuthoritiesPage.expectVisibleElements();
+        await expect(localAuthoritiesPage.availabilityWarningText).toContainText(
+          "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court"
+        );
+        await expect(localAuthoritiesPage.saveButton).toHaveCount(0);
+        await expect(localAuthoritiesPage.tabs).toHaveCount(0);
+        await expect(localAuthoritiesPage.successPanel).toHaveCount(0);
+      }
+    );
+  });
+
+  test('saves local-authority selections and renders the success page when the section is enabled', async ({
+    casesHeardPage,
+    localAuthoritiesPage,
+    playwright,
+  }) => {
+    await withCreatedCourt(
+      playwright,
+      'Local Authorities Functional Test',
+      { serviceCenter: false },
+      async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.selectAllCaseTypes();
+        await casesHeardPage.save();
+        await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+
+        await localAuthoritiesPage.goto(createdCourt.id);
+
+        if (await localAuthoritiesPage.isConfigurationUnavailable()) {
+          await expect(localAuthoritiesPage.availabilityWarningText).toContainText(
+            "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court"
+          );
+          await expect(localAuthoritiesPage.saveButton).toHaveCount(0);
+          return;
+        }
+
+        await expect(localAuthoritiesPage.heading).toContainText('Local Authorities');
+
+        const tabCount = await localAuthoritiesPage.tabs.count();
+        expect(tabCount).toBeGreaterThan(0);
+
+        const checkboxCount = await localAuthoritiesPage.visibleTabCheckboxes.count();
+        expect(checkboxCount).toBeGreaterThan(0);
+
+        const firstCheckbox = localAuthoritiesPage.getFirstVisibleCheckbox();
+        await expect(firstCheckbox).toBeVisible();
+        await firstCheckbox.check();
+        await localAuthoritiesPage.save();
+
+        await expect(localAuthoritiesPage.page).toHaveURL(
+          localAuthoritiesPage.buildLocalAuthoritiesSuccessUrl(createdCourt.id)
+        );
+        await expect(localAuthoritiesPage.successPanel).toContainText(
+          `Local authority settings for ${createdCourt.name} have been successfully updated`
+        );
+        await expect(localAuthoritiesPage.mainContent.content).toContainText('What do you want to do next?');
+        await expect(
+          localAuthoritiesPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
+        ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
+        await expect(localAuthoritiesPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(localAuthoritiesPage.page.locator('a.govuk-link--no-visited-state')).toHaveCount(2);
+
+        await localAuthoritiesPage.goto(createdCourt.id);
+        await expect(localAuthoritiesPage.getFirstVisibleCheckbox()).toBeChecked();
+      }
+    );
+  });
+
+  test('does not render the success page for direct GET requests', async ({ localAuthoritiesPage, playwright }) => {
+    await withCreatedCourt(
+      playwright,
+      'Local Authorities Functional Test',
+      { serviceCenter: false },
+      async ({ createdCourt }) => {
+        await localAuthoritiesPage.gotoSuccess(createdCourt.id);
+
+        await expect(localAuthoritiesPage.page).toHaveURL(
+          localAuthoritiesPage.buildLocalAuthoritiesSuccessUrl(createdCourt.id)
+        );
+        await expect(localAuthoritiesPage.mainContent.content).toContainText('Page Not Found');
+        await expect(localAuthoritiesPage.successPanel).toHaveCount(0);
+      }
+    );
+  });
+
+  test('renders the dedicated court not found page for an invalid court id', async ({ localAuthoritiesPage }) => {
+    await localAuthoritiesPage.goto('not-a-uuid');
+
+    await localAuthoritiesPage.expectVisibleElements();
+    await expect(localAuthoritiesPage.heading).toContainText('Court not found');
+    await expect(localAuthoritiesPage.mainContent.content).toContainText('This court does not exist.');
+    await expect(
+      localAuthoritiesPage.page.getByRole('link', { name: 'Return to the home page to view another court' })
+    ).toBeVisible();
+  });
+});

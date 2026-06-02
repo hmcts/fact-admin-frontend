@@ -102,8 +102,9 @@ test.describe('Cases Heard Page Tests', () => {
         await casesHeardPage.save();
 
         await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
-        await expect(casesHeardPage.warningText).toContainText(
-          `You are removing the cases heard type of ${removedCaseType}.`
+        await expect(casesHeardPage.heading).toContainText('Are you sure you want to save the changes to Cases Heard?');
+        await expect(casesHeardPage.mainContent.content).toContainText(
+          'You are removing the cases heard type of Adoption.'
         );
         await expect(casesHeardPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
         await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
@@ -133,6 +134,7 @@ test.describe('Cases Heard Page Tests', () => {
         await casesHeardPage.clearSelectedCaseTypes();
         await casesHeardPage.getCaseTypeCheckbox(0).check();
         await casesHeardPage.save();
+        await casesHeardPage.successPanel.click();
         await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
 
         await casesHeardPage.goto(createdCourt.id);

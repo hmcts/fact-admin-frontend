@@ -61,4 +61,29 @@ describe('Cases Heard View', () => {
     expect(html).toContain('govuk-link govuk-link--no-visited-state');
     expect(html).toContain('Home');
   });
+
+  test('renders the cases heard confirm page', () => {
+    const html = env.render('cases-heard-confirm.njk', {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      courtName: 'Reading Crown Court',
+      message: 'Removing Adoption and Divorce will remove related local authority config.',
+      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/confirm',
+      selectedAreasOfLaw: '22222222-2222-4222-8222-222222222222,33333333-3333-4333-8333-333333333333',
+    });
+
+    expect(html).toContain('Cases heard confirm update - Reading Crown Court');
+    expect(html).toContain('Are you sure you want to save the changes to Cases Heard?');
+    expect(html).toContain('Court name');
+    expect(html).toContain('Confirm');
+    expect(html).toContain('Removing Adoption and Divorce will remove related local authority config.');
+    expect(html).toContain('name="areasOfLaw"');
+    expect(html).toContain(
+      'value="22222222-2222-4222-8222-222222222222,33333333-3333-4333-8333-333333333333"',
+    );
+    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success');
+    expect(html).toContain('Continue');
+    expect(html).toContain('govuk-button--warning');
+    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
+    expect(html).toContain('Go back');
+  });
 });
