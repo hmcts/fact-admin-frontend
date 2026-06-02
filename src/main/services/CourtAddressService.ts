@@ -30,6 +30,11 @@ export type DeleteCourtAddressResponse =
       courtName: string;
       address: Partial<CourtAddress>;
     }
+  | {
+      status: 'invalid';
+      courtName: string;
+      address: Partial<CourtAddress> & { errors?: Record<string, string[] | undefined> };
+    }
   | HttpStatusCode;
 
 const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
@@ -61,6 +66,10 @@ export class CourtAddressService {
 
   public async retrieve(courtId: string, addressId: string): Promise<CourtAddress | HttpStatusCode> {
     return dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+  }
+
+  public async retrieveAll(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {
+    return dataApiRequests.getCourtAddressDetails(courtId);
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
@@ -97,7 +106,7 @@ export class CourtAddressService {
       return { status: 'invalid', address: { ...address, errors: validationErrors } };
     }
 
-    // retrieve the court as we'll need it's name
+    // retrieve the court as we'll need its name
     const courtResponse = await dataApiRequests.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
@@ -136,9 +145,25 @@ export class CourtAddressService {
     }
 
     // retrieve the address as we'll need it
-    const courtAddressResponse = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+    const courtAddressResponse = await dataApiRequests.getCourtAddressDetails(courtId);
     if (typeof courtAddressResponse === 'number') {
       return courtAddressResponse;
+    }
+
+    const courtAddress = courtAddressResponse.find(address => address.id === addressId);
+    if (!courtAddress) {
+      return HttpStatusCode.NotFound;
+    }
+
+    if (courtAddressResponse.length < 2) {
+      return {
+        status: 'invalid',
+        courtName: courtResponse.name,
+        address: {
+          ...courtAddress,
+          errors: { message: ['Unable to delete this address: At least one address is required for a court.'] },
+        },
+      };
     }
 
     // delete the address
@@ -146,7 +171,7 @@ export class CourtAddressService {
     if (response !== HttpStatusCode.NoContent) {
       return response;
     }
-    return { status: 'deleted', courtName: courtResponse.name, address: courtAddressResponse };
+    return { status: 'deleted', courtName: courtResponse.name, address: courtAddress };
   }
 
   public async retrieveCourtName(courtId: string): Promise<string | HttpStatusCode> {
