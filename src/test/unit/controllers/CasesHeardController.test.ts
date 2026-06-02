@@ -238,6 +238,7 @@ describe('CasesHeardController', () => {
     request.body = {
       adoption: '11111111-1111-4111-8111-111111111111',
       areasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],
+      courtName: 'Reading Crown Court',
     };
     request.params = { courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' };
     const responseMock = mock(response);
@@ -249,6 +250,7 @@ describe('CasesHeardController', () => {
       .once()
       .withArgs('cases-heard-confirm', {
         courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        courtName: 'Reading Crown Court',
         message:
           'You are removing the cases heard type of Adoption. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?',
         selectedAreasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],

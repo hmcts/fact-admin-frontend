@@ -61,6 +61,7 @@ export default class CasesHeardController {
         confirmChildcare,
         confirmDivorce,
         resolvedCourtId,
+        req.body.courtName,
         selectedAreasOfLaw
       );
     }
@@ -91,6 +92,7 @@ export default class CasesHeardController {
     confirmChildcare: boolean,
     confirmDivorce: boolean,
     resolvedCourtId: string,
+    courtName: string,
     selectedAreasOfLaw: string[]
   ) {
     const typeList: string[] = [
@@ -108,6 +110,7 @@ export default class CasesHeardController {
 
     return res.render('cases-heard-confirm', {
       courtId: resolvedCourtId,
+      courtName,
       selectedAreasOfLaw,
       message,
     });

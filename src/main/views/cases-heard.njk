@@ -24,6 +24,7 @@
       <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
 
         {# these values are the ids of the related areas of law #}
+        <input type="hidden" name="courtName" value="{{ courtName }}">
         {%- if confirmRemovalAreasOfLaw.adoption %}
           <input type="hidden" name="adoption" value="{{ confirmRemovalAreasOfLaw.adoption }}">
         {% endif -%}
