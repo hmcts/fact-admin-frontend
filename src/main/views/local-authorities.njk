@@ -12,6 +12,20 @@
 
 {% macro localAuthoritySelection(selections, id, legendText=null, hintText=null) %}
 
+  {{ govukInput({
+    label: {
+      text: "Filter local authorities",
+      classes: "govuk-label--s",
+      isPageHeading: false
+    },
+    attributes: {
+      "data-element-filter-input": "",
+      "data-element-filter-target": "div.govuk-checkboxes .govuk-checkboxes__item"
+    },
+    id: id + "-filter",
+    name: id + "-filter"
+  }) }}
+
   {% set items = [] %}
   {% for selection in selections | sort(false, true, 'name') %}
     {% set items = (items.push({
@@ -84,7 +98,10 @@
                 "Adoption."+localAuthoritySelections.Adoption.areaOfLawId,
                 "Adoption",
                 "Select all local authorities that have adoption cases heard at this court"
-              )
+              ),
+              attributes: {
+                "data-element-filter-container": ""
+              }
             }
           }), items) %}
         {%  endif %}
@@ -98,7 +115,10 @@
                 "Children."+localAuthoritySelections.Children.areaOfLawId,
                 "Children",
                 "Select all local authorities that have childcare cases heard at this court"
-              )
+              ),
+              attributes: {
+                "data-element-filter-container": ""
+              }
             }
           }), items) %}
         {%  endif %}
@@ -112,7 +132,10 @@
                 "Divorce."+localAuthoritySelections.Divorce.areaOfLawId,
                 "Divorce",
                 "Select all local authorities that have divorce cases heard at this court"
-              )
+              ),
+              attributes: {
+                "data-element-filter-container": ""
+              }
             }
           }), items) %}
         {%  endif %}
