@@ -113,5 +113,39 @@ test.describe(
         }
       );
     });
+
+    test('Local Authorities Page Accessibility', async ({ axeUtils, localAuthoritiesPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'Local Authorities Accessibility Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await localAuthoritiesPage.goto(createdCourt.id);
+          await localAuthoritiesPage.expectVisibleElements();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Local Authorities Success Page Accessibility', async ({ axeUtils, casesHeardPage, localAuthoritiesPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'Local Authorities Accessibility Test',
+        { serviceCenter: false, forceFamilyCourt: true },
+        async ({ createdCourt }) => {
+          await casesHeardPage.goto(createdCourt.id);
+          await casesHeardPage.selectAllCaseTypes();
+          await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
+
+          await localAuthoritiesPage.goto(createdCourt.id);
+          await localAuthoritiesPage.expectVisibleElements();
+          await localAuthoritiesPage.save();
+          await localAuthoritiesPage.header.checkIsVisible();
+
+          await axeUtils.audit();
+        }
+      );
+    });
   }
 );

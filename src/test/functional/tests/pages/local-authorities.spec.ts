@@ -78,7 +78,7 @@ test.describe('Local Authorities Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Local Authorities Functional Test',
-      { serviceCenter: false },
+      { serviceCenter: false, forceFamilyCourt: true },
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectAllCaseTypes();

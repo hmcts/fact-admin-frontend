@@ -31,6 +31,7 @@ export type LocalAuthoritiesViewModel = {
   courtTypes: CourtTypes;
   casesHeard: CasesHeard;
   localAuthoritySelections: LocalAuthoritySelections;
+  pageTitle: string;
   errors?: Record<string, string[]>;
 };
 
@@ -94,6 +95,7 @@ export class LocalAuthoritiesService {
         family: !!professionalInformationResponse.codes?.familyCourtCode,
       },
       casesHeard,
+      pageTitle: `Local authorities - ${courtResponse.name}`,
     };
   }
 

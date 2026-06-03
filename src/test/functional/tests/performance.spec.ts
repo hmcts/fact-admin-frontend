@@ -72,5 +72,28 @@ test.describe(
         }
       );
     });
+
+    test('Local Authorities Page Performance', async ({
+      lighthouseUtils,
+      casesHeardPage,
+      localAuthoritiesPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Local Authorities Performance Test',
+        { serviceCenter: false, forceFamilyCourt: true },
+        async ({ createdCourt }) => {
+          await casesHeardPage.goto(createdCourt.id);
+          await casesHeardPage.selectAllCaseTypes();
+          await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
+
+          await localAuthoritiesPage.goto(createdCourt.id);
+          await localAuthoritiesPage.expectVisibleElements();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
   }
 );
