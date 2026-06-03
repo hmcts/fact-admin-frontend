@@ -37,7 +37,7 @@ export type SaveTranslationAndInterpretationResult =
     }
   | HttpStatusCode;
 
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+const emailPattern = /^[A-Za-z0-9._+-]+@(?!.*\.\.)[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 
 export class TranslationAndInterpretationService {
