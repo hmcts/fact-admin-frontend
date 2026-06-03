@@ -17,6 +17,7 @@ export interface PageFixtures {
   homePage: HomePage;
   courtEditPage: CourtEditPage;
   casesHeardPage: CasesHeardPage;
+  translationAndInterpretationPage: TranslationAndInterpretationPage;
   courtAddressListPage: CourtAddressListPage;
   courtAddressFindPage: CourtAddressFindPage;
   courtAddressSelectPage: CourtAddressSelectPage;
