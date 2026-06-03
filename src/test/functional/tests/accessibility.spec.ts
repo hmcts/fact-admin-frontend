@@ -1,4 +1,4 @@
-import { test } from '../fixtures';
+import { expect, test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -64,6 +64,44 @@ test.describe(
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectFirstCaseType();
           await casesHeardPage.save();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Translation and Interpretation Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.expectVisibleElements();
+          await expect(translationAndInterpretationPage.heading).toContainText('Translation and interpretation');
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Translation and Interpretation Validation Error Accessibility', async ({
+      axeUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.emailCheckbox.check();
+          await translationAndInterpretationPage.phoneNumberCheckbox.check();
+          await translationAndInterpretationPage.save();
+          await expect(translationAndInterpretationPage.mainContent.content).toContainText('There is a problem');
           await axeUtils.audit();
         }
       );

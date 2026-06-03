@@ -14,6 +14,7 @@ test.describe(
     tag: '@performance',
   },
   () => {
+    test.describe.configure({ mode: 'serial' });
     test.use({ storageState: config.users.superAdmin.sessionFile });
 
     test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
@@ -29,6 +30,23 @@ test.describe(
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Translation and Interpretation Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Performance Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.header.checkIsVisible();
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );

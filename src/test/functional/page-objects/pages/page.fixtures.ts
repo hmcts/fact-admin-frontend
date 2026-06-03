@@ -10,12 +10,14 @@ import { CourtAddressListPage } from './court-address-list.po';
 import { CourtAddressSelectPage } from './court-address-select.po';
 import { CourtEditPage } from './court-edit.po';
 import { HomePage } from './home.po';
+import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 
 export interface PageFixtures {
   determinePage: Page;
   homePage: HomePage;
   courtEditPage: CourtEditPage;
   casesHeardPage: CasesHeardPage;
+  translationAndInterpretationPage: TranslationAndInterpretationPage;
   courtAddressListPage: CourtAddressListPage;
   courtAddressFindPage: CourtAddressFindPage;
   courtAddressSelectPage: CourtAddressSelectPage;
@@ -47,6 +49,10 @@ export const pageFixtures = {
   courtEditPage: async ({ determinePage }, use): Promise<void> => {
     const courtEditPage = new CourtEditPage(determinePage);
     await use(courtEditPage);
+  },
+  translationAndInterpretationPage: async ({ determinePage }, use): Promise<void> => {
+    const translationAndInterpretationPage = new TranslationAndInterpretationPage(determinePage);
+    await use(translationAndInterpretationPage);
   },
   casesHeardPage: async ({ determinePage }, use): Promise<void> => {
     const casesHeardPage = new CasesHeardPage(determinePage);
