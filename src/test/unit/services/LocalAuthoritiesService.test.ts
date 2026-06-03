@@ -21,8 +21,8 @@ describe('LocalAuthoritiesService', () => {
       getCourtAreasOfLaw: jest
         .fn()
         .mockResolvedValue([
-          { areaOfLawType: { id: '11111111-1111-4111-8111-111111111111', name: 'Adoption' } },
-          { areaOfLawType: { id: '22222222-2222-4222-8222-222222222222', name: 'Children' } },
+          { areaOfLawType: { id: '11111111-1111-4111-8111-111111111111', name: 'Adoption' }, selected: true },
+          { areaOfLawType: { id: '22222222-2222-4222-8222-222222222222', name: 'Children' }, selected: true },
         ]),
       getCourtLocalAuthorities: jest.fn().mockResolvedValue([
         {
