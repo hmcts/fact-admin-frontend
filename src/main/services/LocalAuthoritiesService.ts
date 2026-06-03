@@ -142,9 +142,9 @@ export class LocalAuthoritiesService {
   private extractCasesHeard(casesHeard: CourtAreaOfLawSelection[] | LocalAuthoritySelections): CasesHeard {
     if (Array.isArray(casesHeard)) {
       return {
-        Adoption: casesHeard.some(selection => selection.areaOfLawType.name === 'Adoption'),
-        Children: casesHeard.some(selection => selection.areaOfLawType.name === 'Children'),
-        Divorce: casesHeard.some(selection => selection.areaOfLawType.name === 'Divorce'),
+        Adoption: casesHeard.some(selection => selection.areaOfLawType.name === 'Adoption' && selection.selected),
+        Children: casesHeard.some(selection => selection.areaOfLawType.name === 'Children' && selection.selected),
+        Divorce: casesHeard.some(selection => selection.areaOfLawType.name === 'Divorce' && selection.selected),
       };
     }
     return { Adoption: !!casesHeard.Adoption, Children: !!casesHeard.Children, Divorce: !!casesHeard.Divorce };
