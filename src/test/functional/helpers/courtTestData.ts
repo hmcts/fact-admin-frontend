@@ -39,6 +39,7 @@ export type TestCourtParams = {
   withEnquiriesContact?: boolean;
   withServiceAreaAssociation?: boolean;
   withTranslations?: boolean;
+  forceFamilyCourt?: boolean;
 };
 
 export async function createTestingSupportApiContext(
@@ -65,6 +66,7 @@ export async function createTestCourt(
     withEnquiriesContact = true,
     withServiceAreaAssociation = false,
     withTranslations = true,
+    forceFamilyCourt = false,
   }: TestCourtParams
 ): Promise<CreatedCourt> {
   const params = {
@@ -75,6 +77,7 @@ export async function createTestCourt(
     withEnquiriesContact,
     withServiceAreaAssociation,
     withTranslations,
+    forceFamilyCourt,
     ...(regionId ? { regionId } : {}),
   };
   const response = await apiContext.get('/testing-support/courts', {
