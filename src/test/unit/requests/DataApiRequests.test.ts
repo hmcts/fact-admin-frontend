@@ -31,12 +31,14 @@ describe('DataApiRequests', () => {
   let getStub: sinon.SinonStub;
   let postStub: sinon.SinonStub;
   let putStub: sinon.SinonStub;
+  let deleteStub: sinon.SinonStub;
 
   beforeEach(() => {
     restore();
     getStub = stub(dataApi, 'get');
     postStub = stub(dataApi, 'post');
     putStub = stub(dataApi, 'put');
+    deleteStub = stub(dataApi, 'delete');
   });
 
   it('returns true when health status is UP', async () => {
@@ -361,6 +363,8 @@ describe('DataApiRequests', () => {
         ],
         courtAddresses: [
           {
+            id: '66666666-6666-4666-8666-666666666666',
+            courtId: '55555555-5555-4555-8555-555555555555',
             addressLine1: '1 High Street',
             addressLine2: null,
             townCity: 'London',
@@ -469,6 +473,7 @@ describe('DataApiRequests', () => {
           {
             areasOfLaw: [
               {
+                id: '67676767-6666-7666-7666-666666666666',
                 name: 'Divorce',
                 nameCy: 'Ysgariad',
                 externalLink: null,
@@ -613,5 +618,475 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court address details when the address list response is valid', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addresses = [
+      {
+        id: '88888888-8888-4888-8888-888888888888',
+        courtId,
+        addressLine1: '1 High Street',
+        addressLine2: null,
+        townCity: 'London',
+        county: null,
+        postcode: 'SW1A 1AA',
+        epimId: null,
+        lat: 51.5,
+        lon: -0.14,
+        addressType: 'VISIT_US',
+        areasOfLaw: null,
+        courtTypes: null,
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/address`).resolves({ data: addresses });
+
+    const response = await dataApiRequests.getCourtAddressDetails(courtId);
+
+    expect(response).toEqual(addresses);
+  });
+
+  it('returns unauthorized when address list endpoint returns a 401', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+
+    getStub.withArgs(`/courts/${courtId}/v1/address`).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'unauthorized',
+        status: 401,
+      },
+    });
+
+    const response = await dataApiRequests.getCourtAddressDetails(courtId);
+
+    expect(response).toBe(HttpStatusCode.Unauthorized);
+  });
+
+  it('returns internal server error when address list response fails schema validation', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+
+    getStub.withArgs(`/courts/${courtId}/v1/address`).resolves({
+      data: [{ addressLine1: 'Missing required fields' }],
+    });
+
+    const response = await dataApiRequests.getCourtAddressDetails(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court address details by id when the response is valid', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+    const address = {
+      id: addressId,
+      courtId,
+      addressLine1: '1 High Street',
+      addressLine2: null,
+      townCity: 'London',
+      county: null,
+      postcode: 'SW1A 1AA',
+      epimId: null,
+      lat: 51.5,
+      lon: -0.14,
+      addressType: 'VISIT_US',
+      areasOfLaw: null,
+      courtTypes: null,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({ data: address });
+
+    const response = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+
+    expect(response).toEqual(address);
+  });
+
+  it('returns internal server error when court address by id response fails schema validation', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+
+    getStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({
+      data: {
+        addressLine1: 'Missing required fields',
+      },
+    });
+
+    const response = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns not found when address by id endpoint returns a 404', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+
+    getStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns forbidden when save court address endpoint returns a non-400 axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = { addressLine1: 'some address' };
+
+    postStub.withArgs(`/courts/${courtId}/v1/address`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'forbidden',
+        status: 403,
+      },
+    });
+
+    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+
+    expect(response).toBe(HttpStatusCode.Forbidden);
+  });
+
+  it('returns parsed saved address when save court address response is valid', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      addressLine1: '10 Downing Street',
+      addressLine2: null,
+      townCity: 'London',
+      county: null,
+      postcode: 'SW1A 2AA',
+      epimId: null,
+      lat: 51.503,
+      lon: -0.127,
+      addressType: 'WRITE_TO_US' as const,
+      areasOfLaw: null,
+      courtTypes: null,
+    };
+    const savedAddress = {
+      id: '88888888-8888-4888-8888-888888888888',
+      courtId,
+      ...payload,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/address`, payload).resolves({ data: savedAddress });
+
+    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+
+    expect(response).toEqual(savedAddress);
+  });
+
+  it('returns validation errors map when save court address endpoint returns a 400', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = { addressLine1: '' };
+    const apiErrors = {
+      addressLine1: 'Address line 1 is required',
+      postcode: 'Invalid postcode',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/address`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: 400,
+      },
+    });
+
+    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when save court address throws a non-axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = { addressLine1: 'some address' };
+
+    postStub.withArgs(`/courts/${courtId}/v1/address`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns conflict when update court address endpoint returns a non-400 axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+    const payload = { postcode: 'M1 1AA' };
+
+    putStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: 409,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
+  it('returns internal server error when update court address throws a non-axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+    const payload = { postcode: 'M1 1AA' };
+
+    putStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed updated address when update court address response is valid', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+    const payload = {
+      addressLine1: 'Updated address line 1',
+      addressType: 'VISIT_OR_CONTACT_US' as const,
+      townCity: 'Manchester',
+      postcode: 'M1 1AA',
+    };
+    const updatedAddress = {
+      id: addressId,
+      courtId,
+      addressLine1: payload.addressLine1,
+      addressLine2: null,
+      townCity: payload.townCity,
+      county: null,
+      postcode: payload.postcode,
+      epimId: null,
+      lat: null,
+      lon: null,
+      addressType: payload.addressType,
+      areasOfLaw: null,
+      courtTypes: null,
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`, payload).resolves({ data: updatedAddress });
+
+    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+
+    expect(response).toEqual(updatedAddress);
+  });
+
+  it('returns validation errors map when update court address endpoint returns a 400', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+    const payload = { postcode: 'bad' };
+    const apiErrors = {
+      postcode: 'Invalid postcode',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: 400,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns no content when delete court address succeeds', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns internal server error when delete court address returns an unexpected status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({ status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns gone when delete court address endpoint errors with gone status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'gone',
+        status: 410,
+      },
+    });
+
+    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.Gone);
+  });
+
+  it('returns internal server error when delete court address throws a non-axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const addressId = '88888888-8888-4888-8888-888888888888';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns not found when postcode search endpoint returns a non-400 axios error', async () => {
+    const postcode = 'SW1A1ZZ';
+
+    getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when postcode search throws a non-axios error', async () => {
+    const postcode = 'SW1A1ZZ';
+
+    getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed os data when postcode search response is valid', async () => {
+    const postcode = 'SW1A1AA';
+    const osData = {
+      results: [
+        {
+          DPA: {
+            UPRN: '100023336956',
+            UDPRN: '10002333695',
+            ADDRESS: '10 DOWNING STREET, LONDON, SW1A 2AA',
+            ORGANISATION_NAME: null,
+            BUILDING_NUMBER: '10',
+            BUILDING_NAME: null,
+            THOROUGHFARE_NAME: 'DOWNING STREET',
+            POST_TOWN: 'LONDON',
+            POSTCODE: 'SW1A 2AA',
+            LNG: -0.127,
+            LAT: 51.503,
+            LOCAL_CUSTODIAN_CODE: 5990,
+            LOCAL_CUSTODIAN_CODE_DESCRIPTION: 'WESTMINSTER',
+          },
+        },
+      ],
+    };
+
+    getStub.withArgs(`/search/address/v1/postcode/${postcode}`).resolves({ data: osData });
+
+    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+
+    expect(response).toEqual(osData);
+  });
+
+  it('returns validation errors map when postcode search endpoint returns a 400', async () => {
+    const postcode = 'bad-postcode';
+    const apiErrors = {
+      postcode: 'Postcode is invalid',
+    };
+
+    getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: 400,
+      },
+    });
+
+    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns service unavailable when areas of law endpoint returns a 503', async () => {
+    getStub.withArgs('/types/v1/areas-of-law').rejects({
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: 503,
+      },
+    });
+
+    const response = await dataApiRequests.getAreasOfLaw();
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+  });
+
+  it('returns parsed areas of law when response is valid', async () => {
+    const areasOfLaw = [
+      {
+        id: '99999999-9999-4999-8999-999999999999',
+        name: 'Immigration',
+        nameCy: 'Mewnfudo',
+        externalLink: null,
+        externalLinkCy: null,
+        displayName: null,
+        displayNameCy: null,
+      },
+    ];
+
+    getStub.withArgs('/types/v1/areas-of-law').resolves({ data: areasOfLaw });
+
+    const response = await dataApiRequests.getAreasOfLaw();
+
+    expect(response).toEqual(areasOfLaw);
+  });
+
+  it('returns internal server error when areas of law response fails schema validation', async () => {
+    getStub.withArgs('/types/v1/areas-of-law').resolves({
+      data: [{ name: 'Missing required fields' }],
+    });
+
+    const response = await dataApiRequests.getAreasOfLaw();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court types when response is valid', async () => {
+    const courtTypes = [
+      {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        name: 'County Court',
+      },
+    ];
+
+    getStub.withArgs('/types/v1/court-types').resolves({ data: courtTypes });
+
+    const response = await dataApiRequests.getCourtTypes();
+
+    expect(response).toEqual(courtTypes);
+  });
+
+  it('returns internal server error when court types response fails schema validation', async () => {
+    getStub.withArgs('/types/v1/court-types').resolves({
+      data: [{ name: 'Missing required fields' }],
+    });
+
+    const response = await dataApiRequests.getCourtTypes();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns unauthorized when court types endpoint returns a 401', async () => {
+    getStub.withArgs('/types/v1/court-types').rejects({
+      isAxiosError: true,
+      response: {
+        data: 'unauthorized',
+        status: 401,
+      },
+    });
+
+    const response = await dataApiRequests.getCourtTypes();
+
+    expect(response).toBe(HttpStatusCode.Unauthorized);
   });
 });

@@ -1,0 +1,93 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/common-components.njk" import addressBlock, addressType %}
+
+{#  MACROS #}
+
+{# Row actions - in the form "action1 | action2 | actionN" #}
+{% macro rowActions(items) %}
+  <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">
+    {% for item in items %}
+      {%- if item.href %}
+        <li class="govuk-summary-list__actions-list-item">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
+        </li>
+      {% endif -%}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{#  END OF MACROS #}
+
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+
+  {% set addressTableRows = [] %}
+  {% if courtAddresses.length %}
+    {% for address in courtAddresses %}
+      {% set addressTableRows = (addressTableRows.push([
+        {
+          html: addressType(address)
+        },
+        {
+          html: addressBlock(address)
+        },
+        {
+          html: rowActions([
+            {
+              href: '/courts/' + address.courtId + '/edit/address/find/' + address.id,
+              text: 'Edit'
+            },
+            {
+              href: '/courts/' + address.courtId + '/edit/address/delete/' + address.id,
+              text: 'Delete'
+            } if courtAddresses.length > 1 else null
+          ])
+        }
+      ]), addressTableRows) %}
+    {% endfor %}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Addresses</h1>
+      <span class="govuk-caption-l">You can have between one and three addresses per court</span>
+      {% if addressTableRows.length %}
+        {{ govukTable({
+          firstCellIsHeader: false,
+          head: [
+            {
+              text: "Address type",
+              classes: "govuk-!-width-one-quarter"
+            },
+            {
+              text: "Address",
+              classes: "govuk-!-width-one-half"
+            },
+            {
+              text: "Actions",
+              classes: "govuk-!-width-one-quarter"
+            }
+          ],
+          rows: addressTableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">No addresses are currently configured.</p>
+      {% endif %}
+
+      {%  if courtAddresses.length < 3 %}
+        {{ govukButton({
+          text: "Add address",
+          href: '/courts/' + courtId + '/edit/address/find/'
+        }) }}
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

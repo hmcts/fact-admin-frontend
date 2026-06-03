@@ -57,6 +57,22 @@
   width: 1%;
 }
 
+// two column layout for checkboxes
+.app-checkboxes--two-columns {
+  display: block;
+}
+
+@media (min-width: 40.0625em) {
+  .app-checkboxes--two-columns {
+    column-count: 2;
+    column-gap: 32px;
+  }
+
+  .app-checkboxes--two-columns .govuk-checkboxes__item {
+    break-inside: avoid;
+  }
+}
+
 .cases-heard-columns {
   margin-bottom: 20px;
 }
