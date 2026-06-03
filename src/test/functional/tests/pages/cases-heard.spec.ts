@@ -131,8 +131,9 @@ test.describe('Cases Heard Page Tests', () => {
         const checkboxCount = await casesHeardPage.checkboxes.count();
         expect(checkboxCount).toBeGreaterThan(1);
 
-        await casesHeardPage.clearSelectedCaseTypes();
-        await casesHeardPage.getCaseTypeCheckbox(0).check();
+        // check the first unchecked case type
+        const checkbox = casesHeardPage.page.getByRole('checkbox', { checked: false }).first();
+        await checkbox.click();
         await casesHeardPage.save();
         await casesHeardPage.successPanel.click();
         await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
