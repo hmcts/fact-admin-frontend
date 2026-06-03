@@ -18,12 +18,10 @@ describe('LocalAuthoritiesService', () => {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({
         codes: { familyCourtCode: 'FAMILY-001' },
       }),
-      getCourtAreasOfLaw: jest
-        .fn()
-        .mockResolvedValue([
-          { areaOfLawType: { id: '11111111-1111-4111-8111-111111111111', name: 'Adoption' }, selected: true },
-          { areaOfLawType: { id: '22222222-2222-4222-8222-222222222222', name: 'Children' }, selected: true },
-        ]),
+      getCourtAreasOfLaw: jest.fn().mockResolvedValue([
+        { areaOfLawType: { id: '11111111-1111-4111-8111-111111111111', name: 'Adoption' }, selected: true },
+        { areaOfLawType: { id: '22222222-2222-4222-8222-222222222222', name: 'Children' }, selected: true },
+      ]),
       getCourtLocalAuthorities: jest.fn().mockResolvedValue([
         {
           areaOfLawName: 'Adoption',
@@ -62,6 +60,7 @@ describe('LocalAuthoritiesService', () => {
           ],
         },
       },
+      pageTitle: 'Local authorities - Reading Crown Court',
     });
     expect(dataApiRequests.getLocalAuthorities).toHaveBeenCalledTimes(1);
     expect(dataApiRequests.getAreasOfLaw).toHaveBeenCalledTimes(1);
@@ -138,6 +137,7 @@ describe('LocalAuthoritiesService', () => {
       courtTypes: { family: false },
       casesHeard: { Adoption: false, Children: false, Divorce: false },
       localAuthoritySelections: {},
+      pageTitle: 'Local authorities - Reading Crown Court',
     });
   });
 

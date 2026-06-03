@@ -21,6 +21,7 @@ import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
+import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
 import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
@@ -271,6 +272,45 @@ export class DataApiRequests {
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get translation services by court id
+   */
+  public async getTranslationServices(courtId: string): Promise<TranslationServices | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/translation-services`);
+
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
+
+      return translationServicesSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching translation services for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create or update translation services by court id
+   */
+  public async saveTranslationServices(
+    courtId: string,
+    payload: Pick<TranslationServices, 'courtId' | 'email' | 'phoneNumber'>
+  ): Promise<TranslationServices | HttpStatusCode> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/translation-services`, payload);
+
+      if (response.status === HttpStatusCode.NoContent) {
+        return HttpStatusCode.NoContent;
+      }
+
+      return translationServicesSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error saving translation services for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
 

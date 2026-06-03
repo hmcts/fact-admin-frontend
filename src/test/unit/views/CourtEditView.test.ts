@@ -1,19 +1,23 @@
 import { env } from '../../../testUtils/nunjucksHelper';
 
 describe('Court Edit View', () => {
+  const courtId = '11111111-1111-4111-8111-111111111111';
+  const courtEditPath = `/courts/${courtId}/edit`;
+
   test('renders the court edit page heading and section links', () => {
     const html = env.render('court-edit.njk', {
-      courtId: '11111111-1111-4111-8111-111111111111',
+      courtId,
       courtName: 'Reading Crown Court',
-      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit',
+      pagePath: courtEditPath,
       pageTitle: 'Editing - Reading Crown Court',
     });
 
     expect(html).toContain('Editing - Reading Crown Court');
-    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/accessibility');
-    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
-    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/general');
-    expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/warning-notice');
+    expect(html).toContain(`${courtEditPath}/accessibility`);
+    expect(html).toContain(`${courtEditPath}/general`);
+    expect(html).toContain(`${courtEditPath}/cases-heard`);
+    expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
+    expect(html).toContain(`${courtEditPath}/warning-notice`);
     expect(html).toContain('TODO');
   });
 });

@@ -1090,6 +1090,88 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
 
+  it('returns parsed translation services when the response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const translationServices = {
+      courtId,
+      email: 'translations@example.com',
+      id: '66666666-6666-4666-8666-666666666666',
+      phoneNumber: '+441234 567890',
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/translation-services`).resolves({
+      data: translationServices,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getTranslationServices(courtId);
+
+    expect(response).toEqual(translationServices);
+  });
+
+  it('returns null when translation services do not exist for the court', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/translation-services`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await dataApiRequests.getTranslationServices(courtId);
+
+    expect(response).toBeNull();
+  });
+
+  it('returns not found when the translation services endpoint returns a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/translation-services`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getTranslationServices(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('posts translation services payload and returns the parsed response', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      email: 'translations@example.com',
+      phoneNumber: '+441234 567890',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/translation-services`, payload).resolves({
+      data: {
+        ...payload,
+        id: '66666666-6666-4666-8666-666666666666',
+      },
+      status: HttpStatusCode.Created,
+    });
+
+    const response = await dataApiRequests.saveTranslationServices(courtId, payload);
+
+    expect(response).toEqual({
+      ...payload,
+      id: '66666666-6666-4666-8666-666666666666',
+    });
+  });
+
+  it('returns no content when saving translation services succeeds without a response body', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      email: '',
+      phoneNumber: '',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/translation-services`, payload).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await dataApiRequests.saveTranslationServices(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
   it('returns parsed local authorities when response is valid', async () => {
     const localAuthorities = [
       {
