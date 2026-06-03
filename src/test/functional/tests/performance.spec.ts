@@ -18,15 +18,6 @@ test.describe(
     test.use({ storageState: config.users.superAdmin.sessionFile });
 
     test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
-test.describe(
-  'Performance Tests',
-  {
-    tag: '@performance',
-  },
-  () => {
-    test.use({ storageState: config.users.superAdmin.sessionFile });
-
-    test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
       await homePage.header.checkIsVisible();
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
@@ -59,9 +50,6 @@ test.describe(
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
-    });
-  }
-);
     });
 
     test('Address List Page Performance', async ({ lighthouseUtils, playwright, courtAddressListPage }) => {
