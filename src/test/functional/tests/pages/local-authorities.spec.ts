@@ -22,6 +22,7 @@ test.describe('Local Authorities Page Tests', () => {
   );
 
   test('renders the availability warning when local-authority config is not enabled for a court', async ({
+    casesHeardPage,
     localAuthoritiesPage,
     playwright,
   }) => {
@@ -30,6 +31,33 @@ test.describe('Local Authorities Page Tests', () => {
       'Local Authorities Functional Test',
       { serviceCenter: false },
       async ({ createdCourt }) => {
+
+        // First job is to find all of the case types that would enable
+        // the functionality and remove them.
+        await casesHeardPage.goto(createdCourt.id);
+
+        const removableCaseTypes = ['Adoption', 'Children', 'Divorce'] as const;
+        let removedCaseType = false;
+
+        for (const caseType of removableCaseTypes) {
+          const checkbox = casesHeardPage.page.getByRole('checkbox', { name: caseType });
+          if ((await checkbox.count()) > 0 && (await checkbox.first().isChecked())) {
+            await checkbox.first().uncheck();
+            removedCaseType = true;
+          }
+        }
+
+        if (removedCaseType) {
+          await casesHeardPage.save();
+          const continueButton = casesHeardPage.page.getByRole('button', { name: 'Continue' });
+          if ((await continueButton.count()) > 0) {
+            await continueButton.click();
+          }
+          await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+        }
+
+        // then perform the actual test once we know that it shouldn't
+        // show the availability warning.
         await localAuthoritiesPage.goto(createdCourt.id);
 
         await localAuthoritiesPage.expectVisibleElements();
