@@ -18,6 +18,15 @@ test.describe(
     test.use({ storageState: config.users.superAdmin.sessionFile });
 
     test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
+test.describe(
+  'Performance Tests',
+  {
+    tag: '@performance',
+  },
+  () => {
+    test.use({ storageState: config.users.superAdmin.sessionFile });
+
+    test('Home Page Performance', async ({ homePage, lighthouseUtils }) => {
       await homePage.header.checkIsVisible();
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
@@ -47,6 +56,48 @@ test.describe(
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+  }
+);
+    });
+
+    test('Address List Page Performance', async ({ lighthouseUtils, playwright, courtAddressListPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Performance Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressListPage.goto(createdCourt.id);
+          await courtAddressListPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Address Find Page Performance', async ({ lighthouseUtils, playwright, courtAddressFindPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Performance Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressFindPage.goto(createdCourt.id);
+          await courtAddressFindPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Address Select Page Performance', async ({ lighthouseUtils, playwright, courtAddressSelectPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Performance Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
+          await courtAddressSelectPage.header.checkIsVisible();
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );

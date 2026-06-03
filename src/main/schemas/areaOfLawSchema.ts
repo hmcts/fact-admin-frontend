@@ -1,19 +1,21 @@
 import { z } from 'zod';
 
-export const areaOfLawTypeSchema = z.object({
-  displayName: z.string().nullable().optional(),
-  displayNameCy: z.string().nullable().optional(),
-  externalLink: z.string().nullable().optional(),
-  externalLinkCy: z.string().nullable().optional(),
-  id: z.string().optional(),
+export const areaOfLawSchema = z.object({
+  id: z.string(),
   name: z.string(),
   nameCy: z.string(),
+  externalLink: z.string().nullable().optional(),
+  externalLinkCy: z.string().nullable().optional(),
+  displayName: z.string().nullable().optional(),
+  displayNameCy: z.string().nullable().optional(),
 });
 
-export type AreaOfLawType = z.infer<typeof areaOfLawTypeSchema>;
+export const areaOfLawListSchema = z.array(areaOfLawSchema);
+
+export type AreaOfLawType = z.infer<typeof areaOfLawSchema>;
 
 export const courtAreaOfLawSelectionSchema = z.object({
-  areaOfLawType: areaOfLawTypeSchema,
+  areaOfLawType: areaOfLawSchema,
   selected: z.boolean(),
 });
 
@@ -78,7 +80,7 @@ function parseAreaOfLawTypeStringKey(key: string): AreaOfLawType | null {
   }
 
   try {
-    return areaOfLawTypeSchema.parse(parsedFields);
+    return areaOfLawSchema.parse(parsedFields);
   } catch {
     throw new Error('Failed to parse areaOfLawTypeSchema');
   }
