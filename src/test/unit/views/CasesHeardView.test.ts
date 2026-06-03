@@ -77,9 +77,7 @@ describe('Cases Heard View', () => {
     expect(html).toContain('Confirm');
     expect(html).toContain('Removing Adoption and Divorce will remove related local authority config.');
     expect(html).toContain('name="areasOfLaw"');
-    expect(html).toContain(
-      'value="22222222-2222-4222-8222-222222222222,33333333-3333-4333-8333-333333333333"',
-    );
+    expect(html).toContain('value="22222222-2222-4222-8222-222222222222,33333333-3333-4333-8333-333333333333"');
     expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success');
     expect(html).toContain('Continue');
     expect(html).toContain('govuk-button--warning');
