@@ -183,4 +183,25 @@ describe('TranslationAndInterpretationService', () => {
     });
     expect(saveTranslationServicesStub.notCalled).toBe(true);
   });
+
+  test('returns validation errors when an email domain starts with a dot', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    const saveTranslationServicesStub = stub(DataApiRequests.prototype, 'saveTranslationServices');
+
+    const result = await new TranslationAndInterpretationService().save(courtId, {
+      contactMethods: ['email'],
+      email: 'test.user@.email.com',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [{ href: '#email', text: 'Enter an email address in the correct format' }],
+      },
+    });
+    expect(saveTranslationServicesStub.notCalled).toBe(true);
+  });
 });

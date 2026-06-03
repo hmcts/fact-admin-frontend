@@ -21,9 +21,7 @@ describe('Translation and Interpretation View', () => {
     expect(html).toContain('Email address');
     expect(html).toContain('Phone number');
     expect(html).toContain('Save');
-    expect(html).toContain(
-      'pattern="^(|[A-Za-z0-9._+-]+@(?!.*&#92;.&#92;.)[A-Za-z0-9.-]+&#92;.[A-Za-z]{2,})$"'
-    );
+    expect(html).toContain('pattern="^(|[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(&#92;.[A-Za-z0-9-]+)*&#92;.[A-Za-z]{2,})$"');
     expect(html).not.toContain('checked');
   });
 
