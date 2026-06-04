@@ -352,7 +352,8 @@ export class DataApiRequests {
     localAuthorities: CourtLocalAuthoritiesList
   ): Promise<HttpStatusCode | Map<string, string>> {
     try {
-      return await dataApi.put(`/courts/${courtId}/v1/local-authorities`, localAuthorities);
+      const response = await dataApi.put(`/courts/${courtId}/v1/local-authorities`, localAuthorities);
+      return response.status;
     } catch (error: unknown) {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);

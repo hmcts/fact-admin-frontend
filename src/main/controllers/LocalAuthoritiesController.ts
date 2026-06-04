@@ -53,6 +53,9 @@ export default class LocalAuthoritiesController {
 
     if (typeof saveResult === 'number') {
       res.status(saveResult);
+      if (saveResult === HttpStatusCode.NotFound) {
+        res.render('court-not-found');
+      }
       return res.render('error');
     }
 

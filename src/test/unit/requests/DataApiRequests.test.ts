@@ -1259,7 +1259,7 @@ describe('DataApiRequests', () => {
       },
     ];
 
-    putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).resolves(HttpStatusCode.Ok);
+    putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).resolves({ status: HttpStatusCode.Ok });
 
     const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
 

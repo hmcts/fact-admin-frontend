@@ -114,7 +114,7 @@ export class LocalAuthoritiesService {
       .filter((selection): selection is CourtLocalAuthorities => !!selection);
 
     const updateResponse = await this.dataApiRequests.updateCourtLocalAuthorities(courtId, updatePayload);
-    if (typeof updateResponse === 'number') {
+    if (typeof updateResponse === 'number' && updateResponse !== HttpStatusCode.Ok) {
       return updateResponse;
     }
 
