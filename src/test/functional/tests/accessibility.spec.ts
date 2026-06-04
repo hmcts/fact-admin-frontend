@@ -1,4 +1,4 @@
-import { test } from '../fixtures';
+import { expect, test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -113,10 +113,87 @@ test.describe(
       );
     });
 
+    test('Translation and Interpretation Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.expectVisibleElements();
+          await expect(translationAndInterpretationPage.heading).toContainText('Translation and interpretation');
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Translation and Interpretation Validation Error Accessibility', async ({
+      axeUtils,
+      playwright,
+      translationAndInterpretationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Translation Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await translationAndInterpretationPage.goto(createdCourt.id);
+          await translationAndInterpretationPage.emailCheckbox.check();
+          await translationAndInterpretationPage.phoneNumberCheckbox.check();
+          await translationAndInterpretationPage.save();
+          await expect(translationAndInterpretationPage.mainContent.content).toContainText('There is a problem');
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Court Not Found Page Accessibility', async ({ axeUtils, courtEditPage }) => {
       await courtEditPage.goto('not-a-uuid');
       await courtEditPage.expectVisibleElements();
       await axeUtils.audit();
+    });
+
+    test('Address List Page Accessibility', async ({ axeUtils, courtAddressListPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressListPage.goto(createdCourt.id);
+          await courtAddressListPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Address Find Page Accessibility', async ({ axeUtils, playwright, courtAddressFindPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressFindPage.goto(createdCourt.id);
+          await courtAddressFindPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Address Select Page Accessibility', async ({ axeUtils, playwright, courtAddressSelectPage }) => {
+      await withCreatedCourt(
+        playwright,
+        'Address Edit Accessibility Test',
+        { serviceCenter: false, withTranslations: false },
+        async ({ createdCourt }) => {
+          await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
+          await courtAddressSelectPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
     });
   }
 );

@@ -1,2 +1,9 @@
 export * from './page.fixtures';
 export { PageSection } from './home.po';
+export { CourtAddressDeletePage } from './court-address-delete.po';
+export { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
+export { CourtAddressEditPage, type AddressFormData } from './court-address-edit.po';
+export { CourtAddressEditSuccessPage } from './court-address-edit-success.po';
+export { CourtAddressFindPage } from './court-address-find.po';
+export { CourtAddressListPage } from './court-address-list.po';
+export { CourtAddressSelectPage } from './court-address-select.po';

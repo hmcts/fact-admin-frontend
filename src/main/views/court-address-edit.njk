@@ -1,0 +1,291 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{# MACROS #}
+
+{% macro aolSelection(areasOfLaw, selectedIds) %}
+  {% set areaOfLawItems = [] %}
+  {% for area in areasOfLaw | sort(false, true, 'name') %}
+    {% set areaOfLawItems = (areaOfLawItems.push({
+      value: area.id,
+      text: area.name,
+      checked: selectedIds and area.id in selectedIds
+    }), areaOfLawItems) %}
+  {% endfor %}
+  {{ govukCheckboxes({
+    idPrefix: "areas-of-law",
+    name: "areas-of-law",
+    classes: "govuk-checkboxes--small app-checkboxes--two-columns",
+    fieldset: {
+      legend: {
+        text: "Areas of law"
+      }
+    },
+    hint: {
+      text: "For example, this address is only used for sending documents about civil cases. Select all that apply."
+    },
+    items: areaOfLawItems
+  }) }}
+{% endmacro %}
+
+{% macro courtTypeSelection(courtTypes, selectedIds) %}
+  {% set courtTypeItems = [] %}
+  {% for type in courtTypes | sort(false, true, 'name') %}
+    {% set courtTypeItems = (courtTypeItems.push({
+      value: type.id,
+      text: type.name,
+      checked: selectedIds and type.id in selectedIds
+    }), courtTypeItems) %}
+  {% endfor %}
+  {{ govukCheckboxes({
+    idPrefix: "court-types",
+    name: "court-types",
+    classes: "govuk-checkboxes--small app-checkboxes--two-columns",
+    fieldset: {
+      legend: {
+        text: "Court types"
+      }
+    },
+    hint: {
+      text: "For example, one or more court types apply for this one address. Select all that apply."
+    },
+    items: courtTypeItems
+  }) }}
+{% endmacro %}
+
+{# END MACROS #}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+
+  {% if address.errors %}
+    {% set errorList = [] %}
+    {% for field, errors in address.errors %}
+      {% if field !== "timestamp" %}
+        {% set fieldErrors = [] %}
+        {% for error in errors %}
+          {% set href = "#" + field if field !== "message" else null %}
+          {% set errorList = (errorList.push({
+            text: error,
+            href: href
+          }), errorList) %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Address</h1>
+
+      {% set actionUrl %}
+        {% if addressId %}
+          /courts/{{ courtId }}/edit/address/details/success/{{ addressId }}
+        {% else %}
+          /courts/{{ courtId }}/edit/address/details/success
+        {% endif %}
+      {% endset %}
+
+      <form action="{{ actionUrl }}" method="post">
+
+        {% call govukFieldset({
+          legend: {
+            text: "Enter an address",
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+          }
+        }) %}
+
+          {{ govukRadios({
+            idPrefix: "addressType",
+            name: "addressType",
+            id: "addressType",
+            fieldset: {
+              legend: {
+                text: "Select what applies"
+              }
+            },
+            items: [
+              { value: "VISIT_US", text: "Visit", checked: address.addressType == "VISIT_US" },
+              { value: "WRITE_TO_US", text: "Send documents to", checked: address.addressType == "WRITE_TO_US" },
+              { value: "VISIT_OR_CONTACT_US", text: "Visit and send documents to", checked: address.addressType == "VISIT_OR_CONTACT_US" }
+            ],
+            errorMessage: {
+              text: address.errors.addressType[0]
+            } if address.errors.addressType else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Address line 1"
+            },
+            spellcheck: false,
+            id: "addressLine1",
+            name: "addressLine1",
+            autocomplete: "address-line1",
+            value: address.addressLine1,
+            errorMessage: {
+              text: address.errors.addressLine1[0]
+            } if address.errors.addressLine1 else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Address line 2 (optional)"
+            },
+            spellcheck: false,
+            id: "addressLine2",
+            name: "addressLine2",
+            autocomplete: "address-line2",
+            value: address.addressLine2,
+            errorMessage: {
+              text: address.errors.addressLine2[0]
+            } if address.errors.addressLine2 else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Town or city"
+            },
+            spellcheck: false,
+            classes: "govuk-!-width-two-thirds",
+            id: "townCity",
+            name: "townCity",
+            autocomplete: "address-level2",
+            value: address.townCity,
+            errorMessage: {
+              text: address.errors.townCity[0]
+            } if address.errors.townCity else null
+
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "County (optional)"
+            },
+            spellcheck: false,
+            classes: "govuk-!-width-two-thirds",
+            id: "county",
+            name: "county",
+            value: address.county,
+            errorMessage: {
+              text: address.errors.county[0]
+            } if address.errors.county else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Postcode"
+            },
+            hint: {
+              text: "Please enter full UK postcode, for example BS1 6GR"
+            },
+            classes: "govuk-input--width-10",
+            id: "postcode",
+            name: "postcode",
+            spellcheck: false,
+            autocomplete: "postal-code",
+            value: address.postcode,
+            errorMessage: {
+              text: address.errors.postcode[0]
+            } if address.errors.postcode else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "ePIMS Ref ID (optional)"
+            },
+            classes: "govuk-input--width-10",
+            id: "epimId",
+            name: "epimId",
+            spellcheck: false,
+            value: address.epimId,
+            errorMessage: {
+              text: address.errors.epimId[0]
+            } if address.errors.epimId else null
+          }) }}
+
+        {% endcall %}
+
+        {% call govukFieldset({
+          legend: {
+            text: "Does this address only apply to a specific area of law?",
+            isPageHeading: false
+          }
+        }) %}
+
+          {{ govukRadios({
+            idPrefix: "areasOfLaw",
+            name: "areasOfLaw",
+            id: "areasOfLaw",
+            items: [
+              {
+                value: "yes",
+                text: "Yes",
+                conditional: {
+                  html: aolSelection(areasOfLaw, address.areasOfLaw) | safe
+                },
+                checked: aolSelected
+
+              },
+              { value: "no", text: "No", checked: not aolSelected }
+            ],
+            errorMessage: {
+              text: address.errors.areasOfLaw[0]
+            } if address.errors.areasOfLaw else null
+          }) }}
+
+        {% endcall %}
+
+        {% call govukFieldset({
+          legend: {
+            text: "Does this address only apply to a specific court type?",
+            isPageHeading: false
+          }
+        }) %}
+
+          {{ govukRadios({
+            idPrefix: "courtTypes",
+            name: "courtTypes",
+            id: "courtTypes",
+            items: [
+              {
+                value: "yes",
+                text: "Yes",
+                conditional: {
+                  html: courtTypeSelection(courtTypes, address.courtTypes) | safe
+                },
+                checked: ctSelected
+              },
+              { value: "no", text: "No", checked: not ctSelected }
+            ],
+            errorMessage: {
+              text: address.errors.courtTypes[0]
+            } if address.errors.courtTypes else null
+          }) }}
+
+        {% endcall %}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

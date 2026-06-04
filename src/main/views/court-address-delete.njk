@@ -1,0 +1,69 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/common-components.njk" import addressBlock, addressType %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+
+  {% if address.errors %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{
+        text: address.errors.message[0],
+        href: "#"
+      }]
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if not address.errors %}
+        <h1 class="govuk-heading-xl">Are you sure you want to delete this address?</h1>
+      {% endif %}
+
+      <form method="POST"
+            action="/courts/{{ address.courtId }}/edit/address/delete/success/{{ address.id }}">
+
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Court name" },
+              value: { text: courtName }
+            },
+            {
+              key: { text: "Address type" },
+              value: { text: addressType(address) }
+            },
+            {
+              key: { text: "Address" },
+              value: { text: addressBlock(address) }
+            }
+          ]
+        }) }}
+
+        {% if address.errors %}
+          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do
+            next?</p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li><a href="/courts/{{ address.courtId }}/edit/address"
+                   class="govuk-link govuk-link--no-visited-state">Back to addresses</a></li>
+            <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
+          </ul>
+        {% else %}
+          {{ govukButton({
+            text: "Delete address",
+            classes: "govuk-button--warning"
+          }) }}
+        {% endif %}
+
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import { areaOfLawSchema } from './areaOfLawSchema';
+import { courtAddressSchema } from './courtAddressSchema';
+import { courtTypeSchema } from './courtTypeSchema';
+
 const courtRegionSchema = z.object({
   name: z.string(),
   country: z.string(),
@@ -31,15 +35,6 @@ const courtProfessionalInformationSchema = z.object({
   videoHearings: z.boolean(),
   commonPlatform: z.boolean(),
   accessScheme: z.boolean(),
-});
-
-const areaOfLawSchema = z.object({
-  name: z.string(),
-  nameCy: z.string(),
-  externalLink: z.string().nullable(),
-  externalLinkCy: z.string().nullable(),
-  displayName: z.string().nullable(),
-  displayNameCy: z.string().nullable(),
 });
 
 const courtAreasOfLawSchema = z.object({
@@ -84,10 +79,6 @@ const openingTimesDetailSchema = z.object({
   closingTime: z.string(),
 });
 
-const courtTypeSchema = z.object({
-  name: z.string(),
-});
-
 const courtCounterServiceOpeningHourSchema = z.object({
   counterService: z.boolean(),
   assistWithForms: z.boolean(),
@@ -107,22 +98,6 @@ const openingHourTypeSchema = z.object({
 const courtOpeningHourSchema = z.object({
   openingTimesDetails: z.array(openingTimesDetailSchema),
   openingHourType: openingHourTypeSchema,
-});
-
-export const courtAddressTypeSchema = z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']);
-
-const courtAddressSchema = z.object({
-  addressLine1: z.string(),
-  addressLine2: z.string().nullable(),
-  townCity: z.string(),
-  county: z.string().nullable(),
-  postcode: z.string(),
-  epimId: z.string().nullable(),
-  lat: z.number().nullable(),
-  lon: z.number().nullable(),
-  addressType: courtAddressTypeSchema,
-  areasOfLaw: z.array(areaOfLawSchema),
-  courtTypes: z.array(courtTypeSchema),
 });
 
 const hearingEnhancementEquipmentSchema = z.enum([

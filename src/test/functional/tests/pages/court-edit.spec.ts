@@ -48,6 +48,9 @@ test.describe('Court Edit Page Tests', () => {
           `/courts/${createdCourt.id}/edit/accessibility`
         );
         await expect(courtEditPage.getSectionHref('Address')).resolves.toBe(`/courts/${createdCourt.id}/edit/address`);
+        await expect(courtEditPage.getSectionHref('Translation and interpretation')).resolves.toBe(
+          `/courts/${createdCourt.id}/edit/translation-and-interpretation`
+        );
         await expect(courtEditPage.getSectionHref('Warning notice')).resolves.toBe(
           `/courts/${createdCourt.id}/edit/warning-notice`
         );
