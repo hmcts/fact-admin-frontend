@@ -50,6 +50,7 @@ test.describe(
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.clearSelectedCaseTypes();
           await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
@@ -64,6 +65,7 @@ test.describe(
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectFirstCaseType();
           await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );

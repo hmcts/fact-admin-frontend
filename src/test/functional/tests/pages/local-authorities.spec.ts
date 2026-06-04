@@ -48,6 +48,7 @@ test.describe('Local Authorities Page Tests', () => {
 
         if (removedCaseType) {
           await casesHeardPage.save();
+          await casesHeardPage.header.checkIsVisible();
           const continueButton = casesHeardPage.page.getByRole('button', { name: 'Continue' });
           if ((await continueButton.count()) > 0) {
             await continueButton.click();

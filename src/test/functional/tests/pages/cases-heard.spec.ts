@@ -53,6 +53,7 @@ test.describe('Cases Heard Page Tests', () => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectFirstCaseType();
         await casesHeardPage.save();
+        await casesHeardPage.header.checkIsVisible();
 
         await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
         await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
