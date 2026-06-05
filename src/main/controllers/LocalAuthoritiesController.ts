@@ -3,7 +3,11 @@ import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import { LocalAuthoritiesService, LocalAuthoritySelections } from '../services/LocalAuthoritiesService';
+import {
+  LocalAuthoritiesService,
+  LocalAuthoritySelections,
+  allowedLocalAuthorityAreas,
+} from '../services/LocalAuthoritiesService';
 import { isUuid } from '../utils/valueParsers';
 
 const localAuthoritiesService = new LocalAuthoritiesService();
@@ -12,11 +16,9 @@ const logger = Logger.getLogger('app');
 @route('/courts/:courtId/edit/local-authorities')
 export default class LocalAuthoritiesController {
   @GET()
-  public async renderLocalAuthoritesView(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
+  public async renderLocalAuthoritiesView(req: Request, res: Response): Promise<void> {
+    const resolvedCourtId = this.resolveCourtIdOrRenderNotFound(req);
+    if (resolvedCourtId === undefined) {
       res.status(HttpStatusCode.NotFound);
       return res.render('court-not-found');
     }
@@ -39,10 +41,8 @@ export default class LocalAuthoritiesController {
   @route('/success')
   @POST()
   public async updateLocalAuthorities(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
+    const resolvedCourtId = this.resolveCourtIdOrRenderNotFound(req);
+    if (resolvedCourtId === undefined) {
       res.status(HttpStatusCode.NotFound);
       return res.render('court-not-found');
     }
@@ -54,7 +54,7 @@ export default class LocalAuthoritiesController {
     if (typeof saveResult === 'number') {
       res.status(saveResult);
       if (saveResult === HttpStatusCode.NotFound) {
-        res.render('court-not-found');
+        return res.render('court-not-found');
       }
       return res.render('error');
     }
@@ -83,32 +83,51 @@ export default class LocalAuthoritiesController {
   // --------------------------------------------------------------------------
   // util methods
 
+  private resolveCourtIdOrRenderNotFound(req: Request): string | undefined {
+    const { courtId } = req.params;
+    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
+
+    return resolvedCourtId && isUuid(resolvedCourtId) ? resolvedCourtId : undefined;
+  }
+
   private parseSelectionsFromBody(body: Request['body']): LocalAuthoritySelections {
     const selections: LocalAuthoritySelections = {};
 
-    for (const areaName of ['Adoption', 'Children', 'Divorce']) {
-      const laSelections = Object.entries(body).find(([key]) => key.startsWith(`${areaName}.`));
-      if (laSelections) {
-        const [fullKey, formData] = laSelections;
-        const areaOfLawId = fullKey.slice(areaName.length + 1);
-        if (areaOfLawId) {
-          // if only one checkbox is selected, the form data won't be an array, so we need to
-          // flatten it to ensure we always have an array to work with
-          const selectedIds = formData ? [formData].flat() : [];
-          selections[areaName] = {
-            areaOfLawId,
-            localAuthorities: selectedIds
-              // the form response is forced using a hidden field that adds a single empty result
-              // which we need to filter out because it will break the payload (it's not a local
-              // authority id)
-              .filter(id => isUuid(id as string))
-              .map(id => ({
-                id,
-                selected: true,
-              })),
-          };
-        }
+    if (!body || typeof body !== 'object') {
+      return selections;
+    }
+
+    for (const [fullKey, formData] of Object.entries(body)) {
+      const separatorIndex = fullKey.indexOf('.');
+      if (separatorIndex <= 0) {
+        continue;
       }
+
+      const areaName = fullKey.slice(0, separatorIndex);
+      if (!allowedLocalAuthorityAreas.has(areaName) || selections[areaName]) {
+        continue;
+      }
+
+      const areaOfLawId = fullKey.slice(separatorIndex + 1);
+      if (!areaOfLawId) {
+        continue;
+      }
+
+      // always flatten the area ids into an array, as a single selection will come through as a string,
+      // but multiple selections will be an array of strings. This just normalises the incoming data.
+      const selectedIds = formData ? [formData].flat() : [];
+      selections[areaName] = {
+        areaOfLawId,
+        localAuthorities: selectedIds
+          // the form response is forced using a hidden field that adds a single empty result
+          // which we need to filter out because it will break the payload (it's not a local
+          // authority id)
+          .filter(id => isUuid(id as string))
+          .map(id => ({
+            id,
+            selected: true,
+          })),
+      };
     }
 
     return selections;

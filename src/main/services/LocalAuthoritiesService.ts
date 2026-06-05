@@ -41,6 +41,10 @@ export type LocalAuthoritiesSaveModel = {
   errors?: Record<string, string[]>;
 };
 
+export const allowedLocalAuthorityAreas = new Set(['Adoption', 'Children', 'Divorce']);
+
+const localAuthorityAreas = [...allowedLocalAuthorityAreas] as (keyof LocalAuthoritySelections)[];
+
 export class LocalAuthoritiesService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
@@ -109,7 +113,7 @@ export class LocalAuthoritiesService {
       return courtResponse;
     }
 
-    const updatePayload: CourtLocalAuthoritiesList = (['Adoption', 'Children', 'Divorce'] as const)
+    const updatePayload: CourtLocalAuthoritiesList = localAuthorityAreas
       .map(area => selections[area])
       .filter((selection): selection is CourtLocalAuthorities => !!selection);
 
@@ -123,6 +127,10 @@ export class LocalAuthoritiesService {
       // convert the mapped errors into our expected error format
       const errors: Record<string, string[]> = {};
       for (const [key, value] of updateResponse) {
+        // ignore the timestamp entry when decanting error responses
+        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
+          continue;
+        }
         errors[key] = [value];
       }
 
@@ -153,23 +161,32 @@ export class LocalAuthoritiesService {
   }
 
   private buildCourtLocalAuthoritiesModelData(
-    localAuthorities: LocalAuthorityType[],
+    completeLocalAuthorities: LocalAuthorityType[],
     areasOfLaw: AreaOfLawType[],
     existingCourtLocalAuthorities: CourtLocalAuthoritiesList,
     casesHeard: CasesHeard
   ): LocalAuthoritySelections {
     const localAuthoritySelections: LocalAuthoritySelections = {};
 
-    const areaOfLawNames = (['Adoption', 'Children', 'Divorce'] as const).filter(area => casesHeard[area]);
+    // perform a single run over the existing court local authorities to build a map of area of law
+    // to local authority id to selection, which will make it easier to look up the existing
+    // selections as we build the model data
+    const existingByArea = new Map<string, Map<string, boolean>>();
+    for (const { areaOfLawName, localAuthorities } of existingCourtLocalAuthorities) {
+      if (!areaOfLawName) {
+        continue;
+      }
+      existingByArea.set(areaOfLawName, new Map(localAuthorities.map(({ id, selected }) => [id, selected] as const)));
+    }
 
-    for (const areaOfLaw of areaOfLawNames) {
-      const selections: LocalAuthoritySelection[] = localAuthorities.map(la => ({
+    const filteredAolNames = localAuthorityAreas.filter(area => casesHeard[area]);
+
+    for (const areaOfLaw of filteredAolNames) {
+      const existingSelectionsForArea = existingByArea.get(areaOfLaw);
+      const selections: LocalAuthoritySelection[] = completeLocalAuthorities.map(la => ({
         id: la.id,
         name: la.name,
-        selected:
-          existingCourtLocalAuthorities
-            .find(cla => cla.areaOfLawName === areaOfLaw)
-            ?.localAuthorities.some(courtLA => courtLA.id === la.id && courtLA.selected) ?? false,
+        selected: existingSelectionsForArea?.get(la.id) ?? false,
       }));
 
       localAuthoritySelections[areaOfLaw] = {

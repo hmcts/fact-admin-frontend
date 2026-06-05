@@ -112,7 +112,7 @@ describe('Local Authorities View', () => {
       pagePath: `/courts/${courtId}/edit/local-authorities/success`,
     });
 
-    expect(html).toContain('Address Saved');
+    expect(html).toContain(`Local authorities saved - ${courtName}`);
     expect(html).toContain(`Local authority settings for ${courtName} have been successfully updated`);
     expect(html).toContain('What do you want to do next?');
   });

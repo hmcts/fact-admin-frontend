@@ -41,7 +41,7 @@ describe('LocalAuthoritiesController', () => {
     responseMock.expects('render').once().withArgs('local-authorities', viewModel);
 
     try {
-      await controller.renderLocalAuthoritesView(request, response);
+      await controller.renderLocalAuthoritiesView(request, response);
       assert.calledOnce(retrieveStub);
       assert.calledWith(retrieveStub, COURT_ID);
       responseMock.verify();
@@ -66,7 +66,7 @@ describe('LocalAuthoritiesController', () => {
     responseMock.expects('render').once().withArgs('court-not-found');
 
     try {
-      await controller.renderLocalAuthoritesView(request, response);
+      await controller.renderLocalAuthoritiesView(request, response);
       assert.notCalled(retrieveStub);
       responseMock.verify();
     } finally {
@@ -90,7 +90,7 @@ describe('LocalAuthoritiesController', () => {
     responseMock.expects('render').once().withArgs('court-not-found');
 
     try {
-      await controller.renderLocalAuthoritesView(request, response);
+      await controller.renderLocalAuthoritiesView(request, response);
       assert.calledOnce(retrieveStub);
       responseMock.verify();
     } finally {
@@ -116,7 +116,7 @@ describe('LocalAuthoritiesController', () => {
     responseMock.expects('render').once().withArgs('error');
 
     try {
-      await controller.renderLocalAuthoritesView(request, response);
+      await controller.renderLocalAuthoritiesView(request, response);
       assert.calledOnce(retrieveStub);
       responseMock.verify();
     } finally {

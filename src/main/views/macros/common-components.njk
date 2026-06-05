@@ -41,16 +41,13 @@
 {% macro modelDrivenErrorSummary(modelErrors) %}
   {% set errorList = [] %}
   {% for field, errors in modelErrors %}
-    {% if field !== "timestamp" %}
-      {% set fieldErrors = [] %}
-      {% for error in errors %}
-        {% set href = "#" + field if field !== "message" else null %}
-        {% set errorList = (errorList.push({
-          text: error,
-          href: href
-        }), errorList) %}
-      {% endfor %}
-    {% endif %}
+    {% for error in errors %}
+      {% set href = "#" + field if field !== "message" else null %}
+      {% set errorList = (errorList.push({
+        text: error,
+        href: href
+      }), errorList) %}
+    {% endfor %}
   {% endfor %}
   {{ govukErrorSummary({
     titleText: "There is a problem",
