@@ -1,8 +1,10 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtDetails } from '../schemas/courtDetailsSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
+import { toSlugFormat } from '../utils/valueParsers';
 
 export type GeneralViewModel = Partial<CourtEntity> & { errors?: Record<string, string[]>; regions?: Region[] };
 
@@ -32,16 +34,26 @@ export class GeneralService {
       return courtEntity;
     }
 
+    // overlay our specific changes
+    courtEntity.name = model.name as string;
+    courtEntity.regionId = model.regionId as string;
+    courtEntity.open = model.open as boolean;
+
     // validate for obvious errors
     const validationErrors = this.validateCourtEntity(model);
     if (validationErrors) {
       return { ...courtEntity, errors: validationErrors };
     }
 
-    // overlay our specific changes
-    courtEntity.name = model.name as string;
-    courtEntity.regionId = model.regionId as string;
-    courtEntity.open = model.open as boolean;
+    const duplicateCourt = await this.dataApiRequests.getCourtBySlug(toSlugFormat(courtEntity.name));
+    if (typeof duplicateCourt !== 'number' || duplicateCourt !== HttpStatusCode.NotFound) {
+      return {
+        ...courtEntity,
+        errors: {
+          name: [`A court with the entered name already exists: '${(duplicateCourt as CourtDetails).name}'`],
+        },
+      };
+    }
 
     // persist to the API
     const result = await this.dataApiRequests.updateCourt(courtEntity as CourtEntity);

@@ -9,7 +9,7 @@ import {
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
-import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
+import { CourtDetails, courtDetailsListSchema, courtDetailsSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
@@ -78,6 +78,21 @@ export class DataApiRequests {
       return courtEntitySchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching court details for id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get court details by slug
+   */
+  public async getCourtBySlug(courtSlug: string): Promise<CourtDetails | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/slug/${courtSlug}/v1`);
+      return courtDetailsSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court details for slug ${courtSlug}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
