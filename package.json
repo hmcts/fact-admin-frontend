@@ -32,7 +32,7 @@
     "@hmcts/properties-volume": "1.4.0",
     "applicationinsights": "3.15.0",
     "async-mutex": "0.5.0",
-    "awilix": "12.1.1",
+    "awilix": "13.0.3",
     "awilix-express": "11.0.1",
     "axios": "1.16.1",
     "config": "4.4.1",
