@@ -94,7 +94,7 @@
     "jest": "30.4.2",
     "jest-html-reporter": "4.4.0",
     "lighthouse": "13.3.0",
-    "lint-staged": "16.4.0",
+    "lint-staged": "17.0.7",
     "mini-css-extract-plugin": "2.10.2",
     "odhin-reports-playwright": "1.1.8",
     "pa11y": "9.1.1",
