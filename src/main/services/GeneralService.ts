@@ -1,7 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CourtDetails } from '../schemas/courtDetailsSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
 import { toSlugFormat } from '../utils/valueParsers';
@@ -45,12 +44,17 @@ export class GeneralService {
       return { ...courtEntity, errors: validationErrors };
     }
 
+    // ensure that if we already have a court with this slug, that it's this court
     const duplicateCourt = await this.dataApiRequests.getCourtBySlug(toSlugFormat(courtEntity.name));
-    if (typeof duplicateCourt !== 'number' || duplicateCourt !== HttpStatusCode.NotFound) {
+    if (typeof duplicateCourt === 'number') {
+      if (duplicateCourt !== HttpStatusCode.NotFound) {
+        return duplicateCourt;
+      }
+    } else if (duplicateCourt.id !== courtEntity.id) {
       return {
         ...courtEntity,
         errors: {
-          name: [`A court with the entered name already exists: '${(duplicateCourt as CourtDetails).name}'`],
+          name: [`A court with the entered name already exists: '${duplicateCourt.name}'`],
         },
       };
     }

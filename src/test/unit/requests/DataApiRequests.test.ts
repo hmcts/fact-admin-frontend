@@ -226,6 +226,63 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns parsed court details when the court by slug response is valid', async () => {
+    const courtSlug = 'london-civil-and-family-court';
+    const court = {
+      createdAt: '2026-04-29T09:00:00Z',
+      id: '55555555-5555-4555-8555-555555555555',
+      isServiceCentre: false,
+      lastUpdatedAt: '2026-04-29T10:00:00Z',
+      mrdId: 'MRD-123',
+      name: 'London Civil and Family Court',
+      open: true,
+      openOnCath: true,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      slug: courtSlug,
+      warningNotice: null,
+    };
+
+    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).resolves({ data: court });
+
+    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+
+    expect(response).toEqual(court);
+  });
+
+  it('returns not found when the court by slug endpoint returns a 404', async () => {
+    const courtSlug = 'london-civil-and-family-court';
+
+    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when the court by slug response fails schema validation', async () => {
+    const courtSlug = 'london-civil-and-family-court';
+
+    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).resolves({
+      data: {
+        name: 'Incomplete Court',
+      },
+    });
+
+    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns internal server error when the court by slug request fails without an axios response', async () => {
+    const courtSlug = 'london-civil-and-family-court';
+
+    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).rejects(errorMessage);
+
+    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
   it('returns parsed court details when update court succeeds', async () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',

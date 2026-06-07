@@ -73,6 +73,9 @@ describe('GeneralService', () => {
 
     expect(result).toEqual({
       ...courtEntity,
+      name: '',
+      regionId: '',
+      open: undefined,
       regions,
       errors: {
         name: ['Enter a name for the court'],
@@ -101,6 +104,7 @@ describe('GeneralService', () => {
 
     expect(result).toEqual({
       ...courtEntity,
+      name: 'Court #1',
       regions,
       errors: {
         name: ['Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
@@ -139,6 +143,7 @@ describe('GeneralService', () => {
         name: 'Updated Court Name',
         open: false,
       }),
+      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
@@ -170,6 +175,7 @@ describe('GeneralService', () => {
       getCourtById: jest.fn().mockResolvedValue(courtEntity),
       getRegions: jest.fn().mockResolvedValue(regions),
       updateCourt: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
@@ -194,6 +200,7 @@ describe('GeneralService', () => {
           ['regionId', 'Invalid region'],
         ])
       ),
+      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
