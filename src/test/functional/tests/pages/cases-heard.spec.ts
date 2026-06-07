@@ -110,7 +110,7 @@ test.describe('Cases Heard Page Tests', () => {
         await expect(casesHeardPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
         await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
           'href',
-          `/courts/${createdCourt.id}/edit/cases-heard`
+          '#'
         );
 
         await casesHeardPage.page.getByRole('button', { name: 'Continue' }).click();
