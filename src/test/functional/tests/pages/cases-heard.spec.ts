@@ -108,10 +108,7 @@ test.describe('Cases Heard Page Tests', () => {
           'You are removing the cases heard type of Adoption.'
         );
         await expect(casesHeardPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
-        await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
-          'href',
-          '#'
-        );
+        await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute('href', '#');
 
         await casesHeardPage.page.getByRole('button', { name: 'Continue' }).click();
 
