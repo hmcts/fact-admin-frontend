@@ -28,7 +28,7 @@ jest.mock('../../../main/utils/valueParsers', () => ({
     drinkVendingMachines: false,
     cafeteria: false,
   })),
-  addFoodAndDrink: jest.fn((m) => m),
+  addFoodAndDrink: jest.fn(m => m),
 }));
 
 const { __mocks: serviceMocks } = jest.requireMock('../../../main/services/BuildingFacilitiesService');
@@ -150,15 +150,18 @@ describe('BuildingFacilitiesController', () => {
     it('passes waitingAreaChildren and resolved courtId to save', async () => {
       saveMock.mockResolvedValueOnce({ name: 'Court A' });
 
-      const req = mockReq({ courtId: '11111111-1111-1111-1111-111111111111' }, {
-        parking: 'true',
-        foodAndDrink: ['cafeteria'],
-        waitingArea: 'true',
-        waitingAreaChildren: 'true',
-        quietRoom: 'false',
-        babyChanging: 'false',
-        wifi: 'true',
-      });
+      const req = mockReq(
+        { courtId: '11111111-1111-1111-1111-111111111111' },
+        {
+          parking: 'true',
+          foodAndDrink: ['cafeteria'],
+          waitingArea: 'true',
+          waitingAreaChildren: 'true',
+          quietRoom: 'false',
+          babyChanging: 'false',
+          wifi: 'true',
+        }
+      );
       const res = mockRes();
 
       await controller.updateCourt(req, res);

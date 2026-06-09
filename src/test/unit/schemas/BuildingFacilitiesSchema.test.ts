@@ -59,4 +59,3 @@ describe('BuildingFacilitiesSchema', () => {
     expect(result.success).toBe(true);
   });
 });
-

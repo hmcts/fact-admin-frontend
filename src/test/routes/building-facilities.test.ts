@@ -97,19 +97,21 @@ describe('Building facilities page', () => {
       cafeteria: true,
     } as never);
 
-    const response = await request(app).post(`/courts/${courtId}/edit/building-facilities/success`).type('form').send({
-      parking: 'true',
-      foodAndDrink: ['cafeteria'],
-      waitingArea: 'true',
-      waitingAreaChildren: 'true',
-      quietRoom: 'false',
-      babyChanging: 'false',
-      wifi: 'true',
-    });
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/building-facilities/success`)
+      .type('form')
+      .send({
+        parking: 'true',
+        foodAndDrink: ['cafeteria'],
+        waitingArea: 'true',
+        waitingAreaChildren: 'true',
+        quietRoom: 'false',
+        babyChanging: 'false',
+        wifi: 'true',
+      });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Building Facilities details saved');
     expect(response.text).toContain('Reading Crown Court');
   });
 });
-

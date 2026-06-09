@@ -5,7 +5,6 @@ import { UpdateCourtFacilitiesRequest } from '../requests/types/UpdateCourtFacil
 import { BuildingFacilities } from '../schemas/buildingFacilitiesSchema';
 import { validateBooleanField } from '../utils/validation';
 
-
 export type FacilityModel = Partial<BuildingFacilities> & { errors?: Record<string, string[]> } & { name?: string };
 
 export class BuildingFacilitiesService {
@@ -21,7 +20,7 @@ export class BuildingFacilitiesService {
     if (typeof courtFacility === 'number') {
       return courtFacility;
     }
-    return { ...courtFacility,name:courtResponse.name };
+    return { ...courtFacility, name: courtResponse.name };
   }
   public async save(courtId: string, model: FacilityModel): Promise<FacilityModel | HttpStatusCode> {
     // grab a fresh copy of the model (use the service as we want the regions)
@@ -50,7 +49,7 @@ export class BuildingFacilitiesService {
       for (const [key, value] of result) {
         errors[key] = [value];
       }
-      return { ...model, errors, name:courtResponse.name };
+      return { ...model, errors, name: courtResponse.name };
     }
 
     // otherwise, it's a successful save
@@ -94,7 +93,7 @@ export class BuildingFacilitiesService {
       }
     });
 
-    if(String(model.waitingArea) === 'true'){
+    if (String(model.waitingArea) === 'true') {
       const childrenAreaErrors = validateBooleanField(
         model.waitingAreaChildren,
         'Select whether the children waiting area is available'

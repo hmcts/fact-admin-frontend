@@ -1,11 +1,6 @@
 import { z } from 'zod';
 
-const FoodDrinkEnum = z.enum([
-  'freeWaterDispensers',
-  'snackVendingMachines',
-  'drinkVendingMachines',
-  'cafeteria']);
-
+const FoodDrinkEnum = z.enum(['freeWaterDispensers', 'snackVendingMachines', 'drinkVendingMachines', 'cafeteria']);
 
 export const BuildingFacilitiesSchema = z
   .object({

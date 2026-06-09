@@ -23,10 +23,10 @@ export default class BuildingFacilitiesController {
       res.status(HttpStatusCode.NotFound);
       return res.render('court-not-found');
     }
-      if (typeof model === 'number') {
-        res.status(model);
-        return res.render('error');
-      }
+    if (typeof model === 'number') {
+      res.status(model);
+      return res.render('error');
+    }
     const result = addFoodAndDrink(model);
     res.render('building-facilities-edit', {
       courtId: resolvedCourtId,
@@ -45,8 +45,8 @@ export default class BuildingFacilitiesController {
       return res.render('court-not-found');
     }
 
-    const { parking, foodAndDrink, waitingArea, quietRoom, babyChanging, wifi, waitingAreaChildren }
-    = req.body as Partial<FacilityModel>;
+    const { parking, foodAndDrink, waitingArea, quietRoom, babyChanging, wifi, waitingAreaChildren } =
+      req.body as Partial<FacilityModel>;
 
     const { freeWaterDispensers, snackVendingMachines, drinkVendingMachines, cafeteria } =
       mapFoodAndDrink(foodAndDrink);

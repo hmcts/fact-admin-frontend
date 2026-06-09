@@ -48,7 +48,6 @@ export const mapFoodAndDrink = (foodAndDrink: FoodDrinkOption[] | null | undefin
 };
 
 export const addFoodAndDrink = (data: FacilityModel): FacilityModel => {
-
   const foodAndDrink = (
     ['freeWaterDispensers', 'snackVendingMachines', 'drinkVendingMachines', 'cafeteria'] as FoodDrinkOption[]
   ).filter(key => data[key] === true);

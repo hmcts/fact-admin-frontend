@@ -90,4 +90,3 @@ describe('Building Facilities Views', () => {
     expect(html).toContain('Home');
   });
 });
-

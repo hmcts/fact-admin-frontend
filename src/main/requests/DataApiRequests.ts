@@ -24,7 +24,6 @@ import { GetCourtsParams } from './types/GetCourtsParams';
 import { UpdateCourtFacilitiesRequest } from './types/UpdateCourtFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
 
-
 const logger = Logger.getLogger('app');
 
 export class DataApiRequests {
