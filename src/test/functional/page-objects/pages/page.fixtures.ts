@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { BuildingFacilitiesPage } from './building-facilities.po';
 import { CasesHeardPage } from './cases-heard.po';
 import { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
 import { CourtAddressDeletePage } from './court-address-delete.po';
@@ -17,6 +18,7 @@ export interface PageFixtures {
   homePage: HomePage;
   courtEditPage: CourtEditPage;
   casesHeardPage: CasesHeardPage;
+  buildingFacilitiesPage: BuildingFacilitiesPage;
   translationAndInterpretationPage: TranslationAndInterpretationPage;
   courtAddressListPage: CourtAddressListPage;
   courtAddressFindPage: CourtAddressFindPage;
@@ -57,6 +59,10 @@ export const pageFixtures = {
   casesHeardPage: async ({ determinePage }, use): Promise<void> => {
     const casesHeardPage = new CasesHeardPage(determinePage);
     await use(casesHeardPage);
+  },
+  buildingFacilitiesPage: async ({ determinePage }, use): Promise<void> => {
+    const buildingFacilitiesPage = new BuildingFacilitiesPage(determinePage);
+    await use(buildingFacilitiesPage);
   },
   courtAddressListPage: async ({ determinePage }, use): Promise<void> => {
     const courtAddressListPage = new CourtAddressListPage(determinePage);
