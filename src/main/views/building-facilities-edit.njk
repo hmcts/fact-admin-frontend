@@ -1,0 +1,257 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+
+{% macro modelDrivenErrorSummary(model) %}
+  {% set errorList = [] %}
+  {% for field, errors in model.errors %}
+    {% if field !== "timestamp" %}
+      {% set fieldErrors = [] %}
+      {% for error in errors %}
+        {% set href = "#" + field if field !== "message" else null %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: href
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
+{% endmacro %}
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% set childrenWaiting %}
+{{ govukRadios({
+                    classes: "govuk-radios",
+                    id: "waitingAreaChildren",
+                    name: "waitingAreaChildren",
+                    fieldset: {
+                      legend: {
+                        text: "Are separate waiting areas for children available?"
+                      }
+                    },
+                    items: [
+                      {
+                        value: "true",
+                        text: "Yes",
+                        checked: true if model.waitingAreaChildren == true or model.waitingAreaChildren == "true" else false
+                      },
+                      {
+                        value: "false",
+                        text: "No",
+                        checked: true if model.waitingAreaChildren == false or model.waitingAreaChildren == "false" else false
+                      }
+                    ],
+                    errorMessage: {
+                      text: model.errors.waitingAreaChildren[0]
+                    } if model.errors and model.errors.waitingAreaChildren else null
+                  })
+                  }}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Building Facilities</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/building-facilities/success">
+      <h2 class="govuk-heading-m">Parking</h2>
+        {{ govukRadios({
+          classes: "govuk-radios",
+          id: "parking",
+          name: "parking",
+          fieldset: {
+            legend: {
+              text: "Is there parking?"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: true if model.parking === true else false
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: true if model.parking === false else false
+            }
+          ],
+          errorMessage: {
+            text: model.errors.parking[0]
+          } if model.errors and model.errors.parking else null
+        }) }}
+      <h2 class="govuk-heading-m">Food and Drink</h2>
+
+        {{ govukCheckboxes({
+          name: "foodAndDrink",
+          id: "foodAndDrink",
+          fieldset: {
+            legend: {
+              text: "What food and drink options are available?",
+              isPageHeading: false
+            }
+          },
+          hint: {
+            text: "Select all that apply"
+          },
+          items: [
+            {
+              value: "freeWaterDispensers",
+              text: "Free water dispensers",
+              checked: true if model.foodAndDrink and model.foodAndDrink.includes("freeWaterDispensers") else false
+            },
+            {
+              value: "snackVendingMachines",
+              text: "Snack vending machines",
+              checked: true if model.foodAndDrink and model.foodAndDrink.includes("snackVendingMachines") else false
+            },
+            {
+              value: "drinkVendingMachines",
+              text: "Drink vending machines",
+              checked: true if model.foodAndDrink and model.foodAndDrink.includes("drinkVendingMachines") else false
+            },
+            {
+              value: "cafeteria",
+              text: "A cafeteria serving hot and cold food",
+              checked: true if model.foodAndDrink and model.foodAndDrink.includes("cafeteria") else false
+            }
+          ]
+        }) }}
+        <h2 class="govuk-heading-m">Waiting areas</h2>
+        {{ govukRadios({
+          classes: "govuk-radios",
+          id: "waitingArea",
+          name: "waitingArea",
+          fieldset: {
+            legend: {
+              text: "Are separate waiting areas available?"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: true if model.waitingArea == "true" or model.waitingArea == true  else false,
+              conditional:
+                {
+                  html: childrenWaiting
+                }
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: true if model.waitingArea == false or model.waitingArea == "false" else false
+            }
+          ],
+          errorMessage: {
+            text: model.errors.waitingArea[0]
+          } if model.errors and model.errors.waitingArea else null
+        }) }}
+        <h2 class="govuk-heading-m">Quite room</h2>
+        {{ govukRadios({
+            classes: "govuk-radios",
+            id: "quietRoom",
+            name: "quietRoom",
+            fieldset: {
+              legend: {
+                 text: "Is there a quiet room?"
+                 }
+              },
+                  items: [
+                    {
+                      value: "true",
+                      text: "Yes",
+                      checked: true if model.quietRoom == true else false
+                    },
+                    {
+                      value: "false",
+                      text: "No",
+                      checked: true if model.quietRoom == false else false
+                    }
+                  ],
+                  errorMessage: {
+                    text: model.errors.quietRoom[0]
+                  } if model.errors and model.errors.quietRoom else null
+                }) }}
+        <h2 class="govuk-heading-m">Baby changing facilities</h2>
+        {{ govukRadios({
+            classes: "govuk-radios",
+            id: "babyChanging",
+            name: "babyChanging",
+            fieldset: {
+              legend: {
+                text: "Is there baby changing facilities?"
+              }
+            },
+            items: [
+              {
+              value: "true",
+              text: "Yes",
+              checked: true if model.babyChanging == true else false
+              },
+              {
+              value: "false",
+              text: "No",
+              checked: true if model.babyChanging == false else false
+              }
+            ],
+            errorMessage: {
+              text: model.errors.babyChanging[0]
+              } if model.errors and model.errors.babyChanging else null
+              }) }}
+        <h2 class="govuk-heading-m">Wifi</h2>
+
+        {{ govukRadios({
+            classes: "govuk-radios",
+            id: "wifi",
+            name: "wifi",
+            fieldset: {
+            legend: {
+              text: "Is Wifi available?"
+            }
+          },
+            items: [
+            {
+             value: "true",
+             text: "Yes",
+              checked: true if model.wifi == true else false
+              },
+             {
+             value: "false",
+             text: "No",
+              checked: true if model.wifi == false else false
+             }
+             ],
+             errorMessage: {
+               text: model.errors.wifi[0]
+             } if model.errors and model.errors.wifi else null
+            }) }}
+  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+  <h2 class="govuk-heading-m">Other information displayed on the page</h2>
+      <p class="govuk-body">Toilets are available</p>
+      <p class="govuk-body">Security</p>
+
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}
