@@ -128,6 +128,10 @@ export class CourtAddressService {
       // convert the mapped errors into our expected error format
       const errors: Record<string, string[]> = {};
       for (const [key, value] of result) {
+        // ignore the timestamp entry when decanting error responses
+        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
+          continue;
+        }
         errors[key] = [value];
       }
       return { status: 'invalid', address: { ...address, errors } };

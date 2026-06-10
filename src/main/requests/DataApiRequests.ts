@@ -13,7 +13,13 @@ import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../sch
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
+import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
+import {
+  CourtProfessionalInformation,
+  courtProfessionalInformationSchema,
+} from '../schemas/courtProfessionalInformationSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
+import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
@@ -297,7 +303,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/court-types');
       return courtTypeListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching area of law type details:', error);
+      logger.error('Error fetching court type details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -340,6 +346,74 @@ export class DataApiRequests {
     } catch (error: unknown) {
       logger.error(`Error saving translation services for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve local authority types
+   */
+  public async getLocalAuthorities(): Promise<LocalAuthorityType[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/types/v1/local-authorities');
+      return localAuthorityTypeListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching local authority type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get local authority data by court id
+   */
+  public async getCourtLocalAuthorities(courtId: string): Promise<CourtLocalAuthoritiesList | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/local-authorities`);
+      return courtLocalAuthoritiesListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching local authority data for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update local authority data by court id
+   */
+  public async updateCourtLocalAuthorities(
+    courtId: string,
+    localAuthorities: CourtLocalAuthoritiesList
+  ): Promise<HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.put(`/courts/${courtId}/v1/local-authorities`, localAuthorities);
+      return response.status;
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error updating court local authority details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get professional information data by court id
+   */
+  public async getCourtProfessionalInformation(
+    courtId: string
+  ): Promise<CourtProfessionalInformation | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/professional-information`);
+      return courtProfessionalInformationSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching professional information data for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
     }
   }
 

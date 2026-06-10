@@ -1343,4 +1343,211 @@ describe('DataApiRequests', () => {
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
+
+  it('returns parsed local authorities when response is valid', async () => {
+    const localAuthorities = [
+      {
+        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        name: 'Local Authority A',
+        custodianCode: 1234,
+        childCustodianCodes: [1235, 1236],
+      },
+    ];
+
+    getStub.withArgs('/types/v1/local-authorities').resolves({ data: localAuthorities });
+
+    const response = await dataApiRequests.getLocalAuthorities();
+
+    expect(response).toEqual(localAuthorities);
+  });
+
+  it('returns internal server error when local authorities response fails schema validation', async () => {
+    getStub.withArgs('/types/v1/local-authorities').resolves({
+      data: [{ name: 'Missing required fields' }],
+    });
+
+    const response = await dataApiRequests.getLocalAuthorities();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court local authorities when response is valid', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const localAuthorities = [
+      {
+        areaOfLawId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        areaOfLawName: 'Children',
+        localAuthorities: [
+          {
+            id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+            name: 'Local Authority A',
+            selected: true,
+          },
+        ],
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/local-authorities`).resolves({ data: localAuthorities });
+
+    const response = await dataApiRequests.getCourtLocalAuthorities(courtId);
+
+    expect(response).toEqual(localAuthorities);
+  });
+
+  it('returns not found when court local authorities endpoint returns a 404', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+
+    getStub.withArgs(`/courts/${courtId}/v1/local-authorities`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtLocalAuthorities(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when court local authorities response fails schema validation', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+
+    getStub.withArgs(`/courts/${courtId}/v1/local-authorities`).resolves({
+      data: [{ areaOfLawName: 'Children' }],
+    });
+
+    const response = await dataApiRequests.getCourtLocalAuthorities(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns ok when court local authorities are updated successfully', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        areaOfLawId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        areaOfLawName: 'Children',
+        localAuthorities: [
+          {
+            id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+            selected: true,
+          },
+        ],
+      },
+    ];
+
+    putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).resolves({ status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns validation errors map when update court local authorities endpoint returns a 400', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        areaOfLawId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        localAuthorities: [],
+      },
+    ];
+    const apiErrors = {
+      Children: 'At least one local authority must be selected',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: 400,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when update court local authorities throws a non-axios error', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        areaOfLawId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        localAuthorities: [],
+      },
+    ];
+
+    putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court professional information when response is valid', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+    const professionalInformation = {
+      professionalInformation: {
+        interviewRooms: true,
+        videoHearings: true,
+        commonPlatform: false,
+        accessScheme: true,
+        interviewRoomCount: 3,
+        interviewPhoneNumber: '01234 567890',
+      },
+      codes: {
+        countyCourtCode: 101,
+        crownCourtCode: null,
+        familyCourtCode: 202,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [
+        {
+          dxCode: 'DX 999',
+          explanation: null,
+        },
+      ],
+      faxNumber: [
+        {
+          faxNumber: '020 0000 0000',
+          description: 'Main fax',
+        },
+      ],
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/professional-information`).resolves({ data: professionalInformation });
+
+    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+
+    expect(response).toEqual(professionalInformation);
+  });
+
+  it('returns forbidden when court professional information endpoint returns a 403', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+
+    getStub.withArgs(`/courts/${courtId}/v1/professional-information`).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'forbidden',
+        status: 403,
+      },
+    });
+
+    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+
+    expect(response).toBe(HttpStatusCode.Forbidden);
+  });
+
+  it('returns internal server error when court professional information response fails schema validation', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+
+    getStub.withArgs(`/courts/${courtId}/v1/professional-information`).resolves({
+      data: {
+        professionalInformation: {
+          interviewRooms: true,
+        },
+      },
+    });
+
+    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
 });

@@ -1,4 +1,5 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% macro successPanel(title='', text='') %}
   {{ govukPanel({
@@ -33,4 +34,23 @@
   {% else %} {# visit us #}
     Visit
   {% endif -%}
+{% endmacro %}
+
+{# common error summary/linking for templates where we #}
+{# explicitly map field ids to schema keys #}
+{% macro modelDrivenErrorSummary(modelErrors) %}
+  {% set errorList = [] %}
+  {% for field, errors in modelErrors %}
+    {% for error in errors %}
+      {% set href = "#" + field if field !== "message" else null %}
+      {% set errorList = (errorList.push({
+        text: error,
+        href: href
+      }), errorList) %}
+    {% endfor %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
 {% endmacro %}

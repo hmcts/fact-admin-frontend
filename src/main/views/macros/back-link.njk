@@ -1,0 +1,10 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% macro goBack(path = '#', text = 'Back', ariaLabel = 'Back') %}
+  <nav class="govuk-back-link-wrapper" aria-label="{{ ariaLabel }}">
+    {{ govukBackLink({
+      text: text,
+      href: path
+    }) }}
+  </nav>
+{% endmacro %}
