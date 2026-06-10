@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { UpdateCourtFacilitiesRequest } from '../requests/types/UpdateCourtFacilitiesRequest';
+import { UpdateBuildingFacilitiesRequest } from '../requests/types/UpdateBuildingFacilitiesRequest';
 import { BuildingFacilities } from '../schemas/buildingFacilitiesSchema';
 import { validateBooleanField } from '../utils/validation';
 
@@ -37,7 +37,7 @@ export class BuildingFacilitiesService {
 
     // persist to the API
 
-    const result = await this.dataApiRequests.updateBuildingfacilities(courtId, <UpdateCourtFacilitiesRequest>model);
+    const result = await this.dataApiRequests.updateBuildingfacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
     if (typeof result === 'number') {
       return result;
     }

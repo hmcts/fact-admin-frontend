@@ -21,7 +21,7 @@ import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetCourtsParams } from './types/GetCourtsParams';
-import { UpdateCourtFacilitiesRequest } from './types/UpdateCourtFacilitiesRequest';
+import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
 
 const logger = Logger.getLogger('app');
@@ -348,7 +348,7 @@ export class DataApiRequests {
 
   public async updateBuildingfacilities(
     courtId: string,
-    payload: UpdateCourtFacilitiesRequest
+    payload: UpdateBuildingFacilitiesRequest
   ): Promise<BuildingFacilities | HttpStatusCode | Map<string, string>> {
     try {
       const response = await dataApi.post(`/courts/${courtId}/v1/building-facilities`, payload);
