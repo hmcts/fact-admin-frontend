@@ -85,6 +85,39 @@ export class DataApiRequests {
   }
 
   /**
+   * Request to data API to get court details by slug
+   */
+  public async getCourtBySlug(courtSlug: string): Promise<CourtEntity | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/slug/${courtSlug}/entity/v1`);
+      return courtEntitySchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court details for slug ${courtSlug}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update court details by id
+   */
+  public async updateCourt(court: CourtEntity): Promise<CourtEntity | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.put(`/courts/${court.id}/v1`, court);
+      return courtEntitySchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error(`Error update court details for id ${court.id}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
    * Request to data API to get area of law selections by court id
    */
   public async getCourtAreasOfLaw(courtId: string): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
