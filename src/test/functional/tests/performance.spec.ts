@@ -91,6 +91,25 @@ test.describe(
       );
     });
 
+    test(
+      'General Page Performance',
+      {
+        tag: '@performance',
+      },
+      async ({ generalPage, lighthouseUtils, playwright }) => {
+        await withCreatedCourt(
+          playwright,
+          'General Performance Test',
+          { serviceCenter: false },
+          async ({ createdCourt }) => {
+            await generalPage.goto(createdCourt.id);
+            await generalPage.header.checkIsVisible();
+            await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+          }
+        );
+      }
+    );
+
     test('Local Authorities Page Performance', async ({
       lighthouseUtils,
       casesHeardPage,

@@ -9,6 +9,7 @@ import { CourtAddressFindPage } from './court-address-find.po';
 import { CourtAddressListPage } from './court-address-list.po';
 import { CourtAddressSelectPage } from './court-address-select.po';
 import { CourtEditPage } from './court-edit.po';
+import { GeneralPage } from './general.po';
 import { HomePage } from './home.po';
 import { LocalAuthoritiesPage } from './local-authorities.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
@@ -26,6 +27,7 @@ export interface PageFixtures {
   courtAddressDeletePage: CourtAddressDeletePage;
   courtAddressEditSuccessPage: CourtAddressEditSuccessPage;
   courtAddressDeleteSuccessPage: CourtAddressDeleteSuccessPage;
+  generalPage: GeneralPage;
   localAuthoritiesPage: LocalAuthoritiesPage;
 }
 
@@ -87,6 +89,10 @@ export const pageFixtures = {
   courtAddressDeleteSuccessPage: async ({ determinePage }, use): Promise<void> => {
     const courtAddressDeleteSuccessPage = new CourtAddressDeleteSuccessPage(determinePage);
     await use(courtAddressDeleteSuccessPage);
+  },
+  generalPage: async ({ determinePage }, use): Promise<void> => {
+    const generalPage = new GeneralPage(determinePage);
+    await use(generalPage);
   },
   localAuthoritiesPage: async ({ determinePage }, use): Promise<void> => {
     const localAuthoritiesPage = new LocalAuthoritiesPage(determinePage);

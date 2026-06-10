@@ -71,6 +71,48 @@ test.describe(
       );
     });
 
+    test('General Page Accessibility', async ({ axeUtils, generalPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'General Accessibility Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await generalPage.goto(createdCourt.id);
+          await generalPage.expectVisibleElements();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('General Validation Accessibility', async ({ axeUtils, generalPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'General Accessibility Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await generalPage.goto(createdCourt.id);
+          await generalPage.nameInput.clear();
+          await generalPage.save();
+          await generalPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('General Success Page Accessibility', async ({ axeUtils, generalPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'General Accessibility Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await generalPage.goto(createdCourt.id);
+          await generalPage.save();
+          await generalPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Translation and Interpretation Page Accessibility', async ({
       axeUtils,
       playwright,
