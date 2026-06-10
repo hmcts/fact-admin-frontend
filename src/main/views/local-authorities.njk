@@ -1,0 +1,155 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% macro localAuthoritySelection(selections, id, legendText=null, hintText=null) %}
+
+  {{ govukInput({
+    label: {
+      text: "Search local authorities",
+      isPageHeading: false
+    },
+    attributes: {
+      "data-element-filter-input": "",
+      "data-element-filter-target": "div.govuk-checkboxes .govuk-checkboxes__item"
+    },
+    id: legendText + "-filter",
+    name: legendText + "-filter"
+  }) }}
+
+  {% set items = [] %}
+  {% for selection in selections | sort(false, true, 'name') %}
+    {% set items = (items.push({
+      value: selection.id,
+      text: selection.name,
+      checked: selection.selected
+    }), items) %}
+  {% endfor %}
+
+  {# this prevents complete omission from the form post when no checkboxes are selected #}
+  <input type="hidden" name="{{ id }}" value="">
+  {{ govukCheckboxes({
+    idPrefix: id,
+    name: id,
+    classes: "govuk-checkboxes--small app-checkboxes--two-columns",
+    fieldset: {
+      legend: {
+        text: legendText,
+        isPageHeading: true,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    hint: {
+      text: hintText
+    },
+    items: items
+  }) }}
+
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+      {% if errors %}
+        {{ modelDrivenErrorSummary(errors) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Local Authorities</h1>
+
+      {{ govukWarningText({
+        text: "If you set a local authority for a court, when a user searches for a postcode within that local authority, it will show them the closest court to the entered postcode that has the local authority selected. This will affect users search results."
+      }) }}
+
+      {%- if not courtTypes.family or (not casesHeard.Adoption and not casesHeard.Children and not casesHeard.Divorce) %}
+
+        {{ govukWarningText({
+          text: "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court and the 'Cases heard' as childcare arrangements, adoption and/or divorce."
+        }) }}
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li><a href="/courts/{{ courtId }}/edit" class="govuk-link govuk-link--no-visited-state">Continue updating {{ courtName }}</a></li>
+          <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
+        </ul>
+
+      {% else %}
+
+        {% set items = [] %}
+        {% if casesHeard.Adoption %}
+          {% set items = (items.push({
+            label: "Adoption",
+            id: "Adoption",
+            panel: {
+              html: localAuthoritySelection(
+                localAuthoritySelections.Adoption.localAuthorities,
+                "Adoption."+localAuthoritySelections.Adoption.areaOfLawId,
+                "Adoption",
+                "Select all local authorities that have adoption cases heard at this court"
+              ),
+              attributes: {
+                "data-element-filter-container": ""
+              }
+            }
+          }), items) %}
+        {%  endif %}
+        {% if casesHeard.Children %}
+          {% set items = (items.push({
+            label: "Children",
+            id: "Children",
+            panel: {
+              html: localAuthoritySelection(
+                localAuthoritySelections.Children.localAuthorities,
+                "Children."+localAuthoritySelections.Children.areaOfLawId,
+                "Children",
+                "Select all local authorities that have childcare cases heard at this court"
+              ),
+              attributes: {
+                "data-element-filter-container": ""
+              }
+            }
+          }), items) %}
+        {%  endif %}
+        {% if casesHeard.Divorce %}
+          {% set items = (items.push({
+            label: "Divorce",
+            id: "Divorce",
+            panel: {
+              html: localAuthoritySelection(
+                localAuthoritySelections.Divorce.localAuthorities,
+                "Divorce."+localAuthoritySelections.Divorce.areaOfLawId,
+                "Divorce",
+                "Select all local authorities that have divorce cases heard at this court"
+              ),
+              attributes: {
+                "data-element-filter-container": ""
+              }
+            }
+          }), items) %}
+        {%  endif %}
+
+        <form method="post" action="/courts/{{ courtId }}/edit/local-authorities/success">
+
+          {{ govukTabs({
+            items: items
+          }) }}
+
+          {{ govukButton({
+            text: "Save"
+          }) }}
+
+        </form>
+      </div>
+
+    {% endif -%}
+  </div>
+
+{% endblock %}

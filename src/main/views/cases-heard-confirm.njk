@@ -1,0 +1,49 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "./macros/back-link.njk" import goBack %}
+
+{% block pageTitle %}
+  Cases heard confirm update - {{ courtName }}
+{% endblock %}
+
+{% block beforeContent %}
+    {{ goBack(path = "/courts/" + courtId + "/edit/cases-heard", text = "Go back") }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-xl">Are you sure you want to save the changes to Cases Heard?</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
+
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Court name" },
+              value: { text: courtName }
+            },
+            {
+              key: { text: "Confirm" },
+              value: { text: message }
+            }
+          ]
+        }) }}
+
+        <input type="hidden" name="areasOfLaw" value="{{ selectedAreasOfLaw }}">
+
+        {{ govukButton({
+          text: "Continue",
+          classes: "govuk-button--warning"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+
+
+{% endblock %}

@@ -53,6 +53,7 @@ test.describe('Cases Heard Page Tests', () => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectFirstCaseType();
         await casesHeardPage.save();
+        await casesHeardPage.header.checkIsVisible();
 
         await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
         await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
@@ -69,6 +70,58 @@ test.describe('Cases Heard Page Tests', () => {
     );
   });
 
+  test('shows a confirmation step when removing Adoption, Children or Divorce and saves after continuing', async ({
+    casesHeardPage,
+    playwright,
+  }) => {
+    await withCreatedCourt(
+      playwright,
+      'Cases Heard Functional Test',
+      { serviceCenter: false },
+      async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.selectAllCaseTypes();
+        await casesHeardPage.save();
+        await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+
+        await casesHeardPage.goto(createdCourt.id);
+
+        const removableCaseTypes = ['Adoption', 'Children', 'Divorce'];
+        let removedCaseType: string | undefined;
+
+        for (const caseType of removableCaseTypes) {
+          const checkbox = casesHeardPage.page.getByRole('checkbox', { name: caseType });
+
+          if ((await checkbox.count()) > 0) {
+            await checkbox.first().uncheck();
+            removedCaseType = caseType;
+            break;
+          }
+        }
+
+        expect(removedCaseType).toBeDefined();
+        const removedCaseTypeName = removedCaseType as string;
+        await casesHeardPage.save();
+
+        await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
+        await expect(casesHeardPage.heading).toContainText('Are you sure you want to save the changes to Cases Heard?');
+        await expect(casesHeardPage.mainContent.content).toContainText(
+          `You are removing the cases heard type of ${removedCaseTypeName}.`
+        );
+        await expect(casesHeardPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
+        await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit/cases-heard`
+        );
+
+        await casesHeardPage.page.getByRole('button', { name: 'Continue' }).click();
+
+        await expect(casesHeardPage.page).toHaveURL(casesHeardPage.buildCasesHeardSuccessUrl(createdCourt.id));
+        await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+      }
+    );
+  });
+
   test('persists added case types when returning to the form', async ({ casesHeardPage, playwright }) => {
     await withCreatedCourt(
       playwright,
@@ -80,9 +133,11 @@ test.describe('Cases Heard Page Tests', () => {
         const checkboxCount = await casesHeardPage.checkboxes.count();
         expect(checkboxCount).toBeGreaterThan(1);
 
-        await casesHeardPage.clearSelectedCaseTypes();
-        await casesHeardPage.getCaseTypeCheckbox(0).check();
+        // check the first unchecked case type
+        const checkbox = casesHeardPage.page.getByRole('checkbox', { checked: false }).first();
+        await checkbox.click();
         await casesHeardPage.save();
+        await casesHeardPage.successPanel.click();
         await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
 
         await casesHeardPage.goto(createdCourt.id);

@@ -16,6 +16,7 @@ describe('Court Edit View', () => {
     expect(html).toContain(`${courtEditPath}/accessibility`);
     expect(html).toContain(`${courtEditPath}/general`);
     expect(html).toContain(`${courtEditPath}/cases-heard`);
+    expect(html).toContain('Local authorities');
     expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);
     expect(html).toContain('TODO');

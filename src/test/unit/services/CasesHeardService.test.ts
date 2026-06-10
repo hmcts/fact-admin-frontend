@@ -70,6 +70,11 @@ describe('CasesHeardService', () => {
           value: '22222222-2222-4222-8222-222222222222',
         },
       ],
+      confirmRemovalAreasOfLaw: {
+        adoption: undefined,
+        children: undefined,
+        divorce: '22222222-2222-4222-8222-222222222222',
+      },
     });
   });
 
@@ -110,6 +115,11 @@ describe('CasesHeardService', () => {
         ],
         pageTitle: 'Error: Cases heard - Reading Crown Court',
         rightColumnAreasOfLawItems: [],
+        confirmRemovalAreasOfLaw: {
+          adoption: undefined,
+          children: undefined,
+          divorce: undefined,
+        },
       },
     });
   });

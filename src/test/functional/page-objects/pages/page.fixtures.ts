@@ -11,6 +11,7 @@ import { CourtAddressSelectPage } from './court-address-select.po';
 import { CourtEditPage } from './court-edit.po';
 import { GeneralPage } from './general.po';
 import { HomePage } from './home.po';
+import { LocalAuthoritiesPage } from './local-authorities.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 
 export interface PageFixtures {
@@ -27,6 +28,7 @@ export interface PageFixtures {
   courtAddressEditSuccessPage: CourtAddressEditSuccessPage;
   courtAddressDeleteSuccessPage: CourtAddressDeleteSuccessPage;
   generalPage: GeneralPage;
+  localAuthoritiesPage: LocalAuthoritiesPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -91,6 +93,10 @@ export const pageFixtures = {
   generalPage: async ({ determinePage }, use): Promise<void> => {
     const generalPage = new GeneralPage(determinePage);
     await use(generalPage);
+  },
+  localAuthoritiesPage: async ({ determinePage }, use): Promise<void> => {
+    const localAuthoritiesPage = new LocalAuthoritiesPage(determinePage);
+    await use(localAuthoritiesPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
