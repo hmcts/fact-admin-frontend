@@ -31,6 +31,12 @@ export class BuildingFacilitiesPage extends Base {
     await this.page.locator(`input[name="${fieldName}"][value="false"]`).check();
   }
 
+  async clearRadioSelection(fieldName: string): Promise<void> {
+    await this.page
+      .locator(`input[name="${fieldName}"]`)
+      .evaluateAll(elements => elements.forEach(element => ((element as HTMLInputElement).checked = false)));
+  }
+
   async selectFoodOption(option: string): Promise<void> {
     await this.page.locator(`input[name="foodAndDrink"][value="${option}"]`).check();
   }

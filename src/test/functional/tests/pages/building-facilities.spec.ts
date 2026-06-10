@@ -66,6 +66,7 @@ test.describe('Building Facilities Page Tests', () => {
 
         await buildingFacilitiesPage.selectYes('parking');
         await buildingFacilitiesPage.selectYes('waitingArea');
+        await buildingFacilitiesPage.clearRadioSelection('waitingAreaChildren');
         await buildingFacilitiesPage.selectNo('quietRoom');
         await buildingFacilitiesPage.selectNo('babyChanging');
         await buildingFacilitiesPage.selectYes('wifi');
