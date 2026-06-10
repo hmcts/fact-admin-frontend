@@ -1,13 +1,12 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { AreaOfLawType, CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
+import { CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
 import {
   CourtLocalAuthorities,
   CourtLocalAuthoritiesList,
   LocalAuthoritySelection,
 } from '../schemas/courtLocalAuthoritiesSchema';
-import { LocalAuthorityType } from '../schemas/localAuthorityTypeSchema';
 
 type CasesHeard = {
   Adoption: boolean;
@@ -54,18 +53,6 @@ export class LocalAuthoritiesService {
       return courtResponse;
     }
 
-    // we need the complete set of local authorities to ensure we set up the model correctly
-    const localAuthoritiesResponse = await this.dataApiRequests.getLocalAuthorities();
-    if (typeof localAuthoritiesResponse === 'number') {
-      return localAuthoritiesResponse;
-    }
-
-    // and we need the complete set of areas of law
-    const areasOfLawResponse = await this.dataApiRequests.getAreasOfLaw();
-    if (typeof areasOfLawResponse === 'number') {
-      return areasOfLawResponse;
-    }
-
     // we need to pull professional information to determine if this court has the family court type
     const professionalInformationResponse = await this.dataApiRequests.getCourtProfessionalInformation(courtId);
     if (typeof professionalInformationResponse === 'number') {
@@ -89,12 +76,7 @@ export class LocalAuthoritiesService {
     return {
       courtId,
       courtName: courtResponse.name,
-      localAuthoritySelections: this.buildCourtLocalAuthoritiesModelData(
-        localAuthoritiesResponse,
-        areasOfLawResponse,
-        courtLocalAuthoritiesResponse,
-        casesHeard
-      ),
+      localAuthoritySelections: this.buildCourtLocalAuthoritiesModelData(courtLocalAuthoritiesResponse, casesHeard),
       courtTypes: {
         family: !!professionalInformationResponse.codes?.familyCourtCode,
       },
@@ -161,36 +143,32 @@ export class LocalAuthoritiesService {
   }
 
   private buildCourtLocalAuthoritiesModelData(
-    completeLocalAuthorities: LocalAuthorityType[],
-    areasOfLaw: AreaOfLawType[],
     existingCourtLocalAuthorities: CourtLocalAuthoritiesList,
     casesHeard: CasesHeard
   ): LocalAuthoritySelections {
     const localAuthoritySelections: LocalAuthoritySelections = {};
 
-    // perform a single run over the existing court local authorities to build a map of area of law
-    // to local authority id to selection, which will make it easier to look up the existing
-    // selections as we build the model data
-    const existingByArea = new Map<string, Map<string, boolean>>();
-    for (const { areaOfLawName, localAuthorities } of existingCourtLocalAuthorities) {
-      if (!areaOfLawName) {
-        continue;
-      }
-      existingByArea.set(areaOfLawName, new Map(localAuthorities.map(({ id, selected }) => [id, selected] as const)));
-    }
-
     const filteredAolNames = localAuthorityAreas.filter(area => casesHeard[area]);
 
     for (const areaOfLaw of filteredAolNames) {
-      const existingSelectionsForArea = existingByArea.get(areaOfLaw);
-      const selections: LocalAuthoritySelection[] = completeLocalAuthorities.map(la => ({
-        id: la.id,
-        name: la.name,
-        selected: existingSelectionsForArea?.get(la.id) ?? false,
-      }));
+      const courtLocalAuthorities = existingCourtLocalAuthorities.find(
+        ({ areaOfLawName }) => areaOfLawName === areaOfLaw
+      );
+
+      if (!courtLocalAuthorities) {
+        continue;
+      }
+
+      const selections: LocalAuthoritySelection[] = courtLocalAuthorities.localAuthorities.map(
+        ({ id, name, selected }) => ({
+          id,
+          name,
+          selected,
+        })
+      );
 
       localAuthoritySelections[areaOfLaw] = {
-        areaOfLawId: areasOfLaw.find(aol => aol.name === areaOfLaw)?.id ?? '',
+        areaOfLawId: courtLocalAuthorities.areaOfLawId,
         localAuthorities: selections,
       };
     }

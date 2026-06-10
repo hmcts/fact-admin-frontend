@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block beforeContent %}
-    {{ goBack(text = "Go back", cspNonce = cspNonce) }}
+    {{ goBack(path = "/courts/" + courtId + "/edit/cases-heard", text = "Go back") }}
 {% endblock %}
 
 {% block content %}
