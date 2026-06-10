@@ -1,6 +1,21 @@
 import { z } from 'zod';
 
-const FoodDrinkEnum = z.enum(['freeWaterDispensers', 'snackVendingMachines', 'drinkVendingMachines', 'cafeteria']);
+export enum FoodDrinkEnum {
+  freeWaterDispensers = 'freeWaterDispensers',
+  snackVendingMachines = 'snackVendingMachines',
+  drinkVendingMachines = 'drinkVendingMachines',
+  cafeteria = 'cafeteria',
+}
+
+export const FOOD_DRINK_OPTIONS = [
+  FoodDrinkEnum.freeWaterDispensers,
+  FoodDrinkEnum.snackVendingMachines,
+  FoodDrinkEnum.drinkVendingMachines,
+  FoodDrinkEnum.cafeteria,
+] as const;
+
+export const FoodDrinkZodEnum = z.enum(FOOD_DRINK_OPTIONS);
+export type FoodDrinkOption = `${FoodDrinkEnum}`;
 
 export const BuildingFacilitiesSchema = z
   .object({
@@ -16,7 +31,7 @@ export const BuildingFacilitiesSchema = z
     quietRoom: z.boolean().optional(),
     babyChanging: z.boolean().optional(),
     wifi: z.boolean().optional(),
-    foodAndDrink: z.array(FoodDrinkEnum).nullable().optional(),
+    foodAndDrink: z.array(FoodDrinkZodEnum).nullable().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.waitingArea === true && data.waitingAreaChildren === null) {

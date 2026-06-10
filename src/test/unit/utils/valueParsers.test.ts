@@ -28,6 +28,15 @@ describe('valueParsers', () => {
         cafeteria: true,
       });
     });
+
+    test('maps a single selected option when posted as a scalar value', () => {
+      expect(mapFoodAndDrink('cafeteria')).toEqual({
+        freeWaterDispensers: false,
+        snackVendingMachines: false,
+        drinkVendingMachines: false,
+        cafeteria: true,
+      });
+    });
   });
 
   describe('addFoodAndDrink', () => {

@@ -343,10 +343,10 @@ export class DataApiRequests {
   }
 
   /**
-   * Request to data API to create or update court facilities by court id
-   * **/
+   * Request to data API to update court facilities by court id
+   */
 
-  public async updateBuildingfacilities(
+  public async updateBuildingFacilities(
     courtId: string,
     payload: UpdateBuildingFacilitiesRequest
   ): Promise<BuildingFacilities | HttpStatusCode | Map<string, string>> {

@@ -50,7 +50,7 @@ describe('BuildingFacilitiesService', () => {
   test('save returns status when court lookup fails', async () => {
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
-      updateBuildingfacilities: jest.fn(),
+      updateBuildingFacilities: jest.fn(),
     } as never);
 
     const result = await service.save(courtId, { courtId });
@@ -61,7 +61,7 @@ describe('BuildingFacilitiesService', () => {
   test('save returns validation errors when required fields are missing', async () => {
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      updateBuildingfacilities: jest.fn(),
+      updateBuildingFacilities: jest.fn(),
     } as never);
 
     const result = await service.save(courtId, { courtId });
@@ -79,10 +79,10 @@ describe('BuildingFacilitiesService', () => {
   });
 
   test('save requires waitingAreaChildren when waitingArea is true', async () => {
-    const updateBuildingfacilities = jest.fn();
+    const updateBuildingFacilities = jest.fn();
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      updateBuildingfacilities,
+      updateBuildingFacilities,
     } as never);
 
     const result = await service.save(courtId, {
@@ -105,14 +105,14 @@ describe('BuildingFacilitiesService', () => {
         waitingAreaChildren: ['Select whether the children waiting area is available'],
       },
     });
-    expect(updateBuildingfacilities).not.toHaveBeenCalled();
+    expect(updateBuildingFacilities).not.toHaveBeenCalled();
   });
 
   test('save requires waitingAreaChildren when waitingArea is submitted as string true', async () => {
-    const updateBuildingfacilities = jest.fn();
+    const updateBuildingFacilities = jest.fn();
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      updateBuildingfacilities,
+      updateBuildingFacilities,
     } as never);
 
     const result = await service.save(courtId, {
@@ -135,13 +135,13 @@ describe('BuildingFacilitiesService', () => {
         waitingAreaChildren: ['Select whether the children waiting area is available'],
       },
     });
-    expect(updateBuildingfacilities).not.toHaveBeenCalled();
+    expect(updateBuildingFacilities).not.toHaveBeenCalled();
   });
 
   test('save returns status code when update call fails', async () => {
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      updateBuildingfacilities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      updateBuildingFacilities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     } as never);
 
     const result = await service.save(courtId, {
@@ -159,7 +159,7 @@ describe('BuildingFacilitiesService', () => {
   test('save converts API map errors into field error arrays', async () => {
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      updateBuildingfacilities: jest.fn().mockResolvedValue(new Map([['wifi', 'Invalid wifi value']])),
+      updateBuildingFacilities: jest.fn().mockResolvedValue(new Map([['wifi', 'Invalid wifi value']])),
     } as never);
 
     const result = await service.save(courtId, {
@@ -188,7 +188,7 @@ describe('BuildingFacilitiesService', () => {
   test('save returns successful payload merged with court name', async () => {
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      updateBuildingfacilities: jest.fn().mockResolvedValue({
+      updateBuildingFacilities: jest.fn().mockResolvedValue({
         id: 'fac-1',
         courtId,
         parking: true,

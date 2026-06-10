@@ -61,7 +61,7 @@ describe('Building facilities page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const updateStub = stub(DataApiRequests.prototype, 'updateBuildingfacilities').resolves({
+    const updateStub = stub(DataApiRequests.prototype, 'updateBuildingFacilities').resolves({
       courtId,
       waitingArea: true,
     } as never);
@@ -82,7 +82,7 @@ describe('Building facilities page', () => {
 
   test('renders success page after a valid save', async () => {
     stub(DataApiRequests.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
-    stub(DataApiRequests.prototype, 'updateBuildingfacilities').resolves({
+    stub(DataApiRequests.prototype, 'updateBuildingFacilities').resolves({
       id: 'fac-1',
       courtId,
       waitingArea: true,

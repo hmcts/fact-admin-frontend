@@ -23,7 +23,7 @@ export class BuildingFacilitiesService {
     return { ...courtFacility, name: courtResponse.name };
   }
   public async save(courtId: string, model: FacilityModel): Promise<FacilityModel | HttpStatusCode> {
-    // grab a fresh copy of the model (use the service as we want the regions)
+
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
@@ -37,7 +37,7 @@ export class BuildingFacilitiesService {
 
     // persist to the API
 
-    const result = await this.dataApiRequests.updateBuildingfacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
+    const result = await this.dataApiRequests.updateBuildingFacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
     if (typeof result === 'number') {
       return result;
     }

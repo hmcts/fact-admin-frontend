@@ -1,3 +1,4 @@
+import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
 import { FacilityModel } from '../services/BuildingFacilitiesService';
 /**
  * Parses an integer-like value, falling back when the value is invalid.
@@ -28,29 +29,24 @@ export function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-export type FoodDrinkOption = 'freeWaterDispensers' | 'snackVendingMachines' | 'drinkVendingMachines' | 'cafeteria';
+type FoodDrinkBooleans = Record<FoodDrinkOption, boolean | null>;
 
-type FoodDrinkBooleans = {
-  freeWaterDispensers: boolean | null;
-  snackVendingMachines: boolean | null;
-  drinkVendingMachines: boolean | null;
-  cafeteria: boolean | null;
-};
-
-export const mapFoodAndDrink = (foodAndDrink: FoodDrinkOption[] | null | undefined): FoodDrinkBooleans => {
-  const list = foodAndDrink ?? []; // fallback
-  return {
-    freeWaterDispensers: list.includes('freeWaterDispensers'),
-    snackVendingMachines: list.includes('snackVendingMachines'),
-    drinkVendingMachines: list.includes('drinkVendingMachines'),
-    cafeteria: list.includes('cafeteria'),
-  };
+export const mapFoodAndDrink = (
+  foodAndDrink: FoodDrinkOption | FoodDrinkOption[] | null | undefined
+): FoodDrinkBooleans => {
+  const list = Array.isArray(foodAndDrink) ? foodAndDrink : foodAndDrink ? [foodAndDrink] : [];
+  const selected = new Set(list);
+  return FOOD_DRINK_OPTIONS.reduce(
+    (result, option) => ({
+      ...result,
+      [option]: selected.has(option),
+    }),
+    {} as FoodDrinkBooleans
+  );
 };
 
 export const addFoodAndDrink = (data: FacilityModel): FacilityModel => {
-  const foodAndDrink = (
-    ['freeWaterDispensers', 'snackVendingMachines', 'drinkVendingMachines', 'cafeteria'] as FoodDrinkOption[]
-  ).filter(key => data[key] === true);
+  const foodAndDrink = FOOD_DRINK_OPTIONS.filter(key => data[key] === true);
 
   return {
     ...data,
