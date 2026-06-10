@@ -47,7 +47,6 @@ export default class BuildingFacilitiesController {
 
     const { parking, foodAndDrink, waitingArea, quietRoom, babyChanging, wifi, waitingAreaChildren } =
       req.body as Partial<FacilityModel>;
-    console.log(foodAndDrink);
     const { freeWaterDispensers, snackVendingMachines, drinkVendingMachines, cafeteria } =
       mapFoodAndDrink(foodAndDrink);
     const model = {
@@ -63,7 +62,6 @@ export default class BuildingFacilitiesController {
       babyChanging,
       wifi,
     };
-    console.log(JSON.stringify(model));
     const updateResponse = await buildingFacilitiesService.save(resolvedCourtId, model);
     if (updateResponse === HttpStatusCode.NotFound) {
       res.status(HttpStatusCode.NotFound);

@@ -23,7 +23,6 @@ export class BuildingFacilitiesService {
     return { ...courtFacility, name: courtResponse.name };
   }
   public async save(courtId: string, model: FacilityModel): Promise<FacilityModel | HttpStatusCode> {
-
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
