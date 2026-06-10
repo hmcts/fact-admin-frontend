@@ -53,3 +53,15 @@ export const addFoodAndDrink = (data: FacilityModel): FacilityModel => {
     foodAndDrink,
   };
 };
+/**
+ * converts a string into a slug format (code is mirrored from the data api).
+ *
+ * @param name The court name
+ */
+export function toSlugFormat(name: string): string {
+  return name
+    .toLowerCase()
+    .replaceAll(/[^a-z\s-]/g, '')
+    .replaceAll(/[\s-]+/g, '-')
+    .replaceAll(/(^-)|(-$)/g, '');
+}
