@@ -125,6 +125,11 @@ const courtPhotoSchema = z.object({
   lastUpdatedAt: z.string(),
 });
 
+const courtDetailsAddressSchema = courtAddressSchema.omit({ areasOfLaw: true, courtTypes: true }).extend({
+  areasOfLaw: z.array(areaOfLawSchema).nullable(),
+  courtTypes: z.array(courtTypeSchema).nullable(),
+});
+
 export const courtDetailsSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -138,7 +143,7 @@ export const courtDetailsSchema = z.object({
   courtDxCodes: z.array(courtDxCodeSchema),
   courtCodes: z.array(courtCodeSchema),
   courtFaxNumbers: z.array(courtFaxNumberSchema),
-  courtAddresses: z.array(courtAddressSchema),
+  courtAddresses: z.array(courtDetailsAddressSchema),
   courtOpeningHours: z.array(courtOpeningHourSchema),
   courtCounterServiceOpeningHours: z.array(courtCounterServiceOpeningHourSchema),
   courtContactDetails: z.array(courtContactDetailSchema),
