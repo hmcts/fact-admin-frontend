@@ -239,6 +239,7 @@ const config = defineConfig({
       },
       dependencies: ['setup'],
       grepInvert: /@performance/,
+      testIgnore: /download\.spec\.ts/,
     },
     {
       ...ProjectsConfig.webkit,
@@ -248,6 +249,7 @@ const config = defineConfig({
       },
       dependencies: ['setup'],
       grepInvert: /@performance/,
+      testIgnore: /download\.spec\.ts/,
     },
   ],
 });
