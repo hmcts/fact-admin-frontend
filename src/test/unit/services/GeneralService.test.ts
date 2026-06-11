@@ -76,6 +76,7 @@ describe('GeneralService', () => {
       name: '',
       regionId: '',
       open: undefined,
+      originalName: courtEntity.name,
       regions,
       errors: {
         name: ['Enter a name for the court'],
@@ -105,6 +106,7 @@ describe('GeneralService', () => {
     expect(result).toEqual({
       ...courtEntity,
       name: 'Court #1',
+      originalName: courtEntity.name,
       regions,
       errors: {
         name: ['Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
