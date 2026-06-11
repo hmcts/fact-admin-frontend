@@ -12,7 +12,7 @@ describe('Add Court View', () => {
     });
 
     expect(html).toContain('Add new court');
-    expect(html).toContain('Court will be opened by default.');
+    expect(html).toContain('Court will be closed by default.');
     expect(html).toContain('Name');
     expect(html).toContain('Enter the name of the court. Only capitalise the first letter.');
     expect(html).toContain('Region');

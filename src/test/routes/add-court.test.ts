@@ -18,7 +18,7 @@ describe('Add court page', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Add new court');
-    expect(response.text).toContain('Court will be opened by default.');
+    expect(response.text).toContain('Court will be closed by default.');
     expect(response.text).toContain('South East');
   });
 

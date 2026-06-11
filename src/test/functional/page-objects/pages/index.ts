@@ -1,4 +1,5 @@
 export * from './page.fixtures';
+export { AddCourtPage } from './add-court.po';
 export { PageSection } from './home.po';
 export { CourtAddressDeletePage } from './court-address-delete.po';
 export { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
