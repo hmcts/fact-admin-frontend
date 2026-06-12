@@ -15,8 +15,8 @@ export class ProfessionalInformationPage extends Base {
 
   constructor(page: Page) {
     super(page);
-    this.addDxCodeButton = this.page.getByRole('button', { name: 'Add another DX code' });
-    this.addFaxNumberButton = this.page.getByRole('button', { name: 'Add another Fax number' });
+    this.addDxCodeButton = this.page.locator('[data-professional-information-add="dxCode"]');
+    this.addFaxNumberButton = this.page.locator('[data-professional-information-add="faxNumber"]');
     this.backLink = this.page.locator('.govuk-back-link');
     this.courtTypeCheckboxes = this.page.locator('input[name="courtTypes"]');
     this.errorSummary = this.page.locator('.govuk-error-summary');
@@ -50,15 +50,23 @@ export class ProfessionalInformationPage extends Base {
   }
 
   async addDxCodes(count: number): Promise<void> {
-    for (let index = 1; index < count; index++) {
+    while ((await this.dxCodeInputs.count()) < count) {
       await this.addDxCodeButton.click();
     }
   }
 
   async addFaxNumbers(count: number): Promise<void> {
-    for (let index = 1; index < count; index++) {
+    while ((await this.faxNumberInputs.count()) < count) {
       await this.addFaxNumberButton.click();
     }
+  }
+
+  get dxCodeInputs(): Locator {
+    return this.page.locator('input[name^="dxCode-"]');
+  }
+
+  get faxNumberInputs(): Locator {
+    return this.page.locator('input[name^="faxNumber-"]');
   }
 
   dxCodeInput(index: number): Locator {

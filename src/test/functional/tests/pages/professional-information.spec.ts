@@ -79,6 +79,12 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.codeInput('countyCourtCode')).toBeVisible();
         await expect(professionalInformationPage.codeInput('crownCourtCode')).toBeVisible();
 
+        await professionalInformationPage.codeInput('magistrateCourtCode').fill('');
+        await professionalInformationPage.codeInput('familyCourtCode').fill('');
+        await professionalInformationPage.codeInput('tribunalCode').fill('');
+        await professionalInformationPage.codeInput('countyCourtCode').fill('');
+        await professionalInformationPage.codeInput('crownCourtCode').fill('');
+
         await professionalInformationPage.save();
         await expect(professionalInformationPage.errorSummary).toContainText('Enter a magistrates court code');
         await expect(professionalInformationPage.errorSummary).toContainText('Enter a family court code');
@@ -96,7 +102,9 @@ test.describe('Information for Professionals Page Tests', () => {
       { serviceCenter: false },
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
+        await professionalInformationPage.dxCodeInput(0).fill('');
         await professionalInformationPage.dxCodeDescriptionInput(0).fill('Central DX explanation');
+        await professionalInformationPage.faxNumberInput(0).fill('');
         await professionalInformationPage.faxNumberDescriptionInput(0).fill('Crown court fax');
         await professionalInformationPage.selectRadio('interviewRooms', 'Yes');
         await professionalInformationPage.page.locator('#interviewRoomCount').fill('0');
@@ -130,8 +138,8 @@ test.describe('Information for Professionals Page Tests', () => {
         await professionalInformationPage.addDxCodes(5);
         await professionalInformationPage.addFaxNumbers(5);
 
-        await expect(professionalInformationPage.page.locator('input[name^="dxCode-"]')).toHaveCount(5);
-        await expect(professionalInformationPage.page.locator('input[name^="faxNumber-"]')).toHaveCount(5);
+        await expect(professionalInformationPage.dxCodeInputs).toHaveCount(5);
+        await expect(professionalInformationPage.faxNumberInputs).toHaveCount(5);
         await expect(professionalInformationPage.mainContent.content).toContainText('DX code 2');
         await expect(professionalInformationPage.mainContent.content).toContainText('Fax number 2');
         await expect(professionalInformationPage.removeDxCodeButton(1)).toBeVisible();
@@ -148,8 +156,8 @@ test.describe('Information for Professionals Page Tests', () => {
         await professionalInformationPage.removeDxCodeButton(1).click();
         await professionalInformationPage.removeFaxNumberButton(1).click();
 
-        await expect(professionalInformationPage.page.locator('input[name^="dxCode-"]')).toHaveCount(4);
-        await expect(professionalInformationPage.page.locator('input[name^="faxNumber-"]')).toHaveCount(4);
+        await expect(professionalInformationPage.dxCodeInputs).toHaveCount(4);
+        await expect(professionalInformationPage.faxNumberInputs).toHaveCount(4);
         await expect(professionalInformationPage.addDxCodeButton).toBeVisible();
         await expect(professionalInformationPage.addFaxNumberButton).toBeVisible();
       }
