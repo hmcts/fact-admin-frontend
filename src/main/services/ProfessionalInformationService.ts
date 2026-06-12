@@ -55,6 +55,11 @@ export type SaveProfessionalInformationResult =
     }
   | HttpStatusCode;
 
+export type FamilyCourtRemovalConfirmation = {
+  courtName: string;
+  required: boolean;
+};
+
 export const courtTypeOptions: CourtTypeOption[] = [
   {
     codeField: 'magistrateCourtCode',
@@ -148,6 +153,54 @@ export class ProfessionalInformationService {
     return {
       status: 'saved',
       viewModel,
+    };
+  }
+
+  public async requiresFamilyCourtRemovalConfirmation(
+    courtId: string,
+    form: ProfessionalInformationForm
+  ): Promise<FamilyCourtRemovalConfirmation | HttpStatusCode> {
+    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    if (typeof courtResponse === 'number') {
+      return courtResponse;
+    }
+
+    const professionalInformationResponse = await this.dataApiRequests.getCourtProfessionalInformation(courtId);
+    if (typeof professionalInformationResponse === 'number') {
+      if (professionalInformationResponse !== HttpStatusCode.NotFound) {
+        return professionalInformationResponse;
+      }
+      return {
+        courtName: courtResponse.name,
+        required: false,
+      };
+    }
+
+    const currentlyHasFamilyCourtCode = Boolean(professionalInformationResponse?.codes?.familyCourtCode);
+    const submittedHasFamilyCourtType = this.toArray(form.courtTypes).includes('family');
+    if (!currentlyHasFamilyCourtCode || submittedHasFamilyCourtType) {
+      return {
+        courtName: courtResponse.name,
+        required: false,
+      };
+    }
+
+    const localAuthoritiesResponse = await this.dataApiRequests.getCourtLocalAuthorities(courtId);
+    if (typeof localAuthoritiesResponse === 'number') {
+      if (localAuthoritiesResponse !== HttpStatusCode.NotFound) {
+        return localAuthoritiesResponse;
+      }
+      return {
+        courtName: courtResponse.name,
+        required: false,
+      };
+    }
+
+    return {
+      courtName: courtResponse.name,
+      required: localAuthoritiesResponse.some(area =>
+        area.localAuthorities.some(localAuthority => localAuthority.selected)
+      ),
     };
   }
 

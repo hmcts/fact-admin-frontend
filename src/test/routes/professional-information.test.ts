@@ -73,6 +73,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves({
       professionalInformation: {
         interviewRooms: true,
@@ -148,6 +149,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
@@ -173,6 +175,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -190,6 +193,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
@@ -211,6 +215,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
         [
@@ -238,6 +243,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
@@ -261,6 +267,7 @@ describe('Information for professionals page', () => {
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
         ['message', "Phone Number must match the regex '^(|(\\+44|)[0-9 ]{10,20})$'"],
@@ -281,6 +288,98 @@ describe('Information for professionals page', () => {
       'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000'
     );
     expect(response.text).not.toContain('2026-06-12T10:24:23.354464');
+  });
+
+  test('renders confirmation page before removing family court type with local authority config', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves({
+      professionalInformation: {
+        interviewRooms: false,
+        interviewRoomCount: 0,
+        interviewPhoneNumber: null,
+        videoHearings: false,
+        commonPlatform: false,
+        accessScheme: false,
+      },
+      codes: {
+        countyCourtCode: null,
+        crownCourtCode: null,
+        familyCourtCode: 123,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [],
+      faxNumbers: [],
+    });
+    stub(DataApiRequests.prototype, 'getCourtLocalAuthorities').resolves([
+      {
+        areaOfLawId: '22222222-2222-4222-8222-222222222222',
+        areaOfLawName: 'Children',
+        localAuthorities: [{ id: '33333333-3333-4333-8333-333333333333', selected: true }],
+      },
+    ]);
+    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/information-for-professionals/success`)
+      .type('form')
+      .send({
+        courtTypes: ['crown'],
+        crownCourtCode: '456',
+      });
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('Are you sure you want to save the changes to Information for professionals?');
+    expect(response.text).toContain(
+      'You are removing the court type of Family court. This is being used by the local authorities admin page.'
+    );
+    expect(response.text).toContain('name="confirmFamilyCourtRemoval" value="true"');
+    expect(response.text).toContain('name="courtTypes" value="crown"');
+    expect(saveStub.notCalled).toBe(true);
+  });
+
+  test('saves family court type removal after confirmation', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves({
+      professionalInformation: {
+        interviewRooms: false,
+        interviewRoomCount: 0,
+        interviewPhoneNumber: null,
+        videoHearings: false,
+        commonPlatform: false,
+        accessScheme: false,
+      },
+      codes: {
+        countyCourtCode: null,
+        crownCourtCode: 456,
+        familyCourtCode: null,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [],
+      faxNumbers: [],
+    });
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/information-for-professionals/success`)
+      .type('form')
+      .send({
+        confirmFamilyCourtRemoval: 'true',
+        courtTypes: ['crown'],
+        crownCourtCode: '456',
+      });
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('Information for professionals saved');
+    expect(saveStub.calledOnce).toBe(true);
   });
 
   test('renders court not found for invalid court id', async () => {
