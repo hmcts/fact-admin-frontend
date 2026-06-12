@@ -1,0 +1,304 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% macro repeatableSection(type, heading, entries, addButtonText, removeButtonText, firstLabel, secondLabel, firstHint, secondHint) %}
+  <div data-professional-information-list="{{ type }}" data-professional-information-max="5">
+    {% for entry in entries %}
+      {% set index = loop.index0 %}
+      <div class="professional-information-repeatable" data-professional-information-item>
+        {% if not loop.first %}
+          <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }}</p>
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: firstLabel,
+            classes: "govuk-!-margin-bottom-1"
+          },
+          hint: {
+            text: firstHint
+          } if firstHint else null,
+          classes: "govuk-input--width-20",
+          id: type + "-" + index,
+          name: type + "-" + index,
+          value: entry.code,
+          errorMessage: {
+            text: fieldErrors[type + "-" + index]
+          } if fieldErrors[type + "-" + index] else null
+        }) }}
+
+        {{ govukInput({
+          label: {
+            text: secondLabel,
+            classes: "govuk-!-margin-bottom-1"
+          },
+          hint: {
+            text: secondHint
+          } if secondHint else null,
+          classes: "govuk-input--width-20",
+          id: type + "Description-" + index,
+          name: type + "Description-" + index,
+          value: entry.description
+        }) }}
+
+        {% if not loop.first %}
+          <button class="govuk-button govuk-button--warning professional-information-repeatable__remove" type="button" data-professional-information-remove>
+            {{ removeButtonText }} {{ loop.index }}
+          </button>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {{ govukButton({
+    text: addButtonText,
+    classes: "govuk-button--secondary govuk-!-display-none" if entries.length >= 5 else "govuk-button--secondary",
+    attributes: {
+      "data-professional-information-add": type,
+      "hidden": "hidden"
+    } if entries.length >= 5 else {
+      "data-professional-information-add": type
+    },
+    type: "button"
+  }) }}
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% if errorSummary.length %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errorSummary
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <a href="/courts/{{ courtId }}/edit" class="govuk-back-link">Back</a>
+
+      <h1 class="govuk-heading-l">Information for professionals</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/information-for-professionals/success" novalidate>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Court Types and Codes</h2>
+        <p class="govuk-body govuk-!-margin-bottom-2">
+          Please select the type of court you wish to provide a code for.
+        </p>
+
+        {{ govukWarningText({
+          classes: "govuk-!-margin-bottom-2",
+          text: "If you have set up local authority config, and you remove the court type of 'Family court' here, this will remove the local authority config and will effect search results"
+        }) }}
+
+        {% set courtTypeItems = [] %}
+        {% for option in courtTypeOptions %}
+          {% set isSelected = option.value in selectedCourtTypes %}
+          {% set courtTypeItems = (courtTypeItems.push({
+            value: option.value,
+            text: option.label,
+            checked: isSelected,
+            conditional: {
+              html: govukInput({
+                label: {
+                  text: option.codeLabel
+                },
+                classes: "govuk-input--width-10",
+                id: option.codeField,
+                name: option.codeField,
+                value: selectedCourtTypeCodes[option.codeField],
+                errorMessage: {
+                  text: fieldErrors[option.codeField]
+                } if fieldErrors[option.codeField] else null
+              })
+            }
+          }), courtTypeItems) %}
+        {% endfor %}
+
+        {{ govukCheckboxes({
+          name: "courtTypes",
+          fieldset: {
+            legend: {
+              text: "Court Types and Codes",
+              classes: "govuk-!-margin-bottom-1"
+            }
+          },
+          items: courtTypeItems
+        }) }}
+
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Gbs code</h2>
+        {{ govukInput({
+          label: {
+            text: "Gbs code",
+            classes: "govuk-!-margin-bottom-1"
+          },
+          hint: {
+            text: "Please enter the Gbs code you wish to display."
+          },
+          classes: "govuk-input--width-20",
+          id: "gbs",
+          name: "gbs",
+          value: gbs
+        }) }}
+
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes</h2>
+        {{ repeatableSection(
+          "dxCode",
+          "DX code",
+          dxCodes,
+          "Add another DX code",
+          "Remove DX code",
+          "DX code",
+          "Explanation",
+          "Please enter the DX code you wish to display.",
+          "Enter the explanation text for this DX code."
+        ) }}
+
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Fax numbers</h2>
+        {{ repeatableSection(
+          "faxNumber",
+          "Fax number",
+          faxNumbers,
+          "Add another Fax number",
+          "Remove Fax number",
+          "Fax number",
+          "Description",
+          "",
+          ""
+        ) }}
+
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Facilities</h2>
+        {{ govukRadios({
+          idPrefix: "interviewRooms",
+          name: "interviewRooms",
+          fieldset: {
+            legend: {
+              text: "Does this location have any interview rooms?",
+              classes: "govuk-!-margin-bottom-1"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: interviewRooms === true,
+              conditional: {
+                html: '<fieldset class="govuk-fieldset">' +
+                  '<legend class="govuk-fieldset__legend govuk-!-margin-bottom-1">Enter the amount</legend>' +
+                  govukInput({
+                    label: {
+                      text: "Enter the amount",
+                      classes: "govuk-!-margin-bottom-1"
+                    },
+                    classes: "govuk-input--width-10",
+                    id: "interviewRoomCount",
+                    name: "interviewRoomCount",
+                    value: interviewRoomCount,
+                    errorMessage: {
+                      text: fieldErrors.interviewRoomCount
+                    } if fieldErrors.interviewRoomCount else null
+                  }) +
+                  govukInput({
+                    label: {
+                      text: "Phone number to book it",
+                      classes: "govuk-!-margin-bottom-1"
+                    },
+                    classes: "govuk-input--width-20",
+                    id: "interviewPhoneNumber",
+                    name: "interviewPhoneNumber",
+                    value: interviewPhoneNumber
+                  }) +
+                  '</fieldset>'
+              }
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: interviewRooms === false
+            }
+          ]
+        }) }}
+
+        {{ govukRadios({
+          idPrefix: "videoHearings",
+          name: "videoHearings",
+          fieldset: {
+            legend: {
+              text: "Does this location provide video hearing facilities?",
+              classes: "govuk-!-margin-bottom-1"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: videoHearings === true
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: videoHearings === false
+            }
+          ]
+        }) }}
+
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Professional schemes</h2>
+        {{ govukRadios({
+          idPrefix: "commonPlatform",
+          name: "commonPlatform",
+          fieldset: {
+            legend: {
+              text: "Does this location participate in the HMCTS common platform scheme?",
+              classes: "govuk-!-margin-bottom-1"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: commonPlatform === true
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: commonPlatform === false
+            }
+          ]
+        }) }}
+
+        {{ govukRadios({
+          idPrefix: "accessScheme",
+          name: "accessScheme",
+          fieldset: {
+            legend: {
+              text: "Does this location participate in the professional users' court and tribunal access scheme?",
+              classes: "govuk-!-margin-bottom-1"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: accessScheme === true
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: accessScheme === false
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

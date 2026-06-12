@@ -1519,7 +1519,7 @@ describe('DataApiRequests', () => {
           explanation: null,
         },
       ],
-      faxNumber: [
+      faxNumbers: [
         {
           faxNumber: '020 0000 0000',
           description: 'Main fax',
@@ -1530,6 +1530,58 @@ describe('DataApiRequests', () => {
     getStub.withArgs(`/courts/${courtId}/v1/professional-information`).resolves({ data: professionalInformation });
 
     const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+
+    expect(response).toEqual(professionalInformation);
+  });
+
+  it('returns null when court professional information endpoint returns no content', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+
+    getStub.withArgs(`/courts/${courtId}/v1/professional-information`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+
+    expect(response).toBeNull();
+  });
+
+  it('posts court professional information', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+    const professionalInformation = {
+      professionalInformation: {
+        interviewRooms: true,
+        videoHearings: true,
+        commonPlatform: false,
+        accessScheme: true,
+        interviewRoomCount: 3,
+        interviewPhoneNumber: '01234 567890',
+      },
+      codes: {
+        countyCourtCode: 101,
+        crownCourtCode: null,
+        familyCourtCode: 202,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [
+        {
+          dxCode: 'DX 999',
+          explanation: null,
+        },
+      ],
+      faxNumbers: [
+        {
+          faxNumber: '020 0000 0000',
+          description: 'Main fax',
+        },
+      ],
+    };
+
+    postStub
+      .withArgs(`/courts/${courtId}/v1/professional-information`, professionalInformation)
+      .resolves({ data: professionalInformation });
+
+    const response = await dataApiRequests.saveCourtProfessionalInformation(courtId, professionalInformation);
 
     expect(response).toEqual(professionalInformation);
   });
