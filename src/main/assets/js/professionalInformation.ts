@@ -114,6 +114,7 @@ function buildInput(namePrefix: string, index: number, labelText: string, hintTe
   formGroup.className = 'govuk-form-group';
 
   const id = `${namePrefix}-${index}`;
+  const hintId = `${id}-hint`;
   const label = document.createElement('label');
   label.className = 'govuk-label govuk-!-margin-bottom-1';
   label.htmlFor = id;
@@ -123,7 +124,7 @@ function buildInput(namePrefix: string, index: number, labelText: string, hintTe
   if (hintText) {
     const hint = document.createElement('div');
     hint.className = 'govuk-hint';
-    hint.id = `${id}-hint`;
+    hint.id = hintId;
     hint.textContent = hintText;
     formGroup.append(hint);
   }
@@ -133,6 +134,9 @@ function buildInput(namePrefix: string, index: number, labelText: string, hintTe
   input.id = id;
   input.name = id;
   input.type = 'text';
+  if (hintText) {
+    input.setAttribute('aria-describedby', hintId);
+  }
   formGroup.append(input);
 
   return formGroup;
@@ -179,6 +183,14 @@ function updateInput(item: HTMLElement, namePrefix: string, index: number): void
   input.id = id;
   input.name = id;
   item.querySelector<HTMLLabelElement>(`label[for^="${namePrefix}-"]`)?.setAttribute('for', id);
+
+  const hint = input.closest('.govuk-form-group')?.querySelector<HTMLElement>('.govuk-hint');
+  if (hint) {
+    hint.id = `${id}-hint`;
+    input.setAttribute('aria-describedby', hint.id);
+  } else {
+    input.removeAttribute('aria-describedby');
+  }
 }
 
 function updateRepeatableControls(button: HTMLButtonElement): void {

@@ -5,7 +5,6 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% from "macros/back-link.njk" import goBack %}
 
 {% macro repeatableSection(type, heading, entries, addButtonText, removeButtonText, firstLabel, secondLabel, firstHint, secondHint) %}
   <div data-professional-information-list="{{ type }}" data-professional-information-max="5">
@@ -83,7 +82,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      {{ goBack("/courts/" + courtId + "/edit") }}
+      <a href="/courts/{{ courtId }}/edit" class="govuk-back-link">Back</a>
 
       <h1 class="govuk-heading-l">Information for professionals</h1>
 
