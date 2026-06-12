@@ -1,0 +1,91 @@
+import { GET, POST, route } from 'awilix-express';
+import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
+
+import { BuildingFacilitiesService, FacilityModel } from '../services/BuildingFacilitiesService';
+import { addFoodAndDrink, isUuid, mapFoodAndDrink } from '../utils/valueParsers';
+
+const buildingFacilitiesService = new BuildingFacilitiesService();
+@route('/courts/:courtId/edit/building-facilities')
+export default class BuildingFacilitiesController {
+  @GET()
+  public async renderEditView(req: Request, res: Response): Promise<void> {
+    const { courtId } = req.params;
+    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
+    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
+      res.status(HttpStatusCode.NotFound);
+      return res.render('court-not-found');
+    }
+
+    const model = await buildingFacilitiesService.retrieve(resolvedCourtId);
+
+    if (model === HttpStatusCode.NotFound) {
+      res.status(HttpStatusCode.NotFound);
+      return res.render('court-not-found');
+    }
+    if (typeof model === 'number') {
+      res.status(model);
+      return res.render('error');
+    }
+    const result = addFoodAndDrink(model);
+    res.render('building-facilities-edit', {
+      courtId: resolvedCourtId,
+      model: result,
+      pageTitle: `Building Facilities - ${model.name}`,
+    });
+  }
+
+  @route('/success')
+  @POST()
+  public async updateCourt(req: Request, res: Response): Promise<void> {
+    const { courtId } = req.params;
+    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
+    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
+      res.status(HttpStatusCode.NotFound);
+      return res.render('court-not-found');
+    }
+
+    const { parking, foodAndDrink, waitingArea, quietRoom, babyChanging, wifi, waitingAreaChildren } =
+      req.body as Partial<FacilityModel>;
+    const { freeWaterDispensers, snackVendingMachines, drinkVendingMachines, cafeteria } =
+      mapFoodAndDrink(foodAndDrink);
+    const model = {
+      courtId: resolvedCourtId,
+      parking,
+      freeWaterDispensers,
+      snackVendingMachines,
+      drinkVendingMachines,
+      cafeteria,
+      waitingArea,
+      quietRoom,
+      waitingAreaChildren,
+      babyChanging,
+      wifi,
+    };
+    const updateResponse = await buildingFacilitiesService.save(resolvedCourtId, model);
+    if (updateResponse === HttpStatusCode.NotFound) {
+      res.status(HttpStatusCode.NotFound);
+      return res.render('court-not-found');
+    }
+
+    if (typeof updateResponse === 'number') {
+      res.status(updateResponse);
+      return res.render('error');
+    }
+
+    if (updateResponse.errors) {
+      res.render('building-facilities-edit', {
+        courtId: resolvedCourtId,
+        model: updateResponse as FacilityModel,
+        pageTitle: `Error: Building Facilities - ${updateResponse.name}`,
+      });
+      return;
+    }
+
+    res.render('building-facilities-edit-success', {
+      courtId: resolvedCourtId,
+      // prefer the court name from the updated model
+      courtName: updateResponse.name,
+    });
+  }
+}

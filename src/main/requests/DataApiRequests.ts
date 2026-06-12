@@ -8,6 +8,7 @@ import {
   areaOfLawListSchema,
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
+import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
@@ -26,6 +27,7 @@ import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetCourtsParams } from './types/GetCourtsParams';
+import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
 
 const logger = Logger.getLogger('app');
@@ -424,6 +426,45 @@ export class DataApiRequests {
       return userSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error creating/updating user with SSO ID ${user.ssoId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+  /**
+   * Request to data API to get court facilities by court id
+   */
+  public async getBuildingFacilities(courtId: string): Promise<BuildingFacilities | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/building-facilities`);
+
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
+
+      return BuildingFacilitiesSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court facilities for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update court facilities by court id
+   */
+
+  public async updateBuildingFacilities(
+    courtId: string,
+    payload: UpdateBuildingFacilitiesRequest
+  ): Promise<BuildingFacilities | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/building-facilities`, payload);
+      return BuildingFacilitiesSchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error(`Error update court facilities for id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
