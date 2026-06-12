@@ -109,8 +109,9 @@ test.describe('Cases Heard Page Tests', () => {
           `You are removing the cases heard type of ${removedCaseTypeName}.`
         );
         await expect(casesHeardPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
-        await expect(casesHeardPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
-          'href',
+        await expect(casesHeardPage.page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+        await expect(casesHeardPage.page.locator('#cancel_form')).toHaveAttribute(
+          'action',
           `/courts/${createdCourt.id}/edit/cases-heard`
         );
 

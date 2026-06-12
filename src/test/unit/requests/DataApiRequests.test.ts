@@ -546,8 +546,23 @@ describe('DataApiRequests', () => {
             lat: 51.501,
             lon: -0.141,
             addressType: 'VISIT_US',
-            areasOfLaw: [],
-            courtTypes: [],
+            areasOfLaw: [
+              {
+                id: '67676767-6666-7666-7666-666666666666',
+                name: 'Divorce',
+                nameCy: 'Ysgariad',
+                externalLink: null,
+                externalLinkCy: null,
+                displayName: null,
+                displayNameCy: null,
+              },
+            ],
+            courtTypes: [
+              {
+                id: '77777777-7777-4777-8777-777777777777',
+                name: 'Crown Court',
+              },
+            ],
           },
         ],
         courtOpeningHours: [
