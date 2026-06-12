@@ -80,3 +80,32 @@
 .cases-heard-checkboxes .govuk-checkboxes__item:last-child {
   margin-bottom: 0;
 }
+
+.hods-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.hods-loading-spinner__spinner {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 25px;
+  border: 8px solid govuk-frontend.govuk-colour('mid-grey');
+  border-top-color: govuk-frontend.govuk-colour('blue');
+  border-radius: 50%;
+  animation: hods-loading-spinner 1s linear infinite;
+}
+
+.hods-loading-spinner__content .govuk-heading-m {
+  margin-bottom: 0;
+}
+
+@keyframes hods-loading-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}

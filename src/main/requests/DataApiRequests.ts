@@ -98,6 +98,10 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/slug/${courtSlug}/entity/v1`);
       return courtEntitySchema.parse(response.data);
     } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound) {
+        return HttpStatusCode.NotFound;
+      }
+
       logger.error(`Error fetching court details for slug ${courtSlug}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
@@ -117,6 +121,26 @@ export class DataApiRequests {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
       logger.error(`Error update court details for id ${court.id}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create a court
+   */
+  public async createCourt(
+    court: Pick<CourtEntity, 'isServiceCentre' | 'name' | 'open' | 'regionId'>
+  ): Promise<CourtEntity | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post('/courts/v1', court);
+      return courtEntitySchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error creating court:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

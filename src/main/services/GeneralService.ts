@@ -5,7 +5,11 @@ import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
 import { toSlugFormat } from '../utils/valueParsers';
 
-export type GeneralViewModel = Partial<CourtEntity> & { errors?: Record<string, string[]>; regions?: Region[] };
+export type GeneralViewModel = Partial<CourtEntity> & {
+  errors?: Record<string, string[]>;
+  originalName?: string;
+  regions?: Region[];
+};
 
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
@@ -32,6 +36,7 @@ export class GeneralService {
     if (typeof courtEntity === 'number') {
       return courtEntity;
     }
+    const originalName = courtEntity.name;
 
     // overlay our specific changes
     courtEntity.name = model.name as string;
@@ -41,7 +46,7 @@ export class GeneralService {
     // validate for obvious errors
     const validationErrors = this.validateCourtEntity(model);
     if (validationErrors) {
-      return { ...courtEntity, errors: validationErrors };
+      return { ...courtEntity, errors: validationErrors, originalName };
     }
 
     // ensure that if we already have a court with this slug, that it's this court
@@ -87,7 +92,7 @@ export class GeneralService {
     if (!model.name || model.name.trim().length === 0) {
       nameErrors.push('Enter a name for the court');
     } else if (model.name.length < 5 || model.name.length > 200) {
-      nameErrors.push('Court name should be between 5 and 200 chars');
+      nameErrors.push('Court name should be between 5 and 200 characters');
     }
     // if it's been specified, regardless of other errors, ensure it's content is valid
     if (model.name && !VALID_COURT_NAME_REGEX.test(model.name)) {

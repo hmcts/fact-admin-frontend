@@ -194,6 +194,7 @@ describe('CourtAddressController', () => {
     const saveResponse = {
       status: 'saved' as const,
       courtName: 'Reading Crown Court',
+      courtOpened: true,
       address: buildAddress({
         id: null,
         addressLine1: '10 Kings Road',
@@ -206,6 +207,7 @@ describe('CourtAddressController', () => {
       courtName: 'Reading Crown Court',
       address: saveResponse.address,
       courtId: COURT_ID,
+      courtOpened: true,
     });
 
     try {
@@ -616,6 +618,7 @@ describe('CourtAddressController', () => {
     const saveResponse = {
       status: 'saved' as const,
       courtName: 'Reading Crown Court',
+      courtOpened: false,
       address: buildAddress({ addressLine1: 'Updated line 1' }),
     };
 
@@ -625,6 +628,7 @@ describe('CourtAddressController', () => {
       courtName: 'Reading Crown Court',
       address: saveResponse.address,
       courtId: COURT_ID,
+      courtOpened: false,
     });
 
     try {
