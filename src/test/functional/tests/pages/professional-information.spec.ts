@@ -41,7 +41,7 @@ test.describe('Information for Professionals Page Tests', () => {
         await professionalInformationPage.expectVisibleElements();
         await expect(professionalInformationPage.heading).toContainText('Information for professionals');
         await expect(professionalInformationPage.mainContent.content).toContainText('Court Types and Codes');
-        await expect(professionalInformationPage.mainContent.content).toContainText('Gbs code');
+        await expect(professionalInformationPage.mainContent.content).toContainText('GBS code');
         await expect(professionalInformationPage.mainContent.content).toContainText('DX codes');
         await expect(professionalInformationPage.mainContent.content).toContainText('Fax numbers');
         await expect(professionalInformationPage.mainContent.content).toContainText('Facilities');
@@ -51,7 +51,7 @@ test.describe('Information for Professionals Page Tests', () => {
           "If you have set up local authority config, and you remove the court type of 'Family court' here"
         );
         await expect(professionalInformationPage.saveButton).toBeVisible();
-        await expect(professionalInformationPage.backLink).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
+        await expect(professionalInformationPage.backLink).toHaveCount(0);
       }
     );
   });
@@ -300,10 +300,24 @@ test.describe('Information for Professionals Page Tests', () => {
           'You are removing the court type of Family court.'
         );
         await expect(professionalInformationPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
-        await expect(professionalInformationPage.page.getByRole('link', { name: 'Go back' })).toHaveAttribute(
-          'href',
+        await expect(professionalInformationPage.page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+        await expect(professionalInformationPage.page.locator('#cancel_form')).toHaveAttribute('method', 'GET');
+        await expect(professionalInformationPage.page.locator('#cancel_form')).toHaveAttribute(
+          'action',
           `/courts/${createdCourt.id}/edit/information-for-professionals`
         );
+        await expect(professionalInformationPage.page.getByRole('button', { name: 'Cancel' })).toHaveClass(
+          /govuk-button--secondary/
+        );
+        await expect(professionalInformationPage.page.locator('.govuk-back-link')).toHaveCount(0);
+
+        await professionalInformationPage.page.getByRole('button', { name: 'Cancel' }).click();
+        await expect(professionalInformationPage.page).toHaveURL(
+          professionalInformationPage.buildProfessionalInformationUrl(createdCourt.id)
+        );
+
+        await professionalInformationPage.deselectCourtType('Family court');
+        await professionalInformationPage.save();
 
         await professionalInformationPage.page.getByRole('button', { name: 'Continue' }).click();
 

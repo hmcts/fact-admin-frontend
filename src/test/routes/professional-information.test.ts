@@ -43,7 +43,7 @@ describe('Information for professionals page', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Information for professionals');
     expect(response.text).toContain('Court Types and Codes');
-    expect(response.text).toContain(`href="/courts/${courtId}/edit"`);
+    expect(response.text).not.toContain('govuk-back-link');
     expect(response.text).toContain('value="family" checked');
     expect(response.text).toContain('value="123"');
     expect(response.text).toContain('value="456"');
@@ -365,6 +365,12 @@ describe('Information for professionals page', () => {
     expect(response.text).toContain(
       'You are removing the court type of Family court. This is being used by the local authorities admin page.'
     );
+    expect(response.text).toContain(
+      `<form id="cancel_form" method="GET" action="/courts/${courtId}/edit/information-for-professionals">`
+    );
+    expect(response.text).toContain('Cancel');
+    expect(response.text).toContain('govuk-button--secondary');
+    expect(response.text).not.toContain('govuk-back-link');
     expect(response.text).toContain('name="confirmFamilyCourtRemoval" value="true"');
     expect(response.text).toContain('name="courtTypes" value="crown"');
     expect(saveStub.notCalled).toBe(true);

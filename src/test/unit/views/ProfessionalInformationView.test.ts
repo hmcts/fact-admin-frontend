@@ -34,7 +34,7 @@ describe('Professional Information View', () => {
     });
 
     expect(html).toContain('Information for professionals');
-    expect(html).toContain('Back');
+    expect(html).not.toContain('govuk-back-link');
     expect(html).toContain('Please select the type of court you wish to provide a code for');
     expect(html).toContain('Court Types and Codes');
     expect(html).toContain(
@@ -42,7 +42,7 @@ describe('Professional Information View', () => {
     );
     expect(html).toContain('Family court');
     expect(html).toContain('Family court code');
-    expect(html).toContain('Gbs code');
+    expect(html).toContain('GBS code');
     expect(html).toContain('DX code');
     expect(html).toContain('Explanation');
     expect(html).toContain('Add another DX code');

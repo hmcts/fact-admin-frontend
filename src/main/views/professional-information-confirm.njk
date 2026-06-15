@@ -6,10 +6,6 @@
   Information for professionals confirm update - {{ courtName }}
 {% endblock %}
 
-{% block beforeContent %}
-  <a href="/courts/{{ courtId }}/edit/information-for-professionals" class="govuk-back-link">Go back</a>
-{% endblock %}
-
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -36,6 +32,13 @@
         {{ govukButton({
           text: "Continue",
           classes: "govuk-button--warning"
+        }) }}
+      </form>
+
+      <form id="cancel_form" method="GET" action="/courts/{{ courtId }}/edit/information-for-professionals">
+        {{ govukButton({
+          text: "Cancel",
+          classes: "govuk-button--secondary"
         }) }}
       </form>
     </div>

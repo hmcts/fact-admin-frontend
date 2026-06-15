@@ -1,3 +1,5 @@
+// Enhances the Information for professionals page repeatable DX code and fax number fields.
+// Server-rendered names are preserved so validation and save handling continue to use the same payload shape.
 type RepeatableType = 'dxCode' | 'faxNumber';
 
 type RepeatableFieldName = 'dxCode' | 'dxCodeDescription' | 'faxNumber' | 'faxNumberDescription';

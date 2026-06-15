@@ -85,16 +85,10 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <a href="/courts/{{ courtId }}/edit" class="govuk-back-link">Back</a>
-
       <h1 class="govuk-heading-l">Information for professionals</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/information-for-professionals/success" novalidate>
         <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Court Types and Codes</h2>
-        <p class="govuk-body govuk-!-margin-bottom-2">
-          Please select the type of court you wish to provide a code for.
-        </p>
-
         {{ govukWarningText({
           classes: "govuk-!-margin-bottom-2",
           text: "If you have set up local authority config, and you remove the court type of 'Family court' here, this will remove the local authority config and will effect search results"
@@ -129,20 +123,23 @@
           fieldset: {
             legend: {
               text: "Court Types and Codes",
-              classes: "govuk-!-margin-bottom-1"
+              classes: "govuk-visually-hidden"
             }
+          },
+          hint: {
+            text: "Please select the type of court you wish to provide a code for."
           },
           items: courtTypeItems
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Gbs code</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code</h2>
         {{ govukInput({
           label: {
-            text: "Gbs code",
-            classes: "govuk-!-margin-bottom-1"
+            text: "GBS code",
+            classes: "govuk-visually-hidden"
           },
           hint: {
-            text: "Please enter the Gbs code you wish to display."
+            text: "Please enter the GBS code you wish to display."
           },
           classes: "govuk-input--width-20",
           id: "gbs",
@@ -203,7 +200,7 @@
                   govukInput({
                     label: {
                       text: "Enter the amount",
-                      classes: "govuk-!-margin-bottom-1"
+                      classes: "govuk-visually-hidden"
                     },
                     classes: "govuk-input--width-10",
                     id: "interviewRoomCount",
