@@ -465,9 +465,7 @@ export class DataApiRequests {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
       logger.error(`Error update court facilities for id ${courtId}:`, error);
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
 }

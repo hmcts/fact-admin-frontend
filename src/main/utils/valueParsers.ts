@@ -34,7 +34,8 @@ type FoodDrinkBooleans = Record<FoodDrinkOption, boolean | null>;
 export const mapFoodAndDrink = (
   foodAndDrink: FoodDrinkOption | FoodDrinkOption[] | null | undefined
 ): FoodDrinkBooleans => {
-  const list = Array.isArray(foodAndDrink) ? foodAndDrink : foodAndDrink ? [foodAndDrink] : [];
+  const mapToArray = item => (item ? [item] : []);
+  const list = Array.isArray(foodAndDrink) ? foodAndDrink : mapToArray(foodAndDrink);
   const selected = new Set(list);
   return FOOD_DRINK_OPTIONS.reduce(
     (result, option) => ({

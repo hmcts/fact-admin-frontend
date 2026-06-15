@@ -1,4 +1,4 @@
-import { addFoodAndDrink, mapFoodAndDrink } from '../../../main/utils/valueParsers';
+import { addFoodAndDrink, mapFoodAndDrink, parseBoolean } from '../../../main/utils/valueParsers';
 
 describe('valueParsers', () => {
   describe('mapFoodAndDrink', () => {
@@ -65,6 +65,26 @@ describe('valueParsers', () => {
       });
 
       expect(result.foodAndDrink).toEqual([]);
+    });
+  });
+
+  describe('parseBoolean', () => {
+    test('returns true for boolean true and string "true"', () => {
+      expect(parseBoolean(true)).toBe(true);
+      expect(parseBoolean('true')).toBe(true);
+    });
+
+    test('returns false for boolean false and string "false"', () => {
+      expect(parseBoolean(false)).toBe(false);
+      expect(parseBoolean('false')).toBe(false);
+    });
+
+    test('returns undefined for unsupported values', () => {
+      expect(parseBoolean('TRUE')).toBeUndefined();
+      expect(parseBoolean('yes')).toBeUndefined();
+      expect(parseBoolean(1)).toBeUndefined();
+      expect(parseBoolean(undefined)).toBeUndefined();
+      expect(parseBoolean(null)).toBeUndefined();
     });
   });
 });

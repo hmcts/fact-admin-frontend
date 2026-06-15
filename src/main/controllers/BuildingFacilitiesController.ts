@@ -76,7 +76,7 @@ export default class BuildingFacilitiesController {
     if (updateResponse.errors) {
       res.render('building-facilities-edit', {
         courtId: resolvedCourtId,
-        model: addFoodAndDrink(updateResponse) as FacilityModel,
+        model: addFoodAndDrink(updateResponse),
         pageTitle: `Error: Building Facilities - ${updateResponse.name}`,
       });
       return;
