@@ -262,8 +262,12 @@ function updateRemoveButton(item: HTMLElement, config: RepeatableConfig, index: 
 function updateRepeatableControls(list: HTMLElement, button: HTMLButtonElement): void {
   const atMax = getRepeatableItems(list).length >= getMaxItems(list);
   button.hidden = atMax;
-  button.classList.remove('govuk-!-display-none');
-  button.removeAttribute('aria-hidden');
+  button.classList.toggle('govuk-!-display-none', atMax);
+  if (atMax) {
+    button.setAttribute('aria-hidden', 'true');
+  } else {
+    button.removeAttribute('aria-hidden');
+  }
 }
 
 function findInput(item: HTMLElement, field: RepeatableFieldConfig): HTMLInputElement | null {

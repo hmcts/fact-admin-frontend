@@ -245,8 +245,8 @@ describe('professionalInformation repeatable fields', () => {
 
     expect(mockDom.list.querySelectorAll('[data-professional-information-item]')).toHaveLength(5);
     expect(mockDom.addButton.hidden).toBe(true);
-    expect(mockDom.addButton.attributes['aria-hidden']).toBeUndefined();
-    expect(mockDom.addButton.className).not.toContain('govuk-!-display-none');
+    expect(mockDom.addButton.attributes['aria-hidden']).toBe('true');
+    expect(mockDom.addButton.className).toContain('govuk-!-display-none');
   });
 
   test('removes repeatable rows and reindexes remaining controls', () => {
