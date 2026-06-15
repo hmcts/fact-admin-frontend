@@ -37,8 +37,10 @@ class MockElement {
   public readonly listeners: Record<string, Listener> = {};
   public readonly style: Record<string, string> = {};
   public attributes: Record<string, string> = {};
+  public body?: MockElement;
   public className = '';
   public createElement?: (tagName: string) => MockElement;
+  public documentElement?: MockElement;
   public hidden = false;
   public htmlFor = '';
   public id = '';
@@ -215,9 +217,11 @@ function buildDocument(): {
 
 describe('professionalInformation repeatable fields', () => {
   const originalDocument = globalThis.document;
+  const originalMutationObserver = globalThis.MutationObserver;
 
   afterEach(() => {
     jest.restoreAllMocks();
+    (globalThis as { MutationObserver: typeof MutationObserver }).MutationObserver = originalMutationObserver;
 
     if (originalDocument === undefined) {
       delete (globalThis as { document?: Document }).document;
@@ -287,22 +291,45 @@ describe('professionalInformation repeatable fields', () => {
 
   test('removes unsupported aria-expanded from conditional radio inputs', () => {
     const mockDom = buildDocument();
+    const body = new MockElement('body');
+    let mutationCallback: MutationCallback | undefined;
+    const observe = jest.fn();
     const radio = new MockElement('input');
     radio.type = 'radio';
     radio.setAttribute('aria-expanded', 'true');
+    mockDom.document.body = body;
     mockDom.document.append(radio);
     mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
     (globalThis as { document: Document }).document = mockDom.document as never;
+    (globalThis as { MutationObserver: typeof MutationObserver }).MutationObserver = class {
+      public constructor(callback: MutationCallback) {
+        mutationCallback = callback;
+      }
+
+      public observe = observe;
+      public disconnect = jest.fn();
+      public takeRecords = jest.fn().mockReturnValue([]);
+    } as never;
 
     initProfessionalInformationRepeatableFields();
 
     expect(radio.attributes['aria-expanded']).toBeUndefined();
-
-    radio.setAttribute('aria-expanded', 'false');
-    mockDom.document.listeners.change({
-      currentTarget: mockDom.document,
-      target: radio,
+    expect(observe).toHaveBeenCalledWith(body, {
+      attributeFilter: ['aria-expanded'],
+      attributes: true,
+      subtree: true,
     });
+
+    radio.setAttribute('aria-expanded', 'true');
+    mutationCallback?.(
+      [
+        {
+          attributeName: 'aria-expanded',
+          type: 'attributes',
+        } as MutationRecord,
+      ],
+      {} as MutationObserver
+    );
 
     expect(radio.attributes['aria-expanded']).toBeUndefined();
   });

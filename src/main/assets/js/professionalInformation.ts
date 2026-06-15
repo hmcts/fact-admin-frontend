@@ -22,6 +22,7 @@ const itemSelector = '[data-professional-information-item]';
 const listSelector = '[data-professional-information-list]';
 const conditionalRadioSelector = 'input[type="radio"][aria-expanded]';
 const removeButtonSelector = '[data-professional-information-remove]';
+let unsupportedConditionalRadioObserverInitialised = false;
 
 const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } = {
   dxCode: {
@@ -59,6 +60,7 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
 export function initProfessionalInformationRepeatableFields(): void {
   removeUnsupportedConditionalRadioAria();
   document.addEventListener('change', removeUnsupportedConditionalRadioAria);
+  observeUnsupportedConditionalRadioAria();
 
   const lists = Array.from(document.querySelectorAll<HTMLElement>(listSelector));
   const listCounts = countRepeatableLists(lists);
@@ -80,6 +82,25 @@ function removeUnsupportedConditionalRadioAria(): void {
   document
     .querySelectorAll<HTMLInputElement>(conditionalRadioSelector)
     .forEach(radio => radio.removeAttribute('aria-expanded'));
+}
+
+function observeUnsupportedConditionalRadioAria(): void {
+  const target = document.body ?? document.documentElement;
+  if (unsupportedConditionalRadioObserverInitialised || !target || typeof MutationObserver === 'undefined') {
+    return;
+  }
+
+  new MutationObserver(mutations => {
+    if (mutations.some(mutation => mutation.type === 'attributes' && mutation.attributeName === 'aria-expanded')) {
+      removeUnsupportedConditionalRadioAria();
+    }
+  }).observe(target, {
+    attributeFilter: ['aria-expanded'],
+    attributes: true,
+    subtree: true,
+  });
+
+  unsupportedConditionalRadioObserverInitialised = true;
 }
 
 function initialiseRepeatableList(list: HTMLElement, type: RepeatableType, duplicateIndex?: number): void {
