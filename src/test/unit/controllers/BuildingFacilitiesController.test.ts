@@ -22,6 +22,9 @@ jest.mock('../../../main/services/BuildingFacilitiesService', () => {
 
 jest.mock('../../../main/utils/valueParsers', () => ({
   isUuid: jest.fn(() => true),
+  parseBoolean: jest.fn(() => true),
+}));
+jest.mock('../../../main/utils/mapper', () => ({
   mapFoodAndDrink: jest.fn(() => ({
     freeWaterDispensers: false,
     snackVendingMachines: false,
@@ -29,7 +32,6 @@ jest.mock('../../../main/utils/valueParsers', () => ({
     cafeteria: false,
   })),
   addFoodAndDrink: jest.fn(m => m),
-  parseBoolean: jest.fn(() => true),
 }));
 
 const { __mocks: serviceMocks } = jest.requireMock('../../../main/services/BuildingFacilitiesService');
@@ -182,8 +184,14 @@ describe('BuildingFacilitiesController', () => {
       });
 
       expect(res.render).toHaveBeenCalledWith(
-        'building-facilities-edit-success',
-        expect.objectContaining({ courtId: req.params.courtId, courtName: 'Court A' })
+        'common-edit-success',
+        expect.objectContaining({
+          courtId: '11111111-1111-1111-1111-111111111111',
+          courtName: 'Court A',
+          pageTitle: 'Building Facilities saved - Court A',
+          successPanelBody: 'Building Facilities details saved for Court A have been saved successfully.',
+          successPanelTitle: 'Building Facilities details saved',
+        })
       );
     });
 

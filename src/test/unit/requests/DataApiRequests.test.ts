@@ -1705,4 +1705,128 @@ describe('DataApiRequests', () => {
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
+
+  it('returns parsed accessibility options when the response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const accessibility = {
+      id: '66666666-6666-4666-8666-666666666666',
+      courtId,
+      accessibleParking: true,
+      accessibleEntrance: true,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS',
+      lift: false,
+      quietRoom: true,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/accessibility-options`).resolves({
+      data: accessibility,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getAccessibility(courtId);
+
+    expect(response).toEqual(
+      expect.objectContaining({
+        id: accessibility.id,
+        courtId,
+        hearingEnhancementEquipment: 'infrared',
+      })
+    );
+  });
+
+  it('returns null when accessibility options do not exist for the court', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/accessibility-options`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await dataApiRequests.getAccessibility(courtId);
+
+    expect(response).toBeNull();
+  });
+
+  it('returns internal server error when accessibility response fails schema validation', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/accessibility-options`).resolves({
+      data: {
+        id: '66666666-6666-4666-8666-666666666666',
+        courtId,
+        hearingEnhancementEquipment: 'INVALID_ENUM',
+      },
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getAccessibility(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('posts accessibility payload and returns parsed response', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      accessibleParking: true,
+      accessibleEntrance: true,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS' as const,
+      lift: false,
+      quietRoom: true,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).resolves({
+      data: {
+        id: '66666666-6666-4666-8666-666666666666',
+        ...payload,
+      },
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+
+    expect(response).toEqual(
+      expect.objectContaining({
+        id: '66666666-6666-4666-8666-666666666666',
+        courtId,
+        hearingEnhancementEquipment: 'infrared',
+      })
+    );
+  });
+
+  it('returns validation errors map when update accessibility endpoint returns a 400', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS' as const,
+    };
+    const apiErrors = {
+      hearingEnhancementEquipment: 'Invalid value',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when update accessibility throws a non-axios error', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS' as const,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
 });

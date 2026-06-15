@@ -1,4 +1,5 @@
 export * from './page.fixtures';
+export { AccessibilityPage } from './accessibility.po';
 export { BuildingFacilitiesPage } from './building-facilities.po';
 export { PageSection } from './home.po';
 export { CourtAddressDeletePage } from './court-address-delete.po';
