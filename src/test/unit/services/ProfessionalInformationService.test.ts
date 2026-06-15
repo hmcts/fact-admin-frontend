@@ -267,6 +267,57 @@ describe('ProfessionalInformationService', () => {
     });
   });
 
+  test('maps API validation errors for every professional information field to form anchors', async () => {
+    const dataApiRequests = buildDataApiRequests({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['codes.countyCourtCode', 'County court code must be 10 characters or fewer'],
+          ['codes.gbs', 'GBS code must be 10 characters or fewer'],
+          ['dxCodes[0].dxCode', 'DX code must be 200 characters or fewer'],
+          ['dxCodes[0].explanation', 'Explanation must be 200 characters or fewer'],
+          ['faxNumbers[0].faxNumber', 'Fax number must be 200 characters or fewer'],
+          ['faxNumbers[0].description', 'Description must be 200 characters or fewer'],
+          ['professionalInformation.interviewPhoneNumber', 'Interview phone number must be 20 characters or fewer'],
+          ['professionalInformation.videoHearings', 'Video hearing facilities must be true or false'],
+          ['professionalInformation.commonPlatform', 'Common platform must be true or false'],
+          ['professionalInformation.accessScheme', 'Access scheme must be true or false'],
+        ])
+      ),
+    });
+
+    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {});
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          { href: '#countyCourtCode', text: 'County court code must be 10 characters or fewer' },
+          { href: '#gbs', text: 'GBS code must be 10 characters or fewer' },
+          { href: '#dxCode-0', text: 'DX code must be 200 characters or fewer' },
+          { href: '#dxCodeDescription-0', text: 'Explanation must be 200 characters or fewer' },
+          { href: '#faxNumber-0', text: 'Fax number must be 200 characters or fewer' },
+          { href: '#faxNumberDescription-0', text: 'Description must be 200 characters or fewer' },
+          { href: '#interviewPhoneNumber', text: 'Interview phone number must be 20 characters or fewer' },
+          { href: '#videoHearings', text: 'Video hearing facilities must be true or false' },
+          { href: '#commonPlatform', text: 'Common platform must be true or false' },
+          { href: '#accessScheme', text: 'Access scheme must be true or false' },
+        ],
+        fieldErrors: {
+          accessScheme: 'Access scheme must be true or false',
+          commonPlatform: 'Common platform must be true or false',
+          countyCourtCode: 'County court code must be 10 characters or fewer',
+          'dxCode-0': 'DX code must be 200 characters or fewer',
+          'dxCodeDescription-0': 'Explanation must be 200 characters or fewer',
+          'faxNumber-0': 'Fax number must be 200 characters or fewer',
+          'faxNumberDescription-0': 'Description must be 200 characters or fewer',
+          gbs: 'GBS code must be 10 characters or fewer',
+          interviewPhoneNumber: 'Interview phone number must be 20 characters or fewer',
+          videoHearings: 'Video hearing facilities must be true or false',
+        },
+      },
+    });
+  });
+
   test('returns status codes from save dependencies', async () => {
     await expect(
       new ProfessionalInformationService(

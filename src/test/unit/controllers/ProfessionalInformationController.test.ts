@@ -1,112 +1,141 @@
 import { HttpStatusCode } from 'axios';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { assert, mock, match as sinonMatch, stub } from 'sinon';
+import type { SinonStub } from 'sinon';
 
 import ProfessionalInformationController from '../../../main/controllers/ProfessionalInformationController';
 import { ProfessionalInformationService } from '../../../main/services/ProfessionalInformationService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
+const courtName = 'Reading Crown Court';
+
+type MockProfessionalInformationService = Pick<
+  ProfessionalInformationService,
+  'getViewModel' | 'requiresFamilyCourtRemovalConfirmation' | 'save'
+>;
+
+function buildService(
+  overrides: Partial<Record<keyof MockProfessionalInformationService, SinonStub>> = {}
+): MockProfessionalInformationService {
+  return {
+    getViewModel: overrides.getViewModel ?? stub(),
+    requiresFamilyCourtRemovalConfirmation: overrides.requiresFamilyCourtRemovalConfirmation ?? stub(),
+    save: overrides.save ?? stub(),
+  } as unknown as MockProfessionalInformationService;
+}
+
+function buildController(service = buildService()): ProfessionalInformationController {
+  return new ProfessionalInformationController(service as ProfessionalInformationService);
+}
+
+function buildResponse(): Response {
+  const response = {
+    render: () => '',
+    status: () => response,
+  } as unknown as Response;
+  return response;
+}
+
+function buildRequest(params: Request['params'], body: Request['body'] = {}): Request {
+  const request = mockRequest({});
+  request.params = params;
+  request.body = body;
+  return request;
+}
 
 describe('ProfessionalInformationController', () => {
   test('renders the professional information page', async () => {
-    const controller = new ProfessionalInformationController();
-    const response = {
-      render: () => '',
-    } as unknown as Response;
-    const request = mockRequest({});
-    request.params = { courtId };
-    const responseMock = mock(response);
     const viewModel = {
       courtId,
-      courtName: 'Reading Crown Court',
+      courtName,
     };
-    const getViewModelStub = stub(ProfessionalInformationService.prototype, 'getViewModel').resolves(
-      viewModel as never
-    );
+    const service = buildService({
+      getViewModel: stub().resolves(viewModel),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
 
     responseMock.expects('render').once().withArgs('professional-information', viewModel);
 
-    try {
-      await controller.get(request, response);
-      assert.calledWith(getViewModelStub, courtId);
-      responseMock.verify();
-    } finally {
-      getViewModelStub.restore();
-    }
+    await controller.get(buildRequest({ courtId }), response);
+
+    assert.calledWith(service.getViewModel as SinonStub, courtId);
+    responseMock.verify();
   });
 
-  test('renders court not found for invalid or missing court ids', async () => {
-    const controller = new ProfessionalInformationController();
-    const response = {
-      render: () => '',
-      status: () => response,
-    } as unknown as Response;
-    const request = mockRequest({});
-    request.params = { courtId: 'not-a-uuid' };
+  test.each([
+    ['missing', {}],
+    ['invalid', { courtId: 'not-a-uuid' }],
+  ])('renders court not found for %s court ids', async (_description, params) => {
+    const service = buildService();
+    const controller = buildController(service);
+    const response = buildResponse();
     const responseMock = mock(response);
-    const getViewModelStub = stub(ProfessionalInformationService.prototype, 'getViewModel');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
 
-    try {
-      await controller.get(request, response);
-      assert.notCalled(getViewModelStub);
-      responseMock.verify();
-    } finally {
-      getViewModelStub.restore();
-    }
+    await controller.get(buildRequest(params), response);
+
+    assert.notCalled(service.getViewModel as SinonStub);
+    responseMock.verify();
   });
 
-  test('renders court not found or error status while loading the page', async () => {
-    const controller = new ProfessionalInformationController();
+  test('resolves array court id params defensively', async () => {
+    const service = buildService({
+      getViewModel: stub().resolves({
+        courtId,
+        courtName,
+      }),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
 
-    for (const [statusCode, viewName] of [
-      [HttpStatusCode.NotFound, 'court-not-found'],
-      [HttpStatusCode.InternalServerError, 'error'],
-    ] as const) {
-      const response = {
-        render: () => '',
-        status: () => response,
-      } as unknown as Response;
-      const request = mockRequest({});
-      request.params = { courtId };
-      const responseMock = mock(response);
-      const getViewModelStub = stub(ProfessionalInformationService.prototype, 'getViewModel').resolves(statusCode);
+    responseMock.expects('render').once().withArgs('professional-information');
 
-      responseMock.expects('status').once().withArgs(statusCode).returns(response);
-      responseMock.expects('render').once().withArgs(viewName);
+    await controller.get(buildRequest({ courtId: [courtId] }), response);
 
-      try {
-        await controller.get(request, response);
-        responseMock.verify();
-      } finally {
-        getViewModelStub.restore();
-      }
-    }
+    assert.calledWith(service.getViewModel as SinonStub, courtId);
+    responseMock.verify();
+  });
+
+  test.each([
+    [HttpStatusCode.NotFound, 'court-not-found'],
+    [HttpStatusCode.InternalServerError, 'error'],
+  ])('renders %s from getViewModel as %s', async (statusCode, viewName) => {
+    const service = buildService({
+      getViewModel: stub().resolves(statusCode),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
+
+    responseMock.expects('status').once().withArgs(statusCode).returns(response);
+    responseMock.expects('render').once().withArgs(viewName);
+
+    await controller.get(buildRequest({ courtId }), response);
+
+    responseMock.verify();
   });
 
   test('renders confirmation before removing family court config', async () => {
-    const controller = new ProfessionalInformationController();
-    const response = {
-      render: () => '',
-    } as unknown as Response;
-    const request = mockRequest({});
-    request.params = { courtId };
-    request.body = {
+    const body = {
       courtTypes: ['crown'],
       crownCourtCode: '456',
     };
-    const responseMock = mock(response);
-    const confirmationStub = stub(
-      ProfessionalInformationService.prototype,
-      'requiresFamilyCourtRemovalConfirmation'
-    ).resolves({
-      courtName: 'Reading Crown Court',
-      required: true,
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub().resolves({
+        courtName,
+        required: true,
+      }),
+      save: stub(),
     });
-    const saveStub = stub(ProfessionalInformationService.prototype, 'save');
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
 
     responseMock
       .expects('render')
@@ -115,7 +144,7 @@ describe('ProfessionalInformationController', () => {
         'professional-information-confirm',
         sinonMatch({
           courtId,
-          courtName: 'Reading Crown Court',
+          courtName,
           hiddenInputs: [
             { name: 'courtTypes', value: 'crown' },
             { name: 'crownCourtCode', value: '456' },
@@ -124,132 +153,217 @@ describe('ProfessionalInformationController', () => {
         })
       );
 
-    try {
-      await controller.postSuccess(request, response);
-      assert.calledWith(confirmationStub, courtId, request.body);
-      assert.notCalled(saveStub);
-      responseMock.verify();
-    } finally {
-      confirmationStub.restore();
-      saveStub.restore();
-    }
+    await controller.postSuccess(buildRequest({ courtId }, body), response);
+
+    assert.calledWith(service.requiresFamilyCourtRemovalConfirmation as SinonStub, courtId, body);
+    assert.notCalled(service.save as SinonStub);
+    responseMock.verify();
   });
 
-  test('skips confirmation once confirmed and renders success after save', async () => {
-    const controller = new ProfessionalInformationController();
-    const response = {
-      render: () => '',
-    } as unknown as Response;
-    const request = mockRequest({});
-    request.params = { courtId: [courtId] };
-    request.body = {
-      confirmFamilyCourtRemoval: 'true',
-      courtTypes: ['crown'],
+  test('preserves scalar and array hidden inputs for the confirmation page', async () => {
+    const body = {
+      confirmFamilyCourtRemoval: 'false',
+      courtTypes: ['family', 'crown'],
+      crownCourtCode: '456',
+      nested: { ignored: true },
+      nullable: null,
+      undefinedValue: undefined,
     };
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub().resolves({
+        courtName,
+        required: true,
+      }),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
     const responseMock = mock(response);
-    const confirmationStub = stub(ProfessionalInformationService.prototype, 'requiresFamilyCourtRemovalConfirmation');
-    const saveStub = stub(ProfessionalInformationService.prototype, 'save').resolves({
-      status: 'saved',
-      viewModel: {
-        courtName: 'Reading Crown Court',
-      },
-    } as never);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'professional-information-confirm',
+        sinonMatch({
+          hiddenInputs: [
+            { name: 'courtTypes', value: 'family' },
+            { name: 'courtTypes', value: 'crown' },
+            { name: 'crownCourtCode', value: '456' },
+            { name: 'confirmFamilyCourtRemoval', value: 'true' },
+          ],
+        })
+      );
+
+    await controller.postSuccess(buildRequest({ courtId }, body), response);
+
+    responseMock.verify();
+  });
+
+  test('adds only confirmation hidden input when the body is missing', async () => {
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub().resolves({
+        courtName,
+        required: true,
+      }),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'professional-information-confirm',
+        sinonMatch({
+          hiddenInputs: [{ name: 'confirmFamilyCourtRemoval', value: 'true' }],
+        })
+      );
+
+    await controller.postSuccess(buildRequest({ courtId }, undefined), response);
+
+    responseMock.verify();
+  });
+
+  test('saves without confirmation when confirmation is not required', async () => {
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub().resolves({
+        courtName,
+        required: false,
+      }),
+      save: stub().resolves({
+        status: 'saved',
+        viewModel: {
+          courtName,
+        },
+      }),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
 
     responseMock.expects('render').once().withArgs('professional-information-success', {
       courtId,
-      courtName: 'Reading Crown Court',
+      courtName,
     });
 
-    try {
-      await controller.postSuccess(request, response);
-      assert.notCalled(confirmationStub);
-      assert.calledWith(saveStub, courtId, request.body);
-      responseMock.verify();
-    } finally {
-      confirmationStub.restore();
-      saveStub.restore();
-    }
+    await controller.postSuccess(buildRequest({ courtId }, { courtTypes: ['family'] }), response);
+
+    assert.calledOnce(service.requiresFamilyCourtRemovalConfirmation as SinonStub);
+    assert.calledOnce(service.save as SinonStub);
+    responseMock.verify();
   });
 
-  test('renders validation errors from save', async () => {
-    const controller = new ProfessionalInformationController();
-    const response = {
-      render: () => '',
-      status: () => response,
-    } as unknown as Response;
-    const request = mockRequest({});
-    request.params = { courtId };
-    request.body = {};
+  test('skips confirmation once confirmed and renders success after save', async () => {
+    const body = {
+      confirmFamilyCourtRemoval: 'true',
+      courtTypes: ['crown'],
+    };
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub(),
+      save: stub().resolves({
+        status: 'saved',
+        viewModel: {
+          courtName,
+        },
+      }),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
     const responseMock = mock(response);
+
+    responseMock.expects('render').once().withArgs('professional-information-success', {
+      courtId,
+      courtName,
+    });
+
+    await controller.postSuccess(buildRequest({ courtId: [courtId] }, body), response);
+
+    assert.notCalled(service.requiresFamilyCourtRemovalConfirmation as SinonStub);
+    assert.calledWith(service.save as SinonStub, courtId, body);
+    responseMock.verify();
+  });
+
+  test('still validates after confirmation has been accepted', async () => {
     const viewModel = {
       errorSummary: [{ href: '#dxCode-0', text: 'Enter a DX code' }],
     };
-    const confirmationStub = stub(
-      ProfessionalInformationService.prototype,
-      'requiresFamilyCourtRemovalConfirmation'
-    ).resolves({
-      courtName: 'Reading Crown Court',
-      required: false,
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub(),
+      save: stub().resolves({
+        status: 'validationError',
+        viewModel,
+      }),
     });
-    const saveStub = stub(ProfessionalInformationService.prototype, 'save').resolves({
-      status: 'validationError',
-      viewModel,
-    } as never);
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
     responseMock.expects('render').once().withArgs('professional-information', viewModel);
 
-    try {
-      await controller.postSuccess(request, response);
-      assert.calledOnce(confirmationStub);
-      assert.calledOnce(saveStub);
-      responseMock.verify();
-    } finally {
-      confirmationStub.restore();
-      saveStub.restore();
-    }
+    await controller.postSuccess(buildRequest({ courtId }, { confirmFamilyCourtRemoval: 'true' }), response);
+
+    assert.notCalled(service.requiresFamilyCourtRemovalConfirmation as SinonStub);
+    assert.calledOnce(service.save as SinonStub);
+    responseMock.verify();
   });
 
-  test('renders court not found and error statuses from confirmation and save', async () => {
-    const controller = new ProfessionalInformationController();
+  test('renders validation errors from save', async () => {
+    const viewModel = {
+      errorSummary: [{ href: '#dxCode-0', text: 'Enter a DX code' }],
+    };
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub().resolves({
+        courtName,
+        required: false,
+      }),
+      save: stub().resolves({
+        status: 'validationError',
+        viewModel,
+      }),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
 
-    for (const [serviceMethod, statusCode, viewName] of [
-      ['requiresFamilyCourtRemovalConfirmation', HttpStatusCode.NotFound, 'court-not-found'],
-      ['requiresFamilyCourtRemovalConfirmation', HttpStatusCode.InternalServerError, 'error'],
-      ['save', HttpStatusCode.NotFound, 'court-not-found'],
-      ['save', HttpStatusCode.InternalServerError, 'error'],
-    ] as const) {
-      const response = {
-        render: () => '',
-        status: () => response,
-      } as unknown as Response;
-      const request = mockRequest({});
-      request.params = { courtId };
-      request.body = serviceMethod === 'save' ? { confirmFamilyCourtRemoval: 'true' } : {};
-      const responseMock = mock(response);
-      const confirmationStub = stub(
-        ProfessionalInformationService.prototype,
-        'requiresFamilyCourtRemovalConfirmation'
-      ).resolves(
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
+    responseMock.expects('render').once().withArgs('professional-information', viewModel);
+
+    await controller.postSuccess(buildRequest({ courtId }), response);
+
+    assert.calledOnce(service.requiresFamilyCourtRemovalConfirmation as SinonStub);
+    assert.calledOnce(service.save as SinonStub);
+    responseMock.verify();
+  });
+
+  test.each([
+    ['requiresFamilyCourtRemovalConfirmation', HttpStatusCode.NotFound, 'court-not-found'],
+    ['requiresFamilyCourtRemovalConfirmation', HttpStatusCode.InternalServerError, 'error'],
+    ['save', HttpStatusCode.NotFound, 'court-not-found'],
+    ['save', HttpStatusCode.InternalServerError, 'error'],
+  ] as const)('renders %s status %s as %s', async (serviceMethod, statusCode, viewName) => {
+    const service = buildService({
+      requiresFamilyCourtRemovalConfirmation: stub().resolves(
         serviceMethod === 'requiresFamilyCourtRemovalConfirmation'
           ? statusCode
           : {
-              courtName: 'Reading Crown Court',
+              courtName,
               required: false,
             }
-      );
-      const saveStub = stub(ProfessionalInformationService.prototype, 'save').resolves(statusCode);
+      ),
+      save: stub().resolves(statusCode),
+    });
+    const controller = buildController(service);
+    const response = buildResponse();
+    const responseMock = mock(response);
+    const body = serviceMethod === 'save' ? { confirmFamilyCourtRemoval: 'true' } : {};
 
-      responseMock.expects('status').once().withArgs(statusCode).returns(response);
-      responseMock.expects('render').once().withArgs(viewName);
+    responseMock.expects('status').once().withArgs(statusCode).returns(response);
+    responseMock.expects('render').once().withArgs(viewName);
 
-      try {
-        await controller.postSuccess(request, response);
-        responseMock.verify();
-      } finally {
-        confirmationStub.restore();
-        saveStub.restore();
-      }
-    }
+    await controller.postSuccess(buildRequest({ courtId }, body), response);
+
+    responseMock.verify();
   });
 });

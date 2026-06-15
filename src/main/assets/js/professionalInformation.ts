@@ -1,103 +1,154 @@
+type RepeatableType = 'dxCode' | 'faxNumber';
+
+type RepeatableFieldName = 'dxCode' | 'dxCodeDescription' | 'faxNumber' | 'faxNumberDescription';
+
+type RepeatableFieldConfig = {
+  hint?: string;
+  label: string;
+  name: RepeatableFieldName;
+};
+
 type RepeatableConfig = {
+  fields: readonly RepeatableFieldConfig[];
   heading: string;
-  firstLabel: string;
-  firstName: string;
-  firstHint?: string;
-  secondLabel: string;
-  secondName: string;
-  secondHint?: string;
   removeText: string;
 };
 
-const repeatableConfigs: Record<string, RepeatableConfig> = {
+const defaultMaxItems = 5;
+const itemSelector = '[data-professional-information-item]';
+const listSelector = '[data-professional-information-list]';
+const removeButtonSelector = '[data-professional-information-remove]';
+
+const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } = {
   dxCode: {
     heading: 'DX code',
-    firstLabel: 'DX code',
-    firstName: 'dxCode',
-    firstHint: 'Please enter the DX code you wish to display.',
-    secondLabel: 'Explanation',
-    secondName: 'dxCodeDescription',
-    secondHint: 'Enter the explanation text for this DX code.',
+    fields: [
+      {
+        label: 'DX code',
+        name: 'dxCode',
+        hint: 'Please enter the DX code you wish to display.',
+      },
+      {
+        label: 'Explanation',
+        name: 'dxCodeDescription',
+        hint: 'Enter the explanation text for this DX code.',
+      },
+    ],
     removeText: 'Remove DX code',
   },
   faxNumber: {
     heading: 'Fax number',
-    firstLabel: 'Fax number',
-    firstName: 'faxNumber',
-    secondLabel: 'Description',
-    secondName: 'faxNumberDescription',
+    fields: [
+      {
+        label: 'Fax number',
+        name: 'faxNumber',
+      },
+      {
+        label: 'Description',
+        name: 'faxNumberDescription',
+      },
+    ],
     removeText: 'Remove Fax number',
   },
 };
 
 export function initProfessionalInformationRepeatableFields(): void {
-  document.querySelectorAll<HTMLButtonElement>('[data-professional-information-add]').forEach(button => {
-    button.addEventListener('click', () => addRepeatableItem(button));
-    updateRepeatableControls(button);
-  });
+  const lists = Array.from(document.querySelectorAll<HTMLElement>(listSelector));
+  const listCounts = countRepeatableLists(lists);
+  const listIndexes: Partial<Record<RepeatableType, number>> = {};
 
-  document.querySelectorAll<HTMLButtonElement>('[data-professional-information-remove]').forEach(button => {
-    button.addEventListener('click', () => removeRepeatableItem(button));
+  lists.forEach(list => {
+    const type = getRepeatableType(list.dataset.professionalInformationList);
+    if (!type) {
+      return;
+    }
+
+    const index = listIndexes[type] ?? 0;
+    listIndexes[type] = index + 1;
+    initialiseRepeatableList(list, type, listCounts[type] > 1 ? index : undefined);
   });
 }
 
-function addRepeatableItem(button: HTMLButtonElement): void {
-  const type = button.dataset.professionalInformationAdd;
-  if (!type) {
+function initialiseRepeatableList(list: HTMLElement, type: RepeatableType, duplicateIndex?: number): void {
+  const addButton = findAddButton(list, type);
+  if (!addButton) {
     return;
   }
 
-  const list = document.querySelector<HTMLElement>(`[data-professional-information-list="${type}"]`);
-  const config = repeatableConfigs[type];
-  if (!list || !config) {
+  if (duplicateIndex !== undefined) {
+    list.dataset.professionalInformationIdPrefix = `professional-information-${type}-${duplicateIndex + 1}`;
+  }
+
+  if (list.dataset.professionalInformationInitialised !== 'true') {
+    list.addEventListener('click', event => handleRemoveClick(event, list, type, addButton));
+    list.dataset.professionalInformationInitialised = 'true';
+  }
+
+  if (addButton.dataset.professionalInformationInitialised !== 'true') {
+    addButton.addEventListener('click', () => addRepeatableItem(list, type, addButton));
+    addButton.dataset.professionalInformationInitialised = 'true';
+  }
+
+  reindexRepeatableItems(list, type);
+  updateRepeatableControls(list, addButton);
+}
+
+function handleRemoveClick(
+  event: MouseEvent,
+  list: HTMLElement,
+  type: RepeatableType,
+  addButton: HTMLButtonElement
+): void {
+  const target = event.target as HTMLElement | null;
+  const removeButton = target?.closest?.(removeButtonSelector) as HTMLButtonElement | null;
+  if (!removeButton || removeButton.closest(listSelector) !== list) {
     return;
   }
 
-  const maxItems = Number(list.dataset.professionalInformationMax || '5');
-  const itemCount = list.querySelectorAll('[data-professional-information-item]').length;
-  if (itemCount >= maxItems) {
+  removeRepeatableItem(list, type, removeButton, addButton);
+}
+
+function addRepeatableItem(list: HTMLElement, type: RepeatableType, button: HTMLButtonElement): void {
+  const items = getRepeatableItems(list);
+  if (items.length >= getMaxItems(list)) {
     return;
   }
 
-  const item = buildRepeatableItem(type, config, itemCount);
+  const item = buildRepeatableItem(list, type, items.length);
   list.append(item);
-  item.querySelector<HTMLButtonElement>('[data-professional-information-remove]')?.addEventListener('click', event => {
-    removeRepeatableItem(event.currentTarget as HTMLButtonElement);
-  });
 
-  updateRepeatableControls(button);
+  reindexRepeatableItems(list, type);
+  updateRepeatableControls(list, button);
   item.querySelector<HTMLInputElement>('input')?.focus();
 }
 
-function removeRepeatableItem(button: HTMLButtonElement): void {
-  const item = button.closest('[data-professional-information-item]');
-  const list = button.closest<HTMLElement>('[data-professional-information-list]');
-  if (!item || !list) {
+function removeRepeatableItem(
+  list: HTMLElement,
+  type: RepeatableType,
+  button: HTMLButtonElement,
+  addButton: HTMLButtonElement
+): void {
+  const item = button.closest(itemSelector);
+  if (!item || item.closest(listSelector) !== list) {
     return;
   }
 
   item.remove();
-  const type = list.dataset.professionalInformationList;
-  if (type) {
-    reindexRepeatableItems(list, type);
-  }
-  const addButton = document.querySelector<HTMLButtonElement>(`[data-professional-information-add="${type}"]`);
-  if (addButton) {
-    updateRepeatableControls(addButton);
-  }
+  reindexRepeatableItems(list, type);
+  updateRepeatableControls(list, addButton);
 }
 
-function buildRepeatableItem(type: string, config: RepeatableConfig, index: number): HTMLElement {
+function buildRepeatableItem(list: HTMLElement, type: RepeatableType, index: number): HTMLElement {
+  const config = repeatableConfigs[type];
   const item = document.createElement('div');
   item.className = 'professional-information-repeatable';
   item.dataset.professionalInformationItem = '';
+  item.dataset.professionalInformationType = type;
   item.append(buildHeading(config.heading, index));
   item.append(
-    buildInput(config.firstName, index, config.firstLabel, config.firstHint),
-    buildInput(config.secondName, index, config.secondLabel, config.secondHint),
+    ...config.fields.map(field => buildInput(list, field, index)),
     buildRemoveButton(config.removeText, index)
   );
-  item.dataset.professionalInformationType = type;
   return item;
 }
 
@@ -109,33 +160,36 @@ function buildHeading(text: string, index: number): HTMLParagraphElement {
   return heading;
 }
 
-function buildInput(namePrefix: string, index: number, labelText: string, hintText?: string): HTMLElement {
+function buildInput(list: HTMLElement, field: RepeatableFieldConfig, index: number): HTMLElement {
   const formGroup = document.createElement('div');
   formGroup.className = 'govuk-form-group';
+  formGroup.dataset.professionalInformationField = field.name;
 
-  const id = `${namePrefix}-${index}`;
-  const hintId = `${id}-hint`;
+  const id = inputId(list, field, index);
+  const name = inputName(field, index);
+
   const label = document.createElement('label');
   label.className = 'govuk-label govuk-!-margin-bottom-1';
   label.htmlFor = id;
-  label.textContent = labelText;
+  label.textContent = field.label;
   formGroup.append(label);
 
-  if (hintText) {
+  if (field.hint) {
     const hint = document.createElement('div');
     hint.className = 'govuk-hint';
-    hint.id = hintId;
-    hint.textContent = hintText;
+    hint.id = hintId(id);
+    hint.textContent = field.hint;
     formGroup.append(hint);
   }
 
   const input = document.createElement('input');
   input.className = 'govuk-input govuk-input--width-20';
+  input.dataset.professionalInformationField = field.name;
   input.id = id;
-  input.name = id;
+  input.name = name;
   input.type = 'text';
-  if (hintText) {
-    input.setAttribute('aria-describedby', hintId);
+  if (field.hint) {
+    input.setAttribute('aria-describedby', hintId(id));
   }
   formGroup.append(input);
 
@@ -151,70 +205,134 @@ function buildRemoveButton(text: string, index: number): HTMLButtonElement {
   return button;
 }
 
-function reindexRepeatableItems(list: HTMLElement, type: string): void {
+function reindexRepeatableItems(list: HTMLElement, type: RepeatableType): void {
   const config = repeatableConfigs[type];
-  if (!config) {
-    return;
-  }
 
-  list.querySelectorAll<HTMLElement>('[data-professional-information-item]').forEach((item, index) => {
+  getRepeatableItems(list).forEach((item, index) => {
     const heading = item.querySelector('[data-professional-information-heading]');
     if (heading) {
       heading.textContent = `${config.heading} ${index + 1}`;
     }
-    updateInput(item, config.firstName, index);
-    updateInput(item, config.secondName, index);
 
-    const removeButton = item.querySelector<HTMLButtonElement>('[data-professional-information-remove]');
-    if (removeButton) {
-      removeButton.textContent = `${config.removeText} ${index + 1}`;
-      removeButton.hidden = index === 0;
-    }
+    config.fields.forEach(field => updateInput(item, list, field, index));
+    updateRemoveButton(item, config, index);
   });
 }
 
-function updateInput(item: HTMLElement, namePrefix: string, index: number): void {
-  const input = item.querySelector<HTMLInputElement>(`input[name^="${namePrefix}-"]`);
+function updateInput(item: HTMLElement, list: HTMLElement, field: RepeatableFieldConfig, index: number): void {
+  const input = findInput(item, field);
   if (!input) {
     return;
   }
 
-  const id = `${namePrefix}-${index}`;
+  const id = inputId(list, field, index);
   input.id = id;
-  input.name = id;
-  item.querySelector<HTMLLabelElement>(`label[for^="${namePrefix}-"]`)?.setAttribute('for', id);
+  input.name = inputName(field, index);
+  input.dataset.professionalInformationField = field.name;
 
-  const hint = input.closest('.govuk-form-group')?.querySelector<HTMLElement>('.govuk-hint');
+  const formGroup = input.closest<HTMLElement>('.govuk-form-group');
+  if (formGroup) {
+    formGroup.dataset.professionalInformationField = field.name;
+  }
+
+  const label = formGroup?.querySelector<HTMLLabelElement>('label');
+  if (label) {
+    label.htmlFor = id;
+  }
+
+  const hint = formGroup?.querySelector<HTMLElement>('.govuk-hint');
   if (hint) {
-    hint.id = `${id}-hint`;
+    hint.id = hintId(id);
     input.setAttribute('aria-describedby', hint.id);
   } else {
     input.removeAttribute('aria-describedby');
   }
 }
 
-function updateRepeatableControls(button: HTMLButtonElement): void {
-  const type = button.dataset.professionalInformationAdd;
-  const list = document.querySelector<HTMLElement>(`[data-professional-information-list="${type}"]`);
-  if (!list) {
+function updateRemoveButton(item: HTMLElement, config: RepeatableConfig, index: number): void {
+  const removeButton = item.querySelector<HTMLButtonElement>(removeButtonSelector);
+  if (!removeButton) {
     return;
   }
 
-  const maxItems = Number(list.dataset.professionalInformationMax || '5');
-  const items = list.querySelectorAll<HTMLElement>('[data-professional-information-item]');
-  const atMax = items.length >= maxItems;
+  removeButton.textContent = `${config.removeText} ${index + 1}`;
+  removeButton.hidden = index === 0;
+}
+
+function updateRepeatableControls(list: HTMLElement, button: HTMLButtonElement): void {
+  const atMax = getRepeatableItems(list).length >= getMaxItems(list);
   button.hidden = atMax;
-  button.classList.toggle('govuk-!-display-none', atMax);
-  if (atMax) {
-    button.setAttribute('aria-hidden', 'true');
-  } else {
-    button.removeAttribute('aria-hidden');
+  button.classList.remove('govuk-!-display-none');
+  button.removeAttribute('aria-hidden');
+}
+
+function findInput(item: HTMLElement, field: RepeatableFieldConfig): HTMLInputElement | null {
+  return (
+    item.querySelector<HTMLInputElement>(`input[data-professional-information-field="${field.name}"]`) ??
+    item.querySelector<HTMLInputElement>(`input[name^="${field.name}-"]`)
+  );
+}
+
+function findAddButton(list: HTMLElement, type: RepeatableType): HTMLButtonElement | null {
+  const scope = list.parentElement ?? document;
+  const buttons = Array.from(
+    scope.querySelectorAll<HTMLButtonElement>(`[data-professional-information-add="${type}"]`)
+  );
+  if (!buttons.length) {
+    return null;
   }
 
-  items.forEach((item, index) => {
-    const removeButton = item.querySelector<HTMLButtonElement>('[data-professional-information-remove]');
-    if (removeButton) {
-      removeButton.hidden = index === 0;
+  const siblingButton = buttons.find(button => {
+    if (button.parentElement !== list.parentElement || !list.parentElement) {
+      return false;
     }
+
+    const siblings = Array.from(list.parentElement.children);
+    return siblings.indexOf(button) > siblings.indexOf(list);
   });
+
+  return siblingButton ?? buttons[0];
+}
+
+function getRepeatableItems(list: HTMLElement): HTMLElement[] {
+  return Array.from(list.querySelectorAll<HTMLElement>(itemSelector));
+}
+
+function getMaxItems(list: HTMLElement): number {
+  const parsedMaxItems = Number.parseInt(list.dataset.professionalInformationMax ?? '', 10);
+  return Number.isFinite(parsedMaxItems) && parsedMaxItems > 0 ? parsedMaxItems : defaultMaxItems;
+}
+
+function inputId(list: HTMLElement, field: RepeatableFieldConfig, index: number): string {
+  const name = inputName(field, index);
+  const prefix = list.dataset.professionalInformationIdPrefix;
+  return prefix ? `${prefix}-${name}` : name;
+}
+
+function inputName(field: RepeatableFieldConfig, index: number): string {
+  return `${field.name}-${index}`;
+}
+
+function hintId(inputIdValue: string): string {
+  return `${inputIdValue}-hint`;
+}
+
+function countRepeatableLists(lists: HTMLElement[]): Record<RepeatableType, number> {
+  return lists.reduce(
+    (counts, list) => {
+      const type = getRepeatableType(list.dataset.professionalInformationList);
+      if (type) {
+        counts[type] += 1;
+      }
+      return counts;
+    },
+    {
+      dxCode: 0,
+      faxNumber: 0,
+    }
+  );
+}
+
+function getRepeatableType(value: string | undefined): RepeatableType | undefined {
+  return value === 'dxCode' || value === 'faxNumber' ? value : undefined;
 }

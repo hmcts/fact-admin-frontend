@@ -421,15 +421,42 @@ export class ProfessionalInformationService {
   private apiErrorHref(field: string, text: string): string {
     const normalizedField = field.toLowerCase();
     const normalizedText = text.toLowerCase();
-    if (
-      normalizedField === 'interviewroomcount' ||
-      normalizedText.includes('interview room count') ||
-      normalizedText.includes('interviewroomcount')
-    ) {
+    if (this.matchesApiError(normalizedField, normalizedText, 'interviewRoomCount', 'interview room count')) {
       return '#interviewRoomCount';
+    }
+    if (this.matchesApiError(normalizedField, normalizedText, 'interviewPhoneNumber', 'interview phone number')) {
+      return '#interviewPhoneNumber';
+    }
+    if (this.matchesApiError(normalizedField, normalizedText, 'interviewRooms', 'interview rooms')) {
+      return '#interviewRooms';
+    }
+    if (this.matchesApiError(normalizedField, normalizedText, 'videoHearings', 'video hearing')) {
+      return '#videoHearings';
+    }
+    if (this.matchesApiError(normalizedField, normalizedText, 'commonPlatform', 'common platform')) {
+      return '#commonPlatform';
+    }
+    if (this.matchesApiError(normalizedField, normalizedText, 'accessScheme', 'access scheme')) {
+      return '#accessScheme';
+    }
+    if (this.isFaxNumberDescriptionApiError(normalizedField, normalizedText)) {
+      return '#faxNumberDescription-0';
     }
     if (this.isFaxNumberApiError(normalizedField, normalizedText)) {
       return '#faxNumber-0';
+    }
+    if (this.isGbsApiError(normalizedField, normalizedText)) {
+      return '#gbs';
+    }
+    if (this.isDxCodeDescriptionApiError(normalizedField, normalizedText)) {
+      return '#dxCodeDescription-0';
+    }
+    if (this.matchesApiError(normalizedField, normalizedText, 'dxCode', 'dx code')) {
+      return '#dxCode-0';
+    }
+    const courtCodeHref = this.courtCodeApiErrorHref(normalizedField, normalizedText);
+    if (courtCodeHref) {
+      return courtCodeHref;
     }
     return field && field !== 'message' ? `#${field}` : '';
   }
@@ -444,7 +471,7 @@ export class ProfessionalInformationService {
     ) {
       return interviewRoomCountError;
     }
-    if (this.isFaxNumberApiError(normalizedField, normalizedText)) {
+    if (this.isFaxNumberFormatApiError(normalizedField, normalizedText)) {
       return faxNumberFormatError;
     }
     return text;
@@ -454,8 +481,59 @@ export class ProfessionalInformationService {
     return (
       normalizedField.includes('fax') ||
       normalizedText.includes('fax') ||
-      (normalizedText.includes('phone number') && normalizedText.includes('regex'))
+      this.isFaxNumberFormatApiError(normalizedField, normalizedText)
     );
+  }
+
+  private isDxCodeDescriptionApiError(normalizedField: string, normalizedText: string): boolean {
+    return (
+      this.matchesApiError(normalizedField, normalizedText, 'dxCodeDescription', 'dx code explanation') ||
+      (normalizedField.includes('dxcodes') && normalizedField.includes('explanation')) ||
+      normalizedText.includes('explanation text')
+    );
+  }
+
+  private isFaxNumberDescriptionApiError(normalizedField: string, normalizedText: string): boolean {
+    return (
+      this.matchesApiError(normalizedField, normalizedText, 'faxNumberDescription', 'fax number description') ||
+      (normalizedField.includes('faxnumbers') && normalizedField.includes('description'))
+    );
+  }
+
+  private isFaxNumberFormatApiError(normalizedField: string, normalizedText: string): boolean {
+    return normalizedText.includes('regex') && (normalizedField.includes('fax') || normalizedText.includes('phone'));
+  }
+
+  private isGbsApiError(normalizedField: string, normalizedText: string): boolean {
+    return normalizedField.includes('gbs') || normalizedText.includes('gbs code');
+  }
+
+  private matchesApiError(normalizedField: string, normalizedText: string, fieldName: string, label: string): boolean {
+    const normalizedFieldName = fieldName.toLowerCase();
+    return normalizedField.includes(normalizedFieldName) || normalizedText.includes(label);
+  }
+
+  private courtCodeApiErrorHref(normalizedField: string, normalizedText: string): string | undefined {
+    const matchesCourtCode = (fieldName: CourtCodeField, label: string): boolean =>
+      this.matchesApiError(normalizedField, normalizedText, fieldName, `${label} code`);
+
+    if (matchesCourtCode('magistrateCourtCode', 'magistrates court')) {
+      return '#magistrateCourtCode';
+    }
+    if (matchesCourtCode('familyCourtCode', 'family court')) {
+      return '#familyCourtCode';
+    }
+    if (matchesCourtCode('tribunalCode', 'tribunal')) {
+      return '#tribunalCode';
+    }
+    if (matchesCourtCode('countyCourtCode', 'county court')) {
+      return '#countyCourtCode';
+    }
+    if (matchesCourtCode('crownCourtCode', 'crown court')) {
+      return '#crownCourtCode';
+    }
+
+    return undefined;
   }
 
   private extractRepeatableEntries(

@@ -1,6 +1,11 @@
 import { initProfessionalInformationRepeatableFields } from '../../../../main/assets/js/professionalInformation';
 
-type Listener = (event?: { currentTarget: MockElement }) => void;
+type MockEvent = {
+  currentTarget: MockElement;
+  target: MockElement;
+};
+
+type Listener = (event: MockEvent) => void;
 
 class MockClassList {
   public constructor(private readonly element: MockElement) {}
@@ -15,6 +20,12 @@ class MockClassList {
       classes.delete(className);
     }
 
+    this.element.className = [...classes].join(' ');
+  }
+
+  public remove(className: string): void {
+    const classes = new Set(this.element.className.split(' ').filter(Boolean));
+    classes.delete(className);
     this.element.className = [...classes].join(' ');
   }
 }
@@ -52,7 +63,10 @@ class MockElement {
   }
 
   public click(): void {
-    this.listeners.click?.({ currentTarget: this });
+    this.dispatchClick({
+      currentTarget: this,
+      target: this,
+    });
   }
 
   public closest(selector: string): MockElement | null {
@@ -93,6 +107,14 @@ class MockElement {
     return this.children.flatMap(child => [child, ...child.descendants()]);
   }
 
+  private dispatchClick(event: MockEvent): void {
+    this.listeners.click?.({
+      ...event,
+      currentTarget: this,
+    });
+    this.parentElement?.dispatchClick(event);
+  }
+
   private matches(selector: string): boolean {
     if (selector === '[data-professional-information-add]') {
       return Boolean(this.dataset.professionalInformationAdd);
@@ -127,6 +149,11 @@ class MockElement {
     const inputNamePrefixMatch = selector.match(/^input\[name\^="(.+)"\]$/);
     if (inputNamePrefixMatch) {
       return this.tagName === 'input' && this.name.startsWith(inputNamePrefixMatch[1]);
+    }
+
+    const inputFieldMatch = selector.match(/^input\[data-professional-information-field="(.+)"\]$/);
+    if (inputFieldMatch) {
+      return this.tagName === 'input' && this.dataset.professionalInformationField === inputFieldMatch[1];
     }
 
     const labelForPrefixMatch = selector.match(/^label\[for\^="(.+)"\]$/);
@@ -218,8 +245,8 @@ describe('professionalInformation repeatable fields', () => {
 
     expect(mockDom.list.querySelectorAll('[data-professional-information-item]')).toHaveLength(5);
     expect(mockDom.addButton.hidden).toBe(true);
-    expect(mockDom.addButton.attributes['aria-hidden']).toBe('true');
-    expect(mockDom.addButton.className).toContain('govuk-!-display-none');
+    expect(mockDom.addButton.attributes['aria-hidden']).toBeUndefined();
+    expect(mockDom.addButton.className).not.toContain('govuk-!-display-none');
   });
 
   test('removes repeatable rows and reindexes remaining controls', () => {

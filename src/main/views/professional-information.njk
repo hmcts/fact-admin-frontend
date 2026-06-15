@@ -43,7 +43,10 @@
           classes: "govuk-input--width-20",
           id: type + "Description-" + index,
           name: type + "Description-" + index,
-          value: entry.description
+          value: entry.description,
+          errorMessage: {
+            text: fieldErrors[type + "Description-" + index]
+          } if fieldErrors[type + "Description-" + index] else null
         }) }}
 
         {% if not loop.first %}
@@ -144,7 +147,10 @@
           classes: "govuk-input--width-20",
           id: "gbs",
           name: "gbs",
-          value: gbs
+          value: gbs,
+          errorMessage: {
+            text: fieldErrors.gbs
+          } if fieldErrors.gbs else null
         }) }}
 
         <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes</h2>
@@ -183,6 +189,9 @@
               classes: "govuk-!-margin-bottom-1"
             }
           },
+          errorMessage: {
+            text: fieldErrors.interviewRooms
+          } if fieldErrors.interviewRooms else null,
           items: [
             {
               value: "true",
@@ -212,7 +221,10 @@
                     classes: "govuk-input--width-20",
                     id: "interviewPhoneNumber",
                     name: "interviewPhoneNumber",
-                    value: interviewPhoneNumber
+                    value: interviewPhoneNumber,
+                    errorMessage: {
+                      text: fieldErrors.interviewPhoneNumber
+                    } if fieldErrors.interviewPhoneNumber else null
                   }) +
                   '</fieldset>'
               }
@@ -234,6 +246,9 @@
               classes: "govuk-!-margin-bottom-1"
             }
           },
+          errorMessage: {
+            text: fieldErrors.videoHearings
+          } if fieldErrors.videoHearings else null,
           items: [
             {
               value: "true",
@@ -258,6 +273,9 @@
               classes: "govuk-!-margin-bottom-1"
             }
           },
+          errorMessage: {
+            text: fieldErrors.commonPlatform
+          } if fieldErrors.commonPlatform else null,
           items: [
             {
               value: "true",
@@ -281,6 +299,9 @@
               classes: "govuk-!-margin-bottom-1"
             }
           },
+          errorMessage: {
+            text: fieldErrors.accessScheme
+          } if fieldErrors.accessScheme else null,
           items: [
             {
               value: "true",
