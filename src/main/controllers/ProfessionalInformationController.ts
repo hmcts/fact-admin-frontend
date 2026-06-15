@@ -15,12 +15,22 @@ type HiddenInput = {
   value: string;
 };
 
+type ProfessionalInformationServiceFactory = () => Promise<ProfessionalInformationService>;
+
 @route('/courts/:courtId/edit/information-for-professionals')
 export default class ProfessionalInformationController {
-  private readonly professionalInformationService: ProfessionalInformationService;
+  private professionalInformationService?: ProfessionalInformationService;
+  private readonly professionalInformationServiceFactory?: ProfessionalInformationServiceFactory;
 
-  public constructor(professionalInformationService?: ProfessionalInformationService) {
-    this.professionalInformationService = professionalInformationService ?? new ProfessionalInformationService();
+  public constructor(
+    professionalInformationServiceFactory?: ProfessionalInformationService | ProfessionalInformationServiceFactory
+  ) {
+    if (typeof professionalInformationServiceFactory === 'function') {
+      this.professionalInformationServiceFactory = professionalInformationServiceFactory;
+    } else {
+      this.professionalInformationService =
+        professionalInformationServiceFactory ?? new ProfessionalInformationService();
+    }
   }
 
   @GET()
@@ -30,7 +40,8 @@ export default class ProfessionalInformationController {
       return this.renderCourtNotFound(res);
     }
 
-    const viewModel = await this.professionalInformationService.getViewModel(courtId);
+    const professionalInformationService = await this.getProfessionalInformationService();
+    const viewModel = await professionalInformationService.getViewModel(courtId);
     if (this.renderStatusResponse(res, viewModel)) {
       return;
     }
@@ -47,7 +58,8 @@ export default class ProfessionalInformationController {
     }
 
     if (req.body?.confirmFamilyCourtRemoval !== 'true') {
-      const confirmation = await this.professionalInformationService.requiresFamilyCourtRemovalConfirmation(
+      const professionalInformationService = await this.getProfessionalInformationService();
+      const confirmation = await professionalInformationService.requiresFamilyCourtRemovalConfirmation(
         courtId,
         req.body
       );
@@ -60,7 +72,8 @@ export default class ProfessionalInformationController {
       }
     }
 
-    const saveResponse = await this.professionalInformationService.save(courtId, req.body);
+    const professionalInformationService = await this.getProfessionalInformationService();
+    const saveResponse = await professionalInformationService.save(courtId, req.body);
     if (this.renderStatusResponse(res, saveResponse)) {
       return;
     }
@@ -123,6 +136,16 @@ export default class ProfessionalInformationController {
       message:
         'You are removing the court type of Family court. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?',
     });
+  }
+
+  private async getProfessionalInformationService(): Promise<ProfessionalInformationService> {
+    if (!this.professionalInformationService) {
+      this.professionalInformationService = this.professionalInformationServiceFactory
+        ? await this.professionalInformationServiceFactory()
+        : new ProfessionalInformationService();
+    }
+
+    return this.professionalInformationService;
   }
 
   private buildHiddenInputs(body: Request['body']): HiddenInput[] {
