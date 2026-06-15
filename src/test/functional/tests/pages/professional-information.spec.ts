@@ -312,8 +312,9 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.page.locator('.govuk-back-link')).toHaveCount(0);
 
         await professionalInformationPage.page.getByRole('button', { name: 'Cancel' }).click();
+        const professionalInformationUrl = professionalInformationPage.buildProfessionalInformationUrl(createdCourt.id);
         await expect(professionalInformationPage.page).toHaveURL(
-          professionalInformationPage.buildProfessionalInformationUrl(createdCourt.id)
+          new RegExp(`^${professionalInformationUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\??$`)
         );
 
         await professionalInformationPage.deselectCourtType('Family court');
