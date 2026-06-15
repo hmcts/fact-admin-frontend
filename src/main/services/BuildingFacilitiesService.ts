@@ -92,7 +92,7 @@ export class BuildingFacilitiesService {
       }
     });
 
-    if (String(model.waitingArea) === 'true') {
+    if (model.waitingArea === true) {
       const childrenAreaErrors = validateBooleanField(
         model.waitingAreaChildren,
         'Select whether the children waiting area is available'

@@ -108,7 +108,7 @@ describe('BuildingFacilitiesService', () => {
     expect(updateBuildingFacilities).not.toHaveBeenCalled();
   });
 
-  test('save requires waitingAreaChildren when waitingArea is submitted as string true', async () => {
+  test('save requires waitingAreaChildren when waitingArea is submitted as true', async () => {
     const updateBuildingFacilities = jest.fn();
     const service = new BuildingFacilitiesService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
@@ -118,7 +118,7 @@ describe('BuildingFacilitiesService', () => {
     const result = await service.save(courtId, {
       courtId,
       parking: true,
-      waitingArea: 'true' as never,
+      waitingArea: true,
       quietRoom: false,
       babyChanging: false,
       wifi: true,
@@ -127,7 +127,7 @@ describe('BuildingFacilitiesService', () => {
     expect(result).toEqual({
       courtId,
       parking: true,
-      waitingArea: 'true',
+      waitingArea: true,
       quietRoom: false,
       babyChanging: false,
       wifi: true,

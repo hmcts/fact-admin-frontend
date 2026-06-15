@@ -65,3 +65,12 @@ export function toSlugFormat(name: string): string {
     .replaceAll(/[\s-]+/g, '-')
     .replaceAll(/(^-)|(-$)/g, '');
 }
+export const parseBoolean = (value: unknown): boolean | undefined => {
+  if (value === true || value === 'true') {
+    return true;
+  }
+  if (value === false || value === 'false') {
+    return false;
+  }
+  return undefined;
+};

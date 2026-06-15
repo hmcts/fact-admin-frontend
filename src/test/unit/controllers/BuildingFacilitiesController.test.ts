@@ -29,6 +29,7 @@ jest.mock('../../../main/utils/valueParsers', () => ({
     cafeteria: false,
   })),
   addFoodAndDrink: jest.fn(m => m),
+  parseBoolean: jest.fn(() => true),
 }));
 
 const { __mocks: serviceMocks } = jest.requireMock('../../../main/services/BuildingFacilitiesService');
@@ -167,12 +168,18 @@ describe('BuildingFacilitiesController', () => {
       await controller.updateCourt(req, res);
 
       expect(saveMock).toHaveBeenCalledWith(
-        req.params.courtId,
-        expect.objectContaining({
-          courtId: req.params.courtId,
-          waitingArea: 'true',
-          waitingAreaChildren: 'true',
-        })
+        '11111111-1111-1111-1111-111111111111',
+      { babyChanging: true,
+        cafeteria: false,
+        courtId: '11111111-1111-1111-1111-111111111111',
+        drinkVendingMachines: false,
+        freeWaterDispensers: false,
+        parking: true,
+        quietRoom: true,
+        snackVendingMachines: false,
+        waitingArea: true,
+        waitingAreaChildren: true,
+        wifi: true }
       );
 
       expect(res.render).toHaveBeenCalledWith(

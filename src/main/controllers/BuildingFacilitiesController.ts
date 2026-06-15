@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { BuildingFacilitiesService, FacilityModel } from '../services/BuildingFacilitiesService';
-import { addFoodAndDrink, isUuid, mapFoodAndDrink } from '../utils/valueParsers';
+import { addFoodAndDrink, isUuid, mapFoodAndDrink, parseBoolean } from '../utils/valueParsers';
 
 const buildingFacilitiesService = new BuildingFacilitiesService();
 @route('/courts/:courtId/edit/building-facilities')
@@ -51,16 +51,16 @@ export default class BuildingFacilitiesController {
       mapFoodAndDrink(foodAndDrink);
     const model = {
       courtId: resolvedCourtId,
-      parking,
+      parking: parseBoolean(parking),
       freeWaterDispensers,
       snackVendingMachines,
       drinkVendingMachines,
       cafeteria,
-      waitingArea,
-      quietRoom,
-      waitingAreaChildren,
-      babyChanging,
-      wifi,
+      waitingArea: parseBoolean(waitingArea),
+      quietRoom: parseBoolean(quietRoom),
+      waitingAreaChildren: parseBoolean(waitingArea) === true ? parseBoolean(waitingAreaChildren) : undefined,
+      babyChanging: parseBoolean(babyChanging),
+      wifi: parseBoolean(wifi),
     };
     const updateResponse = await buildingFacilitiesService.save(resolvedCourtId, model);
     if (updateResponse === HttpStatusCode.NotFound) {
@@ -76,7 +76,7 @@ export default class BuildingFacilitiesController {
     if (updateResponse.errors) {
       res.render('building-facilities-edit', {
         courtId: resolvedCourtId,
-        model: updateResponse as FacilityModel,
+        model: addFoodAndDrink(updateResponse) as FacilityModel,
         pageTitle: `Error: Building Facilities - ${updateResponse.name}`,
       });
       return;
