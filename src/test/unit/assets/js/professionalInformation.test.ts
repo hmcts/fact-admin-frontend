@@ -140,6 +140,9 @@ class MockElement {
     if (selector === 'input') {
       return this.tagName === 'input';
     }
+    if (selector === 'input[type="radio"][aria-expanded]') {
+      return this.tagName === 'input' && this.type === 'radio' && this.attributes['aria-expanded'] !== undefined;
+    }
 
     const listMatch = selector.match(/^\[data-professional-information-list="(.+)"\]$/);
     if (listMatch) {
@@ -280,5 +283,27 @@ describe('professionalInformation repeatable fields', () => {
 
     expect(() => initProfessionalInformationRepeatableFields()).not.toThrow();
     expect(() => addButton.click()).not.toThrow();
+  });
+
+  test('removes unsupported aria-expanded from conditional radio inputs', () => {
+    const mockDom = buildDocument();
+    const radio = new MockElement('input');
+    radio.type = 'radio';
+    radio.setAttribute('aria-expanded', 'true');
+    mockDom.document.append(radio);
+    mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = mockDom.document as never;
+
+    initProfessionalInformationRepeatableFields();
+
+    expect(radio.attributes['aria-expanded']).toBeUndefined();
+
+    radio.setAttribute('aria-expanded', 'false');
+    mockDom.document.listeners.change({
+      currentTarget: mockDom.document,
+      target: radio,
+    });
+
+    expect(radio.attributes['aria-expanded']).toBeUndefined();
   });
 });

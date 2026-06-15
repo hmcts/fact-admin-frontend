@@ -1,5 +1,6 @@
-// Enhances the Information for professionals page repeatable DX code and fax number fields.
-// Server-rendered names are preserved so validation and save handling continue to use the same payload shape.
+// Enhances the Information for professionals page controls.
+// Repeatable DX/fax names are preserved so validation and save handling continue to use the same payload shape.
+// GOV.UK conditional radios currently add aria-expanded to radio inputs, which axe rejects for role=radio.
 type RepeatableType = 'dxCode' | 'faxNumber';
 
 type RepeatableFieldName = 'dxCode' | 'dxCodeDescription' | 'faxNumber' | 'faxNumberDescription';
@@ -19,6 +20,7 @@ type RepeatableConfig = {
 const defaultMaxItems = 5;
 const itemSelector = '[data-professional-information-item]';
 const listSelector = '[data-professional-information-list]';
+const conditionalRadioSelector = 'input[type="radio"][aria-expanded]';
 const removeButtonSelector = '[data-professional-information-remove]';
 
 const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } = {
@@ -55,6 +57,9 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
 };
 
 export function initProfessionalInformationRepeatableFields(): void {
+  removeUnsupportedConditionalRadioAria();
+  document.addEventListener('change', removeUnsupportedConditionalRadioAria);
+
   const lists = Array.from(document.querySelectorAll<HTMLElement>(listSelector));
   const listCounts = countRepeatableLists(lists);
   const listIndexes: Partial<Record<RepeatableType, number>> = {};
@@ -69,6 +74,12 @@ export function initProfessionalInformationRepeatableFields(): void {
     listIndexes[type] = index + 1;
     initialiseRepeatableList(list, type, listCounts[type] > 1 ? index : undefined);
   });
+}
+
+function removeUnsupportedConditionalRadioAria(): void {
+  document
+    .querySelectorAll<HTMLInputElement>(conditionalRadioSelector)
+    .forEach(radio => radio.removeAttribute('aria-expanded'));
 }
 
 function initialiseRepeatableList(list: HTMLElement, type: RepeatableType, duplicateIndex?: number): void {
