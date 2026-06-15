@@ -167,9 +167,8 @@ describe('BuildingFacilitiesController', () => {
 
       await controller.updateCourt(req, res);
 
-      expect(saveMock).toHaveBeenCalledWith(
-        '11111111-1111-1111-1111-111111111111',
-      { babyChanging: true,
+      expect(saveMock).toHaveBeenCalledWith('11111111-1111-1111-1111-111111111111', {
+        babyChanging: true,
         cafeteria: false,
         courtId: '11111111-1111-1111-1111-111111111111',
         drinkVendingMachines: false,
@@ -179,8 +178,8 @@ describe('BuildingFacilitiesController', () => {
         snackVendingMachines: false,
         waitingArea: true,
         waitingAreaChildren: true,
-        wifi: true }
-      );
+        wifi: true,
+      });
 
       expect(res.render).toHaveBeenCalledWith(
         'building-facilities-edit-success',
