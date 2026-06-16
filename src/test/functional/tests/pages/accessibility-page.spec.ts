@@ -14,9 +14,23 @@ const seedAccessibilityData = async (accessibilityPage: AccessibilityPage, court
     },
   });
 
-  if (!response.ok()) {
-    throw new Error(`Failed to seed accessibility data (${response.status()}): ${await response.text()}`);
+  const body = await response.text();
+
+  if (!response.ok() || body.includes('Something went wrong') || body.includes('There is a problem')) {
+    throw new Error(`Failed to seed accessibility data (${response.status()}): ${body}`);
   }
+};
+
+const ensureAccessibilityPageLoaded = async (accessibilityPage: AccessibilityPage, courtId: string): Promise<void> => {
+  await accessibilityPage.goto(courtId);
+  const headingText = (await accessibilityPage.heading.textContent())?.trim() ?? '';
+
+  if (headingText.includes('Accessibility')) {
+    return;
+  }
+
+  await seedAccessibilityData(accessibilityPage, courtId);
+  await accessibilityPage.goto(courtId);
 };
 
 test.describe('Accessibility Page Tests', () => {
@@ -31,8 +45,7 @@ test.describe('Accessibility Page Tests', () => {
         'Accessibility Functional Test',
         { serviceCenter: false },
         async ({ createdCourt }) => {
-          await seedAccessibilityData(accessibilityPage, createdCourt.id);
-          await accessibilityPage.goto(createdCourt.id);
+          await ensureAccessibilityPageLoaded(accessibilityPage, createdCourt.id);
           await expect(accessibilityPage.heading).toContainText('Accessibility');
         }
       );
@@ -45,8 +58,7 @@ test.describe('Accessibility Page Tests', () => {
       'Accessibility Functional Test',
       { serviceCenter: false },
       async ({ createdCourt }) => {
-        await seedAccessibilityData(accessibilityPage, createdCourt.id);
-        await accessibilityPage.goto(createdCourt.id);
+        await ensureAccessibilityPageLoaded(accessibilityPage, createdCourt.id);
 
         await accessibilityPage.selectNo('accessibleParking');
         await accessibilityPage.fillAccessibleToiletDescription('Accessible toilet is on the ground floor.');
@@ -74,8 +86,7 @@ test.describe('Accessibility Page Tests', () => {
       'Accessibility Functional Test',
       { serviceCenter: false },
       async ({ createdCourt }) => {
-        await seedAccessibilityData(accessibilityPage, createdCourt.id);
-        await accessibilityPage.goto(createdCourt.id);
+        await ensureAccessibilityPageLoaded(accessibilityPage, createdCourt.id);
 
         await accessibilityPage.selectYes('accessibleParking');
         await accessibilityPage.fillAccessibleToiletDescription('Accessible toilet is on the ground floor.');
