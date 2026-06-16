@@ -218,7 +218,7 @@ test.describe('Information for Professionals Page Tests', () => {
         );
         await expect(
           professionalInformationPage.page.getByRole('link', { name: 'Back to Information for professionals' })
-        ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit/information-for-professionals`);
+        ).toHaveCount(0);
         await expect(
           professionalInformationPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
         ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);

@@ -117,7 +117,7 @@ describe('Information for professionals page', () => {
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Information for professionals saved');
-    expect(response.text).toContain('Back to Information for professionals');
+    expect(response.text).not.toContain('Back to Information for professionals');
     expect(saveStub.calledOnce).toBe(true);
     expect(saveStub.firstCall.args).toEqual([
       courtId,
