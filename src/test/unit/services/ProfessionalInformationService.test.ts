@@ -216,6 +216,35 @@ describe('ProfessionalInformationService', () => {
     expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
+  test('returns all repeatable frontend validation errors before saving', async () => {
+    const dataApiRequests = buildDataApiRequests() as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+      'dxCode-0': '@£@$&()@$)(@()$',
+      'dxCodeDescription-0': '@£@$&()@$)(@()$',
+      'faxNumber-0': '@£@$&()@$)(@()$',
+      'faxNumberDescription-0': '@£@$&()@$)(@()$',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          { href: '#dxCode-0', text: 'DX code 1: Value contains invalid characters' },
+          { href: '#dxCodeDescription-0', text: 'DX code 1 explanation: Value contains invalid characters' },
+          {
+            href: '#faxNumber-0',
+            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          },
+          { href: '#faxNumberDescription-0', text: 'Fax number 1 description: Value contains invalid characters' },
+        ],
+      },
+    });
+    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+  });
+
   test('validates missing and non-numeric interview room counts', async () => {
     const missingCount = await new ProfessionalInformationService(buildDataApiRequests()).save(courtId, {
       interviewRooms: 'true',
@@ -401,6 +430,69 @@ describe('ProfessionalInformationService', () => {
         ],
       },
     });
+  });
+
+  test('maps repeatable API validation errors back to the original visible field indexes after blank rows are omitted from the payload', async () => {
+    const dataApiRequests = buildDataApiRequests({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['dxCodes[0].dxCode', 'Value contains invalid characters'],
+          ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
+        ])
+      ),
+    }) as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+      'dxCode-3': 'Invalid DX 4',
+      'faxNumber-4': '020 0000 0004',
+    });
+
+    expect(dataApiRequests.saveCourtProfessionalInformation).toHaveBeenCalledWith(
+      courtId,
+      expect.objectContaining({
+        dxCodes: [{ dxCode: 'Invalid DX 4', explanation: null }],
+        faxNumbers: [{ faxNumber: '020 0000 0004', description: null }],
+      })
+    );
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          { href: '#dxCode-3', text: 'DX code 4: Value contains invalid characters' },
+          { href: '#faxNumber-4', text: 'Fax number 5: Value contains invalid characters' },
+        ],
+      },
+    });
+  });
+
+  test('links repeatable frontend validation errors to the original visible field indexes after blank rows', async () => {
+    const dataApiRequests = buildDataApiRequests() as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+      'dxCodeDescription-3': 'Documents',
+      'faxNumberDescription-4': 'Secondary fax',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          {
+            href: '#dxCode-3',
+            text: 'DX code 4: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
+          },
+          {
+            href: '#faxNumber-4',
+            text: 'Fax number 5: You have entered a description without a fax number, please add a number or remove the description',
+          },
+        ],
+      },
+    });
+    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
   test('returns status codes from save dependencies', async () => {

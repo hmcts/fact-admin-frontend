@@ -22,6 +22,7 @@ export type ProfessionalInformationError = {
 export type ProfessionalInformationEntry = {
   code?: string;
   description?: string;
+  formIndex?: number;
 };
 
 export type ProfessionalInformationViewModel = {
@@ -101,8 +102,12 @@ export const courtTypeOptions: CourtTypeOption[] = [
 const maxRepeatableEntries = 5;
 const integerPattern = /^\d+$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
+const genericDescriptionPattern = /^[A-Za-z0-9 ()':,\-;.]+$/;
+const dxCodeMaxLength = 200;
+const repeatableDescriptionMaxLength = 250;
 const faxNumberFormatError = 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
 const interviewRoomCountError = 'Enter a number of interview rooms between 1 and 150, or select No';
+const invalidCharactersError = 'Value contains invalid characters';
 
 export class ProfessionalInformationService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
@@ -151,7 +156,7 @@ export class ProfessionalInformationService {
     if (saveResponse instanceof Map) {
       return {
         status: 'validationError',
-        viewModel: this.withErrors(viewModel, this.mapApiErrors(saveResponse)),
+        viewModel: this.withErrors(viewModel, this.mapApiErrors(saveResponse, viewModel)),
       };
     }
 
@@ -326,24 +331,63 @@ export class ProfessionalInformationService {
     }
 
     viewModel.dxCodes.forEach((dxCode, index) => {
-      if (dxCode.description?.trim() && !dxCode.code?.trim()) {
+      const formIndex = dxCode.formIndex ?? index;
+      const code = dxCode.code?.trim() ?? '';
+      const description = dxCode.description?.trim() ?? '';
+      if (description && !code) {
         errors.push({
-          href: `#dxCode-${index}`,
-          text: `DX code ${index + 1}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
+          href: `#dxCode-${formIndex}`,
+          text: `DX code ${formIndex + 1}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
+        });
+      }
+      if (code.length > dxCodeMaxLength) {
+        errors.push({
+          href: `#dxCode-${formIndex}`,
+          text: `DX code ${formIndex + 1}: DX code must be ${dxCodeMaxLength} characters or fewer`,
+        });
+      } else if (code && !genericDescriptionPattern.test(code)) {
+        errors.push({
+          href: `#dxCode-${formIndex}`,
+          text: `DX code ${formIndex + 1}: ${invalidCharactersError}`,
+        });
+      }
+      if (description.length > repeatableDescriptionMaxLength) {
+        errors.push({
+          href: `#dxCodeDescription-${formIndex}`,
+          text: `DX code ${formIndex + 1} explanation: DX explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
+        });
+      } else if (description && !genericDescriptionPattern.test(description)) {
+        errors.push({
+          href: `#dxCodeDescription-${formIndex}`,
+          text: `DX code ${formIndex + 1} explanation: ${invalidCharactersError}`,
         });
       }
     });
 
     viewModel.faxNumbers.forEach((faxNumber, index) => {
-      if (faxNumber.description?.trim() && !faxNumber.code?.trim()) {
+      const formIndex = faxNumber.formIndex ?? index;
+      const code = faxNumber.code?.trim() ?? '';
+      const description = faxNumber.description?.trim() ?? '';
+      if (description && !code) {
         errors.push({
-          href: `#faxNumber-${index}`,
-          text: `Fax number ${index + 1}: You have entered a description without a fax number, please add a number or remove the description`,
+          href: `#faxNumber-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
         });
-      } else if (faxNumber.code?.trim() && !phoneNumberPattern.test(faxNumber.code.trim())) {
+      } else if (code && !phoneNumberPattern.test(code)) {
         errors.push({
-          href: `#faxNumber-${index}`,
-          text: `Fax number ${index + 1}: ${faxNumberFormatError}`,
+          href: `#faxNumber-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: ${faxNumberFormatError}`,
+        });
+      }
+      if (description.length > repeatableDescriptionMaxLength) {
+        errors.push({
+          href: `#faxNumberDescription-${formIndex}`,
+          text: `Fax number ${formIndex + 1} description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
+        });
+      } else if (description && !genericDescriptionPattern.test(description)) {
+        errors.push({
+          href: `#faxNumberDescription-${formIndex}`,
+          text: `Fax number ${formIndex + 1} description: ${invalidCharactersError}`,
         });
       }
     });
@@ -414,11 +458,14 @@ export class ProfessionalInformationService {
     };
   }
 
-  private mapApiErrors(errors: Map<string, string>): ProfessionalInformationError[] {
+  private mapApiErrors(
+    errors: Map<string, string>,
+    viewModel: ProfessionalInformationViewModel
+  ): ProfessionalInformationError[] {
     return [...errors]
       .filter(([field]) => field.toLowerCase() !== 'timestamp')
       .map(([field, text]) => {
-        const repeatableError = this.repeatableApiError(field);
+        const repeatableError = this.repeatableApiError(field, viewModel);
         const errorText = this.apiErrorText(field, text);
         return {
           href: repeatableError?.href ?? this.apiErrorHref(field, text),
@@ -474,7 +521,10 @@ export class ProfessionalInformationService {
     return field && field !== 'message' ? `#${field}` : '';
   }
 
-  private repeatableApiError(field: string): RepeatableApiError | undefined {
+  private repeatableApiError(
+    field: string,
+    viewModel?: ProfessionalInformationViewModel
+  ): RepeatableApiError | undefined {
     const repeatableErrorMatch = field.match(
       /^(dxCodes|faxNumbers)(?:\[(\d+)])(?:\.(dxCode|explanation|faxNumber|description))?$/i
     );
@@ -482,31 +532,42 @@ export class ProfessionalInformationService {
       return undefined;
     }
 
-    const [, listName, index, fieldName] = repeatableErrorMatch;
-    const displayIndex = Number(index) + 1;
+    const [, listName, payloadIndex, fieldName] = repeatableErrorMatch;
+    const formIndex = this.repeatableFormIndex(listName, Number(payloadIndex), viewModel);
+    const displayIndex = formIndex + 1;
     if (listName.toLowerCase() === 'dxcodes') {
       if (fieldName?.toLowerCase() === 'explanation') {
         return {
-          href: `#dxCodeDescription-${index}`,
+          href: `#dxCodeDescription-${formIndex}`,
           label: `DX code ${displayIndex} explanation`,
         };
       }
       return {
-        href: `#dxCode-${index}`,
+        href: `#dxCode-${formIndex}`,
         label: `DX code ${displayIndex}`,
       };
     }
 
     if (fieldName?.toLowerCase() === 'description') {
       return {
-        href: `#faxNumberDescription-${index}`,
+        href: `#faxNumberDescription-${formIndex}`,
         label: `Fax number ${displayIndex} description`,
       };
     }
     return {
-      href: `#faxNumber-${index}`,
+      href: `#faxNumber-${formIndex}`,
       label: `Fax number ${displayIndex}`,
     };
+  }
+
+  private repeatableFormIndex(
+    listName: string,
+    payloadIndex: number,
+    viewModel?: ProfessionalInformationViewModel
+  ): number {
+    const entries = listName.toLowerCase() === 'dxcodes' ? viewModel?.dxCodes : viewModel?.faxNumbers;
+    const payloadEntries = entries?.filter(entry => entry.code?.trim()) ?? [];
+    return payloadEntries[payloadIndex]?.formIndex ?? payloadIndex;
   }
 
   private apiErrorText(field: string, text: string): string {
@@ -595,11 +656,11 @@ export class ProfessionalInformationService {
       const code = this.toString(form[`${codePrefix}-${index}`]);
       const description = this.toString(form[`${descriptionPrefix}-${index}`]);
       if (code || description || index === 0) {
-        entries.push({ code, description });
+        entries.push({ code, description, formIndex: index });
       }
     }
 
-    return entries.length ? entries : [{ code: '', description: '' }];
+    return entries.length ? entries : [{ code: '', description: '', formIndex: 0 }];
   }
 
   private toEntries<T extends Record<string, unknown>>(
@@ -608,12 +669,13 @@ export class ProfessionalInformationService {
     descriptionKey: keyof T
   ): ProfessionalInformationEntry[] {
     const entries =
-      items?.map(item => ({
+      items?.map((item, index) => ({
         code: this.toDisplayString(item[codeKey]),
         description: this.toDisplayString(item[descriptionKey]),
+        formIndex: index,
       })) ?? [];
 
-    return entries.length ? entries : [{ code: '', description: '' }];
+    return entries.length ? entries : [{ code: '', description: '', formIndex: 0 }];
   }
 
   private toArray(value: string | string[] | undefined): string[] {
