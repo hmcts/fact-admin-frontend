@@ -56,8 +56,14 @@ export class LocalAuthoritiesService {
     // we need to pull professional information to determine if this court has the family court type
     const professionalInformationResponse = await this.dataApiRequests.getCourtProfessionalInformation(courtId);
     if (typeof professionalInformationResponse === 'number') {
-      return professionalInformationResponse;
+      if (professionalInformationResponse !== HttpStatusCode.NotFound) {
+        return professionalInformationResponse;
+      }
     }
+    const hasFamilyCourtCode =
+      typeof professionalInformationResponse === 'number'
+        ? false
+        : !!professionalInformationResponse?.codes?.familyCourtCode;
 
     // we need the cases heard in order to determine which areas of family law are handled
     const casesHeardResponse = await this.dataApiRequests.getCourtAreasOfLaw(courtId);
@@ -78,7 +84,7 @@ export class LocalAuthoritiesService {
       courtName: courtResponse.name,
       localAuthoritySelections: this.buildCourtLocalAuthoritiesModelData(courtLocalAuthoritiesResponse, casesHeard),
       courtTypes: {
-        family: !!professionalInformationResponse.codes?.familyCourtCode,
+        family: hasFamilyCourtCode,
       },
       casesHeard,
       pageTitle: `Local authorities - ${courtResponse.name}`,
