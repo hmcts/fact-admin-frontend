@@ -110,6 +110,23 @@ test.describe(
       }
     );
 
+    test('Information for Professionals Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      professionalInformationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Information for Professionals Performance Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await professionalInformationPage.goto(createdCourt.id);
+          await professionalInformationPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
     test('Local Authorities Page Performance', async ({
       lighthouseUtils,
       casesHeardPage,

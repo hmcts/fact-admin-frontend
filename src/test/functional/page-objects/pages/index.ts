@@ -8,3 +8,4 @@ export { CourtAddressFindPage } from './court-address-find.po';
 export { CourtAddressListPage } from './court-address-list.po';
 export { CourtAddressSelectPage } from './court-address-select.po';
 export { LocalAuthoritiesPage } from './local-authorities.po';
+export { ProfessionalInformationPage } from './professional-information.po';
