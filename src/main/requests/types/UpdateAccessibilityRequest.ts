@@ -3,7 +3,7 @@ import type { HearingEnhancementEquipmentApi } from '../../schemas/accessibility
 export interface UpdateAccessibilityRequest {
   courtId?: string;
   accessibleParking?: boolean;
-  accessibleParkingPhoneNumber?: string;
+  accessibleParkingPhoneNumber?: string | null;
   accessibleToiletDescription?: string;
   accessibleToiletDescriptionCy?: string;
   accessibleEntrance?: boolean;

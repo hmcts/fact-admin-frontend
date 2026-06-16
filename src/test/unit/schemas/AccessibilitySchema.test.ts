@@ -38,4 +38,12 @@ describe('AccessibilityScheme', () => {
 
     expect(result.accessibleToiletDescriptionCy).toBe('welsh not available yet');
   });
+  test('normalizes null for accessibleParkingPhoneNumber', () => {
+    const result = AccessibilityScheme.parse({
+      ...base,
+      accessibleParkingPhoneNumber: null,
+    });
+
+    expect(result.accessibleParkingPhoneNumber).toBe(null);
+  });
 });
