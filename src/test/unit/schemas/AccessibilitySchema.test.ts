@@ -29,4 +29,13 @@ describe('AccessibilityScheme', () => {
 
     expect(result.accessibleToiletDescriptionCy).toBe('welsh not available yet');
   });
+
+  test('normalizes null welsh description to the default value', () => {
+    const result = AccessibilityScheme.parse({
+      ...base,
+      accessibleToiletDescriptionCy: null,
+    });
+
+    expect(result.accessibleToiletDescriptionCy).toBe('welsh not available yet');
+  });
 });

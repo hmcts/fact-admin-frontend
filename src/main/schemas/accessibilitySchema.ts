@@ -37,11 +37,15 @@ const normalizeHearingEnhancementEquipment = (
     return undefined;
   }
 
-  if (value in HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE) {
+  if (Object.prototype.hasOwnProperty.call(HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE, value)) {
     return HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE[value as HearingEnhancementEquipmentApi];
   }
 
-  return value as HearingEnhancementEquipmentUi;
+  if (Object.prototype.hasOwnProperty.call(HEARING_ENHANCEMENT_EQUIPMENT_MAP, value)) {
+    return value as HearingEnhancementEquipmentUi;
+  }
+
+  return undefined;
 };
 
 export const AccessibilityScheme = z.object({
@@ -50,7 +54,11 @@ export const AccessibilityScheme = z.object({
   accessibleParking: z.boolean().optional(),
   accessibleParkingPhoneNumber: z.string().optional(),
   accessibleToiletDescription: z.string().optional(),
-  accessibleToiletDescriptionCy: z.string().optional().default('welsh not available yet'),
+  accessibleToiletDescriptionCy: z
+    .string()
+    .optional()
+    .nullable()
+    .transform(value => value ?? 'welsh not available yet'),
   accessibleEntrance: z.boolean().optional(),
   accessibleEntrancePhoneNumber: z.string().optional().nullable(),
   hearingEnhancementEquipment: z
