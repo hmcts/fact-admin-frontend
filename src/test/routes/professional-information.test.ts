@@ -318,6 +318,29 @@ describe('Information for professionals page', () => {
     expect(response.text).toContain('DX code must be 200 characters or fewer');
   });
 
+  test('maps indexed API DX code errors to the matching DX code field', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
+      new Map([['dxCodes[1].dxCode', 'Value contains invalid characters']])
+    );
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/information-for-professionals/success`)
+      .type('form')
+      .send({
+        'dxCode-0': 'DX 123',
+        'dxCode-1': 'Invalid DX',
+      });
+
+    expect(response.status).toBe(HttpStatusCode.BadRequest);
+    expect(response.text).toContain('href="#dxCode-1"');
+    expect(response.text).toContain('Value contains invalid characters');
+  });
+
   test('renders confirmation page before removing family court type with local authority config', async () => {
     stub(DataApiRequests.prototype, 'getCourtById').resolves({
       id: courtId,

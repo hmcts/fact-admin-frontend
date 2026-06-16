@@ -318,6 +318,46 @@ describe('ProfessionalInformationService', () => {
     });
   });
 
+  test('maps indexed API validation errors to the matching repeatable field anchors', async () => {
+    const dataApiRequests = buildDataApiRequests({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['dxCodes[1].dxCode', 'Value contains invalid characters'],
+          ['dxCodes[1].explanation', 'Explanation contains invalid characters'],
+          ['faxNumbers[1].faxNumber', 'Fax number contains invalid characters'],
+          ['faxNumbers[1].description', 'Description contains invalid characters'],
+        ])
+      ),
+    });
+
+    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {
+      'dxCode-0': 'DX 123',
+      'dxCode-1': 'Invalid DX',
+      'dxCodeDescription-1': 'Invalid DX explanation',
+      'faxNumber-0': '020 0000 0000',
+      'faxNumber-1': '020 0000 0001',
+      'faxNumberDescription-1': 'Invalid fax description',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          { href: '#dxCode-1', text: 'Value contains invalid characters' },
+          { href: '#dxCodeDescription-1', text: 'Explanation contains invalid characters' },
+          { href: '#faxNumber-1', text: 'Fax number contains invalid characters' },
+          { href: '#faxNumberDescription-1', text: 'Description contains invalid characters' },
+        ],
+        fieldErrors: {
+          'dxCode-1': 'Value contains invalid characters',
+          'dxCodeDescription-1': 'Explanation contains invalid characters',
+          'faxNumber-1': 'Fax number contains invalid characters',
+          'faxNumberDescription-1': 'Description contains invalid characters',
+        },
+      },
+    });
+  });
+
   test('returns status codes from save dependencies', async () => {
     await expect(
       new ProfessionalInformationService(

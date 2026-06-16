@@ -421,6 +421,10 @@ export class ProfessionalInformationService {
   private apiErrorHref(field: string, text: string): string {
     const normalizedField = field.toLowerCase();
     const normalizedText = text.toLowerCase();
+    const repeatableFieldHref = this.repeatableApiErrorHref(field);
+    if (repeatableFieldHref) {
+      return repeatableFieldHref;
+    }
     if (this.matchesApiError(normalizedField, normalizedText, 'interviewRoomCount', 'interview room count')) {
       return '#interviewRoomCount';
     }
@@ -459,6 +463,22 @@ export class ProfessionalInformationService {
       return courtCodeHref;
     }
     return field && field !== 'message' ? `#${field}` : '';
+  }
+
+  private repeatableApiErrorHref(field: string): string | undefined {
+    const repeatableErrorMatch = field.match(
+      /^(dxCodes|faxNumbers)(?:\[(\d+)])(?:\.(dxCode|explanation|faxNumber|description))?$/i
+    );
+    if (!repeatableErrorMatch) {
+      return undefined;
+    }
+
+    const [, listName, index, fieldName] = repeatableErrorMatch;
+    if (listName.toLowerCase() === 'dxcodes') {
+      return fieldName?.toLowerCase() === 'explanation' ? `#dxCodeDescription-${index}` : `#dxCode-${index}`;
+    }
+
+    return fieldName?.toLowerCase() === 'description' ? `#faxNumberDescription-${index}` : `#faxNumber-${index}`;
   }
 
   private apiErrorText(field: string, text: string): string {
