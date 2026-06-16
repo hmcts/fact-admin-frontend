@@ -13,6 +13,7 @@ import { CourtEditPage } from './court-edit.po';
 import { GeneralPage } from './general.po';
 import { HomePage } from './home.po';
 import { LocalAuthoritiesPage } from './local-authorities.po';
+import { ProfessionalInformationPage } from './professional-information.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 
 export interface PageFixtures {
@@ -31,6 +32,7 @@ export interface PageFixtures {
   courtAddressDeleteSuccessPage: CourtAddressDeleteSuccessPage;
   generalPage: GeneralPage;
   localAuthoritiesPage: LocalAuthoritiesPage;
+  professionalInformationPage: ProfessionalInformationPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -103,6 +105,10 @@ export const pageFixtures = {
   localAuthoritiesPage: async ({ determinePage }, use): Promise<void> => {
     const localAuthoritiesPage = new LocalAuthoritiesPage(determinePage);
     await use(localAuthoritiesPage);
+  },
+  professionalInformationPage: async ({ determinePage }, use): Promise<void> => {
+    const professionalInformationPage = new ProfessionalInformationPage(determinePage);
+    await use(professionalInformationPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
