@@ -64,7 +64,9 @@ export default class AccessibilityController {
       courtId: resolvedCourtId,
       accessibleParking: parseBoolean(accessibleParking),
       accessibleParkingPhoneNumber:
-        typeof accessibleParkingPhoneNumber === 'string' ? accessibleParkingPhoneNumber : undefined,
+        typeof accessibleParkingPhoneNumber === 'string' && parseBoolean(accessibleParking) === true
+          ? accessibleParkingPhoneNumber
+          : undefined,
       accessibleToiletDescription:
         typeof accessibleToiletDescription === 'string' ? accessibleToiletDescription : undefined,
       accessibleToiletDescriptionCy:
