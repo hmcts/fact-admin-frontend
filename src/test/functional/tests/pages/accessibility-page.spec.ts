@@ -7,7 +7,8 @@ const seedAccessibilityData = async (accessibilityPage: AccessibilityPage, court
     form: {
       accessibleParking: 'false',
       accessibleToiletDescription: 'Accessible toilet is on the ground floor.',
-      accessibleEntrance: 'true',
+      accessibleEntrance: 'false',
+      accessibleEntrancePhoneNumber: '0123456789',
       hearingEnhancementEquipment: 'infrared',
       lift: 'false',
       quietRoom: 'false',
