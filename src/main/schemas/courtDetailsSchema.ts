@@ -48,7 +48,10 @@ const courtFacilitiesSchema = z.object({
   drinkVendingMachines: z.boolean(),
   cafeteria: z.boolean(),
   waitingArea: z.boolean(),
-  waitingAreaChildren: z.boolean(),
+  waitingAreaChildren: z
+    .boolean()
+    .nullable()
+    .transform(value => value ?? false),
   quietRoom: z.boolean(),
   babyChanging: z.boolean(),
   wifi: z.boolean(),

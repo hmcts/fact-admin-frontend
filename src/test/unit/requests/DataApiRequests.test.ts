@@ -640,7 +640,7 @@ describe('DataApiRequests', () => {
             drinkVendingMachines: false,
             cafeteria: false,
             waitingArea: true,
-            waitingAreaChildren: false,
+            waitingAreaChildren: null,
             quietRoom: false,
             babyChanging: false,
             wifi: true,
@@ -684,7 +684,18 @@ describe('DataApiRequests', () => {
 
     const response = await dataApiRequests.getAllCourts();
 
-    expect(response).toEqual(allCourts);
+    expect(response).toEqual([
+      {
+        ...allCourts[0],
+        courtFacilities: [
+          {
+            ...allCourts[0].courtFacilities[0],
+            waitingArea: true,
+            waitingAreaChildren: false,
+          },
+        ],
+      },
+    ]);
   });
 
   it('returns bad request when the bulk court endpoint returns a 400', async () => {
