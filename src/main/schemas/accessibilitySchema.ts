@@ -52,7 +52,7 @@ export const AccessibilityScheme = z.object({
   id: z.string(),
   courtId: z.string(),
   accessibleParking: z.boolean().optional(),
-  accessibleParkingPhoneNumber: z.string().optional(),
+  accessibleParkingPhoneNumber: z.string().optional().nullable(),
   accessibleToiletDescription: z.string().optional(),
   accessibleToiletDescriptionCy: z
     .string()
