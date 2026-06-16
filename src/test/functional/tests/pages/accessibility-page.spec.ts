@@ -1,19 +1,16 @@
-import type { APIRequestContext } from '@playwright/test';
-
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
+import type { AccessibilityPage } from '../../page-objects/pages';
 
-const seedAccessibilityData = async (apiContext: APIRequestContext, courtId: string): Promise<void> => {
-  const response = await apiContext.post(`/courts/${courtId}/v1/accessibility-options`, {
-    data: {
-      courtId,
-      accessibleParking: false,
+const seedAccessibilityData = async (accessibilityPage: AccessibilityPage, courtId: string): Promise<void> => {
+  const response = await accessibilityPage.page.request.post(accessibilityPage.buildAccessibilitySuccessUrl(courtId), {
+    form: {
+      accessibleParking: 'false',
       accessibleToiletDescription: 'Accessible toilet is on the ground floor.',
-      accessibleToiletDescriptionCy: 'welsh not available yet',
-      accessibleEntrance: true,
-      hearingEnhancementEquipment: 'INFRARED_SYSTEMS',
-      lift: false,
-      quietRoom: false,
+      accessibleEntrance: 'true',
+      hearingEnhancementEquipment: 'infrared',
+      lift: 'false',
+      quietRoom: 'false',
     },
   });
 
@@ -33,8 +30,8 @@ test.describe('Accessibility Page Tests', () => {
         playwright,
         'Accessibility Functional Test',
         { serviceCenter: false },
-        async ({ apiContext, createdCourt }) => {
-          await seedAccessibilityData(apiContext, createdCourt.id);
+        async ({ createdCourt }) => {
+          await seedAccessibilityData(accessibilityPage, createdCourt.id);
           await accessibilityPage.goto(createdCourt.id);
           await expect(accessibilityPage.heading).toContainText('Accessibility');
         }
@@ -47,8 +44,8 @@ test.describe('Accessibility Page Tests', () => {
       playwright,
       'Accessibility Functional Test',
       { serviceCenter: false },
-      async ({ apiContext, createdCourt }) => {
-        await seedAccessibilityData(apiContext, createdCourt.id);
+      async ({ createdCourt }) => {
+        await seedAccessibilityData(accessibilityPage, createdCourt.id);
         await accessibilityPage.goto(createdCourt.id);
 
         await accessibilityPage.selectNo('accessibleParking');
@@ -76,8 +73,8 @@ test.describe('Accessibility Page Tests', () => {
       playwright,
       'Accessibility Functional Test',
       { serviceCenter: false },
-      async ({ apiContext, createdCourt }) => {
-        await seedAccessibilityData(apiContext, createdCourt.id);
+      async ({ createdCourt }) => {
+        await seedAccessibilityData(accessibilityPage, createdCourt.id);
         await accessibilityPage.goto(createdCourt.id);
 
         await accessibilityPage.selectYes('accessibleParking');
