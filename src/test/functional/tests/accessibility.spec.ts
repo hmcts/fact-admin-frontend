@@ -222,6 +222,23 @@ test.describe(
       );
     });
 
+    test('Information for Professionals Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      professionalInformationPage,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Information for Professionals Accessibility Test',
+        { serviceCenter: false },
+        async ({ createdCourt }) => {
+          await professionalInformationPage.goto(createdCourt.id);
+          await professionalInformationPage.expectVisibleElements();
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Local Authorities Success Page Accessibility', async ({
       axeUtils,
       casesHeardPage,

@@ -33,7 +33,7 @@ export const courtProfessionalInformationSchema = z.object({
   professionalInformation: professionalInformationSchema,
   codes: courtCodesSchema.nullable().optional(),
   dxCodes: z.array(courtDxCodeSchema).nullable().optional(),
-  faxNumber: z.array(courtFaxCodeSchema).nullable().optional(),
+  faxNumbers: z.array(courtFaxCodeSchema).nullable().optional(),
 });
 
 export type CourtProfessionalInformation = z.infer<typeof courtProfessionalInformationSchema>;

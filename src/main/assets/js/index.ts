@@ -3,7 +3,9 @@ import { initAll } from 'govuk-frontend';
 
 import { initDisplayedElementFilters } from './displayedElementFilter';
 import { initLoadingRedirects } from './loadingRedirect';
+import { initProfessionalInformationRepeatableFields } from './professionalInformation';
 
 initAll();
 initDisplayedElementFilters();
 initLoadingRedirects();
+initProfessionalInformationRepeatableFields();

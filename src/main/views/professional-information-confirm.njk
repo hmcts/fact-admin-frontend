@@ -1,0 +1,46 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}
+  Information for professionals confirm update - {{ courtName }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Are you sure you want to save the changes to Information for professionals?</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/information-for-professionals/success">
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Court name" },
+              value: { text: courtName }
+            },
+            {
+              key: { text: "Confirm" },
+              value: { text: message }
+            }
+          ]
+        }) }}
+
+        {% for input in hiddenInputs %}
+          <input type="hidden" name="{{ input.name }}" value="{{ input.value }}">
+        {% endfor %}
+
+        {{ govukButton({
+          text: "Continue",
+          classes: "govuk-button--warning"
+        }) }}
+      </form>
+
+      <form id="cancel_form" method="GET" action="/courts/{{ courtId }}/edit/information-for-professionals">
+        {{ govukButton({
+          text: "Cancel",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

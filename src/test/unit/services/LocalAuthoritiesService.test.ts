@@ -131,6 +131,28 @@ describe('LocalAuthoritiesService', () => {
     });
   });
 
+  test('sets family court type to false when professional information is not found', async () => {
+    const dataApiRequests = {
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+      getCourtAreasOfLaw: jest.fn().mockResolvedValue([]),
+      getCourtLocalAuthorities: jest.fn().mockResolvedValue([]),
+      getCourtById: jest.fn().mockResolvedValue({
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Reading Crown Court',
+      } as never),
+    };
+
+    const service = new LocalAuthoritiesService(dataApiRequests as never);
+
+    const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
+
+    expect(result).toMatchObject({
+      courtTypes: { family: false },
+    });
+    expect(dataApiRequests.getCourtAreasOfLaw).toHaveBeenCalled();
+    expect(dataApiRequests.getCourtLocalAuthorities).toHaveBeenCalled();
+  });
+
   test('saves selected local authorities and returns saved result with court name', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const selections = {

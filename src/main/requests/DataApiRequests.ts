@@ -427,12 +427,36 @@ export class DataApiRequests {
    */
   public async getCourtProfessionalInformation(
     courtId: string
-  ): Promise<CourtProfessionalInformation | HttpStatusCode> {
+  ): Promise<CourtProfessionalInformation | null | HttpStatusCode> {
     try {
       const response = await dataApi.get(`/courts/${courtId}/v1/professional-information`);
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
       return courtProfessionalInformationSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching professional information data for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create or update professional information by court id
+   */
+  public async saveCourtProfessionalInformation(
+    courtId: string,
+    payload: CourtProfessionalInformation
+  ): Promise<CourtProfessionalInformation | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/professional-information`, payload);
+      return courtProfessionalInformationSchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error(`Error saving professional information data for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
