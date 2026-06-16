@@ -203,11 +203,12 @@ describe('ProfessionalInformationService', () => {
         fieldErrors: {
           crownCourtCode: 'Enter a crown court code using numbers only',
           'dxCode-0':
-            'You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
+            'DX code 1: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
           familyCourtCode: 'Enter a family court code',
-          'faxNumber-0': 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          'faxNumber-0':
+            'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           'faxNumber-1':
-            'You have entered a description without a fax number, please add a number or remove the description',
+            'Fax number 2: You have entered a description without a fax number, please add a number or remove the description',
           interviewRoomCount: 'Enter a number of interview rooms between 1 and 150, or select No',
         },
       },
@@ -293,10 +294,13 @@ describe('ProfessionalInformationService', () => {
         errorSummary: [
           { href: '#countyCourtCode', text: 'County court code must be 10 characters or fewer' },
           { href: '#gbs', text: 'GBS code must be 10 characters or fewer' },
-          { href: '#dxCode-0', text: 'DX code must be 200 characters or fewer' },
-          { href: '#dxCodeDescription-0', text: 'Explanation must be 200 characters or fewer' },
-          { href: '#faxNumber-0', text: 'Fax number must be 200 characters or fewer' },
-          { href: '#faxNumberDescription-0', text: 'Description must be 200 characters or fewer' },
+          { href: '#dxCode-0', text: 'DX code 1: DX code must be 200 characters or fewer' },
+          { href: '#dxCodeDescription-0', text: 'DX code 1 explanation: Explanation must be 200 characters or fewer' },
+          { href: '#faxNumber-0', text: 'Fax number 1: Fax number must be 200 characters or fewer' },
+          {
+            href: '#faxNumberDescription-0',
+            text: 'Fax number 1 description: Description must be 200 characters or fewer',
+          },
           { href: '#interviewPhoneNumber', text: 'Interview phone number must be 20 characters or fewer' },
           { href: '#videoHearings', text: 'Video hearing facilities must be true or false' },
           { href: '#commonPlatform', text: 'Common platform must be true or false' },
@@ -306,10 +310,10 @@ describe('ProfessionalInformationService', () => {
           accessScheme: 'Access scheme must be true or false',
           commonPlatform: 'Common platform must be true or false',
           countyCourtCode: 'County court code must be 10 characters or fewer',
-          'dxCode-0': 'DX code must be 200 characters or fewer',
-          'dxCodeDescription-0': 'Explanation must be 200 characters or fewer',
-          'faxNumber-0': 'Fax number must be 200 characters or fewer',
-          'faxNumberDescription-0': 'Description must be 200 characters or fewer',
+          'dxCode-0': 'DX code 1: DX code must be 200 characters or fewer',
+          'dxCodeDescription-0': 'DX code 1 explanation: Explanation must be 200 characters or fewer',
+          'faxNumber-0': 'Fax number 1: Fax number must be 200 characters or fewer',
+          'faxNumberDescription-0': 'Fax number 1 description: Description must be 200 characters or fewer',
           gbs: 'GBS code must be 10 characters or fewer',
           interviewPhoneNumber: 'Interview phone number must be 20 characters or fewer',
           videoHearings: 'Video hearing facilities must be true or false',
@@ -343,17 +347,58 @@ describe('ProfessionalInformationService', () => {
       status: 'validationError',
       viewModel: {
         errorSummary: [
-          { href: '#dxCode-1', text: 'Value contains invalid characters' },
-          { href: '#dxCodeDescription-1', text: 'Explanation contains invalid characters' },
-          { href: '#faxNumber-1', text: 'Fax number contains invalid characters' },
-          { href: '#faxNumberDescription-1', text: 'Description contains invalid characters' },
+          { href: '#dxCode-1', text: 'DX code 2: Value contains invalid characters' },
+          { href: '#dxCodeDescription-1', text: 'DX code 2 explanation: Explanation contains invalid characters' },
+          { href: '#faxNumber-1', text: 'Fax number 2: Fax number contains invalid characters' },
+          {
+            href: '#faxNumberDescription-1',
+            text: 'Fax number 2 description: Description contains invalid characters',
+          },
         ],
         fieldErrors: {
-          'dxCode-1': 'Value contains invalid characters',
-          'dxCodeDescription-1': 'Explanation contains invalid characters',
-          'faxNumber-1': 'Fax number contains invalid characters',
-          'faxNumberDescription-1': 'Description contains invalid characters',
+          'dxCode-1': 'DX code 2: Value contains invalid characters',
+          'dxCodeDescription-1': 'DX code 2 explanation: Explanation contains invalid characters',
+          'faxNumber-1': 'Fax number 2: Fax number contains invalid characters',
+          'faxNumberDescription-1': 'Fax number 2 description: Description contains invalid characters',
         },
+      },
+    });
+  });
+
+  test('keeps repeated API validation errors linked and labelled by repeatable field index', async () => {
+    const dataApiRequests = buildDataApiRequests({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['dxCodes[0].dxCode', 'Value contains invalid characters'],
+          ['dxCodes[3].dxCode', 'Value contains invalid characters'],
+          ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
+          ['faxNumbers[4].faxNumber', 'Value contains invalid characters'],
+        ])
+      ),
+    });
+
+    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {
+      'dxCode-0': 'Invalid DX 1',
+      'dxCode-1': 'DX 2',
+      'dxCode-2': 'DX 3',
+      'dxCode-3': 'Invalid DX 4',
+      'dxCode-4': 'DX 5',
+      'faxNumber-0': '020 0000 0000',
+      'faxNumber-1': '020 0000 0001',
+      'faxNumber-2': '020 0000 0002',
+      'faxNumber-3': '020 0000 0003',
+      'faxNumber-4': '020 0000 0004',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          { href: '#dxCode-0', text: 'DX code 1: Value contains invalid characters' },
+          { href: '#dxCode-3', text: 'DX code 4: Value contains invalid characters' },
+          { href: '#faxNumber-0', text: 'Fax number 1: Value contains invalid characters' },
+          { href: '#faxNumber-4', text: 'Fax number 5: Value contains invalid characters' },
+        ],
       },
     });
   });

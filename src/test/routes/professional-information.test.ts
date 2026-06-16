@@ -338,7 +338,7 @@ describe('Information for professionals page', () => {
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('href="#dxCode-1"');
-    expect(response.text).toContain('Value contains invalid characters');
+    expect(response.text).toContain('DX code 2: Value contains invalid characters');
   });
 
   test('renders confirmation page before removing family court type with local authority config', async () => {

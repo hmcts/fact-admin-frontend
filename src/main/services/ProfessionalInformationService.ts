@@ -60,6 +60,11 @@ export type FamilyCourtRemovalConfirmation = {
   required: boolean;
 };
 
+type RepeatableApiError = {
+  href: string;
+  label: string;
+};
+
 export const courtTypeOptions: CourtTypeOption[] = [
   {
     codeField: 'magistrateCourtCode',
@@ -324,7 +329,7 @@ export class ProfessionalInformationService {
       if (dxCode.description?.trim() && !dxCode.code?.trim()) {
         errors.push({
           href: `#dxCode-${index}`,
-          text: 'You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
+          text: `DX code ${index + 1}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
         });
       }
     });
@@ -333,12 +338,12 @@ export class ProfessionalInformationService {
       if (faxNumber.description?.trim() && !faxNumber.code?.trim()) {
         errors.push({
           href: `#faxNumber-${index}`,
-          text: 'You have entered a description without a fax number, please add a number or remove the description',
+          text: `Fax number ${index + 1}: You have entered a description without a fax number, please add a number or remove the description`,
         });
       } else if (faxNumber.code?.trim() && !phoneNumberPattern.test(faxNumber.code.trim())) {
         errors.push({
           href: `#faxNumber-${index}`,
-          text: faxNumberFormatError,
+          text: `Fax number ${index + 1}: ${faxNumberFormatError}`,
         });
       }
     });
@@ -412,18 +417,22 @@ export class ProfessionalInformationService {
   private mapApiErrors(errors: Map<string, string>): ProfessionalInformationError[] {
     return [...errors]
       .filter(([field]) => field.toLowerCase() !== 'timestamp')
-      .map(([field, text]) => ({
-        href: this.apiErrorHref(field, text),
-        text: this.apiErrorText(field, text),
-      }));
+      .map(([field, text]) => {
+        const repeatableError = this.repeatableApiError(field);
+        const errorText = this.apiErrorText(field, text);
+        return {
+          href: repeatableError?.href ?? this.apiErrorHref(field, text),
+          text: repeatableError ? `${repeatableError.label}: ${errorText}` : errorText,
+        };
+      });
   }
 
   private apiErrorHref(field: string, text: string): string {
     const normalizedField = field.toLowerCase();
     const normalizedText = text.toLowerCase();
-    const repeatableFieldHref = this.repeatableApiErrorHref(field);
-    if (repeatableFieldHref) {
-      return repeatableFieldHref;
+    const repeatableError = this.repeatableApiError(field);
+    if (repeatableError) {
+      return repeatableError.href;
     }
     if (this.matchesApiError(normalizedField, normalizedText, 'interviewRoomCount', 'interview room count')) {
       return '#interviewRoomCount';
@@ -465,7 +474,7 @@ export class ProfessionalInformationService {
     return field && field !== 'message' ? `#${field}` : '';
   }
 
-  private repeatableApiErrorHref(field: string): string | undefined {
+  private repeatableApiError(field: string): RepeatableApiError | undefined {
     const repeatableErrorMatch = field.match(
       /^(dxCodes|faxNumbers)(?:\[(\d+)])(?:\.(dxCode|explanation|faxNumber|description))?$/i
     );
@@ -474,11 +483,30 @@ export class ProfessionalInformationService {
     }
 
     const [, listName, index, fieldName] = repeatableErrorMatch;
+    const displayIndex = Number(index) + 1;
     if (listName.toLowerCase() === 'dxcodes') {
-      return fieldName?.toLowerCase() === 'explanation' ? `#dxCodeDescription-${index}` : `#dxCode-${index}`;
+      if (fieldName?.toLowerCase() === 'explanation') {
+        return {
+          href: `#dxCodeDescription-${index}`,
+          label: `DX code ${displayIndex} explanation`,
+        };
+      }
+      return {
+        href: `#dxCode-${index}`,
+        label: `DX code ${displayIndex}`,
+      };
     }
 
-    return fieldName?.toLowerCase() === 'description' ? `#faxNumberDescription-${index}` : `#faxNumber-${index}`;
+    if (fieldName?.toLowerCase() === 'description') {
+      return {
+        href: `#faxNumberDescription-${index}`,
+        label: `Fax number ${displayIndex} description`,
+      };
+    }
+    return {
+      href: `#faxNumber-${index}`,
+      label: `Fax number ${displayIndex}`,
+    };
   }
 
   private apiErrorText(field: string, text: string): string {
