@@ -221,9 +221,6 @@ test.describe(
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
           await professionalInformationPage.expectVisibleElements();
-          await professionalInformationPage.page
-            .locator('input[type="radio"][aria-expanded]')
-            .evaluateAll(radios => radios.forEach(radio => radio.removeAttribute('aria-expanded')));
           await axeUtils.audit();
         }
       );
