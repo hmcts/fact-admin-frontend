@@ -189,7 +189,7 @@ describe('BuildingFacilitiesController', () => {
           courtId: '11111111-1111-1111-1111-111111111111',
           courtName: 'Court A',
           pageTitle: 'Building Facilities saved - Court A',
-          successPanelBody: 'Building Facilities details saved for Court A have been saved successfully.',
+          successPanelBody: 'Building Facilities details for Court A have been saved successfully.',
           successPanelTitle: 'Building Facilities details saved',
         })
       );
