@@ -1702,4 +1702,144 @@ describe('DataApiRequests', () => {
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
+
+  it('returns parsed building facilities when the response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const buildingFacilities = {
+      id: '66666666-6666-4666-8666-666666666666',
+      courtId,
+      parking: true,
+      freeWaterDispensers: false,
+      snackVendingMachines: false,
+      drinkVendingMachines: false,
+      cafeteria: false,
+      waitingArea: true,
+      waitingAreaChildren: false,
+      quietRoom: false,
+      babyChanging: false,
+      wifi: true,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/building-facilities`).resolves({
+      data: buildingFacilities,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getBuildingFacilities(courtId);
+
+    expect(response).toEqual(buildingFacilities);
+  });
+
+  it('returns null when building facilities do not exist for the court', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/building-facilities`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await dataApiRequests.getBuildingFacilities(courtId);
+
+    expect(response).toBeNull();
+  });
+
+  it('returns internal server error when building facilities response fails schema validation', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/building-facilities`).resolves({
+      data: {
+        id: '66666666-6666-4666-8666-666666666666',
+        courtId,
+      },
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getBuildingFacilities(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('posts building facilities payload and returns parsed response', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      parking: true,
+      freeWaterDispensers: false,
+      snackVendingMachines: false,
+      drinkVendingMachines: false,
+      cafeteria: false,
+      waitingArea: true,
+      waitingAreaChildren: false,
+      quietRoom: false,
+      babyChanging: false,
+      wifi: true,
+    };
+    const responseBody = {
+      id: '66666666-6666-4666-8666-666666666666',
+      ...payload,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/building-facilities`, payload).resolves({
+      data: responseBody,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
+
+    expect(response).toEqual(responseBody);
+  });
+
+  it('returns validation errors map when update building facilities endpoint returns a 400', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      parking: true,
+      freeWaterDispensers: false,
+      snackVendingMachines: false,
+      drinkVendingMachines: false,
+      cafeteria: false,
+      waitingArea: true,
+      waitingAreaChildren: false,
+      quietRoom: false,
+      babyChanging: false,
+      wifi: true,
+    };
+    const apiErrors = {
+      waitingArea: 'Select whether the waiting area is available',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/building-facilities`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when update building facilities throws a non-axios error', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      parking: true,
+      freeWaterDispensers: false,
+      snackVendingMachines: false,
+      drinkVendingMachines: false,
+      cafeteria: false,
+      waitingArea: true,
+      waitingAreaChildren: false,
+      quietRoom: false,
+      babyChanging: false,
+      wifi: true,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/building-facilities`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
 });
