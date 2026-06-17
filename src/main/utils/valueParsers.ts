@@ -1,3 +1,5 @@
+import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
+import { FacilityModel } from '../services/BuildingFacilitiesService';
 /**
  * Parses an integer-like value, falling back when the value is invalid.
  */
