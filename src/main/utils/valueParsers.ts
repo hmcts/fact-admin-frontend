@@ -54,12 +54,3 @@ export const parseLiftMetric = (value: unknown): number | undefined => {
   const parsed = Number(trimmed);
   return Number.isFinite(parsed) ? parsed : NaN;
 };
-export const parseBoolean = (value: unknown): boolean | undefined => {
-  if (value === true || value === 'true') {
-    return true;
-  }
-  if (value === false || value === 'false') {
-    return false;
-  }
-  return undefined;
-};
