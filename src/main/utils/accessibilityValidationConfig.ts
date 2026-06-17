@@ -4,7 +4,7 @@ import type { FacilityModel } from '../services/AccessibilityService';
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
 
 // Regex constants
-export const UK_PHONE_REGEX = /^(|(\+44|)[0-9 ]{10,20})$/; // kept same regex in backend ideally it should be 10-12 digit though
+export const UK_PHONE_REGEX = /^((\+44|)[0-9 ]{10,20})$/; // kept same regex in backend ideally it should be 10-12 digit though
 export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
