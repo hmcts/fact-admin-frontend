@@ -205,6 +205,7 @@ export class CourtAddressController {
         courtName: saveResult['courtName'],
         address: saveResult['address'] as CourtAddress,
         courtId,
+        courtOpened: saveResult['courtOpened'],
       });
     }
   }
@@ -309,6 +310,7 @@ export class CourtAddressController {
         courtName: saveResult['courtName'],
         address: saveResult['address'] as CourtAddress,
         courtId,
+        courtOpened: saveResult['courtOpened'],
       });
     }
   }

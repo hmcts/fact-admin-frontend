@@ -15,6 +15,19 @@ test.describe(
       await axeUtils.audit();
     });
 
+    test('Add Court Page Accessibility', async ({ addCourtPage, axeUtils }) => {
+      await addCourtPage.goto();
+      await addCourtPage.expectVisibleElements();
+      await axeUtils.audit();
+    });
+
+    test('Add Court Validation Accessibility', async ({ addCourtPage, axeUtils }) => {
+      await addCourtPage.goto();
+      await addCourtPage.submitInvalidCourt();
+      await expect(addCourtPage.mainContent.content).toContainText('There is a problem');
+      await axeUtils.audit();
+    });
+
     test('Court Edit Page Accessibility', async ({ axeUtils, courtEditPage, playwright }) => {
       await withCreatedCourt(
         playwright,
