@@ -53,14 +53,15 @@ export class AddCourtService {
    */
   public validate(form: AddCourtForm): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
+    const name = form.name?.trim();
 
     const nameErrors: string[] = [];
-    if (!form.name || form.name.trim().length === 0) {
+    if (!name || name.length === 0) {
       nameErrors.push('Enter a name for the court');
-    } else if (form.name.length < 5 || form.name.length > 200) {
+    } else if (name.length < 5 || name.length > 200) {
       nameErrors.push('Court name should be between 5 and 200 characters');
     }
-    if (form.name && !VALID_COURT_NAME_REGEX.test(form.name)) {
+    if (name && !VALID_COURT_NAME_REGEX.test(name)) {
       nameErrors.push(
         'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
       );
@@ -85,9 +86,13 @@ export class AddCourtService {
    * a closed court ready for the user to add its first address.
    */
   public async create(form: AddCourtForm): Promise<AddCourtResult> {
-    const validationErrors = this.validate(form);
+    const trimmedForm = {
+      ...form,
+      name: form.name?.trim(),
+    };
+    const validationErrors = this.validate(trimmedForm);
     if (validationErrors) {
-      return this.getViewModelWithErrors(form, validationErrors);
+      return this.getViewModelWithErrors(trimmedForm, validationErrors);
     }
 
     const regions = await this.dataApiRequests.getRegions();
@@ -95,15 +100,15 @@ export class AddCourtService {
       return regions;
     }
 
-    const name = form.name as string;
-    const regionId = form.regionId as string;
+    const name = trimmedForm.name as string;
+    const regionId = trimmedForm.regionId as string;
     const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
     if (typeof duplicateCourt === 'number') {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;
       }
     } else {
-      return this.buildViewModelWithErrors(form, regions, {
+      return this.buildViewModelWithErrors(trimmedForm, regions, {
         name: [`A court with the entered name already exists: '${duplicateCourt.name}'`],
       });
     }
@@ -127,7 +132,7 @@ export class AddCourtService {
         }
         errors[key] = [value];
       }
-      return this.buildViewModelWithErrors(form, regions, errors);
+      return this.buildViewModelWithErrors(trimmedForm, regions, errors);
     }
 
     return {

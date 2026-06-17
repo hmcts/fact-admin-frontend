@@ -56,6 +56,14 @@ describe('AddCourtService', () => {
     });
   });
 
+  test('validates court name length after trimming leading and trailing whitespace', () => {
+    const service = new AddCourtService();
+
+    expect(service.validate({ name: ' Test ', regionId: regions[0].id })).toEqual({
+      name: ['Court name should be between 5 and 200 characters'],
+    });
+  });
+
   test('validates court name characters using general page messages', () => {
     const service = new AddCourtService();
 
@@ -131,6 +139,25 @@ describe('AddCourtService', () => {
       regionId: regions[0].id,
     });
     expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+  });
+
+  test('create trims leading and trailing whitespace before duplicate lookup and create API call', async () => {
+    const requests = {
+      createCourt: jest.fn().mockResolvedValue(createdCourt),
+      getCourtByName: jest.fn().mockResolvedValue(404),
+      getRegions: jest.fn().mockResolvedValue(regions),
+    };
+    const service = new AddCourtService(requests as never);
+
+    await service.create({ name: `  ${createdCourt.name}  `, regionId: regions[0].id });
+
+    expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.createCourt).toHaveBeenCalledWith({
+      isServiceCentre: false,
+      name: createdCourt.name,
+      open: false,
+      regionId: regions[0].id,
+    });
   });
 
   test('create maps API validation errors into the add court view model', async () => {

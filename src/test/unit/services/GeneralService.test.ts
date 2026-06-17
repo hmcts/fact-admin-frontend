@@ -173,6 +173,36 @@ describe('GeneralService', () => {
     });
   });
 
+  test('save trims leading and trailing whitespace before duplicate lookup and update API call', async () => {
+    const requests = {
+      getCourtById: jest.fn().mockResolvedValue(courtEntity),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      updateCourt: jest.fn().mockResolvedValue({
+        ...courtEntity,
+        name: 'Updated Court Name',
+      }),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
+    };
+
+    const service = new GeneralService(requests as never);
+
+    await service.save({
+      id: courtEntity.id,
+      name: '  Updated Court Name  ',
+      open: true,
+      regionId: courtEntity.regionId,
+    });
+
+    expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Court Name');
+    expect(requests.updateCourt).toHaveBeenCalledWith({
+      ...courtEntity,
+      regions,
+      name: 'Updated Court Name',
+      open: true,
+      regionId: courtEntity.regionId,
+    });
+  });
+
   test('save returns status code when updateCourt fails', async () => {
     const requests = {
       getCourtById: jest.fn().mockResolvedValue(courtEntity),
