@@ -3,9 +3,12 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
-import { toSlugFormat } from '../utils/valueParsers';
 
-export type GeneralViewModel = Partial<CourtEntity> & { errors?: Record<string, string[]>; regions?: Region[] };
+export type GeneralViewModel = Partial<CourtEntity> & {
+  errors?: Record<string, string[]>;
+  originalName?: string;
+  regions?: Region[];
+};
 
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
@@ -32,20 +35,26 @@ export class GeneralService {
     if (typeof courtEntity === 'number') {
       return courtEntity;
     }
+    const originalName = courtEntity.name;
+    const trimmedName = model.name?.trim();
 
     // overlay our specific changes
-    courtEntity.name = model.name as string;
+    courtEntity.name = trimmedName as string;
     courtEntity.regionId = model.regionId as string;
     courtEntity.open = model.open as boolean;
+    const trimmedModel = {
+      ...model,
+      name: trimmedName,
+    };
 
     // validate for obvious errors
-    const validationErrors = this.validateCourtEntity(model);
+    const validationErrors = this.validateCourtEntity(trimmedModel);
     if (validationErrors) {
-      return { ...courtEntity, errors: validationErrors };
+      return { ...courtEntity, errors: validationErrors, originalName };
     }
 
-    // ensure that if we already have a court with this slug, that it's this court
-    const duplicateCourt = await this.dataApiRequests.getCourtBySlug(toSlugFormat(courtEntity.name));
+    // ensure that if we already have a court with this exact name, that it's this court
+    const duplicateCourt = await this.dataApiRequests.getCourtByName(courtEntity.name);
     if (typeof duplicateCourt === 'number') {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;
@@ -81,16 +90,17 @@ export class GeneralService {
 
   private validateCourtEntity(model: GeneralViewModel): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
+    const name = model.name?.trim();
 
     const nameErrors: string[] = [];
     // Make sure we have a name and that it's within length limits
-    if (!model.name || model.name.trim().length === 0) {
+    if (!name || name.length === 0) {
       nameErrors.push('Enter a name for the court');
-    } else if (model.name.length < 5 || model.name.length > 200) {
-      nameErrors.push('Court name should be between 5 and 200 chars');
+    } else if (name.length < 5 || name.length > 200) {
+      nameErrors.push('Court name should be between 5 and 200 characters');
     }
     // if it's been specified, regardless of other errors, ensure it's content is valid
-    if (model.name && !VALID_COURT_NAME_REGEX.test(model.name)) {
+    if (name && !VALID_COURT_NAME_REGEX.test(name)) {
       nameErrors.push(
         'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
       );

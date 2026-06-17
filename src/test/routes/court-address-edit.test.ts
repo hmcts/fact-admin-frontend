@@ -125,6 +125,7 @@ describe('Court address edit routes', () => {
     stub(CourtAddressService.prototype, 'save').resolves({
       status: 'saved',
       courtName: 'Reading Crown Court',
+      courtOpened: true,
       address,
     } as never);
 
@@ -143,6 +144,7 @@ describe('Court address edit routes', () => {
     expect(response.status).toBe(200);
     expect(response.text).toContain('Address saved:');
     expect(response.text).toContain('Reading Crown Court');
+    expect(response.text).toContain('The court is now open.');
     expect(response.text).toContain(`/courts/${courtId}/edit/address`);
   });
 

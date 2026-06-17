@@ -82,7 +82,7 @@ export default class GeneralController {
     if (updateResponse.errors) {
       res.render('general-edit', {
         model: updateResponse,
-        pageTitle: `Error: General - ${updateResponse.name}`,
+        pageTitle: `Error: General - ${updateResponse.originalName ?? updateResponse.name}`,
       });
       return;
     }

@@ -226,59 +226,59 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
-  it('returns parsed court details when the court by slug response is valid', async () => {
-    const courtSlug = 'london-civil-and-family-court';
+  it('returns parsed court details when the court by exact name response is valid', async () => {
+    const courtName = 'London Civil and Family Court';
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
       isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
-      name: 'London Civil and Family Court',
+      name: courtName,
       open: true,
       openOnCath: true,
       regionId: '33333333-3333-4333-8333-333333333333',
-      slug: courtSlug,
+      slug: 'london-civil-and-family-court',
       warningNotice: null,
     };
 
-    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).resolves({ data: court });
+    getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).resolves({ data: court });
 
-    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+    const response = await dataApiRequests.getCourtByName(courtName);
 
     expect(response).toEqual(court);
   });
 
-  it('returns not found when the court by slug endpoint returns a 404', async () => {
-    const courtSlug = 'london-civil-and-family-court';
+  it('returns not found when the court by exact name endpoint returns a 404', async () => {
+    const courtName = 'London Civil and Family Court';
 
-    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).rejects(errorResponse);
+    getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+    const response = await dataApiRequests.getCourtByName(courtName);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
 
-  it('returns internal server error when the court by slug response fails schema validation', async () => {
-    const courtSlug = 'london-civil-and-family-court';
+  it('returns internal server error when the court by exact name response fails schema validation', async () => {
+    const courtName = 'London Civil and Family Court';
 
-    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).resolves({
+    getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).resolves({
       data: {
         name: 'Incomplete Court',
       },
     });
 
-    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+    const response = await dataApiRequests.getCourtByName(courtName);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
-  it('returns internal server error when the court by slug request fails without an axios response', async () => {
-    const courtSlug = 'london-civil-and-family-court';
+  it('returns internal server error when the court by exact name request fails without an axios response', async () => {
+    const courtName = "King's Lynn Crown Court";
 
-    getStub.withArgs(`/courts/slug/${courtSlug}/entity/v1`).rejects(errorMessage);
+    getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).rejects(errorMessage);
 
-    const response = await dataApiRequests.getCourtBySlug(courtSlug);
+    const response = await dataApiRequests.getCourtByName(courtName);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -303,6 +303,80 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.updateCourt(court);
 
     expect(response).toEqual(court);
+  });
+
+  it('returns parsed court details when create court succeeds', async () => {
+    const payload = {
+      isServiceCentre: false,
+      name: 'Reading Crown Court',
+      open: false,
+      regionId: '33333333-3333-4333-8333-333333333333',
+    };
+    const court = {
+      createdAt: '2026-04-29T09:00:00Z',
+      id: '55555555-5555-4555-8555-555555555555',
+      isServiceCentre: false,
+      lastUpdatedAt: '2026-04-29T10:00:00Z',
+      mrdId: null,
+      name: payload.name,
+      open: true,
+      openOnCath: true,
+      regionId: payload.regionId,
+      slug: 'reading-crown-court',
+      warningNotice: null,
+    };
+
+    postStub.withArgs('/courts/v1', payload).resolves({ data: court });
+
+    const response = await dataApiRequests.createCourt(payload);
+
+    expect(response).toEqual(court);
+    expect(postStub.firstCall.args[1]).toEqual(payload);
+  });
+
+  it('returns a validation map when create court returns a 400', async () => {
+    const payload = {
+      isServiceCentre: false,
+      name: 'Reading Crown Court',
+      open: false,
+      regionId: '33333333-3333-4333-8333-333333333333',
+    };
+    const badRequestError = {
+      isAxiosError: true,
+      response: {
+        data: {
+          name: 'Name already exists',
+        },
+        status: HttpStatusCode.BadRequest,
+      },
+    };
+
+    postStub.withArgs('/courts/v1', payload).rejects(badRequestError);
+
+    const response = await dataApiRequests.createCourt(payload);
+
+    expect(response).toEqual(new Map([['name', 'Name already exists']]));
+  });
+
+  it('returns status code when create court fails with non-400 axios error', async () => {
+    const payload = {
+      isServiceCentre: false,
+      name: 'Reading Crown Court',
+      open: false,
+      regionId: '33333333-3333-4333-8333-333333333333',
+    };
+
+    postStub.withArgs('/courts/v1', payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await dataApiRequests.createCourt(payload);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
   });
 
   it('returns a validation map when update court returns a 400', async () => {
