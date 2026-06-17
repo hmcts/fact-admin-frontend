@@ -9,6 +9,7 @@ export type SaveCourtAddressResponse =
       status: 'saved';
       courtName: string;
       address: Partial<CourtAddress>;
+      courtOpened: boolean;
     }
   | {
       status: 'invalid';
@@ -137,8 +138,26 @@ export class CourtAddressService {
       return { status: 'invalid', address: { ...address, errors } };
     }
 
+    let courtOpened = false;
+    if (!addressId && existingAddresses.length === 0 && !courtResponse.open) {
+      const openCourtResponse = await dataApiRequests.updateCourt({
+        ...courtResponse,
+        open: true,
+      });
+
+      if (typeof openCourtResponse === 'number') {
+        return openCourtResponse;
+      }
+
+      if (openCourtResponse instanceof Map) {
+        return HttpStatusCode.BadRequest;
+      }
+
+      courtOpened = true;
+    }
+
     // otherwise, it's a successful save and we can return the saved address
-    return { status: 'saved', courtName: courtResponse.name, address: result };
+    return { status: 'saved', courtName: courtResponse.name, address: result, courtOpened };
   }
 
   public async delete(courtId: string, addressId: string): Promise<DeleteCourtAddressResponse> {

@@ -76,6 +76,7 @@ describe('GeneralService', () => {
       name: '',
       regionId: '',
       open: undefined,
+      originalName: courtEntity.name,
       regions,
       errors: {
         name: ['Enter a name for the court'],
@@ -105,6 +106,7 @@ describe('GeneralService', () => {
     expect(result).toEqual({
       ...courtEntity,
       name: 'Court #1',
+      originalName: courtEntity.name,
       regions,
       errors: {
         name: ['Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
@@ -143,7 +145,7 @@ describe('GeneralService', () => {
         name: 'Updated Court Name',
         open: false,
       }),
-      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
@@ -163,10 +165,41 @@ describe('GeneralService', () => {
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
     });
+    expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Court Name');
     expect(result).toEqual({
       ...courtEntity,
       name: 'Updated Court Name',
       open: false,
+    });
+  });
+
+  test('save trims leading and trailing whitespace before duplicate lookup and update API call', async () => {
+    const requests = {
+      getCourtById: jest.fn().mockResolvedValue(courtEntity),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      updateCourt: jest.fn().mockResolvedValue({
+        ...courtEntity,
+        name: 'Updated Court Name',
+      }),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
+    };
+
+    const service = new GeneralService(requests as never);
+
+    await service.save({
+      id: courtEntity.id,
+      name: '  Updated Court Name  ',
+      open: true,
+      regionId: courtEntity.regionId,
+    });
+
+    expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Court Name');
+    expect(requests.updateCourt).toHaveBeenCalledWith({
+      ...courtEntity,
+      regions,
+      name: 'Updated Court Name',
+      open: true,
+      regionId: courtEntity.regionId,
     });
   });
 
@@ -175,7 +208,7 @@ describe('GeneralService', () => {
       getCourtById: jest.fn().mockResolvedValue(courtEntity),
       getRegions: jest.fn().mockResolvedValue(regions),
       updateCourt: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
-      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
@@ -200,7 +233,7 @@ describe('GeneralService', () => {
           ['regionId', 'Invalid region'],
         ])
       ),
-      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
