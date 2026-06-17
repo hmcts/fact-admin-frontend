@@ -91,18 +91,18 @@ export class DataApiRequests {
   }
 
   /**
-   * Request to data API to get court details by slug
+   * Request to data API to get a court entity by exact court name
    */
-  public async getCourtBySlug(courtSlug: string): Promise<CourtEntity | HttpStatusCode> {
+  public async getCourtByName(courtName: string): Promise<CourtEntity | HttpStatusCode> {
     try {
-      const response = await dataApi.get(`/courts/slug/${courtSlug}/entity/v1`);
+      const response = await dataApi.get('/courts/name/v1', { params: { name: courtName } });
       return courtEntitySchema.parse(response.data);
     } catch (error: unknown) {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound) {
         return HttpStatusCode.NotFound;
       }
 
-      logger.error(`Error fetching court details for slug ${courtSlug}:`, error);
+      logger.error(`Error fetching court details for name ${courtName}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

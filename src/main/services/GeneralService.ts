@@ -3,7 +3,6 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
-import { toSlugFormat } from '../utils/valueParsers';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
@@ -49,8 +48,8 @@ export class GeneralService {
       return { ...courtEntity, errors: validationErrors, originalName };
     }
 
-    // ensure that if we already have a court with this slug, that it's this court
-    const duplicateCourt = await this.dataApiRequests.getCourtBySlug(toSlugFormat(courtEntity.name));
+    // ensure that if we already have a court with this exact name, that it's this court
+    const duplicateCourt = await this.dataApiRequests.getCourtByName(courtEntity.name);
     if (typeof duplicateCourt === 'number') {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;

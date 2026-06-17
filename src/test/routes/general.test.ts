@@ -98,7 +98,7 @@ describe('General page', () => {
     stub(DataApiRequests.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
-    stub(DataApiRequests.prototype, 'getCourtBySlug').resolves(HttpStatusCode.NotFound);
+    stub(DataApiRequests.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
     const updateCourtStub = stub(DataApiRequests.prototype, 'updateCourt').resolves({
       id: COURT_ID,
       name: 'Updated Reading Crown Court',
@@ -185,7 +185,7 @@ describe('General page', () => {
     stub(DataApiRequests.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
-    stub(DataApiRequests.prototype, 'getCourtBySlug').resolves(HttpStatusCode.NotFound);
+    stub(DataApiRequests.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
     stub(DataApiRequests.prototype, 'updateCourt').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app)

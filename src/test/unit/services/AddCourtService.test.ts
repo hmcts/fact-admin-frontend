@@ -67,7 +67,7 @@ describe('AddCourtService', () => {
   test('create returns validation errors and does not call create API when fields are invalid', async () => {
     const requests = {
       createCourt: jest.fn(),
-      getCourtBySlug: jest.fn(),
+      getCourtByName: jest.fn(),
       getRegions: jest.fn().mockResolvedValue(regions),
     };
     const service = new AddCourtService(requests as never);
@@ -83,14 +83,14 @@ describe('AddCourtService', () => {
       regionId: '',
       regions,
     });
-    expect(requests.getCourtBySlug).not.toHaveBeenCalled();
+    expect(requests.getCourtByName).not.toHaveBeenCalled();
     expect(requests.createCourt).not.toHaveBeenCalled();
   });
 
   test('create returns duplicate name validation errors', async () => {
     const requests = {
       createCourt: jest.fn(),
-      getCourtBySlug: jest.fn().mockResolvedValue(createdCourt),
+      getCourtByName: jest.fn().mockResolvedValue(createdCourt),
       getRegions: jest.fn().mockResolvedValue(regions),
     };
     const service = new AddCourtService(requests as never);
@@ -105,13 +105,14 @@ describe('AddCourtService', () => {
       regionId: regions[0].id,
       regions,
     });
+    expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
     expect(requests.createCourt).not.toHaveBeenCalled();
   });
 
   test('create creates a closed court and returns the loading page view model', async () => {
     const requests = {
       createCourt: jest.fn().mockResolvedValue(createdCourt),
-      getCourtBySlug: jest.fn().mockResolvedValue(404),
+      getCourtByName: jest.fn().mockResolvedValue(404),
       getRegions: jest.fn().mockResolvedValue(regions),
     };
     const service = new AddCourtService(requests as never);
@@ -129,6 +130,7 @@ describe('AddCourtService', () => {
       open: false,
       regionId: regions[0].id,
     });
+    expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
   });
 
   test('create maps API validation errors into the add court view model', async () => {
@@ -139,7 +141,7 @@ describe('AddCourtService', () => {
           ['timestamp', '2026-06-10T10:00:00Z'],
         ])
       ),
-      getCourtBySlug: jest.fn().mockResolvedValue(404),
+      getCourtByName: jest.fn().mockResolvedValue(404),
       getRegions: jest.fn().mockResolvedValue(regions),
     };
     const service = new AddCourtService(requests as never);

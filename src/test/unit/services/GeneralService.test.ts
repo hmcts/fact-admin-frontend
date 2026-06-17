@@ -145,7 +145,7 @@ describe('GeneralService', () => {
         name: 'Updated Court Name',
         open: false,
       }),
-      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
@@ -165,6 +165,7 @@ describe('GeneralService', () => {
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
     });
+    expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Court Name');
     expect(result).toEqual({
       ...courtEntity,
       name: 'Updated Court Name',
@@ -177,7 +178,7 @@ describe('GeneralService', () => {
       getCourtById: jest.fn().mockResolvedValue(courtEntity),
       getRegions: jest.fn().mockResolvedValue(regions),
       updateCourt: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
-      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);
@@ -202,7 +203,7 @@ describe('GeneralService', () => {
           ['regionId', 'Invalid region'],
         ])
       ),
-      getCourtBySlug: jest.fn().mockResolvedValue(courtEntity),
+      getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
     const service = new GeneralService(requests as never);

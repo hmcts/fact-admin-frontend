@@ -2,7 +2,6 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { Region } from '../schemas/regionSchema';
-import { toSlugFormat } from '../utils/valueParsers';
 
 type AddCourtForm = {
   name?: string;
@@ -82,7 +81,7 @@ export class AddCourtService {
   }
 
   /**
-   * Validates the submitted form, checks for an existing court with the same slug, then creates
+   * Validates the submitted form, checks for an existing court with the same exact name, then creates
    * a closed court ready for the user to add its first address.
    */
   public async create(form: AddCourtForm): Promise<AddCourtResult> {
@@ -98,7 +97,7 @@ export class AddCourtService {
 
     const name = form.name as string;
     const regionId = form.regionId as string;
-    const duplicateCourt = await this.dataApiRequests.getCourtBySlug(toSlugFormat(name));
+    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
     if (typeof duplicateCourt === 'number') {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;

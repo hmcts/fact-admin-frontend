@@ -54,7 +54,7 @@ describe('Add court page', () => {
     stub(DataApiRequests.prototype, 'getRegions').resolves([
       { country: 'england', id: court.regionId, name: 'South East' },
     ]);
-    stub(DataApiRequests.prototype, 'getCourtBySlug').resolves(404);
+    stub(DataApiRequests.prototype, 'getCourtByName').resolves(404);
     const createCourtStub = stub(DataApiRequests.prototype, 'createCourt').resolves(court);
 
     const response = await request(app).post('/add-court').send({ name: court.name, regionId: court.regionId });
