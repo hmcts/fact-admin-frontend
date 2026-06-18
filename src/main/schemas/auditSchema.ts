@@ -23,7 +23,9 @@ const auditListItemSchema = z.object({
   user: userSchema,
   actionType: z.string(),
   actionEntity: z.string(),
-  actionDataDiff: z.array(actionDataDiffSchema),
+  // TODO: DELETE actions don't contain a diff, might be better to ensure the API is returning an
+  //       empty array instead of null for consistency
+  actionDataDiff: z.array(actionDataDiffSchema).nullable(),
   createdAt: z.string(),
 });
 
