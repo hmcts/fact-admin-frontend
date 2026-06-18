@@ -8,6 +8,7 @@ import {
   areaOfLawListSchema,
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
+import { CourtNameAndIdList, PagedAudits, courtNameAndIdListSchema, pagedAuditsSchema } from '../schemas/auditSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
@@ -25,6 +26,7 @@ import { TranslationServices, translationServicesSchema } from '../schemas/trans
 import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
+import { GetAuditsParams } from './types/GetAuditsParams';
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { dataApi } from './utils/axiosConfig';
 
@@ -451,6 +453,32 @@ export class DataApiRequests {
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a complete list of court names and their ids
+   */
+  async getCourtNamesAndIds(): Promise<CourtNameAndIdList | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/courts/nameoptions/v1');
+      return courtNameAndIdListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching court names:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a filtered and paginated list of audits
+   */
+  async getAudits(params: GetAuditsParams): Promise<PagedAudits | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/audits/v1', { params });
+      return pagedAuditsSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching audits:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
 }
