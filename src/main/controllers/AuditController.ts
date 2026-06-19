@@ -8,7 +8,8 @@ import {
   isUuid,
   parseDate,
   parseNumber,
-  parseOptionalString, parseString,
+  parseOptionalString,
+  parseString,
   toJsDateString,
   toMojDateString,
 } from '../utils/valueParsers';
