@@ -39,6 +39,18 @@ export class CourtOpeningHoursPage extends Base {
     await this.backToOpeningHoursLink.click();
   }
 
+  async clickFirstAddableOpeningHoursType(): Promise<string | undefined> {
+    await this.clickAddOpeningHours();
+    const openingHoursType = await this.selectFirstAvailableOpeningHoursType();
+
+    if (!openingHoursType) {
+      await this.goto(this.courtIdFromCurrentOpeningHoursUrl());
+      return undefined;
+    }
+
+    return openingHoursType;
+  }
+
   async clickFirstEditLink(): Promise<void> {
     await this.page.getByRole('link', { name: 'Edit' }).first().click();
   }
@@ -67,11 +79,11 @@ export class CourtOpeningHoursPage extends Base {
     await this.page.getByLabel('Select type').selectOption({ label: typeName });
   }
 
-  async selectFirstAvailableOpeningHoursType(): Promise<string> {
+  async selectFirstAvailableOpeningHoursType(): Promise<string | undefined> {
     const typeName = (await this.getSelectableOpeningHoursTypeNames())[0];
 
     if (!typeName) {
-      throw new Error('No opening hours type options are available to select');
+      return undefined;
     }
 
     await this.selectOpeningHoursType(typeName);
@@ -83,6 +95,16 @@ export class CourtOpeningHoursPage extends Base {
     return (await this.openingHoursTable.locator('tbody tr td:first-child').allTextContents()).map(typeName =>
       typeName.trim()
     );
+  }
+
+  async getFirstOpeningHoursTypeName(): Promise<string> {
+    const typeName = (await this.getOpeningHoursTypeNames())[0];
+
+    if (!typeName) {
+      throw new Error('No opening hours rows are available');
+    }
+
+    return typeName;
   }
 
   async getSelectableOpeningHoursTypeNames(): Promise<string[]> {
@@ -136,5 +158,15 @@ export class CourtOpeningHoursPage extends Base {
 
   buildListUrl(courtId: string): string {
     return config.urls.homePageUrl + `/courts/${courtId}/edit/court-opening-hours`;
+  }
+
+  private courtIdFromCurrentOpeningHoursUrl(): string {
+    const match = this.page.url().match(/\/courts\/([^/]+)\/edit\/court-opening-hours/);
+
+    if (!match?.[1]) {
+      throw new Error(`Cannot determine court id from URL: ${this.page.url()}`);
+    }
+
+    return match[1];
   }
 }

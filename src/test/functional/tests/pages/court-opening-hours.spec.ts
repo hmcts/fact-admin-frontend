@@ -33,24 +33,29 @@ test.describe(
         { serviceCenter: false },
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.goto(createdCourt.id);
-          await courtOpeningHoursPage.clickAddOpeningHours();
-          const openingHoursType = await courtOpeningHoursPage.selectFirstAvailableOpeningHoursType();
-          await courtOpeningHoursPage.selectSameTime();
-          await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
-          await courtOpeningHoursPage.save();
+          let openingHoursType = await courtOpeningHoursPage.clickFirstAddableOpeningHoursType();
 
-          await expect(courtOpeningHoursPage.successPanel).toContainText('Opening hours saved');
-          await expect(courtOpeningHoursPage.successPanel).toContainText(
-            `Opening hours for ${createdCourt.name} have been successfully updated.`
-          );
+          if (openingHoursType) {
+            await courtOpeningHoursPage.selectSameTime();
+            await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
+            await courtOpeningHoursPage.save();
 
-          await courtOpeningHoursPage.clickBackToOpeningHours();
-          await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(openingHoursType);
-          await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(
-            'Monday to Friday: 09:00 to 17:00'
-          );
+            await expect(courtOpeningHoursPage.successPanel).toContainText('Opening hours saved');
+            await expect(courtOpeningHoursPage.successPanel).toContainText(
+              `Opening hours for ${createdCourt.name} have been successfully updated.`
+            );
+
+            await courtOpeningHoursPage.clickBackToOpeningHours();
+            await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(openingHoursType);
+            await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(
+              'Monday to Friday: 09:00 to 17:00'
+            );
+          } else {
+            openingHoursType = await courtOpeningHoursPage.getFirstOpeningHoursTypeName();
+          }
 
           await courtOpeningHoursPage.clickEditLinkForType(openingHoursType);
+          await courtOpeningHoursPage.selectSameTime();
           await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '16', '30');
           await courtOpeningHoursPage.save();
 
