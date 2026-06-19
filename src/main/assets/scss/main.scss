@@ -95,7 +95,7 @@
   width: 72px;
   height: 72px;
   margin-bottom: 25px;
-  border: 8px solid govuk-frontend.govuk-colour('mid-grey');
+  border: 8px solid govuk-frontend.govuk-colour("black", $variant: "tint-80");
   border-top-color: govuk-frontend.govuk-colour('blue');
   border-radius: 50%;
   animation: hods-loading-spinner 1s linear infinite;
