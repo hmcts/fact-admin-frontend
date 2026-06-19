@@ -43,8 +43,16 @@ export class CourtOpeningHoursPage extends Base {
     await this.page.getByRole('link', { name: 'Edit' }).first().click();
   }
 
+  async clickEditLinkForType(typeName: string): Promise<void> {
+    await this.openingHoursRow(typeName).getByRole('link', { name: 'Edit' }).click();
+  }
+
   async clickFirstDeleteLink(): Promise<void> {
     await this.page.getByRole('link', { name: 'Delete' }).first().click();
+  }
+
+  async clickDeleteLinkForType(typeName: string): Promise<void> {
+    await this.openingHoursRow(typeName).getByRole('link', { name: 'Delete' }).click();
   }
 
   async clickDeleteOpeningHours(): Promise<void> {
@@ -65,6 +73,18 @@ export class CourtOpeningHoursPage extends Base {
 
   async selectOpeningHoursType(typeName: string): Promise<void> {
     await this.page.getByLabel('Select type').selectOption({ label: typeName });
+  }
+
+  async getOpeningHoursTypeNames(): Promise<string[]> {
+    return (await this.openingHoursTable.locator('tbody tr td:first-child').allTextContents()).map(typeName =>
+      typeName.trim()
+    );
+  }
+
+  openingHoursRow(typeName: string): Locator {
+    return this.openingHoursTable.locator('tbody tr').filter({
+      has: this.page.getByRole('cell', { name: typeName, exact: true }),
+    });
   }
 
   async selectSameTime(): Promise<void> {
