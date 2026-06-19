@@ -70,6 +70,43 @@ describe('CourtOpeningHoursService', () => {
     });
   });
 
+  test('saves selected weekdays when different opening times are selected', async () => {
+    const { saveCourtOpeningHours, service } = buildService({
+      saveCourtOpeningHours: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: tribunalOpenType.id,
+        openingTimesDetails: [{ dayOfWeek: 'MONDAY', openingTime: '10:15', closingTime: '16:45' }],
+      }),
+    });
+
+    const result = await service.save(courtId, undefined, {
+      openingHourTypeId: tribunalOpenType.id,
+      sameTime: 'no',
+      selectedDays: ['MONDAY', 'SATURDAY'],
+      mondayOpeningHour: '10',
+      mondayOpeningMinute: '15',
+      mondayClosingHour: '16',
+      mondayClosingMinute: '45',
+    });
+
+    expect(result.type).toBe('success');
+    expect(saveCourtOpeningHours).toHaveBeenCalledWith(courtId, {
+      courtId,
+      id: undefined,
+      openingHourTypeId: tribunalOpenType.id,
+      openingTimesDetails: [{ dayOfWeek: 'MONDAY', openingTime: '10:15', closingTime: '16:45' }],
+    });
+  });
+
+  test('normalises selected day values from request body input', () => {
+    const { service } = buildService();
+
+    expect(service.getSelectedDays('MONDAY')).toEqual(['MONDAY']);
+    expect(service.getSelectedDays(['MONDAY', 1, 'TUESDAY'])).toEqual(['MONDAY', 'TUESDAY']);
+    expect(service.getSelectedDays(undefined)).toEqual([]);
+  });
+
   test('rejects duplicate opening hour types before saving', async () => {
     const { saveCourtOpeningHours, service } = buildService({
       getCourtOpeningHours: jest.fn().mockResolvedValue([
@@ -134,6 +171,66 @@ describe('CourtOpeningHoursService', () => {
     });
   });
 
+  test('requires an opening hour type and same-time selection', async () => {
+    const { saveCourtOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      selectedDays: [],
+    });
+    const validationResult = result as ValidationErrorResult;
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCourtOpeningHours).not.toHaveBeenCalled();
+    expect(validationResult.viewModel.errorSummary).toEqual([
+      { href: '#openingHourTypeId', text: 'Select an opening hours type' },
+      {
+        href: '#sameTimeYes',
+        text: 'Select whether the court opens and closes at the same time Monday to Friday',
+      },
+    ]);
+  });
+
+  test('rejects missing and out-of-range weekday time parts', async () => {
+    const { saveCourtOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      openingHourTypeId: tribunalOpenType.id,
+      sameTime: 'no',
+      selectedDays: ['MONDAY'],
+      mondayOpeningHour: '24',
+      mondayOpeningMinute: '',
+      mondayClosingHour: '16',
+      mondayClosingMinute: '99',
+    });
+    const validationResult = result as ValidationErrorResult;
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCourtOpeningHours).not.toHaveBeenCalled();
+    expect(validationResult.viewModel.errorSummary).toEqual(
+      expect.arrayContaining([
+        { href: '#mondayOpeningHour', text: 'Monday opening hour must be between 0 and 23' },
+        { href: '#mondayOpeningMinute', text: 'Enter the monday opening minute' },
+        { href: '#mondayClosingMinute', text: 'Monday closing minute must be between 0 and 59' },
+      ])
+    );
+  });
+
+  test('passes through court lookup errors on the list page', async () => {
+    const { service } = buildService({
+      getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+
+    await expect(service.getListPage(courtId)).resolves.toBe(HttpStatusCode.NotFound);
+  });
+
+  test('passes through unexpected opening-hours list errors', async () => {
+    const { service } = buildService({
+      getCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+    });
+
+    await expect(service.getListPage(courtId)).resolves.toBe(HttpStatusCode.InternalServerError);
+  });
+
   test('returns no opening hours on the list page when the API returns 204', async () => {
     const { service } = buildService({
       getCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.NoContent),
@@ -186,6 +283,171 @@ describe('CourtOpeningHoursService', () => {
     });
   });
 
+  test('falls back to the opening hour type id when the type lookup cannot resolve it', async () => {
+    const unknownTypeId = '99999999-9999-4999-8999-999999999999';
+    const { service } = buildService({
+      getOpeningHourTypes: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      getCourtOpeningHours: jest.fn().mockResolvedValue([
+        {
+          id: openingHoursId,
+          courtId,
+          openingHourTypeId: unknownTypeId,
+          openingTimesDetails: [{ dayOfWeek: 'SATURDAY', openingTime: '09:00', closingTime: '12:00' }],
+        },
+      ]),
+    });
+
+    const result = await service.getListPage(courtId);
+
+    expect(result).toMatchObject({
+      openingHours: [
+        {
+          hours: 'SATURDAY: 09:00 to 12:00',
+          openingHourType: unknownTypeId,
+        },
+      ],
+    });
+  });
+
+  test('prepopulates the edit page for Monday to Friday opening hours', async () => {
+    const { service } = buildService({
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: courtOpenType.id,
+        openingHourType: courtOpenType,
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:30' }],
+      }),
+    });
+
+    const result = await service.getEditPage(courtId, openingHoursId);
+
+    expect(result).toMatchObject({
+      form: {
+        openingHourTypeId: courtOpenType.id,
+        sameTime: 'yes',
+        sameOpeningHour: '9',
+        sameOpeningMinute: '00',
+        sameClosingHour: '17',
+        sameClosingMinute: '30',
+      },
+      openingHoursId,
+    });
+  });
+
+  test('prepopulates the edit page for selected weekdays and keeps an unknown current type selectable', async () => {
+    const unknownType = {
+      id: '99999999-9999-4999-8999-999999999999',
+      name: 'Legacy opening type',
+      nameCy: null,
+    };
+    const { service } = buildService({
+      getOpeningHourTypes: jest.fn().mockResolvedValue([courtOpenType, unknownType, tribunalOpenType]),
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: unknownType.id,
+        openingHourType: unknownType,
+        openingTimesDetails: [
+          { dayOfWeek: 'MONDAY', openingTime: '09:15', closingTime: '12:45' },
+          { dayOfWeek: 'SATURDAY', openingTime: '10:00', closingTime: '12:00' },
+        ],
+      }),
+    });
+
+    const result = await service.getEditPage(courtId, openingHoursId);
+
+    expect(result).toMatchObject({
+      form: {
+        openingHourTypeId: unknownType.id,
+        sameTime: 'no',
+        selectedDays: ['MONDAY', 'SATURDAY'],
+        mondayOpeningHour: '9',
+        mondayOpeningMinute: '15',
+        mondayClosingHour: '12',
+        mondayClosingMinute: '45',
+      },
+      openingHourTypes: [courtOpenType, tribunalOpenType, unknownType],
+    });
+  });
+
+  test('sorts multiple legacy current type entries alphabetically when prepopulating the edit page', async () => {
+    const legacyTypeA = {
+      id: '99999999-9999-4999-8999-999999999999',
+      name: 'Z legacy opening type',
+      nameCy: null,
+    };
+    const legacyTypeB = {
+      id: legacyTypeA.id,
+      name: 'A legacy opening type',
+      nameCy: null,
+    };
+    const { service } = buildService({
+      getOpeningHourTypes: jest.fn().mockResolvedValue([legacyTypeA, legacyTypeB]),
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: legacyTypeA.id,
+        openingHourType: legacyTypeA,
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+      }),
+    });
+
+    const result = await service.getEditPage(courtId, openingHoursId);
+
+    expect(result).toMatchObject({
+      openingHourTypes: [legacyTypeB, legacyTypeA],
+    });
+  });
+
+  test('passes through edit page dependency errors', async () => {
+    const { service: courtErrorService } = buildService({
+      getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+    const { service: typesErrorService } = buildService({
+      getOpeningHourTypes: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+    });
+    const { service: openingHoursErrorService } = buildService({
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+
+    await expect(courtErrorService.getEditPage(courtId)).resolves.toBe(HttpStatusCode.NotFound);
+    await expect(typesErrorService.getEditPage(courtId)).resolves.toBe(HttpStatusCode.InternalServerError);
+    await expect(openingHoursErrorService.getEditPage(courtId, openingHoursId)).resolves.toBe(HttpStatusCode.NotFound);
+  });
+
+  test('passes through save dependency and persistence errors', async () => {
+    const { service: baseModelErrorService } = buildService({
+      getOpeningHourTypes: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+    });
+    const { service: existingLookupErrorService } = buildService({
+      getCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+    });
+    const { service: saveStatusErrorService } = buildService({
+      saveCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.BadGateway),
+    });
+    const { service: saveMapErrorService } = buildService({
+      saveCourtOpeningHours: jest.fn().mockResolvedValue(new Map([['field', 'error']])),
+    });
+
+    await expect(baseModelErrorService.save(courtId, undefined, validSameTimeForm())).resolves.toEqual({
+      status: HttpStatusCode.InternalServerError,
+      type: 'status',
+    });
+    await expect(existingLookupErrorService.save(courtId, undefined, validSameTimeForm())).resolves.toEqual({
+      status: HttpStatusCode.InternalServerError,
+      type: 'status',
+    });
+    await expect(saveStatusErrorService.save(courtId, undefined, validSameTimeForm())).resolves.toEqual({
+      status: HttpStatusCode.BadGateway,
+      type: 'status',
+    });
+    await expect(saveMapErrorService.save(courtId, undefined, validSameTimeForm())).resolves.toEqual({
+      status: HttpStatusCode.BadRequest,
+      type: 'status',
+    });
+  });
+
   test('allows saving a first opening hour when the existing opening-hours lookup returns 404', async () => {
     const { saveCourtOpeningHours, service } = buildService({
       getCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
@@ -221,6 +483,59 @@ describe('CourtOpeningHoursService', () => {
     expect(result).toMatchObject({
       openingHourTypes: [courtOpenType],
     });
+  });
+
+  test('builds the delete confirmation page and delete success payload', async () => {
+    const deleteCourtOpeningHours = jest.fn().mockResolvedValue(HttpStatusCode.NoContent);
+    const { service } = buildService({
+      deleteCourtOpeningHours,
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: courtOpenType.id,
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00:00', closingTime: '17:00:00' }],
+      }),
+    });
+
+    await expect(service.getDeletePage(courtId, openingHoursId)).resolves.toMatchObject({
+      courtId,
+      courtName: 'Reading Crown Court',
+      hours: 'Monday to Friday: 09:00 to 17:00',
+      openingHourType: 'Court open',
+      openingHoursId,
+    });
+    await expect(service.delete(courtId, openingHoursId)).resolves.toMatchObject({
+      courtId,
+      courtName: 'Reading Crown Court',
+      openingHourType: 'Court open',
+    });
+    expect(deleteCourtOpeningHours).toHaveBeenCalledWith(courtId, openingHoursId);
+  });
+
+  test('passes through delete page and delete API errors', async () => {
+    const { service: courtErrorService } = buildService({
+      getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+    const { service: openingHoursErrorService } = buildService({
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+    const { service: deleteErrorService } = buildService({
+      deleteCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: courtOpenType.id,
+        openingHourType: courtOpenType,
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+      }),
+    });
+
+    await expect(courtErrorService.getDeletePage(courtId, openingHoursId)).resolves.toBe(HttpStatusCode.NotFound);
+    await expect(openingHoursErrorService.getDeletePage(courtId, openingHoursId)).resolves.toBe(
+      HttpStatusCode.NotFound
+    );
+    await expect(openingHoursErrorService.delete(courtId, openingHoursId)).resolves.toBe(HttpStatusCode.NotFound);
+    await expect(deleteErrorService.delete(courtId, openingHoursId)).resolves.toBe(HttpStatusCode.InternalServerError);
   });
 
   function validSameTimeForm(): OpeningHoursForm {
