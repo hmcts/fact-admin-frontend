@@ -1,18 +1,6 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
-const OPENING_HOURS_TYPES = [
-  'Bailiff office open',
-  'County Court open',
-  'Court open',
-  'Crown Court open',
-  'Family Court open',
-  "Magistrates' Court open",
-  'Telephone enquiries answered',
-  'Telephone payments accepted',
-  'Tribunal open',
-];
-
 test.describe(
   'Court Opening Hours Page Tests',
   {
@@ -45,19 +33,8 @@ test.describe(
         { serviceCenter: false },
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.goto(createdCourt.id);
-          await courtOpeningHoursPage.deleteAllOpeningHours();
-
-          const existingOpeningHoursTypes = await courtOpeningHoursPage.getOpeningHoursTypeNames();
-          const openingHoursType = OPENING_HOURS_TYPES.find(typeName => !existingOpeningHoursTypes.includes(typeName));
-
-          if (!openingHoursType) {
-            throw new Error(
-              `No opening hours type available to add. Existing: ${existingOpeningHoursTypes.join(', ')}`
-            );
-          }
-
           await courtOpeningHoursPage.clickAddOpeningHours();
-          await courtOpeningHoursPage.selectOpeningHoursType(openingHoursType);
+          const openingHoursType = await courtOpeningHoursPage.selectFirstAvailableOpeningHoursType();
           await courtOpeningHoursPage.selectSameTime();
           await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
           await courtOpeningHoursPage.save();
@@ -118,7 +95,7 @@ test.describe(
             'Select whether the court opens and closes at the same time Monday to Friday'
           );
 
-          await courtOpeningHoursPage.selectOpeningHoursType('Family Court open');
+          await courtOpeningHoursPage.selectFirstAvailableOpeningHoursType();
           await courtOpeningHoursPage.selectDifferentTimes();
           await courtOpeningHoursPage.selectDay('Monday');
           await courtOpeningHoursPage.fillDayOpeningTimes('monday', '10', '', '', '');

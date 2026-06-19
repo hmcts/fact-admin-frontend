@@ -59,14 +59,6 @@ export class CourtOpeningHoursPage extends Base {
     await this.deleteOpeningHoursButton.click();
   }
 
-  async deleteAllOpeningHours(): Promise<void> {
-    while ((await this.page.getByRole('link', { name: 'Delete' }).count()) > 0) {
-      await this.clickFirstDeleteLink();
-      await this.clickDeleteOpeningHours();
-      await this.clickBackToOpeningHours();
-    }
-  }
-
   async save(): Promise<void> {
     await this.saveButton.click();
   }
@@ -75,10 +67,28 @@ export class CourtOpeningHoursPage extends Base {
     await this.page.getByLabel('Select type').selectOption({ label: typeName });
   }
 
+  async selectFirstAvailableOpeningHoursType(): Promise<string> {
+    const typeName = (await this.getSelectableOpeningHoursTypeNames())[0];
+
+    if (!typeName) {
+      throw new Error('No opening hours type options are available to select');
+    }
+
+    await this.selectOpeningHoursType(typeName);
+
+    return typeName;
+  }
+
   async getOpeningHoursTypeNames(): Promise<string[]> {
     return (await this.openingHoursTable.locator('tbody tr td:first-child').allTextContents()).map(typeName =>
       typeName.trim()
     );
+  }
+
+  async getSelectableOpeningHoursTypeNames(): Promise<string[]> {
+    return (await this.page.locator('#openingHourTypeId option').allTextContents())
+      .map(typeName => typeName.trim())
+      .filter(typeName => typeName && !typeName.toLowerCase().includes('select'));
   }
 
   openingHoursRow(typeName: string): Locator {
