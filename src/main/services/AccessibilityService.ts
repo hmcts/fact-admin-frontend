@@ -6,12 +6,12 @@ import { Accessibility } from '../schemas/accessibilitySchema';
 import { validate } from '../utils/accessibilityValidationConfig';
 import { mapHearingEnhancementEquipment } from '../utils/mapper';
 
-export type FacilityModel = Partial<Accessibility> & { errors?: Record<string, string[]> } & { name?: string };
+export type AccessibilityModel = Partial<Accessibility> & { errors?: Record<string, string[]> } & { name?: string };
 
 export class AccessibilityService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
-  public async retrieve(courtId: string): Promise<Partial<FacilityModel> | HttpStatusCode> {
+  public async retrieve(courtId: string): Promise<Partial<AccessibilityModel> | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
@@ -23,7 +23,7 @@ export class AccessibilityService {
     }
     return { ...accessibleFacility, name: courtResponse.name };
   }
-  public async save(courtId: string, model: FacilityModel): Promise<FacilityModel | HttpStatusCode> {
+  public async save(courtId: string, model: AccessibilityModel): Promise<AccessibilityModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;

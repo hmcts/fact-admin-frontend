@@ -1,7 +1,7 @@
 import { UpdateAccessibilityRequest } from '../requests/types/UpdateAccessibilityRequest';
 import { HEARING_ENHANCEMENT_EQUIPMENT_MAP, HearingEnhancementEquipmentUi } from '../schemas/accessibilitySchema';
 import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
-import { FacilityModel as AccessiblityModel } from '../services/AccessibilityService';
+import { AccessibilityModel } from '../services/AccessibilityService';
 import { FacilityModel } from '../services/BuildingFacilitiesService';
 type FoodDrinkBooleans = Record<FoodDrinkOption, boolean | null>;
 
@@ -29,14 +29,14 @@ export const addFoodAndDrink = (data: FacilityModel): FacilityModel => {
   };
 };
 
-type HearingEnhancementEquipment = NonNullable<AccessiblityModel['hearingEnhancementEquipment']>;
+type HearingEnhancementEquipment = NonNullable<AccessibilityModel['hearingEnhancementEquipment']>;
 
 export const isHearingEnhancementEquipment = (value: unknown): value is HearingEnhancementEquipment => {
   return typeof value === 'string' && value in HEARING_ENHANCEMENT_EQUIPMENT_MAP;
 };
 
 export const mapHearingEnhancementEquipment = (
-  value: AccessiblityModel['hearingEnhancementEquipment']
+  value: AccessibilityModel['hearingEnhancementEquipment']
 ): UpdateAccessibilityRequest['hearingEnhancementEquipment'] | undefined => {
   if (!value || !isHearingEnhancementEquipment(value)) {
     return undefined;

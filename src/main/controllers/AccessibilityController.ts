@@ -2,7 +2,7 @@ import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import { AccessibilityService, FacilityModel } from '../services/AccessibilityService';
+import { AccessibilityModel, AccessibilityService } from '../services/AccessibilityService';
 import { isHearingEnhancementEquipment } from '../utils/mapper';
 import { isUuid, parseBoolean, parseLiftMetric } from '../utils/valueParsers';
 
@@ -60,7 +60,7 @@ export default class AccessibilityController {
       quietRoom,
     } = req.body as Record<string, unknown>;
 
-    const model: Partial<FacilityModel> = {
+    const model: Partial<AccessibilityModel> = {
       courtId: resolvedCourtId,
       accessibleParking: parseBoolean(accessibleParking),
       accessibleParkingPhoneNumber:
@@ -85,7 +85,7 @@ export default class AccessibilityController {
       quietRoom: parseBoolean(quietRoom),
     };
 
-    const updateResponse = await accessibilityService.save(resolvedCourtId, model as FacilityModel);
+    const updateResponse = await accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
     if (updateResponse === HttpStatusCode.NotFound) {
       res.status(HttpStatusCode.NotFound);
       return res.render('court-not-found');
@@ -99,7 +99,7 @@ export default class AccessibilityController {
     if (updateResponse.errors) {
       res.render('accessibility-edit', {
         courtId: resolvedCourtId,
-        model: updateResponse as FacilityModel,
+        model: updateResponse as AccessibilityModel,
         pageTitle: `Error: Accessibility - ${updateResponse.name}`,
       });
       return;

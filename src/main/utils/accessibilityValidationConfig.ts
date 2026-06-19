@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/namespace
-import type { FacilityModel } from '../services/AccessibilityService';
+import type { AccessibilityModel } from '../services/AccessibilityService';
 
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
 
@@ -10,7 +10,7 @@ export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);
 
-export const validate = (model: FacilityModel): Record<string, string[]> | undefined => {
+export const validate = (model: AccessibilityModel): Record<string, string[]> | undefined => {
   const errors: Record<string, string[]> = {};
 
   const rules: Rule[] = [
