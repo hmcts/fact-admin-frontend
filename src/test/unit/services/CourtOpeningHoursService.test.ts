@@ -99,6 +99,61 @@ describe('CourtOpeningHoursService', () => {
     });
   });
 
+  test('preserves existing unsupported days when editing representable weekday opening hours', async () => {
+    const { saveCourtOpeningHours, service } = buildService({
+      getCourtOpeningHours: jest.fn().mockResolvedValue([
+        {
+          id: openingHoursId,
+          courtId,
+          openingHourTypeId: tribunalOpenType.id,
+          openingTimesDetails: [
+            { dayOfWeek: 'MONDAY', openingTime: '09:00', closingTime: '17:00' },
+            { dayOfWeek: 'SATURDAY', openingTime: '10:00', closingTime: '12:00' },
+          ],
+        },
+      ]),
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: tribunalOpenType.id,
+        openingTimesDetails: [
+          { dayOfWeek: 'MONDAY', openingTime: '09:00', closingTime: '17:00' },
+          { dayOfWeek: 'SATURDAY', openingTime: '10:00', closingTime: '12:00' },
+        ],
+      }),
+      saveCourtOpeningHours: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: tribunalOpenType.id,
+        openingTimesDetails: [
+          { dayOfWeek: 'MONDAY', openingTime: '09:30', closingTime: '16:30' },
+          { dayOfWeek: 'SATURDAY', openingTime: '10:00', closingTime: '12:00' },
+        ],
+      }),
+    });
+
+    const result = await service.save(courtId, openingHoursId, {
+      openingHourTypeId: tribunalOpenType.id,
+      sameTime: 'no',
+      selectedDays: ['MONDAY'],
+      mondayOpeningHour: '9',
+      mondayOpeningMinute: '30',
+      mondayClosingHour: '16',
+      mondayClosingMinute: '30',
+    });
+
+    expect(result.type).toBe('success');
+    expect(saveCourtOpeningHours).toHaveBeenCalledWith(courtId, {
+      courtId,
+      id: openingHoursId,
+      openingHourTypeId: tribunalOpenType.id,
+      openingTimesDetails: [
+        { dayOfWeek: 'MONDAY', openingTime: '09:30', closingTime: '16:30' },
+        { dayOfWeek: 'SATURDAY', openingTime: '10:00', closingTime: '12:00' },
+      ],
+    });
+  });
+
   test('normalises selected day values from request body input', () => {
     const { service } = buildService();
 

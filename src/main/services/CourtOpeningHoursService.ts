@@ -185,11 +185,14 @@ export class CourtOpeningHoursService {
     }
 
     const selectedType = baseModel.openingHourTypes.find(type => type.id === form.openingHourTypeId);
+    const existingOpeningHoursRecord = openingHoursId
+      ? existingOpeningHours.find(existing => existing.id === openingHoursId)
+      : undefined;
     const saveResponse = await this.dataApiRequests.saveCourtOpeningHours(courtId, {
       courtId,
       id: openingHoursId,
       openingHourTypeId: form.openingHourTypeId ?? '',
-      openingTimesDetails: this.toOpeningTimesDetails(form),
+      openingTimesDetails: this.toOpeningTimesDetails(form, existingOpeningHoursRecord),
     });
 
     if (this.isHttpStatusCode(saveResponse)) {
@@ -411,7 +414,12 @@ export class CourtOpeningHoursService {
     }
   }
 
-  private toOpeningTimesDetails(form: OpeningHoursForm): OpeningTimesDetail[] {
+  private toOpeningTimesDetails(
+    form: OpeningHoursForm,
+    existingOpeningHours?: CourtOpeningHours
+  ): OpeningTimesDetail[] {
+    const unsupportedExistingDetails = this.getUnsupportedOpeningTimesDetails(existingOpeningHours);
+
     if (form.sameTime === 'yes') {
       return [
         {
@@ -419,6 +427,7 @@ export class CourtOpeningHoursService {
           openingTime: this.formatTime(form.sameOpeningHour as string, form.sameOpeningMinute as string),
           closingTime: this.formatTime(form.sameClosingHour as string, form.sameClosingMinute as string),
         },
+        ...unsupportedExistingDetails,
       ];
     }
 
@@ -435,7 +444,17 @@ export class CourtOpeningHoursService {
           form[`${dayConfig.idPrefix}ClosingHour`] as string,
           form[`${dayConfig.idPrefix}ClosingMinute`] as string
         ),
-      }));
+      }))
+      .concat(unsupportedExistingDetails);
+  }
+
+  private getUnsupportedOpeningTimesDetails(openingHours?: CourtOpeningHours): OpeningTimesDetail[] {
+    if (!openingHours) {
+      return [];
+    }
+
+    const supportedDayValues = new Set(days.map(day => day.value).concat('EVERYDAY'));
+    return openingHours.openingTimesDetails.filter(detail => !supportedDayValues.has(detail.dayOfWeek));
   }
 
   private toForm(openingHours?: CourtOpeningHours): OpeningHoursForm {

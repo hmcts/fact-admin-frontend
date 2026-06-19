@@ -52,7 +52,7 @@ export default class CourtOpeningHoursController {
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId, openingHoursId);
 
-    this.renderResponse(res, viewModel, 'court-opening-hours-edit');
+    this.renderResponse(res, viewModel, 'court-opening-hours-edit', 'not-found');
   }
 
   @route('/save')
@@ -83,7 +83,7 @@ export default class CourtOpeningHoursController {
 
     const viewModel = await courtOpeningHoursService.getDeletePage(courtId, openingHoursId);
 
-    this.renderResponse(res, viewModel, 'court-opening-hours-delete');
+    this.renderResponse(res, viewModel, 'court-opening-hours-delete', 'not-found');
   }
 
   @route('/delete/success/:openingHoursId')
@@ -102,7 +102,7 @@ export default class CourtOpeningHoursController {
 
     const viewModel = await courtOpeningHoursService.delete(courtId, openingHoursId);
 
-    this.renderResponse(res, viewModel, 'court-opening-hours-delete-success');
+    this.renderResponse(res, viewModel, 'court-opening-hours-delete-success', 'not-found');
   }
 
   private async save(req: Request, res: Response, openingHoursId?: string): Promise<void> {
@@ -126,7 +126,7 @@ export default class CourtOpeningHoursController {
     }
 
     if (saveResult.type === 'status') {
-      this.renderStatus(res, saveResult.status);
+      this.renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
       return;
     }
 
@@ -142,19 +142,24 @@ export default class CourtOpeningHoursController {
     } as OpeningHoursForm;
   }
 
-  private renderResponse(res: Response, viewModel: unknown, template: string): void {
+  private renderResponse(
+    res: Response,
+    viewModel: unknown,
+    template: string,
+    notFoundTemplate = 'court-not-found'
+  ): void {
     if (typeof viewModel === 'number') {
-      this.renderStatus(res, viewModel);
+      this.renderStatus(res, viewModel, notFoundTemplate);
       return;
     }
 
     res.render(template, viewModel as object);
   }
 
-  private renderStatus(res: Response, status: HttpStatusCode): void {
+  private renderStatus(res: Response, status: HttpStatusCode, notFoundTemplate = 'court-not-found'): void {
     if (status === HttpStatusCode.NotFound) {
       res.status(HttpStatusCode.NotFound);
-      res.render('court-not-found');
+      res.render(notFoundTemplate);
       return;
     }
 

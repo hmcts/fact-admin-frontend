@@ -145,6 +145,16 @@ describe('Court opening hours routes', () => {
     expect(response.text).toContain('Delete opening hours');
   });
 
+  test('renders generic not found when an opening hours record no longer exists', async () => {
+    stub(CourtOpeningHoursService.prototype, 'getDeletePage').resolves(HttpStatusCode.NotFound);
+
+    const response = await request(app).get(`/courts/${courtId}/edit/court-opening-hours/delete/${openingHoursId}`);
+
+    expect(response.status).toBe(HttpStatusCode.NotFound);
+    expect(response.text).toContain('Page Not Found');
+    expect(response.text).not.toContain('This court does not exist.');
+  });
+
   test('renders the delete success page', async () => {
     stub(CourtOpeningHoursService.prototype, 'delete').resolves({
       courtId,

@@ -535,6 +535,204 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns parsed opening hour types when the response is valid', async () => {
+    const openingHourTypes = [
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Court open',
+        nameCy: 'Oriau agor y Llys',
+      },
+    ];
+
+    getStub.withArgs('/types/v1/opening-hours-types').resolves({ data: openingHourTypes });
+
+    const response = await dataApiRequests.getOpeningHourTypes();
+
+    expect(response).toEqual(openingHourTypes);
+  });
+
+  it('returns not found when fetching opening hour types fails with an axios status', async () => {
+    getStub.withArgs('/types/v1/opening-hours-types').rejects(errorResponse);
+
+    const response = await dataApiRequests.getOpeningHourTypes();
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when fetching opening hour types throws a non-axios error', async () => {
+    getStub.withArgs('/types/v1/opening-hours-types').rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.getOpeningHourTypes();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court opening hours when the response is valid', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHours = [
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        courtId,
+        openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+        openingHourType: {
+          id: '33333333-3333-4333-8333-333333333333',
+          name: 'Court open',
+          nameCy: 'Oriau agor y Llys',
+        },
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({ data: openingHours, status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toEqual(openingHours);
+  });
+
+  it('returns no content when court opening hours endpoint returns 204', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns not found when fetching court opening hours fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when court opening hours response fails schema validation', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({
+      data: [{ courtId }],
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court opening hours by id when the response is valid', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+    const openingHours = {
+      id: openingHoursId,
+      courtId,
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).resolves({ data: openingHours });
+
+    const response = await dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+
+    expect(response).toEqual(openingHours);
+  });
+
+  it('returns not found when fetching court opening hours by id fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('saves court opening hours and returns the parsed response', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+    const savedOpeningHours = {
+      id: '22222222-2222-4222-8222-222222222222',
+      ...payload,
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).resolves({ data: savedOpeningHours });
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toEqual(savedOpeningHours);
+  });
+
+  it('returns validation errors map when save court opening hours endpoint returns 400', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      openingHourTypeId: '',
+      openingTimesDetails: [],
+    };
+    const apiErrors = {
+      openingHourTypeId: 'Select an opening hours type',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns not found when save court opening hours fails with a non-400 axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).rejects(errorResponse);
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns delete status when delete court opening hours succeeds', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub
+      .withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`)
+      .resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns not found when delete court opening hours fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
   it('returns ok when court areas of law are updated successfully', async () => {
     const payload = {
       areasOfLaw: ['66666666-6666-4666-8666-666666666666'],
