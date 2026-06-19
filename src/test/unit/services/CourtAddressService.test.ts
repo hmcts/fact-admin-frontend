@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
+import { CourtEntity } from '../../../main/schemas/courtEntitySchema';
 import { CourtAddressService, POSTCODE_ERROR_MESSAGES } from '../../../main/services/CourtAddressService';
 
 describe('CourtAddressService', () => {
@@ -22,6 +23,21 @@ describe('CourtAddressService', () => {
     addressType: CourtAddressType.VISIT_US,
     areasOfLaw: ['00000000-0000-4000-8000-000000000000'],
     courtTypes: ['00000000-0000-4000-8000-000000000000'],
+    ...overrides,
+  });
+
+  const buildCourt = (overrides: Partial<CourtEntity> = {}): CourtEntity => ({
+    createdAt: '2026-06-10T10:00:00Z',
+    id: courtId,
+    isServiceCentre: false,
+    lastUpdatedAt: '2026-06-10T10:00:00Z',
+    mrdId: null,
+    name: 'Reading Crown Court',
+    open: false,
+    openOnCath: false,
+    regionId: '33333333-3333-4333-8333-333333333333',
+    slug: 'reading-crown-court',
+    warningNotice: null,
     ...overrides,
   });
 
@@ -167,6 +183,74 @@ describe('CourtAddressService', () => {
     expect(result).toBe(HttpStatusCode.InternalServerError);
   });
 
+  test('retrieves all addresses for a court', async () => {
+    const addresses = [buildAddress()];
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue(addresses);
+
+    const service = new CourtAddressService();
+    const result = await service.retrieveAll(courtId);
+
+    expect(result).toEqual(addresses);
+    expect(DataApiRequests.prototype.getCourtAddressDetails).toHaveBeenCalledWith(courtId);
+  });
+
+  test('returns optional field validation errors before saving', async () => {
+    const getCourtAddressDetails = jest
+      .spyOn(DataApiRequests.prototype, 'getCourtAddressDetails')
+      .mockResolvedValue([]);
+    const saveCourtAddress = jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress');
+
+    const service = new CourtAddressService();
+    const result = await service.save(
+      {
+        addressLine1: 'Invalid #',
+        addressLine2: `${'A'.repeat(256)}#`,
+        addressType: undefined,
+        county: `${'A'.repeat(256)}#`,
+        courtTypes: ['1', '2', '3', '4', '5', '6'],
+        epimId: `${'A'.repeat(11)}#`,
+        areasOfLaw: ['1', '2', '3', '4', '5', '6'],
+        postcode: 'SW1A 1AA',
+        townCity: `${'A'.repeat(101)}#`,
+      },
+      courtId,
+      true,
+      true
+    );
+
+    expect(getCourtAddressDetails).toHaveBeenCalledWith(courtId);
+    expect(saveCourtAddress).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'invalid',
+      address: expect.objectContaining({
+        errors: expect.objectContaining({
+          addressType: ['Select an address type'],
+          addressLine1: [
+            "Address line 1 must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+          ],
+          addressLine2: [
+            'Address line 2 must be 255 characters or less',
+            "Address line 2 must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+          ],
+          county: [
+            'County must be 255 characters or less',
+            "County must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+          ],
+          epimId: [
+            'ePIMS Ref ID must be 10 characters or less',
+            'ePIMS Ref ID must only include letters a to z, spaces and dashes.',
+          ],
+          areasOfLaw: ['Please select between 1 and 5 areas of law that this address is relevant for'],
+          courtTypes: ['Please select at least one court type that this address is relevant for'],
+          townCity: [
+            'Town or city must be 100 characters or less',
+            "Town or city must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+          ],
+        }),
+      }),
+    });
+  });
+
   test('returns status code when loading court fails during save', async () => {
     jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
     jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(HttpStatusCode.NotFound);
@@ -213,33 +297,104 @@ describe('CourtAddressService', () => {
   test('creates a new address when addressId is not provided', async () => {
     const createdAddress = buildAddress({ id: null });
     jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
-    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    const court = buildCourt();
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(court);
     const saveCourtAddress = jest
       .spyOn(DataApiRequests.prototype, 'saveCourtAddress')
       .mockResolvedValue(createdAddress);
     const updateCourtAddress = jest.spyOn(DataApiRequests.prototype, 'updateCourtAddress');
+    const openedCourt = { ...court, open: true };
+    const updateCourt = jest.spyOn(DataApiRequests.prototype, 'updateCourt').mockResolvedValue(openedCourt);
 
     const service = new CourtAddressService();
     const result = await service.save(createdAddress, courtId, false, false);
 
     expect(saveCourtAddress).toHaveBeenCalledWith(createdAddress, courtId);
     expect(updateCourtAddress).not.toHaveBeenCalled();
+    expect(updateCourt).toHaveBeenCalledWith(openedCourt);
     expect(result).toEqual({
       status: 'saved',
       courtName: 'Reading Crown Court',
       address: createdAddress,
+      courtOpened: true,
     });
+  });
+
+  test('does not open the court when adding another address', async () => {
+    const existingAddress = buildAddress();
+    const createdAddress = buildAddress({ id: null, addressType: CourtAddressType.WRITE_TO_US });
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([existingAddress]);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
+    jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress').mockResolvedValue(createdAddress);
+    const updateCourt = jest.spyOn(DataApiRequests.prototype, 'updateCourt');
+
+    const service = new CourtAddressService();
+    const result = await service.save(createdAddress, courtId, false, false);
+
+    expect(updateCourt).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'saved',
+      courtName: 'Reading Crown Court',
+      address: createdAddress,
+      courtOpened: false,
+    });
+  });
+
+  test('does not open the court when it is already open', async () => {
+    const createdAddress = buildAddress({ id: null });
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt({ open: true }));
+    jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress').mockResolvedValue(createdAddress);
+    const updateCourt = jest.spyOn(DataApiRequests.prototype, 'updateCourt');
+
+    const service = new CourtAddressService();
+    const result = await service.save(createdAddress, courtId, false, false);
+
+    expect(updateCourt).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'saved',
+      courtName: 'Reading Crown Court',
+      address: createdAddress,
+      courtOpened: false,
+    });
+  });
+
+  test('returns status code when opening the court after first address fails', async () => {
+    const createdAddress = buildAddress({ id: null });
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
+    jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress').mockResolvedValue(createdAddress);
+    jest.spyOn(DataApiRequests.prototype, 'updateCourt').mockResolvedValue(HttpStatusCode.InternalServerError);
+
+    const service = new CourtAddressService();
+    const result = await service.save(createdAddress, courtId, false, false);
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('returns bad request when opening the court after first address returns validation errors', async () => {
+    const createdAddress = buildAddress({ id: null });
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
+    jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress').mockResolvedValue(createdAddress);
+    jest.spyOn(DataApiRequests.prototype, 'updateCourt').mockResolvedValue(new Map([['open', 'Open is invalid']]));
+
+    const service = new CourtAddressService();
+    const result = await service.save(createdAddress, courtId, false, false);
+
+    expect(result).toBe(HttpStatusCode.BadRequest);
   });
 
   test('updates an existing address when addressId is provided', async () => {
     const existingAddress = buildAddress();
     const updatedAddress = buildAddress({ addressLine1: '2 High Street' });
     jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([existingAddress]);
-    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
     const updateCourtAddress = jest
       .spyOn(DataApiRequests.prototype, 'updateCourtAddress')
       .mockResolvedValue(updatedAddress);
     const saveCourtAddress = jest.spyOn(DataApiRequests.prototype, 'saveCourtAddress');
+    const updateCourt = jest.spyOn(DataApiRequests.prototype, 'updateCourt');
 
     const service = new CourtAddressService();
     const result = await service.save(
@@ -261,17 +416,19 @@ describe('CourtAddressService', () => {
       addressId
     );
     expect(saveCourtAddress).not.toHaveBeenCalled();
+    expect(updateCourt).not.toHaveBeenCalled();
     expect(result).toEqual({
       status: 'saved',
       courtName: 'Reading Crown Court',
       address: updatedAddress,
+      courtOpened: false,
     });
   });
 
   test('deletes an address and returns deleted payload when API deletion succeeds', async () => {
     const address = buildAddress();
     const address2 = buildAddress({ id: addressId.replaceAll('2', '3') });
-    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
     jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([address, address2]);
     jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress').mockResolvedValue(HttpStatusCode.NoContent);
 
@@ -286,8 +443,10 @@ describe('CourtAddressService', () => {
   });
 
   test('returns status code when delete API call does not return no content', async () => {
-    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
-    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetailsById').mockResolvedValue(buildAddress());
+    const address = buildAddress();
+    const address2 = buildAddress({ id: addressId.replaceAll('2', '3') });
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
+    jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue([address, address2]);
     jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress').mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new CourtAddressService();
@@ -311,8 +470,22 @@ describe('CourtAddressService', () => {
 
   test('returns status code when loading address fails during delete', async () => {
     const deleteCourtAddress = jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress');
-    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue({ name: 'Reading Crown Court' } as never);
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
     jest.spyOn(DataApiRequests.prototype, 'getCourtAddressDetails').mockResolvedValue(HttpStatusCode.NotFound);
+
+    const service = new CourtAddressService();
+    const result = await service.delete(courtId, addressId);
+
+    expect(result).toBe(HttpStatusCode.NotFound);
+    expect(deleteCourtAddress).not.toHaveBeenCalled();
+  });
+
+  test('returns not found when address is missing during delete', async () => {
+    const deleteCourtAddress = jest.spyOn(DataApiRequests.prototype, 'deleteCourtAddress');
+    jest.spyOn(DataApiRequests.prototype, 'getCourtById').mockResolvedValue(buildCourt());
+    jest
+      .spyOn(DataApiRequests.prototype, 'getCourtAddressDetails')
+      .mockResolvedValue([buildAddress({ id: '33333333-3333-4333-8333-333333333333' })]);
 
     const service = new CourtAddressService();
     const result = await service.delete(courtId, addressId);

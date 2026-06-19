@@ -7,7 +7,12 @@
 {% endblock %}
 
 {% block content %}
-  {{ successPanel("Address saved: " + addressBlock(address, true), "Addresses for " + courtName + " have been successfully updated ") }}
+  {% set successMessage = "Addresses for " + courtName + " have been successfully updated." %}
+  {% if courtOpened %}
+    {% set successMessage = successMessage + " The court is now open." %}
+  {% endif %}
+
+  {{ successPanel("Address saved: " + addressBlock(address, true), successMessage) }}
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
   <ul class="govuk-list govuk-list--bullet">
     <li><a href="/courts/{{ courtId }}/edit/address" class="govuk-link govuk-link--no-visited-state">Back to addresses</a></li>

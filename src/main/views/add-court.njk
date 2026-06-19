@@ -1,0 +1,91 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% macro modelDrivenErrorSummary(errors) %}
+  {% set errorList = [] %}
+  {% for field, fieldErrors in errors %}
+    {% if field !== "timestamp" %}
+      {% for error in fieldErrors %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: "#" + field
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
+{% endmacro %}
+
+{% set regionOptions = [] %}
+{% if regions.length %}
+  {% set regionOptions = (regionOptions.push({ value: "", text: "Select a region" }), regionOptions) %}
+  {% for row in regions %}
+    {% set regionOptions = (regionOptions.push(
+      { value: row.id, text: row.name, selected: row.id == regionId }
+    ), regionOptions) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ modelDrivenErrorSummary(errors) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Add new court</h1>
+      <p class="govuk-body">
+        Court will be closed by default. An address must be provided. After entering a name you will be redirected to the edit address page for the new court and can fill out any remaining information.
+      </p>
+
+      <form method="post" action="/add-court">
+        {{ govukInput({
+          label: {
+            text: "Name",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Enter the name of the court. Only capitalise the first letter."
+          },
+          id: "name",
+          name: "name",
+          spellcheck: true,
+          value: name,
+          errorMessage: {
+            text: errors.name[0]
+          } if errors and errors.name else null
+        }) }}
+
+        {{ govukSelect({
+          id: "regionId",
+          name: "regionId",
+          label: {
+            text: "Region",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Select the region in which the court is located."
+          },
+          items: regionOptions,
+          errorMessage: {
+            text: errors.regionId[0]
+          } if errors and errors.regionId else null
+        }) }}
+
+        {{ govukButton({
+          text: "Add court"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

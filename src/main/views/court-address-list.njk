@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/common-components.njk" import addressBlock, addressType %}
 
 {#  MACROS #}
@@ -57,6 +58,12 @@
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">Addresses</h1>
       <span class="govuk-caption-l">You can have between one and three addresses per court</span>
+      {% if courtAddresses.length === 0 %}
+        {{ govukWarningText({
+          text: "If you do not add an address, this court will be marked as closed.",
+          iconFallbackText: "Warning"
+        }) }}
+      {% endif %}
       {% if addressTableRows.length %}
         {{ govukTable({
           firstCellIsHeader: false,

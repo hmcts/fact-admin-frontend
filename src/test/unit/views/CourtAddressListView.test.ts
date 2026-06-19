@@ -17,6 +17,9 @@ describe('Court Address List View', () => {
     });
 
     expect(html).toContain('Addresses');
+    expect(html).toContain('govuk-warning-text');
+    expect(html).toContain('Warning');
+    expect(html).toContain('If you do not add an address, this court will be marked as closed.');
     expect(html).toContain('No addresses are currently configured.');
     expect(html).toContain(`/courts/${ids.courtId}/edit/address/find/`);
     expect(html).toContain('Add address');
@@ -68,6 +71,7 @@ describe('Court Address List View', () => {
     expect(html).toContain(`/courts/${ids.courtId}/edit/address/find/${ids.addressC}`);
     expect(html).toContain(`/courts/${ids.courtId}/edit/address/delete/${ids.addressC}`);
     expect(html).not.toContain('Add address');
+    expect(html).not.toContain('If you do not add an address, this court will be marked as closed.');
   });
 
   test('does not render delete action when only one address exists', () => {

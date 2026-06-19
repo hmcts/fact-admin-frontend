@@ -1,3 +1,6 @@
+import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
+import { FacilityModel } from '../services/BuildingFacilitiesService';
+
 const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 /**
@@ -28,6 +31,41 @@ export function parseOptionalString(value: unknown): string | undefined {
 export function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
+
+type FoodDrinkBooleans = Record<FoodDrinkOption, boolean | null>;
+
+export const mapFoodAndDrink = (
+  foodAndDrink: FoodDrinkOption | FoodDrinkOption[] | null | undefined
+): FoodDrinkBooleans => {
+  const mapToArray = item => (item ? [item] : []);
+  const list = Array.isArray(foodAndDrink) ? foodAndDrink : mapToArray(foodAndDrink);
+  const selected = new Set(list);
+  return FOOD_DRINK_OPTIONS.reduce(
+    (result, option) => ({
+      ...result,
+      [option]: selected.has(option),
+    }),
+    {} as FoodDrinkBooleans
+  );
+};
+
+export const addFoodAndDrink = (data: FacilityModel): FacilityModel => {
+  const foodAndDrink = FOOD_DRINK_OPTIONS.filter(key => data[key] === true);
+
+  return {
+    ...data,
+    foodAndDrink,
+  };
+};
+export const parseBoolean = (value: unknown): boolean | undefined => {
+  if (value === true || value === 'true') {
+    return true;
+  }
+  if (value === false || value === 'false') {
+    return false;
+  }
+  return undefined;
+};
 
 /**
  * Converts the passed in Date into a string in the format yyyy-MM-dd which can be parsed
