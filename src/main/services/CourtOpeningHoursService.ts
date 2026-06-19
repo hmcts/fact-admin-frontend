@@ -392,6 +392,9 @@ export class CourtOpeningHoursService {
     if (openingTime > closingTime) {
       errors[openingHourKey] = 'The opening time cannot be after the closing time';
       errors[closingHourKey] = 'The closing time cannot be before the opening time';
+    } else if (openingTime === closingTime) {
+      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
+      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
     }
   }
 

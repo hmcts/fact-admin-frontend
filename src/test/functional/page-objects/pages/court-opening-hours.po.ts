@@ -51,6 +51,14 @@ export class CourtOpeningHoursPage extends Base {
     await this.deleteOpeningHoursButton.click();
   }
 
+  async deleteAllOpeningHours(): Promise<void> {
+    while ((await this.page.getByRole('link', { name: 'Delete' }).count()) > 0) {
+      await this.clickFirstDeleteLink();
+      await this.clickDeleteOpeningHours();
+      await this.clickBackToOpeningHours();
+    }
+  }
+
   async save(): Promise<void> {
     await this.saveButton.click();
   }

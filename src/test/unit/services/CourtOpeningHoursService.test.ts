@@ -208,6 +208,52 @@ describe('CourtOpeningHoursService', () => {
     );
   });
 
+  test('rejects opening times that are the same as closing times for Monday to Friday', async () => {
+    const { saveCourtOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      sameOpeningHour: '10',
+      sameOpeningMinute: '10',
+      sameClosingHour: '10',
+      sameClosingMinute: '10',
+    });
+    const validationResult = result as ValidationErrorResult;
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCourtOpeningHours).not.toHaveBeenCalled();
+    expect(validationResult.viewModel.errorSummary).toEqual(
+      expect.arrayContaining([
+        { href: '#sameOpeningHour', text: 'The opening time cannot be the same as the closing time' },
+        { href: '#sameClosingHour', text: 'The closing time cannot be the same as the opening time' },
+      ])
+    );
+  });
+
+  test('rejects opening times that are the same as closing times for selected weekdays', async () => {
+    const { saveCourtOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      openingHourTypeId: tribunalOpenType.id,
+      sameTime: 'no',
+      selectedDays: ['MONDAY'],
+      mondayOpeningHour: '10',
+      mondayOpeningMinute: '10',
+      mondayClosingHour: '10',
+      mondayClosingMinute: '10',
+    });
+    const validationResult = result as ValidationErrorResult;
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCourtOpeningHours).not.toHaveBeenCalled();
+    expect(validationResult.viewModel.errorSummary).toEqual(
+      expect.arrayContaining([
+        { href: '#mondayOpeningHour', text: 'The opening time cannot be the same as the closing time' },
+        { href: '#mondayClosingHour', text: 'The closing time cannot be the same as the opening time' },
+      ])
+    );
+  });
+
   test('requires at least one weekday when different opening times are selected', async () => {
     const { saveCourtOpeningHours, service } = buildService();
 

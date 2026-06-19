@@ -33,6 +33,7 @@ test.describe(
         { serviceCenter: false },
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.goto(createdCourt.id);
+          await courtOpeningHoursPage.deleteAllOpeningHours();
           await expect(courtOpeningHoursPage.mainContent.content).toContainText(
             'No opening hours are currently configured.'
           );
