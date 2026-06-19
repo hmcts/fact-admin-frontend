@@ -1,0 +1,181 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{# MACROS #}
+
+{% macro createFilterDateInput(dateString, id, text, hint, errors=[]) %}
+  {{ mojDatePicker({
+    id: id,
+    name: id,
+    label: {
+      text: text
+    },
+    hint: {
+      text: hint
+    },
+    value: dateString
+  }) }}
+
+{% endmacro %}
+
+
+{% macro createDiffDetails(diffData) %}
+  {% call govukDetails({
+    summaryText: "Details"
+  }) %}
+    {% if diffData.length %}
+      <pre>{{ diffData | dump(2) }}</pre>
+    {% else %}
+      <pre>No recorded change data</pre>
+    {% endif %}
+  {% endcall %}
+{% endmacro %}
+
+{# END MACROS #}
+
+{% set courtOptions = [{
+  value: "",
+  text: "All courts"
+}] %}
+{% for court in courts %}
+  {% set courtOptions = (courtOptions.push({
+    value: court.id,
+    text: court.name
+  }), courtOptions) %}
+{% endfor %}
+
+{% set auditTableRows = [] %}
+{% if audits.content.length %}
+  {% for audit in audits.content %}
+    {% set auditTableRows = (auditTableRows.push([
+      {
+        html: audit.user.email
+      },
+      {
+        html: audit.actionType
+      },
+      {
+        html: audit.actionEntity
+      },
+      {
+        html: audit.createdAt
+      },
+      {
+        html: createDiffDetails(audit.actionDataDiff)
+      }
+    ]), auditTableRows) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Audits</h1>
+
+      <form method="GET" action="/audits">
+
+        {{ createFilterDateInput(
+          filters.fromDate,
+          "fromDate",
+          "From date",
+          "Search for audits from the start of this date",
+          model.errors.fromDate) }}
+
+        {{ createFilterDateInput(
+          filters.toDate,
+          "toDate",
+          "To date",
+          "Search for audits to the end of this date",
+          model.errors.toDate) }}
+
+        {{ govukInput({
+          label: {
+            text: "Email address"
+          },
+          hint: {
+            text: "Search for audits by email address (partial matches are allowed)"
+          },
+          classes: "govuk-!-width-one-third",
+          id: "email",
+          name: "email",
+          autoComplete: "email",
+          value: filters.email
+        }) }}
+
+        {{ govukSelect({
+          id: "courtId",
+          name: "courtId",
+          label: {
+            text: "Court"
+          },
+          hint: {
+            text: "Search for audits by specific court"
+          },
+          items: courtOptions,
+          value: filters.courtId
+        }) }}
+
+        {{ govukButton({
+          text: "Apply Filters"
+        }) }}
+
+        <pre>
+          filters:
+          {{ filters | dump(2) }}
+        </pre>
+
+
+        {% if auditTableRows.length %}
+          {{ govukTable({
+            firstCellIsHeader: false,
+            head: [
+              {
+                text: "user"
+              },
+              {
+                text: "action"
+              },
+              {
+                text: "location"
+              },
+              {
+                text: "created at"
+              },
+              {
+                text: "details"
+              }
+            ],
+            rows: auditTableRows
+          }) }}
+        {% else %}
+          <p class="govuk-body">No audits returned.</p>
+        {% endif %}
+
+      </form>
+
+      <pre>
+        audits:
+        {{ audits | dump(2) }}
+
+        errors:
+        {{ errors | dump(2) }}
+      </pre>
+
+    </div>
+  </div>
+{% endblock %}
