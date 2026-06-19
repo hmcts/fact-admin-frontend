@@ -4,7 +4,14 @@ import { Request, Response } from 'express';
 
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { AuditListViewModel, AuditService } from '../services/AuditService';
-import { parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
+import {
+  isUuid,
+  parseDate,
+  parseNumber,
+  parseOptionalString, parseString,
+  toJsDateString,
+  toMojDateString,
+} from '../utils/valueParsers';
 
 @route('/audits')
 export default class AuditController {
@@ -18,7 +25,7 @@ export default class AuditController {
     if (this.renderStatusResponse(res, viewModel)) {
       return;
     }
-
+    this.transformDates(viewModel);
     res.render('audit-list', { ...viewModel, pageTitle: viewModel.errors ? 'Error: Audits' : 'Audits' });
   }
 
@@ -37,9 +44,14 @@ export default class AuditController {
       pageNumber: parseNumber(query?.pageNumber, 1),
       pageSize: parseNumber(query?.pageSize, 25),
       email: parseOptionalString(query?.email),
-      courtId: parseOptionalString(query?.courtId),
-      fromDate: parseString(query?.fromDate),
-      toDate: parseOptionalString(query?.toDate),
+      courtId: isUuid(query?.courtId as string) ? parseString(query.courtId) : undefined,
+      fromDate: toJsDateString(parseDate(query?.fromDate as string)) ?? '',
+      toDate: toJsDateString(parseDate(query?.toDate as string)),
     };
+  }
+
+  private transformDates(viewModel: AuditListViewModel): void {
+    viewModel.filters.fromDate = toMojDateString(parseDate(viewModel.filters.fromDate)) ?? '';
+    viewModel.filters.toDate = toMojDateString(parseDate(viewModel.filters.toDate)) ?? '';
   }
 }

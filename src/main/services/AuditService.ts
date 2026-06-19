@@ -56,7 +56,7 @@ export class AuditService {
       ...params,
       pageNumber: params.pageNumber ?? DEFAULT_PAGE_NUMBER,
       pageSize: params.pageSize ?? DEFAULT_PAGE_SIZE,
-      fromDate: params.fromDate ?? this.today(),
+      fromDate: params.fromDate && params.fromDate.trim().length> 0 ? params.fromDate : this.today(),
     };
   }
 
