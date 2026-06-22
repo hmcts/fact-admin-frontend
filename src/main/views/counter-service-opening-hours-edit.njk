@@ -25,26 +25,62 @@
   }) }}
 {% endmacro %}
 
+{% macro courtTypeSelection(courtTypes, selectedIds) %}
+  {% set courtTypeItems = [] %}
+  {% for type in courtTypes | sort(false, true, 'name') %}
+    {% set courtTypeItems = (courtTypeItems.push({
+      value: type.id,
+      text: type.name,
+      checked: selectedIds and type.id in selectedIds
+    }), courtTypeItems) %}
+  {% endfor %}
+  {{ govukCheckboxes({
+    idPrefix: "court-types",
+    name: "court-types",
+    classes: "govuk-checkboxes--small app-checkboxes--two-columns",
+    fieldset: {
+      legend: {
+        text: "Court types"
+      }
+    },
+    hint: {
+      text: "For example, one or more court types apply for this one address. Select all that apply."
+    },
+    items: courtTypeItems
+  }) }}
+{% endmacro %}
+
 {% block pageTitle %}
   {{ pageTitle }}
 {% endblock %}
 
-{% set appointmentContact %}
+{% set appointmentEmail %}
     {{ govukInput({
       classes: "govuk-input--width-20",
-      id: "appointmentContact",
-      name: "appointmentContact",
+      id: "appointmentEmail",
+      name: "appointmentEmail",
       label: {
-        text: "Contact details",
-        classes: "govuk-!-margin-bottom-1"
+        text: "Enter email address for booking (optional)"
       },
-      hint: {
-        text: "Provide the email address or phone number they can use to book appointments."
-      },
-      value: model.appointmentContact,
+      value: model.appointmentEmail,
       errorMessage: {
-        text: model.errors.appointmentContact[0]
-      } if model.errors and model.errors.appointmentContact[0] else null
+        text: model.errors.appointmentEmail[0]
+      } if model.errors and model.errors.appointmentEmail else null
+    }) }}
+{% endset %}
+
+{% set appointmentPhone %}
+    {{ govukInput({
+      classes: "govuk-input--width-20",
+      id: "appointmentPhone",
+      name: "appointmentPhone",
+      label: {
+        text: "Enter phone number for booking (optional)"
+      },
+      value: model.appointmentPhone,
+      errorMessage: {
+        text: model.errors.appointmentPhone[0]
+      } if model.errors and model.errors.appointmentPhone else null
     }) }}
 {% endset %}
 
@@ -59,7 +95,37 @@
       <h1 class="govuk-heading-l">Counter Service Opening Hours</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/success">
-      <h2 class="govuk-heading-m">Counter Service Details</h2>
+
+        {{ govukRadios({
+            classes: "govuk-radios",
+            id: "counterServiceForSpecificCourt",
+            name: "counterServiceForSpecificCourt",
+            fieldset: {
+              legend: {
+                text: "Is this counter service for a specific court?"
+              }
+            },
+            items: [
+              {
+                value: "true",
+                text: "Yes",
+                checked: true if model.counterServiceForSpecificCourt === true else false,
+                conditional:
+                  {
+                      html: courtTypeSelection(courtTypes, model.courtTypes) | safe
+                  }
+              },
+              {
+                value: "false",
+                text: "No",
+                checked: true if model.counterServiceForSpecificCourt == false else false
+              }
+            ],
+            errorMessage: {
+              text: model.errors.counterServiceForSpecificCourt[0]
+            } if model.errors and model.errors.counterServiceForSpecificCourt else null
+         }) }}
+
         {{ govukCheckboxes({
           id: "assistWith",
           name: "assistWith",
@@ -106,7 +172,7 @@
               checked: true if model.appointmentNeeded ===true else false,
               conditional:
                 {
-                  html: appointmentContact
+                  html: appointmentEmail + appointmentPhone
                 }
             },
             {

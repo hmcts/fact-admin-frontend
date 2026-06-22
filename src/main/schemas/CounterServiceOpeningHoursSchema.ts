@@ -10,11 +10,13 @@ export const CounterServiceOpeningHoursSchema = z.object({
   id: z.string(),
   courtId: z.string(),
   counterService: z.boolean(),
+  courtTypes: z.array(z.string()).optional().nullable(),
   assistWithForms: z.boolean(),
   assistWithDocuments: z.boolean(),
   assistWithSupport: z.boolean(),
   appointmentNeeded: z.boolean(),
-  appointmentContact: z.string().optional().nullable(),
+  appointmentEmail: z.string().optional().nullable(),
+  appointmentPhone: z.string().optional().nullable(),
   openingTimesDetails: z.array(openingTimesDetail),
 });
 

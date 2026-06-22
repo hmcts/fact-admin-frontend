@@ -2,6 +2,10 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
 import {
+  CounterServiceOpeningHours,
+  CounterServiceOpeningHoursSchema,
+} from '../schemas/CounterServiceOpeningHoursSchema';
+import {
   AreaOfLawType,
   CourtAreaOfLawSelection,
   CourtAreasOfLawUpdate,
@@ -28,6 +32,7 @@ import { User, userSchema } from '../schemas/userSchema';
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
+import { UpdateCounterServiceOpeningHoursRequest } from './types/UpdateCounterServiceOpeningHoursRequest';
 import { dataApi } from './utils/axiosConfig';
 
 const logger = Logger.getLogger('app');
@@ -513,6 +518,45 @@ export class DataApiRequests {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
       logger.error(`Error update court facilities for id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get court counter service opening hours by court id
+   */
+  public async getCounterServiceOpeningHours(
+    courtId: string
+  ): Promise<CounterServiceOpeningHours | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/counter-service`);
+
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
+
+      return CounterServiceOpeningHoursSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court counter service opening hours for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update court counter service opening hours by court id
+   */
+  public async updateCounterServiceOpeningHours(
+    courtId: string,
+    payload: UpdateCounterServiceOpeningHoursRequest
+  ): Promise<CounterServiceOpeningHours | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/opening-hours/counter-service`, payload);
+      return CounterServiceOpeningHoursSchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error(`Error update court counter service opening hours for id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
