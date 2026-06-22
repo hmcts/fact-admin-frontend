@@ -2,18 +2,18 @@
 {% from "macros/common-components.njk" import successPanel %}
 
 {% block pageTitle %}
-  {{ pageTitle }}
+  Contact details deleted
 {% endblock %}
 
 {% block content %}
-  {{ successPanel(successPanelTitle , successPanelBody ) }}
-  {% set continueUpdatingHref = continueUpdatingHref or '/courts/' + courtId + '/edit' %}
-  {% set continueUpdatingText = continueUpdatingText or 'Continue updating ' + courtName %}
+  {{ successPanel("Contact details deleted", contactType) }}
+  <p class="govuk-body">You have removed this contact type for {{ courtName }}.</p>
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>
-    <a href="{{ continueUpdatingHref }}" class="govuk-link govuk-link--no-visited-state">{{ continueUpdatingText }}</a>
+      <a href="/courts/{{ courtId }}/edit/contact-details" class="govuk-link govuk-link--no-visited-state">Back to contact details</a>
     </li>
     <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
   </ul>
 {% endblock %}
+
