@@ -1,0 +1,78 @@
+{% extends "template.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro createDiffDetails(diffData, actionType) %}
+  {% if diffData.length %}
+    {% set diffRows = [] %}
+    {% for diff in diffData %}
+      {% set diffRows = (diffRows.push([
+        {
+          text: diff.field
+        },
+        {
+          text: diff.oldValue if diff.oldValue else "<null>"
+        } if actionType !== "INSERT" else null,
+        {
+          text: diff.newValue  if diff.newValue else "<null>"
+        }
+      ]), diffRows) %}
+    {% endfor %}
+    {{ govukTable({
+      firstCellIsHeader: false,
+      head: [
+        {
+          text: "Field"
+        },
+        {
+          text: "Old value"
+        } if actionType !== "INSERT" else null,
+        {
+          text: "New value"
+        }
+      ], rows: diffRows }) }}
+  {% else %}
+    <pre>No recorded change data</pre>
+  {% endif %}
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <h1 class="govuk-heading-l">Audit Detail</h1>
+
+    {{  govukSummaryList({
+      rows: [
+        {
+          key: { text: "Action" },
+          value: { text: audit.actionType }
+        },
+        {
+          key: { text: "Subject" },
+          value: { text: audit.court.name + ":  " + audit.actionEntity }
+        },
+        {
+          key: { text: "Subject ID" },
+          value: { text: audit.court.id }
+        },
+        {
+          key: { text: "Created At" },
+          value: { text: audit.createdAt }
+        },
+        {
+          key: { text: "User" },
+          value: { text: audit.user.email + " (" + audit.user.role + ")"}
+        }
+      ]
+    }) }}
+
+    {% if audit.actionType !== "DELETE" %}
+      <h1 class="govuk-heading-m">Change Log</h1>
+      {{ createDiffDetails(audit.actionDataDiff, audit.actionType) }}
+    {% endif %}
+
+  </div>
+{% endblock %}

@@ -3,6 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
+import { Audit } from '../schemas/auditSchema';
 import { AuditListViewModel, AuditService } from '../services/AuditService';
 import {
   isUuid,
@@ -50,7 +51,38 @@ export default class AuditController {
     });
   }
 
-  private renderStatusResponse(res: Response, result: AuditListViewModel | HttpStatusCode): result is HttpStatusCode {
+  @route('/:auditId')
+  @GET()
+  public async renderAuditDetailPage(req: Request, res: Response): Promise<void> {
+    const auditId = this.resolveAuditId(req);
+    if (!auditId) {
+      res.status(HttpStatusCode.NotFound);
+      return res.render('not-found');
+    }
+
+    const audit = await this.auditService.retrieve(auditId);
+
+    if (this.renderStatusResponse(res, audit)) {
+      return;
+    }
+
+    res.render('audit-detail', {
+      audit,
+      pageTitle: 'Audit Detail',
+    });
+  }
+
+  private resolveAuditId(req: Request): string | null {
+    const auditId = req.params?.auditId as string | string[] | undefined;
+    const resolvedAuditId = Array.isArray(auditId) ? auditId[0] : auditId;
+
+    return typeof resolvedAuditId === 'string' && isUuid(resolvedAuditId) ? resolvedAuditId : null;
+  }
+
+  private renderStatusResponse(
+    res: Response,
+    result: AuditListViewModel | Audit | HttpStatusCode
+  ): result is HttpStatusCode {
     if (typeof result !== 'number') {
       return false;
     }

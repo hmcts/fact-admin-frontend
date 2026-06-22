@@ -10,27 +10,6 @@
 
 {# MACROS #}
 
-{% macro createDiffDetails(diffData) %}
-  {% call govukDetails({
-    summaryText: "Details",
-    classes: "govuk-details govuk-!-margin-bottom-0"
-  }) %}
-    {% if diffData.length %}
-      {% set diffRows = [] %}
-      {% for diff in diffData %}
-        {% set diffRows = (diffRows.push([
-          { text: diff.field },{ text: diff.oldValue },{ text: diff.newValue }
-        ]), diffRows) %}
-      {% endfor %}
-      {{ govukTable({
-        firstCellIsHeader: false,
-        head: [{ text: "Field" },{ text: "Old value" },{ text: "New value" }], rows: diffRows }) }}
-    {% else %}
-      <pre>No recorded change data</pre>
-    {% endif %}
-  {% endcall %}
-{% endmacro %}
-
 {% macro createPager(currentFilters, pageInfo) %}
 
   {# calculate the base href using the current filters #}
@@ -118,7 +97,10 @@
       classes: "govuk-label--m"
     },
     classes: "govuk-!-margin-bottom-3",
-    value: filters.fromDate
+    value: filters.fromDate,
+    errorMessage: {
+      text: errors.fromDate[0]
+    } if errors.fromDate else null
   }) }}
 
   {{ mojDatePicker({
@@ -128,7 +110,10 @@
       text: "And"
     },
     classes: "govuk-!-margin-bottom-6",
-    value: filters.toDate
+    value: filters.toDate,
+    errorMessage: {
+      text: errors.toDate[0]
+    } if errors.toDate else null
   }) }}
 
   {{ govukInput({
@@ -139,7 +124,10 @@
     id: "email",
     name: "email",
     autoComplete: "email",
-    value: filters.email
+    value: filters.email,
+    errorMessage: {
+      text: errors.email[0]
+    } if errors.email else null
   }) }}
 
   {{ govukSelect({
@@ -160,7 +148,7 @@
   {% for audit in audits.content %}
 
     {% set auditDetailHtml %}
-      <a class="govuk-link govuk-link--no-visited-state" href="/audits/detail/{{audit.id}}">
+      <a target="_blank" rel="noopener noreferrer" class="govuk-link govuk-link--no-visited-state" href="/audits/{{audit.id}}">
         Details
       </a>
     {% endset %}
@@ -194,8 +182,8 @@
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {% if model.errors %}
-          {{ modelDrivenErrorSummary(model) }}
+        {% if errors %}
+          {{ modelDrivenErrorSummary(errors) }}
         {% endif %}
       </div>
     </div>
@@ -257,10 +245,5 @@
 
       </div>
     </div>
-
-    <pre>
-      {{ audits | dump(2) }}
-    </pre>
-
   </main>
 {% endblock %}

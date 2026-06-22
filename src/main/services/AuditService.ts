@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
+import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
@@ -18,6 +18,10 @@ export type AuditListViewModel = {
 
 export class AuditService {
   constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+
+  public async retrieve(auditId: string): Promise<Audit | HttpStatusCode> {
+    return this.dataApiRequests.getAuditById(auditId);
+  }
 
   public async getAudits(params: Partial<GetAuditsParams>): Promise<AuditListViewModel | HttpStatusCode> {
     // first thing we do here is get the list of audit subject options, as the result of this

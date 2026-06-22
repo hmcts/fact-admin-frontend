@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { courtEntitySchema } from './courtEntitySchema';
 import { pageMetadataSchema } from './pagedMetadataSchema';
 import { userSchema } from './userSchema';
 
@@ -21,9 +22,10 @@ const actionDataDiffSchema = z.object({
   newValue: z.any().nullable(),
 });
 
-const auditListItemSchema = z.object({
+export const auditListItemSchema = z.object({
   id: z.string(),
   courtId: z.string(),
+  court: z.nullable(courtEntitySchema),
   userId: z.string(),
   user: userSchema,
   actionType: z.string(),
@@ -40,5 +42,6 @@ export const pagedAuditsSchema = z.object({
 });
 
 export type PagedAudits = z.infer<typeof pagedAuditsSchema>;
+export type Audit = z.infer<typeof auditListItemSchema>;
 export type AuditSubjectOptionsMap = z.infer<typeof auditSubjectOptionsSchema>;
 export const AuditSubject = auditSubjectTypeSchema.enum;

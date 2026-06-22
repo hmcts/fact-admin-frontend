@@ -9,8 +9,10 @@ import {
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
 import {
+  Audit,
   AuditSubjectOptionsMap,
   PagedAudits,
+  auditListItemSchema,
   auditSubjectOptionsSchema,
   pagedAuditsSchema,
 } from '../schemas/auditSchema';
@@ -486,6 +488,7 @@ export class DataApiRequests {
         : HttpStatusCode.InternalServerError;
     }
   }
+
   /**
    * Request to data API to get court facilities by court id
    */
@@ -507,7 +510,6 @@ export class DataApiRequests {
   /**
    * Request to data API to update court facilities by court id
    */
-
   public async updateBuildingFacilities(
     courtId: string,
     payload: UpdateBuildingFacilitiesRequest
@@ -546,6 +548,19 @@ export class DataApiRequests {
       return pagedAuditsSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching audits:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get audit details by id
+   */
+  async getAuditById(auditId: string): Promise<Audit | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/audits/${auditId}/v1`);
+      return auditListItemSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching audit details for id ${auditId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
