@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { CourtNameAndIdList, PagedAudits } from '../schemas/auditSchema';
+import { AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
@@ -12,7 +12,7 @@ const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 export type AuditListViewModel = {
   filters: GetAuditsParams;
   audits: PagedAudits;
-  courts: CourtNameAndIdList;
+  subjects: AuditSubjectOptionsMap;
   errors?: Record<string, string[]>;
 };
 
@@ -20,22 +20,19 @@ export class AuditService {
   constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
   public async getAudits(params: Partial<GetAuditsParams>): Promise<AuditListViewModel | HttpStatusCode> {
-    // first thing we do here is get the list of court names, as the result of this
+    // first thing we do here is get the list of audit subject options, as the result of this
     // call is a view model that will be displayed to the user regardless of the success
-    // of the query. In order to build a query, they need the list of court names.
-    const courtsResponse = await this.dataApiRequests.getCourtNamesAndIds();
-    if (this.isHttpStatusCode(courtsResponse)) {
-      // TODO: decide whether we do this, or simply return the empty list and let the view
-      //       omit the court id filter? This isn't a good starting point though, so maybe
-      //       a HALO ticket is in order?
-      return courtsResponse;
+    // of the query. In order to build a query, they'll need this data.
+    const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
+    if (this.isHttpStatusCode(auditSubjectResponse)) {
+      return auditSubjectResponse;
     }
 
     const queryParams = this.applyDefaults(params);
     const errors = this.validateQueryParams(queryParams);
     if (errors) {
       // send back a "no results" result and the validation errors
-      return this.buildErrorResponse(courtsResponse, queryParams, errors);
+      return this.buildErrorResponse(auditSubjectResponse, queryParams, errors);
     }
 
     const audits = await this.dataApiRequests.getAudits(queryParams);
@@ -46,7 +43,7 @@ export class AuditService {
 
     return {
       filters: queryParams,
-      courts: courtsResponse,
+      subjects: auditSubjectResponse,
       audits,
     };
   }
@@ -60,10 +57,10 @@ export class AuditService {
     };
   }
 
-  private buildErrorResponse(courts: CourtNameAndIdList, filters: GetAuditsParams, errors: Record<string, string[]>) {
+  private buildErrorResponse(subjects: AuditSubjectOptionsMap, filters: GetAuditsParams, errors: Record<string, string[]>) {
     return {
       filters,
-      courts,
+      subjects,
       audits: {
         content: [],
         page: {
@@ -126,7 +123,7 @@ export class AuditService {
     }
   }
 
-  private isHttpStatusCode(audits: PagedAudits | CourtNameAndIdList | HttpStatusCode): audits is HttpStatusCode {
+  private isHttpStatusCode(audits: PagedAudits | AuditSubjectOptionsMap | HttpStatusCode): audits is HttpStatusCode {
     return typeof audits === 'number';
   }
 

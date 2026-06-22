@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
@@ -21,9 +22,7 @@
     },
     value: dateString
   }) }}
-
 {% endmacro %}
-
 
 {% macro createDiffDetails(diffData) %}
   {% call govukDetails({
@@ -37,17 +36,81 @@
   {% endcall %}
 {% endmacro %}
 
+
+{% macro createPager(currentFilters, pageInfo) %}
+
+  {# calculate the base href using the current filters #}
+  {% set baseHref = "/audits?"%}
+  {% for param, value in currentFilters %}
+    {% if param !== 'pageNumber' and value %}
+      {% set baseHref = baseHref + param + "=" + value + "&" %}
+    {% endif %}
+  {% endfor %}
+  {% set baseHref = baseHref + "pageNumber=" %}
+
+  {# create the pager items #}
+  {% set items = [] %}
+  {% if pageInfo.number > 1 %}
+    {% set items = (items.push({number: 1, href: baseHref + 1}), items) %}
+  {% endif %}
+  {% if pageInfo.number > 3 %}
+    {% set items = (items.push({ ellipsis: true }), items) %}
+  {% endif %}
+  {% if pageInfo.number > 2 %}
+    {% set items = (items.push({number: pageInfo.number - 1, href: baseHref + (pageInfo.number - 1)}), items) %}
+  {% endif %}
+  {% set items = (items.push({number: pageInfo.number, href: baseHref + pageInfo.number, current: true}), items) %}
+  {% if pageInfo.number < pageInfo.totalPages - 1 %}
+    {% set items = (items.push({number: pageInfo.number + 1, href: baseHref + (pageInfo.number + 1)}), items) %}
+  {% endif %}
+  {% if pageInfo.number < pageInfo.totalPages - 2 %}
+    {% set items = (items.push({ ellipsis: true }), items) %}
+  {% endif %}
+  {% if pageInfo.number < pageInfo.totalPages %}
+    {% set items = (items.push({number: pageInfo.totalPages, href: baseHref + pageInfo.totalPages}), items) %}
+  {% endif %}
+
+  {{ govukPagination({
+    classes: "audit-list-pagination",
+    previous: {
+      href: baseHref + (pageInfo.number - 1)
+    } if pageInfo.number > 1 else null,
+    next: {
+      href: baseHref + (pageInfo.number + 1)
+    } if pageInfo.number < pageInfo.totalPages else null,
+    items: items
+  }) }}
+{% endmacro %}
+
 {# END MACROS #}
 
 {% set courtOptions = [{
   value: "",
   text: "All courts"
 }] %}
-{% for court in courts %}
-  {% set courtOptions = (courtOptions.push({
-    value: court.id,
-    text: court.name
-  }), courtOptions) %}
+
+{% set serviceCentreOptions = [{
+  value: "",
+  text: "All service centres"
+}] %}
+
+{# pull concrete values from the subjects map #}
+{% for subject, list in subjects %}
+  {% if subject === "COURT" %}
+    {% for court in list %}
+      {% set courtOptions = (courtOptions.push({
+        value: court.id,
+        text: court.name
+      }), courtOptions) %}
+    {% endfor %}
+  {% elseif subject === "SERVICE_CENTRE" %}
+    {% for serviceCentre in list %}
+      {% set serviceCentreOptions = (serviceCentreOptions.push({
+        value: serviceCentre.id,
+        text: serviceCentre.name
+      }), serviceCentreOptions) %}
+    {% endfor %}
+  {% endif %}
 {% endfor %}
 
 {% set auditTableRows = [] %}
@@ -134,12 +197,6 @@
           text: "Apply Filters"
         }) }}
 
-        <pre>
-          filters:
-          {{ filters | dump(2) }}
-        </pre>
-
-
         {% if auditTableRows.length %}
           {{ govukTable({
             firstCellIsHeader: false,
@@ -166,15 +223,8 @@
           <p class="govuk-body">No audits returned.</p>
         {% endif %}
 
+        {{ createPager(filters, audits.page) }}
       </form>
-
-      <pre>
-        audits:
-        {{ audits | dump(2) }}
-
-        errors:
-        {{ errors | dump(2) }}
-      </pre>
 
     </div>
   </div>

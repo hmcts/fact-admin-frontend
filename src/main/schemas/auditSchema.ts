@@ -3,12 +3,17 @@ import { z } from 'zod';
 import { pageMetadataSchema } from './pagedMetadataSchema';
 import { userSchema } from './userSchema';
 
-const courtNameAndIdSchema = z.object({
-  name: z.string(),
-  id: z.string(),
-});
+const auditSubjectTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
 
-export const courtNameAndIdListSchema = z.array(courtNameAndIdSchema);
+export const auditSubjectOptionsSchema = z.map(
+  auditSubjectTypeSchema,
+  z.array(
+    z.object({
+      name: z.string(),
+      id: z.uuid(),
+    })
+  )
+);
 
 const actionDataDiffSchema = z.object({
   field: z.string(),
@@ -35,4 +40,5 @@ export const pagedAuditsSchema = z.object({
 });
 
 export type PagedAudits = z.infer<typeof pagedAuditsSchema>;
-export type CourtNameAndIdList = z.infer<typeof courtNameAndIdListSchema>;
+export type AuditSubjectOptionsMap = z.infer<typeof auditSubjectOptionsSchema>;
+export const AuditSubject = auditSubjectTypeSchema.enum;

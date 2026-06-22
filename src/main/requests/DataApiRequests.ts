@@ -8,7 +8,7 @@ import {
   areaOfLawListSchema,
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
-import { CourtNameAndIdList, PagedAudits, courtNameAndIdListSchema, pagedAuditsSchema } from '../schemas/auditSchema';
+import { AuditSubjectOptionsMap, PagedAudits, auditSubjectOptionsSchema, pagedAuditsSchema } from '../schemas/auditSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
@@ -520,12 +520,12 @@ export class DataApiRequests {
   }
 
   /**
-   * Request to data API to get a complete list of court names and their ids
+   * Request to data API to get a complete list audit subjects and their options
    */
-  async getCourtNamesAndIds(): Promise<CourtNameAndIdList | HttpStatusCode> {
+  async getAuditSubjectOptionsMap(): Promise<AuditSubjectOptionsMap | HttpStatusCode> {
     try {
-      const response = await dataApi.get('/courts/nameoptions/v1');
-      return courtNameAndIdListSchema.parse(response.data);
+      const response = await dataApi.get('/audits/subjectoptions/v1');
+      return auditSubjectOptionsSchema.parse(new Map(Object.entries(response.data)));
     } catch (error: unknown) {
       logger.error('Error fetching court names:', error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;

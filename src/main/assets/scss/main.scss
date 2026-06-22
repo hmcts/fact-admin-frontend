@@ -1,8 +1,8 @@
 @use '@ministryofjustice/frontend/moj/all' as *;
 @use 'govuk-frontend';
 
-// Homepage pagination
-.homepage-pagination {
+// Homepage and Audit List pagination
+.homepage-pagination, .audit-list-pagination {
   justify-content: center;
 }
 
