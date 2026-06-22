@@ -1,0 +1,138 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% macro modelDrivenErrorSummary(model) %}
+  {% set errorList = [] %}
+  {% for field, errors in model.errors %}
+    {% if field !== "timestamp" %}
+      {% set fieldErrors = [] %}
+      {% for error in errors %}
+        {% set href = "#" + field if field !== "message" else null %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: href
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% set appointmentContact %}
+    {{ govukInput({
+      classes: "govuk-input--width-20",
+      id: "appointmentContact",
+      name: "appointmentContact",
+      label: {
+        text: "Contact details",
+        classes: "govuk-!-margin-bottom-1"
+      },
+      hint: {
+        text: "Provide the email address or phone number they can use to book appointments."
+      },
+      value: model.appointmentContact,
+      errorMessage: {
+        text: model.errors.appointmentContact[0]
+      } if model.errors and model.errors.appointmentContact[0] else null
+    }) }}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Counter Service Opening Hours</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/success">
+      <h2 class="govuk-heading-m">Counter Service Details</h2>
+        {{ govukCheckboxes({
+          id: "assistWith",
+          name: "assistWith",
+          fieldset: {
+            legend: {
+              text: "Select what the counter can assist with?"
+            }
+          },
+          hint: {
+              text: "Select all that apply"
+          },
+          items: [
+            {
+              value: "assistWithForms",
+              text: "Forms",
+              checked: true if model.assistWithForms === true else false
+            },
+            {
+              value: "assistWithDocuments",
+              text: "Documents",
+              checked: true if model.assistWithDocuments === true else false
+            },
+            {
+              value: "assistWithSupport",
+              text: "Support at court",
+              checked: true if model.assistWithSupport === true else false
+            }
+          ]
+        }) }}
+
+        {{ govukRadios({
+          classes: "govuk-radios",
+          id: "appointmentNeeded",
+          name: "appointmentNeeded",
+          fieldset: {
+            legend: {
+              text: "Is an appointment needed?"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: true if model.appointmentNeeded ===true else false,
+              conditional:
+                {
+                  html: appointmentContact
+                }
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: true if model.appointmentNeeded == false else false
+            }
+          ],
+          errorMessage: {
+            text: model.errors.appointmentNeeded[0]
+          } if model.errors and model.errors.appointmentNeeded else null
+        }) }}
+
+        <h2 class="govuk-heading-m">Enter opening hours</h2>
+        {% for entry in model.openingTimesDetails %}
+          <p class="govuk-body">
+            {{ entry.dayOfWeek }}: {{ entry.openingTime }} - {{ entry.closingTime }}
+          </p>
+        {% endfor %}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}
