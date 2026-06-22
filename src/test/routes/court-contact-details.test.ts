@@ -69,7 +69,9 @@ describe('Court contact details routes', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Add contact details');
     expect(response.text).toContain('Contact type');
-    expect(response.text).toContain(`<form action="/courts/${COURT_ID}/edit/contact-details/add/success" method="post"`);
+    expect(response.text).toContain(
+      `<form action="/courts/${COURT_ID}/edit/contact-details/add/success" method="post"`
+    );
   });
 
   test('creates contact detail and renders success page', async () => {
@@ -127,7 +129,9 @@ describe('Court contact details routes', () => {
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Edit contact details');
-    expect(response.text).toContain(`<form action="/courts/${COURT_ID}/edit/contact-details/edit/${CONTACT_DETAIL_ID}/success" method="post"`);
+    expect(response.text).toContain(
+      `<form action="/courts/${COURT_ID}/edit/contact-details/edit/${CONTACT_DETAIL_ID}/success" method="post"`
+    );
   });
 
   test('deletes contact detail and renders success page', async () => {
@@ -153,7 +157,9 @@ describe('Court contact details routes', () => {
       HttpStatusCode.NoContent
     );
 
-    const response = await request(app).post(`/courts/${COURT_ID}/edit/contact-details/delete/${CONTACT_DETAIL_ID}/success`);
+    const response = await request(app).post(
+      `/courts/${COURT_ID}/edit/contact-details/delete/${CONTACT_DETAIL_ID}/success`
+    );
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Contact details deleted');
@@ -161,4 +167,3 @@ describe('Court contact details routes', () => {
     expect(deleteCourtContactDetailStub.firstCall.args).toEqual([COURT_ID, CONTACT_DETAIL_ID]);
   });
 });
-

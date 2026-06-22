@@ -39,7 +39,9 @@ test.describe('Court Contact Details Journey', () => {
         await expect(courtContactDetailsPage.heading).toContainText('Contact details');
 
         await courtContactDetailsPage.addContactDetailLink.click();
-        await expect(courtContactDetailsPage.page).toHaveURL(courtContactDetailsPage.buildAddContactUrl(createdCourt.id));
+        await expect(courtContactDetailsPage.page).toHaveURL(
+          courtContactDetailsPage.buildAddContactUrl(createdCourt.id)
+        );
         await expect(courtContactDetailsPage.heading).toContainText('Add contact details');
 
         const selectedContactTypeLabel = await courtContactDetailsPage.selectFirstAvailableContactType();
@@ -52,7 +54,9 @@ test.describe('Court Contact Details Journey', () => {
         await expect(courtContactDetailsPage.successPanel).toContainText(selectedContactTypeLabel);
         await courtContactDetailsPage.continueUpdatingLink.click();
 
-        await expect(courtContactDetailsPage.page).toHaveURL(courtContactDetailsPage.buildContactDetailsUrl(createdCourt.id));
+        await expect(courtContactDetailsPage.page).toHaveURL(
+          courtContactDetailsPage.buildContactDetailsUrl(createdCourt.id)
+        );
         await expect(courtContactDetailsPage.mainContent.content).toContainText(selectedContactTypeLabel);
         await expect(courtContactDetailsPage.mainContent.content).toContainText(contactEmail);
 
@@ -68,19 +72,20 @@ test.describe('Court Contact Details Journey', () => {
         await expect(courtContactDetailsPage.mainContent.content).toContainText(contactPhone);
 
         await courtContactDetailsPage.clickDeleteForRowText(contactEmail);
-        await expect(courtContactDetailsPage.heading).toContainText('Are you sure you want to delete these contact details?');
+        await expect(courtContactDetailsPage.heading).toContainText(
+          'Are you sure you want to delete these contact details?'
+        );
         await courtContactDetailsPage.confirmDelete();
 
         await expect(courtContactDetailsPage.successPanel).toContainText('Contact details deleted');
         await expect(courtContactDetailsPage.successPanel).toContainText(selectedContactTypeLabel);
         await courtContactDetailsPage.continueUpdatingLink.click();
 
-        await expect(courtContactDetailsPage.page).toHaveURL(courtContactDetailsPage.buildContactDetailsUrl(createdCourt.id));
+        await expect(courtContactDetailsPage.page).toHaveURL(
+          courtContactDetailsPage.buildContactDetailsUrl(createdCourt.id)
+        );
         await expect(courtContactDetailsPage.mainContent.content).not.toContainText(contactEmail);
       }
     );
   });
 });
-
-
-

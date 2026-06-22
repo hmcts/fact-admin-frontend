@@ -88,6 +88,3 @@ export class CourtContactDetailsPage extends Base {
     return config.urls.homePageUrl + `/courts/${courtId}/edit/contact-details/add`;
   }
 }
-
-
-
