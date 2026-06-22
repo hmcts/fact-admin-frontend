@@ -8,7 +8,12 @@ import {
   areaOfLawListSchema,
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
-import { AuditSubjectOptionsMap, PagedAudits, auditSubjectOptionsSchema, pagedAuditsSchema } from '../schemas/auditSchema';
+import {
+  AuditSubjectOptionsMap,
+  PagedAudits,
+  auditSubjectOptionsSchema,
+  pagedAuditsSchema,
+} from '../schemas/auditSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';

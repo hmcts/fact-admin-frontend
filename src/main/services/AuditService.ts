@@ -57,7 +57,11 @@ export class AuditService {
     };
   }
 
-  private buildErrorResponse(subjects: AuditSubjectOptionsMap, filters: GetAuditsParams, errors: Record<string, string[]>) {
+  private buildErrorResponse(
+    subjects: AuditSubjectOptionsMap,
+    filters: GetAuditsParams,
+    errors: Record<string, string[]>
+  ) {
     return {
       filters,
       subjects,
