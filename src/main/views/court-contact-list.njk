@@ -1,20 +1,9 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/common-components.njk" import rowActions %}
 
 {# MACROS #}
-
-{% macro rowActions(items) %}
-  <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">
-    {% for item in items %}
-      {%- if item and item.href %}
-        <li class="govuk-summary-list__actions-list-item">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
-        </li>
-      {% endif -%}
-    {% endfor %}
-  </ul>
-{% endmacro %}
 
 {% macro contactDetailsBlock(contact) %}
   {% if contact.phoneNumber %}
@@ -94,4 +83,3 @@
     </div>
   </div>
 {% endblock %}
-

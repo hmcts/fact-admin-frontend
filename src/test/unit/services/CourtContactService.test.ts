@@ -87,29 +87,6 @@ describe('CourtContactService submitContactDetailFlow', () => {
     });
   });
 
-  test('returns save-error bad request when API responds with validation map', async () => {
-    jest
-      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
-      .mockResolvedValue(new Map([['email', 'invalid']]) as never);
-
-    const result = await new CourtContactService().submitContactDetailFlow({
-      body: {
-        'contact-email': 'enquiries@example.test',
-        'contact-methods': ['email'],
-        'contact-type': contactTypeId,
-      },
-      courtId,
-      courtName: 'Reading Crown Court',
-      formAction: `/courts/${courtId}/edit/contact-details/add/success`,
-      formHeading: 'Add contact details',
-    });
-
-    expect(result).toEqual({
-      status: HttpStatusCode.BadRequest,
-      type: 'save-error',
-    });
-  });
-
   test('returns saved with resolved contact type name when save succeeds', async () => {
     const updateCourtContactDetailSpy = jest
       .spyOn(DataApiRequests.prototype, 'updateCourtContactDetail')

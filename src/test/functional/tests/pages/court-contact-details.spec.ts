@@ -50,8 +50,11 @@ test.describe('Court Contact Details Journey', () => {
         await courtContactDetailsPage.explanationInput.fill('General enquiries desk');
         await courtContactDetailsPage.save();
 
-        await expect(courtContactDetailsPage.successPanel).toContainText('Contact details saved');
+        await expect(courtContactDetailsPage.successPanel).toContainText(`Contact details added: ${contactEmail}`);
         await expect(courtContactDetailsPage.successPanel).toContainText(selectedContactTypeLabel);
+        await expect(courtContactDetailsPage.mainContent.content).toContainText(
+          `contact details of ${selectedContactTypeLabel} for ${createdCourt.name} have been successfully created.`
+        );
         await courtContactDetailsPage.continueUpdatingLink.click();
 
         await expect(courtContactDetailsPage.page).toHaveURL(
@@ -66,7 +69,12 @@ test.describe('Court Contact Details Journey', () => {
         await courtContactDetailsPage.phoneInput.fill(contactPhone);
         await courtContactDetailsPage.save();
 
-        await expect(courtContactDetailsPage.successPanel).toContainText('Contact details saved');
+        await expect(courtContactDetailsPage.successPanel).toContainText(
+          `Contact details saved: ${contactPhone}, ${contactEmail}`
+        );
+        await expect(courtContactDetailsPage.mainContent.content).toContainText(
+          `contact details of ${selectedContactTypeLabel} for ${createdCourt.name} have been successfully updated.`
+        );
         await courtContactDetailsPage.continueUpdatingLink.click();
 
         await expect(courtContactDetailsPage.mainContent.content).toContainText(contactPhone);
@@ -77,8 +85,12 @@ test.describe('Court Contact Details Journey', () => {
         );
         await courtContactDetailsPage.confirmDelete();
 
-        await expect(courtContactDetailsPage.successPanel).toContainText('Contact details deleted');
-        await expect(courtContactDetailsPage.successPanel).toContainText(selectedContactTypeLabel);
+        await expect(courtContactDetailsPage.successPanel).toContainText(
+          `Contact details deleted: ${contactPhone}, ${contactEmail}`
+        );
+        await expect(courtContactDetailsPage.mainContent.content).toContainText(
+          `contact details of ${selectedContactTypeLabel} for ${createdCourt.name} have been successfully deleted.`
+        );
         await courtContactDetailsPage.continueUpdatingLink.click();
 
         await expect(courtContactDetailsPage.page).toHaveURL(

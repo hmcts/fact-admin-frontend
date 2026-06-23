@@ -2,6 +2,7 @@ import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
+import { CourtContactDetail } from '../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { CourtContactFormHeading, CourtContactService } from '../services/CourtContactService';
 
@@ -237,16 +238,28 @@ export default class CourtContactController {
       renderError(res, deleteStatus);
       return;
     }
-
+    const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
     res.render('common-edit-success', {
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       continueUpdatingHref: `/courts/${resolvedCourtId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
-      pageTitle: 'Contact details deleted',
-      successPanelBody: contactDescription,
-      successPanelTitle: 'Contact details deleted',
+      pageTitle: `Contact details deleted: ${contactDescription}`,
+      successPanelBody: `contact details of ${contactDescription} for ${courtResponse.name} have been successfully deleted.`,
+      successPanelTitle: `Contact details deleted: ${detail}`,
     });
+  }
+
+  private detailsGenerator(contactDetailResponse: CourtContactDetail, email: string, phoneNumber: string) {
+    let detail: string = '';
+    if (contactDetailResponse[phoneNumber] && contactDetailResponse[email]) {
+      detail = `${contactDetailResponse[phoneNumber]}, ${contactDetailResponse[email]}`;
+    } else if (contactDetailResponse[phoneNumber]) {
+      detail = contactDetailResponse[phoneNumber];
+    } else if (contactDetailResponse[email]) {
+      detail = contactDetailResponse[email];
+    }
+    return detail;
   }
 
   private resolveRequiredCourtId(req: Request, res: Response): string | undefined {
@@ -305,14 +318,20 @@ export default class CourtContactController {
       return;
     }
 
+    const contactDescription = submitFlowOutcome.successPanelBody;
+    const isUpdate = Boolean(options.contactDetailId);
+    const actionLabel = isUpdate ? 'saved' : 'added';
+    const actionPastTense = isUpdate ? 'updated' : 'created';
+    const detail = this.detailsGenerator(req.body, 'contact-email', 'contact-telephone');
+
     res.render('common-edit-success', {
       courtId: options.courtId,
       courtName: options.courtName,
       continueUpdatingHref: `/courts/${options.courtId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
-      pageTitle: 'Contact details saved',
-      successPanelBody: submitFlowOutcome.successPanelBody,
-      successPanelTitle: 'Contact details saved',
+      pageTitle: `Contact details ${actionLabel}: ${contactDescription}`,
+      successPanelBody: `contact details of ${contactDescription} for ${options.courtName} have been successfully ${actionPastTense}.`,
+      successPanelTitle: `Contact details ${actionLabel}: ${detail}`,
     });
   }
 

@@ -92,7 +92,10 @@ describe('Court contact details routes', () => {
       .send(`contact-type=${CONTACT_TYPE_ID}&contact-methods=email&contact-email=enquiries%40example.test`);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Contact details saved');
+    expect(response.text).toContain('Contact detailsadded: enquiries@example.test');
+    expect(response.text).toContain(
+      'contact details of General enquiries for Reading Crown Court have been successfully created.'
+    );
     expect(response.text).toContain('Back to contact details');
     expect(createCourtContactDetailStub.calledOnce).toBe(true);
     expect(createCourtContactDetailStub.firstCall.args[0]).toBe(COURT_ID);
@@ -162,7 +165,10 @@ describe('Court contact details routes', () => {
     );
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Contact details deleted');
+    expect(response.text).toContain('Contact details deleted: 01234 567890, enquiries@example.test');
+    expect(response.text).toContain(
+      'contact details of General enquiries for Reading Crown Court have been successfully deleted.'
+    );
     expect(deleteCourtContactDetailStub.calledOnce).toBe(true);
     expect(deleteCourtContactDetailStub.firstCall.args).toEqual([COURT_ID, CONTACT_DETAIL_ID]);
   });

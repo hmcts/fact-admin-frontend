@@ -235,7 +235,7 @@ export class CourtContactService {
     courtId: string,
     payload: SaveCourtContactDetailRequest,
     contactDetailId?: string
-  ): Promise<HttpStatusCode | Map<string, string>> {
+  ): Promise<HttpStatusCode> {
     if (contactDetailId) {
       return dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
     }
@@ -339,18 +339,11 @@ export class CourtContactService {
   }
 
   private toSaveErrorOutcome(
-    saveResult: HttpStatusCode | Map<string, string> | undefined
+    saveResult: HttpStatusCode | undefined
   ): Extract<CourtContactSubmitFlowOutcome, { type: 'save-error' }> | undefined {
     if (!saveResult) {
       return {
         status: HttpStatusCode.InternalServerError,
-        type: 'save-error',
-      };
-    }
-
-    if (saveResult instanceof Map) {
-      return {
-        status: HttpStatusCode.BadRequest,
         type: 'save-error',
       };
     }

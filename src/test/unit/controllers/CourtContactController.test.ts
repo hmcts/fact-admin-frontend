@@ -342,9 +342,9 @@ describe('CourtContactController', () => {
       courtName: 'Reading Crown Court',
       continueUpdatingHref: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details',
       continueUpdatingText: 'Back to contact details',
-      pageTitle: 'Contact details saved',
-      successPanelBody: 'General enquiries',
-      successPanelTitle: 'Contact details saved',
+      pageTitle: 'Contact details added: General enquiries',
+      successPanelBody: 'contact details of General enquiries for Reading Crown Court have been successfully created.',
+      successPanelTitle: 'Contact details added: enquiries@example.test',
     });
 
     try {
@@ -644,9 +644,9 @@ describe('CourtContactController', () => {
       courtName: 'Reading Crown Court',
       continueUpdatingHref: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details',
       continueUpdatingText: 'Back to contact details',
-      pageTitle: 'Contact details saved',
-      successPanelBody: 'Listing enquiries',
-      successPanelTitle: 'Contact details saved',
+      pageTitle: 'Contact details saved: Listing enquiries',
+      successPanelBody: 'contact details of Listing enquiries for Reading Crown Court have been successfully updated.',
+      successPanelTitle: 'Contact details saved: 01234 567890',
     });
 
     try {
@@ -981,9 +981,9 @@ describe('CourtContactController', () => {
       courtName: 'Reading Crown Court',
       continueUpdatingHref: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details',
       continueUpdatingText: 'Back to contact details',
-      pageTitle: 'Contact details deleted',
-      successPanelBody: 'Enquiries',
-      successPanelTitle: 'Contact details deleted',
+      pageTitle: 'Contact details deleted: Enquiries',
+      successPanelBody: 'contact details of Enquiries for Reading Crown Court have been successfully deleted.',
+      successPanelTitle: 'Contact details deleted: 01234 567890, enquiries@example.test',
     });
 
     try {
