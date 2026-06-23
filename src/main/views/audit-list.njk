@@ -5,6 +5,7 @@
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
 {% from "moj/components/filter/macro.njk" import mojFilter %}
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
@@ -149,23 +150,37 @@
   {% for audit in audits.content %}
 
     {% set auditDetailHtml %}
-      <a target="_blank" rel="noopener noreferrer" class="govuk-link govuk-link--no-visited-state" href="/audits/{{audit.id}}">
+      <a target="_blank" rel="noopener noreferrer" class="govuk-link govuk-link--no-visited-state"
+         href="/audits/{{ audit.id }}">
         Details
       </a>
     {% endset %}
 
+    {% set tagHtml %}
+      {% if audit.actionType === "DELETE" %}
+        {% set tagColour = "red" %}
+      {% elseif audit.actionType === "INSERT" %}
+        {% set tagColour = "green" %}
+      {% else %}
+        {% set tagColour = "blue" %}
+      {% endif %}
+      {{ govukTag({
+        text: audit.actionType,
+        classes: "govuk-tag--" + tagColour
+      })}}
+    {% endset %}
+
     {% set auditTableRows = (auditTableRows.push([
       {
-        html: audit.user.email
+        text: audit.user.email
       },
       {
-        html: audit.actionType
+        html: tagHtml
       },
+      { text: audit.court.name + ":  " + audit.actionEntity} if audit.court else
+      { text: "<deleted>: " + audit.actionEntity },
       {
-        html: audit.actionEntity
-      },
-      {
-        html: audit.createdAt
+        text: audit.createdAt
       },
       {
         html: auditDetailHtml
@@ -198,6 +213,9 @@
           heading: {
             text: "Filters"
           },
+          submit: {
+            text: "Search"
+          },
           selectedFilters: {
             clearLink: {
               text: "Reset",
@@ -228,21 +246,25 @@
        {% if auditTableRows.length %}
           {{ govukTable({
             firstCellIsHeader: false,
+            captionClasses: "govuk-table__caption--m",
             head: [
               {
-                text: "User"
+                text: "User",
+                classes: "govuk-!-width-one-quarter"
               },
               {
                 text: "Action"
               },
               {
-                text: "Location"
+                text: "Location",
+                classes: "govuk-!-width-one-quarter"
               },
               {
-                text: "Created at"
+                text: "Created at",
+                classes: "govuk-!-width-one-quarter"
               },
               {
-                text: ""
+                text: "Changes"
               }
             ],
             rows: auditTableRows
@@ -251,7 +273,7 @@
           {{ createPager(filters, audits.page) }}
 
         {% else %}
-          <p class="govuk-body">No audits returned.</p>
+          <p class="govuk-body">No audits returned. Try expanding the search parameters.</p>
         {% endif %}
 
     </div>

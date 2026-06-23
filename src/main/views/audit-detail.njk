@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {% macro createDiffDetails(diffData, actionType) %}
   {% if diffData.length %}
@@ -19,7 +20,8 @@
       ]), diffRows) %}
     {% endfor %}
     {{ govukTable({
-      firstCellIsHeader: false,
+      firstCellIsHeader: true,
+      captionClasses: "govuk-table__caption--m",
       head: [
         {
           text: "Field"
@@ -44,11 +46,25 @@
   <div class="govuk-grid-row">
     <h1 class="govuk-heading-l">Audit Detail</h1>
 
+    {% set tagHtml %}
+      {% if audit.actionType === "DELETE" %}
+        {% set tagColour = "red" %}
+      {% elseif audit.actionType === "INSERT" %}
+        {% set tagColour = "green" %}
+      {% else %}
+        {% set tagColour = "blue" %}
+      {% endif %}
+      {{ govukTag({
+        text: audit.actionType,
+        classes: "govuk-tag--" + tagColour
+      })}}
+    {% endset %}
+
     {{  govukSummaryList({
       rows: [
         {
           key: { text: "Action" },
-          value: { text: audit.actionType }
+          value: { html: tagHtml }
         },
         {
           key: { text: "Subject" },
