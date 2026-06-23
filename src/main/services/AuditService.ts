@@ -130,6 +130,10 @@ export class AuditService {
     } catch (error) {
       logger.error('Error generating audit CSV:', error);
       stream.destroy();
+
+      // Try and delete the file if we were in the middle of creating one
+      await this.safeUnlink(filePath);
+
       return HttpStatusCode.InternalServerError;
     }
   }
@@ -137,6 +141,18 @@ export class AuditService {
   private csvEscape(value: unknown): string {
     const s = String(value ?? '');
     return `"${s.replaceAll('"', '""')}"`;
+  }
+
+  private async safeUnlink(filePath: string): Promise<void> {
+    try {
+      await fs.promises.unlink(filePath);
+    } catch (error: unknown) {
+      // Ignore missing file and log any other errors
+      const isMissingFile = (error as NodeJS.ErrnoException)?.code === 'ENOENT';
+      if (!isMissingFile) {
+        logger.error(`Failed to remove temp CSV file: ${filePath}`, error);
+      }
+    }
   }
 
   private applyDefaults(params: Partial<GetAuditsParams>): GetAuditsParams {
@@ -198,7 +214,7 @@ export class AuditService {
     const fromDate = new Date(params.fromDate);
 
     if (Number.isNaN(fromDate.getTime())) {
-      fromDateErrors.push('From date must must be a valid date');
+      fromDateErrors.push('From date must be a valid date');
     } else {
       if (fromDate > new Date(this.today())) {
         fromDateErrors.push('From date must not be in the future');
