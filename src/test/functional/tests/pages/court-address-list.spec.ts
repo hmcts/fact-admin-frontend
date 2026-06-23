@@ -15,16 +15,11 @@ test.describe(
         tag: '@smoke',
       },
       async ({ courtAddressListPage, playwright }) => {
-        await withCreatedCourt(
-          playwright,
-          'Court Address List Functional Test',
-          {},
-          async ({ createdCourt }) => {
-            await courtAddressListPage.goto(createdCourt.id);
+        await withCreatedCourt(playwright, 'Court Address List Functional Test', {}, async ({ createdCourt }) => {
+          await courtAddressListPage.goto(createdCourt.id);
 
-            await expect(courtAddressListPage.heading).toContainText('Addresses');
-          }
-        );
+          await expect(courtAddressListPage.heading).toContainText('Addresses');
+        });
       }
     );
 
@@ -35,27 +30,22 @@ test.describe(
       playwright,
       page,
     }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address List Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await reduceAddressesCount(
-            page,
-            courtAddressListPage,
-            courtAddressDeletePage,
-            courtAddressDeleteSuccessPage,
-            createdCourt.id,
-            2
-          );
+      await withCreatedCourt(playwright, 'Court Address List Functional Test', {}, async ({ createdCourt }) => {
+        await reduceAddressesCount(
+          page,
+          courtAddressListPage,
+          courtAddressDeletePage,
+          courtAddressDeleteSuccessPage,
+          createdCourt.id,
+          2
+        );
 
-          await courtAddressListPage.expectVisibleElements();
-          await expect(courtAddressListPage.mainContent.content).toContainText(
-            'You can have between one and three addresses per court'
-          );
-          await expect(courtAddressListPage.addAddressButton).toBeVisible();
-        }
-      );
+        await courtAddressListPage.expectVisibleElements();
+        await expect(courtAddressListPage.mainContent.content).toContainText(
+          'You can have between one and three addresses per court'
+        );
+        await expect(courtAddressListPage.addAddressButton).toBeVisible();
+      });
     });
 
     test('add address action opens the find address page for the selected court', async ({
@@ -66,29 +56,24 @@ test.describe(
       courtAddressFindPage,
       playwright,
     }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address List Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await reduceAddressesCount(
-            page,
-            courtAddressListPage,
-            courtAddressDeletePage,
-            courtAddressDeleteSuccessPage,
-            createdCourt.id,
-            2
-          );
+      await withCreatedCourt(playwright, 'Court Address List Functional Test', {}, async ({ createdCourt }) => {
+        await reduceAddressesCount(
+          page,
+          courtAddressListPage,
+          courtAddressDeletePage,
+          courtAddressDeleteSuccessPage,
+          createdCourt.id,
+          2
+        );
 
-          await courtAddressListPage.goto(createdCourt.id);
-          await courtAddressListPage.clickAddAddress();
+        await courtAddressListPage.goto(createdCourt.id);
+        await courtAddressListPage.clickAddAddress();
 
-          await expect(courtAddressFindPage.page).toHaveURL(
-            new RegExp(`/courts/${createdCourt.id}/edit/address/find/?$`)
-          );
-          await expect(courtAddressFindPage.heading).toContainText('Find address by postcode');
-        }
-      );
+        await expect(courtAddressFindPage.page).toHaveURL(
+          new RegExp(`/courts/${createdCourt.id}/edit/address/find/?$`)
+        );
+        await expect(courtAddressFindPage.heading).toContainText('Find address by postcode');
+      });
     });
 
     test('renders the dedicated court not found page for an invalid court id', async ({ courtAddressListPage }) => {

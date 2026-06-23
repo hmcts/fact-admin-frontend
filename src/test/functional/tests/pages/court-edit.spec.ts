@@ -8,54 +8,39 @@ test.describe('Court Edit Page Tests', () => {
       tag: '@smoke',
     },
     async ({ courtEditPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Edit Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await courtEditPage.goto(createdCourt.id);
-          await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
-        }
-      );
+      await withCreatedCourt(playwright, 'Court Edit Functional Test', {}, async ({ createdCourt }) => {
+        await courtEditPage.goto(createdCourt.id);
+        await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
+      });
     }
   );
 
   test('visibility test', async ({ courtEditPage, playwright }) => {
-    await withCreatedCourt(
-      playwright,
-      'Court Edit Functional Test',
-      {},
-      async ({ createdCourt }) => {
-        await courtEditPage.goto(createdCourt.id);
-        await courtEditPage.expectVisibleElements();
-        await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
-        await expect(courtEditPage.mainContent.content).toContainText('Accessibility');
-        await expect(courtEditPage.mainContent.content).toContainText('Information for professionals');
-        await expect(courtEditPage.mainContent.content).toContainText('TODO');
-      }
-    );
+    await withCreatedCourt(playwright, 'Court Edit Functional Test', {}, async ({ createdCourt }) => {
+      await courtEditPage.goto(createdCourt.id);
+      await courtEditPage.expectVisibleElements();
+      await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
+      await expect(courtEditPage.mainContent.content).toContainText('Accessibility');
+      await expect(courtEditPage.mainContent.content).toContainText('Information for professionals');
+      await expect(courtEditPage.mainContent.content).toContainText('TODO');
+    });
   });
 
   test('renders the expected section links for the selected court', async ({ courtEditPage, playwright }) => {
-    await withCreatedCourt(
-      playwright,
-      'Court Edit Functional Test',
-      {},
-      async ({ createdCourt }) => {
-        await courtEditPage.goto(createdCourt.id);
+    await withCreatedCourt(playwright, 'Court Edit Functional Test', {}, async ({ createdCourt }) => {
+      await courtEditPage.goto(createdCourt.id);
 
-        await expect(courtEditPage.getSectionHref('Accessibility')).resolves.toBe(
-          `/courts/${createdCourt.id}/edit/accessibility`
-        );
-        await expect(courtEditPage.getSectionHref('Address')).resolves.toBe(`/courts/${createdCourt.id}/edit/address`);
-        await expect(courtEditPage.getSectionHref('Translation and interpretation')).resolves.toBe(
-          `/courts/${createdCourt.id}/edit/translation-and-interpretation`
-        );
-        await expect(courtEditPage.getSectionHref('Warning notice')).resolves.toBe(
-          `/courts/${createdCourt.id}/edit/warning-notice`
-        );
-      }
-    );
+      await expect(courtEditPage.getSectionHref('Accessibility')).resolves.toBe(
+        `/courts/${createdCourt.id}/edit/accessibility`
+      );
+      await expect(courtEditPage.getSectionHref('Address')).resolves.toBe(`/courts/${createdCourt.id}/edit/address`);
+      await expect(courtEditPage.getSectionHref('Translation and interpretation')).resolves.toBe(
+        `/courts/${createdCourt.id}/edit/translation-and-interpretation`
+      );
+      await expect(courtEditPage.getSectionHref('Warning notice')).resolves.toBe(
+        `/courts/${createdCourt.id}/edit/warning-notice`
+      );
+    });
   });
 
   test('renders the dedicated court not found page for an invalid court id', async ({ courtEditPage }) => {

@@ -8,16 +8,11 @@ test.describe('Local Authorities Page Tests', () => {
       tag: '@smoke',
     },
     async ({ localAuthoritiesPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Local Authorities Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await localAuthoritiesPage.goto(createdCourt.id);
+      await withCreatedCourt(playwright, 'Local Authorities Functional Test', {}, async ({ createdCourt }) => {
+        await localAuthoritiesPage.goto(createdCourt.id);
 
-          await expect(localAuthoritiesPage.warningText).toContainText('If you set a local authority for a court');
-        }
-      );
+        await expect(localAuthoritiesPage.warningText).toContainText('If you set a local authority for a court');
+      });
     }
   );
 
@@ -26,49 +21,44 @@ test.describe('Local Authorities Page Tests', () => {
     localAuthoritiesPage,
     playwright,
   }) => {
-    await withCreatedCourt(
-      playwright,
-      'Local Authorities Functional Test',
-      {},
-      async ({ createdCourt }) => {
-        // First job is to find all of the case types that would enable
-        // the functionality and remove them.
-        await casesHeardPage.goto(createdCourt.id);
+    await withCreatedCourt(playwright, 'Local Authorities Functional Test', {}, async ({ createdCourt }) => {
+      // First job is to find all of the case types that would enable
+      // the functionality and remove them.
+      await casesHeardPage.goto(createdCourt.id);
 
-        const removableCaseTypes = ['Adoption', 'Children', 'Divorce'] as const;
-        let removedCaseType = false;
+      const removableCaseTypes = ['Adoption', 'Children', 'Divorce'] as const;
+      let removedCaseType = false;
 
-        for (const caseType of removableCaseTypes) {
-          const checkbox = casesHeardPage.page.getByRole('checkbox', { name: caseType });
-          if ((await checkbox.count()) > 0 && (await checkbox.first().isChecked())) {
-            await checkbox.first().uncheck();
-            removedCaseType = true;
-          }
+      for (const caseType of removableCaseTypes) {
+        const checkbox = casesHeardPage.page.getByRole('checkbox', { name: caseType });
+        if ((await checkbox.count()) > 0 && (await checkbox.first().isChecked())) {
+          await checkbox.first().uncheck();
+          removedCaseType = true;
         }
-
-        if (removedCaseType) {
-          await casesHeardPage.save();
-          await casesHeardPage.header.checkIsVisible();
-          const continueButton = casesHeardPage.page.getByRole('button', { name: 'Continue' });
-          if ((await continueButton.count()) > 0) {
-            await continueButton.click();
-          }
-          await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
-        }
-
-        // then perform the actual test once we know that it shouldn't
-        // show the availability warning.
-        await localAuthoritiesPage.goto(createdCourt.id);
-
-        await localAuthoritiesPage.expectVisibleElements();
-        await expect(localAuthoritiesPage.availabilityWarningText).toContainText(
-          "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court"
-        );
-        await expect(localAuthoritiesPage.saveButton).toHaveCount(0);
-        await expect(localAuthoritiesPage.tabs).toHaveCount(0);
-        await expect(localAuthoritiesPage.successPanel).toHaveCount(0);
       }
-    );
+
+      if (removedCaseType) {
+        await casesHeardPage.save();
+        await casesHeardPage.header.checkIsVisible();
+        const continueButton = casesHeardPage.page.getByRole('button', { name: 'Continue' });
+        if ((await continueButton.count()) > 0) {
+          await continueButton.click();
+        }
+        await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
+      }
+
+      // then perform the actual test once we know that it shouldn't
+      // show the availability warning.
+      await localAuthoritiesPage.goto(createdCourt.id);
+
+      await localAuthoritiesPage.expectVisibleElements();
+      await expect(localAuthoritiesPage.availabilityWarningText).toContainText(
+        "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court"
+      );
+      await expect(localAuthoritiesPage.saveButton).toHaveCount(0);
+      await expect(localAuthoritiesPage.tabs).toHaveCount(0);
+      await expect(localAuthoritiesPage.successPanel).toHaveCount(0);
+    });
   });
 
   test('saves local-authority selections and renders the success page when the section is enabled', async ({
@@ -129,20 +119,15 @@ test.describe('Local Authorities Page Tests', () => {
   });
 
   test('does not render the success page for direct GET requests', async ({ localAuthoritiesPage, playwright }) => {
-    await withCreatedCourt(
-      playwright,
-      'Local Authorities Functional Test',
-      {},
-      async ({ createdCourt }) => {
-        await localAuthoritiesPage.gotoSuccess(createdCourt.id);
+    await withCreatedCourt(playwright, 'Local Authorities Functional Test', {}, async ({ createdCourt }) => {
+      await localAuthoritiesPage.gotoSuccess(createdCourt.id);
 
-        await expect(localAuthoritiesPage.page).toHaveURL(
-          localAuthoritiesPage.buildLocalAuthoritiesSuccessUrl(createdCourt.id)
-        );
-        await expect(localAuthoritiesPage.mainContent.content).toContainText('Page Not Found');
-        await expect(localAuthoritiesPage.successPanel).toHaveCount(0);
-      }
-    );
+      await expect(localAuthoritiesPage.page).toHaveURL(
+        localAuthoritiesPage.buildLocalAuthoritiesSuccessUrl(createdCourt.id)
+      );
+      await expect(localAuthoritiesPage.mainContent.content).toContainText('Page Not Found');
+      await expect(localAuthoritiesPage.successPanel).toHaveCount(0);
+    });
   });
 
   test('renders the dedicated court not found page for an invalid court id', async ({ localAuthoritiesPage }) => {

@@ -29,16 +29,11 @@ test.describe(
     });
 
     test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Cases Heard Performance Test',
-        {},
-        async ({ createdCourt }) => {
-          await casesHeardPage.goto(createdCourt.id);
-          await casesHeardPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+      await withCreatedCourt(playwright, 'Cases Heard Performance Test', {}, async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Translation and Interpretation Page Performance', async ({
@@ -103,16 +98,11 @@ test.describe(
         tag: '@performance',
       },
       async ({ generalPage, lighthouseUtils, playwright }) => {
-        await withCreatedCourt(
-          playwright,
-          'General Performance Test',
-          {},
-          async ({ createdCourt }) => {
-            await generalPage.goto(createdCourt.id);
-            await generalPage.header.checkIsVisible();
-            await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-          }
-        );
+        await withCreatedCourt(playwright, 'General Performance Test', {}, async ({ createdCourt }) => {
+          await generalPage.goto(createdCourt.id);
+          await generalPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        });
       }
     );
 

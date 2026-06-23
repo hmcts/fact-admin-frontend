@@ -10,21 +10,16 @@ test.describe(
   },
   () => {
     test('visibility test', async ({ courtAddressSelectPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Select Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
+      await withCreatedCourt(playwright, 'Court Address Select Functional Test', {}, async ({ createdCourt }) => {
+        await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
 
-          await courtAddressSelectPage.expectVisibleElements();
-          await expect(courtAddressSelectPage.heading).toContainText('Select an address');
-          await expect(courtAddressSelectPage.mainContent.content).toContainText(`Postcode: ${TEST_POSTCODE}.`);
-          await expect(courtAddressSelectPage.addressSelect).toBeVisible();
-          await expect(courtAddressSelectPage.continueButton).toBeVisible();
-          await expect(courtAddressSelectPage.enterAddressManuallyButton).toBeVisible();
-        }
-      );
+        await courtAddressSelectPage.expectVisibleElements();
+        await expect(courtAddressSelectPage.heading).toContainText('Select an address');
+        await expect(courtAddressSelectPage.mainContent.content).toContainText(`Postcode: ${TEST_POSTCODE}.`);
+        await expect(courtAddressSelectPage.addressSelect).toBeVisible();
+        await expect(courtAddressSelectPage.continueButton).toBeVisible();
+        await expect(courtAddressSelectPage.enterAddressManuallyButton).toBeVisible();
+      });
     });
 
     test('continue action opens the address details form with selected address data', async ({
@@ -32,21 +27,16 @@ test.describe(
       courtAddressEditPage,
       playwright,
     }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Select Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
-          await courtAddressSelectPage.selectFirstAddress();
-          await courtAddressSelectPage.clickContinue();
+      await withCreatedCourt(playwright, 'Court Address Select Functional Test', {}, async ({ createdCourt }) => {
+        await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
+        await courtAddressSelectPage.selectFirstAddress();
+        await courtAddressSelectPage.clickContinue();
 
-          await expect(courtAddressEditPage.page).toHaveURL(
-            new RegExp(`/courts/${createdCourt.id}/edit/address/details$`)
-          );
-          await expect(courtAddressEditPage.heading).toContainText('Address');
-        }
-      );
+        await expect(courtAddressEditPage.page).toHaveURL(
+          new RegExp(`/courts/${createdCourt.id}/edit/address/details$`)
+        );
+        await expect(courtAddressEditPage.heading).toContainText('Address');
+      });
     });
 
     test('enter address manually action opens the address details form', async ({
@@ -54,20 +44,15 @@ test.describe(
       courtAddressEditPage,
       playwright,
     }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Select Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
-          await courtAddressSelectPage.clickEnterAddressManually();
+      await withCreatedCourt(playwright, 'Court Address Select Functional Test', {}, async ({ createdCourt }) => {
+        await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
+        await courtAddressSelectPage.clickEnterAddressManually();
 
-          await expect(courtAddressEditPage.page).toHaveURL(
-            new RegExp(`/courts/${createdCourt.id}/edit/address/details$`)
-          );
-          await expect(courtAddressEditPage.heading).toContainText('Address');
-        }
-      );
+        await expect(courtAddressEditPage.page).toHaveURL(
+          new RegExp(`/courts/${createdCourt.id}/edit/address/details$`)
+        );
+        await expect(courtAddressEditPage.heading).toContainText('Address');
+      });
     });
   }
 );

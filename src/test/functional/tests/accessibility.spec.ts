@@ -29,101 +29,66 @@ test.describe(
     });
 
     test('Court Edit Page Accessibility', async ({ axeUtils, courtEditPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Edit Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await courtEditPage.goto(createdCourt.id);
-          await courtEditPage.expectVisibleElements();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'Court Edit Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtEditPage.goto(createdCourt.id);
+        await courtEditPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
     });
 
     test('Cases Heard Page Accessibility', async ({ axeUtils, casesHeardPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Cases Heard Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await casesHeardPage.goto(createdCourt.id);
-          await casesHeardPage.expectVisibleElements();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'Cases Heard Accessibility Test', {}, async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
     });
 
     test('Cases Heard Validation Accessibility', async ({ axeUtils, casesHeardPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Cases Heard Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await casesHeardPage.goto(createdCourt.id);
-          await casesHeardPage.clearSelectedCaseTypes();
-          await casesHeardPage.save();
-          await casesHeardPage.header.checkIsVisible();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'Cases Heard Accessibility Test', {}, async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.clearSelectedCaseTypes();
+        await casesHeardPage.save();
+        await casesHeardPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
     });
 
     test('Cases Heard Success Page Accessibility', async ({ axeUtils, casesHeardPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Cases Heard Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await casesHeardPage.goto(createdCourt.id);
-          await casesHeardPage.selectFirstCaseType();
-          await casesHeardPage.save();
-          await casesHeardPage.header.checkIsVisible();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'Cases Heard Accessibility Test', {}, async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.selectFirstCaseType();
+        await casesHeardPage.save();
+        await casesHeardPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
     });
 
     test('General Page Accessibility', async ({ axeUtils, generalPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'General Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await generalPage.goto(createdCourt.id);
-          await generalPage.expectVisibleElements();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
+        await generalPage.goto(createdCourt.id);
+        await generalPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
     });
 
     test('General Validation Accessibility', async ({ axeUtils, generalPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'General Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await generalPage.goto(createdCourt.id);
-          await generalPage.nameInput.clear();
-          await generalPage.save();
-          await generalPage.header.checkIsVisible();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
+        await generalPage.goto(createdCourt.id);
+        await generalPage.nameInput.clear();
+        await generalPage.save();
+        await generalPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
     });
 
     test('General Success Page Accessibility', async ({ axeUtils, generalPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'General Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await generalPage.goto(createdCourt.id);
-          await generalPage.save();
-          await generalPage.header.checkIsVisible();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
+        await generalPage.goto(createdCourt.id);
+        await generalPage.save();
+        await generalPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
     });
 
     test('Translation and Interpretation Page Accessibility', async ({
@@ -210,16 +175,11 @@ test.describe(
     });
 
     test('Local Authorities Page Accessibility', async ({ axeUtils, localAuthoritiesPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Local Authorities Accessibility Test',
-        {},
-        async ({ createdCourt }) => {
-          await localAuthoritiesPage.goto(createdCourt.id);
-          await localAuthoritiesPage.expectVisibleElements();
-          await axeUtils.audit();
-        }
-      );
+      await withCreatedCourt(playwright, 'Local Authorities Accessibility Test', {}, async ({ createdCourt }) => {
+        await localAuthoritiesPage.goto(createdCourt.id);
+        await localAuthoritiesPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
     });
 
     test('Information for Professionals Page Accessibility', async ({
