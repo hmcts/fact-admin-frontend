@@ -403,11 +403,7 @@ export class DataApiRequests {
   ): Promise<CourtOpeningHours | HttpStatusCode | Map<string, string>> {
     try {
       const response = await dataApi.put(`/courts/${courtId}/v1/opening-hours`, payload);
-      if (
-        response.status >= HttpStatusCode.Ok &&
-        response.status < HttpStatusCode.MultipleChoices &&
-        !response.data
-      ) {
+      if (response.status >= HttpStatusCode.Ok && response.status < HttpStatusCode.MultipleChoices && !response.data) {
         return response.status as HttpStatusCode;
       }
 

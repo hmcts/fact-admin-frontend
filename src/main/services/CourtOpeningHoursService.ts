@@ -576,9 +576,7 @@ export class CourtOpeningHoursService {
 
   private isSuccessfulStatus(response: unknown): response is HttpStatusCode {
     return (
-      this.isHttpStatusCode(response) &&
-      response >= HttpStatusCode.Ok &&
-      response < HttpStatusCode.MultipleChoices
+      this.isHttpStatusCode(response) && response >= HttpStatusCode.Ok && response < HttpStatusCode.MultipleChoices
     );
   }
 
