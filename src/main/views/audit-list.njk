@@ -179,83 +179,82 @@
 {% endblock %}
 
 {% block content %}
-  <main class="govuk-main-wrapper">
 
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
-        {% if errors %}
-          {{ modelDrivenErrorSummary(errors) }}
-        {% endif %}
-      </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if errors %}
+        {{ modelDrivenErrorSummary(errors) }}
+      {% endif %}
     </div>
+  </div>
 
-    <h1 class="govuk-heading-l">Audits</h1>
+  <h1 class="govuk-heading-l">Audits</h1>
 
-    <div class="govuk-grid-row">
+  <div class="govuk-grid-row">
 
-      <div class="govuk-grid-column-one-third">
-        <form method="GET" action="/audits">
-          {{ mojFilter({
+    <div class="govuk-grid-column-one-third">
+      <form method="GET" action="/audits">
+        {{ mojFilter({
+          heading: {
+            text: "Filters"
+          },
+          selectedFilters: {
+            clearLink: {
+              text: "Reset",
+              href: '/audits'
+            },
             heading: {
-              text: "Filters"
+              text: "Selected filters"
             },
-            selectedFilters: {
-              clearLink: {
-                text: "Reset",
-                href: '/audits'
-              },
-              heading: {
-                text: "Selected filters"
-              },
-              categories: filterCategories
-            },
-            optionsHtml: filterOptionsHtml
-          }) }}
-        </form>
-        {% if downloadUrl %}
-          {{ govukButton({
-            text: "Download CSV",
-            classes: "govuk-!-margin-top-6",
-            href: downloadUrl,
-            arttributes: {
-              rel: "noopener noreferrer",
-              target: "_blank"
-            }
-          }) }}
-        {% endif %}
-      </div>
-
-      <div class="govuk-grid-column-two-thirds">
-         {% if auditTableRows.length %}
-            {{ govukTable({
-              firstCellIsHeader: false,
-              head: [
-                {
-                  text: "User"
-                },
-                {
-                  text: "Action"
-                },
-                {
-                  text: "Location"
-                },
-                {
-                  text: "Created at"
-                },
-                {
-                  text: ""
-                }
-              ],
-              rows: auditTableRows
-            }) }}
-
-            {{ createPager(filters, audits.page) }}
-
-          {% else %}
-            <p class="govuk-body">No audits returned.</p>
-          {% endif %}
-
-      </div>
+            categories: filterCategories
+          },
+          optionsHtml: filterOptionsHtml
+        }) }}
+      </form>
+      {% if downloadUrl %}
+        {{ govukButton({
+          text: "Download CSV",
+          classes: "govuk-!-margin-top-6 govuk-button--secondary",
+          href: downloadUrl,
+          arttributes: {
+            rel: "noopener noreferrer",
+            target: "_blank"
+          }
+        }) }}
+      {% endif %}
     </div>
-  </main>
+
+    <div class="govuk-grid-column-two-thirds">
+       {% if auditTableRows.length %}
+          {{ govukTable({
+            firstCellIsHeader: false,
+            head: [
+              {
+                text: "User"
+              },
+              {
+                text: "Action"
+              },
+              {
+                text: "Location"
+              },
+              {
+                text: "Created at"
+              },
+              {
+                text: ""
+              }
+            ],
+            rows: auditTableRows
+          }) }}
+
+          {{ createPager(filters, audits.page) }}
+
+        {% else %}
+          <p class="govuk-body">No audits returned.</p>
+        {% endif %}
+
+    </div>
+  </div>
+
 {% endblock %}
