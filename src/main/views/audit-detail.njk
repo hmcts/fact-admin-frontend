@@ -52,11 +52,11 @@
         },
         {
           key: { text: "Subject" },
-          value: { text: audit.court.name + ":  " + audit.actionEntity }
+          value: { text: audit.court.name + ":  " + audit.actionEntity } if audit.court else { text: "<deleted>: " + audit.actionEntity }
         },
         {
           key: { text: "Subject ID" },
-          value: { text: audit.court.id }
+          value: { text: audit.courtId }
         },
         {
           key: { text: "Created At" },
