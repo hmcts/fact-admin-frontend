@@ -52,10 +52,12 @@ export default class AuditController {
     this.transformForUI(viewModel);
     const filterCategories = this.buildFilterCategories(viewModel.filters);
     const downloadUrl = this.buildDownloadUrl(req.query);
+    const basePagerUrl = this.buildPagerBaseUrl(viewModel.filters);
 
     res.render('audit-list', {
       ...viewModel,
       filterCategories,
+      basePagerUrl,
       downloadUrl: viewModel.errors || viewModel.audits.content.length === 0 ? undefined : downloadUrl,
       pageTitle: viewModel.errors ? 'Error: Audits' : 'Audits',
     });
@@ -188,7 +190,7 @@ export default class AuditController {
   }
 
   /**
-   * Builds the download URL that emulates the current query parameters, so that the user can #
+   * Builds the download URL that emulates the current query parameters, so that the user can
    * download the same set of audits that they are currently viewing.
    *
    * @param query
@@ -212,5 +214,36 @@ export default class AuditController {
 
     const queryString = new URLSearchParams(queryEntries).toString();
     return queryString ? `/audits/download?${queryString}` : '/audits/download';
+  }
+
+  /**
+   * Build the base URL for the pager links, which is the current query parameters minus
+   * the pageNumber parameter.
+   *
+   * @param filters
+   * @private
+   */
+  private buildPagerBaseUrl(filters: GetAuditsParams): string {
+    const params = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (key === 'pageNumber') {
+        continue;
+      }
+
+      if (value === undefined || value === null) {
+        continue;
+      }
+
+      const stringValue = String(value).trim();
+      if (!stringValue) {
+        continue;
+      }
+
+      params.append(key, String(value));
+    }
+
+    const query = params.toString();
+    return query ? `/audits?${query}&pageNumber=` : '/audits?pageNumber=';
   }
 }

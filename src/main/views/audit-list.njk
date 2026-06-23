@@ -12,16 +12,7 @@
 
 {# MACROS #}
 
-{% macro createPager(currentFilters, pageInfo) %}
-
-  {# calculate the base href using the current filters #}
-  {% set baseHref = "/audits?" %}
-  {% for param, value in currentFilters %}
-    {% if param !== 'pageNumber' and value %}
-      {% set baseHref = baseHref + param + "=" + value + "&" %}
-    {% endif %}
-  {% endfor %}
-  {% set baseHref = baseHref + "pageNumber=" %}
+{% macro createPager(baseHref, pageInfo) %}
 
   {# create the pager items #}
   {% set items = [] %}
@@ -233,11 +224,7 @@
         {{ govukButton({
           text: "Download CSV",
           classes: "govuk-!-margin-top-6 govuk-button--secondary",
-          href: downloadUrl,
-          arttributes: {
-            rel: "noopener noreferrer",
-            target: "_blank"
-          }
+          href: downloadUrl
         }) }}
       {% endif %}
     </div>
@@ -270,7 +257,7 @@
             rows: auditTableRows
           }) }}
 
-          {{ createPager(filters, audits.page) }}
+         {{ createPager(basePagerUrl, audits.page) }}
 
         {% else %}
           <p class="govuk-body">No audits returned. Try expanding the search parameters.</p>
