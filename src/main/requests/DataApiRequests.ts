@@ -534,7 +534,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/audits/subjectoptions/v1');
       return auditSubjectOptionsSchema.parse(new Map(Object.entries(response.data)));
     } catch (error: unknown) {
-      logger.error('Error fetching court names:', error);
+      logger.error('Error fetching audit subject names:', error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
