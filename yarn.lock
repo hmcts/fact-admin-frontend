@@ -5128,12 +5128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.19.21":
-  version: 22.19.21
-  resolution: "@types/node@npm:22.19.21"
+"@types/node@npm:22.20.0":
+  version: 22.20.0
+  resolution: "@types/node@npm:22.20.0"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/3767b914ea4ec2f05dfa541b90e20bf580ab671feae8459c49f67eddd6c18f1d178d054a0836d3928f53e3049e84c0c7ee64630c20980941202ba5ecfd731e56
+  checksum: 10/527db73c68206572fc6209eb8a739c26ea17ba0bd99f776e73654082f9210fb2145a5a5726bdfc5896d41d22e5ae9b8987dcac3dca51774f1ad1a72fc4e7511f
   languageName: node
   linkType: hard
 
@@ -9941,7 +9941,7 @@ __metadata:
     "@types/govuk-frontend": "npm:^5.11.0"
     "@types/jest": "npm:^30.0.0"
     "@types/lodash": "npm:4.17.24"
-    "@types/node": "npm:22.19.21"
+    "@types/node": "npm:22.20.0"
     "@types/nunjucks": "npm:3.2.6"
     "@types/pa11y": "npm:^5.3.7"
     "@types/supertest": "npm:^6.0.3"
