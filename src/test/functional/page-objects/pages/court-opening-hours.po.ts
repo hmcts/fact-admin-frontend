@@ -40,8 +40,10 @@ export class CourtOpeningHoursPage extends Base {
   }
 
   async clickFirstAddableOpeningHoursType(): Promise<string | undefined> {
+    const existingTypeNames = new Set(await this.getOpeningHoursTypeNames());
+
     await this.clickAddOpeningHours();
-    const openingHoursType = await this.selectFirstAvailableOpeningHoursType();
+    const openingHoursType = await this.selectFirstAvailableOpeningHoursType(existingTypeNames);
 
     if (!openingHoursType) {
       await this.goto(this.courtIdFromCurrentOpeningHoursUrl());
@@ -79,8 +81,10 @@ export class CourtOpeningHoursPage extends Base {
     await this.page.getByLabel('Select type').selectOption({ label: typeName });
   }
 
-  async selectFirstAvailableOpeningHoursType(): Promise<string | undefined> {
-    const typeName = (await this.getSelectableOpeningHoursTypeNames())[0];
+  async selectFirstAvailableOpeningHoursType(excludedTypeNames = new Set<string>()): Promise<string | undefined> {
+    const typeName = (await this.getSelectableOpeningHoursTypeNames()).find(
+      selectableTypeName => !excludedTypeNames.has(selectableTypeName)
+    );
 
     if (!typeName) {
       return undefined;
