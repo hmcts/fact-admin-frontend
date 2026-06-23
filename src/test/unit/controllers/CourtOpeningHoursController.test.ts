@@ -202,6 +202,38 @@ describe('CourtOpeningHoursController', () => {
     expect(response.render).toHaveBeenCalledWith('court-opening-hours-edit', viewModel);
   });
 
+  test('normalises array body values when saving add', async () => {
+    const controller = new CourtOpeningHoursController();
+    const response = responseMock();
+    const request = mockRequest({});
+    request.params = { courtId };
+    request.body = {
+      openingHourTypeId: ['33333333-3333-4333-8333-333333333333'],
+      sameTime: ['yes'],
+      sameOpeningHour: '9',
+      sameOpeningMinute: '00',
+      sameClosingHour: '17',
+      sameClosingMinute: '00',
+    };
+    const viewModel = {
+      courtId,
+      courtName: 'Reading Crown Court',
+      openingHourType: 'Court open',
+    };
+    const save = stub(CourtOpeningHoursService.prototype, 'save').resolves({
+      type: 'success',
+      viewModel,
+    });
+
+    await controller.postAdd(request, response);
+
+    expect(save.firstCall.args[2]).toMatchObject({
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      sameTime: 'yes',
+    });
+    expect(response.render).toHaveBeenCalledWith('court-opening-hours-save-success', viewModel);
+  });
+
   test('renders save success when saving edit succeeds', async () => {
     const controller = new CourtOpeningHoursController();
     const response = responseMock();

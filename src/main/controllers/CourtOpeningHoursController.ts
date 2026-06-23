@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 import { CourtOpeningHoursService, OpeningHoursForm } from '../services/CourtOpeningHoursService';
 import { renderResponse, renderStatus } from '../utils/responseRendering';
-import { isUuid, parseOptionalString } from '../utils/valueParsers';
+import { isUuid, parseOptionalString, parseString } from '../utils/valueParsers';
 
 const courtOpeningHoursService = new CourtOpeningHoursService();
 
@@ -12,7 +12,7 @@ const courtOpeningHoursService = new CourtOpeningHoursService();
 export default class CourtOpeningHoursController {
   @GET()
   public async getList(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveParam(req.params.courtId);
+    const courtId = parseString(req.params.courtId);
 
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
@@ -26,7 +26,7 @@ export default class CourtOpeningHoursController {
   @route('/add')
   @GET()
   public async getAdd(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveParam(req.params.courtId);
+    const courtId = parseString(req.params.courtId);
 
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
@@ -40,8 +40,8 @@ export default class CourtOpeningHoursController {
   @route('/edit/:openingHoursId')
   @GET()
   public async getEdit(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveParam(req.params.courtId);
-    const openingHoursId = this.resolveParam(req.params.openingHoursId);
+    const courtId = parseString(req.params.courtId);
+    const openingHoursId = parseString(req.params.openingHoursId);
 
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
@@ -65,14 +65,14 @@ export default class CourtOpeningHoursController {
   @route('/save/:openingHoursId')
   @POST()
   public async postEdit(req: Request, res: Response): Promise<void> {
-    await this.save(req, res, this.resolveParam(req.params.openingHoursId));
+    await this.save(req, res, parseString(req.params.openingHoursId));
   }
 
   @route('/delete/:openingHoursId')
   @GET()
   public async getDelete(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveParam(req.params.courtId);
-    const openingHoursId = this.resolveParam(req.params.openingHoursId);
+    const courtId = parseString(req.params.courtId);
+    const openingHoursId = parseString(req.params.openingHoursId);
 
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
@@ -90,8 +90,8 @@ export default class CourtOpeningHoursController {
   @route('/delete/success/:openingHoursId')
   @POST()
   public async postDelete(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveParam(req.params.courtId);
-    const openingHoursId = this.resolveParam(req.params.openingHoursId);
+    const courtId = parseString(req.params.courtId);
+    const openingHoursId = parseString(req.params.openingHoursId);
 
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
@@ -107,7 +107,7 @@ export default class CourtOpeningHoursController {
   }
 
   private async save(req: Request, res: Response, openingHoursId?: string): Promise<void> {
-    const courtId = this.resolveParam(req.params.courtId);
+    const courtId = parseString(req.params.courtId);
 
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
@@ -151,9 +151,5 @@ export default class CourtOpeningHoursController {
     }
 
     return true;
-  }
-
-  private resolveParam(value: string | string[] | undefined): string {
-    return Array.isArray(value) ? value[0] : (value ?? '');
   }
 }
