@@ -1,10 +1,13 @@
+import fs from 'node:fs';
+
+import { Logger } from '@hmcts/nodejs-logging';
 import { GET, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit } from '../schemas/auditSchema';
-import { AuditListViewModel, AuditService } from '../services/AuditService';
+import { AuditCsvFile, AuditListViewModel, AuditService } from '../services/AuditService';
 import {
   isUuid,
   parseDate,
@@ -19,6 +22,8 @@ type FilterCategory = {
   heading: { text: string };
   items: { text: string; href: string }[];
 };
+
+const logger = Logger.getLogger('audit-controller');
 
 @route('/audits')
 export default class AuditController {
@@ -43,11 +48,37 @@ export default class AuditController {
 
     this.transformForUI(viewModel);
     const filterCategories = this.buildFilterCategories(viewModel.filters);
+    const downloadUrl = this.buildDownloadUrl(req.query);
 
     res.render('audit-list', {
       ...viewModel,
       filterCategories,
+      downloadUrl: viewModel.errors || viewModel.audits.content.length === 0 ? undefined : downloadUrl,
       pageTitle: viewModel.errors ? 'Error: Audits' : 'Audits',
+    });
+  }
+
+  @route('/download')
+  @GET()
+  public async downloadAudits(req: Request, res: Response): Promise<void> {
+    const filters = this.getFiltersFromQueryOrDefault(req.query);
+    const csvResponse = await this.auditService.generateCsv(filters);
+
+    if (this.renderStatusResponse(res, csvResponse)) {
+      return;
+    }
+
+    res.download(csvResponse.filePath, csvResponse.filename, err => {
+      // Try to ensure temp file is removed after send completes or errors
+      fs.unlink(csvResponse.filePath, unlinkErr => {
+        if (unlinkErr) {
+          logger.error(`Failed to remove temp CSV file: ${csvResponse.filePath}`, unlinkErr);
+        }
+      });
+
+      if (err && !res.headersSent) {
+        res.status(HttpStatusCode.InternalServerError).render('error');
+      }
     });
   }
 
@@ -81,7 +112,7 @@ export default class AuditController {
 
   private renderStatusResponse(
     res: Response,
-    result: AuditListViewModel | Audit | HttpStatusCode
+    result: AuditListViewModel | Audit | AuditCsvFile | HttpStatusCode
   ): result is HttpStatusCode {
     if (typeof result !== 'number') {
       return false;
@@ -136,5 +167,32 @@ export default class AuditController {
         items: [{ text: this.CATEGORY_LABELS[key] ?? key, href: `/audits?${params.toString()}` }],
       };
     });
+  }
+
+  /**
+   * Builds the download URL that emulates the current query parameters, so that the user can #
+   * download the same set of audits that they are currently viewing.
+   *
+   * @param query
+   * @private
+   */
+  private buildDownloadUrl(query: Request['query']): string {
+    const queryEntries: [string, string][] = [];
+
+    for (const [key, value] of Object.entries(query)) {
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          queryEntries.push([key, String(item)]);
+        }
+        continue;
+      }
+
+      if (value !== undefined) {
+        queryEntries.push([key, String(value)]);
+      }
+    }
+
+    const queryString = new URLSearchParams(queryEntries).toString();
+    return queryString ? `/audits/download?${queryString}` : '/audits/download';
   }
 }

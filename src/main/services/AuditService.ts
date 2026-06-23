@@ -1,3 +1,9 @@
+import { randomUUID } from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
@@ -9,11 +15,18 @@ const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_PARAM = 1000;
 const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 
+const logger = Logger.getLogger('audit-service');
+
 export type AuditListViewModel = {
   filters: GetAuditsParams;
   audits: PagedAudits;
   subjects: AuditSubjectOptionsMap;
   errors?: Record<string, string[]>;
+};
+
+export type AuditCsvFile = {
+  filename: string;
+  filePath: string;
 };
 
 export class AuditService {
@@ -148,5 +161,69 @@ export class AuditService {
     return [today.getFullYear(), today.getMonth() + 1, today.getDate()]
       .map(value => String(value).padStart(2, '0'))
       .join('-');
+  }
+
+  public async generateCsv(filters: GetAuditsParams): Promise<AuditCsvFile | HttpStatusCode> {
+    const pageSize = 1000;
+    let pageNumber = 0;
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `audit-export-${timestamp}.csv`;
+    const filePath = path.join(os.tmpdir(), `fact-audits-${randomUUID()}.csv`);
+
+    const stream = fs.createWriteStream(filePath, { encoding: 'utf8' });
+
+    try {
+      // write the header
+      stream.write(['Created At', 'User', 'Action', 'location', 'Changes'].map(this.csvEscape).join(',') + '\n');
+
+      // Pull all pages from API in chunks of 1000
+      while (true) {
+        const response = await this.dataApiRequests.getAudits({
+          ...filters,
+          pageNumber,
+          pageSize,
+        });
+
+        if (this.isHttpStatusCode(response)) {
+          stream.end();
+          return response;
+        }
+
+        for (const audit of response.content) {
+          const row = [
+            audit.createdAt ?? '',
+            audit.user.email ?? '',
+            audit.actionType ?? '',
+            (audit.court?.name ?? '<deleted>') + `: ${audit.actionEntity}`,
+            JSON.stringify(audit.actionDataDiff ?? ''),
+          ]
+            .map(this.csvEscape)
+            .join(',');
+
+          stream.write(`${row}\n`);
+        }
+
+        pageNumber += 1;
+        if (pageNumber >= response.page.totalPages || response.content.length === 0) {
+          break;
+        }
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        stream.end(err => (err ? reject(err) : resolve()));
+      });
+
+      return { filename, filePath };
+    } catch (error) {
+      logger.error('Error generating audit CSV:', error);
+      stream.destroy();
+      return HttpStatusCode.InternalServerError;
+    }
+  }
+
+  private csvEscape(value: unknown): string {
+    const s = String(value ?? '');
+    return `"${s.replaceAll('"', '""')}"`;
   }
 }

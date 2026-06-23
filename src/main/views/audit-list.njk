@@ -1,4 +1,5 @@
 {% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
@@ -211,6 +212,17 @@
             optionsHtml: filterOptionsHtml
           }) }}
         </form>
+        {% if downloadUrl %}
+          {{ govukButton({
+            text: "Download CSV",
+            classes: "govuk-!-margin-top-6",
+            href: downloadUrl,
+            arttributes: {
+              rel: "noopener noreferrer",
+              target: "_blank"
+            }
+          }) }}
+        {% endif %}
       </div>
 
       <div class="govuk-grid-column-two-thirds">
