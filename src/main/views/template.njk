@@ -12,14 +12,14 @@
   {% set isAuditPage = pagePath.startsWith("/audits") %}
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
-    homepageUrl: "/"
+    homepageUrl: "/",
+    attributes: {
+      "fact-header": ""
+    }
   }) }}
   {{ govukServiceNavigation({
     serviceName: "Find a Court or Tribunal Admin",
     serviceUrl: "/",
-    slots: {
-      navigationEnd: "<li class='govuk-service-navigation__item'><a class='govuk-service-navigation__link' href='/sso/logout'><strong>Sign out</strong></a></li>"
-    },
     navigation: [
       {
         href: "/",

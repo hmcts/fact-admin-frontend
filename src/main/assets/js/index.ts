@@ -1,15 +1,17 @@
 import '../scss/main.scss';
 
-// Import MOJ component initialisers explicitly
-import { initAll as initAllMoj } from '@ministryofjustice/frontend';
-import { initAll } from 'govuk-frontend';
+import * as moj from '@ministryofjustice/frontend';
+import * as gds from 'govuk-frontend';
 
 import { initDisplayedElementFilters } from './displayedElementFilter';
+import { initFactHeaderSignOutLink } from './factHeaderSignOut';
 import { initLoadingRedirects } from './loadingRedirect';
 import { initProfessionalInformationRepeatableFields } from './professionalInformation';
 
-initAll();
-initAllMoj();
+gds.initAll();
+moj.initAll();
+
 initDisplayedElementFilters();
 initLoadingRedirects();
 initProfessionalInformationRepeatableFields();
+initFactHeaderSignOutLink();

@@ -111,3 +111,15 @@
     transform: rotate(360deg);
   }
 }
+
+.sign-out-link {
+  @extend .govuk-service-navigation__link;
+  color: #fff;
+  float: inline-end;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.sign-out-link:visited {
+  color: #fff;
+}
