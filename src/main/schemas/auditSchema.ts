@@ -24,9 +24,9 @@ const actionDataDiffSchema = z.object({
 
 export const auditListItemSchema = z.object({
   id: z.string(),
-  courtId: z.string(),
+  courtId: z.uuid(),
   court: z.nullable(courtEntitySchema),
-  userId: z.string(),
+  userId: z.uuid(),
   user: userSchema,
   actionType: z.string(),
   actionEntity: z.string(),
