@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode } from 'axios';
+import moment from 'moment';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
@@ -77,8 +78,7 @@ export class AuditService {
   public async generateCsv(filters: GetAuditsParams): Promise<AuditCsvFile | HttpStatusCode> {
     let pageNumber = 0;
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `audit-export-${timestamp}.csv`;
+    const filename = `audits-${moment.utc().format('YYYY-MM-DD')}.csv`;
     const filePath = path.join(os.tmpdir(), `fact-audits-${randomUUID()}.csv`);
 
     const stream = fs.createWriteStream(filePath, { encoding: 'utf8' });

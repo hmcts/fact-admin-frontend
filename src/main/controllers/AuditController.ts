@@ -110,6 +110,9 @@ export default class AuditController {
     });
   }
 
+  // --------------------------------------------------------------------------
+  // util methods
+
   private resolveAuditId(req: Request): string | null {
     const auditId = req.params?.auditId as string | string[] | undefined;
     const resolvedAuditId = Array.isArray(auditId) ? auditId[0] : auditId;
