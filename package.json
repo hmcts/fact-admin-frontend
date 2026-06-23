@@ -123,7 +123,7 @@
     "joi": "18.2.3",
     "js-yaml@npm:^4": "npm:4.2.0",
     "protobufjs": "7.6.4",
-    "uuid": "14.0.0"
+    "uuid": "14.0.1"
   },
   "husky": {
     "hooks": {
