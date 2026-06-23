@@ -154,6 +154,53 @@ describe('CourtOpeningHoursService', () => {
     });
   });
 
+  test('treats a no-content response from an edit save as success', async () => {
+    const { saveCourtOpeningHours, service } = buildService({
+      getCourtOpeningHours: jest.fn().mockResolvedValue([
+        {
+          id: openingHoursId,
+          courtId,
+          openingHourTypeId: courtOpenType.id,
+          openingHourType: courtOpenType,
+          openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+        },
+      ]),
+      getCourtOpeningHoursById: jest.fn().mockResolvedValue({
+        id: openingHoursId,
+        courtId,
+        openingHourTypeId: courtOpenType.id,
+        openingHourType: courtOpenType,
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+      }),
+      saveCourtOpeningHours: jest.fn().mockResolvedValue(HttpStatusCode.NoContent),
+    });
+
+    const result = await service.save(courtId, openingHoursId, {
+      openingHourTypeId: courtOpenType.id,
+      sameTime: 'yes',
+      selectedDays: [],
+      sameOpeningHour: '9',
+      sameOpeningMinute: '00',
+      sameClosingHour: '16',
+      sameClosingMinute: '30',
+    });
+
+    expect(result).toEqual({
+      type: 'success',
+      viewModel: {
+        courtId,
+        courtName: 'Reading Crown Court',
+        openingHourType: courtOpenType.name,
+      },
+    });
+    expect(saveCourtOpeningHours).toHaveBeenCalledWith(courtId, {
+      courtId,
+      id: openingHoursId,
+      openingHourTypeId: courtOpenType.id,
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '16:30' }],
+    });
+  });
+
   test('normalises selected day values from request body input', () => {
     const { service } = buildService();
 

@@ -670,6 +670,22 @@ describe('DataApiRequests', () => {
     expect(response).toEqual(savedOpeningHours);
   });
 
+  it('returns no content when save court opening hours succeeds without a response body', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      id: '22222222-2222-4222-8222-222222222222',
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '16:30' }],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
   it('returns validation errors map when save court opening hours endpoint returns 400', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const payload = {

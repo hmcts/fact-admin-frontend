@@ -195,6 +195,17 @@ export class CourtOpeningHoursService {
       openingTimesDetails: this.toOpeningTimesDetails(form, existingOpeningHoursRecord),
     });
 
+    if (this.isSuccessfulStatus(saveResponse)) {
+      return {
+        type: 'success',
+        viewModel: {
+          courtId,
+          courtName: baseModel.courtName,
+          openingHourType: selectedType?.name ?? existingOpeningHoursRecord?.openingHourType?.name ?? '',
+        },
+      };
+    }
+
     if (this.isHttpStatusCode(saveResponse)) {
       return { status: saveResponse, type: 'status' };
     }
@@ -561,6 +572,14 @@ export class CourtOpeningHoursService {
 
   private isHttpStatusCode(response: unknown): response is HttpStatusCode {
     return typeof response === 'number';
+  }
+
+  private isSuccessfulStatus(response: unknown): response is HttpStatusCode {
+    return (
+      this.isHttpStatusCode(response) &&
+      response >= HttpStatusCode.Ok &&
+      response < HttpStatusCode.MultipleChoices
+    );
   }
 
   private isNoOpeningHoursResponse(status: HttpStatusCode): boolean {
