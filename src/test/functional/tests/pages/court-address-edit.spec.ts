@@ -18,7 +18,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.clickEnterAddressManually();
@@ -39,7 +39,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           const address = buildTestAddress('ValidationAddressType');
 
@@ -68,7 +68,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.clickEnterAddressManually();
@@ -93,7 +93,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.clickEnterAddressManually();
@@ -116,7 +116,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.clickEnterAddressManually();
@@ -141,7 +141,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('EditBase1'));
           const addressId = await getFirstAddressId(page, createdCourt.id);
@@ -170,7 +170,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Success Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           // reduce the addresses down to 1
           await reduceAddressesCount(

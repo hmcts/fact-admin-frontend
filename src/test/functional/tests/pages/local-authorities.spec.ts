@@ -11,7 +11,7 @@ test.describe('Local Authorities Page Tests', () => {
       await withCreatedCourt(
         playwright,
         'Local Authorities Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await localAuthoritiesPage.goto(createdCourt.id);
 
@@ -29,7 +29,7 @@ test.describe('Local Authorities Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Local Authorities Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         // First job is to find all of the case types that would enable
         // the functionality and remove them.
@@ -79,7 +79,7 @@ test.describe('Local Authorities Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Local Authorities Functional Test',
-      { serviceCenter: false, forceFamilyCourt: true },
+      { forceFamilyCourt: true },
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectAllCaseTypes();
@@ -132,7 +132,7 @@ test.describe('Local Authorities Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Local Authorities Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await localAuthoritiesPage.gotoSuccess(createdCourt.id);
 

@@ -13,7 +13,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Find Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
 
@@ -29,7 +29,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Find Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.searchPostcode('');
@@ -49,7 +49,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Find Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('FindPage1'));
           const addressId = await getSpecificAddressId(page, createdCourt.id, 'SW1A 1AA');

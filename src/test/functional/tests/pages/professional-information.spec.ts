@@ -11,7 +11,7 @@ test.describe('Information for Professionals Page Tests', () => {
       await withCreatedCourt(
         playwright,
         'Information for Professionals Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
 
@@ -30,7 +30,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);
         await courtEditPage.page.getByRole('link', { name: 'Information for professionals' }).click();
@@ -63,7 +63,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
 
@@ -99,7 +99,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
         await professionalInformationPage.dxCodeInput(0).fill('');
@@ -128,7 +128,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
 
@@ -168,7 +168,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
         await professionalInformationPage.save();
@@ -188,7 +188,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
         await professionalInformationPage.selectCourtType('County court');
@@ -262,7 +262,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { forceFamilyCourt: true, serviceCenter: false },
+      { forceFamilyCourt: true },
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
         const familyCourtCheckbox = professionalInformationPage.page.getByRole('checkbox', { name: 'Family court' });
@@ -334,7 +334,7 @@ test.describe('Information for Professionals Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Information for Professionals Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await professionalInformationPage.gotoSuccess(createdCourt.id);
 

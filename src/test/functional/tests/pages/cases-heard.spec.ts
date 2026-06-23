@@ -11,7 +11,7 @@ test.describe('Cases Heard Page Tests', () => {
       await withCreatedCourt(
         playwright,
         'Cases Heard Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
 
@@ -25,7 +25,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
 
@@ -48,7 +48,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectFirstCaseType();
@@ -77,7 +77,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectAllCaseTypes();
@@ -127,7 +127,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
 
@@ -158,7 +158,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         const checkboxCount = await casesHeardPage.checkboxes.count();
@@ -180,7 +180,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.clearSelectedCaseTypes();
@@ -203,7 +203,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.selectFirstCaseType();
@@ -226,7 +226,7 @@ test.describe('Cases Heard Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Cases Heard Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await casesHeardPage.gotoSuccess(createdCourt.id);
 

@@ -26,7 +26,6 @@ async function createOpenTestCourts(apiContext: APIRequestContext, courtNames: s
       await createTestCourt(apiContext, {
         courtName,
         open: true,
-        serviceCenter: false,
       })
     );
   }
@@ -93,12 +92,10 @@ test.describe(
         await createTestCourt(apiContext, {
           courtName: openCourtName,
           open: true,
-          serviceCenter: false,
         });
         await createTestCourt(apiContext, {
           courtName: closedCourtName,
           open: false,
-          serviceCenter: false,
         });
 
         await homePage.searchForCourt(courtNamePrefix);
@@ -134,12 +131,10 @@ test.describe(
         await createTestCourt(apiContext, {
           courtName: `${courtNamePrefix} Open`,
           open: true,
-          serviceCenter: false,
         });
         await createTestCourt(apiContext, {
           courtName: `${courtNamePrefix} Closed`,
           open: false,
-          serviceCenter: false,
         });
 
         await homePage.searchForCourt(courtNamePrefix);
@@ -156,7 +151,6 @@ test.describe(
         const createdCourt = await createTestCourt(apiContext, {
           courtName,
           open: true,
-          serviceCenter: false,
         });
 
         await homePage.searchForCourt(courtName);
@@ -177,7 +171,6 @@ test.describe(
         const createdCourt = await createTestCourt(apiContext, {
           courtName,
           open: true,
-          serviceCenter: false,
         });
 
         await homePage.searchForCourt(courtName);
@@ -205,13 +198,11 @@ test.describe(
           courtName: firstRegionCourtName,
           open: true,
           regionId: firstRegion.id,
-          serviceCenter: false,
         });
         await createTestCourt(apiContext, {
           courtName: secondRegionCourtName,
           open: true,
           regionId: secondRegion.id,
-          serviceCenter: false,
         });
 
         await homePage.searchForCourt(courtNamePrefix);
@@ -265,13 +256,11 @@ test.describe(
         await createTestCourt(apiContext, {
           courtName: olderCourtName,
           open: true,
-          serviceCenter: false,
         });
         await page.waitForTimeout(1100);
         await createTestCourt(apiContext, {
           courtName: newerCourtName,
           open: true,
-          serviceCenter: false,
         });
 
         await homePage.searchForCourt(courtNamePrefix);
@@ -318,12 +307,10 @@ test.describe(
         await createTestCourt(apiContext, {
           courtName: openCourtName,
           open: true,
-          serviceCenter: false,
         });
         await createTestCourt(apiContext, {
           courtName: closedCourtName,
           open: false,
-          serviceCenter: false,
         });
 
         await homePage.page.goto(

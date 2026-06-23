@@ -18,7 +18,7 @@ test.describe(
         await withCreatedCourt(
           playwright,
           'Court Address List Functional Test',
-          { serviceCenter: false },
+          {},
           async ({ createdCourt }) => {
             await courtAddressListPage.goto(createdCourt.id);
 
@@ -38,7 +38,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address List Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await reduceAddressesCount(
             page,
@@ -69,7 +69,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address List Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await reduceAddressesCount(
             page,

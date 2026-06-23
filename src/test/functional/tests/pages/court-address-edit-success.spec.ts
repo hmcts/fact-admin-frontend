@@ -18,7 +18,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Edit Success Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.clickEnterAddressManually();

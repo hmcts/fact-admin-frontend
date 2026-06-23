@@ -11,7 +11,7 @@ test.describe('Building Facilities Page Tests', () => {
       await withCreatedCourt(
         playwright,
         'Building Facilities Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await buildingFacilitiesPage.goto(createdCourt.id);
           await expect(buildingFacilitiesPage.heading).toContainText('Building Facilities');
@@ -24,7 +24,7 @@ test.describe('Building Facilities Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Building Facilities Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await buildingFacilitiesPage.goto(createdCourt.id);
 
@@ -60,7 +60,7 @@ test.describe('Building Facilities Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Building Facilities Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await buildingFacilitiesPage.goto(createdCourt.id);
 

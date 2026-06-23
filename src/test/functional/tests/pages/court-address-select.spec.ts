@@ -13,7 +13,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Select Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
 
@@ -35,7 +35,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Select Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
           await courtAddressSelectPage.selectFirstAddress();
@@ -57,7 +57,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Select Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);
           await courtAddressSelectPage.clickEnterAddressManually();

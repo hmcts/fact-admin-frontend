@@ -11,7 +11,7 @@ test.describe('Court Edit Page Tests', () => {
       await withCreatedCourt(
         playwright,
         'Court Edit Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtEditPage.goto(createdCourt.id);
           await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
@@ -24,7 +24,7 @@ test.describe('Court Edit Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Court Edit Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);
         await courtEditPage.expectVisibleElements();
@@ -40,7 +40,7 @@ test.describe('Court Edit Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'Court Edit Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);
 

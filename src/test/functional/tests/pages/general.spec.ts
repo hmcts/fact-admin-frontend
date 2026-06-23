@@ -11,7 +11,7 @@ test.describe('General Page Tests', () => {
       await withCreatedCourt(
         playwright,
         'General Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await generalPage.goto(createdCourt.id);
 
@@ -25,7 +25,7 @@ test.describe('General Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'General Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await generalPage.goto(createdCourt.id);
 
@@ -44,7 +44,7 @@ test.describe('General Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'General Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         const updatedCourtName = `${createdCourt.name} Updated`;
 
@@ -71,7 +71,7 @@ test.describe('General Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'General Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await generalPage.goto(createdCourt.id);
         await generalPage.updateCourtName('');
@@ -90,7 +90,7 @@ test.describe('General Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'General Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         const updatedCourtName = `${createdCourt.name} Updated`;
 
@@ -116,7 +116,7 @@ test.describe('General Page Tests', () => {
     await withCreatedCourt(
       playwright,
       'General Functional Test',
-      { serviceCenter: false },
+      {},
       async ({ createdCourt }) => {
         await generalPage.gotoSuccess(createdCourt.id);
 

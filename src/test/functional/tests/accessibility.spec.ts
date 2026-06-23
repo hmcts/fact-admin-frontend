@@ -32,7 +32,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Edit Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtEditPage.goto(createdCourt.id);
           await courtEditPage.expectVisibleElements();
@@ -45,7 +45,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Cases Heard Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.expectVisibleElements();
@@ -58,7 +58,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Cases Heard Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.clearSelectedCaseTypes();
@@ -73,7 +73,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Cases Heard Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectFirstCaseType();
@@ -88,7 +88,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'General Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await generalPage.goto(createdCourt.id);
           await generalPage.expectVisibleElements();
@@ -101,7 +101,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'General Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await generalPage.goto(createdCourt.id);
           await generalPage.nameInput.clear();
@@ -116,7 +116,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'General Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await generalPage.goto(createdCourt.id);
           await generalPage.save();
@@ -134,7 +134,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Accessibility Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.expectVisibleElements();
@@ -152,7 +152,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Accessibility Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.emailCheckbox.check();
@@ -174,7 +174,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Accessibility Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressListPage.goto(createdCourt.id);
           await courtAddressListPage.header.checkIsVisible();
@@ -187,7 +187,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Accessibility Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.header.checkIsVisible();
@@ -200,7 +200,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Accessibility Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
           await courtAddressSelectPage.header.checkIsVisible();
@@ -213,7 +213,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Local Authorities Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await localAuthoritiesPage.goto(createdCourt.id);
           await localAuthoritiesPage.expectVisibleElements();
@@ -230,7 +230,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Information for Professionals Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
           await professionalInformationPage.expectVisibleElements();
@@ -248,7 +248,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Local Authorities Accessibility Test',
-        { serviceCenter: false, forceFamilyCourt: true },
+        { forceFamilyCourt: true },
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectAllCaseTypes();

@@ -13,7 +13,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Address Delete Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('DeleteOne'));
           await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('DeleteTwo'));
