@@ -260,7 +260,11 @@
          {{ createPager(basePagerUrl, audits.page) }}
 
         {% else %}
-          <p class="govuk-body">No audits returned. Try expanding the search parameters.</p>
+          {% if errors %}
+            <p class="govuk-body">No audits returned; there is an unresolved issue with the search parameters.</p>
+          {% else %}
+            <p class="govuk-body">No audits found. Try expanding the search parameters.</p>
+          {% endif %}
         {% endif %}
 
     </div>
