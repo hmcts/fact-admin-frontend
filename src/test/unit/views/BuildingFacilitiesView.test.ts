@@ -22,7 +22,7 @@ describe('Building Facilities Views', () => {
 
     expect(html).toContain('Building Facilities');
     expect(html).toContain('Are separate waiting areas available?');
-    expect(html).toContain('Select if a separate waiting area is available for children.');
+    expect(html).toContain('Are separate waiting areas for children available?');
     expect(html).toContain(`/courts/${courtId}/edit/building-facilities/success`);
     expect(html).toMatch(/<input[^>]*name="waitingArea"[^>]*value="true"[^>]*checked/);
     expect(html).toMatch(/<input[^>]*name="waitingAreaChildren"[^>]*value="true"[^>]*checked/);
