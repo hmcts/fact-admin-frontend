@@ -77,7 +77,7 @@ test.describe('Building Facilities Page Tests', () => {
         );
         await expect(buildingFacilitiesPage.errorSummary).toContainText('There is a problem');
         await expect(buildingFacilitiesPage.errorSummary).toContainText(
-          'Select whether the children waiting area is available'
+          'Select if a separate waiting area is available for children'
         );
         await expect(buildingFacilitiesPage.successPanel).toHaveCount(0);
       }
