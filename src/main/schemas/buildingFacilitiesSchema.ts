@@ -38,7 +38,7 @@ export const BuildingFacilitiesSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['waitingAreaChildren'],
-        message: 'Select whether the children waiting area is available',
+        message: 'Select if a separate waiting area is available for children',
       });
     }
   });

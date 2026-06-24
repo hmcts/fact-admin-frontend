@@ -33,7 +33,7 @@ describe('Building facilities page', () => {
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Building Facilities');
-    expect(response.text).toContain('Select if a separate waiting area is available for children.');
+    expect(response.text).toContain('Are separate waiting areas for children available?');
   });
 
   test('renders edit page with no pre-selection when facilities are missing', async () => {
@@ -75,7 +75,7 @@ describe('Building facilities page', () => {
     });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Select whether the children waiting area is available');
+    expect(response.text).toContain('Select if a separate waiting area is available for children');
     expect(getCourtByIdStub.calledOnce).toBe(true);
     expect(updateStub.notCalled).toBe(true);
   });

@@ -102,7 +102,7 @@ describe('BuildingFacilitiesService', () => {
       babyChanging: false,
       wifi: true,
       errors: {
-        waitingAreaChildren: ['Select whether the children waiting area is available'],
+        waitingAreaChildren: ['Select if a separate waiting area is available for children'],
       },
     });
     expect(updateBuildingFacilities).not.toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('BuildingFacilitiesService', () => {
       babyChanging: false,
       wifi: true,
       errors: {
-        waitingAreaChildren: ['Select whether the children waiting area is available'],
+        waitingAreaChildren: ['Select if a separate waiting area is available for children'],
       },
     });
     expect(updateBuildingFacilities).not.toHaveBeenCalled();
