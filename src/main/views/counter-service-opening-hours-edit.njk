@@ -54,35 +54,35 @@
   {{ pageTitle }}
 {% endblock %}
 
-{% set appointmentEmail %}
+{% set appointmentContact %}
     {{ govukInput({
       classes: "govuk-input--width-20",
-      id: "appointmentEmail",
-      name: "appointmentEmail",
+      id: "appointmentContact",
+      name: "appointmentContact",
       label: {
-        text: "Enter email address for booking (optional)"
+        text: "Enter email address or phone number for booking (optional)"
       },
-      value: model.appointmentEmail,
+      value: model.appointmentContact,
       errorMessage: {
-        text: model.errors.appointmentEmail[0]
-      } if model.errors and model.errors.appointmentEmail else null
+        text: model.errors.appointmentContact[0]
+      } if model.errors and model.errors.appointmentContact else null
     }) }}
 {% endset %}
 
-{% set appointmentPhone %}
-    {{ govukInput({
-      classes: "govuk-input--width-20",
-      id: "appointmentPhone",
-      name: "appointmentPhone",
-      label: {
-        text: "Enter phone number for booking (optional)"
-      },
-      value: model.appointmentPhone,
-      errorMessage: {
-        text: model.errors.appointmentPhone[0]
-      } if model.errors and model.errors.appointmentPhone else null
-    }) }}
-{% endset %}
+{#{% set appointmentPhone %}#}
+{#    {{ govukInput({#}
+{#      classes: "govuk-input--width-20",#}
+{#      id: "appointmentPhone",#}
+{#      name: "appointmentPhone",#}
+{#      label: {#}
+{#        text: "Enter phone number for booking (optional)"#}
+{#      },#}
+{#      value: model.appointmentPhone,#}
+{#      errorMessage: {#}
+{#        text: model.errors.appointmentPhone[0]#}
+{#      } if model.errors and model.errors.appointmentPhone else null#}
+{#    }) }}#}
+{#{% endset %}#}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -172,7 +172,7 @@
               checked: true if model.appointmentNeeded ===true else false,
               conditional:
                 {
-                  html: appointmentEmail + appointmentPhone
+                  html: appointmentContact
                 }
             },
             {

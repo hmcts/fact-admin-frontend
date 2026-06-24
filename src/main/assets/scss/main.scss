@@ -104,6 +104,14 @@
   margin-bottom: 0;
 }
 
+.fact-table-actions {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  gap: 10px;
+}
+
 @keyframes hods-loading-spinner {
   to {
     transform: rotate(360deg);

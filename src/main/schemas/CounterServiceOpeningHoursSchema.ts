@@ -15,9 +15,12 @@ export const CounterServiceOpeningHoursSchema = z.object({
   assistWithDocuments: z.boolean(),
   assistWithSupport: z.boolean(),
   appointmentNeeded: z.boolean(),
-  appointmentEmail: z.string().optional().nullable(),
-  appointmentPhone: z.string().optional().nullable(),
+  appointmentContact: z.string().optional().nullable(),
+  // appointmentPhone: z.string().optional().nullable(),
   openingTimesDetails: z.array(openingTimesDetail),
 });
 
+export const CounterServiceOpeningHoursListSchema = z.array(CounterServiceOpeningHoursSchema);
+
+export type OpeningTimeDetails = z.infer<typeof openingTimesDetail>;
 export type CounterServiceOpeningHours = z.infer<typeof CounterServiceOpeningHoursSchema>;

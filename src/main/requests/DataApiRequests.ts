@@ -1,8 +1,10 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
+import { z } from 'zod';
 
 import {
   CounterServiceOpeningHours,
+  CounterServiceOpeningHoursListSchema,
   CounterServiceOpeningHoursSchema,
 } from '../schemas/CounterServiceOpeningHoursSchema';
 import {
@@ -523,24 +525,77 @@ export class DataApiRequests {
   }
 
   /**
-   * Request to data API to get court counter service opening hours by court id
+   * Request to data API to retrieve counter service opening hours by court id
    */
-  public async getCounterServiceOpeningHours(
-    courtId: string
-  ): Promise<CounterServiceOpeningHours | null | HttpStatusCode> {
+  public async getCounterServiceOpeningHours(courtId: string): Promise<CounterServiceOpeningHours[] | HttpStatusCode> {
     try {
       const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/counter-service`);
 
       if (response.status === HttpStatusCode.NoContent) {
-        return null;
+        return HttpStatusCode.NoContent;
       }
 
-      return CounterServiceOpeningHoursSchema.parse(response.data);
+      console.log('Is array:', Array.isArray(response.data));
+      console.log('Scheam type', CounterServiceOpeningHoursListSchema instanceof z.ZodArray);
+      return CounterServiceOpeningHoursListSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching court counter service opening hours for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
+
+  /**
+   * Request to data API to retrieve a counter service opening hours record by id
+   */
+  public async getCounterServiceOpeningHoursById(
+    courtId: string,
+    counterServiceId: string
+  ): Promise<CounterServiceOpeningHours | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`);
+      return CounterServiceOpeningHoursSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching counter service opening hour ${counterServiceId} for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to delete counter service opening hours
+   */
+  public async deleteCounterServiceOpeningHours(courtId: string, counterServiceId: string): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.delete(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      logger.error(`Error deleting counter service opening hours ${counterServiceId} for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  // /**
+  //  * Request to data API to get court counter service opening hours by court id
+  //  */
+  // public async getCounterServiceOpeningHours(
+  //   courtId: string
+  // ): Promise<CounterServiceOpeningHours | null | HttpStatusCode> {
+  //   try {
+  //     const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/counter-service`);
+  //
+  //     if (response.status === HttpStatusCode.NoContent) {
+  //       return null;
+  //     }
+  //
+  //     return CounterServiceOpeningHoursSchema.parse(response.data);
+  //   } catch (error: unknown) {
+  //     logger.error(`Error fetching court counter service opening hours for court id ${courtId}:`, error);
+  //     return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+  //   }
+  // }
 
   /**
    * Request to data API to update court counter service opening hours by court id
