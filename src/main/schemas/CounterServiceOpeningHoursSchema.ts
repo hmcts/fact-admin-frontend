@@ -16,7 +16,6 @@ export const CounterServiceOpeningHoursSchema = z.object({
   assistWithSupport: z.boolean(),
   appointmentNeeded: z.boolean(),
   appointmentContact: z.string().optional().nullable(),
-  // appointmentPhone: z.string().optional().nullable(),
   openingTimesDetails: z.array(openingTimesDetail),
 });
 

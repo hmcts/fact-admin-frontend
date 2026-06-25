@@ -1,130 +1,140 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukInput %}
 
-{% macro modelDrivenErrorSummary(model) %}
-  {% set errorList = [] %}
-  {% for field, errors in model.errors %}
-    {% if field !== "timestamp" %}
-      {% set fieldErrors = [] %}
-      {% for error in errors %}
-        {% set href = "#" + field if field !== "message" else null %}
-        {% set errorList = (errorList.push({
-          text: error,
-          href: href
-        }), errorList) %}
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
-  {{ govukErrorSummary({
-    titleText: "There is a problem",
-    errorList: errorList
-  }) }}
+{% macro timeSection(prefix, kind, title, errors, form, classes) %}
+  {% set sectionErrors = [] %}
+  {% if errors[prefix + kind + "Hour"] %}
+    {% set sectionErrors = (sectionErrors.push(errors[prefix + kind + "Hour"]), sectionErrors) %}
+  {% endif %}
+  {% if errors[prefix + kind + "Minute"] %}
+    {% set sectionErrors = (sectionErrors.push(errors[prefix + kind + "Minute"]), sectionErrors) %}
+  {% endif %}
+  {% set sectionErrorHtml %}
+    {% for error in sectionErrors %}
+      <span class="govuk-!-display-block{% if not loop.last %} govuk-!-margin-bottom-1{% endif %}">{{ error }}</span>
+    {% endfor %}
+  {% endset %}
+  <div{% if classes %} class="{{ classes }}"{% endif %}>
+    <p class="govuk-body govuk-!-margin-bottom-2">{{ title }}</p>
+    {{ govukDateInput({
+      id: prefix + kind + "Time",
+      items: [
+        {
+          id: prefix + kind + "Hour",
+          name: prefix + kind + "Hour",
+          label: "Hour",
+          classes: "govuk-input--width-2",
+          inputmode: "numeric",
+          value: form[prefix + kind + "Hour"]
+        },
+        {
+          id: prefix + kind + "Minute",
+          name: prefix + kind + "Minute",
+          label: "Minute",
+          classes: "govuk-input--width-2",
+          inputmode: "numeric",
+          value: form[prefix + kind + "Minute"]
+        }
+      ],
+      errorMessage: {
+        html: sectionErrorHtml
+      } if sectionErrors.length else null
+    }) }}
+  </div>
 {% endmacro %}
 
-{% macro courtTypeSelection(courtTypes, selectedIds) %}
-  {% set courtTypeItems = [] %}
-  {% for type in courtTypes | sort(false, true, 'name') %}
-    {% set courtTypeItems = (courtTypeItems.push({
-      value: type.id,
-      text: type.name,
-      checked: selectedIds and type.id in selectedIds
-    }), courtTypeItems) %}
-  {% endfor %}
-  {{ govukCheckboxes({
-    idPrefix: "court-types",
-    name: "court-types",
-    classes: "govuk-checkboxes--small app-checkboxes--two-columns",
-    fieldset: {
-      legend: {
-        text: "Court types"
-      }
-    },
-    hint: {
-      text: "For example, one or more court types apply for this one address. Select all that apply."
-    },
-    items: courtTypeItems
-  }) }}
+{% macro timeInputs(prefix, errors, form) %}
+  {{ timeSection(prefix, "Opening", "Opening time", errors, form, "") }}
+  {{ timeSection(prefix, "Closing", "Closing time", errors, form, "govuk-!-margin-top-4") }}
+{% endmacro %}
+
+{% macro dayTimeInputs(day, errors, form) %}
+  {% set hasDayErrors = errors[day.idPrefix + "OpeningHour"] or errors[day.idPrefix + "OpeningMinute"] or errors[day.idPrefix + "ClosingHour"] or errors[day.idPrefix + "ClosingMinute"] %}
+  {% set columnClass = "govuk-grid-column-one-half" if hasDayErrors else "govuk-grid-column-one-third" %}
+  <div class="govuk-grid-row">
+    <div class="{{ columnClass }}">
+      {{ timeSection(day.idPrefix, "Opening", "Opening time", errors, form, "") }}
+    </div>
+    <div class="{{ columnClass }}">
+      {{ timeSection(day.idPrefix, "Closing", "Closing time", errors, form, "") }}
+    </div>
+  </div>
 {% endmacro %}
 
 {% block pageTitle %}
   {{ pageTitle }}
 {% endblock %}
 
-{% set appointmentContact %}
-    {{ govukInput({
-      classes: "govuk-input--width-20",
-      id: "appointmentContact",
-      name: "appointmentContact",
-      label: {
-        text: "Enter email address or phone number for booking (optional)"
-      },
-      value: model.appointmentContact,
-      errorMessage: {
-        text: model.errors.appointmentContact[0]
-      } if model.errors and model.errors.appointmentContact else null
-    }) }}
-{% endset %}
-
-{#{% set appointmentPhone %}#}
-{#    {{ govukInput({#}
-{#      classes: "govuk-input--width-20",#}
-{#      id: "appointmentPhone",#}
-{#      name: "appointmentPhone",#}
-{#      label: {#}
-{#        text: "Enter phone number for booking (optional)"#}
-{#      },#}
-{#      value: model.appointmentPhone,#}
-{#      errorMessage: {#}
-{#        text: model.errors.appointmentPhone[0]#}
-{#      } if model.errors and model.errors.appointmentPhone else null#}
-{#    }) }}#}
-{#{% endset %}#}
-
 {% block content %}
+  {% if errorSummary.length %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errorSummary
+    }) }}
+  {% endif %}
+
   <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Counter service opening hours</h1>
+      <h2 class="govuk-heading-m">Edit Counter service opening hours</h2>
 
-    <div class="govuk-grid-column-full">
-      {% if model.errors %}
-        {{ modelDrivenErrorSummary(model) }}
-      {% endif %}
-
-      <h1 class="govuk-heading-l">Counter Service Opening Hours</h1>
-
-      <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/success">
-
-        {{ govukRadios({
-            classes: "govuk-radios",
-            id: "counterServiceForSpecificCourt",
-            name: "counterServiceForSpecificCourt",
-            fieldset: {
-              legend: {
-                text: "Is this counter service for a specific court?"
-              }
+      {% set appointmentContact %}
+          {{ govukInput({
+            classes: "govuk-input--width-20",
+            id: "appointmentContact",
+            name: "appointmentContact",
+            label: {
+              text: "Enter contact details for booking"
             },
-            items: [
-              {
-                value: "true",
-                text: "Yes",
-                checked: true if model.counterServiceForSpecificCourt === true else false,
-                conditional:
-                  {
-                      html: courtTypeSelection(courtTypes, model.courtTypes) | safe
-                  }
-              },
-              {
-                value: "false",
-                text: "No",
-                checked: true if model.counterServiceForSpecificCourt == false else false
-              }
-            ],
+            hint: {
+              test: "Provide the email adddress they can use to book appointments. Use lower case."
+            },
+            value: model.appointmentContact,
             errorMessage: {
-              text: model.errors.counterServiceForSpecificCourt[0]
-            } if model.errors and model.errors.counterServiceForSpecificCourt else null
-         }) }}
+              text: model.errors.appointmentContact[0]
+            } if model.errors and model.errors.appointmentContact else null
+          }) }}
+      {% endset %}
+
+      {% set yesConditional %}
+        {{ timeInputs("same", errors, form) }}
+      {% endset %}
+
+      {% set dayItems = [] %}
+      {% for day in days %}
+        {% set dayItems = (dayItems.push({
+          value: day.value,
+          text: day.name,
+          checked: form.selectedDays and form.selectedDays.includes(day.value),
+          conditional: {
+            html: dayTimeInputs(day, errors, form)
+          }
+        }), dayItems) %}
+      {% endfor %}
+
+      {% set noConditional %}
+        {{ govukCheckboxes({
+          idPrefix: "selectedDays",
+          name: "selectedDays",
+          fieldset: {
+            legend: {
+              text: "Select all that apply"
+            }
+          },
+          items: dayItems,
+          errorMessage: {
+            text: errors.selectedDays
+          } if errors.selectedDays else null
+        }) }}
+      {% endset %}
+
+      <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/save{% if counterServiceId %}/{{ counterServiceId }}{% endif %}" novalidate data-counter-service-opening-hours-form>
+        <h3 class="govuk-heading-s">Enter opening hours</h3>
 
         {{ govukCheckboxes({
           id: "assistWith",
@@ -135,25 +145,28 @@
             }
           },
           hint: {
-              text: "Select all that apply"
+            text: "Select all that apply"
           },
           items: [
             {
-              value: "assistWithForms",
+              value: "forms",
               text: "Forms",
-              checked: true if model.assistWithForms === true else false
+              checked: form.assistWith and form.assistWith.include("forms")
             },
             {
-              value: "assistWithDocuments",
+              value: "documents",
               text: "Documents",
-              checked: true if model.assistWithDocuments === true else false
+              checked: checked: form.assistWith and form.assistWith.include("documents")
             },
             {
-              value: "assistWithSupport",
+              value: "support",
               text: "Support at court",
-              checked: true if model.assistWithSupport === true else false
+              checked: checked: form.assistWith and form.assistWith.include("support")
             }
-          ]
+          ],
+          errorMessage: {
+            text: error.assistWith
+            if errors.assistWith else null
         }) }}
 
         {{ govukRadios({
@@ -167,38 +180,64 @@
           },
           items: [
             {
-              value: "true",
+              value: "yes",
               text: "Yes",
-              checked: true if model.appointmentNeeded ===true else false,
+              checked: true if model.appointmentNeeded === "yes",
               conditional:
-                {
-                  html: appointmentContact
-                }
+               {
+                 html: appointmentContact
+               }
             },
             {
-              value: "false",
+              value: "no",
               text: "No",
-              checked: true if model.appointmentNeeded == false else false
+              checked: true if model.appointmentNeeded === "no"
             }
           ],
           errorMessage: {
-            text: model.errors.appointmentNeeded[0]
-          } if model.errors and model.errors.appointmentNeeded else null
+           text: errors.appointmentNeeded
+         } if errors and model.errors.appointmentNeeded else null
         }) }}
 
-        <h2 class="govuk-heading-m">Enter opening hours</h2>
-        {% for entry in model.openingTimesDetails %}
-          <p class="govuk-body">
-            {{ entry.dayOfWeek }}: {{ entry.openingTime }} - {{ entry.closingTime }}
-          </p>
-        {% endfor %}
+        <h3 class="govuk-heading-s">Enter opening hours</h3>
+
+        {{ govukRadios({
+          idPrefix: "sameTime",
+          name: "sameTime",
+          fieldset: {
+            legend: {
+              text: "Does the court open and close at the same time Monday to Friday?"
+            }
+          },
+          items: [
+            {
+              id: "sameTimeYes",
+              value: "yes",
+              text: "Yes",
+              checked: form.sameTime === "yes",
+              conditional: {
+                html: yesConditional
+              }
+            },
+            {
+              id: "sameTimeNo",
+              value: "no",
+              text: "No",
+              checked: form.sameTime === "no",
+              conditional: {
+                html: noConditional
+              }
+            }
+          ],
+            errorMessage: {
+            text: errors.sameTimeYes
+          if errors.sameTimeYes else null
+        }) }}
 
         {{ govukButton({
           text: "Save"
         }) }}
-
       </form>
-
     </div>
   </div>
 {% endblock %}
