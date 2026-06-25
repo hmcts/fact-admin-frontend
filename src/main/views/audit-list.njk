@@ -3,6 +3,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
@@ -51,30 +52,24 @@
 
 {# END MACROS #}
 
-{% set courtOptions = [{
-  value: "",
-  text: "All courts"
-}] %}
+{% set courtOptions = [] %}
 
-{% set serviceCentreOptions = [{
-  value: "",
-  text: "All service centres"
-}] %}
+{% set serviceCentreOptions = [] %}
 
 {# pull concrete values from the subjects map #}
 {% for subject, list in subjects %}
   {% if subject === "COURT" %}
-    {% for court in list %}
+    {% for id, name in list %}
       {% set courtOptions = (courtOptions.push({
-        value: court.id,
-        text: court.name
+        value: id,
+        text: name
       }), courtOptions) %}
     {% endfor %}
   {% elseif subject === "SERVICE_CENTRE" %}
-    {% for serviceCentre in list %}
+    {% for id, name in list %}
       {% set serviceCentreOptions = (serviceCentreOptions.push({
-        value: serviceCentre.id,
-        text: serviceCentre.name
+        value: id,
+        text: name
       }), serviceCentreOptions) %}
     {% endfor %}
   {% endif %}
@@ -123,15 +118,64 @@
     } if errors.email else null
   }) }}
 
-  {{ govukSelect({
-    id: "courtId",
-    name: "courtId",
-    label: {
-      text: "Court",
-      classes: "govuk-label--m"
+  {%- set courtHtml %}
+    {{ govukSelect({
+      id: "courtId",
+      name: "courtId",
+      hint: {
+        text: "Court Name"
+      },
+      items: courtOptions,
+      value: filters.courtId
+    }) }}
+  {% endset -%}
+
+  {%- set serviceCentreHtml %}
+    {{ govukSelect({
+      id: "serviceCentreId",
+      name: "serviceCentreId",
+      hint: {
+        text: "Service Centre Name"
+      },
+      items: serviceCentreOptions,
+      value: filters.serviceCentreId
+    }) }}
+  {% endset -%}
+
+  {{ govukRadios({
+    name: "subjectType",
+    idPrefix: "subjectType",
+    classes: "govuk-radios--small",
+    fieldset: {
+      legend: {
+        text: "Subject",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
     },
-    items: courtOptions,
-    value: filters.courtId
+    items: [
+      {
+        value: "",
+        text: "All",
+        checked: not filters.courtId and not filters.serviceCentreId
+      },
+      {
+        value: "COURT",
+        text: "Court",
+        checked: filters.courtId,
+        conditional: {
+          html: courtHtml
+        }
+      },
+      {
+        value: "SERVICE_CENTRE",
+        text: "Service Centre",
+        checked: filters.serviceCentreId and not filters.courtId,
+        conditional: {
+          html: serviceCentreHtml
+        }
+      }
+    ]
   }) }}
 
 {% endset -%}
@@ -168,8 +212,9 @@
       {
         html: tagHtml
       },
-      { text: audit.court.name + ":  " + audit.actionEntity} if audit.court else
-      { text: "<deleted>: " + audit.actionEntity },
+      {
+        text: audit.subjectName + ":  " + audit.actionEntity
+      },
       {
         text: audit.createdAt
       },

@@ -30,11 +30,12 @@ const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
 
 @route('/audits')
 export default class AuditController {
-  INCLUDED_CATEGORIES = new Set(['email', 'courtId', 'toDate']);
+  INCLUDED_CATEGORIES = new Set(['email', 'courtId', 'serviceCentreId', 'toDate']);
 
   CATEGORY_LABELS: Record<string, string> = {
     email: 'Email address',
     courtId: 'Court',
+    serviceCentreId: 'Service Centre',
     toDate: 'Between',
   };
 
@@ -136,11 +137,20 @@ export default class AuditController {
   }
 
   private getFiltersFromQueryOrDefault(query: Request['query']): GetAuditsParams {
+
+    const subjectType = parseOptionalString(query?.subjectType);
+
     return {
       pageNumber: parseNumber(query?.pageNumber, 1) - 1, // UI is 1-based, service is 0-based
       pageSize: parseNumber(query?.pageSize, 25),
       email: parseOptionalString(query?.email),
-      courtId: isUuid(query?.courtId as string) ? parseString(query.courtId) : undefined,
+      courtId: subjectType === 'COURT' && isUuid(query?.courtId as string)
+        ? parseString(query.courtId)
+        : undefined,
+      serviceCentreId:
+        subjectType === 'SERVICE_CENTRE' && isUuid(query?.serviceCentreId as string)
+          ? parseString(query.serviceCentreId)
+          : undefined,
       fromDate: toJsDateString(parseDate(query?.fromDate as string)) ?? '',
       toDate: toJsDateString(parseDate(query?.toDate as string)),
     };

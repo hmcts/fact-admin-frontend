@@ -18,10 +18,12 @@ const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 
 const logger = Logger.getLogger('audit-service');
 
+export type AuditSubjectOptionsNestedMap = Map<string, Map<string, string>>;
+
 export type AuditListViewModel = {
   filters: GetAuditsParams;
   audits: PagedAudits;
-  subjects: AuditSubjectOptionsMap;
+  subjects: AuditSubjectOptionsNestedMap;
   errors?: Record<string, string[]>;
 };
 
@@ -34,7 +36,21 @@ export class AuditService {
   constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
   public async retrieve(auditId: string): Promise<Audit | HttpStatusCode> {
-    return this.dataApiRequests.getAuditById(auditId);
+    const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
+    if (this.isHttpStatusCode(auditSubjectResponse)) {
+      return auditSubjectResponse;
+    }
+
+    // this is a little heavyweight for one audit, but we need the subject name for display
+    // purposes and this is the only way to get it
+    const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
+    const audit = await this.dataApiRequests.getAuditById(auditId);
+    if (this.isHttpStatusCode(audit)) {
+      return audit;
+    }
+
+    // this will be an
+    return { ...audit, subjectName: nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>' };
   }
 
   public async getAudits(params: Partial<GetAuditsParams>): Promise<AuditListViewModel | HttpStatusCode> {
@@ -45,12 +61,13 @@ export class AuditService {
     if (this.isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
+    const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
 
     const queryParams = this.applyDefaults(params);
     const errors = this.validateQueryParams(queryParams);
     if (errors) {
       // send back a "no results" result and the validation errors
-      return this.buildErrorResponse(auditSubjectResponse, queryParams, errors);
+      return this.buildErrorResponse(nestedSubjectMap, queryParams, errors);
     }
 
     const audits = await this.dataApiRequests.getAudits(queryParams);
@@ -59,9 +76,14 @@ export class AuditService {
       return audits;
     }
 
+    // inject the subject name into each audit for display purposes
+    audits.content.forEach(audit => {
+      audit.subjectName = nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>';
+    });
+
     return {
       filters: queryParams,
-      subjects: auditSubjectResponse,
+      subjects: nestedSubjectMap,
       audits,
     };
   }
@@ -76,6 +98,14 @@ export class AuditService {
    * @param filters
    */
   public async generateCsv(filters: GetAuditsParams): Promise<AuditCsvFile | HttpStatusCode> {
+
+    const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
+    if (this.isHttpStatusCode(auditSubjectResponse)) {
+      return auditSubjectResponse;
+    }
+
+    const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
+
     let pageNumber = 0;
 
     const filename = `audits-${moment.utc().format('YYYY-MM-DD')}.csv`;
@@ -106,7 +136,7 @@ export class AuditService {
             audit.createdAt ?? '',
             audit.user.email ?? '',
             audit.actionType ?? '',
-            (audit.court?.name ?? '<deleted>') + `: ${audit.actionEntity}`,
+            (nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>') + `: ${audit.actionEntity}`,
             JSON.stringify(audit.actionDataDiff ?? ''),
           ]
             .map(this.csvEscape)
@@ -165,7 +195,7 @@ export class AuditService {
   }
 
   private buildErrorResponse(
-    subjects: AuditSubjectOptionsMap,
+    subjects: AuditSubjectOptionsNestedMap,
     filters: GetAuditsParams,
     errors: Record<string, string[]>
   ) {
@@ -234,7 +264,8 @@ export class AuditService {
     }
   }
 
-  private isHttpStatusCode(audits: PagedAudits | AuditSubjectOptionsMap | HttpStatusCode): audits is HttpStatusCode {
+  private isHttpStatusCode(audits: PagedAudits | AuditSubjectOptionsMap | Audit | HttpStatusCode):
+    audits is HttpStatusCode {
     return typeof audits === 'number';
   }
 
@@ -251,5 +282,14 @@ export class AuditService {
     return [today.getFullYear(), today.getMonth() + 1, today.getDate()]
       .map(value => String(value).padStart(2, '0'))
       .join('-');
+  }
+
+  private toNestedAuditSubjectOptionsMap(options: AuditSubjectOptionsMap): AuditSubjectOptionsNestedMap {
+    return new Map(
+      Array.from(options.entries()).map(([subjectType, subjects]) => [
+        subjectType,
+        new Map(subjects.map(({ id, name }) => [id, name])),
+      ])
+    );
   }
 }

@@ -4,7 +4,6 @@ import { pageMetadataSchema } from './pagedMetadataSchema';
 
 export const courtListItemSchema = z.object({
   id: z.string().uuid(),
-  isServiceCentre: z.boolean(),
   lastUpdatedAt: z.string(),
   name: z.string(),
   open: z.boolean(),

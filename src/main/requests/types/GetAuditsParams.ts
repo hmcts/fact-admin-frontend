@@ -3,6 +3,7 @@ export type GetAuditsParams = {
   pageSize: number;
   email?: string;
   courtId?: string;
+  serviceCentreId?: string;
   fromDate: string;
   toDate?: string;
 };

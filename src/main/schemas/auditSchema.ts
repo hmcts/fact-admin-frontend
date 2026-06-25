@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import { courtEntitySchema } from './courtEntitySchema';
 import { pageMetadataSchema } from './pagedMetadataSchema';
 import { userSchema } from './userSchema';
 
@@ -24,8 +23,11 @@ const actionDataDiffSchema = z.object({
 
 export const auditListItemSchema = z.object({
   id: z.string(),
-  courtId: z.uuid(),
-  court: z.nullable(courtEntitySchema),
+  subjectId: z.uuid(),
+  subjectType: auditSubjectTypeSchema,
+  // this is not currently in the result data returned from the API, but we will add it to the
+  // schema so that we can use it in the various view models
+  subjectName: z.string().optional().nullable(),
   userId: z.uuid(),
   user: userSchema,
   actionType: z.string(),

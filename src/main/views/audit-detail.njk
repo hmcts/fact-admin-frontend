@@ -60,19 +60,23 @@
       })}}
     {% endset %}
 
-    {{  govukSummaryList({
+    {{ govukSummaryList({
       rows: [
         {
           key: { text: "Action" },
           value: { html: tagHtml }
         },
         {
+          key: { text: "Subject Type" },
+          value: { text: audit.subjectType }
+        },
+        {
           key: { text: "Subject" },
-          value: { text: audit.court.name + ":  " + audit.actionEntity } if audit.court else { text: "<deleted>: " + audit.actionEntity }
+          value: { text: audit.subjectName + ":  " + audit.actionEntity }
         },
         {
           key: { text: "Subject ID" },
-          value: { text: audit.courtId }
+          value: { text: audit.subjectId }
         },
         {
           key: { text: "Created At" },
