@@ -98,7 +98,6 @@ export class AuditService {
    * @param filters
    */
   public async generateCsv(filters: GetAuditsParams): Promise<AuditCsvFile | HttpStatusCode> {
-
     const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
     if (this.isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
@@ -264,8 +263,9 @@ export class AuditService {
     }
   }
 
-  private isHttpStatusCode(audits: PagedAudits | AuditSubjectOptionsMap | Audit | HttpStatusCode):
-    audits is HttpStatusCode {
+  private isHttpStatusCode(
+    audits: PagedAudits | AuditSubjectOptionsMap | Audit | HttpStatusCode
+  ): audits is HttpStatusCode {
     return typeof audits === 'number';
   }
 

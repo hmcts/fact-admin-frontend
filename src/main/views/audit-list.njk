@@ -52,9 +52,15 @@
 
 {# END MACROS #}
 
-{% set courtOptions = [] %}
+{% set courtOptions = [{
+  value: "",
+  text: "All courts"
+}] %}
 
-{% set serviceCentreOptions = [] %}
+{% set serviceCentreOptions = [{
+  value: "",
+  text: "All service centres"
+}] %}
 
 {# pull concrete values from the subjects map #}
 {% for subject, list in subjects %}
@@ -155,14 +161,9 @@
     },
     items: [
       {
-        value: "",
-        text: "All",
-        checked: not filters.courtId and not filters.serviceCentreId
-      },
-      {
         value: "COURT",
         text: "Court",
-        checked: filters.courtId,
+        checked: filters.subjectType === "COURT",
         conditional: {
           html: courtHtml
         }
@@ -170,7 +171,7 @@
       {
         value: "SERVICE_CENTRE",
         text: "Service Centre",
-        checked: filters.serviceCentreId and not filters.courtId,
+        checked: filters.subjectType === "SERVICE_CENTRE",
         conditional: {
           html: serviceCentreHtml
         }

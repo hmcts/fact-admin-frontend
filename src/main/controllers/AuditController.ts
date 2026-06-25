@@ -30,13 +30,22 @@ const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
 
 @route('/audits')
 export default class AuditController {
-  INCLUDED_CATEGORIES = new Set(['email', 'courtId', 'serviceCentreId', 'toDate']);
+  INCLUDED_CATEGORIES = new Set(['email', 'subjectType', 'courtId', 'serviceCentreId', 'toDate']);
 
   CATEGORY_LABELS: Record<string, string> = {
     email: 'Email address',
-    courtId: 'Court',
-    serviceCentreId: 'Service Centre',
+    subjectType: 'Subject',
+    courtId: 'Subject',
+    serviceCentreId: 'Subject',
     toDate: 'Between',
+  };
+
+  ITEM_LABELS: Record<string, string> = {
+    email: 'Email address',
+    subjectType: 'Type',
+    courtId: 'Court Name',
+    serviceCentreId: 'Service Centre Name',
+    toDate: 'To date',
   };
 
   constructor(private readonly auditService = new AuditService()) {}
@@ -137,16 +146,14 @@ export default class AuditController {
   }
 
   private getFiltersFromQueryOrDefault(query: Request['query']): GetAuditsParams {
-
     const subjectType = parseOptionalString(query?.subjectType);
 
     return {
       pageNumber: parseNumber(query?.pageNumber, 1) - 1, // UI is 1-based, service is 0-based
       pageSize: parseNumber(query?.pageSize, 25),
       email: parseOptionalString(query?.email),
-      courtId: subjectType === 'COURT' && isUuid(query?.courtId as string)
-        ? parseString(query.courtId)
-        : undefined,
+      subjectType,
+      courtId: subjectType === 'COURT' && isUuid(query?.courtId as string) ? parseString(query.courtId) : undefined,
       serviceCentreId:
         subjectType === 'SERVICE_CENTRE' && isUuid(query?.serviceCentreId as string)
           ? parseString(query.serviceCentreId)
@@ -173,9 +180,8 @@ export default class AuditController {
 
   /**
    * builds out the structure of the filter categories in the audit view filter sidebar.
-   * For each filter that is present in the query, we want to create a category with a
-   * single item that is a link to the same page but with that filter removed. This
-   * allows the user to easily remove individual filters from their search.
+   * For each filter that is present in the query, we want to add it to a category and give it
+   * a unique label that, when clicked, will remove that portion of the filter.
    *
    * @param filters
    * @private
@@ -185,18 +191,42 @@ export default class AuditController {
       ([k, v]) => this.INCLUDED_CATEGORIES.has(k) && v && String(v).trim() !== ''
     );
 
-    return entries.map(([key]) => {
-      const params = new URLSearchParams(
-        Object.entries(filters)
-          .filter(([k, v]) => k !== key && v && String(v).trim() !== '')
-          .map(([k, v]) => [k, String(v)])
-      );
+    const grouped = new Map<string, { key: string; itemText: string }[]>();
 
-      return {
-        heading: { text: this.CATEGORY_LABELS[key] ?? key },
-        items: [{ text: this.CATEGORY_LABELS[key] ?? key, href: `/audits?${params.toString()}` }],
-      };
-    });
+    for (const [key] of entries) {
+      const categoryLabel = this.CATEGORY_LABELS[key] ?? key;
+      const itemText =
+        key === 'subjectType'
+          ? `${this.ITEM_LABELS[key]} (${filters.subjectType?.replaceAll('_', ' ')})`
+          : (this.ITEM_LABELS[key] ?? categoryLabel);
+      const current = grouped.get(categoryLabel) ?? [];
+      current.push({ key, itemText });
+      grouped.set(categoryLabel, current);
+    }
+
+    const categories: FilterCategory[] = [];
+
+    for (const [categoryLabel, groupEntries] of grouped) {
+      const items = groupEntries.map(({ key, itemText }) => {
+        const params = new URLSearchParams(
+          Object.entries(filters)
+            .filter(([k, v]) => k !== key && v && String(v).trim() !== '')
+            .map(([k, v]) => [k, String(v)])
+        );
+
+        return {
+          text: itemText,
+          href: `/audits?${params.toString()}`,
+        };
+      });
+
+      categories.push({
+        heading: { text: categoryLabel },
+        items,
+      });
+    }
+
+    return categories;
   }
 
   /**
