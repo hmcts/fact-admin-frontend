@@ -10,35 +10,25 @@ test.describe(
   },
   () => {
     test('visibility test', async ({ courtAddressFindPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Find Functional Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await courtAddressFindPage.goto(createdCourt.id);
+      await withCreatedCourt(playwright, 'Court Address Find Functional Test', {}, async ({ createdCourt }) => {
+        await courtAddressFindPage.goto(createdCourt.id);
 
-          await courtAddressFindPage.expectVisibleElements();
-          await expect(courtAddressFindPage.heading).toContainText('Find address by postcode');
-          await expect(courtAddressFindPage.findAddressButton).toBeVisible();
-          await expect(courtAddressFindPage.enterAddressManuallyButton).toBeVisible();
-        }
-      );
+        await courtAddressFindPage.expectVisibleElements();
+        await expect(courtAddressFindPage.heading).toContainText('Find address by postcode');
+        await expect(courtAddressFindPage.findAddressButton).toBeVisible();
+        await expect(courtAddressFindPage.enterAddressManuallyButton).toBeVisible();
+      });
     });
 
     test('shows a validation error when postcode is blank', async ({ courtAddressFindPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Find Functional Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await courtAddressFindPage.goto(createdCourt.id);
-          await courtAddressFindPage.searchPostcode('');
+      await withCreatedCourt(playwright, 'Court Address Find Functional Test', {}, async ({ createdCourt }) => {
+        await courtAddressFindPage.goto(createdCourt.id);
+        await courtAddressFindPage.searchPostcode('');
 
-          await expect(courtAddressFindPage.errorSummary).toBeVisible();
-          await expect(courtAddressFindPage.mainContent.content).toContainText('There is a problem');
-          await expect(courtAddressFindPage.heading).toContainText('Find address by postcode');
-        }
-      );
+        await expect(courtAddressFindPage.errorSummary).toBeVisible();
+        await expect(courtAddressFindPage.mainContent.content).toContainText('There is a problem');
+        await expect(courtAddressFindPage.heading).toContainText('Find address by postcode');
+      });
     });
 
     test('loads the update find page with the existing postcode value', async ({
@@ -46,19 +36,14 @@ test.describe(
       playwright,
       page,
     }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Find Functional Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('FindPage1'));
-          const addressId = await getSpecificAddressId(page, createdCourt.id, 'SW1A 1AA');
+      await withCreatedCourt(playwright, 'Court Address Find Functional Test', {}, async ({ createdCourt }) => {
+        await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('FindPage1'));
+        const addressId = await getSpecificAddressId(page, createdCourt.id, 'SW1A 1AA');
 
-          await courtAddressFindPage.goto(createdCourt.id, addressId);
+        await courtAddressFindPage.goto(createdCourt.id, addressId);
 
-          await expect(courtAddressFindPage.postcodeInput).toHaveValue('SW1A 1AA');
-        }
-      );
+        await expect(courtAddressFindPage.postcodeInput).toHaveValue('SW1A 1AA');
+      });
     });
   }
 );
