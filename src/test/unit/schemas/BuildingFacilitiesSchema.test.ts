@@ -42,7 +42,7 @@ describe('BuildingFacilitiesSchema', () => {
     expect(result.error.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          message: 'Select whether the children waiting area is available',
+          message: 'Select if a separate waiting area is available for children',
           path: ['waitingAreaChildren'],
         }),
       ])
