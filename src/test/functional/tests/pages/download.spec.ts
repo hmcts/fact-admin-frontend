@@ -16,7 +16,6 @@ test.describe(
         await createTestCourt(apiContext, {
           courtName,
           open: true,
-          serviceCenter: false,
         });
 
         const downloadPromise = homePage.page.waitForEvent('download');
