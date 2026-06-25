@@ -61,6 +61,15 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
           : undefined,
     },
 
+    // Lift support phone (required when no lift)
+    {
+      key: 'liftSupportPhoneNumber',
+      validate: m =>
+        m.lift === false && !m.liftSupportPhoneNumber?.trim()
+          ? ['Enter telephone number for organising support at court']
+          : undefined,
+    },
+
     // Phone pattern
     patternRule(
       'accessibleParkingPhoneNumber',
@@ -69,6 +78,11 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     ),
     patternRule(
       'accessibleEntrancePhoneNumber',
+      UK_PHONE_REGEX,
+      'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
+    ),
+    patternRule(
+      'liftSupportPhoneNumber',
       UK_PHONE_REGEX,
       'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
     ),

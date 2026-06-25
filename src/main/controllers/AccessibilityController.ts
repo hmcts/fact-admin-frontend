@@ -57,6 +57,7 @@ export default class AccessibilityController {
       lift,
       liftDoorWidth,
       liftDoorLimit,
+      liftSupportPhoneNumber,
       quietRoom,
     } = req.body as Record<string, unknown>;
 
@@ -82,6 +83,8 @@ export default class AccessibilityController {
       lift: parseBoolean(lift),
       liftDoorWidth: parseBoolean(lift) === true ? parseLiftMetric(liftDoorWidth) : undefined,
       liftDoorLimit: parseBoolean(lift) === true ? parseLiftMetric(liftDoorLimit) : undefined,
+      liftSupportPhoneNumber:
+        typeof liftSupportPhoneNumber === 'string' && parseBoolean(lift) === false ? liftSupportPhoneNumber : undefined,
       quietRoom: parseBoolean(quietRoom),
     };
 

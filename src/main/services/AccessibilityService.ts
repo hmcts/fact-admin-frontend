@@ -32,7 +32,14 @@ export class AccessibilityService {
     // validate for errors
     const validationErrors = validate(model);
     if (validationErrors) {
-      return { ...model, errors: validationErrors };
+      const updatedLiftDoorLimit = Number.isNaN(model.liftDoorLimit) ? undefined : model.liftDoorLimit;
+      const updatedLiftDoorWidth = Number.isNaN(model.liftDoorWidth) ? undefined : model.liftDoorWidth;
+      return {
+        ...model,
+        liftDoorLimit: updatedLiftDoorLimit,
+        liftDoorWidth: updatedLiftDoorWidth,
+        errors: validationErrors,
+      };
     }
 
     const payload: UpdateAccessibilityRequest = {
