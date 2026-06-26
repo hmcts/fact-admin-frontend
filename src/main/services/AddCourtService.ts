@@ -114,7 +114,6 @@ export class AddCourtService {
     }
 
     const createResponse = await this.dataApiRequests.createCourt({
-      isServiceCentre: false,
       name,
       open: false,
       regionId,
