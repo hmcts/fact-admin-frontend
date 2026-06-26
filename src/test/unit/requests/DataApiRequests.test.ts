@@ -1,12 +1,14 @@
 import { HttpStatusCode } from 'axios';
 import sinon, { restore, stub } from 'sinon';
 
+const mockDataApiLogger = {
+  error: jest.fn(),
+  info: jest.fn(),
+};
+
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
-    getLogger: jest.fn().mockReturnValue({
-      error: jest.fn(),
-      info: jest.fn(),
-    }),
+    getLogger: jest.fn().mockReturnValue(mockDataApiLogger),
   },
 }));
 
@@ -35,6 +37,7 @@ describe('DataApiRequests', () => {
 
   beforeEach(() => {
     restore();
+    jest.clearAllMocks();
     getStub = stub(dataApi, 'get');
     postStub = stub(dataApi, 'post');
     putStub = stub(dataApi, 'put');
@@ -1830,5 +1833,255 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed audit subject options when response is valid', async () => {
+    const responseBody = {
+      COURT: [{ id: '11111111-1111-4111-8111-111111111111', name: 'Reading Crown Court' }],
+      SERVICE_CENTRE: [{ id: '22222222-2222-4222-8222-222222222222', name: 'Birmingham Service Centre' }],
+    };
+
+    getStub.withArgs('/audits/subjectoptions/v1').resolves({ data: responseBody });
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toEqual(
+      new Map([
+        ['COURT', [{ id: '11111111-1111-4111-8111-111111111111', name: 'Reading Crown Court' }]],
+        ['SERVICE_CENTRE', [{ id: '22222222-2222-4222-8222-222222222222', name: 'Birmingham Service Centre' }]],
+      ])
+    );
+  });
+
+  it('returns internal server error and logs when audit subject options response fails schema validation', async () => {
+    getStub.withArgs('/audits/subjectoptions/v1').resolves({
+      data: {
+        COURT: [{ id: 'not-a-uuid', name: 'Invalid Court' }],
+      },
+    });
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', expect.anything());
+  });
+
+  it('returns axios status and logs when audit subject options endpoint errors', async () => {
+    const badGatewayError = {
+      isAxiosError: true,
+      response: {
+        data: 'bad gateway',
+        status: HttpStatusCode.BadGateway,
+      },
+    };
+
+    getStub.withArgs('/audits/subjectoptions/v1').rejects(badGatewayError);
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toBe(HttpStatusCode.BadGateway);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', badGatewayError);
+  });
+
+  it('returns internal server error and logs when audit subject options endpoint throws non-axios error', async () => {
+    const nonAxiosError = new Error('Unexpected subject options error');
+    getStub.withArgs('/audits/subjectoptions/v1').rejects(nonAxiosError);
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', nonAxiosError);
+  });
+
+  it('returns parsed paged audits when response is valid', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+      toDate: '2026-06-26',
+      email: 'admin@example.com',
+      subjectType: 'COURT',
+      courtId: '11111111-1111-4111-8111-111111111111',
+      serviceCentreId: undefined,
+    };
+    const audits = {
+      content: [
+        {
+          id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          subjectId: '11111111-1111-4111-8111-111111111111',
+          subjectType: 'COURT',
+          userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          user: {
+            email: 'admin@example.com',
+            favouriteCourts: null,
+            id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+            lastLogin: '2026-06-26T09:10:11.123Z',
+            role: 'SUPER_ADMIN',
+            ssoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+          },
+          actionType: 'UPDATE',
+          actionEntity: 'court',
+          actionDataDiff: null,
+          createdAt: '2026-06-26T09:10:11.123Z',
+        },
+      ],
+      page: {
+        number: 0,
+        size: 25,
+        totalElements: 1,
+        totalPages: 1,
+      },
+    };
+
+    getStub.withArgs('/audits/v1', { params }).resolves({ data: audits });
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toEqual(audits);
+  });
+
+  it('returns internal server error and logs when audits response fails schema validation', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+    };
+
+    getStub.withArgs('/audits/v1', { params }).resolves({
+      data: {
+        content: [{ id: 'missing-required-fields' }],
+        page: {
+          number: 0,
+          size: 25,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', expect.anything());
+  });
+
+  it('returns axios status and logs when audits endpoint errors', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+    };
+    const serviceUnavailableError = {
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: HttpStatusCode.ServiceUnavailable,
+      },
+    };
+
+    getStub.withArgs('/audits/v1', { params }).rejects(serviceUnavailableError);
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', serviceUnavailableError);
+  });
+
+  it('returns internal server error and logs when audits endpoint throws non-axios error', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+    };
+    const nonAxiosError = new Error('Unexpected audits error');
+
+    getStub.withArgs('/audits/v1', { params }).rejects(nonAxiosError);
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', nonAxiosError);
+  });
+
+  it('returns parsed audit by id when response is valid', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const audit = {
+      id: auditId,
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT',
+      userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      user: {
+        email: 'admin@example.com',
+        favouriteCourts: null,
+        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        lastLogin: '2026-06-26T09:10:11.123Z',
+        role: 'SUPER_ADMIN',
+        ssoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      },
+      actionType: 'UPDATE',
+      actionEntity: 'court',
+      actionDataDiff: null,
+      createdAt: '2026-06-26T09:10:11.123Z',
+    };
+
+    getStub.withArgs(`/audits/${auditId}/v1`).resolves({ data: audit });
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toEqual(audit);
+  });
+
+  it('returns internal server error and logs when audit by id response fails schema validation', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+    getStub.withArgs(`/audits/${auditId}/v1`).resolves({
+      data: {
+        id: auditId,
+      },
+    });
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      expect.anything()
+    );
+  });
+
+  it('returns axios status and logs when audit by id endpoint errors', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const notFoundError = {
+      isAxiosError: true,
+      response: {
+        data: 'not found',
+        status: HttpStatusCode.NotFound,
+      },
+    };
+
+    getStub.withArgs(`/audits/${auditId}/v1`).rejects(notFoundError);
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      notFoundError
+    );
+  });
+
+  it('returns internal server error and logs when audit by id endpoint throws non-axios error', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const nonAxiosError = new Error('Unexpected audit by id error');
+
+    getStub.withArgs(`/audits/${auditId}/v1`).rejects(nonAxiosError);
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      nonAxiosError
+    );
   });
 });

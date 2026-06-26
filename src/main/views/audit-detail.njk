@@ -1,0 +1,98 @@
+{% extends "template.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro createDiffDetails(diffData, actionType) %}
+  {% if diffData.length %}
+    {% set diffRows = [] %}
+    {% for diff in diffData %}
+      {% set diffRows = (diffRows.push([
+        {
+          text: diff.field
+        },
+        {
+          text: diff.oldValue if diff.oldValue else "<null>"
+        } if actionType !== "INSERT" else null,
+        {
+          text: diff.newValue  if diff.newValue else "<null>"
+        }
+      ]), diffRows) %}
+    {% endfor %}
+    {{ govukTable({
+      firstCellIsHeader: true,
+      captionClasses: "govuk-table__caption--m",
+      head: [
+        {
+          text: "Field"
+        },
+        {
+          text: "Old value"
+        } if actionType !== "INSERT" else null,
+        {
+          text: "New value"
+        }
+      ], rows: diffRows }) }}
+  {% else %}
+    <pre>No recorded change data</pre>
+  {% endif %}
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <h1 class="govuk-heading-l">Audit Detail</h1>
+
+    {% set tagHtml %}
+      {% if audit.actionType === "DELETE" %}
+        {% set tagColour = "red" %}
+      {% elseif audit.actionType === "INSERT" %}
+        {% set tagColour = "green" %}
+      {% else %}
+        {% set tagColour = "blue" %}
+      {% endif %}
+      {{ govukTag({
+        text: audit.actionType,
+        classes: "govuk-tag--" + tagColour
+      })}}
+    {% endset %}
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: "Action" },
+          value: { html: tagHtml }
+        },
+        {
+          key: { text: "Subject Type" },
+          value: { text: audit.subjectType }
+        },
+        {
+          key: { text: "Subject" },
+          value: { text: audit.subjectName + ":  " + audit.actionEntity }
+        },
+        {
+          key: { text: "Subject ID" },
+          value: { text: audit.subjectId }
+        },
+        {
+          key: { text: "Created At" },
+          value: { text: audit.createdAt }
+        },
+        {
+          key: { text: "User" },
+          value: { text: audit.user.email + " (" + audit.user.role + ")"}
+        }
+      ]
+    }) }}
+
+    {% if audit.actionType !== "DELETE" %}
+      <h1 class="govuk-heading-m">Change Log</h1>
+      {{ createDiffDetails(audit.actionDataDiff, audit.actionType) }}
+    {% endif %}
+
+  </div>
+{% endblock %}

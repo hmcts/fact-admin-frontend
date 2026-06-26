@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { pageMetadataSchema } from './pagedMetadataSchema';
+
 export const courtListItemSchema = z.object({
   id: z.string().uuid(),
   lastUpdatedAt: z.string(),
@@ -7,13 +9,6 @@ export const courtListItemSchema = z.object({
   open: z.boolean(),
   regionId: z.string().uuid(),
   slug: z.string(),
-});
-
-export const pageMetadataSchema = z.object({
-  number: z.number(),
-  size: z.number(),
-  totalElements: z.number(),
-  totalPages: z.number(),
 });
 
 export const pagedCourtsSchema = z.object({

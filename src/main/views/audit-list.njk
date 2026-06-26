@@ -1,0 +1,321 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
+{% from "moj/components/filter/macro.njk" import mojFilter %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{# MACROS #}
+
+{% macro createPager(baseHref, pageInfo) %}
+
+  {# create the pager items #}
+  {% set items = [] %}
+  {% if pageInfo.number > 1 %}
+    {% set items = (items.push({number: 1, href: baseHref + 1}), items) %}
+  {% endif %}
+  {% if pageInfo.number > 3 %}
+    {% set items = (items.push({ ellipsis: true }), items) %}
+  {% endif %}
+  {% if pageInfo.number > 2 %}
+    {% set items = (items.push({number: pageInfo.number - 1, href: baseHref + (pageInfo.number - 1)}), items) %}
+  {% endif %}
+  {% set items = (items.push({number: pageInfo.number, href: baseHref + pageInfo.number, current: true}), items) %}
+  {% if pageInfo.number < pageInfo.totalPages - 1 %}
+    {% set items = (items.push({number: pageInfo.number + 1, href: baseHref + (pageInfo.number + 1)}), items) %}
+  {% endif %}
+  {% if pageInfo.number < pageInfo.totalPages - 2 %}
+    {% set items = (items.push({ ellipsis: true }), items) %}
+  {% endif %}
+  {% if pageInfo.number < pageInfo.totalPages %}
+    {% set items = (items.push({number: pageInfo.totalPages, href: baseHref + pageInfo.totalPages}), items) %}
+  {% endif %}
+
+  {{ govukPagination({
+    classes: "audit-list-pagination",
+    previous: {
+      href: baseHref + (pageInfo.number - 1)
+    } if pageInfo.number > 1 else null,
+    next: {
+      href: baseHref + (pageInfo.number + 1)
+    } if pageInfo.number < pageInfo.totalPages else null,
+    items: items
+  }) }}
+
+{% endmacro %}
+
+{# END MACROS #}
+
+{% set courtOptions = [{
+  value: "",
+  text: "All courts"
+}] %}
+
+{% set serviceCentreOptions = [{
+  value: "",
+  text: "All service centres"
+}] %}
+
+{# pull concrete values from the subjects map #}
+{% for subject, list in subjects %}
+  {% if subject === "COURT" %}
+    {% for id, name in list %}
+      {% set courtOptions = (courtOptions.push({
+        value: id,
+        text: name
+      }), courtOptions) %}
+    {% endfor %}
+  {% elseif subject === "SERVICE_CENTRE" %}
+    {% for id, name in list %}
+      {% set serviceCentreOptions = (serviceCentreOptions.push({
+        value: id,
+        text: name
+      }), serviceCentreOptions) %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{%- set filterOptionsHtml %}
+
+  {{ mojDatePicker({
+    id: "fromDate",
+    name: "fromDate",
+    label: {
+      text: "Between",
+      classes: "govuk-label--m"
+    },
+    classes: "govuk-!-margin-bottom-3",
+    value: filters.fromDate,
+    errorMessage: {
+      text: errors.fromDate[0]
+    } if errors.fromDate else null
+  }) }}
+
+  {{ mojDatePicker({
+    id: "toDate",
+    name: "toDate",
+    label: {
+      text: "And"
+    },
+    classes: "govuk-!-margin-bottom-6",
+    value: filters.toDate,
+    errorMessage: {
+      text: errors.toDate[0]
+    } if errors.toDate else null
+  }) }}
+
+  {{ govukInput({
+    label: {
+      text: "Email address",
+      classes: "govuk-label--m"
+    },
+    id: "email",
+    name: "email",
+    autoComplete: "email",
+    value: filters.email,
+    errorMessage: {
+      text: errors.email[0]
+    } if errors.email else null
+  }) }}
+
+  {%- set courtHtml %}
+    {{ govukSelect({
+      id: "courtId",
+      name: "courtId",
+      label: {
+        text: "Court Name",
+        classes: "govuk-label--s"
+      },
+      items: courtOptions,
+      value: filters.courtId
+    }) }}
+  {% endset -%}
+
+  {%- set serviceCentreHtml %}
+    {{ govukSelect({
+      id: "serviceCentreId",
+      name: "serviceCentreId",
+      label: {
+        text: "Service Centre Name",
+        classes: "govuk-label--s"
+      },
+      items: serviceCentreOptions,
+      value: filters.serviceCentreId
+    }) }}
+  {% endset -%}
+
+  {{ govukRadios({
+    name: "subjectType",
+    idPrefix: "subjectType",
+    classes: "govuk-radios--small",
+    fieldset: {
+      legend: {
+        text: "Subject",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: [
+      {
+        value: "COURT",
+        text: "Court",
+        checked: filters.subjectType === "COURT",
+        conditional: {
+          html: courtHtml
+        }
+      },
+      {
+        value: "SERVICE_CENTRE",
+        text: "Service Centre",
+        checked: filters.subjectType === "SERVICE_CENTRE",
+        conditional: {
+          html: serviceCentreHtml
+        }
+      }
+    ]
+  }) }}
+
+{% endset -%}
+
+{% set auditTableRows = [] %}
+{% if audits.content.length %}
+  {% for audit in audits.content %}
+
+    {% set auditDetailHtml %}
+      <a target="_blank" rel="noopener noreferrer" class="govuk-link govuk-link--no-visited-state"
+         href="/audits/{{ audit.id }}">
+        Details
+      </a>
+    {% endset %}
+
+    {% set tagHtml %}
+      {% if audit.actionType === "DELETE" %}
+        {% set tagColour = "red" %}
+      {% elseif audit.actionType === "INSERT" %}
+        {% set tagColour = "green" %}
+      {% else %}
+        {% set tagColour = "blue" %}
+      {% endif %}
+      {{ govukTag({
+        text: audit.actionType,
+        classes: "govuk-tag--" + tagColour
+      })}}
+    {% endset %}
+
+    {% set auditTableRows = (auditTableRows.push([
+      {
+        text: audit.user.email
+      },
+      {
+        html: tagHtml
+      },
+      {
+        text: audit.subjectName + ":  " + audit.actionEntity
+      },
+      {
+        text: audit.createdAt
+      },
+      {
+        html: auditDetailHtml
+      }
+    ]), auditTableRows) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if errors %}
+        {{ modelDrivenErrorSummary(errors) }}
+      {% endif %}
+    </div>
+  </div>
+
+  <h1 class="govuk-heading-l">Audits</h1>
+
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-one-third">
+      <form method="GET" action="/audits">
+        {{ mojFilter({
+          heading: {
+            text: "Filters"
+          },
+          submit: {
+            text: "Search"
+          },
+          selectedFilters: {
+            clearLink: {
+              text: "Reset",
+              href: '/audits'
+            },
+            heading: {
+              text: "Selected filters"
+            },
+            categories: filterCategories
+          },
+          optionsHtml: filterOptionsHtml
+        }) }}
+      </form>
+      {% if downloadUrl %}
+        {{ govukButton({
+          text: "Download CSV",
+          classes: "govuk-!-margin-top-6 govuk-button--secondary",
+          href: downloadUrl
+        }) }}
+      {% endif %}
+    </div>
+
+    <div class="govuk-grid-column-two-thirds">
+       {% if auditTableRows.length %}
+          {{ govukTable({
+            firstCellIsHeader: false,
+            captionClasses: "govuk-table__caption--m",
+            head: [
+              {
+                text: "User",
+                classes: "govuk-!-width-one-quarter"
+              },
+              {
+                text: "Action"
+              },
+              {
+                text: "Location",
+                classes: "govuk-!-width-one-quarter"
+              },
+              {
+                text: "Created at",
+                classes: "govuk-!-width-one-quarter"
+              },
+              {
+                text: "Changes"
+              }
+            ],
+            rows: auditTableRows
+          }) }}
+
+         {{ createPager(basePagerUrl, audits.page) }}
+
+        {% else %}
+          {% if errors %}
+            <p class="govuk-body">No audits returned; there is an unresolved issue with the search parameters.</p>
+          {% else %}
+            <p class="govuk-body">No audits found. Try expanding the search parameters.</p>
+          {% endif %}
+        {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}
