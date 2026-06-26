@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
+import { Audit, AuditSubject, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
@@ -49,7 +49,6 @@ export class AuditService {
       return audit;
     }
 
-    // this will be an
     return { ...audit, subjectName: nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>' };
   }
 
@@ -231,6 +230,10 @@ export class AuditService {
         'Email match may only contain letters, hyphens, periods, plus/minus signs,' +
           " underscores, and a single 'at' (@) symbol",
       ];
+    }
+    // subject type check
+    if (params.subjectType && !Object.keys(AuditSubject).includes(params.subjectType)) {
+      errors.subjectType = ['Subject type must be one of: ' + Object.keys(AuditSubject).join(', ')];
     }
     // date range checks
     this.validateDateRange(params, errors);
