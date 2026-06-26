@@ -1351,6 +1351,49 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
 
+  it('returns parsed contact description types when response is valid', async () => {
+    const contactDescriptionTypes = [
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
+      },
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Listing enquiries',
+      },
+    ];
+
+    getStub.withArgs('/types/v1/contact-description-types').resolves({ data: contactDescriptionTypes });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toEqual(contactDescriptionTypes);
+  });
+
+  it('returns internal server error when contact description types response fails schema validation', async () => {
+    getStub.withArgs('/types/v1/contact-description-types').resolves({
+      data: [{ name: 'Missing id' }],
+    });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns service unavailable when contact description types endpoint returns a 503', async () => {
+    getStub.withArgs('/types/v1/contact-description-types').rejects({
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: HttpStatusCode.ServiceUnavailable,
+      },
+    });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+  });
+
   it('returns parsed translation services when the response is valid', async () => {
     const courtId = '55555555-5555-4555-8555-555555555555';
     const translationServices = {
