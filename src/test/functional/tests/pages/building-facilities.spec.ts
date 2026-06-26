@@ -31,8 +31,8 @@ test.describe('Building Facilities Page Tests', () => {
       await expect(buildingFacilitiesPage.page).toHaveURL(
         buildingFacilitiesPage.buildBuildingFacilitiesSuccessUrl(createdCourt.id)
       );
-      await expect(buildingFacilitiesPage.successPanel).toContainText('Building Facilities details saved');
-      await expect(buildingFacilitiesPage.successPanel).toContainText(
+      await expect(buildingFacilitiesPage.mainContent.content).toContainText('Building Facilities details saved');
+      await expect(buildingFacilitiesPage.mainContent.content).toContainText(
         `Building Facilities details for ${createdCourt.name} have been saved successfully.`
       );
       await expect(buildingFacilitiesPage.mainContent.content).toContainText('What do you want to do next?');

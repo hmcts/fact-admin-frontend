@@ -3,7 +3,8 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { BuildingFacilitiesService, FacilityModel } from '../services/BuildingFacilitiesService';
-import { addFoodAndDrink, isUuid, mapFoodAndDrink, parseBoolean } from '../utils/valueParsers';
+import { addFoodAndDrink, mapFoodAndDrink } from '../utils/mapper';
+import { isUuid, parseBoolean } from '../utils/valueParsers';
 
 const buildingFacilitiesService = new BuildingFacilitiesService();
 @route('/courts/:courtId/edit/building-facilities')
@@ -82,9 +83,11 @@ export default class BuildingFacilitiesController {
       return;
     }
 
-    res.render('building-facilities-edit-success', {
+    res.render('common-edit-success', {
       courtId: resolvedCourtId,
-      // prefer the court name from the updated model
+      pageTitle: `Building Facilities saved - ${updateResponse.name}`,
+      successPanelTitle: 'Building Facilities details saved',
+      successPanelBody: `Building Facilities details for ${updateResponse.name} have been saved successfully.`,
       courtName: updateResponse.name,
     });
   }
