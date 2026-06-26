@@ -15,25 +15,20 @@ test.describe(
       courtAddressEditSuccessPage,
       playwright,
     }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Address Edit Success Functional Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await courtAddressFindPage.goto(createdCourt.id);
-          await courtAddressFindPage.clickEnterAddressManually();
-          await courtAddressEditPage.fillAddressForm(buildTestAddress('SaveSuccess1'));
-          await courtAddressEditPage.clickSave();
+      await withCreatedCourt(playwright, 'Court Address Edit Success Functional Test', {}, async ({ createdCourt }) => {
+        await courtAddressFindPage.goto(createdCourt.id);
+        await courtAddressFindPage.clickEnterAddressManually();
+        await courtAddressEditPage.fillAddressForm(buildTestAddress('SaveSuccess1'));
+        await courtAddressEditPage.clickSave();
 
-          await expect(courtAddressEditSuccessPage.successPanelTitle).toContainText('Address saved:');
-          await expect(courtAddressEditSuccessPage.mainContent.content).toContainText('have been successfully updated');
-          await expect(courtAddressEditSuccessPage.backToAddressesLink).toHaveAttribute(
-            'href',
-            `/courts/${createdCourt.id}/edit/address`
-          );
-          await expect(courtAddressEditSuccessPage.homeLink).toHaveAttribute('href', '/');
-        }
-      );
+        await expect(courtAddressEditSuccessPage.successPanelTitle).toContainText('Address saved:');
+        await expect(courtAddressEditSuccessPage.mainContent.content).toContainText('have been successfully updated');
+        await expect(courtAddressEditSuccessPage.backToAddressesLink).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit/address`
+        );
+        await expect(courtAddressEditSuccessPage.homeLink).toHaveAttribute('href', '/');
+      });
     });
   }
 );

@@ -14,7 +14,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
 
@@ -38,7 +38,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.selectEmail('translations@example.com');
@@ -64,7 +64,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.selectEmail('translations@example.com');
@@ -102,7 +102,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.selectPhoneNumber('+441234 567890');
@@ -120,7 +120,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.selectEmail('translations@example.com');
@@ -145,7 +145,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.selectEmail('translations@example.com');
@@ -181,7 +181,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.emailCheckbox.check();
@@ -206,7 +206,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.selectEmail('INVALID');
@@ -233,7 +233,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Functional Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.gotoSuccess(createdCourt.id);
 
