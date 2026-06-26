@@ -1,12 +1,18 @@
+import fs from 'node:fs';
+
 import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
-import { assert, match, mock, stub } from 'sinon';
+import { assert, match, mock, restore, stub } from 'sinon';
 
 import AuditController from '../../../main/controllers/AuditController';
 import { AuditListViewModel } from '../../../main/services/AuditService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('AuditController', () => {
+  beforeEach(() => {
+    restore();
+  });
+
   test('renders audit list view', async () => {
     const viewModel: AuditListViewModel = {
       filters: {
@@ -144,6 +150,141 @@ describe('AuditController', () => {
     await controller.renderAuditSearchPage(request, response);
 
     assert.notCalled(auditFilterCategoriesService.buildFilterCategories);
+    responseMock.verify();
+  });
+
+  test('renders not-found when audit id is invalid', async () => {
+    const auditService = {
+      retrieve: stub(),
+    };
+    const controller = new AuditController(auditService as never, {} as never);
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { auditId: 'not-a-uuid' };
+
+    const responseMock = mock(response);
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    await controller.renderAuditDetailPage(request, response);
+
+    assert.notCalled(auditService.retrieve);
+    responseMock.verify();
+  });
+
+  test('renders audit detail when lookup succeeds', async () => {
+    const auditService = {
+      retrieve: stub().resolves({
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT',
+        subjectName: 'Audit Controller Court',
+        userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        user: {
+          email: 'super-admin@example.com',
+          favouriteCourts: null,
+          id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          lastLogin: '2026-06-26T09:10:11.123Z',
+          role: 'SUPER_ADMIN',
+          ssoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+        },
+        actionType: 'UPDATE',
+        actionEntity: 'court',
+        actionDataDiff: [],
+        createdAt: '2026-06-26T09:10:11.123Z',
+      }),
+    };
+    const controller = new AuditController(auditService as never, {} as never);
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { auditId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' };
+
+    const responseMock = mock(response);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'audit-detail',
+        match((renderModel: Record<string, unknown>) => {
+          const audit = renderModel.audit as { createdAt?: string };
+          return renderModel.pageTitle === 'Audit Detail' && typeof audit?.createdAt === 'string';
+        })
+      );
+
+    await controller.renderAuditDetailPage(request, response);
+
+    assert.calledWith(auditService.retrieve, 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+    responseMock.verify();
+  });
+
+  test('downloads csv and removes temp file after response', async () => {
+    const auditService = {
+      generateCsv: stub().resolves({
+        filename: 'audits-2026-06-26.csv',
+        filePath: '/tmp/audit-controller-test.csv',
+      }),
+    };
+    const controller = new AuditController(auditService as never, {} as never);
+    const response = {
+      download: () => '',
+      headersSent: false,
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    const unlinkStub = stub(fs, 'unlink').callsFake((_path, callback) => callback(null));
+
+    const responseMock = mock(response);
+    responseMock
+      .expects('download')
+      .once()
+      .withArgs('/tmp/audit-controller-test.csv', 'audits-2026-06-26.csv', match.func)
+      .callsFake((_path: string, _filename: string, cb: (err: Error | null) => void) => {
+        cb(null);
+      });
+
+    await controller.downloadAudits(request, response);
+
+    assert.calledOnce(auditService.generateCsv);
+    assert.calledWith(unlinkStub, '/tmp/audit-controller-test.csv', match.func);
+    responseMock.verify();
+  });
+
+  test('renders error when download send fails before headers are sent', async () => {
+    const auditService = {
+      generateCsv: stub().resolves({
+        filename: 'audits-2026-06-26.csv',
+        filePath: '/tmp/audit-controller-test.csv',
+      }),
+    };
+    const controller = new AuditController(auditService as never, {} as never);
+    const response = {
+      download: () => '',
+      headersSent: false,
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    stub(fs, 'unlink').callsFake((_path, callback) => callback(null));
+
+    const responseMock = mock(response);
+    responseMock
+      .expects('download')
+      .once()
+      .callsFake((_path: string, _filename: string, cb: (err: Error | null) => void) => {
+        cb(new Error('download failed'));
+      });
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    await controller.downloadAudits(request, response);
+
+    assert.calledOnce(auditService.generateCsv);
     responseMock.verify();
   });
 });
