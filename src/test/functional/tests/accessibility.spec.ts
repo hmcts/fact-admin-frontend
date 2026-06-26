@@ -178,7 +178,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Opening Hours Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.goto(createdCourt.id);
           await courtOpeningHoursPage.header.checkIsVisible();
@@ -191,7 +191,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Opening Hours Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.gotoAdd(createdCourt.id);
           await courtOpeningHoursPage.save();
@@ -205,7 +205,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Opening Hours Accessibility Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.gotoAdd(createdCourt.id);
           await courtOpeningHoursPage.selectOpeningHoursType('Court open');

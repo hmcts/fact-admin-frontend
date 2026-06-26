@@ -16,7 +16,7 @@ test.describe(
         await withCreatedCourt(
           playwright,
           'Court Opening Hours Functional Test',
-          { serviceCenter: false },
+          {},
           async ({ createdCourt }) => {
             await courtOpeningHoursPage.goto(createdCourt.id);
 
@@ -30,7 +30,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Opening Hours Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.goto(createdCourt.id);
           let openingHoursType = await courtOpeningHoursPage.clickFirstAddableOpeningHoursType();
@@ -90,7 +90,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Court Opening Hours Validation Functional Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await courtOpeningHoursPage.gotoAdd(createdCourt.id);
           await courtOpeningHoursPage.save();
