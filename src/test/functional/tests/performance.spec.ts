@@ -1,4 +1,5 @@
 import { test } from '../fixtures';
+import { seedAuditTrailViaUi } from '../helpers/auditTestSupport';
 import { withCreatedCourt } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -144,6 +145,64 @@ test.describe(
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
+    });
+
+    test('Audit List Page Performance', async ({
+      addCourtPage,
+      auditListPage,
+      courtAddressDeletePage,
+      generalPage,
+      lighthouseUtils,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        includeDelete: false,
+        page,
+        playwright,
+        prefixLabel: 'Audit Performance Test',
+        run: async ({ courtId }) => {
+          await auditListPage.goto();
+          await auditListPage.filterByCourt(courtId);
+          await auditListPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        },
+      });
+    });
+
+    test('Audit Detail Page Performance', async ({
+      addCourtPage,
+      auditListPage,
+      courtAddressDeletePage,
+      generalPage,
+      lighthouseUtils,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        includeDelete: false,
+        page,
+        playwright,
+        prefixLabel: 'Audit Detail Performance Test',
+        run: async ({ courtId }) => {
+          await auditListPage.goto();
+          await auditListPage.filterByCourt(courtId);
+
+          const detailHref = await auditListPage.getDetailsHrefForAction('UPDATE');
+          if (!detailHref) {
+            throw new Error('Expected a details link for an UPDATE audit row.');
+          }
+
+          await page.goto(config.urls.homePageUrl + detailHref);
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        },
+      });
     });
   }
 );
