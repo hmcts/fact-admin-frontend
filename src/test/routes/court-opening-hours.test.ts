@@ -167,7 +167,7 @@ describe('Court opening hours routes', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.text).toContain('Opening hours deleted Court open.');
+    expect(response.text).toContain('Opening hours deleted: Court open.');
     expect(response.text).toContain('You have removed this opening hour for Reading Crown Court.');
     expect(response.text).toContain('Back to opening hours');
   });

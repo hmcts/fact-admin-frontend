@@ -63,7 +63,7 @@ test.describe(
         await expect(courtOpeningHoursPage.mainContent.content).toContainText(openingHoursType);
         await courtOpeningHoursPage.clickDeleteOpeningHours();
 
-        await expect(courtOpeningHoursPage.successPanel).toContainText(`Opening hours deleted ${openingHoursType}.`);
+        await expect(courtOpeningHoursPage.successPanel).toContainText(`Opening hours deleted: ${openingHoursType}.`);
         await expect(courtOpeningHoursPage.successPanel).toContainText(
           `You have removed this opening hour for ${createdCourt.name}.`
         );
