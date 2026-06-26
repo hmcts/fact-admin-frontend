@@ -28,20 +28,19 @@ test.describe('Building Facilities Page Tests', () => {
       await buildingFacilitiesPage.selectYes('wifi');
       await buildingFacilitiesPage.save();
 
-        await expect(buildingFacilitiesPage.page).toHaveURL(
-          buildingFacilitiesPage.buildBuildingFacilitiesSuccessUrl(createdCourt.id)
-        );
-        await expect(buildingFacilitiesPage.mainContent.content).toContainText('Building Facilities details saved');
-        await expect(buildingFacilitiesPage.mainContent.content).toContainText(
-          `Building Facilities details for ${createdCourt.name} have been saved successfully.`
-        );
-        await expect(buildingFacilitiesPage.mainContent.content).toContainText('What do you want to do next?');
-        await expect(
-          buildingFacilitiesPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
-        ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-        await expect(buildingFacilitiesPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
-      }
-    );
+      await expect(buildingFacilitiesPage.page).toHaveURL(
+        buildingFacilitiesPage.buildBuildingFacilitiesSuccessUrl(createdCourt.id)
+      );
+      await expect(buildingFacilitiesPage.mainContent.content).toContainText('Building Facilities details saved');
+      await expect(buildingFacilitiesPage.mainContent.content).toContainText(
+        `Building Facilities details for ${createdCourt.name} have been saved successfully.`
+      );
+      await expect(buildingFacilitiesPage.mainContent.content).toContainText('What do you want to do next?');
+      await expect(
+        buildingFacilitiesPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
+      ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
+      await expect(buildingFacilitiesPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+    });
   });
 
   test('renders validation error when children waiting area is not selected', async ({
