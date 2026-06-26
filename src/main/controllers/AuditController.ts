@@ -65,6 +65,7 @@ export default class AuditController {
     }
 
     res.setHeader('Content-Disposition', `attachment; filename="${csvResponse.filename}"`);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.download(csvResponse.filePath, csvResponse.filename, err => {
       // Try to ensure temp file is removed after send completes or errors
       fs.unlink(csvResponse.filePath, unlinkErr => {
