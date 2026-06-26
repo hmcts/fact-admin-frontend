@@ -82,7 +82,6 @@ describe('HomePageService', () => {
         content: [
           {
             id: '22222222-2222-4222-8222-222222222222',
-            isServiceCentre: false,
             lastUpdatedAt: '2026-04-29T10:00:00Z',
             name: 'London Civil and Family Court',
             open: true,
@@ -241,7 +240,6 @@ describe('HomePageService', () => {
         content: [
           {
             id: '22222222-2222-4222-8222-222222222222',
-            isServiceCentre: false,
             lastUpdatedAt: '2026-04-29T10:00:00Z',
             name: 'London Civil and Family Court',
             open: true,

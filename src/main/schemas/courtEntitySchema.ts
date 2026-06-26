@@ -3,7 +3,6 @@ import { z } from 'zod';
 export const courtEntitySchema = z.object({
   createdAt: z.string(),
   id: z.string(),
-  isServiceCentre: z.boolean(),
   lastUpdatedAt: z.string(),
   mrdId: z.string().nullable(),
   name: z.string(),
