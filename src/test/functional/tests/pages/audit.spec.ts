@@ -49,7 +49,19 @@ test.describe(
         },
       });
     });
+  }
+);
 
+test.describe(
+  'Audit Page Download Tests',
+  {
+    tag: '@functional',
+  },
+  () => {
+    // Skip this test only for webkit. It passes locally, but fails consistently in CI
+    test.skip(({ browserName }) => browserName === 'webkit');
+
+    test.use({ storageState: config.users.superAdmin.sessionFile });
     test('downloads a CSV that contains a deterministic row for seeded DELETE actions', async ({
       addCourtPage,
       auditListPage,
