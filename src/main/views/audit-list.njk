@@ -128,8 +128,9 @@
     {{ govukSelect({
       id: "courtId",
       name: "courtId",
-      hint: {
-        text: "Court Name"
+      label: {
+        text: "Court Name",
+        classes: "govuk-label--s"
       },
       items: courtOptions,
       value: filters.courtId
@@ -140,8 +141,9 @@
     {{ govukSelect({
       id: "serviceCentreId",
       name: "serviceCentreId",
-      hint: {
-        text: "Service Centre Name"
+      label: {
+        text: "Service Centre Name",
+        classes: "govuk-label--s"
       },
       items: serviceCentreOptions,
       value: filters.serviceCentreId
