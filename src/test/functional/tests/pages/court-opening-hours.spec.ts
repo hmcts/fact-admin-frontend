@@ -13,74 +13,64 @@ test.describe(
         tag: '@smoke',
       },
       async ({ courtOpeningHoursPage, playwright }) => {
-        await withCreatedCourt(
-          playwright,
-          'Court Opening Hours Functional Test',
-          {},
-          async ({ createdCourt }) => {
-            await courtOpeningHoursPage.goto(createdCourt.id);
+        await withCreatedCourt(playwright, 'Court Opening Hours Functional Test', {}, async ({ createdCourt }) => {
+          await courtOpeningHoursPage.goto(createdCourt.id);
 
-            await expect(courtOpeningHoursPage.heading).toContainText('Court opening hours');
-          }
-        );
+          await expect(courtOpeningHoursPage.heading).toContainText('Court opening hours');
+        });
       }
     );
 
     test('adds, edits and deletes opening hours', async ({ courtOpeningHoursPage, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Opening Hours Functional Test',
-        {},
-        async ({ createdCourt }) => {
-          await courtOpeningHoursPage.goto(createdCourt.id);
-          let openingHoursType = await courtOpeningHoursPage.clickFirstAddableOpeningHoursType();
+      await withCreatedCourt(playwright, 'Court Opening Hours Functional Test', {}, async ({ createdCourt }) => {
+        await courtOpeningHoursPage.goto(createdCourt.id);
+        let openingHoursType = await courtOpeningHoursPage.clickFirstAddableOpeningHoursType();
 
-          if (openingHoursType) {
-            await courtOpeningHoursPage.selectSameTime();
-            await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
-            await courtOpeningHoursPage.save();
-
-            await expect(courtOpeningHoursPage.successPanel).toContainText('Opening hours saved');
-            await expect(courtOpeningHoursPage.successPanel).toContainText(
-              `Opening hours for ${createdCourt.name} have been successfully updated.`
-            );
-
-            await courtOpeningHoursPage.clickBackToOpeningHours();
-            await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(openingHoursType);
-            await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(
-              'Monday to Friday: 09:00 to 17:00'
-            );
-          } else {
-            openingHoursType = await courtOpeningHoursPage.getFirstOpeningHoursTypeName();
-          }
-
-          await courtOpeningHoursPage.clickEditLinkForType(openingHoursType);
+        if (openingHoursType) {
           await courtOpeningHoursPage.selectSameTime();
-          await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '16', '30');
+          await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
           await courtOpeningHoursPage.save();
 
           await expect(courtOpeningHoursPage.successPanel).toContainText('Opening hours saved');
-          await courtOpeningHoursPage.clickBackToOpeningHours();
-          await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(
-            'Monday to Friday: 09:00 to 16:30'
-          );
-
-          await courtOpeningHoursPage.clickDeleteLinkForType(openingHoursType);
-          await expect(courtOpeningHoursPage.heading).toContainText(
-            'Are you sure you want to delete these opening hours?'
-          );
-          await expect(courtOpeningHoursPage.mainContent.content).toContainText(openingHoursType);
-          await courtOpeningHoursPage.clickDeleteOpeningHours();
-
-          await expect(courtOpeningHoursPage.successPanel).toContainText(`Opening hours deleted ${openingHoursType}.`);
           await expect(courtOpeningHoursPage.successPanel).toContainText(
-            `You have removed this opening hour for ${createdCourt.name}.`
+            `Opening hours for ${createdCourt.name} have been successfully updated.`
           );
 
           await courtOpeningHoursPage.clickBackToOpeningHours();
-          await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toHaveCount(0);
+          await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(openingHoursType);
+          await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(
+            'Monday to Friday: 09:00 to 17:00'
+          );
+        } else {
+          openingHoursType = await courtOpeningHoursPage.getFirstOpeningHoursTypeName();
         }
-      );
+
+        await courtOpeningHoursPage.clickEditLinkForType(openingHoursType);
+        await courtOpeningHoursPage.selectSameTime();
+        await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '16', '30');
+        await courtOpeningHoursPage.save();
+
+        await expect(courtOpeningHoursPage.successPanel).toContainText('Opening hours saved');
+        await courtOpeningHoursPage.clickBackToOpeningHours();
+        await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toContainText(
+          'Monday to Friday: 09:00 to 16:30'
+        );
+
+        await courtOpeningHoursPage.clickDeleteLinkForType(openingHoursType);
+        await expect(courtOpeningHoursPage.heading).toContainText(
+          'Are you sure you want to delete these opening hours?'
+        );
+        await expect(courtOpeningHoursPage.mainContent.content).toContainText(openingHoursType);
+        await courtOpeningHoursPage.clickDeleteOpeningHours();
+
+        await expect(courtOpeningHoursPage.successPanel).toContainText(`Opening hours deleted ${openingHoursType}.`);
+        await expect(courtOpeningHoursPage.successPanel).toContainText(
+          `You have removed this opening hour for ${createdCourt.name}.`
+        );
+
+        await courtOpeningHoursPage.clickBackToOpeningHours();
+        await expect(courtOpeningHoursPage.openingHoursRow(openingHoursType)).toHaveCount(0);
+      });
     });
 
     test('renders validation errors for missing fields and invalid weekday times', async ({
