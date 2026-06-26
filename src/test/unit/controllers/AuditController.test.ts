@@ -303,6 +303,7 @@ describe('AuditController', () => {
       headersSent: false,
       render: () => '',
       status: () => response,
+      setHeader: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     const unlinkStub = stub(fs, 'unlink').callsFake((_path, callback) => callback(null));
@@ -336,6 +337,7 @@ describe('AuditController', () => {
       headersSent: false,
       render: () => '',
       status: () => response,
+      setHeader: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     stub(fs, 'unlink').callsFake((_path, callback) => callback(null));
@@ -391,6 +393,7 @@ describe('AuditController', () => {
       headersSent: true,
       render: () => '',
       status: () => response,
+      setHeader: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     const unlinkError = new Error('unlink failed');
