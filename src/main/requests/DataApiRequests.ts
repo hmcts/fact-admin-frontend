@@ -140,7 +140,7 @@ export class DataApiRequests {
    * Request to data API to create a court
    */
   public async createCourt(
-    court: Pick<CourtEntity, 'isServiceCentre' | 'name' | 'open' | 'regionId'>
+    court: Pick<CourtEntity, 'name' | 'open' | 'regionId'>
   ): Promise<CourtEntity | HttpStatusCode | Map<string, string>> {
     try {
       const response = await dataApi.post('/courts/v1', court);

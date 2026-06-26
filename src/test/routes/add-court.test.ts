@@ -41,7 +41,6 @@ describe('Add court page', () => {
     const court = {
       createdAt: '2026-06-10T10:00:00Z',
       id: '11111111-1111-4111-8111-111111111111',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-06-10T10:00:00Z',
       mrdId: null,
       name: 'Reading Crown Court',
@@ -62,7 +61,6 @@ describe('Add court page', () => {
     expect(response.status).toBe(200);
     expect(
       createCourtStub.calledWith({
-        isServiceCentre: false,
         name: court.name,
         open: false,
         regionId: court.regionId,
