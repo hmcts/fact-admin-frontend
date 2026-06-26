@@ -1863,10 +1863,7 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAuditSubjectOptionsMap();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
-      'Error fetching audit subject names:',
-      expect.anything()
-    );
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', expect.anything());
   });
 
   it('returns axios status and logs when audit subject options endpoint errors', async () => {
@@ -2067,7 +2064,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAuditById(auditId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith(`Error fetching audit details for id ${auditId}:`, notFoundError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      notFoundError
+    );
   });
 
   it('returns internal server error and logs when audit by id endpoint throws non-axios error', async () => {
@@ -2079,6 +2079,9 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAuditById(auditId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith(`Error fetching audit details for id ${auditId}:`, nonAxiosError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      nonAxiosError
+    );
   });
 });
