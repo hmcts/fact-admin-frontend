@@ -46,6 +46,9 @@ export class AccessibilityPage extends Base {
   async fillLiftDoorLimit(value: string): Promise<void> {
     await this.page.locator('#liftDoorLimit').fill(value);
   }
+  async fillAccessibleliftPhoneNumber(value: string): Promise<void> {
+    await this.page.locator('#liftSupportPhoneNumber').fill(value);
+  }
 
   async save(): Promise<void> {
     await this.saveButton.click();

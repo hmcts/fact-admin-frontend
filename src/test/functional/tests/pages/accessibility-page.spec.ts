@@ -24,6 +24,7 @@ test.describe('Accessibility Page Tests', () => {
       await accessibilityPage.selectYes('accessibleEntrance');
       await accessibilityPage.selectHearingOption('infraredAndHearingLoop');
       await accessibilityPage.selectNo('lift');
+      await accessibilityPage.fillAccessibleliftPhoneNumber('07405123123');
       await accessibilityPage.selectYes('quietRoom');
       await accessibilityPage.save();
 
