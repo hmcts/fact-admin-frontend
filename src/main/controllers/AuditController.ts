@@ -8,6 +8,7 @@ import moment from 'moment';
 
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit } from '../schemas/auditSchema';
+import { AuditFilterCategoriesService } from '../services/AuditFilterCategoriesService';
 import { AuditCsvFile, AuditListViewModel, AuditService } from '../services/AuditService';
 import {
   isUuid,
@@ -19,36 +20,16 @@ import {
   toMojDateString,
 } from '../utils/valueParsers';
 
-type FilterCategory = {
-  heading: { text: string };
-  items: { text: string; href: string }[];
-};
-
 const logger = Logger.getLogger('audit-controller');
 
 const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
 
 @route('/audits')
 export default class AuditController {
-  INCLUDED_CATEGORIES = new Set(['email', 'subjectType', 'courtId', 'serviceCentreId', 'toDate']);
-
-  CATEGORY_LABELS: Record<string, string> = {
-    email: 'Email address',
-    subjectType: 'Subject',
-    courtId: 'Subject',
-    serviceCentreId: 'Subject',
-    toDate: 'Between',
-  };
-
-  ITEM_LABELS: Record<string, string> = {
-    email: 'Email address',
-    subjectType: 'Type',
-    courtId: 'Court Name',
-    serviceCentreId: 'Service Centre Name',
-    toDate: 'To date',
-  };
-
-  constructor(private readonly auditService = new AuditService()) {}
+  constructor(
+    private readonly auditService = new AuditService(),
+    private readonly auditFilterCategoriesService = new AuditFilterCategoriesService()
+  ) {}
 
   @GET()
   public async renderAuditSearchPage(req: Request, res: Response): Promise<void> {
@@ -60,7 +41,7 @@ export default class AuditController {
     }
 
     this.transformForUI(viewModel);
-    const filterCategories = this.buildFilterCategories(viewModel.filters);
+    const filterCategories = this.auditFilterCategoriesService.buildFilterCategories(viewModel.filters);
     const downloadUrl = this.buildDownloadUrl(req.query);
     const basePagerUrl = this.buildPagerBaseUrl(viewModel.filters);
 
@@ -176,57 +157,6 @@ export default class AuditController {
         createdAt: formattedCreatedAt.isValid() ? formattedCreatedAt.format(UI_DATE_FORMAT) : audit.createdAt,
       };
     });
-  }
-
-  /**
-   * builds out the structure of the filter categories in the audit view filter sidebar.
-   * For each filter that is present in the query, we want to add it to a category and give it
-   * a unique label that, when clicked, will remove that portion of the filter.
-   *
-   * @param filters
-   * @private
-   */
-  private buildFilterCategories(filters: GetAuditsParams): FilterCategory[] {
-    const entries = Object.entries(filters).filter(
-      ([k, v]) => this.INCLUDED_CATEGORIES.has(k) && v && String(v).trim() !== ''
-    );
-
-    const grouped = new Map<string, { key: string; itemText: string }[]>();
-
-    for (const [key] of entries) {
-      const categoryLabel = this.CATEGORY_LABELS[key] ?? key;
-      const itemText =
-        key === 'subjectType'
-          ? `${this.ITEM_LABELS[key]} (${filters.subjectType?.replaceAll('_', ' ')})`
-          : (this.ITEM_LABELS[key] ?? categoryLabel);
-      const current = grouped.get(categoryLabel) ?? [];
-      current.push({ key, itemText });
-      grouped.set(categoryLabel, current);
-    }
-
-    const categories: FilterCategory[] = [];
-
-    for (const [categoryLabel, groupEntries] of grouped) {
-      const items = groupEntries.map(({ key, itemText }) => {
-        const params = new URLSearchParams(
-          Object.entries(filters)
-            .filter(([k, v]) => k !== key && v && String(v).trim() !== '')
-            .map(([k, v]) => [k, String(v)])
-        );
-
-        return {
-          text: itemText,
-          href: `/audits?${params.toString()}`,
-        };
-      });
-
-      categories.push({
-        heading: { text: categoryLabel },
-        items,
-      });
-    }
-
-    return categories;
   }
 
   /**
