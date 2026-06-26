@@ -5,7 +5,6 @@ describe('AddCourtService', () => {
   const createdCourt = {
     createdAt: '2026-06-10T10:00:00Z',
     id: '11111111-1111-4111-8111-111111111111',
-    isServiceCentre: false,
     lastUpdatedAt: '2026-06-10T10:00:00Z',
     mrdId: null,
     name: 'Reading Crown Court',
@@ -133,7 +132,6 @@ describe('AddCourtService', () => {
       pageTitle: `New court created - ${createdCourt.name}`,
     });
     expect(requests.createCourt).toHaveBeenCalledWith({
-      isServiceCentre: false,
       name: createdCourt.name,
       open: false,
       regionId: regions[0].id,
@@ -153,7 +151,6 @@ describe('AddCourtService', () => {
 
     expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
     expect(requests.createCourt).toHaveBeenCalledWith({
-      isServiceCentre: false,
       name: createdCourt.name,
       open: false,
       regionId: regions[0].id,
