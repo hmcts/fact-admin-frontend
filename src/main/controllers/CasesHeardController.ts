@@ -83,7 +83,7 @@ export default class CasesHeardController {
       return res.render('error');
     }
 
-    res.render('common-edit-success', {
+    return res.render('common-edit-success', {
       courtId: resolvedCourtId,
       pageTitle: `Cases heard saved - ${saveResult.viewModel.courtName}`,
       successPanelTitle: 'Cases heard saved',

@@ -60,7 +60,7 @@ describe('accessibilityValidationConfig.validate', () => {
       accessibleParkingPhoneNumber: 'abc',
       accessibleEntrance: false,
       accessibleEntrancePhoneNumber: '',
-      lift: false,
+      lift: true,
       quietRoom: true,
       accessibleToiletDescription: 'Ground floor',
       hearingEnhancementEquipment: 'hearingLoop',
@@ -70,6 +70,40 @@ describe('accessibilityValidationConfig.validate', () => {
       expect.objectContaining({
         accessibleParkingPhoneNumber: ['Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'],
         accessibleEntrancePhoneNumber: ['Enter a phone number for the accessible entrance'],
+      })
+    );
+  });
+
+  test('requires and validates lift support phone when lift is no', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: false,
+      liftSupportPhoneNumber: 'abc',
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'hearingLoop',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        liftSupportPhoneNumber: ['Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'],
+      })
+    );
+
+    const missingPhoneResult = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: false,
+      liftSupportPhoneNumber: '',
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'hearingLoop',
+    });
+
+    expect(missingPhoneResult).toEqual(
+      expect.objectContaining({
+        liftSupportPhoneNumber: ['Enter telephone number for organising support at court'],
       })
     );
   });

@@ -69,6 +69,7 @@ export const AccessibilityScheme = z.object({
   // Values come from form inputs as text and may be normalised later.
   liftDoorWidth: z.number().optional().nullable(),
   liftDoorLimit: z.number().optional().nullable(),
+  liftSupportPhoneNumber: z.string().optional().nullable(),
   quietRoom: z.boolean().optional(),
 });
 

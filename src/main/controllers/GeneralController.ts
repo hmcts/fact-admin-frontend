@@ -87,7 +87,7 @@ export default class GeneralController {
       return;
     }
 
-    res.render('common-edit-success', {
+    return res.render('common-edit-success', {
       courtId: resolvedCourtId,
       pageTitle: `General saved - ${updateResponse.name}`,
       successPanelTitle: 'General details saved',

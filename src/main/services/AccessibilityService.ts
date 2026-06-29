@@ -32,7 +32,10 @@ export class AccessibilityService {
     // validate for errors
     const validationErrors = validate(model);
     if (validationErrors) {
-      return { ...model, errors: validationErrors };
+      return {
+        ...model,
+        errors: validationErrors,
+      };
     }
 
     const payload: UpdateAccessibilityRequest = {
@@ -45,7 +48,7 @@ export class AccessibilityService {
       return result;
     }
 
-    // if it's a Map, it's [validation ]errors from the API
+    // if it's a Map, it's validation errors from the API
     if (result instanceof Map) {
       // convert the mapped errors into our expected error format
       const errors: Record<string, string[]> = {};

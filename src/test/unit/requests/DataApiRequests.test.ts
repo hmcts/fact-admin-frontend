@@ -118,7 +118,6 @@ describe('DataApiRequests', () => {
       content: [
         {
           id: '44444444-4444-4444-8444-444444444444',
-          isServiceCentre: false,
           lastUpdatedAt: '2026-04-29T10:00:00Z',
           name: 'London Civil and Family Court',
           open: true,
@@ -184,7 +183,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: courtId,
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'London Civil and Family Court',
@@ -231,7 +229,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: courtName,
@@ -287,7 +284,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -307,7 +303,6 @@ describe('DataApiRequests', () => {
 
   it('returns parsed court details when create court succeeds', async () => {
     const payload = {
-      isServiceCentre: false,
       name: 'Reading Crown Court',
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
@@ -315,7 +310,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: null,
       name: payload.name,
@@ -336,7 +330,6 @@ describe('DataApiRequests', () => {
 
   it('returns a validation map when create court returns a 400', async () => {
     const payload = {
-      isServiceCentre: false,
       name: 'Reading Crown Court',
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
@@ -360,7 +353,6 @@ describe('DataApiRequests', () => {
 
   it('returns status code when create court fails with non-400 axios error', async () => {
     const payload = {
-      isServiceCentre: false,
       name: 'Reading Crown Court',
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
@@ -383,7 +375,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -420,7 +411,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -449,7 +439,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',

@@ -30,7 +30,7 @@ export default class AccessibilityController {
       return res.render('error');
     }
 
-    res.render('accessibility-edit', {
+    return res.render('accessibility-edit', {
       courtId: resolvedCourtId,
       model,
       pageTitle: `Accessibility - ${model.name}`,
@@ -43,8 +43,7 @@ export default class AccessibilityController {
     const { courtId } = req.params;
     const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     const {
@@ -57,6 +56,7 @@ export default class AccessibilityController {
       lift,
       liftDoorWidth,
       liftDoorLimit,
+      liftSupportPhoneNumber,
       quietRoom,
     } = req.body as Record<string, unknown>;
 
@@ -70,7 +70,7 @@ export default class AccessibilityController {
       accessibleToiletDescription:
         typeof accessibleToiletDescription === 'string' ? accessibleToiletDescription : undefined,
       accessibleToiletDescriptionCy:
-        typeof accessibleToiletDescription === 'string' ? accessibleToiletDescription : undefined,
+        typeof accessibleToiletDescription === 'string' ? accessibleToiletDescription : undefined, //change me - welsh
       accessibleEntrance: parseBoolean(accessibleEntrance),
       accessibleEntrancePhoneNumber:
         typeof accessibleEntrancePhoneNumber === 'string' && parseBoolean(accessibleEntrance) === false
@@ -82,36 +82,36 @@ export default class AccessibilityController {
       lift: parseBoolean(lift),
       liftDoorWidth: parseBoolean(lift) === true ? parseLiftMetric(liftDoorWidth) : undefined,
       liftDoorLimit: parseBoolean(lift) === true ? parseLiftMetric(liftDoorLimit) : undefined,
+      liftSupportPhoneNumber:
+        typeof liftSupportPhoneNumber === 'string' && parseBoolean(lift) === false ? liftSupportPhoneNumber : undefined,
       quietRoom: parseBoolean(quietRoom),
     };
 
     const updateResponse = await accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
     if (updateResponse === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     if (typeof updateResponse === 'number') {
-      res.status(updateResponse);
-      return res.render('error');
+      return res.status(updateResponse).render('error');
     }
 
     if (updateResponse.errors) {
-      res.render('accessibility-edit', {
+      const updatedLiftDoorLimit = Number.isNaN(updateResponse.liftDoorLimit) ? liftDoorLimit : model.liftDoorLimit;
+      const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
+
+      return res.render('accessibility-edit', {
         courtId: resolvedCourtId,
-        model: updateResponse as AccessibilityModel,
+        model: { ...updateResponse, liftDoorWidth: updatedLiftDoorLimit, liftDoorLimit: updatedLiftDoorWidth },
         pageTitle: `Error: Accessibility - ${updateResponse.name}`,
       });
-      return;
     }
 
-    res.render('common-edit-success', {
+    return res.render('common-edit-success', {
       courtId: resolvedCourtId,
       pageTitle: `Accessibility saved - ${updateResponse.name}`,
       successPanelTitle: 'Accessibility details saved',
       successPanelBody: `Accessibility details saved for ${updateResponse.name}`,
-      //task: 'Accessibility',
-      // prefer the court name from the updated model
       courtName: updateResponse.name,
     });
   }

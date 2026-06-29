@@ -167,6 +167,7 @@ describe('AccessibilityController', () => {
         expect.objectContaining({
           accessibleParking: true,
           accessibleEntrance: false,
+          accessibleEntrancePhoneNumber: '01234567891',
           hearingEnhancementEquipment: 'infrared',
           lift: true,
           liftDoorWidth: NaN,
@@ -267,6 +268,34 @@ describe('AccessibilityController', () => {
 
       expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
       expect(res.render).toHaveBeenCalledWith('court-not-found');
+    });
+
+    it('includes lift support phone when lift is set to no', async () => {
+      saveMock.mockResolvedValueOnce({ name: 'Court A' });
+
+      const req = mockReq(
+        { courtId: '11111111-1111-1111-1111-111111111111' },
+        {
+          accessibleParking: 'true',
+          accessibleToiletDescription: 'Ground floor',
+          accessibleEntrance: 'true',
+          hearingEnhancementEquipment: 'infrared',
+          lift: 'false',
+          liftSupportPhoneNumber: '01234567891',
+          quietRoom: 'true',
+        }
+      );
+      const res = mockRes();
+
+      await controller.updateCourt(req, res);
+
+      expect(saveMock).toHaveBeenCalledWith(
+        req.params.courtId,
+        expect.objectContaining({
+          lift: false,
+          liftSupportPhoneNumber: '01234567891',
+        })
+      );
     });
   });
 });

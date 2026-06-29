@@ -35,9 +35,7 @@ export type TestCourtParams = {
   courtName: string;
   open?: boolean;
   regionId?: string;
-  serviceCenter?: boolean;
   withEnquiriesContact?: boolean;
-  withServiceAreaAssociation?: boolean;
   withTranslations?: boolean;
   forceFamilyCourt?: boolean;
 };
@@ -62,9 +60,7 @@ export async function createTestCourt(
     courtName,
     open = true,
     regionId,
-    serviceCenter = false,
     withEnquiriesContact = true,
-    withServiceAreaAssociation = false,
     withTranslations = true,
     forceFamilyCourt = false,
   }: TestCourtParams
@@ -73,9 +69,7 @@ export async function createTestCourt(
     addWarningNotice,
     courtName,
     open,
-    serviceCenter,
     withEnquiriesContact,
-    withServiceAreaAssociation,
     withTranslations,
     forceFamilyCourt,
     ...(regionId ? { regionId } : {}),

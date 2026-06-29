@@ -50,6 +50,7 @@
 {{ govukInput({
   id: "accessibleEntrancePhoneNumber",
   name: "accessibleEntrancePhoneNumber",
+  type: "tel",
   value: model.accessibleEntrancePhoneNumber,
   autoComplete: "tel",
   classes: "govuk-!-width-one-third",
@@ -62,13 +63,30 @@
 }) }}
 {% endset -%}
 
+{% set liftSupportBooking %}
+{{ govukInput({
+  id: "liftSupportPhoneNumber",
+  name: "liftSupportPhoneNumber",
+  type: "tel",
+  value: model.liftSupportPhoneNumber,
+  autoComplete: "tel",
+  classes: "govuk-!-width-one-third",
+  label: {
+    text: "Enter telephone number for organising support at court"
+  },
+  errorMessage: {
+    text: model.errors.liftSupportPhoneNumber[0]
+  } if model.errors and model.errors.liftSupportPhoneNumber else null
+}) }}
+{% endset -%}
+
 {% set liftDetails %}
 {{ govukInput({
   id: "liftDoorWidth",
   name: "liftDoorWidth",
   value: model.liftDoorWidth,
   label: {
-    text: "Enter the door width"
+    text: "Enter the door width in centimetres"
   },
   suffix: {
     text: "cm"
@@ -85,7 +103,7 @@
   name: "liftDoorLimit",
   value: model.liftDoorLimit,
   label: {
-    text: "Enter the door limit"
+    text: "Enter the weight limit in kilograms"
   },
   suffix: {
     text: "kg"
@@ -148,7 +166,7 @@
             text: "Where is the accessible toilet?"
           },
           hint: {
-            text: "For example available on the groud, first and third floors."
+            text: "For example, 'Available on the ground, first and third floors.'."
           },
           errorMessage: {
                       text: model.errors.accessibleToiletDescription[0]
@@ -191,7 +209,7 @@
             name: "hearingEnhancementEquipment",
             fieldset: {
               legend: {
-                 text: "what hearing enhancement equipment is available?"
+                 text: "What hearing enhancement equipment is available?"
                  }
               },
                   items: [
@@ -237,7 +255,10 @@
               {
               value: "false",
               text: "No",
-              checked: true if model.lift == false else false
+              checked: true if model.lift == false else false,
+              conditional: {
+                html: liftSupportBooking
+              }
               }
             ],
             errorMessage: {

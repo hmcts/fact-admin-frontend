@@ -29,16 +29,11 @@ test.describe(
     });
 
     test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Cases Heard Performance Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await casesHeardPage.goto(createdCourt.id);
-          await casesHeardPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+      await withCreatedCourt(playwright, 'Cases Heard Performance Test', {}, async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Translation and Interpretation Page Performance', async ({
@@ -49,7 +44,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.header.checkIsVisible();
@@ -62,7 +57,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressListPage.goto(createdCourt.id);
           await courtAddressListPage.header.checkIsVisible();
@@ -75,7 +70,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.header.checkIsVisible();
@@ -88,7 +83,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
           await courtAddressSelectPage.header.checkIsVisible();
@@ -103,16 +98,11 @@ test.describe(
         tag: '@performance',
       },
       async ({ generalPage, lighthouseUtils, playwright }) => {
-        await withCreatedCourt(
-          playwright,
-          'General Performance Test',
-          { serviceCenter: false },
-          async ({ createdCourt }) => {
-            await generalPage.goto(createdCourt.id);
-            await generalPage.header.checkIsVisible();
-            await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-          }
-        );
+        await withCreatedCourt(playwright, 'General Performance Test', {}, async ({ createdCourt }) => {
+          await generalPage.goto(createdCourt.id);
+          await generalPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        });
       }
     );
 
@@ -124,7 +114,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Information for Professionals Performance Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
           await professionalInformationPage.header.checkIsVisible();
@@ -142,7 +132,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Local Authorities Performance Test',
-        { serviceCenter: false, forceFamilyCourt: true },
+        { forceFamilyCourt: true },
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectAllCaseTypes();

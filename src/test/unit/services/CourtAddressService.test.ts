@@ -29,7 +29,6 @@ describe('CourtAddressService', () => {
   const buildCourt = (overrides: Partial<CourtEntity> = {}): CourtEntity => ({
     createdAt: '2026-06-10T10:00:00Z',
     id: courtId,
-    isServiceCentre: false,
     lastUpdatedAt: '2026-06-10T10:00:00Z',
     mrdId: null,
     name: 'Reading Crown Court',
