@@ -24,19 +24,19 @@ module "managed_redis" {
   persistence_rdb_backup_frequency   = "6h"
 }
 
-resource "azurerm_key_vault_secret" "redis_v6_host" {
+resource "azurerm_key_vault_secret" "managed_redis_host" {
   name         = "managed-redis-host"
   value        = module.managed_redis.hostname
   key_vault_id = data.azurerm_key_vault.app_kv.id
 }
 
-resource "azurerm_key_vault_secret" "redis_v6_port" {
+resource "azurerm_key_vault_secret" "managed_redis_port" {
   name         = "managed-redis-port"
   value        = module.managed_redis.port
   key_vault_id = data.azurerm_key_vault.app_kv.id
 }
 
-resource "azurerm_key_vault_secret" "redis_v6_access_key" {
+resource "azurerm_key_vault_secret" "managed_redis_access_key" {
   name         = "managed-redis-access-key"
   value        = module.managed_redis.primary_access_key
   key_vault_id = data.azurerm_key_vault.app_kv.id
