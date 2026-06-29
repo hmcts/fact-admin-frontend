@@ -11,7 +11,7 @@ test.describe('Court Contact Details Journey', () => {
       await withCreatedCourt(
         playwright,
         'Court Contact Details Smoke',
-        { serviceCenter: false },
+        {  },
         async ({ createdCourt }) => {
           await courtContactDetailsPage.goto(createdCourt.id);
 
@@ -27,7 +27,7 @@ test.describe('Court Contact Details Journey', () => {
     await withCreatedCourt(
       playwright,
       'Court Contact Details Journey',
-      { serviceCenter: false },
+      {  },
       async ({ createdCourt }) => {
         const uniqueSuffix = Date.now();
         const contactEmail = `contact-${uniqueSuffix}@example.test`;

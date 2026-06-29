@@ -147,77 +147,57 @@ test.describe(
     });
 
     test('Court Contact List Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Contact List Performance Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await courtContactDetailsPage.goto(createdCourt.id);
-          await courtContactDetailsPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+      await withCreatedCourt(playwright, 'Court Contact List Performance Test', {}, async ({ createdCourt }) => {
+        await courtContactDetailsPage.goto(createdCourt.id);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Court Contact Add Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Contact Add Performance Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await courtContactDetailsPage.gotoAdd(createdCourt.id);
-          await courtContactDetailsPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+      await withCreatedCourt(playwright, 'Court Contact Add Performance Test', {}, async ({ createdCourt }) => {
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Court Contact Edit Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Contact Edit Performance Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          const uniqueSuffix = Date.now();
-          const contactEmail = `perf-contact-${uniqueSuffix}@example.test`;
+      await withCreatedCourt(playwright, 'Court Contact Edit Performance Test', {}, async ({ createdCourt }) => {
+        const uniqueSuffix = Date.now();
+        const contactEmail = `perf-contact-${uniqueSuffix}@example.test`;
 
-          await courtContactDetailsPage.gotoAdd(createdCourt.id);
-          await courtContactDetailsPage.selectFirstAvailableContactType();
-          await courtContactDetailsPage.emailCheckbox.check();
-          await courtContactDetailsPage.emailInput.fill(contactEmail);
-          await courtContactDetailsPage.explanationInput.fill('Performance edit test contact');
-          await courtContactDetailsPage.save();
-          await courtContactDetailsPage.continueUpdatingLink.click();
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.selectFirstAvailableContactType();
+        await courtContactDetailsPage.emailCheckbox.check();
+        await courtContactDetailsPage.emailInput.fill(contactEmail);
+        await courtContactDetailsPage.explanationInput.fill('Performance edit test contact');
+        await courtContactDetailsPage.save();
+        await courtContactDetailsPage.continueUpdatingLink.click();
 
-          await courtContactDetailsPage.clickEditForRowText(contactEmail);
-          await courtContactDetailsPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+        await courtContactDetailsPage.clickEditForRowText(contactEmail);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Court Contact Delete Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Court Contact Delete Performance Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          const uniqueSuffix = Date.now();
-          const contactEmail = `perf-delete-${uniqueSuffix}@example.test`;
+      await withCreatedCourt(playwright, 'Court Contact Delete Performance Test', {}, async ({ createdCourt }) => {
+        const uniqueSuffix = Date.now();
+        const contactEmail = `perf-delete-${uniqueSuffix}@example.test`;
 
-          await courtContactDetailsPage.gotoAdd(createdCourt.id);
-          await courtContactDetailsPage.selectFirstAvailableContactType();
-          await courtContactDetailsPage.emailCheckbox.check();
-          await courtContactDetailsPage.emailInput.fill(contactEmail);
-          await courtContactDetailsPage.explanationInput.fill('Performance delete test contact');
-          await courtContactDetailsPage.save();
-          await courtContactDetailsPage.continueUpdatingLink.click();
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.selectFirstAvailableContactType();
+        await courtContactDetailsPage.emailCheckbox.check();
+        await courtContactDetailsPage.emailInput.fill(contactEmail);
+        await courtContactDetailsPage.explanationInput.fill('Performance delete test contact');
+        await courtContactDetailsPage.save();
+        await courtContactDetailsPage.continueUpdatingLink.click();
 
-          await courtContactDetailsPage.clickDeleteForRowText(contactEmail);
-          await courtContactDetailsPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+        await courtContactDetailsPage.clickDeleteForRowText(contactEmail);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
   }
 );
