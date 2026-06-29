@@ -32,11 +32,11 @@ export class HomePage extends Base {
     this.clearFiltersButton = this.page.getByRole('button', { name: 'Clear filters' });
     this.downloadNavigationLink = this.page.getByRole('link', { name: 'Download csv' });
     this.includeClosedCheckbox = this.page.getByLabel('Include closed');
-    this.noResultsMessage = this.page.getByText('No courts match the current filters.');
+    this.noResultsMessage = this.page.getByText('No locations match the current filters.');
     this.regionSelect = this.page.getByLabel('Region');
     this.paginationNextLink = this.page.getByRole('link', { name: 'Next' });
     this.paginationPreviousLink = this.page.getByRole('link', { name: 'Previous' });
-    this.partialCourtNameInput = this.page.getByLabel('Search courts and tribunals');
+    this.partialCourtNameInput = this.page.getByLabel('Search locations');
     this.resultsMessage = this.page.locator('#main-content .govuk-body').first();
     this.statusColumnHeader = this.page.getByRole('columnheader', { name: 'Status' });
     this.tableHeaders = this.page.locator('table.homepage-courts-table thead th');

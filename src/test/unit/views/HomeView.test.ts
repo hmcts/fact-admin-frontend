@@ -17,7 +17,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
-      pageTitle: 'Courts and tribunals',
+      pageTitle: 'Locations',
       pagination: {
         currentPage: 0,
         items: [],
@@ -25,21 +25,21 @@ describe('Home View', () => {
       },
       partialCourtNameError: undefined,
       regionOptions: [{ selected: true, text: 'All regions', value: '' }],
-      resultsMessage: 'No courts found.',
+      resultsMessage: 'No locations found.',
     });
 
-    expect(html).toContain('Courts and tribunals');
+    expect(html).toContain('Locations');
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
-    expect(html).toContain('No courts found.');
-    expect(html).toContain('No courts match the current filters.');
+    expect(html).toContain('No locations found.');
+    expect(html).toContain('No locations match the current filters.');
   });
 
   test('renders error summary and pagination when provided', () => {
     const html = env.render('home.njk', {
       courtTableHead: [{ text: 'Name' }, { text: 'Actions' }],
       courtTableRows: [[{ text: 'Reading Crown Court' }, { text: 'Edit' }]],
-      errorMessage: 'There was a problem loading courts.',
+      errorMessage: 'There was a problem loading locations.',
       errorSummary: [{ href: '#partialCourtName', text: 'Enter a court name' }],
       filters: {
         includeClosed: false,
@@ -52,7 +52,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
-      pageTitle: 'Courts and tribunals',
+      pageTitle: 'Locations',
       pagination: {
         currentPage: 0,
         items: [
@@ -64,12 +64,12 @@ describe('Home View', () => {
       },
       partialCourtNameError: 'Enter a court name',
       regionOptions: [{ selected: true, text: 'All regions', value: '' }],
-      resultsMessage: 'Showing 1 to 1 of 1 courts',
+      resultsMessage: 'Showing 1 to 1 of 1 locations',
     });
 
     expect(html).toContain('There is a problem');
     expect(html).toContain('Enter a court name');
-    expect(html).toContain('There was a problem loading courts.');
+    expect(html).toContain('There was a problem loading locations.');
     expect(html).toContain('href="/?pageNumber=1"');
   });
 });

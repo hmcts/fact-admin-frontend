@@ -38,10 +38,10 @@ describe('HomeController', () => {
         items: [],
         totalPages: 0,
       },
-      pageTitle: 'Courts and tribunals',
+      pageTitle: 'Locations',
       partialCourtNameError: undefined,
       regionOptions: [],
-      resultsMessage: 'No courts found.',
+      resultsMessage: 'No locations found.',
     };
     const getFiltersStub = stub(HomePageService.prototype, 'getFilters').returns(filters);
     const getHomePageViewModelStub = stub(HomePageService.prototype, 'getHomePageViewModel').resolves(viewModel);

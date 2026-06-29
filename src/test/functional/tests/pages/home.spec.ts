@@ -45,13 +45,13 @@ test.describe(
         tag: '@smoke',
       },
       async ({ homePage }) => {
-        await expect(homePage.heading).toContainText('Courts and tribunals');
+        await expect(homePage.heading).toContainText('Locations');
       }
     );
 
     test('visibility test', async ({ homePage }) => {
       await homePage.expectVisibleElements();
-      await expect(homePage.heading).toContainText('Courts and tribunals');
+      await expect(homePage.heading).toContainText('Locations');
       await homePage.header.expectNavigationLink('Courts');
       await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
@@ -113,7 +113,7 @@ test.describe(
     test('shows a no results message when no courts match the filter', async ({ homePage }) => {
       await homePage.searchForCourt(`No Matching Court ${generateRandomSuffix()}`);
 
-      await expect(homePage.resultsMessage).toContainText('No courts found.');
+      await expect(homePage.resultsMessage).toContainText('No locations found.');
       await expect(homePage.noResultsMessage).toBeVisible();
     });
 
