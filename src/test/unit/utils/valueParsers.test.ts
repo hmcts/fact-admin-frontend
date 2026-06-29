@@ -1,4 +1,11 @@
-import { addFoodAndDrink, mapFoodAndDrink, parseBoolean, toUkDateTimeString } from '../../../main/utils/valueParsers';
+import {
+  addFoodAndDrink,
+  mapFoodAndDrink,
+  parseBoolean,
+  parseOptionalString,
+  parseString,
+  toUkDateTimeString,
+} from '../../../main/utils/valueParsers';
 
 describe('valueParsers', () => {
   describe('mapFoodAndDrink', () => {
@@ -85,6 +92,36 @@ describe('valueParsers', () => {
       expect(parseBoolean(1)).toBeUndefined();
       expect(parseBoolean(undefined)).toBeUndefined();
       expect(parseBoolean(null)).toBeUndefined();
+    });
+  });
+
+  describe('parseString', () => {
+    test('returns string values directly', () => {
+      expect(parseString('court-id')).toBe('court-id');
+    });
+
+    test('returns the first string when value is an array', () => {
+      expect(parseString(['first', 'second'])).toBe('first');
+    });
+
+    test('returns an empty string when no string value is available', () => {
+      expect(parseString(undefined)).toBe('');
+      expect(parseString([1, false])).toBe('');
+    });
+  });
+
+  describe('parseOptionalString', () => {
+    test('returns string values directly', () => {
+      expect(parseOptionalString('yes')).toBe('yes');
+    });
+
+    test('returns the first string when value is an array', () => {
+      expect(parseOptionalString([1, 'yes', 'no'])).toBe('yes');
+    });
+
+    test('returns undefined when no string value is available', () => {
+      expect(parseOptionalString(undefined)).toBeUndefined();
+      expect(parseOptionalString([1, false])).toBeUndefined();
     });
   });
 

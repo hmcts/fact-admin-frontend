@@ -175,6 +175,35 @@ test.describe(
       );
     });
 
+    test('Court Opening Hours List Page Accessibility', async ({ axeUtils, courtOpeningHoursPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Opening Hours Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtOpeningHoursPage.goto(createdCourt.id);
+        await courtOpeningHoursPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Opening Hours Validation Accessibility', async ({ axeUtils, courtOpeningHoursPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Opening Hours Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtOpeningHoursPage.gotoAdd(createdCourt.id);
+        await courtOpeningHoursPage.save();
+        await expect(courtOpeningHoursPage.mainContent.content).toContainText('There is a problem');
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Opening Hours Success Page Accessibility', async ({ axeUtils, courtOpeningHoursPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Opening Hours Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtOpeningHoursPage.gotoAdd(createdCourt.id);
+        await courtOpeningHoursPage.selectOpeningHoursType('Court open');
+        await courtOpeningHoursPage.selectSameTime();
+        await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
+        await courtOpeningHoursPage.save();
+        await courtOpeningHoursPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
+    });
+
     test('Local Authorities Page Accessibility', async ({ axeUtils, localAuthoritiesPage, playwright }) => {
       await withCreatedCourt(playwright, 'Local Authorities Accessibility Test', {}, async ({ createdCourt }) => {
         await localAuthoritiesPage.goto(createdCourt.id);
