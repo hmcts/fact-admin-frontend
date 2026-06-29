@@ -17,7 +17,15 @@ export function parseString(value: unknown): string {
  * Parses an optional string-like value.
  */
 export function parseOptionalString(value: unknown): string | undefined {
-  return typeof value === 'string' ? value : undefined;
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.find((entry): entry is string => typeof entry === 'string');
+  }
+
+  return undefined;
 }
 
 /**

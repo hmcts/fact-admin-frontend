@@ -1,0 +1,74 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro rowActions(items) %}
+  <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">
+    {% for item in items %}
+      <li class="govuk-summary-list__actions-list-item">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% set openingHoursTableRows = [] %}
+  {% for item in openingHours %}
+    {% set openingHoursTableRows = (openingHoursTableRows.push([
+      {
+        text: item.openingHourType
+      },
+      {
+        html: item.hours
+      },
+      {
+        html: rowActions([
+          {
+            href: "/courts/" + courtId + "/edit/court-opening-hours/edit/" + item.id,
+            text: "Edit"
+          },
+          {
+            href: "/courts/" + courtId + "/edit/court-opening-hours/delete/" + item.id,
+            text: "Delete"
+          }
+        ])
+      }
+    ]), openingHoursTableRows) %}
+  {% endfor %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Court opening hours</h1>
+
+      {% if openingHoursTableRows.length %}
+        {{ govukTable({
+          firstCellIsHeader: false,
+          head: [
+            {
+              text: "Opening hours type"
+            },
+            {
+              text: "Hours"
+            },
+            {
+              text: "Actions"
+            }
+          ],
+          rows: openingHoursTableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">No opening hours are currently configured.</p>
+      {% endif %}
+
+      {{ govukButton({
+        text: "Add opening hours",
+        href: "/courts/" + courtId + "/edit/court-opening-hours/add"
+      }) }}
+    </div>
+  </div>
+{% endblock %}
