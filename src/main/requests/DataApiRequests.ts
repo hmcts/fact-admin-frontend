@@ -431,6 +431,8 @@ export class DataApiRequests {
         : HttpStatusCode.InternalServerError;
     }
   }
+
+  /**
    * Request to data API to retrieve opening hour types
    */
   public async getOpeningHourTypes(): Promise<OpeningHourType[] | HttpStatusCode> {
