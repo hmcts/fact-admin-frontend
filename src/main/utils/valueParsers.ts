@@ -10,14 +10,24 @@ export function parseNumber(value: unknown, fallback: number): number {
  * Parses a required string-like value, returning an empty string when absent.
  */
 export function parseString(value: unknown): string {
-  return typeof value === 'string' ? value : '';
+  const parsed = parseOptionalString(value);
+
+  return parsed ?? '';
 }
 
 /**
  * Parses an optional string-like value.
  */
 export function parseOptionalString(value: unknown): string | undefined {
-  return typeof value === 'string' ? value : undefined;
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.find((entry): entry is string => typeof entry === 'string');
+  }
+
+  return undefined;
 }
 
 /**

@@ -4,6 +4,7 @@ import { DataApiRequests } from '../requests/DataApiRequests';
 import { AreaOfLawType } from '../schemas/areaOfLawSchema';
 import { CourtType } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType } from '../schemas/localAuthorityTypeSchema';
+import { OpeningHourType } from '../schemas/openingHoursSchema';
 
 const dataApiRequests = new DataApiRequests();
 
@@ -16,6 +17,10 @@ export class TypesService {
 
   public async listCourtTypes(): Promise<CourtType[] | HttpStatusCode> {
     return dataApiRequests.getCourtTypes();
+  }
+
+  public async listOpeningHourTypes(): Promise<OpeningHourType[] | HttpStatusCode> {
+    return dataApiRequests.getOpeningHourTypes();
   }
 
   public async listLocalAuthorities(): Promise<LocalAuthorityType[] | HttpStatusCode> {
