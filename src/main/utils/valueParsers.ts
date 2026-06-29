@@ -10,7 +10,9 @@ export function parseNumber(value: unknown, fallback: number): number {
  * Parses a required string-like value, returning an empty string when absent.
  */
 export function parseString(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : '';
+  const parsed = parseOptionalString(value);
+
+  return parsed ? parsed.trim() : '';
 }
 
 /**
