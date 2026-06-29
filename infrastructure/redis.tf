@@ -12,6 +12,7 @@ module "managed_redis" {
   env         = var.env
   location    = var.location
   common_tags = var.common_tags
+  existing_resource_group_name = "fact-${var.env}"
 
   sku_name = var.managed_redis_sku_name
 
