@@ -1,9 +1,4 @@
-import {
-  parseBoolean,
-  parseLiftMetric,
-  parseOptionalString,
-  parseString,
-} from '../../../main/utils/valueParsers';
+import { parseBoolean, parseLiftMetric, parseOptionalString, parseString } from '../../../main/utils/valueParsers';
 
 describe('valueParsers', () => {
   describe('parseBoolean', () => {
