@@ -1,7 +1,10 @@
+import moment from 'moment-timezone';
+
 import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
 import { FacilityModel } from '../services/BuildingFacilitiesService';
 
 const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
+const UK_TIME_ZONE = 'Europe/London';
 
 /**
  * Parses an integer-like value, falling back when the value is invalid.
@@ -111,4 +114,15 @@ export function parseDate(value: string | undefined): Date {
     }
   }
   return new Date(Number.NaN);
+}
+
+/**
+ * Converts an ISO-8601 UTC date-time string into UK local time
+ * (Europe/London), preserving milliseconds in output.
+ *
+ * Returns the original value when parsing fails.
+ */
+export function toUkDateTimeString(value: string, format = 'DD/MM/YYYY HH:mm:ss.SSS'): string {
+  const parsedUtc = moment.utc(value, moment.ISO_8601, true);
+  return parsedUtc.isValid() ? parsedUtc.tz(UK_TIME_ZONE).format(format) : value;
 }

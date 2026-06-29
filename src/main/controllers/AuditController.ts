@@ -4,7 +4,6 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { GET, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-import moment from 'moment';
 
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit } from '../schemas/auditSchema';
@@ -18,6 +17,7 @@ import {
   parseString,
   toJsDateString,
   toMojDateString,
+  toUkDateTimeString,
 } from '../utils/valueParsers';
 
 const logger = Logger.getLogger('audit-controller');
@@ -96,8 +96,7 @@ export default class AuditController {
     }
 
     // fix the date for view
-    const formattedCreatedAt = moment.utc(audit.createdAt, moment.ISO_8601, true);
-    audit.createdAt = formattedCreatedAt.isValid() ? formattedCreatedAt.format(UI_DATE_FORMAT) : audit.createdAt;
+    audit.createdAt = toUkDateTimeString(audit.createdAt, UI_DATE_FORMAT);
 
     res.render('audit-detail', {
       audit,
@@ -152,13 +151,10 @@ export default class AuditController {
     viewModel.filters.pageNumber = viewModel.filters.pageNumber + 1 || 1;
     viewModel.audits.page.number = viewModel.filters.pageNumber;
 
-    viewModel.audits.content = viewModel.audits.content.map(audit => {
-      const formattedCreatedAt = moment.utc(audit.createdAt, moment.ISO_8601, true);
-      return {
-        ...audit,
-        createdAt: formattedCreatedAt.isValid() ? formattedCreatedAt.format(UI_DATE_FORMAT) : audit.createdAt,
-      };
-    });
+    viewModel.audits.content = viewModel.audits.content.map(audit => ({
+      ...audit,
+      createdAt: toUkDateTimeString(audit.createdAt, UI_DATE_FORMAT),
+    }));
   }
 
   /**

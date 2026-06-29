@@ -72,6 +72,7 @@
     "@types/govuk-frontend": "^5.11.0",
     "@types/jest": "^30.0.0",
     "@types/lodash": "4.17.24",
+    "@types/moment-timezone": "^0.5.30",
     "@types/node": "22.20.0",
     "@types/nunjucks": "3.2.6",
     "@types/pa11y": "^5.3.7",

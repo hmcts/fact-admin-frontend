@@ -5132,6 +5132,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/moment-timezone@npm:^0.5.30":
+  version: 0.5.30
+  resolution: "@types/moment-timezone@npm:0.5.30"
+  dependencies:
+    moment-timezone: "npm:*"
+  checksum: 10/488b5880b346101f15e3f90267eb8d848ce20a41ea8b51305b1fee25f4fac57b93d553dc0de6f2eb8412be764bd74c9c347ed678c9a6d20d800a06c106b674f9
+  languageName: node
+  linkType: hard
+
 "@types/mysql@npm:2.15.26":
   version: 2.15.26
   resolution: "@types/mysql@npm:2.15.26"
@@ -9853,6 +9862,7 @@ __metadata:
     "@types/govuk-frontend": "npm:^5.11.0"
     "@types/jest": "npm:^30.0.0"
     "@types/lodash": "npm:4.17.24"
+    "@types/moment-timezone": "npm:^0.5.30"
     "@types/node": "npm:22.20.0"
     "@types/nunjucks": "npm:3.2.6"
     "@types/pa11y": "npm:^5.3.7"
@@ -13889,6 +13899,15 @@ __metadata:
   version: 1.0.4
   resolution: "module-details-from-path@npm:1.0.4"
   checksum: 10/2ebfada5358492f6ab496b70f70a1042f2ee7a4c79d29467f59ed6704f741fb4461d7cecb5082144ed39a05fec4d19e9ff38b731c76228151be97227240a05b2
+  languageName: node
+  linkType: hard
+
+"moment-timezone@npm:*":
+  version: 0.6.2
+  resolution: "moment-timezone@npm:0.6.2"
+  dependencies:
+    moment: "npm:^2.29.4"
+  checksum: 10/021f908742a392ff7234b3814fb20c786cb086d0fa3f98a58f6810181c71a305244e908e913d8bd6750c4a7e09300eda2c869cd77ef0b3f83e58028fa75f84de
   languageName: node
   linkType: hard
 

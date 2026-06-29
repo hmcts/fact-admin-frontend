@@ -305,7 +305,9 @@
             rows: auditTableRows
           }) }}
 
-         {{ createPager(basePagerUrl, audits.page) }}
+          {%- if audits.page.totalPages > 1 %}
+            {{ createPager(basePagerUrl, audits.page) }}
+          {% endif -%}
 
         {% else %}
           {% if errors %}
