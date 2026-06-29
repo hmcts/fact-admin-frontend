@@ -319,11 +319,14 @@ export class DataApiRequests {
   public async createCourtContactDetail(
     courtId: string,
     payload: SaveCourtContactDetailRequest
-  ): Promise<HttpStatusCode> {
+  ): Promise<HttpStatusCode | Map<string, string>> {
     try {
       const response = await dataApi.post(`/courts/${courtId}/v1/contact-details`, payload);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
       logger.error('Error creating court contact detail:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
@@ -338,11 +341,14 @@ export class DataApiRequests {
     courtId: string,
     contactDetailId: string,
     payload: SaveCourtContactDetailRequest
-  ): Promise<HttpStatusCode> {
+  ): Promise<HttpStatusCode | Map<string, string>> {
     try {
       const response = await dataApi.put(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
       logger.error('Error updating court contact detail:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
@@ -423,7 +429,9 @@ export class DataApiRequests {
   public async getContactDescriptionTypes(): Promise<ContactDescriptionType[] | HttpStatusCode> {
     try {
       const response = await dataApi.get('/types/v1/contact-description-types');
-      return contactDescriptionTypeListSchema.parse(response.data);
+      return contactDescriptionTypeListSchema
+        .parse(response.data)
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
     } catch (error: unknown) {
       logger.error('Error fetching contact description type details:', error);
       return isAxiosError(error) && error.response?.status

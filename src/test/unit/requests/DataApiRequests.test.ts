@@ -1568,12 +1568,12 @@ describe('DataApiRequests', () => {
   it('returns parsed contact description types when response is valid', async () => {
     const contactDescriptionTypes = [
       {
-        id: '11111111-1111-4111-8111-111111111111',
-        name: 'General enquiries',
-      },
-      {
         id: '22222222-2222-4222-8222-222222222222',
         name: 'Listing enquiries',
+      },
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
       },
     ];
 
@@ -1581,7 +1581,16 @@ describe('DataApiRequests', () => {
 
     const response = await dataApiRequests.getContactDescriptionTypes();
 
-    expect(response).toEqual(contactDescriptionTypes);
+    expect(response).toEqual([
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
+      },
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Listing enquiries',
+      },
+    ]);
   });
 
   it('returns internal server error when contact description types response fails schema validation', async () => {

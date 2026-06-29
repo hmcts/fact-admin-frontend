@@ -20,6 +20,7 @@ export type CourtContactValidationError = {
 
 export type CourtContactFormErrors = {
   contactEmail?: string;
+  contactExplanation?: string;
   contactMethods?: string;
   contactTelephone?: string;
   contactType?: string;
@@ -75,6 +76,11 @@ export type CourtContactFormViewModel = {
   formHeading: CourtContactFormHeading;
   formValues: CourtContactFormValues;
   pageTitle: string;
+};
+
+type ApiValidationMapping = {
+  formField: keyof CourtContactFormErrors;
+  href: string;
 };
 
 const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
@@ -235,7 +241,7 @@ export class CourtContactService {
     courtId: string,
     payload: SaveCourtContactDetailRequest,
     contactDetailId?: string
-  ): Promise<HttpStatusCode> {
+  ): Promise<HttpStatusCode | Map<string, string>> {
     if (contactDetailId) {
       return dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
     }
@@ -262,6 +268,33 @@ export class CourtContactService {
     }
 
     const saveResult = await this.saveContactDetail(options.courtId, submission.payload, options.contactDetailId);
+    if (saveResult instanceof Map) {
+      const contactDescriptionTypeItems = await this.getContactDescriptionTypeItems(submission.selectedContactTypeId);
+      if (typeof contactDescriptionTypeItems === 'number') {
+        return {
+          status: contactDescriptionTypeItems,
+          type: 'save-error',
+        };
+      }
+
+      const backendErrors = this.mapApiValidationErrors(saveResult);
+      return {
+        formViewModel: this.buildValidationFormViewModel(
+          options,
+          {
+            ...submission,
+            errorSummary: backendErrors.errorSummary,
+            formErrors: {
+              ...submission.formErrors,
+              ...backendErrors.formErrors,
+            },
+          },
+          contactDescriptionTypeItems
+        ),
+        type: 'validation-error',
+      };
+    }
+
     const saveErrorOutcome = this.toSaveErrorOutcome(saveResult);
     if (saveErrorOutcome) {
       return saveErrorOutcome;
@@ -356,5 +389,32 @@ export class CourtContactService {
     }
 
     return undefined;
+  }
+
+  private mapApiValidationErrors(apiErrors: Map<string, string>): {
+    errorSummary: CourtContactValidationError[];
+    formErrors: CourtContactFormErrors;
+  } {
+    const formErrors: CourtContactFormErrors = {};
+    const errorSummary: CourtContactValidationError[] = [];
+    const fieldMappings: Record<string, ApiValidationMapping> = {
+      courtContactDescriptionId: { formField: 'contactType', href: '#contact-type' },
+      email: { formField: 'contactEmail', href: '#contact-email' },
+      phoneNumber: { formField: 'contactTelephone', href: '#contact-telephone' },
+      explanation: { formField: 'contactExplanation', href: '#contact-explanation' },
+    };
+
+    for (const [field, message] of apiErrors.entries()) {
+      const mapping = fieldMappings[field];
+      if (!mapping) {
+        errorSummary.push({ href: '#main-content', text: '' });
+        continue;
+      }
+
+      formErrors[mapping.formField] = message;
+      errorSummary.push({ href: mapping.href, text: message });
+    }
+
+    return { errorSummary, formErrors };
   }
 }

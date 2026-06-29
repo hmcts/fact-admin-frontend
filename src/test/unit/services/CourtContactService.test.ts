@@ -87,6 +87,38 @@ describe('CourtContactService submitContactDetailFlow', () => {
     });
   });
 
+  test('returns validation-error when backend returns validation map', async () => {
+    const createCourtContactDetailSpy = jest
+      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .mockResolvedValue(new Map([['email', 'Email already exists']]) as never);
+    jest
+      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
+
+    const result = await new CourtContactService().submitContactDetailFlow({
+      body: {
+        'contact-email': 'enquiries@example.test',
+        'contact-methods': ['email'],
+        'contact-type': contactTypeId,
+      },
+      courtId,
+      courtName: 'Reading Crown Court',
+      formAction: `/courts/${courtId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.formViewModel.formErrors).toMatchObject({
+      contactEmail: 'Email already exists',
+    });
+    expect(result.formViewModel.errorSummary).toEqual([{ href: '#contact-email', text: 'Email already exists' }]);
+    expect(createCourtContactDetailSpy).toHaveBeenCalledTimes(1);
+  });
+
   test('returns saved with resolved contact type name when save succeeds', async () => {
     const updateCourtContactDetailSpy = jest
       .spyOn(DataApiRequests.prototype, 'updateCourtContactDetail')
