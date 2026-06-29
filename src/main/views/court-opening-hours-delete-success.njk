@@ -1,0 +1,16 @@
+{% extends "template.njk" %}
+{% from "macros/common-components.njk" import successPanel %}
+
+{% block pageTitle %}
+  Opening hours deleted
+{% endblock %}
+
+{% block content %}
+  {{ successPanel("Opening hours deleted: " + openingHourType + ".", "You have removed this opening hour for " + courtName + ".") }}
+
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a href="/courts/{{ courtId }}/edit/court-opening-hours" class="govuk-link govuk-link--no-visited-state">Back to opening hours</a></li>
+    <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
+  </ul>
+{% endblock %}

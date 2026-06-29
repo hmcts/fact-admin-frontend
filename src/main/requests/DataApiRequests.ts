@@ -20,6 +20,13 @@ import {
 } from '../schemas/courtProfessionalInformationSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
+import {
+  CourtOpeningHours,
+  OpeningHourType,
+  courtOpeningHoursListSchema,
+  courtOpeningHoursSchema,
+  openingHourTypeListSchema,
+} from '../schemas/openingHoursSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
@@ -328,6 +335,99 @@ export class DataApiRequests {
       return courtTypeListSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching court type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve opening hour types
+   */
+  public async getOpeningHourTypes(): Promise<OpeningHourType[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/types/v1/opening-hours-types');
+      return openingHourTypeListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching opening hour type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve court opening hours by court id
+   */
+  public async getCourtOpeningHours(courtId: string): Promise<CourtOpeningHours[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours`);
+
+      if (response.status === HttpStatusCode.NoContent) {
+        return HttpStatusCode.NoContent;
+      }
+
+      return courtOpeningHoursListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court opening hours for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve a court opening hours record by id
+   */
+  public async getCourtOpeningHoursById(
+    courtId: string,
+    openingHoursId: string
+  ): Promise<CourtOpeningHours | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`);
+      return courtOpeningHoursSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching opening hours ${openingHoursId} for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create or update court opening hours
+   */
+  public async saveCourtOpeningHours(
+    courtId: string,
+    payload: Partial<CourtOpeningHours>
+  ): Promise<CourtOpeningHours | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.put(`/courts/${courtId}/v1/opening-hours`, payload);
+      if (response.status >= HttpStatusCode.Ok && response.status < HttpStatusCode.MultipleChoices && !response.data) {
+        return response.status as HttpStatusCode;
+      }
+
+      return courtOpeningHoursSchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error(`Error saving opening hours for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to delete court opening hours
+   */
+  public async deleteCourtOpeningHours(courtId: string, openingHoursId: string): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.delete(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      logger.error(`Error deleting opening hours ${openingHoursId} for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
