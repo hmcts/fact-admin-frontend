@@ -7,12 +7,12 @@ data "azurerm_subnet" "core_infra_redis_subnet" {
 module "managed_redis" {
   source = "git@github.com:hmcts/terraform-module-azure-managed-redis?ref=main"
 
-  product                      = var.product
-  component                    = var.component
-  env                          = var.env
-  location                     = var.location
-  common_tags                  = var.common_tags
-  existing_resource_group_name = "fact-${var.env}"
+  product     = var.product
+  component   = var.component
+  env         = var.env
+  location    = var.location
+  common_tags = var.common_tags
+  name        = "${var.product}-${var.component}-redis-${var.env}"
 
   sku_name = var.managed_redis_sku_name
 
