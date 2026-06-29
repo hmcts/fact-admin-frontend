@@ -12,11 +12,11 @@ nodejs:
       secrets:
         - name: session-secret
           alias: SESSION_SECRET
-        - name: REDIS-V6-HOST
+        - name: managed-redis-host
           alias: REDIS_HOST
-        - name: REDIS-V6-PASSWORD
+        - name: managed-redis-access-key
           alias: REDIS_PASSWORD
-        - name: REDIS-V6-PORT
+        - name: managed-redis-port
           alias: REDIS_PORT
         - name: bstrap-sso-client-id
           alias: SSO_APP_REG_ID
@@ -33,6 +33,6 @@ nodejs:
         - name: api-app-reg-id
           alias: API_APP_REG_ID
   environment:
-    DATA_API_URL: 'https://fact-data-api-pr-266.preview.platform.hmcts.net'
-    PUBLIC_FRONTEND_URL: 'https://fact-public-frontend-pr-176.preview.platform.hmcts.net/' # Override in Flux for Prod
+    DATA_API_URL: 'https://fact-data-api.{{ .Values.global.environment }}.platform.hmcts.net'
+    PUBLIC_FRONTEND_URL: 'https://fact-public-frontend.{{ .Values.global.environment }}.platform.hmcts.net' # Override in Flux for Prod
     FRONTEND_URL: 'https://fact-admin-frontend.{{ .Values.global.environment }}.platform.hmcts.net' # Override in Flux for Prod
