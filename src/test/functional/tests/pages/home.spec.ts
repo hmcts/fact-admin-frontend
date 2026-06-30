@@ -2,7 +2,7 @@ import { APIRequestContext } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
 import { type CreatedCourt, createTestCourt, getTestingSupportRegions } from '../../helpers/courtTestData';
-import { generateRandomSuffix, withTestCourtPrefix } from '../../helpers/testSupport';
+import { generateRandomSuffix, withCreatedServiceCentre, withTestCourtPrefix } from '../../helpers/testSupport';
 import { config } from '../../utils';
 
 function indexToAlphabetSuffix(index: number): string {
@@ -180,6 +180,30 @@ test.describe(
           new RegExp(`/courts/${createdCourt.slug}$`)
         );
       });
+    });
+
+    test('shows service centre rows with public view and temporary edit not found actions', async ({
+      homePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Home Service Centre Functional Test',
+        { open: true },
+        async ({ createdServiceCentre }) => {
+          await homePage.searchForCourt(createdServiceCentre.name);
+          await homePage.expectCourtVisible(createdServiceCentre.name);
+
+          await expect(homePage.getViewHrefForCourt(createdServiceCentre.name)).resolves.toMatch(
+            new RegExp(`/service-centres/${createdServiceCentre.slug}$`)
+          );
+
+          await homePage.clickEditForCourt(createdServiceCentre.name);
+
+          await expect(homePage.heading).toContainText('Page Not Found');
+          await expect(homePage.page).toHaveURL(new RegExp(`/service-centres/${createdServiceCentre.id}/edit$`));
+        }
+      );
     });
 
     test('filters courts by region when a region is selected', async ({ homePage, playwright }) => {

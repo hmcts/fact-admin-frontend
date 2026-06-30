@@ -17,8 +17,21 @@ type CourtResponse = {
   slug: string;
 };
 
+type ServiceCentreResponse = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 export type CreatedCourt = {
   body: CourtResponse;
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export type CreatedServiceCentre = {
+  body: ServiceCentreResponse;
   id: string;
   name: string;
   slug: string;
@@ -38,6 +51,13 @@ export type TestCourtParams = {
   withEnquiriesContact?: boolean;
   withTranslations?: boolean;
   forceFamilyCourt?: boolean;
+};
+
+export type TestServiceCentreParams = {
+  addWarningNotice?: boolean;
+  open?: boolean;
+  serviceCentreName: string;
+  withContactDetails?: boolean;
 };
 
 export async function createTestingSupportApiContext(
@@ -97,6 +117,38 @@ export async function createTestCourt(
   };
 }
 
+export async function createTestServiceCentre(
+  apiContext: APIRequestContext,
+  { addWarningNotice = false, open = true, serviceCentreName, withContactDetails = true }: TestServiceCentreParams
+): Promise<CreatedServiceCentre> {
+  const response = await apiContext.get('/testing-support/service-centres', {
+    params: {
+      addWarningNotice,
+      open,
+      serviceCentreName,
+      withContactDetails,
+    },
+  });
+  const responseText = await response.text();
+
+  if (!response.ok()) {
+    throw new Error(`Failed to create test service centre (${response.status()}): ${responseText}`);
+  }
+
+  if (!responseText) {
+    throw new Error(`Failed to create test service centre (${response.status()}): empty response body`);
+  }
+
+  const responseBody = JSON.parse(responseText) as ServiceCentreResponse;
+
+  return {
+    body: responseBody,
+    id: responseBody.id,
+    name: responseBody.name,
+    slug: responseBody.slug,
+  };
+}
+
 export async function getTestingSupportRegions(apiContext: APIRequestContext): Promise<TestingSupportRegion[]> {
   const response = await apiContext.get('/testing-support/regions');
   const responseText = await response.text();
@@ -122,5 +174,20 @@ export async function deleteTestCourtsByNamePrefix(
 
   if (!response.ok()) {
     throw new Error(`Failed to delete test courts for prefix ${courtNamePrefix}: ${await response.text()}`);
+  }
+}
+
+export async function deleteTestServiceCentresByNamePrefix(
+  apiContext: APIRequestContext,
+  serviceCentreNamePrefix: string
+): Promise<void> {
+  const response = await apiContext.delete(
+    `/testing-support/service-centres/name-prefix/${encodeURIComponent(serviceCentreNamePrefix)}`
+  );
+
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to delete test service centres for prefix ${serviceCentreNamePrefix}: ${await response.text()}`
+    );
   }
 }
