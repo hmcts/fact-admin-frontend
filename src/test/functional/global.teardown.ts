@@ -2,7 +2,11 @@ import fs from 'node:fs';
 
 import { chromium, request } from '@playwright/test';
 
-import { createTestingSupportApiContext, deleteTestCourtsByNamePrefix } from './helpers/courtTestData';
+import {
+  createTestingSupportApiContext,
+  deleteTestCourtsByNamePrefix,
+  deleteTestServiceCentresByNamePrefix,
+} from './helpers/courtTestData';
 import { TEST_COURT_PREFIX } from './helpers/testSupport';
 import { config } from './utils';
 
@@ -11,6 +15,7 @@ async function globalTeardown(): Promise<void> {
 
   try {
     await deleteTestCourtsByNamePrefix(apiContext, TEST_COURT_PREFIX);
+    await deleteTestServiceCentresByNamePrefix(apiContext, TEST_COURT_PREFIX);
   } catch {
     // Ignore teardown cleanup failures so they do not mask the real test outcome.
   } finally {
