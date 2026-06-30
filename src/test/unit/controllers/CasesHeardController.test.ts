@@ -209,8 +209,11 @@ describe('CasesHeardController', () => {
       HttpStatusCode.Ok
     );
 
-    responseMock.expects('render').once().withArgs('cases-heard-success', {
+    responseMock.expects('render').once().withArgs('common-edit-success', {
       courtId: '11111111-1111-4111-8111-111111111111',
+      pageTitle: 'Cases heard saved - Reading Crown Court',
+      successPanelTitle: 'Cases heard saved',
+      successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
       courtName: 'Reading Crown Court',
     });
 
@@ -286,8 +289,11 @@ describe('CasesHeardController', () => {
       HttpStatusCode.Ok
     );
 
-    responseMock.expects('render').once().withArgs('cases-heard-success', {
+    responseMock.expects('render').once().withArgs('common-edit-success', {
       courtId: '11111111-1111-4111-8111-111111111111',
+      pageTitle: 'Cases heard saved - Reading Crown Court',
+      successPanelTitle: 'Cases heard saved',
+      successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
       courtName: 'Reading Crown Court',
     });
 
