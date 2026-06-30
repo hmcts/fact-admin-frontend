@@ -13,7 +13,7 @@ import {
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
-const DEFAULT_RESULTS_MESSAGE = 'No locations found.';
+const DEFAULT_RESULTS_MESSAGE = 'No courts found.';
 const PUBLIC_FRONTEND_URL = process.env.PUBLIC_FRONTEND_URL || 'https://localhost:3344';
 const SORT_ICON_PATHS = {
   ascending: '<path d="M6.5625 15.5L11 6.63125L15.4375 15.5H6.5625Z" fill="currentColor"/>',
@@ -77,10 +77,10 @@ export class HomePageViewService {
     const titlePrefix = hasValidationErrors ? 'Error: ' : '';
 
     if ((courtsPage.page.totalPages ?? 0) > 1) {
-      return `${titlePrefix}Locations (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
+      return `${titlePrefix}Courts and tribunals (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
     }
 
-    return `${titlePrefix}Locations`;
+    return `${titlePrefix}Courts and tribunals`;
   }
 
   /**
@@ -93,7 +93,7 @@ export class HomePageViewService {
       return DEFAULT_RESULTS_MESSAGE;
     }
 
-    return `Showing ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + 1} to ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + courtsPage.content.length} of ${totalElements} locations`;
+    return `Showing ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + 1} to ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + courtsPage.content.length} of ${totalElements} courts`;
   }
 
   /**

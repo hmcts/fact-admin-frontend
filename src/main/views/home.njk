@@ -15,7 +15,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">Locations</h1>
+      <h1 class="govuk-heading-xl">Courts and tribunals</h1>
 
       {% if errorSummary.length %}
         {{ govukErrorSummary({
@@ -35,7 +35,7 @@
               id: "partialCourtName",
               name: "partialCourtName",
               label: {
-                text: "Search locations"
+                text: "Search courts and tribunals"
               },
               errorMessage: {
                 text: partialCourtNameError
@@ -104,7 +104,7 @@
             }) }}
           {% endif %}
         {% else %}
-          <p class="govuk-body">No locations match the current filters.</p>
+          <p class="govuk-body">No courts match the current filters.</p>
         {% endif %}
 
         {% if pagination.totalPages > 1 %}
@@ -125,7 +125,7 @@
         items: [
           {
             id: "courts",
-            label: "Locations",
+            label: "Courts",
             current: true,
             panel: {
               html: courtsTableHtml

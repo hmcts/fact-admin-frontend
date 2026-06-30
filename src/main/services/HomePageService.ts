@@ -67,11 +67,11 @@ export class HomePageService {
     const hasCourtsError = !this.isPagedCourts(courtsResponse);
 
     return hasRegionError && hasCourtsError
-      ? 'There was a problem loading regions and locations.'
+      ? 'There was a problem loading regions and courts.'
       : hasRegionError
         ? 'There was a problem loading regions.'
         : hasCourtsError
-          ? 'There was a problem loading locations.'
+          ? 'There was a problem loading courts.'
           : undefined;
   }
 

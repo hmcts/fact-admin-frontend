@@ -27,7 +27,7 @@ function stubHomePage(): void {
     errorSummary: [],
     filters,
     includeStatusColumn: false,
-    pageTitle: 'Locations',
+    pageTitle: 'Courts and tribunals',
     pagination: {
       currentPage: 0,
       items: [],
@@ -35,7 +35,7 @@ function stubHomePage(): void {
     },
     partialCourtNameError: undefined,
     regionOptions: [{ selected: true, text: 'All regions', value: '' }],
-    resultsMessage: 'No locations found.',
+    resultsMessage: 'No courts found.',
   });
 }
 
@@ -50,7 +50,7 @@ describe('Home page', () => {
     const response = await request(app).get('/');
 
     expect(response.status).toBe(200);
-    expect(response.text).toContain('Locations');
+    expect(response.text).toContain('Courts and tribunals');
     expect(response.text).toContain('Apply filters');
     expect(response.text).toContain('Download csv');
     expect(response.text).toContain('Add new court');

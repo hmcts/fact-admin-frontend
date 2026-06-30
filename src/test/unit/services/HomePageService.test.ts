@@ -181,9 +181,9 @@ describe('HomePageService', () => {
     expect(viewModel.errorMessage).toBeUndefined();
     expect(viewModel.errorSummary).toEqual([]);
     expect(viewModel.includeStatusColumn).toBe(false);
-    expect(viewModel.pageTitle).toBe('Locations');
+    expect(viewModel.pageTitle).toBe('Courts and tribunals');
     expect(viewModel.partialCourtNameError).toBeUndefined();
-    expect(viewModel.resultsMessage).toBe('Showing 1 to 2 of 2 locations');
+    expect(viewModel.resultsMessage).toBe('Showing 1 to 2 of 2 courts');
     expect(viewModel.regionOptions).toEqual([
       { selected: true, text: 'All regions', value: '' },
       {
@@ -283,10 +283,10 @@ describe('HomePageService', () => {
       rawSortOrder: undefined,
     });
 
-    expect(viewModel.errorMessage).toBe('There was a problem loading regions and locations.');
+    expect(viewModel.errorMessage).toBe('There was a problem loading regions and courts.');
     expect(viewModel.errorSummary).toEqual([]);
     expect(viewModel.courtTableRows).toEqual([]);
-    expect(viewModel.resultsMessage).toBe('No locations found.');
+    expect(viewModel.resultsMessage).toBe('No courts found.');
   });
 
   test('builds condensed pagination and page title for later pages', async () => {
@@ -334,7 +334,7 @@ describe('HomePageService', () => {
     });
 
     expect(viewModel.includeStatusColumn).toBe(true);
-    expect(viewModel.pageTitle).toBe('Locations (page 5 of 10)');
+    expect(viewModel.pageTitle).toBe('Courts and tribunals (page 5 of 10)');
     expect(viewModel.pagination).toEqual({
       currentPage: 4,
       items: [
