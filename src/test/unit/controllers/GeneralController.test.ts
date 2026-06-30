@@ -237,8 +237,11 @@ describe('GeneralController', () => {
       name: 'Reading Crown Court',
     });
 
-    responseMock.expects('render').once().withArgs('general-edit-success', {
+    responseMock.expects('render').once().withArgs('common-edit-success', {
       courtId: '11111111-1111-4111-8111-111111111111',
+      pageTitle: 'General saved - Reading Crown Court',
+      successPanelTitle: 'General details saved',
+      successPanelBody: 'General details for Reading Crown Court have been saved successfully.',
       courtName: 'Reading Crown Court',
     });
 
