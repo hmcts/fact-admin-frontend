@@ -1,8 +1,18 @@
 import { APIRequestContext } from '@playwright/test';
 
 import { expect, test } from '../../fixtures';
-import { type CreatedCourt, createTestCourt, getTestingSupportRegions } from '../../helpers/courtTestData';
-import { generateRandomSuffix, withCreatedServiceCentre, withTestCourtPrefix } from '../../helpers/testSupport';
+import {
+  type CreatedCourt,
+  createTestCourt,
+  createTestServiceCentre,
+  getTestingSupportRegions,
+} from '../../helpers/courtTestData';
+import {
+  generateRandomSuffix,
+  withCreatedServiceCentre,
+  withTestCourtPrefix,
+  withTestLocationPrefix,
+} from '../../helpers/testSupport';
 import { config } from '../../utils';
 
 function indexToAlphabetSuffix(index: number): string {
@@ -238,6 +248,49 @@ test.describe(
         await homePage.expectCourtHidden(secondRegionCourtName);
         await expect(homePage.regionSelect).toHaveValue(firstRegion.id);
       });
+    });
+
+    test('filters service centres by region when a region is selected', async ({ homePage, playwright }) => {
+      await withTestLocationPrefix(
+        playwright,
+        'Home Service Centre Region Functional Test',
+        async ({ apiContext, courtNamePrefix }) => {
+          const regions = await getTestingSupportRegions(apiContext);
+          if (regions.length < 2) {
+            throw new Error('Expected at least two regions to run the homepage service-centre region filter test.');
+          }
+
+          const firstRegion = regions[0];
+          const secondRegion = regions[1];
+          const firstRegionServiceCentreName = `${courtNamePrefix} ${firstRegion.name} Service Centre`;
+          const secondRegionServiceCentreName = `${courtNamePrefix} ${secondRegion.name} Service Centre`;
+
+          await createTestServiceCentre(apiContext, {
+            open: true,
+            regionId: firstRegion.id,
+            serviceCentreName: firstRegionServiceCentreName,
+          });
+          await createTestServiceCentre(apiContext, {
+            open: true,
+            regionId: secondRegion.id,
+            serviceCentreName: secondRegionServiceCentreName,
+          });
+
+          await homePage.searchForCourt(courtNamePrefix);
+          await homePage.expectCourtVisible(firstRegionServiceCentreName);
+          await homePage.expectCourtVisible(secondRegionServiceCentreName);
+
+          await homePage.searchForCourtInRegion(courtNamePrefix, firstRegion.id);
+          await homePage.expectCourtVisible(firstRegionServiceCentreName);
+          await homePage.expectCourtHidden(secondRegionServiceCentreName);
+          await expect(homePage.regionSelect).toHaveValue(firstRegion.id);
+
+          await homePage.searchForCourtInRegion(courtNamePrefix, secondRegion.id);
+          await homePage.expectCourtHidden(firstRegionServiceCentreName);
+          await homePage.expectCourtVisible(secondRegionServiceCentreName);
+          await expect(homePage.regionSelect).toHaveValue(secondRegion.id);
+        }
+      );
     });
 
     test('shows the default unsorted state before a sort is applied', async ({ homePage, playwright }) => {

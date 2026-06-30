@@ -139,7 +139,7 @@ describe('DataApiRequests', () => {
           name: 'National Business Centre',
           open: true,
           openOnCath: null,
-          regionId: null,
+          regionId: '33333333-3333-4333-8333-333333333333',
           serviceCentre: true,
           slug: 'national-business-centre',
           warningNotice: null,

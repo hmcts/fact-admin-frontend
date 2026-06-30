@@ -20,6 +20,7 @@ type CourtResponse = {
 type ServiceCentreResponse = {
   id: string;
   name: string;
+  regionId?: string;
   slug: string;
 };
 
@@ -34,6 +35,7 @@ export type CreatedServiceCentre = {
   body: ServiceCentreResponse;
   id: string;
   name: string;
+  regionId?: string;
   slug: string;
 };
 
@@ -56,6 +58,7 @@ export type TestCourtParams = {
 export type TestServiceCentreParams = {
   addWarningNotice?: boolean;
   open?: boolean;
+  regionId?: string;
   serviceCentreName: string;
   withContactDetails?: boolean;
 };
@@ -119,15 +122,23 @@ export async function createTestCourt(
 
 export async function createTestServiceCentre(
   apiContext: APIRequestContext,
-  { addWarningNotice = false, open = true, serviceCentreName, withContactDetails = true }: TestServiceCentreParams
+  {
+    addWarningNotice = false,
+    open = true,
+    regionId,
+    serviceCentreName,
+    withContactDetails = true,
+  }: TestServiceCentreParams
 ): Promise<CreatedServiceCentre> {
+  const params = {
+    addWarningNotice,
+    open,
+    serviceCentreName,
+    withContactDetails,
+    ...(regionId ? { regionId } : {}),
+  };
   const response = await apiContext.get('/testing-support/service-centres', {
-    params: {
-      addWarningNotice,
-      open,
-      serviceCentreName,
-      withContactDetails,
-    },
+    params,
   });
   const responseText = await response.text();
 
@@ -145,6 +156,7 @@ export async function createTestServiceCentre(
     body: responseBody,
     id: responseBody.id,
     name: responseBody.name,
+    regionId: responseBody.regionId,
     slug: responseBody.slug,
   };
 }

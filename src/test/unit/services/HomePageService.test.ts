@@ -130,7 +130,7 @@ describe('HomePageService', () => {
             name: 'National Business Centre',
             open: true,
             openOnCath: null,
-            regionId: null,
+            regionId: '11111111-1111-4111-8111-111111111111',
             serviceCentre: true,
             slug: 'national-business-centre',
             warningNotice: null,
