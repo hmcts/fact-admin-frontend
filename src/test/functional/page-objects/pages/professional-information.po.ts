@@ -50,14 +50,20 @@ export class ProfessionalInformationPage extends Base {
   }
 
   async addDxCodes(count: number): Promise<void> {
-    while ((await this.dxCodeInputs.count()) < count) {
-      await this.addDxCodeButton.click();
+    const initialCount = await this.dxCodeInputs.count();
+    for (let index = initialCount; index < count; index++) {
+      await this.addDxCodeButton.scrollIntoViewIfNeeded();
+      await this.addDxCodeButton.click({ force: true });
+      await this.dxCodeInput(index).waitFor({ state: 'visible' });
     }
   }
 
   async addFaxNumbers(count: number): Promise<void> {
-    while ((await this.faxNumberInputs.count()) < count) {
-      await this.addFaxNumberButton.click();
+    const initialCount = await this.faxNumberInputs.count();
+    for (let index = initialCount; index < count; index++) {
+      await this.addFaxNumberButton.scrollIntoViewIfNeeded();
+      await this.addFaxNumberButton.click({ force: true });
+      await this.faxNumberInput(index).waitFor({ state: 'visible' });
     }
   }
 
