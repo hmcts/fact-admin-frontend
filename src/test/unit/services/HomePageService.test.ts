@@ -76,23 +76,70 @@ describe('HomePageService', () => {
     expect(filters.sortOrder).toBe('asc');
   });
 
+  test('does not send sort params when no sort is requested', async () => {
+    const getCourts = jest.fn().mockResolvedValue({
+      content: [],
+      page: {
+        number: 0,
+        size: 25,
+        totalElements: 0,
+        totalPages: 0,
+      },
+    });
+    const service = new HomePageService({
+      getCourts,
+      getRegions: jest.fn().mockResolvedValue([]),
+    } as never);
+
+    const filters = service.getFilters({});
+    await service.getHomePageViewModel(filters);
+
+    expect(filters.sortBy).toBe('');
+    expect(filters.sortOrder).toBe('asc');
+    expect(getCourts).toHaveBeenCalledWith({
+      includeClosed: false,
+      pageNumber: 0,
+      pageSize: 25,
+    });
+  });
+
   test('builds the homepage view model from API responses', async () => {
     const service = new HomePageService({
       getCourts: jest.fn().mockResolvedValue({
         content: [
           {
+            createdAt: '2026-04-29T09:00:00Z',
             id: '22222222-2222-4222-8222-222222222222',
             lastUpdatedAt: '2026-04-29T10:00:00Z',
+            locationType: 'COURT',
+            mrdId: 'MRD-123',
             name: 'London Civil and Family Court',
             open: true,
+            openOnCath: true,
             regionId: '11111111-1111-4111-8111-111111111111',
+            serviceCentre: false,
             slug: 'london-civil-and-family-court',
+            warningNotice: null,
+          },
+          {
+            createdAt: '2026-04-29T09:30:00Z',
+            id: '33333333-3333-4333-8333-333333333333',
+            lastUpdatedAt: '2026-04-30T10:00:00Z',
+            locationType: 'SERVICE_CENTRE',
+            mrdId: null,
+            name: 'National Business Centre',
+            open: true,
+            openOnCath: null,
+            regionId: '11111111-1111-4111-8111-111111111111',
+            serviceCentre: true,
+            slug: 'national-business-centre',
+            warningNotice: null,
           },
         ],
         page: {
           number: 0,
           size: 25,
-          totalElements: 1,
+          totalElements: 2,
           totalPages: 1,
         },
       }),
@@ -136,7 +183,7 @@ describe('HomePageService', () => {
     expect(viewModel.includeStatusColumn).toBe(false);
     expect(viewModel.pageTitle).toBe('Courts and tribunals');
     expect(viewModel.partialCourtNameError).toBeUndefined();
-    expect(viewModel.resultsMessage).toBe('Showing 1 to 1 of 1 courts');
+    expect(viewModel.resultsMessage).toBe('Showing 1 to 2 of 2 courts');
     expect(viewModel.regionOptions).toEqual([
       { selected: true, text: 'All regions', value: '' },
       {
@@ -152,6 +199,14 @@ describe('HomePageService', () => {
         {
           classes: 'homepage-courts-table__actions',
           html: '<ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0"><li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="https://localhost:3344/courts/london-civil-and-family-court">View<span class="govuk-visually-hidden"> London Civil and Family Court</span></a></li><li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/courts/22222222-2222-4222-8222-222222222222/edit">Edit<span class="govuk-visually-hidden"> London Civil and Family Court</span></a></li></ul>',
+        },
+      ],
+      [
+        { text: 'National Business Centre' },
+        { text: '30 Apr 2026' },
+        {
+          classes: 'homepage-courts-table__actions',
+          html: '<ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0"><li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="https://localhost:3344/service-centres/national-business-centre">View<span class="govuk-visually-hidden"> National Business Centre</span></a></li><li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/service-centres/33333333-3333-4333-8333-333333333333/edit">Edit<span class="govuk-visually-hidden"> National Business Centre</span></a></li></ul>',
         },
       ],
     ]);
@@ -239,12 +294,18 @@ describe('HomePageService', () => {
       getCourts: jest.fn().mockResolvedValue({
         content: [
           {
+            createdAt: '2026-04-29T09:00:00Z',
             id: '22222222-2222-4222-8222-222222222222',
             lastUpdatedAt: '2026-04-29T10:00:00Z',
+            locationType: 'COURT',
+            mrdId: 'MRD-123',
             name: 'London Civil and Family Court',
             open: true,
+            openOnCath: true,
             regionId: '11111111-1111-4111-8111-111111111111',
+            serviceCentre: false,
             slug: 'london-civil-and-family-court',
+            warningNotice: null,
           },
         ],
         page: {
