@@ -48,14 +48,3 @@ variable "key_vault_resource_group_name" {
   default     = ""
   description = "Resource group containing the Key Vault. Defaults to <product>-<env>-rg when empty."
 }
-
-variable "private_dns_subscription_id" {
-  type        = string
-  default     = "1baf5470-1c3e-40d3-a6f7-74bfbce4b348"
-  description = "Subscription ID containing the private DNS zone for managed Redis private endpoints."
-}
-
-variable "managed_redis_sku_name" {
-  default     = "Balanced_B0"
-  description = "The SKU of Redis to use. E.g. Balanced_B1, MemoryOptimized_M10, FlashOptimized_A250"
-}
