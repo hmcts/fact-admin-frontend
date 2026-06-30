@@ -75,13 +75,13 @@ describe('Court opening hours routes', () => {
         days: [{ idPrefix: 'monday', name: 'Monday', value: 'MONDAY' }],
         errors: {
           openingHourTypeId: 'Select an opening hours type',
-          sameOpeningHour: 'Opening opening hour must be between 0 and 23',
-          sameOpeningMinute: 'Opening opening minute must be between 0 and 59',
+          sameOpeningHour: 'Opening hour must be between 0 and 23',
+          sameOpeningMinute: 'Opening minute must be between 0 and 59',
         },
         errorSummary: [
           { href: '#openingHourTypeId', text: 'Select an opening hours type' },
-          { href: '#sameOpeningHour', text: 'Opening opening hour must be between 0 and 23' },
-          { href: '#sameOpeningMinute', text: 'Opening opening minute must be between 0 and 59' },
+          { href: '#sameOpeningHour', text: 'Opening hour must be between 0 and 23' },
+          { href: '#sameOpeningMinute', text: 'Opening minute must be between 0 and 59' },
         ],
         form: { selectedDays: [], sameTime: 'yes' },
         openingHourTypes: [{ id: '33333333-3333-4333-8333-333333333333', name: 'Court open', nameCy: null }],
@@ -96,8 +96,8 @@ describe('Court opening hours routes', () => {
     expect(response.text).toContain('href="#openingHourTypeId"');
     expect(response.text).toContain('href="#sameOpeningHour"');
     expect(response.text).toContain('href="#sameOpeningMinute"');
-    expect(response.text).toContain('Opening opening hour must be between 0 and 23');
-    expect(response.text).toContain('Opening opening minute must be between 0 and 59');
+    expect(response.text).toContain('Opening hour must be between 0 and 23');
+    expect(response.text).toContain('Opening minute must be between 0 and 59');
   });
 
   test('renders the save success page', async () => {
