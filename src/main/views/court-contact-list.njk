@@ -1,0 +1,85 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/common-components.njk" import rowActions %}
+
+{# MACROS #}
+
+{% macro contactDetailsBlock(contact) %}
+  {% if contact.phoneNumber %}
+    <p class="govuk-body govuk-!-margin-bottom-1"><strong>Telephone </strong> {{ contact.phoneNumber }}</p>
+  {% endif %}
+  {% if contact.email %}
+    <p class="govuk-body govuk-!-margin-bottom-0"><strong>Email </strong> {{ contact.email }}</p>
+  {% endif %}
+{% endmacro %}
+
+{# END OF MACROS #}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% set contacts = courtContactDetails or [] %}
+  {% set contactTableRows = [] %}
+
+  {% if contacts.length %}
+    {% for contact in contacts %}
+      {% set contactTableRows = (contactTableRows.push([
+        {
+          text: contact.description
+        },
+        {
+          html: contactDetailsBlock(contact)
+        },
+        {
+          html: rowActions([
+            {
+              href: contact.editHref,
+              text: 'Edit'
+            },
+            {
+              href: contact.deleteHref,
+              text: 'Delete'
+            }
+          ])
+        }
+      ]), contactTableRows) %}
+    {% endfor %}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Contact details</h1>
+
+      {% if contactTableRows.length %}
+        {{ govukTable({
+          firstCellIsHeader: false,
+          head: [
+            {
+              text: "Description",
+              classes: "govuk-!-width-one-quarter"
+            },
+            {
+              text: "Details",
+              classes: "govuk-!-width-one-half"
+            },
+            {
+              text: "Action",
+              classes: "govuk-!-width-one-quarter"
+            }
+          ],
+          rows: contactTableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">No contact details are currently configured.</p>
+      {% endif %}
+
+      {{ govukButton({
+        text: "Add contact detail",
+        href: '/courts/' + courtId + '/edit/contact-details/add'
+      }) }}
+    </div>
+  </div>
+{% endblock %}

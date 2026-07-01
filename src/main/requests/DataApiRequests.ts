@@ -10,7 +10,9 @@ import {
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
+import { ContactDescriptionType, contactDescriptionTypeListSchema } from '../schemas/contactDescriptionTypeSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
+import { CourtContactDetail, courtContactDetailListSchema } from '../schemas/courtContactDetailSchema';
 import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
@@ -35,6 +37,7 @@ import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetCourtsParams } from './types/GetCourtsParams';
+import { SaveCourtContactDetailRequest } from './types/SaveCourtContactDetailRequest';
 import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
@@ -217,6 +220,21 @@ export class DataApiRequests {
   }
 
   /**
+   * Request to data API to get contact details for a given court
+   */
+  public async getCourtContactDetails(courtId: string): Promise<CourtContactDetail[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/contact-details`);
+      return courtContactDetailListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court contact details for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
    * Request to data API to get address details for a given court
    */
   public async getCourtAddressDetails(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {
@@ -309,6 +327,68 @@ export class DataApiRequests {
   }
 
   /**
+   * Request to data API to create a new contact detail
+   */
+  public async createCourtContactDetail(
+    courtId: string,
+    payload: SaveCourtContactDetailRequest
+  ): Promise<HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/contact-details`, payload);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error creating court contact detail:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update an existing contact detail
+   */
+  public async updateCourtContactDetail(
+    courtId: string,
+    contactDetailId: string,
+    payload: SaveCourtContactDetailRequest
+  ): Promise<HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.put(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error updating court contact detail:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to delete an existing contact detail
+   */
+  public async deleteCourtContactDetail(courtId: string, contactDetailId: string): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.delete(`/courts/${courtId}/v1/contact-details/${contactDetailId}`);
+      if (response.status === HttpStatusCode.NoContent) {
+        return response.status;
+      }
+      logger.error('Unexpected response status when deleting court contact detail:', response.status);
+      return HttpStatusCode.InternalServerError;
+    } catch (error: unknown) {
+      logger.error('Error deleting court contact detail:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
    * Request to data API to perform a postcode based address search (O|S)
    */
   public async getAddressesForPostcode(postcode: string): Promise<OsData | Map<string, string> | HttpStatusCode> {
@@ -350,6 +430,23 @@ export class DataApiRequests {
       return courtTypeListSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching court type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve contact description types
+   */
+  public async getContactDescriptionTypes(): Promise<ContactDescriptionType[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/types/v1/contact-description-types');
+      return contactDescriptionTypeListSchema
+        .parse(response.data)
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    } catch (error: unknown) {
+      logger.error('Error fetching contact description type details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
