@@ -42,7 +42,7 @@ describe('Single point of entry view', () => {
     expect(html).toContain(
       `<a href="/courts/${courtId}/edit" class="govuk-link govuk-link--no-visited-state">Continue updating Reading Crown Court</a>`
     );
-    expect(html).not.toContain(`Back to Single points of entry`);
-    expect(html).toContain(`<a href="/" class="govuk-link govuk-link--no-visited-state">Home</a>`);
+    expect(html).not.toContain('Back to Single points of entry');
+    expect(html).toContain('<a href="/" class="govuk-link govuk-link--no-visited-state">Home</a>');
   });
 });

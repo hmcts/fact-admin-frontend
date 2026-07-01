@@ -66,6 +66,19 @@ describe('SinglePointOfEntryService', () => {
     expect(dataApiRequests.getCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 
+  test('returns status code when single points of entry lookup fails during retrieve', async () => {
+    const dataApiRequests = {
+      getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
+      getCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+    };
+
+    const service = new SinglePointOfEntryService(dataApiRequests as never);
+
+    const result = await service.retrieve(courtId);
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
   test('saves childcare arrangements single point of entry and returns saved result', async () => {
     const dataApiRequests = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
@@ -130,6 +143,58 @@ describe('SinglePointOfEntryService', () => {
     expect(result).toBe(HttpStatusCode.InternalServerError);
   });
 
+  test('returns status code when court lookup fails during update', async () => {
+    const dataApiRequests = {
+      getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+      getCourtSinglePointOfEntry: jest.fn(),
+      updateCourtSinglePointOfEntry: jest.fn(),
+    };
+
+    const service = new SinglePointOfEntryService(dataApiRequests as never);
+
+    const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
+
+    expect(result).toBe(HttpStatusCode.NotFound);
+    expect(dataApiRequests.getCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+  });
+
+  test('returns status code when single points of entry lookup fails during update', async () => {
+    const dataApiRequests = {
+      getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
+      getCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      updateCourtSinglePointOfEntry: jest.fn(),
+    };
+
+    const service = new SinglePointOfEntryService(dataApiRequests as never);
+
+    const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+  });
+
+  test('does not call update endpoint when an editable service selection is missing', async () => {
+    const dataApiRequests = {
+      getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
+      getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
+        {
+          id: childrenAreaOfLawId,
+          name: 'Children',
+          selected: false,
+        },
+      ]),
+      updateCourtSinglePointOfEntry: jest.fn(),
+    };
+
+    const service = new SinglePointOfEntryService(dataApiRequests as never);
+
+    const result = await service.update(courtId, {});
+
+    expect(result).toBe(HttpStatusCode.BadRequest);
+    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+  });
+
   test('returns invalid result with mapped errors when update call returns validation map', async () => {
     const dataApiRequests = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
@@ -140,9 +205,12 @@ describe('SinglePointOfEntryService', () => {
           selected: false,
         },
       ]),
-      updateCourtSinglePointOfEntry: jest
-        .fn()
-        .mockResolvedValue(new Map<string, string>([['Children', 'Invalid single point of entry setting']])),
+      updateCourtSinglePointOfEntry: jest.fn().mockResolvedValue(
+        new Map<string, string>([
+          ['timestamp', '2026-07-01T12:00:00Z'],
+          ['Children', 'Invalid single point of entry setting'],
+        ])
+      ),
     };
 
     const service = new SinglePointOfEntryService(dataApiRequests as never);
