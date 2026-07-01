@@ -19,6 +19,10 @@ import {
   CourtProfessionalInformation,
   courtProfessionalInformationSchema,
 } from '../schemas/courtProfessionalInformationSchema';
+import {
+  CourtSinglePointOfEntryList,
+  courtSinglePointOfEntryListSchema,
+} from '../schemas/courtSinglePointOfEntrySchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
 import {
@@ -533,6 +537,42 @@ export class DataApiRequests {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
       logger.error('Error updating court local authority details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get single point of entry data by court id
+   */
+  public async getCourtSinglePointOfEntry(courtId: string): Promise<CourtSinglePointOfEntryList | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/single-point-of-entry`);
+      return courtSinglePointOfEntryListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching single point of entry data for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update single point of entry data by court id
+   */
+  public async updateCourtSinglePointOfEntry(
+    courtId: string,
+    singlePointOfEntry: CourtSinglePointOfEntryList
+  ): Promise<HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.put(`/courts/${courtId}/v1/single-point-of-entry`, singlePointOfEntry);
+      return response.status;
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error updating court single point of entry details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
