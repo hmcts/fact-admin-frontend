@@ -42,7 +42,7 @@ export default class AuditController {
 
     this.transformForUI(viewModel);
     const filterCategories = this.auditFilterCategoriesService.buildFilterCategories(viewModel.filters);
-    const downloadUrl = this.buildDownloadUrl(req.query);
+    const downloadUrl = this.buildDownloadUrl(viewModel.filters);
     const basePagerUrl = this.buildPagerBaseUrl(viewModel.filters);
 
     res.render('audit-list', {
@@ -164,10 +164,10 @@ export default class AuditController {
    * @param query
    * @private
    */
-  private buildDownloadUrl(query: Request['query']): string {
+  private buildDownloadUrl(filters: GetAuditsParams): string {
     const queryEntries: [string, string][] = [];
 
-    for (const [key, value] of Object.entries(query)) {
+    for (const [key, value] of Object.entries(filters)) {
       if (Array.isArray(value)) {
         for (const item of value) {
           queryEntries.push([key, String(item)]);
