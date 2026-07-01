@@ -7,6 +7,32 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    test(
+      'smoke test',
+      {
+        tag: '@smoke',
+      },
+      async ({ playwright, translationAndInterpretationPage }) => {
+        await withCreatedCourt(
+          playwright,
+          'Translation Functional Test',
+          { withTranslations: false },
+          async ({ createdCourt }) => {
+            await translationAndInterpretationPage.goto(createdCourt.id);
+
+            const breadcrumb = translationAndInterpretationPage.page.getByLabel('Breadcrumb');
+            await expect(translationAndInterpretationPage.heading).toContainText('Translation and interpretation');
+            await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+            await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+              'href',
+              `/courts/${createdCourt.id}/edit`
+            );
+            await expect(breadcrumb).toContainText('Translation and interpretation');
+          }
+        );
+      }
+    );
+
     test('renders an empty page when the court has no translation contact', async ({
       playwright,
       translationAndInterpretationPage,
@@ -74,10 +100,9 @@ test.describe(
           await expect(
             translationAndInterpretationPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
           ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-          await expect(translationAndInterpretationPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute(
-            'href',
-            '/'
-          );
+          await expect(
+            translationAndInterpretationPage.mainContent.content.getByRole('link', { name: 'Home' })
+          ).toHaveAttribute('href', '/');
 
           await translationAndInterpretationPage.page
             .getByRole('link', { name: `Continue updating ${createdCourt.name}` })
@@ -109,7 +134,7 @@ test.describe(
           await translationAndInterpretationPage.save();
 
           await translationAndInterpretationPage.expectSuccessPage(createdCourt.name);
-          await translationAndInterpretationPage.page.getByRole('link', { name: 'Home' }).click();
+          await translationAndInterpretationPage.mainContent.content.getByRole('link', { name: 'Home' }).click();
           await expect(homePage.heading).toContainText('Courts and tribunals');
           await expect(homePage.page).toHaveURL(/\/$/);
         }

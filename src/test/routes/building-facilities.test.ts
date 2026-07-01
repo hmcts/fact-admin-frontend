@@ -34,6 +34,11 @@ describe('Building facilities page', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Building Facilities');
     expect(response.text).toContain('Are separate waiting areas for children available?');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Reading Crown Court</a>`
+    );
   });
 
   test('renders edit page with no pre-selection when facilities are missing', async () => {

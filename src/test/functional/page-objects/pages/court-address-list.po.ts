@@ -15,8 +15,8 @@ export class CourtAddressListPage extends Base {
     this.addAddressButton = this.page.getByRole('button', { name: 'Add address' });
     this.addressesTable = this.page.getByRole('table');
     this.noAddressesMessage = this.page.getByText('No addresses are currently configured.');
-    this.firstEditLink = this.page.getByRole('link', { name: 'Edit' }).first();
-    this.firstDeleteLink = this.page.getByRole('link', { name: 'Delete' }).first();
+    this.firstEditLink = this.addressesTable.getByRole('link', { name: 'Edit', exact: true }).first();
+    this.firstDeleteLink = this.addressesTable.getByRole('link', { name: 'Delete', exact: true }).first();
   }
 
   async goto(courtId: string): Promise<void> {
@@ -24,7 +24,7 @@ export class CourtAddressListPage extends Base {
   }
 
   async getAddressCount(): Promise<number> {
-    return this.page.getByRole('link', { name: 'Edit' }).count();
+    return this.addressesTable.getByRole('link', { name: 'Edit', exact: true }).count();
   }
 
   async clickAddAddress(): Promise<void> {

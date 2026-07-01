@@ -20,6 +20,9 @@ describe('Add court page', () => {
     expect(response.text).toContain('Add new court');
     expect(response.text).toContain('Court will be closed by default.');
     expect(response.text).toContain('South East');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain('Add new court');
   });
 
   test('re-renders the add court page with validation errors', async () => {

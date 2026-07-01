@@ -50,6 +50,6 @@ export class TranslationAndInterpretationPage extends Base {
     );
     await expect(this.mainContent.content).toContainText('What do you want to do next?');
     await expect(this.page.getByRole('link', { name: `Continue updating ${courtName}` })).toBeVisible();
-    await expect(this.page.getByRole('link', { name: 'Home' })).toBeVisible();
+    await expect(this.mainContent.content.getByRole('link', { name: 'Home' })).toBeVisible();
   }
 }
