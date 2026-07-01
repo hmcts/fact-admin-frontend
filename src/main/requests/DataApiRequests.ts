@@ -47,6 +47,7 @@ import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitie
 import { dataApi } from './utils/axiosConfig';
 
 const logger = Logger.getLogger('app');
+const courtSinglePointOfEntryEndpoint = (courtId: string): string => `/courts/${courtId}/v1/single-point-of-entry`;
 
 export class DataApiRequests {
   /**
@@ -645,7 +646,7 @@ export class DataApiRequests {
    */
   public async getCourtSinglePointOfEntry(courtId: string): Promise<CourtSinglePointOfEntryList | HttpStatusCode> {
     try {
-      const { data } = await dataApi.get(`/courts/${courtId}/v1/single-point-of-entry`);
+      const { data } = await dataApi.get(courtSinglePointOfEntryEndpoint(courtId));
       return courtSinglePointOfEntryListSchema.parse(data);
     } catch (error: unknown) {
       logger.error(`Error fetching single point of entry data for court id ${courtId}:`, error);
@@ -663,8 +664,7 @@ export class DataApiRequests {
     singlePointOfEntry: CourtSinglePointOfEntryList
   ): Promise<HttpStatusCode | Map<string, string>> {
     try {
-      const response = await dataApi.put(`/courts/${courtId}/v1/single-point-of-entry`, singlePointOfEntry);
-      return response.status;
+      return (await dataApi.put(courtSinglePointOfEntryEndpoint(courtId), singlePointOfEntry)).status;
     } catch (error: unknown) {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
