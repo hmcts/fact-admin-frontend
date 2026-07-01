@@ -1631,6 +1631,58 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
 
+  it('returns parsed contact description types when response is valid', async () => {
+    const contactDescriptionTypes = [
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Listing enquiries',
+      },
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
+      },
+    ];
+
+    getStub.withArgs('/types/v1/contact-description-types').resolves({ data: contactDescriptionTypes });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toEqual([
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
+      },
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Listing enquiries',
+      },
+    ]);
+  });
+
+  it('returns internal server error when contact description types response fails schema validation', async () => {
+    getStub.withArgs('/types/v1/contact-description-types').resolves({
+      data: [{ name: 'Missing id' }],
+    });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns service unavailable when contact description types endpoint returns a 503', async () => {
+    getStub.withArgs('/types/v1/contact-description-types').rejects({
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: HttpStatusCode.ServiceUnavailable,
+      },
+    });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+  });
+
   it('returns parsed translation services when the response is valid', async () => {
     const courtId = '55555555-5555-4555-8555-555555555555';
     const translationServices = {
@@ -2334,5 +2386,144 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.updateAccessibility(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('creates court contact detail and returns response status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).resolves({ status: HttpStatusCode.Created });
+
+    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Created);
+  });
+
+  it('returns validation errors map when create contact detail endpoint returns a 400', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      courtContactDescriptionId: '',
+      courtId,
+      email: 'invalid-email',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+    const apiErrors = {
+      courtContactDescriptionId: 'Select a contact type',
+      email: 'Enter an email address in the correct format',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns conflict when create contact detail endpoint returns a non-400 axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
+  it('updates court contact detail and returns response status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload).resolves({
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns validation errors map when update contact detail endpoint returns a 400', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'invalid-email',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+    const apiErrors = {
+      email: 'Enter an email address in the correct format',
+      phoneNumber: 'Enter a phone number in the correct format',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns gone when update contact detail endpoint returns a non-400 axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'gone',
+        status: HttpStatusCode.Gone,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+
+    expect(response).toBe(HttpStatusCode.Gone);
   });
 });

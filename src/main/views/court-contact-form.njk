@@ -1,0 +1,115 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% set formErrors = formErrors or {} %}
+  {% set errorSummary = errorSummary or [] %}
+  {% set formValues = formValues or {} %}
+  {% set selectedContactMethods = formValues.contactMethods or [] %}
+  {% set contactDescriptionTypeItems = contactDescriptionTypeItems or [{ text: "Select", value: "" }] %}
+  {% if errorSummary.length %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errorSummary
+    }) }}
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">{{ formHeading }}</h1>
+      <form action="{{ formAction }}" method="post" novalidate>
+        {{ govukSelect({
+          id: "contact-type",
+          name: "contact-type",
+          label: {
+            text: "Contact type"
+          },
+          errorMessage: {
+            text: formErrors.contactType
+          } if formErrors.contactType else null,
+          items: contactDescriptionTypeItems
+        }) }}
+
+        {{ govukInput({
+          label: {
+            text: "Explanation (optional)"
+          },
+          hint: {
+            text: "Add a short explanation if required. For example, 'Breathing Spaces gives someone in debt the right to legal protections'."
+          },
+          id: "contact-explanation",
+          name: "contact-explanation",
+          type: "text",
+          value: formValues.contactExplanation,
+          errorMessage: {
+            text: formErrors.contactExplanation
+          } if formErrors.contactExplanation else null
+        }) }}
+
+        {{ govukCheckboxes({
+          idPrefix: "contact-methods",
+          name: "contact-methods",
+          fieldset: {
+            legend: {
+              text: "Select all that apply",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          errorMessage: {
+            text: formErrors.contactMethods
+          } if formErrors.contactMethods else null,
+          items: [
+            {
+              value: "email",
+              text: "Email address",
+              checked: selectedContactMethods.includes('email'),
+              conditional: {
+                html: govukInput({
+                  id: "contact-email",
+                  name: "contact-email",
+                  type: "email",
+                  label: { text: "Email address", classes: "govuk-visually-hidden" },
+                  hint: { text: "Write email address in full and in lower case." },
+                  errorMessage: {
+                    text: formErrors.contactEmail
+                  } if formErrors.contactEmail else null,
+                  value: formValues.contactEmail
+                })
+              }
+            },
+            {
+              value: "phone",
+              text: "Phone number",
+              checked: selectedContactMethods.includes('phone'),
+              conditional: {
+                html: govukInput({
+                  id: "contact-telephone",
+                  name: "contact-telephone",
+                  type: "tel",
+                  label: { text: "Phone number", classes: "govuk-visually-hidden" },
+                  hint: { text: "Use space between city and local exchange. For example, 01273 800 900 or 020 7450 4000." },
+                  errorMessage: {
+                    text: formErrors.contactTelephone
+                  } if formErrors.contactTelephone else null,
+                  value: formValues.contactTelephone
+                })
+              }
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
