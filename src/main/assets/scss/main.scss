@@ -1,7 +1,9 @@
+@use '@ministryofjustice/frontend/moj/all' as *;
 @use 'govuk-frontend';
 
-// Homepage pagination
-.homepage-pagination {
+// Homepage and Audit List pagination
+.homepage-pagination,
+.audit-list-pagination {
   justify-content: center;
 }
 
@@ -94,7 +96,7 @@
   width: 72px;
   height: 72px;
   margin-bottom: 25px;
-  border: 8px solid govuk-frontend.govuk-colour('mid-grey');
+  border: 8px solid govuk-frontend.govuk-colour('black', $variant: 'tint-80');
   border-top-color: govuk-frontend.govuk-colour('blue');
   border-radius: 50%;
   animation: hods-loading-spinner 1s linear infinite;
@@ -108,4 +110,17 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.sign-out-link {
+  @extend .govuk-service-navigation__link;
+  color: #fff;
+  float: inline-end;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.sign-out-link:visited,
+.sign-out-link:link {
+  color: #fff;
 }

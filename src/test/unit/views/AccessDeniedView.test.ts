@@ -9,6 +9,5 @@ describe('Access Denied View', () => {
 
     expect(html).toContain('Access Denied');
     expect(html).toContain('You do not have permission to view this page.');
-    expect(html).toContain('Sign out');
   });
 });
