@@ -358,7 +358,7 @@ export class CourtOpeningHoursService {
     }
 
     if (form.sameTime === 'yes') {
-      this.validateTimeGroup(errors, form, 'same', 'Opening');
+      this.validateTimeGroup(errors, form, 'same', '');
       return errors;
     }
 
@@ -387,11 +387,13 @@ export class CourtOpeningHoursService {
     const openingMinuteKey = `${prefix}OpeningMinute`;
     const closingHourKey = `${prefix}ClosingHour`;
     const closingMinuteKey = `${prefix}ClosingMinute`;
+    const fieldLabel = (timePart: string): string =>
+      labelPrefix ? `${labelPrefix} ${timePart}` : `${timePart.charAt(0).toUpperCase()}${timePart.slice(1)}`;
 
-    this.validateTimePart(errors, form[openingHourKey], openingHourKey, `${labelPrefix} opening hour`, 23);
-    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, `${labelPrefix} opening minute`, 59);
-    this.validateTimePart(errors, form[closingHourKey], closingHourKey, `${labelPrefix} closing hour`, 23);
-    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, `${labelPrefix} closing minute`, 59);
+    this.validateTimePart(errors, form[openingHourKey], openingHourKey, fieldLabel('opening hour'), 23);
+    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, fieldLabel('opening minute'), 59);
+    this.validateTimePart(errors, form[closingHourKey], closingHourKey, fieldLabel('closing hour'), 23);
+    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, fieldLabel('closing minute'), 59);
 
     if (errors[openingHourKey] || errors[openingMinuteKey] || errors[closingHourKey] || errors[closingMinuteKey]) {
       return;

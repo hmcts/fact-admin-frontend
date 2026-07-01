@@ -38,7 +38,7 @@ const courtProfessionalInformationSchema = z.object({
 });
 
 const courtAreasOfLawSchema = z.object({
-  areasOfLaw: z.array(areaOfLawSchema),
+  areasOfLaw: z.array(z.union([areaOfLawSchema, z.string()])),
 });
 
 const courtFacilitiesSchema = z.object({
@@ -133,6 +133,57 @@ const courtDetailsAddressSchema = courtAddressSchema.omit({ areasOfLaw: true, co
   courtTypes: z.array(courtTypeSchema).nullable(),
 });
 
+const nullableString = z.string().nullable();
+
+const serviceCentreAddressSchema = z.object({
+  id: z.string().nullable().optional(),
+  serviceCentreId: z.string().optional(),
+  addressLine1: nullableString.optional(),
+  addressLine2: nullableString.optional(),
+  townCity: nullableString.optional(),
+  county: nullableString.optional(),
+  postcode: nullableString.optional(),
+  lat: z.number().nullable().optional(),
+  lon: z.number().nullable().optional(),
+  addressType: z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']),
+});
+
+const serviceCentreContactDescriptionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  nameCy: z.string(),
+});
+
+const serviceCentreContactDetailSchema = z.object({
+  id: z.string().optional(),
+  serviceCentreId: z.string().optional(),
+  explanation: nullableString.optional(),
+  explanationCy: nullableString.optional(),
+  email: nullableString.optional(),
+  phoneNumber: nullableString.optional(),
+  serviceCentreContactDescription: serviceCentreContactDescriptionSchema.nullable().optional(),
+});
+
+const serviceCentreAreasOfLawSchema = z.object({
+  id: z.string().optional(),
+  serviceCentreId: z.string().optional(),
+  areasOfLaw: z
+    .array(z.union([areaOfLawSchema, z.string()]))
+    .nullable()
+    .optional(),
+});
+
+const serviceAreaSchema = z.union([
+  z
+    .object({
+      id: z.string(),
+      name: z.string().nullable().optional(),
+      nameCy: z.string().nullable().optional(),
+    })
+    .passthrough(),
+  z.string(),
+]);
+
 export const courtDetailsSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -158,6 +209,39 @@ export const courtDetailsSchema = z.object({
   courtPhotos: z.array(courtPhotoSchema),
 });
 
+export const serviceCentreDetailsSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  open: z.boolean(),
+  warningNotice: nullableString.optional(),
+  createdAt: nullableString.optional(),
+  lastUpdatedAt: z.string(),
+  serviceAreas: z.array(serviceAreaSchema).optional().default([]),
+  catchmentType: z.enum(['LOCAL', 'NATIONAL', 'REGIONAL']).nullable().optional(),
+  serviceCentreAddresses: z.array(serviceCentreAddressSchema).optional().default([]),
+  serviceCentreContactDetails: z.array(serviceCentreContactDetailSchema).optional().default([]),
+  serviceCentreAreasOfLaw: z.array(serviceCentreAreasOfLawSchema).optional().default([]),
+});
+
+export const allLocationDetailsSchema = z.discriminatedUnion('locationType', [
+  z.object({
+    locationType: z.literal('COURT'),
+    serviceCentre: z.literal(false),
+    court: courtDetailsSchema,
+    serviceCentreDetails: z.null(),
+  }),
+  z.object({
+    locationType: z.literal('SERVICE_CENTRE'),
+    serviceCentre: z.literal(true),
+    court: z.null(),
+    serviceCentreDetails: serviceCentreDetailsSchema,
+  }),
+]);
+
 export const courtDetailsListSchema = z.array(courtDetailsSchema);
+export const allLocationDetailsListSchema = z.array(allLocationDetailsSchema);
 
 export type CourtDetails = z.infer<typeof courtDetailsSchema>;
+export type ServiceCentreDetails = z.infer<typeof serviceCentreDetailsSchema>;
+export type AllLocationDetails = z.infer<typeof allLocationDetailsSchema>;

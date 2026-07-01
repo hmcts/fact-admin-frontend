@@ -1,4 +1,4 @@
-import { PagedCourts } from '../schemas/courtListSchema';
+import { LocationListItem, PagedCourts } from '../schemas/courtListSchema';
 import { Region } from '../schemas/regionSchema';
 
 import {
@@ -47,7 +47,7 @@ export class HomePageViewService {
       ...(filters.includeClosed ? [{ text: court.open ? 'Open' : 'Closed' }] : []),
       {
         classes: 'homepage-courts-table__actions',
-        html: `<ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0"><li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="${this.buildPublicCourtHref(court.slug)}">View<span class="govuk-visually-hidden"> ${court.name}</span></a></li><li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/courts/${court.id}/edit">Edit<span class="govuk-visually-hidden"> ${court.name}</span></a></li></ul>`,
+        html: this.buildActionsHtml(court),
       },
     ]);
   }
@@ -94,6 +94,18 @@ export class HomePageViewService {
     }
 
     return `Showing ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + 1} to ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + courtsPage.content.length} of ${totalElements} courts`;
+  }
+
+  /**
+   * Builds the row action list.
+   */
+  private buildActionsHtml(location: LocationListItem): string {
+    const viewLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="${this.buildPublicLocationHref(location)}">View<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
+    const editPathPrefix =
+      location.serviceCentre || location.locationType === 'SERVICE_CENTRE' ? 'service-centres' : 'courts';
+    const editLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/${editPathPrefix}/${location.id}/edit">Edit<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
+
+    return `<ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">${viewLink}${editLink}</ul>`;
   }
 
   /**
@@ -220,10 +232,13 @@ export class HomePageViewService {
   }
 
   /**
-   * Builds the public frontend court URL used by the View action link.
+   * Builds the public frontend location URL used by the View action link.
    */
-  private buildPublicCourtHref(slug: string): string {
-    return `${PUBLIC_FRONTEND_URL.replace(/\/$/, '')}/courts/${slug}`;
+  private buildPublicLocationHref(location: LocationListItem): string {
+    const pathPrefix =
+      location.serviceCentre || location.locationType === 'SERVICE_CENTRE' ? 'service-centres' : 'courts';
+
+    return `${PUBLIC_FRONTEND_URL.replace(/\/$/, '')}/${pathPrefix}/${location.slug}`;
   }
 
   /**
