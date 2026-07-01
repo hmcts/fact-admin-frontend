@@ -85,6 +85,8 @@ type ApiValidationMapping = {
 
 const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
+const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
+const maxExplanationLength = 250;
 
 const dataApiRequests = new DataApiRequests();
 
@@ -226,6 +228,16 @@ export class CourtContactService {
         formErrors.contactTelephone = 'Enter a phone number in the correct format';
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       }
+    }
+
+    const contactExplanation = formValues.contactExplanation;
+    if (contactExplanation.length > maxExplanationLength) {
+      formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
+      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
+    } else if (contactExplanation && !explanationPattern.test(contactExplanation)) {
+      formErrors.contactExplanation =
+        'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
     }
 
     return {

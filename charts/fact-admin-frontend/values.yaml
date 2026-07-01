@@ -12,11 +12,11 @@ nodejs:
       secrets:
         - name: session-secret
           alias: SESSION_SECRET
-        - name: managed-redis-host
+        - name: REDIS-V6-HOST
           alias: REDIS_HOST
-        - name: managed-redis-access-key
+        - name: REDIS-V6-PASSWORD
           alias: REDIS_PASSWORD
-        - name: managed-redis-port
+        - name: REDIS-V6-PORT
           alias: REDIS_PORT
         - name: bstrap-sso-client-id
           alias: SSO_APP_REG_ID
