@@ -24,7 +24,7 @@ export default class SinglePointOfEntryController {
       return this.renderStatus(res, viewModel);
     }
 
-    res.render('single-point-of-entry', viewModel);
+    return void res.render('single-point-of-entry', viewModel);
   }
 
   @route('/success')
@@ -50,7 +50,7 @@ export default class SinglePointOfEntryController {
       return this.renderStatus(res, HttpStatusCode.BadRequest);
     }
 
-    res.render('single-point-of-entry-success', {
+    return void res.render('single-point-of-entry-success', {
       courtId,
       courtName: saveResult.courtName,
     });
@@ -68,7 +68,7 @@ export default class SinglePointOfEntryController {
   }
 
   private renderStatus(res: Response, status: HttpStatusCode): void {
-    res.status(status).render(status === HttpStatusCode.NotFound ? 'court-not-found' : 'error');
+    return void res.status(status).render(status === HttpStatusCode.NotFound ? 'court-not-found' : 'error');
   }
 
   private logValidationErrors(errors?: Record<string, string[]>): void {

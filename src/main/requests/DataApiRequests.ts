@@ -548,8 +548,8 @@ export class DataApiRequests {
    */
   public async getCourtSinglePointOfEntry(courtId: string): Promise<CourtSinglePointOfEntryList | HttpStatusCode> {
     try {
-      const response = await dataApi.get(`/courts/${courtId}/v1/single-point-of-entry`);
-      return courtSinglePointOfEntryListSchema.parse(response.data);
+      const { data } = await dataApi.get(`/courts/${courtId}/v1/single-point-of-entry`);
+      return courtSinglePointOfEntryListSchema.parse(data);
     } catch (error: unknown) {
       logger.error(`Error fetching single point of entry data for court id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status
