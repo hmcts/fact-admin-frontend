@@ -97,10 +97,13 @@ describe('General View', () => {
     expect(html).not.toContain('ignored timestamp error');
   });
   test('renders the general success page', () => {
-    const html = env.render('general-edit-success.njk', {
+    const html = env.render('common-edit-success.njk', {
       courtId,
+      pageTitle: 'General saved - Reading Crown Court',
+      successPanelTitle: 'General details saved',
+      successPanelBody: 'General details for Reading Crown Court have been saved successfully.',
       courtName: 'Reading Crown Court',
-      pagePath: `/courts/${courtId}}/edit/general/success`,
+      pagePath: `/courts/${courtId}/edit/general/success`,
     });
 
     expect(html).toContain('General saved - Reading Crown Court');

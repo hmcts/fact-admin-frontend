@@ -1,6 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
+import { Accessibility, AccessibilityScheme } from '../schemas/accessibilitySchema';
 import {
   AreaOfLawType,
   CourtAreaOfLawSelection,
@@ -18,7 +19,7 @@ import {
 } from '../schemas/auditSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
-import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
+import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
@@ -43,6 +44,7 @@ import { User, userSchema } from '../schemas/userSchema';
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetAuditsParams } from './types/GetAuditsParams';
 import { GetCourtsParams } from './types/GetCourtsParams';
+import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
 
@@ -83,7 +85,7 @@ export class DataApiRequests {
    */
   public async getCourts(params: GetCourtsParams = {}): Promise<PagedCourts | HttpStatusCode> {
     try {
-      const response = await dataApi.get('/courts/v1', { params });
+      const response = await dataApi.get('/all/v1', { params });
       return pagedCourtsSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching courts:', error);
@@ -199,11 +201,24 @@ export class DataApiRequests {
    * Request to data API to get all court details
    */
   public async getAllCourts(): Promise<CourtDetails[] | HttpStatusCode> {
+    const locationsResponse = await this.getAllLocations();
+
+    if (!Array.isArray(locationsResponse)) {
+      return locationsResponse;
+    }
+
+    return locationsResponse.flatMap(location => (location.locationType === 'COURT' ? [location.court] : []));
+  }
+
+  /**
+   * Request to data API to get all location details
+   */
+  public async getAllLocations(): Promise<AllLocationDetails[] | HttpStatusCode> {
     try {
-      const response = await dataApi.get('/courts/all/v1');
-      return courtDetailsListSchema.parse(response.data);
+      const response = await dataApi.get('/all/details/v1');
+      return allLocationDetailsListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching all courts:', error);
+      logger.error('Error fetching all locations:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -623,6 +638,45 @@ export class DataApiRequests {
       }
       logger.error(`Error update court facilities for id ${courtId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get accessibility options by court id
+   */
+  public async getAccessibility(courtId: string): Promise<Accessibility | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/accessibility-options`);
+
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
+
+      return AccessibilityScheme.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching accessibility options for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to update accessibility options by court id
+   */
+  public async updateAccessibility(
+    courtId: string,
+    payload: UpdateAccessibilityRequest
+  ): Promise<Accessibility | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/accessibility-options`, payload);
+      return AccessibilityScheme.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error(`Error updating accessibility options for court id ${courtId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
     }
   }
 

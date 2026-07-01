@@ -1,8 +1,5 @@
 import moment from 'moment-timezone';
 
-import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
-import { FacilityModel } from '../services/BuildingFacilitiesService';
-
 const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
 const UK_TIME_ZONE = 'Europe/London';
 
@@ -45,31 +42,6 @@ export function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-type FoodDrinkBooleans = Record<FoodDrinkOption, boolean | null>;
-
-export const mapFoodAndDrink = (
-  foodAndDrink: FoodDrinkOption | FoodDrinkOption[] | null | undefined
-): FoodDrinkBooleans => {
-  const mapToArray = item => (item ? [item] : []);
-  const list = Array.isArray(foodAndDrink) ? foodAndDrink : mapToArray(foodAndDrink);
-  const selected = new Set(list);
-  return FOOD_DRINK_OPTIONS.reduce(
-    (result, option) => ({
-      ...result,
-      [option]: selected.has(option),
-    }),
-    {} as FoodDrinkBooleans
-  );
-};
-
-export const addFoodAndDrink = (data: FacilityModel): FacilityModel => {
-  const foodAndDrink = FOOD_DRINK_OPTIONS.filter(key => data[key] === true);
-
-  return {
-    ...data,
-    foodAndDrink,
-  };
-};
 export const parseBoolean = (value: unknown): boolean | undefined => {
   if (value === true || value === 'true') {
     return true;
@@ -78,6 +50,24 @@ export const parseBoolean = (value: unknown): boolean | undefined => {
     return false;
   }
   return undefined;
+};
+
+export const parseLiftMetric = (value: unknown): number | undefined => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : NaN;
+  }
+
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : NaN;
 };
 
 /**

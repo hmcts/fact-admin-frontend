@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CourtDetails } from '../schemas/courtDetailsSchema';
+import { AllLocationDetails, CourtDetails, ServiceCentreDetails } from '../schemas/courtDetailsSchema';
 
 const CSV_HEADERS = [
   'Name',
@@ -52,7 +52,7 @@ export type CsvDownload = {
 };
 
 /**
- * Loads all courts from the data API and maps them into a downloadable CSV export.
+ * Loads all locations from the data API and maps them into a downloadable CSV export.
  */
 export class DownloadCsvService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
@@ -61,25 +61,34 @@ export class DownloadCsvService {
    * Returns the generated CSV and filename, or the upstream HTTP status code on failure.
    */
   public async getDownloadCsv(now = new Date()): Promise<CsvDownload | HttpStatusCode> {
-    const courtsResponse = await this.dataApiRequests.getAllCourts();
+    const locationsResponse = await this.dataApiRequests.getAllLocations();
 
-    if (!Array.isArray(courtsResponse)) {
-      return courtsResponse;
+    if (!Array.isArray(locationsResponse)) {
+      return locationsResponse;
     }
 
     return {
-      csv: this.buildCsv(courtsResponse),
+      csv: this.buildCsv(locationsResponse),
       filename: `courts-${this.formatDate(now, 'Europe/London')}.csv`,
     };
   }
 
   /**
-   * Builds the CSV body including the header row and one row per court.
+   * Builds the CSV body including the header row and one row per location.
    */
-  public buildCsv(courts: CourtDetails[]): string {
-    const rows = [CSV_HEADERS, ...courts.map(court => this.buildCourtRow(court))];
+  public buildCsv(locations: AllLocationDetails[]): string {
+    const rows = [CSV_HEADERS, ...locations.map(location => this.buildLocationRow(location))];
 
     return rows.map(row => row.map(value => this.escapeCsvValue(value)).join(',')).join('\n');
+  }
+
+  /**
+   * Builds a single CSV row for the provided all-location wrapper.
+   */
+  private buildLocationRow(location: AllLocationDetails): string[] {
+    return location.locationType === 'COURT'
+      ? this.buildCourtRow(location.court)
+      : this.buildServiceCentreRow(location.serviceCentreDetails);
   }
 
   /**
@@ -91,7 +100,11 @@ export class DownloadCsvService {
       court.open ? 'Open' : 'Closed',
       this.formatDate(court.lastUpdatedAt),
       this.formatAddresses(court),
-      this.joinValues(court.courtAreasOfLaw.flatMap(group => group.areasOfLaw.map(area => area.name))),
+      this.joinValues(
+        court.courtAreasOfLaw.flatMap(group =>
+          group.areasOfLaw.flatMap(area => (typeof area === 'string' ? [] : [area.name]))
+        )
+      ),
       this.formatCourtTypes(court),
       this.formatCourtCodes(court, 'crownCourtCode'),
       this.formatCourtCodes(court, 'countyCourtCode'),
@@ -111,11 +124,63 @@ export class DownloadCsvService {
   }
 
   /**
+   * Builds a single CSV row for the provided service centre.
+   */
+  private buildServiceCentreRow(serviceCentre: ServiceCentreDetails): string[] {
+    return [
+      serviceCentre.name,
+      serviceCentre.open ? 'Open' : 'Closed',
+      this.formatDate(serviceCentre.lastUpdatedAt),
+      this.formatServiceCentreAddresses(serviceCentre),
+      this.joinValues(
+        serviceCentre.serviceCentreAreasOfLaw.flatMap(
+          group => group.areasOfLaw?.flatMap(area => (typeof area === 'string' ? [] : [area.name])) ?? []
+        )
+      ),
+      this.joinValues(
+        serviceCentre.serviceAreas.flatMap(serviceArea =>
+          typeof serviceArea === 'string' || !serviceArea.name ? [] : [serviceArea.name]
+        )
+      ),
+      '',
+      '',
+      '',
+      '',
+      this.buildPublicServiceCentreHref(serviceCentre.slug),
+      this.joinValues(
+        serviceCentre.serviceCentreContactDetails.flatMap(detail => (detail.email ? [detail.email] : []))
+      ),
+      this.formatServiceCentreContacts(serviceCentre),
+      '',
+      '',
+    ];
+  }
+
+  /**
    * Formats all court addresses into one multiline cell.
    */
   private formatAddresses(court: CourtDetails): string {
     return this.joinValues(
       court.courtAddresses.map(address => {
+        const addressParts = [
+          address.addressLine1,
+          address.addressLine2,
+          address.townCity,
+          address.county,
+          address.postcode,
+        ].filter(Boolean);
+
+        return `${ADDRESS_TYPE_LABELS[address.addressType]}: ${addressParts.join(', ')}`;
+      })
+    );
+  }
+
+  /**
+   * Formats all service-centre addresses into one multiline cell.
+   */
+  private formatServiceCentreAddresses(serviceCentre: ServiceCentreDetails): string {
+    return this.joinValues(
+      serviceCentre.serviceCentreAddresses.map(address => {
         const addressParts = [
           address.addressLine1,
           address.addressLine2,
@@ -183,6 +248,25 @@ export class DownloadCsvService {
         translation.phoneNumber ? [`Translations: ${translation.phoneNumber}`] : []
       ),
     ]);
+  }
+
+  /**
+   * Formats service-centre contact numbers into one multiline cell.
+   */
+  private formatServiceCentreContacts(serviceCentre: ServiceCentreDetails): string {
+    return this.joinValues(
+      serviceCentre.serviceCentreContactDetails.flatMap(detail => {
+        if (!detail.phoneNumber) {
+          return [];
+        }
+
+        const contactLabel = [detail.serviceCentreContactDescription?.name, detail.explanation]
+          .filter(Boolean)
+          .join(' - ');
+
+        return [`${contactLabel}: ${detail.phoneNumber}`];
+      })
+    );
   }
 
   /**
@@ -259,5 +343,12 @@ export class DownloadCsvService {
    */
   private buildPublicCourtHref(slug: string): string {
     return `${PUBLIC_FRONTEND_URL.replace(/\/$/, '')}/courts/${slug}`;
+  }
+
+  /**
+   * Builds the public frontend service-centre URL used in the CSV export.
+   */
+  private buildPublicServiceCentreHref(slug: string): string {
+    return `${PUBLIC_FRONTEND_URL.replace(/\/$/, '')}/service-centres/${slug}`;
   }
 }

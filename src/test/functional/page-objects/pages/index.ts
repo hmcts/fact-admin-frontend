@@ -1,4 +1,5 @@
 export * from './page.fixtures';
+export { AccessibilityPage } from './accessibility.po';
 export { BuildingFacilitiesPage } from './building-facilities.po';
 export { AddCourtPage } from './add-court.po';
 export { AuditListPage } from './audit-list.po';

@@ -338,6 +338,32 @@ describe('CourtOpeningHoursService', () => {
     ]);
   });
 
+  test('rejects out-of-range same-time parts with unprefixed opening and closing labels', async () => {
+    const { saveCourtOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      openingHourTypeId: courtOpenType.id,
+      sameTime: 'yes',
+      selectedDays: [],
+      sameOpeningHour: '24',
+      sameOpeningMinute: '60',
+      sameClosingHour: '24',
+      sameClosingMinute: '60',
+    });
+    const validationResult = result as ValidationErrorResult;
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCourtOpeningHours).not.toHaveBeenCalled();
+    expect(validationResult.viewModel.errorSummary).toEqual(
+      expect.arrayContaining([
+        { href: '#sameOpeningHour', text: 'Opening hour must be between 0 and 23' },
+        { href: '#sameOpeningMinute', text: 'Opening minute must be between 0 and 59' },
+        { href: '#sameClosingHour', text: 'Closing hour must be between 0 and 23' },
+        { href: '#sameClosingMinute', text: 'Closing minute must be between 0 and 59' },
+      ])
+    );
+  });
+
   test('rejects missing and out-of-range weekday time parts', async () => {
     const { saveCourtOpeningHours, service } = buildService();
 

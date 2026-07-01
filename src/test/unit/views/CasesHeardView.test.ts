@@ -46,9 +46,12 @@ describe('Cases Heard View', () => {
   });
 
   test('renders the cases heard success page', () => {
-    const html = env.render('cases-heard-success.njk', {
+    const html = env.render('common-edit-success.njk', {
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',
+      pageTitle: 'Cases heard saved - Reading Crown Court',
+      successPanelTitle: 'Cases heard saved',
+      successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
       pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success',
     });
 

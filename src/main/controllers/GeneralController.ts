@@ -87,9 +87,11 @@ export default class GeneralController {
       return;
     }
 
-    res.render('general-edit-success', {
+    return res.render('common-edit-success', {
       courtId: resolvedCourtId,
-      // prefer the court name from the updated model
+      pageTitle: `General saved - ${updateResponse.name}`,
+      successPanelTitle: 'General details saved',
+      successPanelBody: `General details for ${updateResponse.name} have been saved successfully.`,
       courtName: updateResponse.name ?? model.name,
     });
   }
