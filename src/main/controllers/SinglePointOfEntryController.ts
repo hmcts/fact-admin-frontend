@@ -4,7 +4,8 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { SinglePointOfEntryService } from '../services/SinglePointOfEntryService';
-import { isUuid } from '../utils/valueParsers';
+import { renderResponse, renderStatus } from '../utils/responseRendering';
+import { isUuid, parseBoolean, parseString } from '../utils/valueParsers';
 
 const singlePointOfEntryService = new SinglePointOfEntryService();
 const logger = Logger.getLogger('app');
@@ -16,15 +17,11 @@ export default class SinglePointOfEntryController {
   public async renderSinglePointOfEntryView(req: Request, res: Response): Promise<void> {
     const courtId = this.resolveCourtId(req);
     if (!courtId) {
-      return this.renderStatus(res, HttpStatusCode.NotFound);
+      return renderStatus(res, HttpStatusCode.NotFound);
     }
 
     const viewModel = await singlePointOfEntryService.retrieve(courtId);
-    if (this.isStatusCode(viewModel)) {
-      return this.renderStatus(res, viewModel);
-    }
-
-    return void res.render('single-point-of-entry', viewModel);
+    return renderResponse(res, viewModel, 'single-point-of-entry');
   }
 
   @route('/success')
@@ -32,22 +29,22 @@ export default class SinglePointOfEntryController {
   public async updateSinglePointOfEntry(req: Request, res: Response): Promise<void> {
     const courtId = this.resolveCourtId(req);
     if (!courtId) {
-      return this.renderStatus(res, HttpStatusCode.NotFound);
+      return renderStatus(res, HttpStatusCode.NotFound);
     }
 
     const serviceSelections = this.parseServiceSelections(req.body);
     if (!serviceSelections) {
-      return this.renderStatus(res, HttpStatusCode.BadRequest);
+      return renderStatus(res, HttpStatusCode.BadRequest);
     }
 
     const saveResult = await singlePointOfEntryService.update(courtId, serviceSelections);
-    if (this.isStatusCode(saveResult)) {
-      return this.renderStatus(res, saveResult);
+    if (typeof saveResult === 'number') {
+      return renderStatus(res, saveResult);
     }
 
     if (saveResult.status === 'invalid') {
       this.logValidationErrors(saveResult.errors);
-      return this.renderStatus(res, HttpStatusCode.BadRequest);
+      return renderStatus(res, HttpStatusCode.BadRequest);
     }
 
     return void res.render('single-point-of-entry-success', {
@@ -57,18 +54,9 @@ export default class SinglePointOfEntryController {
   }
 
   private resolveCourtId(req: Request): string | undefined {
-    const id = req.params.courtId;
-    const candidate = Array.isArray(id) ? id.at(0) : id;
+    const candidate = parseString(req.params.courtId);
 
-    return candidate && isUuid(candidate) ? candidate : undefined;
-  }
-
-  private isStatusCode<T>(result: T | HttpStatusCode): result is HttpStatusCode {
-    return typeof result === 'number';
-  }
-
-  private renderStatus(res: Response, status: HttpStatusCode): void {
-    return void res.status(status).render(status === HttpStatusCode.NotFound ? 'court-not-found' : 'error');
+    return isUuid(candidate) ? candidate : undefined;
   }
 
   private logValidationErrors(errors?: Record<string, string[]>): void {
@@ -112,12 +100,6 @@ export default class SinglePointOfEntryController {
       return undefined;
     }
 
-    if (value === 'true') {
-      return true;
-    }
-    if (value === 'false') {
-      return false;
-    }
-    return undefined;
+    return parseBoolean(value);
   }
 }

@@ -119,14 +119,14 @@ export class SinglePointOfEntryService {
     singlePointOfEntry: CourtSinglePointOfEntryList,
     serviceSelections: Record<string, boolean>
   ): boolean {
-    const editableIds = this.buildSinglePointOfEntryServiceSelections(singlePointOfEntry).map(
-      service => service.areaOfLawId
+    const editableIds = new Set(
+      this.buildSinglePointOfEntryServiceSelections(singlePointOfEntry).map(service => service.areaOfLawId)
     );
 
     return (
-      editableIds.length > 0 &&
-      editableIds.every(areaOfLawId => serviceSelections[areaOfLawId] !== undefined) &&
-      Object.keys(serviceSelections).every(areaOfLawId => editableIds.includes(areaOfLawId))
+      editableIds.size > 0 &&
+      [...editableIds].every(areaOfLawId => serviceSelections[areaOfLawId] !== undefined) &&
+      Object.keys(serviceSelections).every(areaOfLawId => editableIds.has(areaOfLawId))
     );
   }
 
