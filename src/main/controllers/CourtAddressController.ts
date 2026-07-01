@@ -9,6 +9,8 @@ import { CourtAddressService } from '../services/CourtAddressService';
 import { TypesService } from '../services/TypesService';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const logger = Logger.getLogger('app');
 const courtAddressService = new CourtAddressService();
 const typesService = new TypesService();
@@ -21,6 +23,8 @@ export class CourtAddressController {
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
     }
+
+    const courtName = await this.resolveCourtName(courtId);
 
     const courtAddressListResponse = await courtAddressService.list(courtId);
     if (!this.validateServiceResponse(courtAddressListResponse, res, 'court-not-found')) {
@@ -36,6 +40,7 @@ export class CourtAddressController {
     courtAddresses.sort((a, b) => (addressTypeRank[a.addressType] ?? 99) - (addressTypeRank[b.addressType] ?? 99));
 
     res.render('court-address-list', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName),
       courtAddresses,
       courtId,
       pageTitle: 'Manage Addresses',
@@ -50,7 +55,10 @@ export class CourtAddressController {
       return;
     }
 
+    const courtName = await this.resolveCourtName(courtId);
+
     res.render('court-address-find', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
       pageTitle: 'Find Address',
       courtId,
     });
@@ -67,12 +75,15 @@ export class CourtAddressController {
       return;
     }
 
+    const courtName = await this.resolveCourtName(courtId);
+
     const courtAddressResponse = await courtAddressService.retrieve(courtId, addressId);
     if (!this.validateServiceResponse(courtAddressResponse, res, 'not-found')) {
       return;
     }
 
     res.render('court-address-find', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
       postcode: (courtAddressResponse as CourtAddress).postcode,
       courtId,
       addressId,
@@ -88,9 +99,12 @@ export class CourtAddressController {
       return;
     }
 
+    const courtName = await this.resolveCourtName(courtId);
+
     const postcode = req.query?.postcode as string;
     if (!courtAddressService.isValidPostcode(postcode)) {
       res.render('court-address-find', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
         error: courtAddressService.validatePostcode(postcode),
@@ -105,6 +119,7 @@ export class CourtAddressController {
 
     if (postcodeSearchResponse['status'] === 'invalid') {
       res.render('court-address-find', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
@@ -113,6 +128,7 @@ export class CourtAddressController {
     }
 
     res.render('court-address-select', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
@@ -131,9 +147,12 @@ export class CourtAddressController {
       return;
     }
 
+    const courtName = await this.resolveCourtName(courtId);
+
     const postcode = req.query?.postcode as string;
     if (!courtAddressService.isValidPostcode(postcode)) {
       res.render('court-address-find', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
@@ -149,6 +168,7 @@ export class CourtAddressController {
 
     if (postcodeSearchResponse['status'] === 'invalid') {
       res.render('court-address-find', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
@@ -158,6 +178,7 @@ export class CourtAddressController {
     }
 
     res.render('court-address-select', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
@@ -173,7 +194,8 @@ export class CourtAddressController {
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
     }
-    await this.renderAddAddress(res, courtId, false, false, undefined, req.body?.address);
+    const courtName = await this.resolveCourtName(courtId);
+    await this.renderAddAddress(res, courtId, courtName, false, false, undefined, req.body?.address);
   }
 
   @route('/details/success')
@@ -183,6 +205,8 @@ export class CourtAddressController {
     if (!this.validateUuid(courtId, res, 'court-not-found')) {
       return;
     }
+
+    const courtName = await this.resolveCourtName(courtId);
 
     const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId);
 
@@ -196,12 +220,20 @@ export class CourtAddressController {
     }
 
     if (saveResult['status'] === 'invalid') {
-      await this.renderAddAddress(res, courtId, aolSelected, ctSelected, saveResult['address'] as CourtAddress);
+      await this.renderAddAddress(
+        res,
+        courtId,
+        courtName,
+        aolSelected,
+        ctSelected,
+        saveResult['address'] as CourtAddress
+      );
       return;
     }
 
     if (saveResult['status'] === 'saved') {
       res.render('court-address-edit-success', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
         courtName: saveResult['courtName'],
         address: saveResult['address'] as CourtAddress,
         courtId,
@@ -213,6 +245,7 @@ export class CourtAddressController {
   private async renderAddAddress(
     res: Response,
     courtId: string,
+    courtName: string,
     aolSelected: boolean,
     ctSelected: boolean,
     courtAddress?: CourtAddress,
@@ -231,6 +264,7 @@ export class CourtAddressController {
     const address = dpaAddressData ? this.buildAddressData(dpaAddressData) : (courtAddress ?? {});
 
     res.render('court-address-edit', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
       address,
       courtTypes,
       areasOfLaw,
@@ -252,6 +286,8 @@ export class CourtAddressController {
       return;
     }
 
+    const courtName = await this.resolveCourtName(courtId);
+
     const courtAddress = await courtAddressService.retrieve(courtId, addressId);
     if (!this.validateServiceResponse(courtAddress, res, 'not-found')) {
       return;
@@ -263,6 +299,7 @@ export class CourtAddressController {
     await this.renderEditAddress(
       res,
       courtId,
+      courtName,
       addressId,
       courtAddress as CourtAddress,
       aolSelected,
@@ -282,6 +319,8 @@ export class CourtAddressController {
       return;
     }
 
+    const courtName = await this.resolveCourtName(courtId);
+
     const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId, addressId);
 
     const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
@@ -297,6 +336,7 @@ export class CourtAddressController {
       await this.renderEditAddress(
         res,
         courtId,
+        courtName,
         addressId,
         saveResult['address'] as CourtAddress,
         aolSelected,
@@ -307,6 +347,7 @@ export class CourtAddressController {
 
     if (saveResult['status'] === 'saved') {
       res.render('court-address-edit-success', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
         courtName: saveResult['courtName'],
         address: saveResult['address'] as CourtAddress,
         courtId,
@@ -318,6 +359,7 @@ export class CourtAddressController {
   private async renderEditAddress(
     res: Response,
     courtId: string,
+    courtName: string,
     addressId: string,
     courtAddress: CourtAddress,
     aolSelected: boolean,
@@ -337,6 +379,7 @@ export class CourtAddressController {
     const address = dpaAddressData ? this.buildAddressData(dpaAddressData, courtAddress) : courtAddress;
 
     res.render('court-address-edit', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
       address,
       courtTypes,
       areasOfLaw,
@@ -370,8 +413,10 @@ export class CourtAddressController {
     }
 
     res.render('court-address-delete', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Delete address'),
       address: courtAddressResponse,
       courtName,
+      courtId,
       pageTitle: 'Delete Address',
     });
   }
@@ -396,8 +441,10 @@ export class CourtAddressController {
     // if we failed to delete the address, re-render the screen and show the error message
     if (deleteResult['status'] === 'invalid') {
       res.render('court-address-delete', {
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Delete address'),
         address: deleteResult['address'],
         courtName: deleteResult['courtName'],
+        courtId,
         pageTitle: 'Delete Address',
       });
       return;
@@ -405,6 +452,7 @@ export class CourtAddressController {
 
     // The only other option is 'deleted'
     res.render('court-address-delete-success', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Address deleted'),
       courtName: deleteResult['courtName'],
       address: deleteResult['address'],
       courtId,
@@ -453,6 +501,16 @@ export class CourtAddressController {
 
     res.status(status);
     res.render('error');
+  }
+
+  private async resolveCourtName(courtId: string): Promise<string> {
+    try {
+      const courtName = await courtAddressService.retrieveCourtName(courtId);
+      return typeof courtName === 'number' ? 'Court' : courtName;
+    } catch (error) {
+      logger.warn('Unable to resolve court name for breadcrumbs:', error);
+      return 'Court';
+    }
   }
 
   private buildCourtAddressFromRequestBody(
@@ -507,5 +565,9 @@ export class CourtAddressController {
       logger.warn('Unable to parse address data:', error);
     }
     return result;
+  }
+
+  private buildAddressBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Addresses', 'address', currentPage);
   }
 }

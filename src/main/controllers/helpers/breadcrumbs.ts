@@ -7,7 +7,7 @@ export function buildEditBreadcrumbs(courtId: string, courtName: string, current
   return [
     { href: '/', text: 'Home' },
     { href: `/courts/${courtId}/edit`, text: courtName },
-    { text: currentPage , href: '#' },
+    { text: currentPage, href: '#' },
   ];
 }
 
@@ -30,4 +30,3 @@ export function buildSectionBreadcrumbs(
 
   return breadcrumbs;
 }
-

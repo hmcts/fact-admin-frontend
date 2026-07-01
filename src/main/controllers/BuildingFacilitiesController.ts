@@ -6,6 +6,8 @@ import { BuildingFacilitiesService, FacilityModel } from '../services/BuildingFa
 import { addFoodAndDrink, mapFoodAndDrink } from '../utils/mapper';
 import { isUuid, parseBoolean } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const buildingFacilitiesService = new BuildingFacilitiesService();
 @route('/courts/:courtId/edit/building-facilities')
 export default class BuildingFacilitiesController {
@@ -30,6 +32,7 @@ export default class BuildingFacilitiesController {
     }
     const result = addFoodAndDrink(model);
     res.render('building-facilities-edit', {
+      breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, model.name ?? 'Court'),
       courtId: resolvedCourtId,
       model: result,
       pageTitle: `Building Facilities - ${model.name}`,
@@ -76,6 +79,7 @@ export default class BuildingFacilitiesController {
 
     if (updateResponse.errors) {
       res.render('building-facilities-edit', {
+        breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, updateResponse.name ?? 'Court'),
         courtId: resolvedCourtId,
         model: addFoodAndDrink(updateResponse),
         pageTitle: `Error: Building Facilities - ${updateResponse.name}`,
@@ -84,11 +88,20 @@ export default class BuildingFacilitiesController {
     }
 
     res.render('common-edit-success', {
+      breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(
+        resolvedCourtId,
+        updateResponse.name ?? 'Court',
+        'Building facilities saved'
+      ),
       courtId: resolvedCourtId,
       pageTitle: `Building Facilities saved - ${updateResponse.name}`,
       successPanelTitle: 'Building Facilities details saved',
       successPanelBody: `Building Facilities details for ${updateResponse.name} have been saved successfully.`,
       courtName: updateResponse.name,
     });
+  }
+
+  private buildBuildingFacilitiesBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Building facilities', 'building-facilities', currentPage);
   }
 }

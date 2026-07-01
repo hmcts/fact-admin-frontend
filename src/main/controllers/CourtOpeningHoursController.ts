@@ -6,6 +6,8 @@ import { CourtOpeningHoursService, OpeningHoursForm } from '../services/CourtOpe
 import { renderResponse, renderStatus } from '../utils/responseRendering';
 import { isUuid, parseOptionalString, parseString } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const courtOpeningHoursService = new CourtOpeningHoursService();
 
 @route('/courts/:courtId/edit/court-opening-hours')
@@ -19,8 +21,9 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getListPage(courtId);
+    const listViewModel = this.withBreadcrumbs(courtId, viewModel);
 
-    renderResponse(res, viewModel, 'court-opening-hours');
+    renderResponse(res, listViewModel, 'court-opening-hours');
   }
 
   @route('/add')
@@ -33,8 +36,9 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId);
+    const addViewModel = this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours');
 
-    renderResponse(res, viewModel, 'court-opening-hours-edit');
+    renderResponse(res, addViewModel, 'court-opening-hours-edit');
   }
 
   @route('/edit/:openingHoursId')
@@ -52,8 +56,9 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId, openingHoursId);
+    const editViewModel = this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours');
 
-    renderResponse(res, viewModel, 'court-opening-hours-edit', 'not-found');
+    renderResponse(res, editViewModel, 'court-opening-hours-edit', 'not-found');
   }
 
   @route('/save')
@@ -83,8 +88,9 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getDeletePage(courtId, openingHoursId);
+    const deleteViewModel = this.withBreadcrumbs(courtId, viewModel, 'Delete opening hours');
 
-    renderResponse(res, viewModel, 'court-opening-hours-delete', 'not-found');
+    renderResponse(res, deleteViewModel, 'court-opening-hours-delete', 'not-found');
   }
 
   @route('/delete/success/:openingHoursId')
@@ -102,8 +108,9 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.delete(courtId, openingHoursId);
+    const deleteSuccessViewModel = this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted');
 
-    renderResponse(res, viewModel, 'court-opening-hours-delete-success', 'not-found');
+    renderResponse(res, deleteSuccessViewModel, 'court-opening-hours-delete-success', 'not-found');
   }
 
   private async save(req: Request, res: Response, openingHoursId?: string): Promise<void> {
@@ -122,7 +129,10 @@ export default class CourtOpeningHoursController {
 
     if (saveResult.type === 'validation_error') {
       res.status(HttpStatusCode.BadRequest);
-      res.render('court-opening-hours-edit', saveResult.viewModel);
+      res.render('court-opening-hours-edit', {
+        ...saveResult.viewModel,
+        breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Edit opening hours'),
+      });
       return;
     }
 
@@ -131,7 +141,10 @@ export default class CourtOpeningHoursController {
       return;
     }
 
-    res.render('court-opening-hours-save-success', saveResult.viewModel);
+    res.render('court-opening-hours-save-success', {
+      ...saveResult.viewModel,
+      breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Opening hours saved'),
+    });
   }
 
   private toForm(body: Record<string, unknown>): OpeningHoursForm {
@@ -151,5 +164,24 @@ export default class CourtOpeningHoursController {
     }
 
     return true;
+  }
+
+  private buildOpeningHoursBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Court opening hours', 'court-opening-hours', currentPage);
+  }
+
+  private withBreadcrumbs<T extends { courtName: string }>(
+    courtId: string,
+    viewModel: T | HttpStatusCode,
+    currentPage?: string
+  ): T | HttpStatusCode {
+    if (typeof viewModel === 'number') {
+      return viewModel;
+    }
+
+    return {
+      ...viewModel,
+      breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, viewModel.courtName, currentPage),
+    };
   }
 }

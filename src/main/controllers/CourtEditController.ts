@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
+
 const dataApiRequests = new DataApiRequests();
 
 @route('/courts/:courtId/edit')
@@ -35,6 +37,7 @@ export default class CourtEditController {
     }
 
     res.render('court-edit', {
+      breadcrumbs: buildEditBreadcrumbs(resolvedCourtId, courtResponse.name),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       pageTitle: `Editing - ${courtResponse.name}`,

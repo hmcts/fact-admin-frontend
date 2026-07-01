@@ -28,15 +28,23 @@ describe('TranslationAndInterpretationController', () => {
       phoneNumber: '+441234 567890',
     });
 
-    responseMock.expects('render').once().withArgs('translation-and-interpretation', {
-      courtId,
-      courtName: 'Reading Crown Court',
-      email: 'translations@example.com',
-      emailSelected: true,
-      errorSummary: [],
-      phoneNumber: '+441234 567890',
-      phoneNumberSelected: true,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('translation-and-interpretation', {
+        courtId,
+        courtName: 'Reading Crown Court',
+        email: 'translations@example.com',
+        emailSelected: true,
+        errorSummary: [],
+        phoneNumber: '+441234 567890',
+        phoneNumberSelected: true,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${courtId}/edit`, text: 'Reading Crown Court' },
+          { href: `/courts/${courtId}/edit/translation-and-interpretation`, text: 'Translation and interpretation' },
+        ],
+      });
 
     try {
       await controller.get(request, response);
@@ -163,10 +171,19 @@ describe('TranslationAndInterpretationController', () => {
       HttpStatusCode.NoContent
     );
 
-    responseMock.expects('render').once().withArgs('translation-and-interpretation-success', {
-      courtId,
-      courtName: 'Reading Crown Court',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('translation-and-interpretation-success', {
+        courtId,
+        courtName: 'Reading Crown Court',
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${courtId}/edit`, text: 'Reading Crown Court' },
+          { href: `/courts/${courtId}/edit/translation-and-interpretation`, text: 'Translation and interpretation' },
+          { href: '#', text: 'Translation and interpretation saved' },
+        ],
+      });
 
     try {
       await controller.postSuccess(request, response);

@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import { GeneralService, GeneralViewModel } from '../services/GeneralService';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const generalService = new GeneralService();
 
 @route('/courts/:courtId/edit/general')
@@ -31,6 +33,7 @@ export default class GeneralController {
     }
 
     res.render('general-edit', {
+      breadcrumbs: this.buildSectionBreadcrumbs(resolvedCourtId, model.name ?? 'Court', 'General'),
       model,
       pageTitle: `General - ${model.name}`,
     });
@@ -81,6 +84,11 @@ export default class GeneralController {
 
     if (updateResponse.errors) {
       res.render('general-edit', {
+        breadcrumbs: this.buildSectionBreadcrumbs(
+          resolvedCourtId,
+          updateResponse.originalName ?? updateResponse.name ?? 'Court',
+          'General'
+        ),
         model: updateResponse,
         pageTitle: `Error: General - ${updateResponse.originalName ?? updateResponse.name}`,
       });
@@ -88,11 +96,21 @@ export default class GeneralController {
     }
 
     return res.render('common-edit-success', {
+      breadcrumbs: this.buildSectionBreadcrumbs(
+        resolvedCourtId,
+        updateResponse.name ?? model.name ?? 'Court',
+        'General',
+        'General saved'
+      ),
       courtId: resolvedCourtId,
       pageTitle: `General saved - ${updateResponse.name}`,
       successPanelTitle: 'General details saved',
       successPanelBody: `General details for ${updateResponse.name} have been saved successfully.`,
       courtName: updateResponse.name ?? model.name,
     });
+  }
+
+  private buildSectionBreadcrumbs(courtId: string, courtName: string, section: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, section, section.toLowerCase().replace(/ /g, '-'), currentPage);
   }
 }

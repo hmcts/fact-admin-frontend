@@ -112,7 +112,11 @@ export default class AccessibilityController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name ?? 'Court', 'Accessibility saved'),
+      breadcrumbs: this.buildAccessibilityBreadcrumbs(
+        resolvedCourtId,
+        updateResponse.name ?? 'Court',
+        'Accessibility saved'
+      ),
       courtId: resolvedCourtId,
       pageTitle: `Accessibility saved - ${updateResponse.name}`,
       successPanelTitle: 'Accessibility details saved',
