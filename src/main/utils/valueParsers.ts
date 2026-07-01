@@ -12,7 +12,7 @@ export function parseNumber(value: unknown, fallback: number): number {
 export function parseString(value: unknown): string {
   const parsed = parseOptionalString(value);
 
-  return parsed ?? '';
+  return parsed ? parsed.trim() : '';
 }
 
 /**
