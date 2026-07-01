@@ -38,6 +38,11 @@ describe('Court opening hours routes', () => {
     expect(response.text).toContain('Edit');
     expect(response.text).toContain('Delete');
     expect(response.text).toContain('Add opening hours');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Reading Crown Court</a>`
+    );
   });
 
   test('renders the edit opening hours form', async () => {

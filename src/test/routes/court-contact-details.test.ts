@@ -43,6 +43,11 @@ describe('Court contact details routes', () => {
     expect(response.text).toContain(`/courts/${COURT_ID}/edit/contact-details/add`);
     expect(response.text).toContain(`/courts/${COURT_ID}/edit/contact-details/edit/${CONTACT_DETAIL_ID}`);
     expect(response.text).toContain(`/courts/${COURT_ID}/edit/contact-details/delete/${CONTACT_DETAIL_ID}`);
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${COURT_ID}/edit">Reading Crown Court</a>`
+    );
   });
 
   test('renders court not found for invalid court id on list page', async () => {
@@ -92,7 +97,7 @@ describe('Court contact details routes', () => {
       .send(`contact-type=${CONTACT_TYPE_ID}&contact-methods=email&contact-email=enquiries%40example.test`);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Contact detailsadded: enquiries@example.test');
+    expect(response.text).toContain('Contact details added: enquiries@example.test');
     expect(response.text).toContain(
       'contact details of General enquiries for Reading Crown Court have been successfully created.'
     );

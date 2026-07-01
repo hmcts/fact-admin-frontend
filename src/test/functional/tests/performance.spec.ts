@@ -1,4 +1,4 @@
-import { test } from '../fixtures';
+import { expect, test } from '../fixtures';
 import { withCreatedCourt } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -25,13 +25,60 @@ test.describe(
     test('Add Court Page Performance', async ({ addCourtPage, lighthouseUtils }) => {
       await addCourtPage.goto();
       await addCourtPage.header.checkIsVisible();
+      const breadcrumb = addCourtPage.page.getByLabel('Breadcrumb');
+      await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+    });
+
+    test('Court Edit Page Performance', async ({ courtEditPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Edit Performance Test', {}, async ({ createdCourt }) => {
+        await courtEditPage.goto(createdCourt.id);
+        const breadcrumb = courtEditPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb).toContainText(createdCourt.name);
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Accessibility Page Performance', async ({ accessibilityPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Accessibility Performance Test', {}, async ({ createdCourt }) => {
+        await accessibilityPage.goto(createdCourt.id);
+        const breadcrumb = accessibilityPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Building Facilities Page Performance', async ({ buildingFacilitiesPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Building Facilities Performance Test', {}, async ({ createdCourt }) => {
+        await buildingFacilitiesPage.goto(createdCourt.id);
+        const breadcrumb = buildingFacilitiesPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Cases Heard Performance Test', {}, async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.header.checkIsVisible();
+        const breadcrumb = casesHeardPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
     });
@@ -48,6 +95,12 @@ test.describe(
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.header.checkIsVisible();
+          const breadcrumb = translationAndInterpretationPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
@@ -61,9 +114,29 @@ test.describe(
         async ({ createdCourt }) => {
           await courtAddressListPage.goto(createdCourt.id);
           await courtAddressListPage.header.checkIsVisible();
+          const breadcrumb = courtAddressListPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
+    });
+
+    test('Court Opening Hours Page Performance', async ({ courtOpeningHoursPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Opening Hours Performance Test', {}, async ({ createdCourt }) => {
+        await courtOpeningHoursPage.goto(createdCourt.id);
+        const breadcrumb = courtOpeningHoursPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Address Find Page Performance', async ({ lighthouseUtils, playwright, courtAddressFindPage }) => {
@@ -101,10 +174,27 @@ test.describe(
         await withCreatedCourt(playwright, 'General Performance Test', {}, async ({ createdCourt }) => {
           await generalPage.goto(createdCourt.id);
           await generalPage.header.checkIsVisible();
+          const breadcrumb = generalPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         });
       }
     );
+
+    test('General Breadcrumb Performance', async ({ generalPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'General Performance Test', {}, async ({ createdCourt }) => {
+        await generalPage.goto(createdCourt.id);
+        const breadcrumb = generalPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb).toBeVisible();
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
 
     test('Information for Professionals Page Performance', async ({
       lighthouseUtils,
@@ -118,6 +208,12 @@ test.describe(
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
           await professionalInformationPage.header.checkIsVisible();
+          const breadcrumb = professionalInformationPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
@@ -141,6 +237,12 @@ test.describe(
 
           await localAuthoritiesPage.goto(createdCourt.id);
           await localAuthoritiesPage.expectVisibleElements();
+          const breadcrumb = localAuthoritiesPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
@@ -150,6 +252,12 @@ test.describe(
       await withCreatedCourt(playwright, 'Court Contact List Performance Test', {}, async ({ createdCourt }) => {
         await courtContactDetailsPage.goto(createdCourt.id);
         await courtContactDetailsPage.header.checkIsVisible();
+        const breadcrumb = courtContactDetailsPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
     });

@@ -18,6 +18,8 @@ test.describe(
     test('Add Court Page Accessibility', async ({ addCourtPage, axeUtils }) => {
       await addCourtPage.goto();
       await addCourtPage.expectVisibleElements();
+      const breadcrumb = addCourtPage.page.getByLabel('Breadcrumb');
+      await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
       await axeUtils.audit();
     });
 
@@ -32,6 +34,41 @@ test.describe(
       await withCreatedCourt(playwright, 'Court Edit Accessibility Test', {}, async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);
         await courtEditPage.expectVisibleElements();
+        const breadcrumb = courtEditPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb).toContainText(createdCourt.name);
+        await axeUtils.audit();
+      });
+    });
+
+    test('Accessibility Page Breadcrumb Accessibility', async ({ accessibilityPage, axeUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Accessibility Accessibility Test', {}, async ({ createdCourt }) => {
+        await accessibilityPage.goto(createdCourt.id);
+        const breadcrumb = accessibilityPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await axeUtils.audit();
+      });
+    });
+
+    test('Building Facilities Page Breadcrumb Accessibility', async ({
+      axeUtils,
+      buildingFacilitiesPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(playwright, 'Building Facilities Accessibility Test', {}, async ({ createdCourt }) => {
+        await buildingFacilitiesPage.goto(createdCourt.id);
+        const breadcrumb = buildingFacilitiesPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await axeUtils.audit();
       });
     });
@@ -40,6 +77,12 @@ test.describe(
       await withCreatedCourt(playwright, 'Cases Heard Accessibility Test', {}, async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
         await casesHeardPage.expectVisibleElements();
+        const breadcrumb = casesHeardPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await axeUtils.audit();
       });
     });
@@ -68,6 +111,21 @@ test.describe(
       await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
         await generalPage.goto(createdCourt.id);
         await generalPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
+    });
+
+    test('General Breadcrumb Accessibility', async ({ axeUtils, generalPage, playwright }) => {
+      await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
+        await generalPage.goto(createdCourt.id);
+        const breadcrumb = generalPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb).toBeVisible();
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await axeUtils.audit();
       });
     });
@@ -104,6 +162,12 @@ test.describe(
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.expectVisibleElements();
           await expect(translationAndInterpretationPage.heading).toContainText('Translation and interpretation');
+          const breadcrumb = translationAndInterpretationPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await axeUtils.audit();
         }
       );
@@ -143,6 +207,12 @@ test.describe(
         async ({ createdCourt }) => {
           await courtAddressListPage.goto(createdCourt.id);
           await courtAddressListPage.header.checkIsVisible();
+          const breadcrumb = courtAddressListPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await axeUtils.audit();
         }
       );
@@ -178,6 +248,12 @@ test.describe(
       await withCreatedCourt(playwright, 'Opening Hours Accessibility Test', {}, async ({ createdCourt }) => {
         await courtOpeningHoursPage.goto(createdCourt.id);
         await courtOpeningHoursPage.header.checkIsVisible();
+        const breadcrumb = courtOpeningHoursPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await axeUtils.audit();
       });
     });
@@ -207,6 +283,12 @@ test.describe(
       await withCreatedCourt(playwright, 'Local Authorities Accessibility Test', {}, async ({ createdCourt }) => {
         await localAuthoritiesPage.goto(createdCourt.id);
         await localAuthoritiesPage.expectVisibleElements();
+        const breadcrumb = localAuthoritiesPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await axeUtils.audit();
       });
     });
@@ -223,6 +305,12 @@ test.describe(
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
           await professionalInformationPage.expectVisibleElements();
+          const breadcrumb = professionalInformationPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
           await axeUtils.audit();
         }
       );
@@ -258,6 +346,12 @@ test.describe(
       await withCreatedCourt(playwright, 'Court Contact List Accessibility Test', {}, async ({ createdCourt }) => {
         await courtContactDetailsPage.goto(createdCourt.id);
         await courtContactDetailsPage.expectVisibleElements();
+        const breadcrumb = courtContactDetailsPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
         await axeUtils.audit();
       });
     });

@@ -13,6 +13,20 @@ const ADDRESS_ID = '22222222-2222-4222-8222-222222222222';
 const AREA_OF_LAW_ID = '33333333-3333-4333-8333-333333333333';
 const COURT_TYPE_ID = '44444444-4444-4444-8444-444444444444';
 
+const buildAddressBreadcrumbs = (courtName = 'Court', currentPage?: string) => {
+  const breadcrumbs = [
+    { href: '/', text: 'Home' },
+    { href: `/courts/${COURT_ID}/edit`, text: courtName },
+    { href: `/courts/${COURT_ID}/edit/address`, text: 'Addresses' },
+  ];
+
+  if (currentPage) {
+    breadcrumbs.push({ href: '#', text: currentPage });
+  }
+
+  return breadcrumbs;
+};
+
 const buildAddress = (overrides?: Partial<CourtAddress>): CourtAddress => ({
   id: ADDRESS_ID,
   courtId: COURT_ID,
@@ -107,11 +121,15 @@ describe('CourtAddressController', () => {
     request.query = { postcode: '' };
     const retrieveAddressOptionsStub = stub(CourtAddressService.prototype, 'retrieveAddressOptions');
 
-    responseMock.expects('render').once().withArgs('court-address-find', {
-      courtId: COURT_ID,
-      pageTitle: 'Find Address',
-      error: POSTCODE_ERROR_MESSAGES.blankPostcode,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-find', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        courtId: COURT_ID,
+        pageTitle: 'Find Address',
+        error: POSTCODE_ERROR_MESSAGES.blankPostcode,
+      });
 
     try {
       await controller.renderSelectNew(request, response);
@@ -152,12 +170,16 @@ describe('CourtAddressController', () => {
       addressOptions
     );
 
-    responseMock.expects('render').once().withArgs('court-address-select', {
-      addresses: addressOptions,
-      postcode: 'RG1 2AA',
-      courtId: COURT_ID,
-      pageTitle: 'Select Address',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-select', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        addresses: addressOptions,
+        postcode: 'RG1 2AA',
+        courtId: COURT_ID,
+        pageTitle: 'Select Address',
+      });
 
     try {
       await controller.renderSelectNew(request, response);
@@ -203,12 +225,16 @@ describe('CourtAddressController', () => {
 
     const saveStub = stub(CourtAddressService.prototype, 'save').resolves(saveResponse);
 
-    responseMock.expects('render').once().withArgs('court-address-edit-success', {
-      courtName: 'Reading Crown Court',
-      address: saveResponse.address,
-      courtId: COURT_ID,
-      courtOpened: true,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-edit-success', {
+        breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address saved'),
+        courtName: 'Reading Crown Court',
+        address: saveResponse.address,
+        courtId: COURT_ID,
+        courtOpened: true,
+      });
 
     try {
       await controller.saveNewAddress(request, response);
@@ -332,11 +358,15 @@ describe('CourtAddressController', () => {
     };
     const deleteStub = stub(CourtAddressService.prototype, 'delete').resolves(deleteResponse);
 
-    responseMock.expects('render').once().withArgs('court-address-delete-success', {
-      courtName: 'Reading Crown Court',
-      address: deleteResponse.address,
-      courtId: COURT_ID,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-delete-success', {
+        breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address deleted'),
+        courtName: 'Reading Crown Court',
+        address: deleteResponse.address,
+        courtId: COURT_ID,
+      });
 
     try {
       await controller.deleteAddress(request, response);
@@ -416,12 +446,16 @@ describe('CourtAddressController', () => {
 
     const retrieveStub = stub(CourtAddressService.prototype, 'retrieve').resolves(buildAddress());
 
-    responseMock.expects('render').once().withArgs('court-address-find', {
-      postcode: 'RG1 2AA',
-      courtId: COURT_ID,
-      addressId: ADDRESS_ID,
-      pageTitle: 'Find Address',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-find', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        postcode: 'RG1 2AA',
+        courtId: COURT_ID,
+        addressId: ADDRESS_ID,
+        pageTitle: 'Find Address',
+      });
 
     try {
       await controller.renderFindForUpdate(request, response);
@@ -469,12 +503,16 @@ describe('CourtAddressController', () => {
 
     const retrieveAddressOptionsStub = stub(CourtAddressService.prototype, 'retrieveAddressOptions');
 
-    responseMock.expects('render').once().withArgs('court-address-find', {
-      courtId: COURT_ID,
-      addressId: ADDRESS_ID,
-      pageTitle: 'Find Address',
-      error: POSTCODE_ERROR_MESSAGES.blankPostcode,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-find', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        courtId: COURT_ID,
+        addressId: ADDRESS_ID,
+        pageTitle: 'Find Address',
+        error: POSTCODE_ERROR_MESSAGES.blankPostcode,
+      });
 
     try {
       await controller.renderSelectForUpdate(request, response);
@@ -511,13 +549,17 @@ describe('CourtAddressController', () => {
       addressOptions as never
     );
 
-    responseMock.expects('render').once().withArgs('court-address-select', {
-      addresses: addressOptions,
-      postcode: 'RG1 2AA',
-      courtId: COURT_ID,
-      addressId: ADDRESS_ID,
-      pageTitle: 'Select Address',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-select', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        addresses: addressOptions,
+        postcode: 'RG1 2AA',
+        courtId: COURT_ID,
+        addressId: ADDRESS_ID,
+        pageTitle: 'Select Address',
+      });
 
     try {
       await controller.renderSelectForUpdate(request, response);
@@ -624,12 +666,16 @@ describe('CourtAddressController', () => {
 
     const saveStub = stub(CourtAddressService.prototype, 'save').resolves(saveResponse);
 
-    responseMock.expects('render').once().withArgs('court-address-edit-success', {
-      courtName: 'Reading Crown Court',
-      address: saveResponse.address,
-      courtId: COURT_ID,
-      courtOpened: false,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-edit-success', {
+        breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address saved'),
+        courtName: 'Reading Crown Court',
+        address: saveResponse.address,
+        courtId: COURT_ID,
+        courtOpened: false,
+      });
 
     try {
       await controller.updateExistingAddress(request, response);
@@ -701,11 +747,16 @@ describe('CourtAddressController', () => {
     );
     const retrieveStub = stub(CourtAddressService.prototype, 'retrieve').resolves(buildAddress());
 
-    responseMock.expects('render').once().withArgs('court-address-delete', {
-      address: buildAddress(),
-      courtName: 'Reading Crown Court',
-      pageTitle: 'Delete Address',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-delete', {
+        breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Delete address'),
+        address: buildAddress(),
+        courtName: 'Reading Crown Court',
+        courtId: COURT_ID,
+        pageTitle: 'Delete Address',
+      });
 
     try {
       await controller.renderDeleteAddress(request, response);
@@ -786,15 +837,19 @@ describe('CourtAddressController', () => {
     const listAreasOfLawStub = stub(TypesService.prototype, 'listAreasOfLaw').resolves([] as never);
     const listCourtTypesStub = stub(TypesService.prototype, 'listCourtTypes').resolves([] as never);
 
-    responseMock.expects('render').once().withArgs('court-address-edit', {
-      address: {},
-      courtTypes: [],
-      areasOfLaw: [],
-      aolSelected: undefined,
-      ctSelected: undefined,
-      courtId: COURT_ID,
-      pageTitle: 'Manage Addresses',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-edit', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Edit address'),
+        address: {},
+        courtTypes: [],
+        areasOfLaw: [],
+        aolSelected: undefined,
+        ctSelected: undefined,
+        courtId: COURT_ID,
+        pageTitle: 'Manage Addresses',
+      });
 
     try {
       await controller.addAddress(request, response);
@@ -830,10 +885,14 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID };
 
-    responseMock.expects('render').once().withArgs('court-address-find', {
-      pageTitle: 'Find Address',
-      courtId: COURT_ID,
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-find', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        pageTitle: 'Find Address',
+        courtId: COURT_ID,
+      });
 
     await controller.renderFindNew(request, response);
     responseMock.verify();
@@ -895,11 +954,15 @@ describe('CourtAddressController', () => {
       invalidResponse as never
     );
 
-    responseMock.expects('render').once().withArgs('court-address-find', {
-      courtId: COURT_ID,
-      pageTitle: 'Find Address',
-      error: 'No addresses found',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-find', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        courtId: COURT_ID,
+        pageTitle: 'Find Address',
+        error: 'No addresses found',
+      });
 
     try {
       await controller.renderSelectNew(request, response);
@@ -1246,12 +1309,16 @@ describe('CourtAddressController', () => {
       error: 'No addresses found',
     } as never);
 
-    responseMock.expects('render').once().withArgs('court-address-find', {
-      courtId: COURT_ID,
-      addressId: ADDRESS_ID,
-      pageTitle: 'Find Address',
-      error: 'No addresses found',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-find', {
+        breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+        courtId: COURT_ID,
+        addressId: ADDRESS_ID,
+        pageTitle: 'Find Address',
+        error: 'No addresses found',
+      });
 
     try {
       await controller.renderSelectForUpdate(request, response);

@@ -27,6 +27,9 @@ describe('Court edit page', () => {
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/contact-details');
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/general');
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/local-authorities');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain('Reading Crown Court');
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {

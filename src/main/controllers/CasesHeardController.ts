@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import { CasesHeardService } from '../services/CasesHeardService';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const casesHeardService = new CasesHeardService();
 
 type Confirmations = {
@@ -37,7 +39,10 @@ export default class CasesHeardController {
       return res.render('error');
     }
 
-    res.render('cases-heard', viewModel);
+    res.render('cases-heard', {
+      ...viewModel,
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, viewModel.courtName ?? 'Court'),
+    });
   }
 
   @route('/success')
@@ -70,7 +75,10 @@ export default class CasesHeardController {
 
     if (saveResult.type === 'validation_error') {
       res.status(HttpStatusCode.BadRequest);
-      return res.render('cases-heard', saveResult.viewModel);
+      return res.render('cases-heard', {
+        ...saveResult.viewModel,
+        breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, saveResult.viewModel.courtName ?? 'Court'),
+      });
     }
 
     if (saveResult.type === 'status' && saveResult.status === HttpStatusCode.NotFound) {
@@ -84,6 +92,11 @@ export default class CasesHeardController {
     }
 
     return res.render('common-edit-success', {
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(
+        resolvedCourtId,
+        saveResult.viewModel.courtName,
+        'Cases heard saved'
+      ),
       courtId: resolvedCourtId,
       pageTitle: `Cases heard saved - ${saveResult.viewModel.courtName}`,
       successPanelTitle: 'Cases heard saved',
@@ -112,10 +125,15 @@ export default class CasesHeardController {
     }
 
     return res.render('cases-heard-confirm', {
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, courtName, 'Cases heard confirm update'),
       courtId: resolvedCourtId,
       courtName,
       selectedAreasOfLaw,
       message,
     });
+  }
+
+  private buildCasesHeardBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Cases heard', 'cases-heard', currentPage);
   }
 }

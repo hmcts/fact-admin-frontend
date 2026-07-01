@@ -47,6 +47,11 @@ describe('Cases heard page', () => {
     expect(response.text).toContain(
       '<form method="post" action="/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success">'
     );
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      '<a class="govuk-breadcrumbs__link" href="/courts/11111111-1111-4111-8111-111111111111/edit">Reading Crown Court</a>'
+    );
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {
