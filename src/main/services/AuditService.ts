@@ -103,6 +103,7 @@ export class AuditService {
     }
 
     const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
+    const queryParams = this.applyDefaults(filters);
 
     let pageNumber = 0;
 
@@ -119,7 +120,7 @@ export class AuditService {
       // This is done in a loop until all pages are retrieved.
       while (true) {
         const response = await this.dataApiRequests.getAudits({
-          ...filters,
+          ...queryParams,
           pageNumber,
           pageSize: MAX_PAGE_PARAM,
         });
