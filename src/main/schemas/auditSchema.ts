@@ -29,7 +29,7 @@ export const auditListItemSchema = z.object({
   // schema so that we can use it in the various view models
   subjectName: z.string().optional().nullable(),
   userId: z.uuid(),
-  user: userSchema,
+  user: userSchema.optional().nullable(),
   actionType: z.string(),
   actionEntity: z.string(),
   actionDataDiff: z.array(actionDataDiffSchema).nullable(),

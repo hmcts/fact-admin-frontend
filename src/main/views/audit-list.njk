@@ -210,7 +210,7 @@
 
     {% set auditTableRows = (auditTableRows.push([
       {
-        text: audit.user.email
+        text: audit.user.email if audit.user else "<unkown>"
       },
       {
         html: tagHtml

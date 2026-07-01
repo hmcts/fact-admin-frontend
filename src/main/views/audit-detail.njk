@@ -84,7 +84,11 @@
         },
         {
           key: { text: "User" },
-          value: { text: audit.user.email + " (" + audit.user.role + ")"}
+          value: { text: audit.user.email + " (" + audit.user.role + ")"} if audit.user else { text: "<unknown>" }
+        },
+        {
+          key: { text: "User Id" },
+          value: { text: audit.userId }
         }
       ]
     }) }}
