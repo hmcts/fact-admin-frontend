@@ -14,6 +14,10 @@ import { Audit, AuditSubject, AuditSubjectOptionsMap, PagedAudits } from '../sch
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_PARAM = 1000;
+
+const CSV_PAGE_SIZE = 1000;
+const MAX_CSV_PAGES = 10;
+
 const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 
 const logger = Logger.getLogger('audit-service');
@@ -116,13 +120,13 @@ export class AuditService {
       // write the header
       stream.write(['Created At', 'User', 'Action', 'location', 'Changes'].map(this.csvEscape).join(',') + '\n');
 
-      // Pull all pages from API in chunks of MAX_PAGE_PARAM and write to the file stream.
+      // Pull at most MAX_CSV_PAGES pages from API in chunks of CSV_PAGE_SIZE and write to the file stream.
       // This is done in a loop until all pages are retrieved.
       while (true) {
         const response = await this.dataApiRequests.getAudits({
           ...queryParams,
           pageNumber,
-          pageSize: MAX_PAGE_PARAM,
+          pageSize: CSV_PAGE_SIZE,
         });
 
         if (this.isHttpStatusCode(response)) {
@@ -133,7 +137,7 @@ export class AuditService {
         for (const audit of response.content) {
           const row = [
             audit.createdAt ?? '',
-            audit.user.email ?? '',
+            audit.user?.email ?? '<unknown>',
             audit.actionType ?? '',
             (nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>') + `: ${audit.actionEntity}`,
             JSON.stringify(audit.actionDataDiff ?? ''),
@@ -145,7 +149,7 @@ export class AuditService {
         }
 
         pageNumber += 1;
-        if (pageNumber >= response.page.totalPages || response.content.length === 0) {
+        if (pageNumber >= response.page.totalPages || pageNumber >= MAX_CSV_PAGES || response.content.length === 0) {
           break;
         }
       }
@@ -218,8 +222,8 @@ export class AuditService {
     const errors: Record<string, string[]> = {};
 
     // page number bounds check
-    if (params.pageNumber < 0 || params.pageNumber > MAX_PAGE_PARAM) {
-      errors.pageNumber = [`Page number must be between 0 and ${MAX_PAGE_PARAM}`];
+    if (params.pageNumber < 0 || params.pageNumber > 100000) {
+      errors.pageNumber = ['Page number must be between 0 and 100000'];
     }
     // page size bounds check
     if (params.pageSize < 1 || params.pageSize > MAX_PAGE_PARAM) {

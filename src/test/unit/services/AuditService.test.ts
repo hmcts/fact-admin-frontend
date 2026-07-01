@@ -367,7 +367,7 @@ describe('AuditService', () => {
     }
 
     expect(response.filters.fromDate).toBe('2026-06-26');
-    expect(response.errors?.pageNumber).toEqual(['Page number must be between 0 and 1000']);
+    expect(response.errors?.pageNumber).toEqual(['Page number must be between 0 and 100000']);
     expect(response.errors?.pageSize).toEqual(['Page size must be between 1 and 1000']);
     expect(response.errors?.fromDate).toEqual(['From date must not be after To date']);
     expect(response.errors?.toDate).toEqual(['To date must not be before From date']);
