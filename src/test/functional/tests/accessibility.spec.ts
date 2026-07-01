@@ -310,5 +310,67 @@ test.describe(
         },
       });
     });
+
+    test('Court Contact List Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact List Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtContactDetailsPage.goto(createdCourt.id);
+        await courtContactDetailsPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Contact Add Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact Add Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Contact Edit Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact Edit Accessibility Test', {}, async ({ createdCourt }) => {
+        const uniqueSuffix = Date.now();
+        const contactEmail = `a11y-contact-${uniqueSuffix}@example.test`;
+
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.selectFirstAvailableContactType();
+        await courtContactDetailsPage.emailCheckbox.check();
+        await courtContactDetailsPage.emailInput.fill(contactEmail);
+        await courtContactDetailsPage.explanationInput.fill('Accessibility edit test contact');
+        await courtContactDetailsPage.save();
+
+        await expect(courtContactDetailsPage.successPanel).toContainText('Contact details added:');
+        await courtContactDetailsPage.continueUpdatingLink.click();
+        await courtContactDetailsPage.clickEditForRowText(contactEmail);
+
+        await courtContactDetailsPage.expectVisibleElements();
+        await expect(courtContactDetailsPage.heading).toContainText('Edit contact details');
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Contact Delete Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact Delete Accessibility Test', {}, async ({ createdCourt }) => {
+        const uniqueSuffix = Date.now();
+        const contactEmail = `a11y-delete-${uniqueSuffix}@example.test`;
+
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.selectFirstAvailableContactType();
+        await courtContactDetailsPage.emailCheckbox.check();
+        await courtContactDetailsPage.emailInput.fill(contactEmail);
+        await courtContactDetailsPage.explanationInput.fill('Accessibility delete test contact');
+        await courtContactDetailsPage.save();
+
+        await expect(courtContactDetailsPage.successPanel).toContainText('Contact details added:');
+        await courtContactDetailsPage.continueUpdatingLink.click();
+        await courtContactDetailsPage.clickDeleteForRowText(contactEmail);
+
+        await courtContactDetailsPage.expectVisibleElements();
+        await expect(courtContactDetailsPage.heading).toContainText(
+          'Are you sure you want to delete these contact details?'
+        );
+        await axeUtils.audit();
+      });
+    });
   }
 );
