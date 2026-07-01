@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CourtSinglePointOfEntry, CourtSinglePointOfEntryList } from '../schemas/courtSinglePointOfEntrySchema';
+import { CourtSinglePointOfEntryList } from '../schemas/courtSinglePointOfEntrySchema';
 
 const supportedSinglePointOfEntryServices = [
   {
@@ -69,9 +69,10 @@ export class SinglePointOfEntryService {
       return HttpStatusCode.BadRequest;
     }
 
-    const updatePayload = this.applySelections(existingSinglePointOfEntryResponse, serviceSelections);
-
-    const updateResponse = await this.dataApiRequests.updateCourtSinglePointOfEntry(courtId, updatePayload);
+    const updateResponse = await this.dataApiRequests.updateCourtSinglePointOfEntry(
+      courtId,
+      this.applySelections(existingSinglePointOfEntryResponse, serviceSelections)
+    );
     if (typeof updateResponse === 'number' && updateResponse !== HttpStatusCode.Ok) {
       return updateResponse;
     }
@@ -94,7 +95,7 @@ export class SinglePointOfEntryService {
     singlePointOfEntry: CourtSinglePointOfEntryList
   ): SinglePointOfEntryServiceSelection[] {
     return supportedSinglePointOfEntryServices.flatMap(service => {
-      const matchingEntry = this.findAreaOfLaw(singlePointOfEntry, service.areaOfLawName);
+      const matchingEntry = singlePointOfEntry.find(entry => entry.name === service.areaOfLawName);
 
       return matchingEntry
         ? [
@@ -106,13 +107,6 @@ export class SinglePointOfEntryService {
           ]
         : [];
     });
-  }
-
-  private findAreaOfLaw(
-    singlePointOfEntry: CourtSinglePointOfEntryList,
-    areaOfLawName: string
-  ): CourtSinglePointOfEntry | undefined {
-    return singlePointOfEntry.find(entry => entry.name === areaOfLawName);
   }
 
   private hasExpectedServiceSelections(

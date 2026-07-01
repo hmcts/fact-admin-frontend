@@ -20,8 +20,7 @@ export default class SinglePointOfEntryController {
       return renderStatus(res, HttpStatusCode.NotFound);
     }
 
-    const viewModel = await singlePointOfEntryService.retrieve(courtId);
-    return renderResponse(res, viewModel, 'single-point-of-entry');
+    return renderResponse(res, await singlePointOfEntryService.retrieve(courtId), 'single-point-of-entry');
   }
 
   @route('/success')
@@ -43,7 +42,9 @@ export default class SinglePointOfEntryController {
     }
 
     if (saveResult.status === 'invalid') {
-      this.logValidationErrors(saveResult.errors);
+      Object.values(saveResult.errors ?? {})
+        .flat()
+        .forEach(message => logger.error(message));
       return renderStatus(res, HttpStatusCode.BadRequest);
     }
 
@@ -57,12 +58,6 @@ export default class SinglePointOfEntryController {
     const candidate = parseString(req.params.courtId);
 
     return isUuid(candidate) ? candidate : undefined;
-  }
-
-  private logValidationErrors(errors?: Record<string, string[]>): void {
-    Object.values(errors ?? {})
-      .flat()
-      .forEach(message => logger.error(message));
   }
 
   private parseServiceSelections(body: Request['body']): Record<string, boolean> | undefined {
