@@ -57,6 +57,78 @@ describe('CourtContactService submitContactDetailFlow', () => {
     expect(createCourtContactDetailSpy).not.toHaveBeenCalled();
   });
 
+  test('returns validation-error when explanation is over 250 characters', async () => {
+    const getContactDescriptionTypesSpy = jest
+      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
+    const createCourtContactDetailSpy = jest
+      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .mockResolvedValue(HttpStatusCode.Created);
+
+    const result = await new CourtContactService().submitContactDetailFlow({
+      body: {
+        'contact-explanation': 'a'.repeat(251),
+        'contact-methods': ['email'],
+        'contact-email': 'enquiries@example.test',
+        'contact-type': contactTypeId,
+      },
+      courtId,
+      courtName: 'Reading Crown Court',
+      formAction: `/courts/${courtId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.formViewModel.formErrors.contactExplanation).toBe('Explanation must be 250 characters or fewer');
+    expect(result.formViewModel.errorSummary).toContainEqual({
+      href: '#contact-explanation',
+      text: 'Explanation must be 250 characters or fewer',
+    });
+    expect(getContactDescriptionTypesSpy).toHaveBeenCalledTimes(1);
+    expect(createCourtContactDetailSpy).not.toHaveBeenCalled();
+  });
+
+  test('returns validation-error when explanation contains unsupported characters', async () => {
+    const getContactDescriptionTypesSpy = jest
+      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
+    const createCourtContactDetailSpy = jest
+      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .mockResolvedValue(HttpStatusCode.Created);
+
+    const result = await new CourtContactService().submitContactDetailFlow({
+      body: {
+        'contact-explanation': 'Invalid/',
+        'contact-methods': ['email'],
+        'contact-email': 'enquiries@example.test',
+        'contact-type': contactTypeId,
+      },
+      courtId,
+      courtName: 'Reading Crown Court',
+      formAction: `/courts/${courtId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.formViewModel.formErrors.contactExplanation).toBe(
+      'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+    );
+    expect(result.formViewModel.errorSummary).toContainEqual({
+      href: '#contact-explanation',
+      text: 'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
+    });
+    expect(getContactDescriptionTypesSpy).toHaveBeenCalledTimes(1);
+    expect(createCourtContactDetailSpy).not.toHaveBeenCalled();
+  });
+
   test('returns save-error when save status is unsuccessful', async () => {
     const createCourtContactDetailSpy = jest
       .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')

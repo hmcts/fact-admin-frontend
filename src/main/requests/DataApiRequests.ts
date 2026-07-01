@@ -13,7 +13,6 @@ import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildin
 import { ContactDescriptionType, contactDescriptionTypeListSchema } from '../schemas/contactDescriptionTypeSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtContactDetail, courtContactDetailListSchema } from '../schemas/courtContactDetailSchema';
-import { CourtDetails, courtDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';

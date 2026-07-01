@@ -47,7 +47,10 @@
           id: "contact-explanation",
           name: "contact-explanation",
           type: "text",
-          value: formValues.contactExplanation
+          value: formValues.contactExplanation,
+          errorMessage: {
+            text: formErrors.contactExplanation
+          } if formErrors.contactExplanation else null
         }) }}
 
         {{ govukCheckboxes({
