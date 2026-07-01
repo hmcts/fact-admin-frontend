@@ -109,7 +109,7 @@ describe('AuditController', () => {
             renderModel.basePagerUrl ===
               '/audits?pageSize=25&email=admin%40example.com&subjectType=COURT&courtId=11111111-1111-4111-8111-111111111111&fromDate=25%2F6%2F2026&toDate=26%2F6%2F2026&pageNumber=' &&
             renderModel.downloadUrl ===
-              '/audits/download?pageNumber=2&email=admin%40example.com&subjectType=COURT&courtId=11111111-1111-4111-8111-111111111111&fromDate=25%2F6%2F2026&toDate=26%2F6%2F2026' &&
+              '/audits/download?pageNumber=2&pageSize=25&email=admin%40example.com&subjectType=COURT&courtId=11111111-1111-4111-8111-111111111111&fromDate=25%2F6%2F2026&toDate=26%2F6%2F2026' &&
             renderModel.filterCategories === categories
           );
         })
@@ -501,8 +501,9 @@ describe('AuditController', () => {
             !basePagerUrl.includes('toDate=') &&
             basePagerUrl.endsWith('pageNumber=') &&
             downloadUrl.includes('/audits/download?') &&
-            downloadUrl.includes('extra=alpha') &&
-            downloadUrl.includes('extra=beta')
+            downloadUrl.includes('subjectType=SERVICE_CENTRE') &&
+            downloadUrl.includes('toDate=') &&
+            !downloadUrl.includes('extra=')
           );
         })
       );
