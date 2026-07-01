@@ -65,23 +65,11 @@ export class SinglePointOfEntryService {
       return existingSinglePointOfEntryResponse;
     }
 
-    const editableServices = this.buildSinglePointOfEntryServiceSelections(existingSinglePointOfEntryResponse);
-    if (
-      editableServices.length === 0 ||
-      editableServices.some(service => serviceSelections[service.areaOfLawId] === undefined)
-    ) {
+    if (!this.hasExpectedServiceSelections(existingSinglePointOfEntryResponse, serviceSelections)) {
       return HttpStatusCode.BadRequest;
     }
 
-    const editableServiceIds = new Set(editableServices.map(service => service.areaOfLawId));
-    if (Object.keys(serviceSelections).some(areaOfLawId => !editableServiceIds.has(areaOfLawId))) {
-      return HttpStatusCode.BadRequest;
-    }
-
-    const updatePayload: CourtSinglePointOfEntryList = existingSinglePointOfEntryResponse.map(areaOfLaw => ({
-      ...areaOfLaw,
-      selected: serviceSelections[areaOfLaw.id] ?? areaOfLaw.selected,
-    }));
+    const updatePayload = this.applySelections(existingSinglePointOfEntryResponse, serviceSelections);
 
     const updateResponse = await this.dataApiRequests.updateCourtSinglePointOfEntry(courtId, updatePayload);
     if (typeof updateResponse === 'number' && updateResponse !== HttpStatusCode.Ok) {
@@ -89,18 +77,10 @@ export class SinglePointOfEntryService {
     }
 
     if (updateResponse instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of updateResponse) {
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
-
       return {
         status: 'invalid',
         courtName: courtResponse.name,
-        errors,
+        errors: this.toValidationErrors(updateResponse),
       };
     }
 
@@ -133,5 +113,38 @@ export class SinglePointOfEntryService {
     areaOfLawName: string
   ): CourtSinglePointOfEntry | undefined {
     return singlePointOfEntry.find(entry => entry.name === areaOfLawName);
+  }
+
+  private hasExpectedServiceSelections(
+    singlePointOfEntry: CourtSinglePointOfEntryList,
+    serviceSelections: Record<string, boolean>
+  ): boolean {
+    const editableIds = this.buildSinglePointOfEntryServiceSelections(singlePointOfEntry).map(
+      service => service.areaOfLawId
+    );
+
+    return (
+      editableIds.length > 0 &&
+      editableIds.every(areaOfLawId => serviceSelections[areaOfLawId] !== undefined) &&
+      Object.keys(serviceSelections).every(areaOfLawId => editableIds.includes(areaOfLawId))
+    );
+  }
+
+  private applySelections(
+    currentConfiguration: CourtSinglePointOfEntryList,
+    serviceSelections: Record<string, boolean>
+  ): CourtSinglePointOfEntryList {
+    return currentConfiguration.map(areaOfLaw => ({
+      ...areaOfLaw,
+      selected: serviceSelections[areaOfLaw.id] ?? areaOfLaw.selected,
+    }));
+  }
+
+  private toValidationErrors(apiErrors: Map<string, string>): Record<string, string[]> {
+    return Object.fromEntries(
+      [...apiErrors.entries()]
+        .filter(([key]) => key.toLowerCase() !== 'timestamp')
+        .map(([key, message]) => [key, [message]])
+    );
   }
 }

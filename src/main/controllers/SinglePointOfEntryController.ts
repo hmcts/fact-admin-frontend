@@ -14,22 +14,14 @@ const singlePointOfEntryFieldPrefix = 'singlePointOfEntry.';
 export default class SinglePointOfEntryController {
   @GET()
   public async renderSinglePointOfEntryView(req: Request, res: Response): Promise<void> {
-    const resolvedCourtId = this.resolveCourtId(req);
-    if (resolvedCourtId === undefined) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const courtId = this.resolveCourtId(req);
+    if (!courtId) {
+      return this.renderStatus(res, HttpStatusCode.NotFound);
     }
 
-    const viewModel = await singlePointOfEntryService.retrieve(resolvedCourtId);
-
-    if (viewModel === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      return res.render('error');
+    const viewModel = await singlePointOfEntryService.retrieve(courtId);
+    if (this.isStatusCode(viewModel)) {
+      return this.renderStatus(res, viewModel);
     }
 
     res.render('single-point-of-entry', viewModel);
@@ -38,49 +30,51 @@ export default class SinglePointOfEntryController {
   @route('/success')
   @POST()
   public async updateSinglePointOfEntry(req: Request, res: Response): Promise<void> {
-    const resolvedCourtId = this.resolveCourtId(req);
-    if (resolvedCourtId === undefined) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const courtId = this.resolveCourtId(req);
+    if (!courtId) {
+      return this.renderStatus(res, HttpStatusCode.NotFound);
     }
 
     const serviceSelections = this.parseServiceSelections(req.body);
-    if (serviceSelections === undefined) {
-      res.status(HttpStatusCode.BadRequest);
-      return res.render('error');
+    if (!serviceSelections) {
+      return this.renderStatus(res, HttpStatusCode.BadRequest);
     }
 
-    const saveResult = await singlePointOfEntryService.update(resolvedCourtId, serviceSelections);
-
-    if (typeof saveResult === 'number') {
-      res.status(saveResult);
-      if (saveResult === HttpStatusCode.NotFound) {
-        return res.render('court-not-found');
-      }
-      return res.render('error');
+    const saveResult = await singlePointOfEntryService.update(courtId, serviceSelections);
+    if (this.isStatusCode(saveResult)) {
+      return this.renderStatus(res, saveResult);
     }
 
     if (saveResult.status === 'invalid') {
-      if (saveResult.errors) {
-        Object.values(saveResult.errors)
-          .flat()
-          .forEach(error => logger.error(error));
-      }
-      res.status(HttpStatusCode.BadRequest);
-      return res.render('error');
+      this.logValidationErrors(saveResult.errors);
+      return this.renderStatus(res, HttpStatusCode.BadRequest);
     }
 
     res.render('single-point-of-entry-success', {
-      courtId: resolvedCourtId,
+      courtId,
       courtName: saveResult.courtName,
     });
   }
 
   private resolveCourtId(req: Request): string | undefined {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
+    const id = req.params.courtId;
+    const candidate = Array.isArray(id) ? id.at(0) : id;
 
-    return resolvedCourtId && isUuid(resolvedCourtId) ? resolvedCourtId : undefined;
+    return candidate && isUuid(candidate) ? candidate : undefined;
+  }
+
+  private isStatusCode<T>(result: T | HttpStatusCode): result is HttpStatusCode {
+    return typeof result === 'number';
+  }
+
+  private renderStatus(res: Response, status: HttpStatusCode): void {
+    res.status(status).render(status === HttpStatusCode.NotFound ? 'court-not-found' : 'error');
+  }
+
+  private logValidationErrors(errors?: Record<string, string[]>): void {
+    Object.values(errors ?? {})
+      .flat()
+      .forEach(message => logger.error(message));
   }
 
   private parseServiceSelections(body: Request['body']): Record<string, boolean> | undefined {
