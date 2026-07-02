@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { pageMetadataSchema } from './pagedMetadataSchema';
+
 export const locationTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
 
 export const locationListItemSchema = z.object({
@@ -15,13 +17,6 @@ export const locationListItemSchema = z.object({
   serviceCentre: z.boolean(),
   slug: z.string(),
   warningNotice: z.string().nullable(),
-});
-
-export const pageMetadataSchema = z.object({
-  number: z.number(),
-  size: z.number(),
-  totalElements: z.number(),
-  totalPages: z.number(),
 });
 
 export const pagedLocationsSchema = z.object({
