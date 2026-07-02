@@ -54,6 +54,44 @@ describe('accessibilityValidationConfig.validate', () => {
     );
   });
 
+  test('validates lift min and max ranges', () => {
+    const tooSmall = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: true,
+      liftDoorWidth: 0,
+      liftDoorLimit: 0,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(tooSmall).toEqual(
+      expect.objectContaining({
+        liftDoorWidth: ['Lift door width must be between 1 and 1000 cm'],
+        liftDoorLimit: ['Lift door limit must be between 1 and 10000 kg'],
+      })
+    );
+
+    const tooLarge = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: true,
+      liftDoorWidth: 1001,
+      liftDoorLimit: 10001,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(tooLarge).toEqual(
+      expect.objectContaining({
+        liftDoorWidth: ['Lift door width must be between 1 and 1000 cm'],
+        liftDoorLimit: ['Lift door limit must be between 1 and 10000 kg'],
+      })
+    );
+  });
+
   test('validates phone requirements and formats', () => {
     const result = validate({
       accessibleParking: true,
