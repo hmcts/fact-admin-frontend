@@ -7,8 +7,17 @@ import { Rule, addError, patternRule, validateBooleanField } from './validation'
 export const UK_PHONE_REGEX = /^((\+44|)[0-9 ]{10,20})$/; // kept same regex in backend ideally it should be 10-12 digit though
 export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
 
+const MIN_LIFT_DOOR_WIDTH_CM = 1;
+const MAX_LIFT_DOOR_WIDTH_CM = 1000;
+const MIN_LIFT_DOOR_LIMIT_KG = 1;
+const MAX_LIFT_DOOR_LIMIT_KG = 10000;
+
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);
+const isBelowMin = (value: number | null | undefined, min: number): boolean =>
+  typeof value === 'number' && !Number.isNaN(value) && value < min;
+const isAboveMax = (value: number | null | undefined, max: number): boolean =>
+  typeof value === 'number' && !Number.isNaN(value) && value > max;
 
 export const validate = (model: AccessibilityModel): Record<string, string[]> | undefined => {
   const errors: Record<string, string[]> = {};
@@ -34,6 +43,29 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
 
     // Lift conditionals
     {
+      key: 'liftDoorWidth',
+      validate: m => (m.lift && isMissing(m.liftDoorWidth) ? ['Enter the lift door width'] : undefined),
+    },
+    {
+      key: 'liftDoorWidth',
+      validate: m =>
+        m.lift && isInvalidNumber(m.liftDoorWidth) ? ['Lift door width must be a valid number'] : undefined,
+    },
+    {
+      key: 'liftDoorWidth',
+      validate: m =>
+        m.lift && isBelowMin(m.liftDoorWidth, MIN_LIFT_DOOR_WIDTH_CM)
+          ? ['Lift door width needs to be over 1cm']
+          : undefined,
+    },
+    {
+      key: 'liftDoorWidth',
+      validate: m =>
+        m.lift && isAboveMax(m.liftDoorWidth, MAX_LIFT_DOOR_WIDTH_CM)
+          ? ['Lift door width needs to be under 1000cm']
+          : undefined,
+    },
+    {
       key: 'liftDoorLimit',
       validate: m => (m.lift && isMissing(m.liftDoorLimit) ? ['Enter the lift door limit'] : undefined),
     },
@@ -43,13 +75,18 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
         m.lift && isInvalidNumber(m.liftDoorLimit) ? ['Lift door limit must be a valid number'] : undefined,
     },
     {
-      key: 'liftDoorWidth',
-      validate: m => (m.lift && isMissing(m.liftDoorWidth) ? ['Enter the lift door width'] : undefined),
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isBelowMin(m.liftDoorLimit, MIN_LIFT_DOOR_LIMIT_KG)
+          ? ['Lift weight limit should be at least 1kg']
+          : undefined,
     },
     {
-      key: 'liftDoorWidth',
+      key: 'liftDoorLimit',
       validate: m =>
-        m.lift && isInvalidNumber(m.liftDoorWidth) ? ['Lift door width must be a valid number'] : undefined,
+        m.lift && isAboveMax(m.liftDoorLimit, MAX_LIFT_DOOR_LIMIT_KG)
+          ? ['Lift weight limit should be at most 10000kg']
+          : undefined,
     },
 
     // Accessible entrance phone (required)
