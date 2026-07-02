@@ -166,26 +166,18 @@ describe('AuditService', () => {
   test('generateCsv writes paged rows to file and returns filename/path', async () => {
     const dataApiRequests = {
       getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
-      getAudits: jest
-        .fn()
-        .mockResolvedValueOnce({
-          content: [{ ...baseAudit, actionType: 'INSERT' }],
-          page: {
-            number: 0,
-            size: 1000,
-            totalElements: 2,
-            totalPages: 2,
-          },
-        })
-        .mockResolvedValueOnce({
-          content: [{ ...baseAudit, id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', actionType: 'DELETE' }],
-          page: {
-            number: 1,
-            size: 1000,
-            totalElements: 2,
-            totalPages: 2,
-          },
-        }),
+      getAudits: jest.fn().mockResolvedValueOnce({
+        content: [
+          { ...baseAudit, actionType: 'INSERT' },
+          { ...baseAudit, id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', actionType: 'DELETE' },
+        ],
+        page: {
+          number: 0,
+          size: 1000,
+          totalElements: 2,
+          totalPages: 1,
+        },
+      }),
     };
     const service = new AuditService(dataApiRequests as never);
 
