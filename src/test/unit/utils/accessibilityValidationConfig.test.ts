@@ -68,8 +68,8 @@ describe('accessibilityValidationConfig.validate', () => {
 
     expect(tooSmall).toEqual(
       expect.objectContaining({
-        liftDoorWidth: ['Lift door width must be between 1 and 1000 cm'],
-        liftDoorLimit: ['Lift door limit must be between 1 and 10000 kg'],
+        liftDoorWidth: ['Lift door width needs to be over 1cm'],
+        liftDoorLimit: ['Lift weight limit should be at least 1kg'],
       })
     );
 
@@ -86,8 +86,8 @@ describe('accessibilityValidationConfig.validate', () => {
 
     expect(tooLarge).toEqual(
       expect.objectContaining({
-        liftDoorWidth: ['Lift door width must be between 1 and 1000 cm'],
-        liftDoorLimit: ['Lift door limit must be between 1 and 10000 kg'],
+        liftDoorWidth: ['Lift door width needs to be under 1000cm'],
+        liftDoorLimit: ['Lift weight limit should be at most 10000kg'],
       })
     );
   });

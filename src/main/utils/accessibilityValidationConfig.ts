@@ -14,8 +14,10 @@ const MAX_LIFT_DOOR_LIMIT_KG = 10000;
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);
-const isOutOfRange = (value: number | null | undefined, min: number, max: number): boolean =>
-  typeof value === 'number' && !Number.isNaN(value) && (value < min || value > max);
+const isBelowMin = (value: number | null | undefined, min: number): boolean =>
+  typeof value === 'number' && !Number.isNaN(value) && value < min;
+const isAboveMax = (value: number | null | undefined, max: number): boolean =>
+  typeof value === 'number' && !Number.isNaN(value) && value > max;
 
 export const validate = (model: AccessibilityModel): Record<string, string[]> | undefined => {
   const errors: Record<string, string[]> = {};
@@ -41,22 +43,6 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
 
     // Lift conditionals
     {
-      key: 'liftDoorLimit',
-      validate: m => (m.lift && isMissing(m.liftDoorLimit) ? ['Enter the lift door limit'] : undefined),
-    },
-    {
-      key: 'liftDoorLimit',
-      validate: m =>
-        m.lift && isInvalidNumber(m.liftDoorLimit) ? ['Lift door limit must be a valid number'] : undefined,
-    },
-    {
-      key: 'liftDoorLimit',
-      validate: m =>
-        m.lift && isOutOfRange(m.liftDoorLimit, MIN_LIFT_DOOR_LIMIT_KG, MAX_LIFT_DOOR_LIMIT_KG)
-          ? ['Lift door limit must be between 1 and 10000 kg']
-          : undefined,
-    },
-    {
       key: 'liftDoorWidth',
       validate: m => (m.lift && isMissing(m.liftDoorWidth) ? ['Enter the lift door width'] : undefined),
     },
@@ -68,8 +54,38 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     {
       key: 'liftDoorWidth',
       validate: m =>
-        m.lift && isOutOfRange(m.liftDoorWidth, MIN_LIFT_DOOR_WIDTH_CM, MAX_LIFT_DOOR_WIDTH_CM)
-          ? ['Lift door width must be between 1 and 1000 cm']
+        m.lift && isBelowMin(m.liftDoorWidth, MIN_LIFT_DOOR_WIDTH_CM)
+          ? ['Lift door width needs to be over 1cm']
+          : undefined,
+    },
+    {
+      key: 'liftDoorWidth',
+      validate: m =>
+        m.lift && isAboveMax(m.liftDoorWidth, MAX_LIFT_DOOR_WIDTH_CM)
+          ? ['Lift door width needs to be under 1000cm']
+          : undefined,
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m => (m.lift && isMissing(m.liftDoorLimit) ? ['Enter the lift door limit'] : undefined),
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isInvalidNumber(m.liftDoorLimit) ? ['Lift door limit must be a valid number'] : undefined,
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isBelowMin(m.liftDoorLimit, MIN_LIFT_DOOR_LIMIT_KG)
+          ? ['Lift weight limit should be at least 1kg']
+          : undefined,
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isAboveMax(m.liftDoorLimit, MAX_LIFT_DOOR_LIMIT_KG)
+          ? ['Lift weight limit should be at most 10000kg']
           : undefined,
     },
 
