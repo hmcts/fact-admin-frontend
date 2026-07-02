@@ -16,7 +16,7 @@ const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_PARAM = 1000;
 
 const CSV_PAGE_SIZE = 1000;
-const MAX_CSV_PAGES = 10;
+const MAX_CSV_PAGES = 1;
 
 const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 
