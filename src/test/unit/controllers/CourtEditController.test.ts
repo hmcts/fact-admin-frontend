@@ -32,8 +32,7 @@ describe('CourtEditController', () => {
         ...viewModel,
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
-          { href: '#', text: 'Edit' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
         ],
       });
 

@@ -42,7 +42,7 @@ describe('CourtOpeningHoursController', () => {
       ...viewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: viewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
       ],
     };
@@ -88,7 +88,7 @@ describe('CourtOpeningHoursController', () => {
       ...viewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: viewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Edit opening hours' },
       ],
@@ -214,7 +214,7 @@ describe('CourtOpeningHoursController', () => {
       ...viewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: viewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Edit opening hours' },
       ],
@@ -260,7 +260,7 @@ describe('CourtOpeningHoursController', () => {
       ...viewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: viewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Opening hours saved' },
       ],
@@ -299,7 +299,7 @@ describe('CourtOpeningHoursController', () => {
       ...viewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: viewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Opening hours saved' },
       ],
@@ -375,7 +375,7 @@ describe('CourtOpeningHoursController', () => {
       ...deleteViewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: deleteViewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${deleteViewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Delete opening hours' },
       ],
@@ -385,7 +385,7 @@ describe('CourtOpeningHoursController', () => {
       ...successViewModel,
       breadcrumbs: [
         { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: successViewModel.courtName },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${successViewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Opening hours deleted' },
       ],

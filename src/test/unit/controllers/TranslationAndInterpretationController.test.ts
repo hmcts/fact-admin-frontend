@@ -41,7 +41,7 @@ describe('TranslationAndInterpretationController', () => {
         phoneNumberSelected: true,
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: `/courts/${courtId}/edit`, text: 'Reading Crown Court' },
+          { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
           { href: `/courts/${courtId}/edit/translation-and-interpretation`, text: 'Translation and interpretation' },
         ],
       });
@@ -179,7 +179,7 @@ describe('TranslationAndInterpretationController', () => {
         courtName: 'Reading Crown Court',
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: `/courts/${courtId}/edit`, text: 'Reading Crown Court' },
+          { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
           { href: `/courts/${courtId}/edit/translation-and-interpretation`, text: 'Translation and interpretation' },
           { href: '#', text: 'Translation and interpretation saved' },
         ],

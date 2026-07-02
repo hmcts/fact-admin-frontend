@@ -45,7 +45,7 @@ describe('LocalAuthoritiesController', () => {
         ...viewModel,
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: `/courts/${COURT_ID}/edit`, text: 'Court' },
+          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Court' },
           { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
         ],
       });
@@ -162,7 +162,7 @@ describe('LocalAuthoritiesController', () => {
         courtName: 'Reading Crown Court',
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: `/courts/${COURT_ID}/edit`, text: 'Reading Crown Court' },
+          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
           { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
           { href: '#', text: 'Local authorities saved' },
         ],

@@ -3,11 +3,10 @@ export type BreadcrumbItem = {
   text: string;
 };
 
-export function buildEditBreadcrumbs(courtId: string, courtName: string, currentPage = 'Edit'): BreadcrumbItem[] {
+export function buildEditBreadcrumbs(courtId: string, courtName: string): BreadcrumbItem[] {
   return [
     { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: courtName },
-    { text: currentPage, href: '#' },
+    { href: `/courts/${courtId}/edit`, text: `Edit ${courtName}` },
   ];
 }
 
@@ -19,8 +18,7 @@ export function buildSectionBreadcrumbs(
   currentPage?: string
 ): BreadcrumbItem[] {
   const breadcrumbs: BreadcrumbItem[] = [
-    { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: courtName },
+    ...buildEditBreadcrumbs(courtId, courtName),
     { href: `/courts/${courtId}/edit/${sectionPath}`, text: sectionText },
   ];
 

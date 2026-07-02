@@ -9,7 +9,7 @@ import { mockRequest } from '../mocks/mockRequest';
 const buildCasesHeardBreadcrumbs = (courtId: string, courtName: string, currentPage?: string) => {
   const breadcrumbs = [
     { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: courtName },
+    { href: `/courts/${courtId}/edit`, text: `Edit ${courtName}` },
     { href: `/courts/${courtId}/edit/cases-heard`, text: 'Cases heard' },
   ];
 

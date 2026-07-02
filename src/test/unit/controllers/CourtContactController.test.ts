@@ -45,7 +45,7 @@ describe('CourtContactController', () => {
       .withArgs('court-contact-list', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
         ],
         courtContactDetails: [
@@ -207,7 +207,7 @@ describe('CourtContactController', () => {
       .withArgs('court-contact-form', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Add contact details' },
         ],
@@ -354,7 +354,7 @@ describe('CourtContactController', () => {
       .withArgs('common-edit-success', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Contact details saved' },
         ],
@@ -530,7 +530,7 @@ describe('CourtContactController', () => {
       .withArgs('court-contact-form', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Edit contact details' },
         ],
@@ -672,7 +672,7 @@ describe('CourtContactController', () => {
       .withArgs('common-edit-success', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Contact details saved' },
         ],
@@ -849,7 +849,7 @@ describe('CourtContactController', () => {
       .withArgs('court-contact-delete', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Delete contact details' },
         ],
@@ -922,7 +922,7 @@ describe('CourtContactController', () => {
       .withArgs('court-contact-delete', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Delete contact details' },
         ],
@@ -1031,7 +1031,7 @@ describe('CourtContactController', () => {
       .withArgs('common-edit-success', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Contact details deleted' },
         ],

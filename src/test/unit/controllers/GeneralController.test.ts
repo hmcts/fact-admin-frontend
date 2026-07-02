@@ -26,7 +26,7 @@ describe('GeneralController', () => {
       .withArgs('general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
         ],
         model: {
@@ -216,7 +216,7 @@ describe('GeneralController', () => {
       .withArgs('general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'bob' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit bob' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
         ],
         model: saveResult,
@@ -256,7 +256,7 @@ describe('GeneralController', () => {
       .withArgs('common-edit-success', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
           { href: '#', text: 'General saved' },
         ],

@@ -16,7 +16,7 @@ const COURT_TYPE_ID = '44444444-4444-4444-8444-444444444444';
 const buildAddressBreadcrumbs = (courtName = 'Court', currentPage?: string) => {
   const breadcrumbs = [
     { href: '/', text: 'Home' },
-    { href: `/courts/${COURT_ID}/edit`, text: courtName },
+    { href: `/courts/${COURT_ID}/edit`, text: `Edit ${courtName}` },
     { href: `/courts/${COURT_ID}/edit/address`, text: 'Addresses' },
   ];
 

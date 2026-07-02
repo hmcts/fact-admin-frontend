@@ -13,7 +13,7 @@ const courtName = 'Reading Crown Court';
 const buildProfessionalInformationBreadcrumbs = (resolvedCourtName: string, currentPage?: string) => {
   const breadcrumbs = [
     { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: resolvedCourtName },
+    { href: `/courts/${courtId}/edit`, text: `Edit ${resolvedCourtName}` },
     { href: `/courts/${courtId}/edit/information-for-professionals`, text: 'Information for professionals' },
   ];
 
