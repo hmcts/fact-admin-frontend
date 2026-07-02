@@ -146,6 +146,18 @@ test.describe(
       );
     });
 
+    test('Single Points of Entry Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      singlePointsOfEntryPage,
+    }) => {
+      await withCreatedCourt(playwright, 'Single Points Of Entry Performance Test', {}, async ({ createdCourt }) => {
+        await singlePointsOfEntryPage.goto(createdCourt.id);
+        await singlePointsOfEntryPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Court Contact List Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Court Contact List Performance Test', {}, async ({ createdCourt }) => {
         await courtContactDetailsPage.goto(createdCourt.id);
