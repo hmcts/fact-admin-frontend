@@ -106,7 +106,7 @@ export default class AccessibilityController {
       return res.render('accessibility-edit', {
         breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name ?? 'Court'),
         courtId: resolvedCourtId,
-        model: { ...updateResponse, liftDoorWidth: updatedLiftDoorLimit, liftDoorLimit: updatedLiftDoorWidth },
+        model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
         pageTitle: `Error: Accessibility - ${updateResponse.name}`,
       });
     }
