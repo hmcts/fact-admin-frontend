@@ -25,6 +25,9 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
 
     const courtAddressListResponse = await courtAddressService.list(courtId);
     if (!this.validateServiceResponse(courtAddressListResponse, res, 'court-not-found')) {
@@ -40,7 +43,7 @@ export class CourtAddressController {
     courtAddresses.sort((a, b) => (addressTypeRank[a.addressType] ?? 99) - (addressTypeRank[b.addressType] ?? 99));
 
     res.render('court-address-list', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName),
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string),
       courtAddresses,
       courtId,
       pageTitle: 'Manage Addresses',
@@ -56,9 +59,12 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
 
     res.render('court-address-find', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       pageTitle: 'Find Address',
       courtId,
     });
@@ -76,6 +82,9 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
 
     const courtAddressResponse = await courtAddressService.retrieve(courtId, addressId);
     if (!this.validateServiceResponse(courtAddressResponse, res, 'not-found')) {
@@ -83,7 +92,7 @@ export class CourtAddressController {
     }
 
     res.render('court-address-find', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       postcode: (courtAddressResponse as CourtAddress).postcode,
       courtId,
       addressId,
@@ -100,11 +109,14 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
 
     const postcode = req.query?.postcode as string;
     if (!courtAddressService.isValidPostcode(postcode)) {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
         error: courtAddressService.validatePostcode(postcode),
@@ -119,7 +131,7 @@ export class CourtAddressController {
 
     if (postcodeSearchResponse['status'] === 'invalid') {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
@@ -128,7 +140,7 @@ export class CourtAddressController {
     }
 
     res.render('court-address-select', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
@@ -148,11 +160,13 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
-
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
     const postcode = req.query?.postcode as string;
     if (!courtAddressService.isValidPostcode(postcode)) {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
@@ -168,7 +182,7 @@ export class CourtAddressController {
 
     if (postcodeSearchResponse['status'] === 'invalid') {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
@@ -178,7 +192,7 @@ export class CourtAddressController {
     }
 
     res.render('court-address-select', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Find address by postcode'),
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
@@ -195,7 +209,10 @@ export class CourtAddressController {
       return;
     }
     const courtName = await this.resolveCourtName(courtId);
-    await this.renderAddAddress(res, courtId, courtName, false, false, undefined, req.body?.address);
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
+    await this.renderAddAddress(res, courtId, courtName as string, false, false, undefined, req.body?.address);
   }
 
   @route('/details/success')
@@ -207,7 +224,9 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
-
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
     const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId);
 
     const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
@@ -223,7 +242,7 @@ export class CourtAddressController {
       await this.renderAddAddress(
         res,
         courtId,
-        courtName,
+        courtName as string,
         aolSelected,
         ctSelected,
         saveResult['address'] as CourtAddress
@@ -287,6 +306,9 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
 
     const courtAddress = await courtAddressService.retrieve(courtId, addressId);
     if (!this.validateServiceResponse(courtAddress, res, 'not-found')) {
@@ -299,7 +321,7 @@ export class CourtAddressController {
     await this.renderEditAddress(
       res,
       courtId,
-      courtName,
+      courtName as string,
       addressId,
       courtAddress as CourtAddress,
       aolSelected,
@@ -320,7 +342,9 @@ export class CourtAddressController {
     }
 
     const courtName = await this.resolveCourtName(courtId);
-
+    if (!this.validateServiceResponse(courtName, res, 'not-found')) {
+      return;
+    }
     const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId, addressId);
 
     const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
@@ -336,7 +360,7 @@ export class CourtAddressController {
       await this.renderEditAddress(
         res,
         courtId,
-        courtName,
+        courtName as string,
         addressId,
         saveResult['address'] as CourtAddress,
         aolSelected,
@@ -503,13 +527,12 @@ export class CourtAddressController {
     res.render('error');
   }
 
-  private async resolveCourtName(courtId: string): Promise<string> {
+  private async resolveCourtName(courtId: string): Promise<string | HttpStatusCode> {
     try {
-      const courtName = await courtAddressService.retrieveCourtName(courtId);
-      return typeof courtName === 'number' ? 'Court' : courtName;
+      return await courtAddressService.retrieveCourtName(courtId);
     } catch (error) {
       logger.warn('Unable to resolve court name for breadcrumbs:', error);
-      return 'Court';
+      return HttpStatusCode.NotFound;
     }
   }
 

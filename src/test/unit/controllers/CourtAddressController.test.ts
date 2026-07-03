@@ -45,6 +45,16 @@ const buildAddress = (overrides?: Partial<CourtAddress>): CourtAddress => ({
 });
 
 describe('CourtAddressController', () => {
+  let retrieveCourtNameStub: ReturnType<typeof stub>;
+
+  beforeEach(() => {
+    retrieveCourtNameStub = stub(CourtAddressService.prototype, 'retrieveCourtName').resolves('Court');
+  });
+
+  afterEach(() => {
+    retrieveCourtNameStub.restore();
+  });
+
   test('renders the address list sorted by address type rank', async () => {
     const controller = new CourtAddressController();
     const response = {
@@ -742,9 +752,7 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
 
-    const retrieveCourtNameStub = stub(CourtAddressService.prototype, 'retrieveCourtName').resolves(
-      'Reading Crown Court'
-    );
+    retrieveCourtNameStub.resolves('Reading Crown Court');
     const retrieveStub = stub(CourtAddressService.prototype, 'retrieve').resolves(buildAddress());
 
     responseMock
@@ -764,7 +772,6 @@ describe('CourtAddressController', () => {
       assert.calledOnce(retrieveStub);
       responseMock.verify();
     } finally {
-      retrieveCourtNameStub.restore();
       retrieveStub.restore();
     }
   });
@@ -779,9 +786,7 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
 
-    const retrieveCourtNameStub = stub(CourtAddressService.prototype, 'retrieveCourtName').resolves(
-      HttpStatusCode.NotFound
-    );
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
     const retrieveStub = stub(CourtAddressService.prototype, 'retrieve');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
@@ -793,7 +798,6 @@ describe('CourtAddressController', () => {
       assert.notCalled(retrieveStub);
       responseMock.verify();
     } finally {
-      retrieveCourtNameStub.restore();
       retrieveStub.restore();
     }
   });
@@ -1544,8 +1548,6 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid', addressId: ADDRESS_ID };
 
-    const retrieveCourtNameStub = stub(CourtAddressService.prototype, 'retrieveCourtName');
-
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
 
@@ -1554,7 +1556,7 @@ describe('CourtAddressController', () => {
       assert.notCalled(retrieveCourtNameStub);
       responseMock.verify();
     } finally {
-      retrieveCourtNameStub.restore();
+      retrieveCourtNameStub.resetHistory();
     }
   });
 
@@ -1568,8 +1570,6 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: 'not-a-uuid' };
 
-    const retrieveCourtNameStub = stub(CourtAddressService.prototype, 'retrieveCourtName');
-
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('not-found');
 
@@ -1578,7 +1578,7 @@ describe('CourtAddressController', () => {
       assert.notCalled(retrieveCourtNameStub);
       responseMock.verify();
     } finally {
-      retrieveCourtNameStub.restore();
+      retrieveCourtNameStub.resetHistory();
     }
   });
 
@@ -1592,9 +1592,7 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
 
-    const retrieveCourtNameStub = stub(CourtAddressService.prototype, 'retrieveCourtName').resolves(
-      'Reading Crown Court'
-    );
+    retrieveCourtNameStub.resolves('Reading Crown Court');
     const retrieveStub = stub(CourtAddressService.prototype, 'retrieve').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
@@ -1606,7 +1604,6 @@ describe('CourtAddressController', () => {
       assert.calledOnce(retrieveStub);
       responseMock.verify();
     } finally {
-      retrieveCourtNameStub.restore();
       retrieveStub.restore();
     }
   });

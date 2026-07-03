@@ -72,6 +72,7 @@ describe('AccessibilityService', () => {
 
     expect(result).toEqual({
       ...model,
+      name: 'Court A',
       errors: { quietRoom: ['Select whether a quiet room is available'] },
     });
     expect(updateAccessibility).not.toHaveBeenCalled();

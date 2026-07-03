@@ -23,25 +23,22 @@ export default class CasesHeardController {
     const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
 
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     const viewModel = await casesHeardService.getCasesHeardPage(resolvedCourtId);
 
     if (viewModel === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      return res.render('error');
+      return res.status(viewModel).render('error');
     }
 
-    res.render('cases-heard', {
+    return res.render('cases-heard', {
       ...viewModel,
-      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, viewModel.courtName ?? 'Court'),
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, viewModel.courtName),
     });
   }
 
@@ -52,8 +49,7 @@ export default class CasesHeardController {
     const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
 
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     const selectedAreasOfLaw = casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
@@ -74,21 +70,18 @@ export default class CasesHeardController {
     const saveResult = await casesHeardService.saveCasesHeard(resolvedCourtId, selectedAreasOfLaw);
 
     if (saveResult.type === 'validation_error') {
-      res.status(HttpStatusCode.BadRequest);
-      return res.render('cases-heard', {
+      return res.status(HttpStatusCode.BadRequest).render('cases-heard', {
         ...saveResult.viewModel,
-        breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, saveResult.viewModel.courtName ?? 'Court'),
+        breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, saveResult.viewModel.courtName),
       });
     }
 
     if (saveResult.type === 'status' && saveResult.status === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     if (saveResult.type === 'status') {
-      res.status(saveResult.status);
-      return res.render('error');
+      return res.status(saveResult.status).render('error');
     }
 
     return res.render('common-edit-success', {

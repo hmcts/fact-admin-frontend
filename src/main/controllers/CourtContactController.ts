@@ -28,11 +28,10 @@ export default class CourtContactController {
 
     const courtContactDetailsResponse = await courtContactService.listContactDetails(resolvedCourtId);
     if (typeof courtContactDetailsResponse === 'number') {
-      renderError(res, courtContactDetailsResponse);
-      return;
+      return renderError(res, courtContactDetailsResponse);
     }
 
-    res.render('court-contact-list', {
+    return res.render('court-contact-list', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name),
       courtContactDetails: courtContactDetailsResponse,
       courtId: resolvedCourtId,
@@ -56,11 +55,10 @@ export default class CourtContactController {
 
     const contactDescriptionTypesResponse = await courtContactService.getContactDescriptionTypeItems();
     if (typeof contactDescriptionTypesResponse === 'number') {
-      renderError(res, contactDescriptionTypesResponse);
-      return;
+      return renderError(res, contactDescriptionTypesResponse);
     }
 
-    res.render('court-contact-form', {
+    return res.render('court-contact-form', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Add contact details'),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
@@ -91,24 +89,21 @@ export default class CourtContactController {
       resolvedContactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      renderError(res, contactDetailResponse);
-      return;
+      return renderError(res, contactDetailResponse);
     }
 
     if (!contactDetailResponse) {
-      renderCourtNotFound(res);
-      return;
+      return renderCourtNotFound(res);
     }
 
     const contactDescriptionTypesResponse = await courtContactService.getContactDescriptionTypeItems(
       contactDetailResponse.courtContactDescriptionId
     );
     if (typeof contactDescriptionTypesResponse === 'number') {
-      renderError(res, contactDescriptionTypesResponse);
-      return;
+      return renderError(res, contactDescriptionTypesResponse);
     }
 
-    res.render('court-contact-form', {
+    return res.render('court-contact-form', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Edit contact details'),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
@@ -184,18 +179,16 @@ export default class CourtContactController {
       resolvedContactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      renderError(res, contactDetailResponse);
-      return;
+      return renderError(res, contactDetailResponse);
     }
 
     if (!contactDetailResponse) {
-      renderCourtNotFound(res);
-      return;
+      return renderCourtNotFound(res);
     }
 
     const contactDescription = await courtContactService.resolveContactDetailDescription(contactDetailResponse);
 
-    res.render('court-contact-delete', {
+    return res.render('court-contact-delete', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Delete contact details'),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
@@ -227,24 +220,21 @@ export default class CourtContactController {
       resolvedContactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      renderError(res, contactDetailResponse);
-      return;
+      return renderError(res, contactDetailResponse);
     }
 
     if (!contactDetailResponse) {
-      renderCourtNotFound(res);
-      return;
+      return renderCourtNotFound(res);
     }
 
     const contactDescription = await courtContactService.resolveContactDetailDescription(contactDetailResponse);
 
     const deleteStatus = await courtContactService.deleteContactDetail(resolvedCourtId, resolvedContactDetailId);
     if (deleteStatus !== HttpStatusCode.NoContent) {
-      renderError(res, deleteStatus);
-      return;
+      return renderError(res, deleteStatus);
     }
     const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
-    res.render('common-edit-success', {
+    return res.render('common-edit-success', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Contact details deleted'),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
@@ -268,11 +258,10 @@ export default class CourtContactController {
     return detail;
   }
 
-  private resolveRequiredCourtId(req: Request, res: Response): string | undefined {
+  private resolveRequiredCourtId(req: Request, res: Response): string | void {
     const courtId = getUuidRouteParam(req, 'courtId');
     if (!courtId) {
-      renderCourtNotFound(res);
-      return;
+      return renderCourtNotFound(res);
     }
 
     return courtId;
@@ -315,7 +304,7 @@ export default class CourtContactController {
 
     if (submitFlowOutcome.type === 'validation-error') {
       res.status(HttpStatusCode.BadRequest);
-      res.render('court-contact-form', {
+      return res.render('court-contact-form', {
         ...submitFlowOutcome.formViewModel,
         breadcrumbs: this.buildContactDetailsBreadcrumbs(
           options.courtId,
@@ -323,12 +312,10 @@ export default class CourtContactController {
           options.formHeading === 'Add contact details' ? 'Add contact details' : 'Edit contact details'
         ),
       });
-      return;
     }
 
     if (submitFlowOutcome.type === 'save-error') {
-      renderError(res, submitFlowOutcome.status);
-      return;
+      return renderError(res, submitFlowOutcome.status);
     }
 
     const contactDescription = submitFlowOutcome.successPanelBody;
@@ -337,7 +324,7 @@ export default class CourtContactController {
     const actionPastTense = isUpdate ? 'updated' : 'created';
     const detail = this.detailsGenerator(req.body, 'contact-email', 'contact-telephone');
 
-    res.render('common-edit-success', {
+    return res.render('common-edit-success', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(options.courtId, options.courtName, 'Contact details saved'),
       courtId: options.courtId,
       courtName: options.courtName,
@@ -349,17 +336,15 @@ export default class CourtContactController {
     });
   }
 
-  private async resolveCourtForView(courtId: string, res: Response): Promise<CourtEntity | undefined> {
+  private async resolveCourtForView(courtId: string, res: Response): Promise<CourtEntity | void> {
     const courtResponse = await courtContactService.getCourtById(courtId);
 
     if (courtResponse === HttpStatusCode.NotFound) {
-      renderCourtNotFound(res);
-      return;
+      return renderCourtNotFound(res);
     }
 
     if (typeof courtResponse === 'number') {
-      renderError(res, courtResponse);
-      return;
+      return renderError(res, courtResponse);
     }
 
     return courtResponse;

@@ -33,7 +33,7 @@ export default class AccessibilityController {
     }
 
     return res.render('accessibility-edit', {
-      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, model.name ?? 'Court'),
+      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model,
       pageTitle: `Accessibility - ${model.name}`,
@@ -104,7 +104,7 @@ export default class AccessibilityController {
       const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
 
       return res.render('accessibility-edit', {
-        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name ?? 'Court'),
+        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
         pageTitle: `Error: Accessibility - ${updateResponse.name}`,
@@ -112,11 +112,7 @@ export default class AccessibilityController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildAccessibilityBreadcrumbs(
-        resolvedCourtId,
-        updateResponse.name ?? 'Court',
-        'Accessibility saved'
-      ),
+      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!, 'Accessibility saved'),
       courtId: resolvedCourtId,
       pageTitle: `Accessibility saved - ${updateResponse.name}`,
       successPanelTitle: 'Accessibility details saved',

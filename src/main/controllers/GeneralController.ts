@@ -33,7 +33,7 @@ export default class GeneralController {
     }
 
     res.render('general-edit', {
-      breadcrumbs: this.buildSectionBreadcrumbs(resolvedCourtId, model.name ?? 'Court', 'General'),
+      breadcrumbs: this.buildSectionBreadcrumbs(resolvedCourtId, model.name!, 'General'),
       model,
       pageTitle: `General - ${model.name}`,
     });
@@ -86,7 +86,7 @@ export default class GeneralController {
       res.render('general-edit', {
         breadcrumbs: this.buildSectionBreadcrumbs(
           resolvedCourtId,
-          updateResponse.originalName ?? updateResponse.name ?? 'Court',
+          updateResponse.originalName! ?? updateResponse.name,
           'General'
         ),
         model: updateResponse,
@@ -98,7 +98,7 @@ export default class GeneralController {
     return res.render('common-edit-success', {
       breadcrumbs: this.buildSectionBreadcrumbs(
         resolvedCourtId,
-        updateResponse.name ?? model.name ?? 'Court',
+        updateResponse.name ?? model.name!,
         'General',
         'General saved'
       ),

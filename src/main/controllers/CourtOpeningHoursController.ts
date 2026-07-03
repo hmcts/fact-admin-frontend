@@ -21,9 +21,8 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getListPage(courtId);
-    const listViewModel = this.withBreadcrumbs(courtId, viewModel);
 
-    renderResponse(res, listViewModel, 'court-opening-hours');
+    renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-opening-hours');
   }
 
   @route('/add')
@@ -36,9 +35,8 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId);
-    const addViewModel = this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours');
 
-    renderResponse(res, addViewModel, 'court-opening-hours-edit');
+    renderResponse(res, this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'), 'court-opening-hours-edit');
   }
 
   @route('/edit/:openingHoursId')
@@ -56,9 +54,13 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId, openingHoursId);
-    const editViewModel = this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours');
 
-    renderResponse(res, editViewModel, 'court-opening-hours-edit', 'not-found');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
+      'court-opening-hours-edit',
+      'not-found'
+    );
   }
 
   @route('/save')
@@ -88,9 +90,13 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getDeletePage(courtId, openingHoursId);
-    const deleteViewModel = this.withBreadcrumbs(courtId, viewModel, 'Delete opening hours');
 
-    renderResponse(res, deleteViewModel, 'court-opening-hours-delete', 'not-found');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Delete opening hours'),
+      'court-opening-hours-delete',
+      'not-found'
+    );
   }
 
   @route('/delete/success/:openingHoursId')
@@ -108,9 +114,13 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.delete(courtId, openingHoursId);
-    const deleteSuccessViewModel = this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted');
 
-    renderResponse(res, deleteSuccessViewModel, 'court-opening-hours-delete-success', 'not-found');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted'),
+      'court-opening-hours-delete-success',
+      'not-found'
+    );
   }
 
   private async save(req: Request, res: Response, openingHoursId?: string): Promise<void> {
@@ -128,20 +138,17 @@ export default class CourtOpeningHoursController {
     const saveResult = await courtOpeningHoursService.save(courtId, openingHoursId, form);
 
     if (saveResult.type === 'validation_error') {
-      res.status(HttpStatusCode.BadRequest);
-      res.render('court-opening-hours-edit', {
+      return res.status(HttpStatusCode.BadRequest).render('court-opening-hours-edit', {
         ...saveResult.viewModel,
         breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Edit opening hours'),
       });
-      return;
     }
 
     if (saveResult.type === 'status') {
-      renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
-      return;
+      return renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
     }
 
-    res.render('court-opening-hours-save-success', {
+    return res.render('court-opening-hours-save-success', {
       ...saveResult.viewModel,
       breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Opening hours saved'),
     });

@@ -32,7 +32,7 @@ export default class BuildingFacilitiesController {
     }
     const result = addFoodAndDrink(model);
     res.render('building-facilities-edit', {
-      breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, model.name ?? 'Court'),
+      breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model: result,
       pageTitle: `Building Facilities - ${model.name}`,
@@ -79,7 +79,7 @@ export default class BuildingFacilitiesController {
 
     if (updateResponse.errors) {
       res.render('building-facilities-edit', {
-        breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, updateResponse.name ?? 'Court'),
+        breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: addFoodAndDrink(updateResponse),
         pageTitle: `Error: Building Facilities - ${updateResponse.name}`,
@@ -90,7 +90,7 @@ export default class BuildingFacilitiesController {
     res.render('common-edit-success', {
       breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(
         resolvedCourtId,
-        updateResponse.name ?? 'Court',
+        updateResponse.name!,
         'Building facilities saved'
       ),
       courtId: resolvedCourtId,

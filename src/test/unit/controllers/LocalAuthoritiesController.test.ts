@@ -26,6 +26,7 @@ describe('LocalAuthoritiesController', () => {
 
     const viewModel = {
       courtId: COURT_ID,
+      courtName: 'Court',
       courtTypes: { family: true },
       casesHeard: { Adoption: true, Children: true, Divorce: false },
       localAuthoritySelections: {

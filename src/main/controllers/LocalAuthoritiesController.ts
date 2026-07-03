@@ -37,9 +37,9 @@ export default class LocalAuthoritiesController {
       return res.render('error');
     }
 
-    res.render('local-authorities', {
+    return res.render('local-authorities', {
       ...viewModel,
-      breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(resolvedCourtId, viewModel.courtName ?? 'Court'),
+      breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(resolvedCourtId, viewModel.courtName),
     });
   }
 
@@ -79,7 +79,7 @@ export default class LocalAuthoritiesController {
       return res.render('error');
     }
 
-    res.render('local-authorities-success', {
+    return res.render('local-authorities-success', {
       breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(
         resolvedCourtId,
         saveResult.courtName,

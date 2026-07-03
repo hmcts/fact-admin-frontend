@@ -32,9 +32,9 @@ export default class TranslationAndInterpretationController {
       return res.render('error');
     }
 
-    res.render('translation-and-interpretation', {
+    return res.render('translation-and-interpretation', {
       ...viewModel,
-      breadcrumbs: this.buildTranslationBreadcrumbs(courtId, viewModel.courtName ?? 'Court'),
+      breadcrumbs: this.buildTranslationBreadcrumbs(courtId, viewModel.courtName),
     });
   }
 
@@ -64,11 +64,11 @@ export default class TranslationAndInterpretationController {
       res.status(HttpStatusCode.BadRequest);
       return res.render('translation-and-interpretation', {
         ...saveResponse.viewModel,
-        breadcrumbs: this.buildTranslationBreadcrumbs(courtId, saveResponse.viewModel.courtName ?? 'Court'),
+        breadcrumbs: this.buildTranslationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
       });
     }
 
-    res.render('translation-and-interpretation-success', {
+    return res.render('translation-and-interpretation-success', {
       breadcrumbs: this.buildTranslationBreadcrumbs(
         courtId,
         saveResponse.viewModel.courtName,

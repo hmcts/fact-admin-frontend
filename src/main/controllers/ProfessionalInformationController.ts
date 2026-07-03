@@ -50,7 +50,7 @@ export default class ProfessionalInformationController {
 
     res.render('professional-information', {
       ...viewModel,
-      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, viewModel.courtName ?? 'Court'),
+      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, viewModel.courtName),
     });
   }
 
