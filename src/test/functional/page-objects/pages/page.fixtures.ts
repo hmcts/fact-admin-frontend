@@ -2,6 +2,8 @@ import { Page } from '@playwright/test';
 
 import { AccessibilityPage } from './accessibility.po';
 import { AddCourtPage } from './add-court.po';
+import { AuditDetailPage } from './audit-detail.po';
+import { AuditListPage } from './audit-list.po';
 import { BuildingFacilitiesPage } from './building-facilities.po';
 import { CasesHeardPage } from './cases-heard.po';
 import { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
@@ -24,6 +26,8 @@ export interface PageFixtures {
   determinePage: Page;
   addCourtPage: AddCourtPage;
   homePage: HomePage;
+  auditListPage: AuditListPage;
+  auditDetailPage: AuditDetailPage;
   courtEditPage: CourtEditPage;
   casesHeardPage: CasesHeardPage;
   accessibilityPage: AccessibilityPage;
@@ -65,6 +69,14 @@ export const pageFixtures = {
     const homePage = new HomePage(determinePage);
     await homePage.goto();
     await use(homePage);
+  },
+  auditListPage: async ({ determinePage }, use): Promise<void> => {
+    const auditListPage = new AuditListPage(determinePage);
+    await use(auditListPage);
+  },
+  auditDetailPage: async ({ determinePage }, use): Promise<void> => {
+    const auditDetailPage = new AuditDetailPage(determinePage);
+    await use(auditDetailPage);
   },
   courtEditPage: async ({ determinePage }, use): Promise<void> => {
     const courtEditPage = new CourtEditPage(determinePage);
