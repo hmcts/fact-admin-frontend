@@ -7,8 +7,6 @@ describe('Template View', () => {
     });
 
     expect(html).toContain('Find a Court or Tribunal Admin');
-    expect(html).toContain('Sign out');
-    expect(html).toContain('href="/sso/logout"');
     expect(html).toContain('Courts');
     expect(html).toContain('Download csv');
     expect(html).toContain('Add new court');

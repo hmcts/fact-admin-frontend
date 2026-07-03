@@ -1,4 +1,10 @@
-import { parseBoolean, parseLiftMetric, parseOptionalString, parseString } from '../../../main/utils/valueParsers';
+import {
+  parseBoolean,
+  parseLiftMetric,
+  parseOptionalString,
+  parseString,
+  toUkDateTimeString,
+} from '../../../main/utils/valueParsers';
 
 describe('valueParsers', () => {
   describe('parseBoolean', () => {
@@ -74,6 +80,32 @@ describe('valueParsers', () => {
     test('returns undefined when no string value is available', () => {
       expect(parseOptionalString(undefined)).toBeUndefined();
       expect(parseOptionalString([1, false])).toBeUndefined();
+    });
+  });
+
+  describe('toUkDateTimeString', () => {
+    test('converts a UTC winter timestamp to UK local time with milliseconds', () => {
+      expect(toUkDateTimeString('2024-01-15T12:34:56.789Z')).toBe('15/01/2024 12:34:56.789');
+    });
+
+    test('converts a UTC summer timestamp to UK local time applying daylight savings offset', () => {
+      expect(toUkDateTimeString('2024-07-15T12:34:56.789Z')).toBe('15/07/2024 13:34:56.789');
+    });
+
+    test('returns the original value when input is not a valid ISO-8601 datetime', () => {
+      expect(toUkDateTimeString('not-a-date')).toBe('not-a-date');
+    });
+
+    test('returns the original value when input is an impossible ISO date', () => {
+      expect(toUkDateTimeString('2024-02-30T10:00:00.000Z')).toBe('2024-02-30T10:00:00.000Z');
+    });
+
+    test('formats output using a provided custom format', () => {
+      expect(toUkDateTimeString('2024-03-01T00:00:00.123Z', 'YYYY-MM-DD HH:mm:ss')).toBe('2024-03-01 00:00:00');
+    });
+
+    test('accepts ISO-8601 UTC offset input and converts it to UK local time', () => {
+      expect(toUkDateTimeString('2024-03-01T01:00:00.000+01:00')).toBe('01/03/2024 00:00:00.000');
     });
   });
 });

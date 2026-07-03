@@ -9,6 +9,14 @@ import {
   areaOfLawListSchema,
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
+import {
+  Audit,
+  AuditSubjectOptionsMap,
+  PagedAudits,
+  auditListItemSchema,
+  auditSubjectOptionsSchema,
+  pagedAuditsSchema,
+} from '../schemas/auditSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { ContactDescriptionType, contactDescriptionTypeListSchema } from '../schemas/contactDescriptionTypeSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
@@ -36,6 +44,7 @@ import { TranslationServices, translationServicesSchema } from '../schemas/trans
 import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
+import { GetAuditsParams } from './types/GetAuditsParams';
 import { GetCourtsParams } from './types/GetCourtsParams';
 import { SaveCourtContactDetailRequest } from './types/SaveCourtContactDetailRequest';
 import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
@@ -691,6 +700,7 @@ export class DataApiRequests {
         : HttpStatusCode.InternalServerError;
     }
   }
+
   /**
    * Request to data API to get court facilities by court id
    */
@@ -712,7 +722,6 @@ export class DataApiRequests {
   /**
    * Request to data API to update court facilities by court id
    */
-
   public async updateBuildingFacilities(
     courtId: string,
     payload: UpdateBuildingFacilitiesRequest
@@ -765,6 +774,45 @@ export class DataApiRequests {
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a complete list audit subjects and their options
+   */
+  async getAuditSubjectOptionsMap(): Promise<AuditSubjectOptionsMap | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/audits/subjectoptions/v1');
+      return auditSubjectOptionsSchema.parse(new Map(Object.entries(response.data)));
+    } catch (error: unknown) {
+      logger.error('Error fetching audit subject names:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a filtered and paginated list of audits
+   */
+  async getAudits(params: GetAuditsParams): Promise<PagedAudits | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/audits/v1', { params });
+      return pagedAuditsSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching audits:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get audit details by id
+   */
+  async getAuditById(auditId: string): Promise<Audit | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/audits/${auditId}/v1`);
+      return auditListItemSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching audit details for id ${auditId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
 }

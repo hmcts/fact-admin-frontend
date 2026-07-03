@@ -6,7 +6,7 @@
   {% include "webpack/css.njk" %}
 {% endblock %}
 
-{% block header %}
+{% block govukHeader %}
   {% set isCourtsPage = pagePath == "/" %}
   {% set isDownloadPage = pagePath.startsWith("/download") %}
   {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
@@ -14,13 +14,9 @@
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
     homepageUrl: "/",
-    navigationClasses: "govuk-header__navigation--end",
-    navigation: [
-      {
-        href: "/sso/logout",
-        html: "<strong>Sign out</strong>"
-      }
-    ]
+    attributes: {
+      "fact-header": ""
+    }
   }) }}
   {{ govukServiceNavigation({
     serviceName: "Find a Court or Tribunal Admin",
@@ -43,7 +39,7 @@
       },
       {
         href: "/audits",
-        text: "Audit",
+        text: "Audits",
         current: isAuditPage
       } if isSuperAdmin else false,
       {
@@ -55,7 +51,7 @@
   }) }}
 {% endblock %}
 
-{% block footer %}
+{% block govukFooter %}
   {{ govukFooter({}) }}
 {% endblock %}
 
