@@ -388,6 +388,41 @@ describe('CourtAddressController', () => {
     }
   });
 
+  test('re-renders delete confirmation page when delete returns invalid', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    const invalidDeleteResponse = {
+      status: 'invalid' as const,
+      courtName: 'Reading Crown Court',
+      address: buildAddress(),
+    };
+    const deleteStub = stub(CourtAddressService.prototype, 'delete').resolves(invalidDeleteResponse);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-address-delete', {
+        breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Delete address'),
+        address: invalidDeleteResponse.address,
+        courtName: 'Reading Crown Court',
+        courtId: COURT_ID,
+        pageTitle: 'Delete Address',
+      });
+
+    try {
+      await controller.deleteAddress(request, response);
+      assert.calledOnce(deleteStub);
+      responseMock.verify();
+    } finally {
+      deleteStub.restore();
+    }
+  });
+
   test('maps DPA address data when rendering add address details page', async () => {
     const controller = new CourtAddressController();
     const response = {
@@ -1605,6 +1640,353 @@ describe('CourtAddressController', () => {
       responseMock.verify();
     } finally {
       retrieveStub.restore();
+    }
+  });
+
+  test('renders not-found in address list when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const listStub = stub(CourtAddressService.prototype, 'list');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.renderAddressList(request, response);
+      assert.notCalled(listStub);
+      responseMock.verify();
+    } finally {
+      listStub.restore();
+    }
+  });
+
+  test('renders not-found in add find page when court name lookup throws', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    retrieveCourtNameStub.rejects(new Error('boom'));
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    await controller.renderFindNew(request, response);
+    responseMock.verify();
+  });
+
+  test('renders not-found in find-for-update when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const retrieveStub = stub(CourtAddressService.prototype, 'retrieve');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.renderFindForUpdate(request, response);
+      assert.notCalled(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
+  test('renders not-found in select-new when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const retrieveAddressOptionsStub = stub(CourtAddressService.prototype, 'retrieveAddressOptions');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.renderSelectNew(request, response);
+      assert.notCalled(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('renders not-found in select-for-update when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const retrieveAddressOptionsStub = stub(CourtAddressService.prototype, 'retrieveAddressOptions');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.renderSelectForUpdate(request, response);
+      assert.notCalled(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('renders not-found in add-address when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const listAreasOfLawStub = stub(TypesService.prototype, 'listAreasOfLaw');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.addAddress(request, response);
+      assert.notCalled(listAreasOfLawStub);
+      responseMock.verify();
+    } finally {
+      listAreasOfLawStub.restore();
+    }
+  });
+
+  test('renders not-found in save-new when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    request.body = {
+      addressLine1: '10 Kings Road',
+      townCity: 'Reading',
+      postcode: 'RG1 2AA',
+      addressType: CourtAddressType.VISIT_US,
+    };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const saveStub = stub(CourtAddressService.prototype, 'save');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.saveNewAddress(request, response);
+      assert.notCalled(saveStub);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('renders not-found in edit-address when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const retrieveStub = stub(CourtAddressService.prototype, 'retrieve');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.editAddress(request, response);
+      assert.notCalled(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
+  test('renders not-found in update-existing when court name lookup returns not found', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    request.body = {
+      addressLine1: '10 Kings Road',
+      townCity: 'Reading',
+      postcode: 'RG1 2AA',
+      addressType: CourtAddressType.VISIT_US,
+    };
+    retrieveCourtNameStub.resolves(HttpStatusCode.NotFound);
+    const saveStub = stub(CourtAddressService.prototype, 'save');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('not-found');
+
+    try {
+      await controller.updateExistingAddress(request, response);
+      assert.notCalled(saveStub);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('uses address area/court-type values when save-new invalid flow has no yes flags', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    request.body = {
+      addressLine1: '',
+      townCity: 'Reading',
+      postcode: 'RG1 2AA',
+      areasOfLaw: 'no',
+      courtTypes: 'no',
+    };
+
+    const saveStub = stub(CourtAddressService.prototype, 'save').resolves({
+      status: 'invalid',
+      address: buildAddress({
+        id: null,
+        areasOfLaw: [AREA_OF_LAW_ID],
+        courtTypes: [COURT_TYPE_ID],
+      }),
+    } as never);
+    const listAreasOfLawStub = stub(TypesService.prototype, 'listAreasOfLaw').resolves([] as never);
+    const listCourtTypesStub = stub(TypesService.prototype, 'listCourtTypes').resolves([] as never);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'court-address-edit',
+        match((viewModel: Record<string, unknown>) => {
+          return viewModel.aolSelected === AREA_OF_LAW_ID && viewModel.ctSelected === COURT_TYPE_ID;
+        })
+      );
+
+    try {
+      await controller.saveNewAddress(request, response);
+      assert.calledOnce(saveStub);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+      listAreasOfLawStub.restore();
+      listCourtTypesStub.restore();
+    }
+  });
+
+  test('passes false selections when save-new request omits area and court type flags', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    request.body = {
+      addressLine1: '10 Kings Road',
+      townCity: 'Reading',
+      postcode: 'RG1 2AA',
+      addressType: CourtAddressType.VISIT_US,
+    };
+
+    const saveStub = stub(CourtAddressService.prototype, 'save').resolves(HttpStatusCode.InternalServerError);
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.saveNewAddress(request, response);
+      assert.calledWithMatch(saveStub, match.any, COURT_ID, false, false);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('uses address area/court-type values when update invalid flow has no yes flags', async () => {
+    const controller = new CourtAddressController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    request.body = {
+      addressLine1: 'Updated line 1',
+      townCity: 'Reading',
+      postcode: 'RG1 2AA',
+      addressType: CourtAddressType.WRITE_TO_US,
+      areasOfLaw: 'no',
+      courtTypes: 'no',
+    };
+
+    const saveStub = stub(CourtAddressService.prototype, 'save').resolves({
+      status: 'invalid',
+      address: buildAddress({
+        areasOfLaw: [AREA_OF_LAW_ID],
+        courtTypes: [COURT_TYPE_ID],
+      }),
+    } as never);
+    const listAreasOfLawStub = stub(TypesService.prototype, 'listAreasOfLaw').resolves([] as never);
+    const listCourtTypesStub = stub(TypesService.prototype, 'listCourtTypes').resolves([] as never);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'court-address-edit',
+        match((viewModel: Record<string, unknown>) => {
+          return viewModel.aolSelected === AREA_OF_LAW_ID && viewModel.ctSelected === COURT_TYPE_ID;
+        })
+      );
+
+    try {
+      await controller.updateExistingAddress(request, response);
+      assert.calledOnce(saveStub);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+      listAreasOfLawStub.restore();
+      listCourtTypesStub.restore();
     }
   });
 });
