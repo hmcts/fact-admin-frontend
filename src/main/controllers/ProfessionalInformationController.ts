@@ -87,7 +87,7 @@ export default class ProfessionalInformationController {
       res.status(HttpStatusCode.BadRequest);
       return res.render('professional-information', {
         ...saveResponse.viewModel,
-        breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, saveResponse.viewModel.courtName ?? 'Court'),
+        breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
       });
     }
 

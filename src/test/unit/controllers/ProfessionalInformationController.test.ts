@@ -314,6 +314,7 @@ describe('ProfessionalInformationController', () => {
 
   test('still validates after confirmation has been accepted', async () => {
     const viewModel = {
+      courtName,
       errorSummary: [{ href: '#dxCode-0', text: 'Enter a DX code' }],
     };
     const service = buildService({
@@ -333,7 +334,7 @@ describe('ProfessionalInformationController', () => {
       .once()
       .withArgs('professional-information', {
         ...viewModel,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs('Court'),
+        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
 
     await controller.postSuccess(buildRequest({ courtId }, { confirmFamilyCourtRemoval: 'true' }), response);
@@ -345,6 +346,7 @@ describe('ProfessionalInformationController', () => {
 
   test('renders validation errors from save', async () => {
     const viewModel = {
+      courtName,
       errorSummary: [{ href: '#dxCode-0', text: 'Enter a DX code' }],
     };
     const service = buildService({
@@ -367,7 +369,7 @@ describe('ProfessionalInformationController', () => {
       .once()
       .withArgs('professional-information', {
         ...viewModel,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs('Court'),
+        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
 
     await controller.postSuccess(buildRequest({ courtId }), response);
