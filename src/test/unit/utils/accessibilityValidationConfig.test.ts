@@ -29,7 +29,7 @@ describe('accessibilityValidationConfig.validate', () => {
     expect(result).toEqual(
       expect.objectContaining({
         liftDoorWidth: ['Enter the lift door width'],
-        liftDoorLimit: ['Enter the lift door limit'],
+        liftDoorLimit: ['Enter the lift weight limit'],
       })
     );
   });
@@ -49,7 +49,7 @@ describe('accessibilityValidationConfig.validate', () => {
     expect(result).toEqual(
       expect.objectContaining({
         liftDoorWidth: ['Lift door width must be a valid number'],
-        liftDoorLimit: ['Lift door limit must be a valid number'],
+        liftDoorLimit: ['Lift weight limit must be a valid number'],
       })
     );
   });
