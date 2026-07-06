@@ -1,13 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CounterServiceOpeningHours } from '../schemas/CounterServiceOpeningHoursSchema';
-
-export type CounterServiceOpeningHoursModel = Partial<CounterServiceOpeningHours> & {
-  errors?: Record<string, string[]>;
-} & {
-  name?: string;
-};
+import { CounterServiceOpeningHours, OpeningTimeDetails } from '../schemas/CounterServiceOpeningHoursSchema';
 
 type Day = {
   idPrefix: string;
@@ -78,6 +72,13 @@ export type CounterServiceSuccessViewModel = {
   assistanceAvailable: string;
 };
 
+const days: Day[] = [
+  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
+  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
+  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
+  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
+  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
+];
 export class CounterServiceOpeningHoursService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
@@ -114,17 +115,85 @@ export class CounterServiceOpeningHoursService {
     };
   }
 
-  public async retrieve(courtId: string): Promise<Partial<CounterServiceOpeningHoursModel> | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+  public async getEditPage(
+    courtId: string,
+    counterServiceId?: string
+  ): Promise<CounterServiceEditViewModel | HttpStatusCode> {
+    const baseModel = await this.getEditPageBase(courtId, counterServiceId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
-      return courtResponse;
+    if (this.isHttpStatusCode(baseModel)) {
+      return baseModel;
     }
-    const courtCounterServiceOpeningHours = await this.dataApiRequests.getCounterServiceOpeningHours(courtId);
-    if (typeof courtCounterServiceOpeningHours === 'number') {
-      return courtCounterServiceOpeningHours;
+
+    return baseModel;
+  }
+
+  public async save(
+    courtId: string,
+    counterServiceId: string | undefined,
+    form: CounterServiceOpeningHoursForm
+  ): Promise<SaveCounterServiceOpeningHoursResult> {
+    const baseModel = await this.getEditPageBase(courtId, counterServiceId, form);
+
+    if (this.isHttpStatusCode(baseModel)) {
+      return { status: baseModel, type: 'status' };
     }
-    return { ...courtCounterServiceOpeningHours, name: courtResponse.name };
+
+    const errors = this.validate(form);
+
+    if (Object.keys(errors).length > 0) {
+      return {
+        type: 'validation_error',
+        viewModel: {
+          ...baseModel,
+          errors,
+          errorSummary: this.toErrorSummary(errors),
+          pageTitle: `Error: Edit counter service opening hours - ${baseModel.courtName}`,
+        },
+      };
+    }
+
+    const assistWith = this.getSelectedDays(form.assistWith);
+
+    const saveResponse = await this.dataApiRequests.saveCounterServiceOpeningHours(courtId, {
+      courtId,
+      id: counterServiceId,
+      counterService: true,
+      assistWithForms: assistWith.includes('forms'),
+      assistWithDocuments: assistWith.includes('documents'),
+      assistWithSupport: assistWith.includes('support'),
+      appointmentNeeded: form.appointmentNeeded === 'yes',
+      appointmentContact: form.appointmentNeeded === 'yes' ? form.appointmentContact : null,
+      openingTimesDetails: this.toOpeningTimesDetails(form),
+    });
+
+    if (this.isSuccessfulStatus(saveResponse)) {
+      return {
+        type: 'success',
+        viewModel: {
+          courtId,
+          courtName: baseModel.courtName,
+          assistanceAvailable: this.formatAssistance(saveResponse as unknown as CounterServiceOpeningHours),
+        },
+      };
+    }
+
+    if (this.isHttpStatusCode(saveResponse)) {
+      return { status: saveResponse, type: 'status' };
+    }
+
+    if (saveResponse instanceof Map) {
+      return { status: HttpStatusCode.BadRequest, type: 'status' };
+    }
+
+    return {
+      type: 'success',
+      viewModel: {
+        courtId,
+        courtName: baseModel.courtName,
+        assistanceAvailable: this.formatAssistance(saveResponse),
+      },
+    };
   }
 
   public async getDeletePage(
@@ -151,7 +220,7 @@ export class CounterServiceOpeningHoursService {
       counterServiceId,
       assistanceAvailable: this.formatAssistance(counterServiceResponse),
       hours: this.formatOpeningTimes(counterServiceResponse.openingTimesDetails),
-      pageTitle: `Delete Counter service opening hours - ${courtResponse.name}`,
+      pageTitle: `Delete counter service opening hours - ${courtResponse.name}`,
     };
   }
 
@@ -178,15 +247,326 @@ export class CounterServiceOpeningHoursService {
     };
   }
 
-  private formatAssistance(hours: CounterServiceOpeningHours): string {
+  public getSelectedDays(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value.filter((selectedValue): selectedValue is string => typeof selectedValue === 'string');
+    }
+
+    return typeof value === 'string' ? [value] : [];
+  }
+
+  //
+  // public async save(
+  //   courtId: string,
+  //   model: CounterServiceOpeningHoursModel
+  // ): Promise<CounterServiceOpeningHoursModel | HttpStatusCode> {
+  //   const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+  //   if (this.isHttpStatusCode(courtResponse)) {
+  //     return courtResponse;
+  //   }
+  //
+  //   // validate for errors
+  //   const validationErrors = this.validate(model);
+  //   if (validationErrors) {
+  //     return { ...model, errors: validationErrors };
+  //   }
+  //
+  //   // persist to the API
+  //
+  //   const result = await this.dataApiRequests.updateBuildingFacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
+  //   if (typeof result === 'number') {
+  //     return result;
+  //   }
+  //
+  //   // if it's a Map, it's [validation ]errors from the API
+  //   if (result instanceof Map) {
+  //     // convert the mapped errors into our expected error format
+  //     const errors: Record<string, string[]> = {};
+  //     for (const [key, value] of result) {
+  //       errors[key] = [value];
+  //     }
+  //     return { ...model, errors, name: courtResponse.name };
+  //   }
+  //
+  //   // otherwise, it's a successful save
+  //   return { ...result, name: courtResponse.name };
+  // }
+  //
+  // private validate(model: CounterServiceOpeningHoursModel): Record<string, string[]> | undefined {
+  //   const errors: Record<string, string[]> = {};
+  //   const fields = [
+  //     {
+  //       key: 'parking',
+  //       value: model.parking,
+  //       message: 'Select whether the parking is available',
+  //     },
+  //     {
+  //       key: 'waitingArea',
+  //       value: model.waitingArea,
+  //       message: 'Select whether the waiting area is available',
+  //     },
+  //     {
+  //       key: 'quietRoom',
+  //       value: model.quietRoom,
+  //       message: 'Select whether the quiet room is available',
+  //     },
+  //     {
+  //       key: 'babyChanging',
+  //       value: model.babyChanging,
+  //       message: 'Select whether the baby changing is available',
+  //     },
+  //     {
+  //       key: 'wifi',
+  //       value: model.wifi,
+  //       message: 'Select whether the wifi is available',
+  //     },
+  //   ];
+  //
+  //   fields.forEach(({ key, value, message }) => {
+  //     const fieldErrors = validateBooleanField(value, message);
+  //     if (fieldErrors) {
+  //       errors[key] = fieldErrors;
+  //     }
+  //   });
+  //
+  //   if (model.waitingArea === true) {
+  //     const childrenAreaErrors = validateBooleanField(
+  //       model.waitingAreaChildren,
+  //       'Select whether the children waiting area is available'
+  //     );
+  //
+  //     if (childrenAreaErrors) {
+  //       errors.waitingAreaChildren = childrenAreaErrors;
+  //     }
+  //   }
+  //
+  //   return Object.keys(errors).length > 0 ? errors : undefined;
+  // }
+
+  private async getEditPageBase(
+    courtId: string,
+    counterServiceId?: string,
+    postedForm?: CounterServiceOpeningHoursForm
+  ): Promise<CounterServiceEditViewModel | HttpStatusCode> {
+    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+
+    if (this.isHttpStatusCode(courtResponse)) {
+      return courtResponse;
+    }
+
+    let existingRecord: CounterServiceOpeningHours | undefined;
+    if (counterServiceId) {
+      const counterServiceResponse = await this.dataApiRequests.getCounterServiceOpeningHoursById(
+        courtId,
+        counterServiceId
+      );
+      if (this.isHttpStatusCode(counterServiceResponse)) {
+        return counterServiceResponse;
+      }
+      existingRecord = counterServiceResponse;
+    }
+
+    console.log('=== to form', JSON.stringify(existingRecord, null, 2));
+
+    const form = postedForm ?? this.toForm(existingRecord);
+
+    return {
+      courtId,
+      courtName: courtResponse.name,
+      days,
+      errors: {},
+      errorSummary: [],
+      form,
+      counterServiceId,
+      pageTitle: `Edit counter service opening hours - ${courtResponse.name}`,
+    };
+  }
+
+  private validate(form: CounterServiceOpeningHoursForm): Record<string, string> {
+    const errors: Record<string, string> = {};
+
+    const assistWith = this.getSelectedDays(form.assistWith);
+    if (assistWith.length === 0) {
+      errors.assistWith = 'Select what the counter can assist with';
+    }
+
+    if (!form.appointmentNeeded) {
+      errors.appointmentNeeded = 'Select yes if an appointment is needed';
+    }
+
+    if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
+      errors.sameTimeYes = 'Select whether the court opens and closes at the same time Monday to Friday';
+      return errors;
+    }
+
+    if (form.sameTime === 'yes') {
+      this.validateTimeGroup(errors, form, 'same', 'Opening');
+      return errors;
+    }
+
+    if (form.selectedDays.length === 0) {
+      errors.selectedDays = 'Select at least one day';
+      return errors;
+    }
+
+    form.selectedDays.forEach(day => {
+      const dayConfig = days.find(config => config.value === day);
+      if (dayConfig) {
+        this.validateTimeGroup(errors, form, dayConfig.idPrefix, dayConfig.name);
+      }
+    });
+
+    return errors;
+  }
+
+  private validateTimeGroup(
+    errors: Record<string, string>,
+    form: CounterServiceOpeningHoursForm,
+    prefix: string,
+    labelPrefix: string
+  ): void {
+    const openingHourKey = `${prefix}OpeningHour`;
+    const openingMinuteKey = `${prefix}OpeningMinute`;
+    const closingHourKey = `${prefix}ClosingHour`;
+    const closingMinuteKey = `${prefix}ClosingMinute`;
+
+    this.validateTimePart(errors, form[openingHourKey], openingHourKey, `${labelPrefix} opening hour`, 23);
+    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, `${labelPrefix} opening minute`, 59);
+    this.validateTimePart(errors, form[closingHourKey], closingHourKey, `${labelPrefix} closing hour`, 23);
+    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, `${labelPrefix} closing minute`, 59);
+
+    if (errors[openingHourKey] || errors[openingMinuteKey] || errors[closingHourKey] || errors[closingMinuteKey]) {
+      return;
+    }
+
+    const openingTime = this.toMinutes(form[openingHourKey] as string, form[openingMinuteKey] as string);
+    const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
+
+    if (openingTime > closingTime) {
+      errors[openingHourKey] = 'The opening time cannot be after the closing time';
+      errors[closingHourKey] = 'The closing time cannot be before the opening time';
+    } else if (openingTime === closingTime) {
+      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
+      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
+    }
+  }
+
+  private validateTimePart(
+    errors: Record<string, string>,
+    value: string | string[] | undefined,
+    key: string,
+    label: string,
+    maximum: number
+  ): void {
+    const valueText = typeof value === 'string' ? value.trim() : '';
+
+    if (!valueText) {
+      errors[key] = `Enter the ${label.toLowerCase()}`;
+      return;
+    }
+
+    if (!/^\d{1,2}$/.test(valueText) || Number(valueText) > maximum) {
+      errors[key] = `${label} must be between 0 and ${maximum}`;
+    }
+  }
+
+  private toOpeningTimesDetails(form: CounterServiceOpeningHoursForm): OpeningTimeDetails[] {
+    if (form.sameTime === 'yes') {
+      return [
+        {
+          dayOfWeek: 'EVERYDAY',
+          openingTime: this.formatTime(form.sameOpeningHour as string, form.sameOpeningMinute as string),
+          closingTime: this.formatTime(form.sameClosingHour as string, form.sameClosingMinute as string),
+        },
+      ];
+    }
+
+    return form.selectedDays
+      .map(day => days.find(dayConfig => dayConfig.value === day))
+      .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
+      .map(dayConfig => ({
+        dayOfWeek: dayConfig.value,
+        openingTime: this.formatTime(
+          form[`${dayConfig.idPrefix}OpeningHour`] as string,
+          form[`${dayConfig.idPrefix}OpeningMinute`] as string
+        ),
+        closingTime: this.formatTime(
+          form[`${dayConfig.idPrefix}ClosingHour`] as string,
+          form[`${dayConfig.idPrefix}ClosingMinute`] as string
+        ),
+      }));
+  }
+
+  private toForm(existingRecord?: CounterServiceOpeningHours): CounterServiceOpeningHoursForm {
+    if (!existingRecord) {
+      return { assistWith: [], selectedDays: [] };
+    }
+
+    const assistWith: string[] = [
+      ...(existingRecord.assistWithForms ? ['forms'] : []),
+      ...(existingRecord.assistWithDocuments ? ['documents'] : []),
+      ...(existingRecord.assistWithSupport ? ['support'] : []),
+    ];
+
+    const daysList = existingRecord.openingTimesDetails.map(d => d.dayOfWeek);
+    const sameTime = daysList.length === 1 && daysList[0] === 'EVERYDAY' ? 'yes' : 'no';
+
+    const form: CounterServiceOpeningHoursForm = {
+      assistWith,
+      appointmentNeeded: existingRecord.appointmentNeeded ? 'yes' : 'no',
+      appointmentContact: existingRecord.appointmentContact ?? '',
+      sameTime,
+      selectedDays: sameTime === 'no' ? daysList : [],
+    };
+
+    if (sameTime === 'yes') {
+      const everyDay = existingRecord.openingTimesDetails[0];
+      form.sameOpeningHour = everyDay.openingTime.split(':')[0];
+      form.sameOpeningMinute = everyDay.openingTime.split(':')[1];
+      form.sameClosingHour = everyDay.closingTime.split(':')[0];
+      form.sameClosingMinute = everyDay.closingTime.split(':')[1];
+    } else {
+      existingRecord.openingTimesDetails.forEach(detail => {
+        const prefix = detail.dayOfWeek.toLowerCase();
+        form[`${prefix}OpeningHour`] = detail.openingTime.split(':')[0];
+        form[`${prefix}OpeningMinute`] = detail.openingTime.split(':')[1];
+        form[`${prefix}ClosingHour`] = detail.closingTime.split(':')[0];
+        form[`${prefix}ClosingMinute`] = detail.closingTime.split(':')[1];
+      });
+    }
+
+    console.log(
+      '=== to form opening hours',
+      JSON.stringify(
+        {
+          sameTime: form.sameTime,
+          sameOpeningHour: form.sameOpeningHour,
+          sameOpeningMinute: form.sameOpeningMinute,
+          sameClosingHour: form.sameClosingHour,
+          sameClosingMinute: form.sameClosingMinute,
+          selectedDays: form.selectedDays,
+        },
+        null,
+        2
+      )
+    );
+
+    return form;
+  }
+
+  private toErrorSummary(errors: Record<string, string>): CounterServiceEditError[] {
+    return Object.entries(errors).map(([field, text]) => ({ href: `#${field}`, text }));
+  }
+
+  private formatAssistance(counterService: CounterServiceOpeningHours): string {
     const items: string[] = [];
-    if (hours.assistWithForms) {
+    if (counterService.assistWithForms) {
       items.push('Forms');
     }
-    if (hours.assistWithDocuments) {
+    if (counterService.assistWithDocuments) {
       items.push('Documents');
     }
-    if (hours.assistWithSupport) {
+    if (counterService.assistWithSupport) {
       items.push('Support at court');
     }
     return items.join(', ');
@@ -199,12 +579,12 @@ export class CounterServiceOpeningHoursService {
           detail.dayOfWeek === 'EVERYDAY'
             ? 'Monday to Friday'
             : detail.dayOfWeek.charAt(0) + detail.dayOfWeek.slice(1).toLowerCase();
-        return `${day}: ${this.formatTime(detail.openingTime)} to ${this.formatTime(detail.closingTime)}`;
+        return `${day}: ${this.formatDisplayTime(detail.openingTime)} to ${this.formatDisplayTime(detail.closingTime)}`;
       })
       .join('<br>');
   }
 
-  private formatTime(time: string): string {
+  private formatDisplayTime(time: string): string {
     const [hour, minute] = time.split(':');
     const hourNum = parseInt(hour, 10);
     const period = hourNum >= 12 ? 'pm' : 'am';
@@ -212,8 +592,22 @@ export class CounterServiceOpeningHoursService {
     return minute === '00' ? `${displayHour}${period}` : `${displayHour}:${minute}${period}`;
   }
 
+  private toMinutes(hour: string, minute: string): number {
+    return Number(hour) * 60 + Number(minute);
+  }
+
+  private formatTime(hour: string, minute: string): string {
+    return `${hour.trim().padStart(2, '0')}:${minute.trim().padStart(2, '0')}`;
+  }
+
   private isHttpStatusCode(response: unknown): response is HttpStatusCode {
     return typeof response === 'number';
+  }
+
+  private isSuccessfulStatus(response: unknown): response is HttpStatusCode {
+    return (
+      this.isHttpStatusCode(response) && response >= HttpStatusCode.Ok && response < HttpStatusCode.MultipleChoices
+    );
   }
 
   private isNoOpeningHoursResponse(status: HttpStatusCode): boolean {

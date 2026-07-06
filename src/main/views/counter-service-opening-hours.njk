@@ -3,7 +3,7 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% macro rowActions(items) %}
-  <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0 fact-table-action">
+  <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">
     {% for item in items %}
       <li class="govuk-summary-list__actions-list-item">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
@@ -62,7 +62,8 @@
               text: "Hours"
             },
             {
-              text: "Actions"
+              text: "Actions",
+              classes: "govuk-!-width-one-quarter"
             }
           ],
           rows: counterServiceOpeningHoursTableRows
@@ -73,7 +74,7 @@
 
       {% if counterServiceOpeningHoursTableRows.length < 5 %}
         {{ govukButton({
-          text: "Add counter service opening hours",
+          text: "Add opening hours",
           href: "/courts/" + courtId + "/edit/counter-service-opening-hours/add"
         }) }}
       {% endif %}

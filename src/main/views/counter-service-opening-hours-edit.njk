@@ -4,7 +4,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/select/macro.njk" import govukInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% macro timeSection(prefix, kind, title, errors, form, classes) %}
   {% set sectionErrors = [] %}
@@ -80,8 +80,8 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">Counter service opening hours</h1>
-      <h2 class="govuk-heading-m">Edit Counter service opening hours</h2>
+      <h1 class="govuk-heading-l">Edit Counter service opening hours</h1>
+      <h2 class="govuk-heading-m">Counter service details</h2>
 
       {% set appointmentContact %}
           {{ govukInput({
@@ -92,12 +92,12 @@
               text: "Enter contact details for booking"
             },
             hint: {
-              test: "Provide the email adddress they can use to book appointments. Use lower case."
+              text: "Provide the email adddress they can use to book appointments. Use lower case."
             },
-            value: model.appointmentContact,
+            value: form.appointmentContact,
             errorMessage: {
-              text: model.errors.appointmentContact[0]
-            } if model.errors and model.errors.appointmentContact else null
+              text: form.errors.appointmentContact[0]
+            } if form.errors and form.errors.appointmentContact else null
           }) }}
       {% endset %}
 
@@ -134,7 +134,6 @@
       {% endset %}
 
       <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/save{% if counterServiceId %}/{{ counterServiceId }}{% endif %}" novalidate data-counter-service-opening-hours-form>
-        <h3 class="govuk-heading-s">Enter opening hours</h3>
 
         {{ govukCheckboxes({
           id: "assistWith",
@@ -151,22 +150,22 @@
             {
               value: "forms",
               text: "Forms",
-              checked: form.assistWith and form.assistWith.include("forms")
+              checked: form.assistWith and form.assistWith.includes("forms")
             },
             {
               value: "documents",
               text: "Documents",
-              checked: checked: form.assistWith and form.assistWith.include("documents")
+              checked: form.assistWith and form.assistWith.includes("documents")
             },
             {
               value: "support",
               text: "Support at court",
-              checked: checked: form.assistWith and form.assistWith.include("support")
+              checked: form.assistWith and form.assistWith.includes("support")
             }
           ],
           errorMessage: {
             text: error.assistWith
-            if errors.assistWith else null
+          }  if errors.assistWith else null
         }) }}
 
         {{ govukRadios({
@@ -182,7 +181,7 @@
             {
               value: "yes",
               text: "Yes",
-              checked: true if model.appointmentNeeded === "yes",
+              checked: true if form.appointmentNeeded === "yes",
               conditional:
                {
                  html: appointmentContact
@@ -191,12 +190,12 @@
             {
               value: "no",
               text: "No",
-              checked: true if model.appointmentNeeded === "no"
+              checked: true if form.appointmentNeeded === "no"
             }
           ],
           errorMessage: {
-           text: errors.appointmentNeeded
-         } if errors and model.errors.appointmentNeeded else null
+            text: errors.appointmentNeeded
+          } if errors and form.errors.appointmentNeeded else null
         }) }}
 
         <h3 class="govuk-heading-s">Enter opening hours</h3>
@@ -206,7 +205,7 @@
           name: "sameTime",
           fieldset: {
             legend: {
-              text: "Does the court open and close at the same time Monday to Friday?"
+              text: "Does the counter open and close at the same time Monday to Friday?"
             }
           },
           items: [
@@ -229,8 +228,9 @@
               }
             }
           ],
-            errorMessage: {
+          errorMessage: {
             text: errors.sameTimeYes
+          }
           if errors.sameTimeYes else null
         }) }}
 
