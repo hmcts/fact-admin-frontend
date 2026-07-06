@@ -1637,6 +1637,10 @@ describe('DataApiRequests', () => {
   it('returns parsed contact description types when response is valid', async () => {
     const contactDescriptionTypes = [
       {
+        id: '33333333-3333-4333-8333-333333333333',
+        name: 'Enquiries',
+      },
+      {
         id: '22222222-2222-4222-8222-222222222222',
         name: 'Listing enquiries',
       },
@@ -1651,6 +1655,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getContactDescriptionTypes();
 
     expect(response).toEqual([
+      {
+        id: '33333333-3333-4333-8333-333333333333',
+        name: 'Enquiries',
+      },
       {
         id: '11111111-1111-4111-8111-111111111111',
         name: 'General enquiries',
