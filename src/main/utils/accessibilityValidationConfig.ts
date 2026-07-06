@@ -67,12 +67,12 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     },
     {
       key: 'liftDoorLimit',
-      validate: m => (m.lift && isMissing(m.liftDoorLimit) ? ['Enter the lift door limit'] : undefined),
+      validate: m => (m.lift && isMissing(m.liftDoorLimit) ? ['Enter the lift weight limit'] : undefined),
     },
     {
       key: 'liftDoorLimit',
       validate: m =>
-        m.lift && isInvalidNumber(m.liftDoorLimit) ? ['Lift door limit must be a valid number'] : undefined,
+        m.lift && isInvalidNumber(m.liftDoorLimit) ? ['Lift weight limit must be a valid number'] : undefined,
     },
     {
       key: 'liftDoorLimit',
