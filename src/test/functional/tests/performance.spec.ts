@@ -156,6 +156,9 @@ test.describe(
         await singlePointsOfEntryPage.goto(createdCourt.id);
         await singlePointsOfEntryPage.header.checkIsVisible();
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Audit List Page Performance', async ({
       addCourtPage,
       auditListPage,
