@@ -455,9 +455,20 @@ export class DataApiRequests {
   public async getContactDescriptionTypes(): Promise<ContactDescriptionType[] | HttpStatusCode> {
     try {
       const response = await dataApi.get('/types/v1/contact-description-types');
-      return contactDescriptionTypeListSchema
-        .parse(response.data)
-        .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      return contactDescriptionTypeListSchema.parse(response.data).sort((a, b) => {
+        const aIsEnquiries = a.name.trim().localeCompare('Enquiries', undefined, { sensitivity: 'base' }) === 0;
+        const bIsEnquiries = b.name.trim().localeCompare('Enquiries', undefined, { sensitivity: 'base' }) === 0;
+
+        if (aIsEnquiries && !bIsEnquiries) {
+          return -1;
+        }
+
+        if (!aIsEnquiries && bIsEnquiries) {
+          return 1;
+        }
+
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      });
     } catch (error: unknown) {
       logger.error('Error fetching contact description type details:', error);
       return isAxiosError(error) && error.response?.status
