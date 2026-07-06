@@ -427,6 +427,32 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.NotFound);
   });
 
+  it('returns status code when the service centre by exact name endpoint returns a non-404 axios error', async () => {
+    const serviceCentreName = 'National Business Centre';
+
+    getStub.withArgs('/service-centres/name/v1', { params: { name: serviceCentreName } }).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await dataApiRequests.getServiceCentreByName(serviceCentreName);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
+  it('returns internal server error when the service centre by exact name request fails without an axios status', async () => {
+    const serviceCentreName = 'National Business Centre';
+
+    getStub.withArgs('/service-centres/name/v1', { params: { name: serviceCentreName } }).rejects(errorMessage);
+
+    const response = await dataApiRequests.getServiceCentreByName(serviceCentreName);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
   it('returns parsed service centre when create service centre succeeds', async () => {
     const payload = {
       name: 'National Business Centre',
@@ -475,6 +501,47 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.createServiceCentre(payload);
 
     expect(response).toEqual(new Map([['name', 'Name already exists']]));
+  });
+
+  it('returns status code when create service centre fails with non-400 axios error', async () => {
+    const payload = {
+      name: 'National Business Centre',
+      open: false,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      serviceAreaIds: ['77777777-7777-4777-8777-777777777777'],
+    };
+
+    postStub.withArgs('/service-centres/v1', payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await dataApiRequests.createServiceCentre(payload);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
+  it('returns internal server error when create service centre response fails schema validation', async () => {
+    const payload = {
+      name: 'National Business Centre',
+      open: false,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      serviceAreaIds: ['77777777-7777-4777-8777-777777777777'],
+    };
+
+    postStub.withArgs('/service-centres/v1', payload).resolves({
+      data: {
+        id: '66666666-6666-4666-8666-666666666666',
+        name: payload.name,
+      },
+    });
+
+    const response = await dataApiRequests.createServiceCentre(payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
   it('returns a validation map when update court returns a 400', async () => {
@@ -1702,6 +1769,14 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getServiceAreas();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns status code when service areas request fails with axios error', async () => {
+    getStub.withArgs('/types/v1/service-areas').rejects(errorResponse);
+
+    const response = await dataApiRequests.getServiceAreas();
+
+    expect(response).toBe(HttpStatusCode.NotFound);
   });
 
   it('returns parsed court types when response is valid', async () => {

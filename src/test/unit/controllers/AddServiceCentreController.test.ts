@@ -32,6 +32,28 @@ describe('AddServiceCentreController', () => {
     }
   });
 
+  test('renders the error page when the add service centre view model returns a status code', async () => {
+    const controller = new AddServiceCentreController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const getViewModelStub = stub(AddServiceCentreService.prototype, 'getViewModel').resolves(500);
+
+    responseMock.expects('status').once().withArgs(500).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(mockRequest({}), response);
+
+      assert.calledOnce(getViewModelStub);
+      responseMock.verify();
+    } finally {
+      getViewModelStub.restore();
+    }
+  });
+
   test('re-renders the add service centre page when create returns validation errors', async () => {
     const controller = new AddServiceCentreController();
     const response = {
@@ -61,6 +83,39 @@ describe('AddServiceCentreController', () => {
 
       assert.calledOnce(createStub);
       assert.calledWith(createStub, { name: 'Te', regionId: '', serviceAreaIds: [] });
+      responseMock.verify();
+    } finally {
+      createStub.restore();
+    }
+  });
+
+  test('renders the error page when create returns a status code', async () => {
+    const controller = new AddServiceCentreController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      name: 'National Business Centre',
+      regionId: '22222222-2222-4222-8222-222222222222',
+      serviceAreaIds: ['33333333-3333-4333-8333-333333333333', 123],
+    };
+    const responseMock = mock(response);
+    const createStub = stub(AddServiceCentreService.prototype, 'create').resolves(500);
+
+    responseMock.expects('status').once().withArgs(500).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.createServiceCentre(request, response);
+
+      assert.calledOnce(createStub);
+      assert.calledWith(createStub, {
+        name: 'National Business Centre',
+        regionId: '22222222-2222-4222-8222-222222222222',
+        serviceAreaIds: ['33333333-3333-4333-8333-333333333333', '123'],
+      });
       responseMock.verify();
     } finally {
       createStub.restore();
@@ -98,6 +153,42 @@ describe('AddServiceCentreController', () => {
         name: 'National Business Centre',
         regionId: '22222222-2222-4222-8222-222222222222',
         serviceAreaIds: ['33333333-3333-4333-8333-333333333333'],
+      });
+      responseMock.verify();
+    } finally {
+      createStub.restore();
+    }
+  });
+
+  test('passes undefined form values and an empty service area list when body is missing', async () => {
+    const controller = new AddServiceCentreController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = undefined;
+    const responseMock = mock(response);
+    const viewModel = {
+      errors: {
+        name: ['Enter a name for the service centre'],
+      },
+      pagePath: '/add-service-centre',
+      pageTitle: 'Error: Add new service centre',
+      regions: [],
+      serviceAreas: [],
+    };
+    const createStub = stub(AddServiceCentreService.prototype, 'create').resolves(viewModel);
+
+    responseMock.expects('render').once().withArgs('add-service-centre', viewModel);
+
+    try {
+      await controller.createServiceCentre(request, response);
+
+      assert.calledOnce(createStub);
+      assert.calledWith(createStub, {
+        name: undefined,
+        regionId: undefined,
+        serviceAreaIds: [],
       });
       responseMock.verify();
     } finally {
