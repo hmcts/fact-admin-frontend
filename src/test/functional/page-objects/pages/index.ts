@@ -2,6 +2,8 @@ export * from './page.fixtures';
 export { AccessibilityPage } from './accessibility.po';
 export { BuildingFacilitiesPage } from './building-facilities.po';
 export { AddCourtPage } from './add-court.po';
+export { AuditListPage } from './audit-list.po';
+export { AuditDetailPage } from './audit-detail.po';
 export { PageSection } from './home.po';
 export { CourtAddressDeletePage } from './court-address-delete.po';
 export { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';

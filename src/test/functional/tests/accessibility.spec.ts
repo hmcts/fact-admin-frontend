@@ -1,4 +1,5 @@
 import { expect, test } from '../fixtures';
+import { seedAuditTrailViaUi } from '../helpers/auditTestSupport';
 import { withCreatedCourt } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -274,6 +275,62 @@ test.describe(
           await axeUtils.audit();
         }
       );
+    });
+
+    test('Audit List Page Accessibility', async ({
+      addCourtPage,
+      auditListPage,
+      axeUtils,
+      courtAddressDeletePage,
+      generalPage,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        page,
+        playwright,
+        prefixLabel: 'Audit Accessibility Test',
+        run: async () => {
+          await auditListPage.goto();
+          await axeUtils.audit();
+        },
+      });
+    });
+
+    test('Audit Detail Page Accessibility', async ({
+      addCourtPage,
+      auditDetailPage,
+      auditListPage,
+      axeUtils,
+      courtAddressDeletePage,
+      generalPage,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        page,
+        playwright,
+        prefixLabel: 'Audit Detail Accessibility Test',
+        run: async ({ courtId }) => {
+          await auditListPage.goto();
+          await auditListPage.filterByCourt(courtId);
+
+          const detailHref = await auditListPage.getDetailsHrefForAction('DELETE');
+          if (!detailHref) {
+            throw new Error('Expected a details link for a DELETE audit row.');
+          }
+
+          await page.goto(config.urls.homePageUrl + detailHref);
+          await auditDetailPage.expectVisibleElements();
+          await axeUtils.audit();
+        },
+      });
     });
 
     test('Court Contact List Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {

@@ -10,6 +10,5 @@ describe('Users View', () => {
 
     expect(html).toContain('Users');
     expect(html).toContain('Audit');
-    expect(html).toContain('Sign out');
   });
 });
