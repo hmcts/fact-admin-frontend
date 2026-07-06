@@ -1,0 +1,126 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% macro modelDrivenErrorSummary(errors) %}
+  {% set errorList = [] %}
+  {% for field, fieldErrors in errors %}
+    {% if field !== "timestamp" %}
+      {% for error in fieldErrors %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: "#" + field
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
+{% endmacro %}
+
+{% set regionOptions = [] %}
+{% if regions.length %}
+  {% set regionOptions = (regionOptions.push({ value: "", text: "Select a region" }), regionOptions) %}
+  {% for row in regions %}
+    {% set regionOptions = (regionOptions.push(
+      { value: row.id, text: row.name, selected: row.id == regionId }
+    ), regionOptions) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ modelDrivenErrorSummary(errors) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Add new service centre</h1>
+      <p class="govuk-body">
+        Service centre will be closed by default. An address must be provided. After entering a name you will be redirected to the edit address page for the new service centre and can fill out any remaining information.
+      </p>
+
+      <form method="post" action="/add-service-centre">
+        {{ govukInput({
+          label: {
+            text: "Name",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Enter the name of the service centre."
+          },
+          id: "name",
+          name: "name",
+          spellcheck: true,
+          value: name,
+          errorMessage: {
+            text: errors.name[0]
+          } if errors and errors.name else null
+        }) }}
+
+        {{ govukSelect({
+          id: "regionId",
+          name: "regionId",
+          label: {
+            text: "Region",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Select the region in which the service centre is located."
+          },
+          items: regionOptions,
+          errorMessage: {
+            text: errors.regionId[0]
+          } if errors and errors.regionId else null
+        }) }}
+
+        <fieldset class="govuk-fieldset">
+          <div class="govuk-form-group{% if errors and errors.serviceAreaIds %} govuk-form-group--error{% endif %}" id="serviceAreaIds">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              Service areas
+            </legend>
+            <div id="serviceAreaIds-hint" class="govuk-hint">
+              Select all service areas handled by the service centre.
+            </div>
+            {% if errors and errors.serviceAreaIds %}
+              <p class="govuk-error-message" id="serviceAreaIds-error">
+                <span class="govuk-visually-hidden">Error:</span> {{ errors.serviceAreaIds[0] }}
+              </p>
+            {% endif %}
+            <div class="govuk-grid-row cases-heard-columns">
+              <div class="govuk-grid-column-one-half">
+                {{ govukCheckboxes({
+                  classes: "cases-heard-checkboxes",
+                  idPrefix: "serviceAreaIds-left",
+                  name: "serviceAreaIds",
+                  items: leftColumnServiceAreaItems
+                }) }}
+              </div>
+              <div class="govuk-grid-column-one-half">
+                {{ govukCheckboxes({
+                  classes: "cases-heard-checkboxes",
+                  idPrefix: "serviceAreaIds-right",
+                  name: "serviceAreaIds",
+                  items: rightColumnServiceAreaItems
+                }) }}
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        {{ govukButton({
+          text: "Add service centre"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

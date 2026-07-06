@@ -28,6 +28,7 @@ export class HomePageFiltersService {
 
     return {
       includeClosed: query.includeClosed === 'true' || query.includeClosed === 'on',
+      onlyServiceCentres: query.onlyServiceCentres === 'true' || query.onlyServiceCentres === 'on',
       pageNumber: Math.min(parseNumber(query.pageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),
       pageSize: Math.min(parseNumber(query.pageSize, DEFAULT_PAGE_SIZE), MAX_PAGE_PARAM),
       partialCourtName: parseString(query.partialCourtName),
@@ -35,6 +36,7 @@ export class HomePageFiltersService {
       sortBy,
       sortOrder: rawSortOrder === 'desc' ? 'desc' : DEFAULT_SORT_ORDER,
       rawIncludeClosed: parseOptionalString(query.includeClosed),
+      rawOnlyServiceCentres: parseOptionalString(query.onlyServiceCentres),
       rawPageNumber: parseOptionalString(query.pageNumber),
       rawPageSize: parseOptionalString(query.pageSize),
       rawSortBy,
@@ -56,7 +58,7 @@ export class HomePageFiltersService {
       });
     }
 
-    // Pagination and includeClosed
+    // Pagination and boolean filters
     if (
       filters.rawIncludeClosed !== undefined &&
       filters.rawIncludeClosed !== 'true' &&
@@ -66,6 +68,18 @@ export class HomePageFiltersService {
       errors.push({
         href: '#main-content',
         text: 'includeClosed must be true or false',
+      });
+    }
+
+    if (
+      filters.rawOnlyServiceCentres !== undefined &&
+      filters.rawOnlyServiceCentres !== 'true' &&
+      filters.rawOnlyServiceCentres !== 'false' &&
+      filters.rawOnlyServiceCentres !== 'on'
+    ) {
+      errors.push({
+        href: '#main-content',
+        text: 'onlyServiceCentres must be true or false',
       });
     }
 
@@ -136,6 +150,7 @@ export class HomePageFiltersService {
   public toGetCourtsParams(filters: HomePageFilters): GetCourtsParams {
     const params: GetCourtsParams = {
       includeClosed: filters.includeClosed,
+      onlyServiceCentres: filters.onlyServiceCentres,
       pageNumber: filters.pageNumber,
       pageSize: filters.pageSize,
     };

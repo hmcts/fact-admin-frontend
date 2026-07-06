@@ -2,6 +2,7 @@ export * from './page.fixtures';
 export { AccessibilityPage } from './accessibility.po';
 export { BuildingFacilitiesPage } from './building-facilities.po';
 export { AddCourtPage } from './add-court.po';
+export { AddServiceCentrePage } from './add-service-centre.po';
 export { AuditListPage } from './audit-list.po';
 export { AuditDetailPage } from './audit-detail.po';
 export { PageSection } from './home.po';
