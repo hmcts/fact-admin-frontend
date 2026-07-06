@@ -1,0 +1,41 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Single points of entry</h1>
+
+      <p class="govuk-body">
+        Select the services where this court is the single point of entry. When selected, eligible public postcode searches will show this court as the only result when it is the closest matching court.
+      </p>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/single-point-of-entry/success">
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-visually-hidden">Services</legend>
+            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+              {% for service in singlePointOfEntryServices %}
+                <input type="hidden" name="singlePointOfEntry.{{ service.areaOfLawId }}" value="false">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="singlePointOfEntry-{{ service.areaOfLawId }}" name="singlePointOfEntry.{{ service.areaOfLawId }}" type="checkbox" value="true"{% if service.singlePointOfEntry %} checked{% endif %}>
+                  <label class="govuk-label govuk-checkboxes__label" for="singlePointOfEntry-{{ service.areaOfLawId }}">
+                    {{ service.label }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          </fieldset>
+        </div>
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
