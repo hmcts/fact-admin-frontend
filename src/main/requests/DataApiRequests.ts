@@ -25,6 +25,7 @@ import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
+import { CourtLock, CourtLockList, Page, courtLockListSchema, courtLockSchema } from '../schemas/courtLockSchema';
 import {
   CourtProfessionalInformation,
   courtProfessionalInformationSchema,
@@ -812,6 +813,59 @@ export class DataApiRequests {
       return auditListItemSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching audit details for id ${auditId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve a court lock based on court id and page
+   */
+  public async getCourtLock(courtId: string, page: typeof Page): Promise<CourtLock | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/locks/${page}`);
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
+      return courtLockSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court lock information for court id ${courtId} and page ${page}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve all locks for a given court
+   */
+  public async getCourtLocks(courtId: string): Promise<CourtLockList | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/locks`);
+      if (response.status === HttpStatusCode.NoContent) {
+        return [];
+      }
+      return courtLockListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching court lock information for court id ${courtId}`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to acquire a court lock
+   */
+  public async acquireCourtLock(
+    courtId: string,
+    page: typeof Page,
+    userId: string
+  ): Promise<CourtLock | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.post(`/courts/${courtId}/v1/locks/${page}`, userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return courtLockSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error acquiring court lock for court id ${courtId} and page ${page}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }

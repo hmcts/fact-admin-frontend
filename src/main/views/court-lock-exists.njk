@@ -1,0 +1,9 @@
+{% extends "template.njk" %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Already Locked</h1>
+  <p class="govuk-body">The court page you are trying to access is locked by another user</p>
+  <pre>
+    {{ courtLock | dump(2) }}
+  </pre>
+{% endblock %}
