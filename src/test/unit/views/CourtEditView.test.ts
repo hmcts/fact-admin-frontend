@@ -18,6 +18,8 @@ describe('Court Edit View', () => {
     expect(html).toContain(`${courtEditPath}/cases-heard`);
     expect(html).toContain(`${courtEditPath}/information-for-professionals`);
     expect(html).toContain('Information for professionals');
+    expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
+    expect(html).toContain('Single points of entry');
     expect(html).toContain('Local authorities');
     expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);

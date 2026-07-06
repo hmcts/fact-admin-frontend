@@ -26,6 +26,7 @@ describe('Court edit page', () => {
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/address');
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/contact-details');
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/general');
+    expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/single-point-of-entry');
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/local-authorities');
   });
 
