@@ -225,6 +225,28 @@ test.describe(
       });
     });
 
+    test('Single Points of Entry Page Accessibility', async ({ axeUtils, playwright, singlePointsOfEntryPage }) => {
+      await withCreatedCourt(playwright, 'Single Points Of Entry Accessibility Test', {}, async ({ createdCourt }) => {
+        await singlePointsOfEntryPage.goto(createdCourt.id);
+        await singlePointsOfEntryPage.expectVisibleElements();
+        await axeUtils.audit();
+      });
+    });
+
+    test('Single Points of Entry Success Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      singlePointsOfEntryPage,
+    }) => {
+      await withCreatedCourt(playwright, 'Single Points Of Entry Accessibility Test', {}, async ({ createdCourt }) => {
+        await singlePointsOfEntryPage.goto(createdCourt.id);
+        await singlePointsOfEntryPage.singlePointOfEntryCheckbox('Childcare arrangements').check();
+        await singlePointsOfEntryPage.save();
+        await singlePointsOfEntryPage.header.checkIsVisible();
+        await axeUtils.audit();
+      });
+    });
+
     test('Information for Professionals Page Accessibility', async ({
       axeUtils,
       playwright,

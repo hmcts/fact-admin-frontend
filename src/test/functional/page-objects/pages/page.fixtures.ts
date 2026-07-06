@@ -21,6 +21,7 @@ import { GeneralPage } from './general.po';
 import { HomePage } from './home.po';
 import { LocalAuthoritiesPage } from './local-authorities.po';
 import { ProfessionalInformationPage } from './professional-information.po';
+import { SinglePointsOfEntryPage } from './single-points-of-entry.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 
 export interface PageFixtures {
@@ -46,6 +47,7 @@ export interface PageFixtures {
   courtOpeningHoursPage: CourtOpeningHoursPage;
   generalPage: GeneralPage;
   localAuthoritiesPage: LocalAuthoritiesPage;
+  singlePointsOfEntryPage: SinglePointsOfEntryPage;
   professionalInformationPage: ProfessionalInformationPage;
 }
 
@@ -147,6 +149,10 @@ export const pageFixtures = {
   localAuthoritiesPage: async ({ determinePage }, use): Promise<void> => {
     const localAuthoritiesPage = new LocalAuthoritiesPage(determinePage);
     await use(localAuthoritiesPage);
+  },
+  singlePointsOfEntryPage: async ({ determinePage }, use): Promise<void> => {
+    const singlePointsOfEntryPage = new SinglePointsOfEntryPage(determinePage);
+    await use(singlePointsOfEntryPage);
   },
   professionalInformationPage: async ({ determinePage }, use): Promise<void> => {
     const professionalInformationPage = new ProfessionalInformationPage(determinePage);

@@ -153,6 +153,18 @@ test.describe(
       );
     });
 
+    test('Single Points of Entry Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      singlePointsOfEntryPage,
+    }) => {
+      await withCreatedCourt(playwright, 'Single Points Of Entry Performance Test', {}, async ({ createdCourt }) => {
+        await singlePointsOfEntryPage.goto(createdCourt.id);
+        await singlePointsOfEntryPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Audit List Page Performance', async ({
       addCourtPage,
       auditListPage,
