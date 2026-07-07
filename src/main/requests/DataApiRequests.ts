@@ -25,7 +25,6 @@ import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
-import { Lock, LockList, Page, lockListSchema, lockSchema } from '../schemas/lockSchema';
 import {
   CourtProfessionalInformation,
   courtProfessionalInformationSchema,
@@ -36,6 +35,7 @@ import {
 } from '../schemas/courtSinglePointOfEntrySchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
+import { Lock, LockList, Page, lockListSchema, lockSchema } from '../schemas/lockSchema';
 import {
   CourtOpeningHours,
   OpeningHourType,
@@ -45,6 +45,7 @@ import {
 } from '../schemas/openingHoursSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
+import { Subject } from '../schemas/subjectTypeSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
 import { User, userSchema } from '../schemas/userSchema';
 
@@ -55,7 +56,6 @@ import { SaveCourtContactDetailRequest } from './types/SaveCourtContactDetailReq
 import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
-import { Subject } from '../schemas/subjectTypeSchema';
 
 const logger = Logger.getLogger('app');
 
@@ -908,7 +908,7 @@ export class DataApiRequests {
     subjectId: string,
     page: typeof Page,
     userId: string
-  ): Promise<Lock | null | HttpStatusCode> {
+  ): Promise<Lock | HttpStatusCode> {
     try {
       const response = await dataApi.post(`/locks/${subject}/${subjectId}/v1/${page}`, userId, {
         headers: {
@@ -918,6 +918,18 @@ export class DataApiRequests {
       return lockSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to clear all locks held by the given user
+   */
+  public async clearUserLocks(userId: string): Promise<HttpStatusCode> {
+    try {
+      return await dataApi.delete(`/user/v1/${userId}/locks`);
+    } catch (error: unknown) {
+      logger.error(`Error acquiring removing locks for user with id: ${userId}`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }

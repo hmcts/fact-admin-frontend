@@ -16,6 +16,7 @@ const pageSchema = z.enum([
   'LOCAL_AUTHORITIES',
   'PHOTO',
   'TRANSLATION_AND_INTERPRETATION',
+  'SINGLE_POINT_OF_ENTRY',
   'WARNING_NOTICE',
 ]);
 
@@ -48,5 +49,6 @@ export const PATH_TO_PAGE_MAP = {
   'local-authorities': Page.LOCAL_AUTHORITIES,
   photo: Page.PHOTO,
   'translation-and-interpretation': Page.TRANSLATION_AND_INTERPRETATION,
+  'single-point-of-entry': Page.SINGLE_POINT_OF_ENTRY,
   'warning-notice': Page.WARNING_NOTICE,
 };

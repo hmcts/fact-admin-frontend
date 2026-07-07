@@ -1,4 +1,5 @@
 import { Logger } from '@hmcts/nodejs-logging';
+import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
 import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
@@ -22,59 +23,39 @@ export class LockingInterceptor {
       if (userId && (isAdmin(req) || isSuperAdmin(req))) {
         const matches = req.path.match(LOCK_DETAILS_REGEX);
         if (matches?.length === 4) {
-          // user is heading towards a page that requires a lock, so check if they
-          // have the lock and if not, try to acquire it
-
+          // user is heading towards a page that requires a lock
           const subject = matches[1] === 'courts' ? SubjectType.COURT : SubjectType.SERVICE_CENTRE;
           const subjectId = matches[2];
           const pageKey = matches[3];
 
-          logger.info(`LOCKING INTERCEPTOR SUBJECT: ${subject}`);
-          logger.info(`LOCKING INTERCEPTOR SUBJECT ID: ${subjectId}`);
-          logger.info(`LOCKING INTERCEPTOR PAGE KEY: ${pageKey}`);
+          logger.info(`LOCKING INTERCEPTOR: SUBJECT: ${subject}`);
+          logger.info(`LOCKING INTERCEPTOR: SUBJECT ID: ${subjectId}`);
+          logger.info(`LOCKING INTERCEPTOR: PAGE KEY: ${pageKey}`);
 
           const page = PATH_TO_PAGE_MAP[pageKey];
           if (page) {
-            logger.info(`LOCKING INTERCEPTOR PAGE: ${page}`);
+            logger.info(`LOCKING INTERCEPTOR: PAGE: ${page}`);
+            logger.info(`LOCKING INTERCEPTOR: ACQUIRING LOCK: ${subject}/${subjectId}/${page}`);
+            const courtLock = await dataApi.acquireLock(subject, subjectId, page, userId);
 
-            let courtLock = await dataApi.getLock(subject, subjectId, page);
-
-            // deal with the case where the locking details can't be retrieved
+            // if we didn't get the lock, we'll have a status code. If it's CONFLICT (409) that means
+            // that someone else has the lock. Any other status is a locking failure.
             if (typeof courtLock === 'number') {
-              // show unable to lock page
               res.status(courtLock);
-              return res.render('court-lock-failed');
+              return res.render(courtLock === HttpStatusCode.Conflict ? 'lock-exists' : 'lock-failed');
             }
-
-            if (courtLock === null) {
-              // TODO: try and acquire the lock
-              logger.info(`LOCKING INTERCEPTOR ACQUIRE LOCK FOR COURT: ${subjectId} and PAGE: ${page}`);
-              courtLock = await dataApi.acquireLock(subject, subjectId, page, userId);
-              if (typeof courtLock === 'number') {
-                // didn't get the lock, but we need to decide if we didn't get it for failure reasons
-                // or because someone beat us to it
-                courtLock = await dataApi.getLock(subject, subjectId, page);
-                if (typeof courtLock === 'number' || courtLock === null) {
-                  // show unable to lock page
-                  res.status(500);
-                  return res.render('court-lock-failed');
-                } else {
-                  res.status(403);
-                  return res.render('court-lock-exists', courtLock);
-                }
-              }
-            } else if (courtLock?.userId === userId) {
-              // we already have the page locked, just carry on
-              // TODO: check the timestamp
-              logger.info(`LOCKING INTERCEPTOR ALREADY LOCKED FOR COURT: ${subjectId} and PAGE: ${page}`);
-            } else {
-              res.status(403);
-              return res.render('court-lock-exists', courtLock);
-            }
+          } else {
+            logger.warn(`LOCKING INTERCEPTOR: NO PAGE FOR PAGE KEY ${pageKey}`);
+            res.status(HttpStatusCode.BadRequest);
+            return res.render('lock-failed');
           }
+          logger.info('LOCKING INTERCEPTOR: LOCK ACQUIRED OR REFRESHED');
+        } else {
+          // user is heading away from a page that requires a lock
+          logger.info('LOCKING INTERCEPTOR: CLEARING USER LOCKS');
+          await dataApi.clearUserLocks(userId);
         }
       }
-
       return next();
     });
   }
