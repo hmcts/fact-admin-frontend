@@ -359,6 +359,7 @@ test.describe(
         await courtContactDetailsPage.emailCheckbox.check();
         await courtContactDetailsPage.emailInput.fill(contactEmail);
         await courtContactDetailsPage.explanationInput.fill('Accessibility edit test contact');
+        await courtContactDetailsPage.explanationCyInput.fill('Cyswllt golygu hygyrchedd');
         await courtContactDetailsPage.save();
 
         await expect(courtContactDetailsPage.successPanel).toContainText('Contact details added:');
@@ -381,6 +382,7 @@ test.describe(
         await courtContactDetailsPage.emailCheckbox.check();
         await courtContactDetailsPage.emailInput.fill(contactEmail);
         await courtContactDetailsPage.explanationInput.fill('Accessibility delete test contact');
+        await courtContactDetailsPage.explanationCyInput.fill('Cyswllt dileu hygyrchedd');
         await courtContactDetailsPage.save();
 
         await expect(courtContactDetailsPage.successPanel).toContainText('Contact details added:');

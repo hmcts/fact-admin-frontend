@@ -244,7 +244,10 @@ describe('ProfessionalInformationService', () => {
             text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           },
           { href: '#faxNumberDescription-0', text: 'Fax number 1 description: Value contains invalid characters' },
-          { href: '#faxNumberDescriptionCy-0', text: 'Fax number 1 welsh description: Value contains invalid characters' },
+          {
+            href: '#faxNumberDescriptionCy-0',
+            text: 'Fax number 1 welsh description: Value contains invalid characters',
+          },
         ],
       },
     });
@@ -273,8 +276,7 @@ describe('ProfessionalInformationService', () => {
         fieldErrors: {
           'dxCodeDescriptionCy-0': 'DX code 1: Enter a Welsh explanation',
           'dxCodeDescription-1': 'DX code 2: Enter an explanation',
-          'faxNumberDescription-0':
-            'Fax number 1: Enter a description',
+          'faxNumberDescription-0': 'Fax number 1: Enter a description',
           'faxNumberDescriptionCy-1': 'Fax number 2: Enter a Welsh description',
         },
       },

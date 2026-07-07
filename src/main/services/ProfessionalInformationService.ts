@@ -724,11 +724,11 @@ export class ProfessionalInformationService {
       const description = this.toString(form[`${descriptionPrefix}-${index}`]);
       const descriptionCy = this.toString(form[`${descriptionCyPrefix}-${index}`]);
       if (code || description || index === 0) {
-        entries.push({ code, description,descriptionCy, formIndex: index });
+        entries.push({ code, description, descriptionCy, formIndex: index });
       }
     }
 
-    return entries.length ? entries : [{ code: '', description: '',descriptionCy:'', formIndex: 0 }];
+    return entries.length ? entries : [{ code: '', description: '', descriptionCy: '', formIndex: 0 }];
   }
 
   private toEntries<T extends Record<string, unknown>>(

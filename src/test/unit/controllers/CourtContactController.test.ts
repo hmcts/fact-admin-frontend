@@ -335,7 +335,7 @@ describe('CourtContactController', () => {
     const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-          explanationCy: 'Desg ymholiadau cyffredinol',
+        explanationCy: 'Desg ymholiadau cyffredinol',
         name: 'General enquiries',
       },
     ] as never);
