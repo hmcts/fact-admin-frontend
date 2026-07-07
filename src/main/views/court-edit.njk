@@ -40,15 +40,13 @@
       },
       {
         html: '<span id="' + statusId + '">' + govukTag({
-          text: 'AVAILABLE',
-          classes: "govuk-tag--green"
+          text: 'Available',
+          classes: "govuk-tag--green fact-tag-max-width--unlimited"
         } if lock === null or lock.userId === userId else {
-          text: 'LOCKED',
-          classes: "govuk-tag--red"
-        }) + '</span>'
-      },
-      {
-        html: '<span>' + (lock.user.email if lock !== null else '')
+          text: 'Locked by ' + lock.user.email,
+          classes: "govuk-tag--red fact-tag-max-width--unlimited"
+        }) + '</span>',
+        classes: "fact-table-cell-align--right"
       }
     ]), sectionRows) %}
   {% endfor %}
@@ -61,16 +59,11 @@
           firstCellIsHeader: false,
           head: [
             {
-              text: "Section",
-              classes: "govuk-!-width-one-half"
+              text: "Section"
             },
             {
               text: "Edit Status",
-              classes: "govuk-!-width-one-quarter"
-            },
-            {
-              text: "Being edited by",
-              classes: "govuk-!-width-one-quarter"
+              classes: "fact-table-cell-align--right"
             }
           ],
           rows: sectionRows
