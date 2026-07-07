@@ -1,4 +1,3 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
@@ -10,8 +9,6 @@ import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenti
 let dataApiRequests: DataApiRequestsType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
-
-const logger = Logger.getLogger('app-locking');
 
 type LockRequirements = {
   subject: Subject;
@@ -30,33 +27,38 @@ export class LockingInterceptor {
 
   private async handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
     const dataApi = await this.getDataApi();
-
-    logger.info(`LOCKING INTERCEPTOR: ${req.path}`);
-
     const userId = getFactUserId(req);
     res.locals.userId = userId;
 
+    // check that we're interested in even processing this request (i.e. user is admin or super admin)
     if (!this.shouldProcessRequest(req, userId)) {
       return next();
     }
 
+    // figure out what it is we're trying to lock, if anything
     const lockDetails = this.getLockDetailsRequirements(req.path);
     if (!lockDetails) {
-      logger.info('LOCKING INTERCEPTOR: CLEARING USER LOCKS');
+      // As we only maintain a single lock for a user based on the last page they visit,
+      // if they navigate away from a lockable resource, we will clear their locks. If they
+      // are still editing (e.g. they have multiple tabs open) then the lock will need to be
+      // re-acquired when they refresh or save.
       await dataApi.clearUserLocks(userId);
       return next();
     }
 
-    const handled = await this.handleLockAcquisition(dataApi, userId, lockDetails, res);
-    if (handled) {
+    // attempt to acquire the lock, and if we can't, render the appropriate error page
+    const errorPageRendered = await this.handleLockAcquisition(dataApi, userId, lockDetails, res);
+    if (errorPageRendered) {
       return;
     }
 
-    logger.info('LOCKING INTERCEPTOR: LOCK ACQUIRED OR REFRESHED');
+    // we have the lock, so we can move on
     return next();
   }
 
   private shouldProcessRequest(req: express.Request, userId: string | undefined): userId is string {
+    // For now, we're only interested in processing this request if we have a valid
+    // user, and that user is either an admin or a super admin
     return Boolean(userId && (isAdmin(req) || isSuperAdmin(req)));
   }
 
@@ -70,10 +72,6 @@ export class LockingInterceptor {
     const subjectId = matches[2];
     const pageKey = matches[3];
 
-    logger.info(`LOCKING INTERCEPTOR: SUBJECT: ${subject}`);
-    logger.info(`LOCKING INTERCEPTOR: SUBJECT ID: ${subjectId}`);
-    logger.info(`LOCKING INTERCEPTOR: PAGE KEY: ${pageKey}`);
-
     return { subject, subjectId, pageKey };
   }
 
@@ -86,24 +84,23 @@ export class LockingInterceptor {
     const page = PATH_TO_PAGE_MAP[details.pageKey];
     const subjectStr = (details.subject as string).toLowerCase().replaceAll('_', ' ');
     if (!page) {
-      logger.warn(`LOCKING INTERCEPTOR: NO PAGE FOR PAGE KEY ${details.pageKey}`);
+      // we don't have a page mapping for that key so fail the lock
       res.status(HttpStatusCode.BadRequest);
       res.render('lock-failed', {
         subject: subjectStr,
-        page: (details.pageKey as string).toLowerCase().replaceAll('-', ' ')
+        page: details.pageKey.toLowerCase().replaceAll('-', ' '),
       });
       return true;
     }
 
-    logger.info(`LOCKING INTERCEPTOR: PAGE: ${page}`);
-    logger.info(`LOCKING INTERCEPTOR: ACQUIRING LOCK: ${details.subject}/${details.subjectId}/${page}`);
-
+    // just attempt the acquire the lock, we only need to do anything if we fail
     const lock = await dataApi.acquireLock(details.subject, details.subjectId, page, userId);
 
     if (typeof lock === 'number') {
       res.status(lock);
       const pageStr = (page as string).toLowerCase().replaceAll('_', ' ');
       if (lock === HttpStatusCode.Conflict) {
+        // someone else has the lock to retrieve it and render the already locked page.
         const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
         res.render('lock-exists', {
           subject: subjectStr,
@@ -111,9 +108,10 @@ export class LockingInterceptor {
           lock: existingLock,
         });
       } else {
+        // something else went wrong, so just render the generic lock failed page
         res.render('lock-failed', {
           subject: subjectStr,
-          page: pageStr
+          page: pageStr,
         });
       }
       return true;
