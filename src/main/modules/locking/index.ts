@@ -36,7 +36,7 @@ export class LockingInterceptor {
       return next();
     }
 
-    res.locals.userId = undefined;
+    res.locals.userId = userId;
 
     // figure out what it is we're trying to lock, if anything
     const lockDetails = this.getLockDetailsRequirements(req.path);
