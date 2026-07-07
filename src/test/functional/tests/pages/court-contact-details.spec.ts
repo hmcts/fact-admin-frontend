@@ -25,7 +25,10 @@ test.describe('Court Contact Details Journey', () => {
     }
   );
 
-  test('requires Welsh explanation when English explanation is provided', async ({ courtContactDetailsPage, playwright }) => {
+  test('requires Welsh explanation when English explanation is provided', async ({
+    courtContactDetailsPage,
+    playwright,
+  }) => {
     await withCreatedCourt(playwright, 'Court Contact Welsh Validation', {}, async ({ createdCourt }) => {
       const uniqueSuffix = Date.now();
       const contactEmail = `contact-welsh-${uniqueSuffix}@example.test`;
