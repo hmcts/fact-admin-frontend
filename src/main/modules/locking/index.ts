@@ -28,12 +28,15 @@ export class LockingInterceptor {
   private async handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
     const dataApi = await this.getDataApi();
     const userId = getFactUserId(req);
-    res.locals.userId = userId;
+    res.locals.userId = undefined;
+    res.locals.timeoutDialogConfig = undefined;
 
     // check that we're interested in even processing this request (i.e. user is admin or super admin)
     if (!this.shouldProcessRequest(req, userId)) {
       return next();
     }
+
+    res.locals.userId = undefined;
 
     // figure out what it is we're trying to lock, if anything
     const lockDetails = this.getLockDetailsRequirements(req.path);
@@ -51,6 +54,17 @@ export class LockingInterceptor {
     if (errorPageRendered) {
       return;
     }
+
+    // setup timeout dialog config so that the dialog shows up.
+    res.locals.timeoutDialogConfig = {
+      subject: (lockDetails.subject as string).toLowerCase().replaceAll('_', ' '),
+      timeout: 900,
+      countdown: 120,
+      timeoutUrl:
+        lockDetails.subject === SubjectType.SERVICE_CENTRE
+          ? `/service-centres/${lockDetails.subjectId}/edit`
+          : `/courts/${lockDetails.subjectId}/edit`,
+    };
 
     // we have the lock, so we can move on
     return next();
