@@ -597,23 +597,4 @@ export class DataApiRequests {
         : HttpStatusCode.InternalServerError;
     }
   }
-
-  // /**
-  //  * Request to data API to update court counter service opening hours by court id
-  //  */
-  // public async updateCounterServiceOpeningHours(
-  //   courtId: string,
-  //   payload: UpdateCounterServiceOpeningHoursRequest
-  // ): Promise<CounterServiceOpeningHours | HttpStatusCode | Map<string, string>> {
-  //   try {
-  //     const response = await dataApi.post(`/courts/${courtId}/v1/opening-hours/counter-service`, payload);
-  //     return CounterServiceOpeningHoursSchema.parse(response.data);
-  //   } catch (error: unknown) {
-  //     if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-  //       return new Map(Object.entries(error.response.data) as [string, string][]);
-  //     }
-  //     logger.error(`Error update court counter service opening hours for id ${courtId}:`, error);
-  //     return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-  //   }
-  // }
 }

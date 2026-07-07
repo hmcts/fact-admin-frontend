@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { AddCourtPage } from './add-court.po';
 import { BuildingFacilitiesPage } from './building-facilities.po';
 import { CasesHeardPage } from './cases-heard.po';
+import { CounterServiceOpeningHoursPage } from './counter-service-opening-hours.po';
 import { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
 import { CourtAddressDeletePage } from './court-address-delete.po';
 import { CourtAddressEditSuccessPage } from './court-address-edit-success.po';
@@ -35,6 +36,7 @@ export interface PageFixtures {
   generalPage: GeneralPage;
   localAuthoritiesPage: LocalAuthoritiesPage;
   professionalInformationPage: ProfessionalInformationPage;
+  counterServiceOpeningHoursPage: CounterServiceOpeningHoursPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -115,6 +117,10 @@ export const pageFixtures = {
   professionalInformationPage: async ({ determinePage }, use): Promise<void> => {
     const professionalInformationPage = new ProfessionalInformationPage(determinePage);
     await use(professionalInformationPage);
+  },
+  counterServiceOpeningHoursPage: async ({ determinePage }, use): Promise<void> => {
+    const counterServiceOpeningHoursPage = new CounterServiceOpeningHoursPage(determinePage);
+    await use(counterServiceOpeningHoursPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
