@@ -3,11 +3,12 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CourtLockService } from '../services/CourtLockService';
+import { SubjectType } from '../schemas/subjectTypeSchema';
+import { LockService } from '../services/LockService';
 import { isUuid } from '../utils/valueParsers';
 
 const dataApiRequests = new DataApiRequests();
-const courtLockService = new CourtLockService(dataApiRequests);
+const courtLockService = new LockService(dataApiRequests);
 
 @route('/courts/:courtId/edit')
 export default class CourtEditController {
@@ -36,7 +37,7 @@ export default class CourtEditController {
       return;
     }
 
-    const courtLocks = await courtLockService.getCourtLocks(resolvedCourtId);
+    const courtLocks = await courtLockService.getLocks(SubjectType.COURT, resolvedCourtId);
 
     if (typeof courtLocks === 'number') {
       res.status(courtLocks);
