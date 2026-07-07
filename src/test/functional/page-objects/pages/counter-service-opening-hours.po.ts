@@ -72,6 +72,31 @@ export class CounterServiceOpeningHoursPage extends Base {
     await this.page.locator('#sameClosingMinute').fill(closingMinute);
   }
 
+  async selectDay(day: string): Promise<void> {
+    await this.page.getByLabel(day).check();
+  }
+
+  async fillDayOpeningTimes(
+    dayPrefix: string,
+    openingHour: string,
+    openingMinute: string,
+    closingHour: string,
+    closingMinute: string
+  ): Promise<void> {
+    await this.page.locator(`#${dayPrefix}OpeningHour`).fill(openingHour);
+    await this.page.locator(`#${dayPrefix}OpeningMinute`).fill(openingMinute);
+    await this.page.locator(`#${dayPrefix}ClosingHour`).fill(closingHour);
+    await this.page.locator(`#${dayPrefix}ClosingMinute`).fill(closingMinute);
+  }
+
+  async clickFirstEditLink(): Promise<void> {
+    await this.page.getByRole('link', { name: 'Edit' }).first().click();
+  }
+
+  async clickBackToCounterService(): Promise<void> {
+    await this.backToCounterServiceLink.click();
+  }
+
   async clickFirstDeleteLink(): Promise<void> {
     await this.page.getByRole('link', { name: 'Delete' }).first().click();
   }
