@@ -110,8 +110,9 @@ export class AddServiceCentreService {
         return duplicateLocationStatus;
       }
 
+      const duplicateLocationType = duplicateLocationStatus.type === 'serviceCentre' ? 'service centre' : 'court';
       return this.buildViewModelWithErrors(trimmedForm, modelData.regions, modelData.serviceAreas, {
-        name: [`A court or service centre already exists with the name: ${name}`],
+        name: [`A ${duplicateLocationType} with the entered name already exists: '${duplicateLocationStatus.name}'`],
       });
     }
 
@@ -148,10 +149,10 @@ export class AddServiceCentreService {
 
   private async checkDuplicateLocationName(
     name: string
-  ): Promise<{ name: string } | HttpStatusCode.NotFound | HttpStatusCode> {
+  ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
     const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
     if (typeof duplicateCourt !== 'number') {
-      return { name: duplicateCourt.name };
+      return { name: duplicateCourt.name, type: 'court' };
     }
     if (duplicateCourt !== HttpStatusCode.NotFound) {
       return duplicateCourt;
@@ -159,7 +160,7 @@ export class AddServiceCentreService {
 
     const duplicateServiceCentre = await this.dataApiRequests.getServiceCentreByName(name);
     if (typeof duplicateServiceCentre !== 'number') {
-      return { name: duplicateServiceCentre.name };
+      return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
     }
 
     return duplicateServiceCentre;

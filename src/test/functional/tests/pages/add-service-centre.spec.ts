@@ -80,7 +80,7 @@ test.describe(
 
           await expect(addServiceCentrePage.errorSummary).toBeVisible();
           await expect(addServiceCentrePage.mainContent.content).toContainText(
-            `A court or service centre already exists with the name: ${serviceCentreName}`
+            `A service centre with the entered name already exists: '${serviceCentreName}'`
           );
         }
       );
@@ -105,7 +105,7 @@ test.describe(
 
           await expect(addServiceCentrePage.errorSummary).toBeVisible();
           await expect(addServiceCentrePage.mainContent.content).toContainText(
-            `A court or service centre already exists with the name: ${locationName}`
+            `A court with the entered name already exists: '${locationName}'`
           );
         }
       );

@@ -25,6 +25,18 @@ describe('AddServiceCentreService', () => {
     slug: 'national-business-centre',
     warningNotice: null,
   };
+  const createdCourt = {
+    createdAt: '2026-06-10T10:00:00Z',
+    id: '55555555-5555-4555-8555-555555555555',
+    lastUpdatedAt: '2026-06-10T10:00:00Z',
+    mrdId: null,
+    name: 'Reading Crown Court',
+    open: true,
+    openOnCath: true,
+    regionId: regions[0].id,
+    slug: 'reading-crown-court',
+    warningNotice: null,
+  };
 
   test('builds the add service centre view model with regions and service areas', async () => {
     const requests = {
@@ -92,7 +104,7 @@ describe('AddServiceCentreService', () => {
     expect(requests.createServiceCentre).not.toHaveBeenCalled();
   });
 
-  test('create returns duplicate name validation errors across courts and service centres', async () => {
+  test('create returns duplicate name validation errors when a service centre already exists', async () => {
     const requests = {
       createServiceCentre: jest.fn(),
       getCourtByName: jest.fn().mockResolvedValue(404),
@@ -106,7 +118,7 @@ describe('AddServiceCentreService', () => {
       service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
     ).resolves.toEqual({
       errors: {
-        name: [`A court or service centre already exists with the name: ${createdServiceCentre.name}`],
+        name: [`A service centre with the entered name already exists: '${createdServiceCentre.name}'`],
       },
       ...selectedServiceAreaColumns,
       name: createdServiceCentre.name,
@@ -117,6 +129,35 @@ describe('AddServiceCentreService', () => {
       serviceAreaIds: [serviceAreas[0].id],
       serviceAreas,
     });
+    expect(requests.createServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('create returns duplicate name validation errors when a court already exists', async () => {
+    const requests = {
+      createServiceCentre: jest.fn(),
+      getCourtByName: jest.fn().mockResolvedValue(createdCourt),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getServiceCentreByName: jest.fn(),
+    };
+    const service = new AddServiceCentreService(requests as never);
+
+    await expect(
+      service.create({ name: createdCourt.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
+    ).resolves.toEqual({
+      errors: {
+        name: [`A court with the entered name already exists: '${createdCourt.name}'`],
+      },
+      ...selectedServiceAreaColumns,
+      name: createdCourt.name,
+      pagePath: '/add-service-centre',
+      pageTitle: 'Error: Add new service centre',
+      regionId: regions[0].id,
+      regions,
+      serviceAreaIds: [serviceAreas[0].id],
+      serviceAreas,
+    });
+    expect(requests.getServiceCentreByName).not.toHaveBeenCalled();
     expect(requests.createServiceCentre).not.toHaveBeenCalled();
   });
 
