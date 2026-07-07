@@ -84,21 +84,38 @@ export class LockingInterceptor {
     res: express.Response
   ): Promise<boolean> {
     const page = PATH_TO_PAGE_MAP[details.pageKey];
+    const subjectStr = (details.subject as string).toLowerCase().replaceAll('_', ' ');
     if (!page) {
       logger.warn(`LOCKING INTERCEPTOR: NO PAGE FOR PAGE KEY ${details.pageKey}`);
       res.status(HttpStatusCode.BadRequest);
-      res.render('lock-failed');
+      res.render('lock-failed', {
+        subject: subjectStr,
+        page: (details.pageKey as string).toLowerCase().replaceAll('-', ' ')
+      });
       return true;
     }
 
     logger.info(`LOCKING INTERCEPTOR: PAGE: ${page}`);
     logger.info(`LOCKING INTERCEPTOR: ACQUIRING LOCK: ${details.subject}/${details.subjectId}/${page}`);
 
-    const courtLock = await dataApi.acquireLock(details.subject, details.subjectId, page, userId);
+    const lock = await dataApi.acquireLock(details.subject, details.subjectId, page, userId);
 
-    if (typeof courtLock === 'number') {
-      res.status(courtLock);
-      res.render(courtLock === HttpStatusCode.Conflict ? 'lock-exists' : 'lock-failed');
+    if (typeof lock === 'number') {
+      res.status(lock);
+      const pageStr = (page as string).toLowerCase().replaceAll('_', ' ');
+      if (lock === HttpStatusCode.Conflict) {
+        const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
+        res.render('lock-exists', {
+          subject: subjectStr,
+          page: pageStr,
+          lock: existingLock,
+        });
+      } else {
+        res.render('lock-failed', {
+          subject: subjectStr,
+          page: pageStr
+        });
+      }
       return true;
     }
 
