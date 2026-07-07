@@ -132,12 +132,24 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
           ? ['Enter a description of the accessible toilet facilities']
           : undefined,
     },
+    {
+      key: 'accessibleToiletDescriptionCy',
+      validate: m =>
+        !m.accessibleToiletDescriptionCy?.trim()
+          ? ['Enter a welsh description of the accessible toilet facilities']
+          : undefined,
+    },
 
     // Toilet description pattern
     patternRule(
       'accessibleToiletDescription',
       TOILET_DESC_REGEX,
       'Enter a valid description (letters, numbers, spaces and basic punctuation only)'
+    ),
+    patternRule(
+      'accessibleToiletDescriptionCy',
+      TOILET_DESC_REGEX,
+      'Enter a valid welsh description (letters, numbers, spaces and basic punctuation only)'
     ),
 
     // Hearing equipment

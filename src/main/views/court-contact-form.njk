@@ -53,6 +53,22 @@
           } if formErrors.contactExplanation else null
         }) }}
 
+        {{ govukInput({
+          label: {
+            text: "Explanation in welsh (optional)"
+          },
+          hint: {
+            text: "Add a short explanation if required. For example, 'Breathing Spaces gives someone in debt the right to legal protections'."
+          },
+          id: "contact-explanation-cy",
+          name: "contact-explanation-cy",
+          type: "text",
+          value: formValues.contactExplanationCy,
+          errorMessage: {
+            text: formErrors.contactExplanationCy
+          } if formErrors.contactExplanationCy else null
+        }) }}
+
         {{ govukCheckboxes({
           idPrefix: "contact-methods",
           name: "contact-methods",

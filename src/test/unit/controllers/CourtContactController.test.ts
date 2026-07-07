@@ -212,6 +212,7 @@ describe('CourtContactController', () => {
         formValues: {
           contactEmail: '',
           contactExplanation: '',
+          contactExplanationCy: '',
           contactMethods: [],
           contactTelephone: '',
         },
@@ -317,6 +318,7 @@ describe('CourtContactController', () => {
     request.body = {
       'contact-type': 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
       'contact-explanation': 'General enquiries desk',
+      'contact-explanation-cy': 'Desg ymholiadau cyffredinol',
       'contact-methods': ['email'],
       'contact-email': 'enquiries@example.test',
     };
@@ -333,6 +335,7 @@ describe('CourtContactController', () => {
     const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          explanationCy: 'Desg ymholiadau cyffredinol',
         name: 'General enquiries',
       },
     ] as never);
@@ -357,6 +360,7 @@ describe('CourtContactController', () => {
         courtId: '11111111-1111-4111-8111-111111111111',
         courtContactDescriptionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         explanation: 'General enquiries desk',
+        explanationCy: 'Desg ymholiadau cyffredinol',
         email: 'enquiries@example.test',
         phoneNumber: undefined,
       });
@@ -521,6 +525,7 @@ describe('CourtContactController', () => {
         formValues: {
           contactEmail: 'enquiries@example.test',
           contactExplanation: 'General enquiries',
+          contactExplanationCy: '',
           contactMethods: ['email', 'phone'],
           contactTelephone: '01234 567890',
         },
@@ -616,6 +621,7 @@ describe('CourtContactController', () => {
     request.body = {
       'contact-type': 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
       'contact-explanation': 'Listing office',
+      'contact-explanation-cy': 'Swyddfa restri',
       'contact-methods': ['phone'],
       'contact-telephone': '01234 567890',
     };
@@ -663,6 +669,7 @@ describe('CourtContactController', () => {
           courtId: '11111111-1111-4111-8111-111111111111',
           courtContactDescriptionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
           explanation: 'Listing office',
+          explanationCy: 'Swyddfa restri',
           email: undefined,
           phoneNumber: '01234 567890',
         }

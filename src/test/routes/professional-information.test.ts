@@ -105,8 +105,10 @@ describe('Information for professionals page', () => {
         gbs: 'GBS123',
         'dxCode-0': 'DX 999',
         'dxCodeDescription-0': 'Documents',
+        'dxCodeDescriptionCy-0': 'Dogfennau',
         'faxNumber-0': '020 0000 0000',
         'faxNumberDescription-0': 'Main fax',
+        'faxNumberDescriptionCy-0': 'Prif ffacs',
         interviewRooms: 'true',
         interviewRoomCount: '2',
         interviewPhoneNumber: '01234 567890',
@@ -138,8 +140,8 @@ describe('Information for professionals page', () => {
           magistrateCourtCode: null,
           tribunalCode: null,
         },
-        dxCodes: [{ dxCode: 'DX 999', explanation: 'Documents' }],
-        faxNumbers: [{ faxNumber: '020 0000 0000', description: 'Main fax' }],
+        dxCodes: [{ dxCode: 'DX 999', explanation: 'Documents', explanationCy: 'Dogfennau' }],
+        faxNumbers: [{ faxNumber: '020 0000 0000', description: 'Main fax', descriptionCy: 'Prif ffacs' }],
       },
     ]);
   });
@@ -167,6 +169,36 @@ describe('Information for professionals page', () => {
     expect(response.text).toContain(
       'You have entered a description without a fax number, please add a number or remove the description'
     );
+    expect(saveStub.notCalled).toBe(true);
+  });
+
+  test('renders directional validation errors when DX/fax English and Welsh descriptions are not paired', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: courtId,
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
+    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/information-for-professionals/success`)
+      .type('form')
+      .send({
+        'dxCode-0': 'DX 100',
+        'dxCodeDescription-0': 'English only explanation',
+        'dxCode-1': 'DX 101',
+        'dxCodeDescriptionCy-1': 'Esboniad Cymraeg yn unig',
+        'faxNumber-0': '01234 567890',
+        'faxNumberDescription-0': 'English only description',
+        'faxNumber-1': '01234 567891',
+        'faxNumberDescriptionCy-1': 'Disgrifiad Cymraeg yn unig',
+      });
+
+    expect(response.status).toBe(HttpStatusCode.BadRequest);
+    expect(response.text).toContain('DX code 1: Enter a Welsh explanation');
+    expect(response.text).toContain('DX code 2: Enter an explanation');
+    expect(response.text).toContain('Fax number 1: Enter a Welsh description');
+    expect(response.text).toContain('Fax number 2: Enter a description');
     expect(saveStub.notCalled).toBe(true);
   });
 

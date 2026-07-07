@@ -74,6 +74,52 @@ describe('Court contact details routes', () => {
     );
   });
 
+  test('re-renders add form when Welsh explanation is missing for an English explanation', async () => {
+    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail');
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: COURT_ID,
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+      { id: CONTACT_TYPE_ID, name: 'General enquiries' },
+    ] as never);
+
+    const response = await request(app)
+      .post(`/courts/${COURT_ID}/edit/contact-details/add/success`)
+      .type('form')
+      .send(
+        `contact-type=${CONTACT_TYPE_ID}&contact-methods=email&contact-email=enquiries%40example.test&contact-explanation=General%20enquiries%20desk`
+      );
+
+    expect(response.status).toBe(HttpStatusCode.BadRequest);
+    expect(response.text).toContain('Enter the Welsh translation for explanation');
+    expect(response.text).toContain('href="#contact-explanation-cy"');
+    expect(createCourtContactDetailStub.notCalled).toBe(true);
+  });
+
+  test('re-renders add form when English explanation is missing for a Welsh explanation', async () => {
+    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail');
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: COURT_ID,
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+      { id: CONTACT_TYPE_ID, name: 'General enquiries' },
+    ] as never);
+
+    const response = await request(app)
+      .post(`/courts/${COURT_ID}/edit/contact-details/add/success`)
+      .type('form')
+      .send(
+        `contact-type=${CONTACT_TYPE_ID}&contact-methods=email&contact-email=enquiries%40example.test&contact-explanation-cy=Desg%20ymholiadau%20cyffredinol`
+      );
+
+    expect(response.status).toBe(HttpStatusCode.BadRequest);
+    expect(response.text).toContain('Enter the English translation for explanation');
+    expect(response.text).toContain('href="#contact-explanation"');
+    expect(createCourtContactDetailStub.notCalled).toBe(true);
+  });
+
   test('creates contact detail and renders success page', async () => {
     const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail').resolves(
       HttpStatusCode.Created
@@ -92,7 +138,7 @@ describe('Court contact details routes', () => {
       .send(`contact-type=${CONTACT_TYPE_ID}&contact-methods=email&contact-email=enquiries%40example.test`);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Contact detailsadded: enquiries@example.test');
+    expect(response.text).toContain('Contact details added: enquiries@example.test');
     expect(response.text).toContain(
       'contact details of General enquiries for Reading Crown Court have been successfully created.'
     );

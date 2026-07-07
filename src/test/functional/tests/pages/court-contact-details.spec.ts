@@ -14,9 +14,36 @@ test.describe('Court Contact Details Journey', () => {
         await courtContactDetailsPage.expectVisibleElements();
         await expect(courtContactDetailsPage.heading).toContainText('Contact details');
         await expect(courtContactDetailsPage.addContactDetailLink).toBeVisible();
+
+        await courtContactDetailsPage.addContactDetailLink.click();
+        await expect(courtContactDetailsPage.heading).toContainText('Add contact details');
+        await expect(courtContactDetailsPage.explanationCyContainer).toBeHidden();
+
+        await courtContactDetailsPage.explanationInput.fill('General enquiries desk');
+        await expect(courtContactDetailsPage.explanationCyContainer).toBeVisible();
       });
     }
   );
+
+  test('requires Welsh explanation when English explanation is provided', async ({ courtContactDetailsPage, playwright }) => {
+    await withCreatedCourt(playwright, 'Court Contact Welsh Validation', {}, async ({ createdCourt }) => {
+      const uniqueSuffix = Date.now();
+      const contactEmail = `contact-welsh-${uniqueSuffix}@example.test`;
+
+      await courtContactDetailsPage.gotoAdd(createdCourt.id);
+      await courtContactDetailsPage.selectFirstAvailableContactType();
+      await courtContactDetailsPage.emailCheckbox.check();
+      await courtContactDetailsPage.emailInput.fill(contactEmail);
+      await courtContactDetailsPage.explanationInput.fill('General enquiries desk');
+      await courtContactDetailsPage.save();
+
+      await expect(courtContactDetailsPage.errorSummary).toContainText('Enter the Welsh translation for explanation');
+      await courtContactDetailsPage.fillWelshExplanation('Desg ymholiadau cyffredinol');
+      await courtContactDetailsPage.save();
+
+      await expect(courtContactDetailsPage.successPanel).toContainText(`Contact details added: ${contactEmail}`);
+    });
+  });
 
   test('adds, edits and deletes contact details', async ({ courtContactDetailsPage, playwright }) => {
     await withCreatedCourt(playwright, 'Court Contact Details Journey', {}, async ({ createdCourt }) => {
@@ -37,6 +64,7 @@ test.describe('Court Contact Details Journey', () => {
       await courtContactDetailsPage.emailCheckbox.check();
       await courtContactDetailsPage.emailInput.fill(contactEmail);
       await courtContactDetailsPage.explanationInput.fill('General enquiries desk');
+      await courtContactDetailsPage.fillWelshExplanation('Desg ymholiadau cyffredinol');
       await courtContactDetailsPage.save();
 
       await expect(courtContactDetailsPage.successPanel).toContainText(`Contact details added: ${contactEmail}`);
@@ -56,6 +84,7 @@ test.describe('Court Contact Details Journey', () => {
       await expect(courtContactDetailsPage.heading).toContainText('Edit contact details');
       await courtContactDetailsPage.phoneCheckbox.check();
       await courtContactDetailsPage.phoneInput.fill(contactPhone);
+      await courtContactDetailsPage.fillWelshExplanation('Swyddfa restri');
       await courtContactDetailsPage.save();
 
       await expect(courtContactDetailsPage.successPanel).toContainText(

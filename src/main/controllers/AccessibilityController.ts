@@ -50,6 +50,7 @@ export default class AccessibilityController {
       accessibleParking,
       accessibleParkingPhoneNumber,
       accessibleToiletDescription,
+      accessibleToiletDescriptionCy,
       accessibleEntrance,
       accessibleEntrancePhoneNumber,
       hearingEnhancementEquipment,
@@ -70,7 +71,8 @@ export default class AccessibilityController {
       accessibleToiletDescription:
         typeof accessibleToiletDescription === 'string' ? accessibleToiletDescription : undefined,
       accessibleToiletDescriptionCy:
-        typeof accessibleToiletDescription === 'string' ? accessibleToiletDescription : undefined, //change me - welsh
+        typeof accessibleToiletDescriptionCy === 'string' ? accessibleToiletDescriptionCy : undefined,
+
       accessibleEntrance: parseBoolean(accessibleEntrance),
       accessibleEntrancePhoneNumber:
         typeof accessibleEntrancePhoneNumber === 'string' && parseBoolean(accessibleEntrance) === false

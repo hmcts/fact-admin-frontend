@@ -56,9 +56,7 @@ export const AccessibilityScheme = z.object({
   accessibleToiletDescription: z.string().optional(),
   accessibleToiletDescriptionCy: z
     .string()
-    .optional()
-    .nullable()
-    .transform(value => value ?? 'welsh not available yet'),
+    .optional(),
   accessibleEntrance: z.boolean().optional(),
   accessibleEntrancePhoneNumber: z.string().optional().nullable(),
   hearingEnhancementEquipment: z

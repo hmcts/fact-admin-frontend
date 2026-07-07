@@ -124,6 +124,14 @@ test.describe(
       );
     });
 
+    test('Accessibility Page Performance', async ({ accessibilityPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Accessibility Performance Test', {}, async ({ createdCourt }) => {
+        await accessibilityPage.goto(createdCourt.id);
+        await accessibilityPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Local Authorities Page Performance', async ({
       lighthouseUtils,
       casesHeardPage,
@@ -243,6 +251,7 @@ test.describe(
         await courtContactDetailsPage.emailCheckbox.check();
         await courtContactDetailsPage.emailInput.fill(contactEmail);
         await courtContactDetailsPage.explanationInput.fill('Performance edit test contact');
+        await courtContactDetailsPage.fillWelshExplanation('Cyswllt prawf perfformiad');
         await courtContactDetailsPage.save();
         await courtContactDetailsPage.continueUpdatingLink.click();
 
@@ -262,6 +271,7 @@ test.describe(
         await courtContactDetailsPage.emailCheckbox.check();
         await courtContactDetailsPage.emailInput.fill(contactEmail);
         await courtContactDetailsPage.explanationInput.fill('Performance delete test contact');
+        await courtContactDetailsPage.fillWelshExplanation('Cyswllt dileu perfformiad');
         await courtContactDetailsPage.save();
         await courtContactDetailsPage.continueUpdatingLink.click();
 

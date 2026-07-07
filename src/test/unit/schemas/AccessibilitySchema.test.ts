@@ -24,19 +24,19 @@ describe('AccessibilityScheme', () => {
     expect(result.hearingEnhancementEquipment).toBe('infrared');
   });
 
-  test('sets default welsh description value when omitted', () => {
+  test('keeps welsh description undefined when omitted', () => {
     const result = AccessibilityScheme.parse({ ...base });
 
-    expect(result.accessibleToiletDescriptionCy).toBe('welsh not available yet');
+    expect(result.accessibleToiletDescriptionCy).toBeUndefined();
   });
 
-  test('normalizes null welsh description to the default value', () => {
-    const result = AccessibilityScheme.parse({
-      ...base,
-      accessibleToiletDescriptionCy: null,
-    });
-
-    expect(result.accessibleToiletDescriptionCy).toBe('welsh not available yet');
+  test('rejects null welsh description values', () => {
+    expect(() =>
+      AccessibilityScheme.parse({
+        ...base,
+        accessibleToiletDescriptionCy: null,
+      })
+    ).toThrow('Invalid input: expected string, received null');
   });
   test('normalizes null for accessibleParkingPhoneNumber', () => {
     const result = AccessibilityScheme.parse({
