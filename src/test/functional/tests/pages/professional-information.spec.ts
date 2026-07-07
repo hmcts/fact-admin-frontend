@@ -238,9 +238,7 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.dxCodeDescriptionCyInput(0)).toHaveValue('Prif esboniad DX');
         await expect(professionalInformationPage.faxNumberInput(0)).toHaveValue('01273 800 900');
         await expect(professionalInformationPage.faxNumberDescriptionInput(0)).toHaveValue('Crown court fax');
-        await expect(professionalInformationPage.faxNumberDescriptionCyInput(0)).toHaveValue(
-          'Disgrifiad ffacs y llys'
-        );
+        await expect(professionalInformationPage.faxNumberDescriptionCyInput(0)).toHaveValue('Disgrifiad ffacs y llys');
         await expect(
           professionalInformationPage.page.locator('input[name="interviewRooms"][value="true"]')
         ).toBeChecked();
