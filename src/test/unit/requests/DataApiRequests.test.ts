@@ -1637,6 +1637,10 @@ describe('DataApiRequests', () => {
   it('returns parsed contact description types when response is valid', async () => {
     const contactDescriptionTypes = [
       {
+        id: '33333333-3333-4333-8333-333333333333',
+        name: 'Enquiries',
+      },
+      {
         id: '22222222-2222-4222-8222-222222222222',
         name: 'Listing enquiries',
       },
@@ -1651,6 +1655,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getContactDescriptionTypes();
 
     expect(response).toEqual([
+      {
+        id: '33333333-3333-4333-8333-333333333333',
+        name: 'Enquiries',
+      },
       {
         id: '11111111-1111-4111-8111-111111111111',
         name: 'General enquiries',
@@ -1899,6 +1907,106 @@ describe('DataApiRequests', () => {
     putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).rejects(new Error('Unexpected error'));
 
     const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court single point of entry when response is valid', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const singlePointOfEntry = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        nameCy: 'Plant',
+        selected: true,
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).resolves({ data: singlePointOfEntry });
+
+    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+
+    expect(response).toEqual(singlePointOfEntry);
+  });
+
+  it('returns not found when court single point of entry endpoint returns a 404', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+
+    getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when court single point of entry response fails schema validation', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+
+    getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).resolves({
+      data: [{ name: 'Children' }],
+    });
+
+    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns ok when court single point of entry is updated successfully', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        selected: true,
+      },
+    ];
+
+    putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).resolves({ status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns validation errors map when update court single point of entry endpoint returns a 400', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        selected: true,
+      },
+    ];
+    const apiErrors = {
+      Children: 'Invalid single point of entry setting',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: 400,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when update court single point of entry throws a non-axios error', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        selected: true,
+      },
+    ];
+
+    putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
