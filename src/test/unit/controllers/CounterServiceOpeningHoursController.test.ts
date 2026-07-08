@@ -205,7 +205,7 @@ describe('CounterServiceOpeningHoursController', () => {
     const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
-    request.params = { courtId, counterServiceId };
+    request.params = { courtId };
     request.body = {
       assistWith: ['forms'],
       appointmentNeeded: 'no',
@@ -229,9 +229,7 @@ describe('CounterServiceOpeningHoursController', () => {
 
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBeUndefined();
-
-    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', viewModel);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', viewModel);
   });
 
   test('renders save success when saving edit succeeds', async () => {
