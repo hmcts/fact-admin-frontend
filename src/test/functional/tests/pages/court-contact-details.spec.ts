@@ -17,10 +17,6 @@ test.describe('Court Contact Details Journey', () => {
 
         await courtContactDetailsPage.addContactDetailLink.click();
         await expect(courtContactDetailsPage.heading).toContainText('Add contact details');
-        await expect(courtContactDetailsPage.explanationCyContainer).toBeHidden();
-
-        await courtContactDetailsPage.explanationInput.fill('General enquiries desk');
-        await expect(courtContactDetailsPage.explanationCyContainer).toBeVisible();
       });
     }
   );

@@ -12,7 +12,6 @@ export class CourtContactDetailsPage extends Base {
   public readonly phoneInput: Locator;
   public readonly explanationInput: Locator;
   public readonly explanationCyInput: Locator;
-  public readonly explanationCyContainer: Locator;
   public readonly saveButton: Locator;
   public readonly errorSummary: Locator;
   public readonly successPanel: Locator;
@@ -28,7 +27,6 @@ export class CourtContactDetailsPage extends Base {
     this.phoneInput = this.page.locator('#contact-telephone');
     this.explanationInput = this.page.locator('#contact-explanation');
     this.explanationCyInput = this.page.locator('#contact-explanation-cy');
-    this.explanationCyContainer = this.page.locator('[data-court-contact-explanation-cy-container]');
     this.saveButton = this.page.getByRole('button', { name: 'Save' });
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.successPanel = this.page.locator('.govuk-panel--confirmation');
