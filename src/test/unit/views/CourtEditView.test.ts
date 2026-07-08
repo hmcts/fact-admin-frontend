@@ -13,16 +13,19 @@ describe('Court Edit View', () => {
     });
 
     expect(html).toContain('Editing - Reading Crown Court');
+    expect(html).toContain(`${courtEditPath}/address`);
     expect(html).toContain(`${courtEditPath}/accessibility`);
-    expect(html).toContain(`${courtEditPath}/general`);
     expect(html).toContain(`${courtEditPath}/cases-heard`);
+    expect(html).toContain(`${courtEditPath}/contact-details`);
+    expect(html).toContain(`${courtEditPath}/counter-service-opening-hours`);
+    expect(html).toContain(`${courtEditPath}/court-opening-hours`);
+    expect(html).toContain(`${courtEditPath}/general`);
+    expect(html).toContain(`${courtEditPath}/building-facilities`);
     expect(html).toContain(`${courtEditPath}/information-for-professionals`);
-    expect(html).toContain('Information for professionals');
-    expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
-    expect(html).toContain('Single points of entry');
-    expect(html).toContain('Local authorities');
+    expect(html).toContain(`${courtEditPath}/local-authorities`);
+    expect(html).toContain(`${courtEditPath}/photo`);
     expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
+    expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);
-    expect(html).toContain('TODO');
   });
 });
