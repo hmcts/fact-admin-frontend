@@ -9,6 +9,8 @@ import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenti
 let dataApiRequests: DataApiRequestsType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
+const TIMEOUT_SECONDS = 60 * 15;
+const WARN_SECONDS = 60 * 2;
 
 type LockRequirements = {
   subject: Subject;
@@ -24,6 +26,7 @@ export class LockingInterceptor {
   public enableFor(app: express.Express): void {
     app.use(this.handleRequest.bind(this));
   }
+
 
   private async handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
     const dataApi = await this.getDataApi();
@@ -55,15 +58,18 @@ export class LockingInterceptor {
       return;
     }
 
+    // calculate the correct sign out URL based on the subject type
+    const signOutUrl = lockDetails.subject === SubjectType.SERVICE_CENTRE
+      ? `/service-centres/${lockDetails.subjectId}/edit`
+      : `/courts/${lockDetails.subjectId}/edit`;
+
     // setup timeout dialog config so that the dialog shows up.
     res.locals.timeoutDialogConfig = {
       subject: (lockDetails.subject as string).toLowerCase().replaceAll('_', ' '),
-      timeout: 900,
-      countdown: 120,
-      timeoutUrl:
-        lockDetails.subject === SubjectType.SERVICE_CENTRE
-          ? `/service-centres/${lockDetails.subjectId}/edit`
-          : `/courts/${lockDetails.subjectId}/edit`,
+      timeout: TIMEOUT_SECONDS,
+      countdown: WARN_SECONDS,
+      signOutUrl,
+      timeOutUrl: `${signOutUrl}?timeout=${Math.ceil(Math.max(1,TIMEOUT_SECONDS/60))}`,
     };
 
     // we have the lock, so we can move on

@@ -5,7 +5,10 @@ import { Request, Response } from 'express';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { LockService } from '../services/LockService';
-import { isUuid } from '../utils/valueParsers';
+import {
+  isUuid,
+  parseNumber,
+} from '../utils/valueParsers';
 
 const dataApiRequests = new DataApiRequests();
 const courtLockService = new LockService(dataApiRequests);
@@ -50,6 +53,12 @@ export default class CourtEditController {
       courtName: courtResponse.name,
       pageTitle: `Editing - ${courtResponse.name}`,
       courtLocks,
+      timeoutMins: this.getTimeoutMinsFromQuery(req.query)
     });
+  }
+
+  private getTimeoutMinsFromQuery(query: Request['query']): number | undefined {
+    const timeoutMins = parseNumber(query?.timeout, -1);
+    return timeoutMins === -1 ? undefined : timeoutMins;
   }
 }

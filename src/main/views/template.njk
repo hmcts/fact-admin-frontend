@@ -17,8 +17,8 @@
       keepAliveUrl: "javascript: void(0)",
       keepAliveButtonText: "Continue editing",
       signOutButtonText: "Return to " + subject + " edit page",
-      signOutUrl: timeoutDialogConfig.timeoutUrl if timeoutDialogConfig.timeoutUrl is defined else "/",
-      timeoutUrl: timeoutDialogConfig.timeoutUrl if timeoutDialogConfig.timeoutUrl is defined else "/",
+      signOutUrl: timeoutDialogConfig.signOutUrl if timeoutDialogConfig.signOutUrl is defined else "/",
+      timeoutUrl: timeoutDialogConfig.timeOutUrl if timeoutDialogConfig.timeOutUrl is defined else "/",
       language: "en"
     }) }}
   {% endif %}
