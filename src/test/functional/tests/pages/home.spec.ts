@@ -212,7 +212,7 @@ test.describe(
 
           await homePage.clickEditForCourt(createdServiceCentre.name);
 
-          await expect(homePage.heading).toContainText('Editing service centre');
+          await expect(homePage.heading).toContainText(`Editing - ${createdServiceCentre.name}`);
           await expect(homePage.page).toHaveURL(new RegExp(`/service-centres/${createdServiceCentre.id}/edit$`));
           await expect(homePage.mainContent.content).toContainText('General');
           await expect(homePage.mainContent.content).toContainText('Warning notice');

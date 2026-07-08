@@ -27,7 +27,7 @@ describe('ServiceCentreEditController', () => {
 
     responseMock.expects('render').once().withArgs('service-centre-edit', {
       pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-      pageTitle: 'Editing service centre',
+      pageTitle: 'Editing - National Business Centre',
       serviceCentreId: '22222222-2222-4222-8222-222222222222',
       serviceCentreName: 'National Business Centre',
       showApproveData: false,

@@ -40,7 +40,7 @@ export default class ServiceCentreEditController {
     res.render('service-centre-edit', {
       ...approvalAction,
       pagePath: `/service-centres/${resolvedServiceCentreId}/edit`,
-      pageTitle: 'Editing service centre',
+      pageTitle: `Editing - ${serviceCentreResponse.name}`,
       serviceCentreId: resolvedServiceCentreId,
       serviceCentreName: serviceCentreResponse.name,
     });

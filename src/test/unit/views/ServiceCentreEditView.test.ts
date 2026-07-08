@@ -7,12 +7,13 @@ describe('Service Centre Edit View', () => {
   test('renders the service centre edit page heading and section links', () => {
     const html = env.render('service-centre-edit.njk', {
       pagePath: serviceCentreEditPath,
-      pageTitle: 'Editing service centre',
+      pageTitle: 'Editing - National Business Centre',
       serviceCentreId,
+      serviceCentreName: 'National Business Centre',
       showApproveData: false,
     });
 
-    expect(html).toContain('Editing service centre');
+    expect(html).toContain('Editing - National Business Centre');
     expect(html).toContain(`${serviceCentreEditPath}/general`);
     expect(html).toContain('General');
     expect(html).toContain(`${serviceCentreEditPath}/warning-notice`);
@@ -31,7 +32,7 @@ describe('Service Centre Edit View', () => {
     const html = env.render('service-centre-edit.njk', {
       approvePath: `${serviceCentreEditPath}/approve`,
       pagePath: serviceCentreEditPath,
-      pageTitle: 'Editing service centre',
+      pageTitle: 'Editing - National Business Centre',
       serviceCentreId,
       serviceCentreName: 'National Business Centre',
       showApproveData: true,

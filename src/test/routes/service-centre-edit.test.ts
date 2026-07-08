@@ -20,7 +20,7 @@ describe('Service centre edit page', () => {
     const response = await request(app).get('/service-centres/22222222-2222-4222-8222-222222222222/edit');
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Editing service centre');
+    expect(response.text).toContain('Editing - National Business Centre');
     expect(response.text).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit/general');
     expect(response.text).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit/warning-notice');
     expect(response.text).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit/address');
