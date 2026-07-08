@@ -14,11 +14,6 @@ export class CounterServiceOpeningHoursPage extends Base {
 
   constructor(page: Page) {
     super(page);
-    this.errorSummary = this.page.locator('.govuk-error-summary');
-    this.successPanel = this.page.locator('.govuk-panel--confirmation');
-    this.saveButton = this.page.getByRole('button', { name: 'Save' });
-
-    super(page);
     this.addCounterServiceButton = this.page.getByRole('button', { name: 'Add opening hours' });
     this.backToCounterServiceLink = this.page.getByRole('link', { name: 'Back to counter service opening hours' });
     this.deleteOpeningHoursButton = this.page.getByRole('button', { name: 'Delete opening hours' });
