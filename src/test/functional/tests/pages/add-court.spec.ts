@@ -3,6 +3,25 @@ import { withTestCourtPrefix } from '../../helpers/testSupport';
 
 import { buildTestAddress } from './court-address-test-support';
 
+type EditPageExpectation = {
+  heading: string;
+  path: string;
+};
+
+const implementedEditPages: EditPageExpectation[] = [
+  { heading: 'Accessibility', path: 'accessibility' },
+  { heading: 'Addresses', path: 'address' },
+  { heading: 'Cases heard', path: 'cases-heard' },
+  { heading: 'Contact details', path: 'contact-details' },
+  { heading: 'Court opening hours', path: 'court-opening-hours' },
+  { heading: 'General', path: 'general' },
+  { heading: 'Building Facilities', path: 'building-facilities' },
+  { heading: 'Information for professionals', path: 'information-for-professionals' },
+  { heading: 'Single points of entry', path: 'single-point-of-entry' },
+  { heading: 'Local Authorities', path: 'local-authorities' },
+  { heading: 'Translation and interpretation', path: 'translation-and-interpretation' },
+];
+
 test.describe(
   'Add Court Page Tests',
   {
@@ -131,6 +150,43 @@ test.describe(
         await expect(generalPage.closedRadio).toBeChecked();
         await expect(generalPage.openRadio).not.toBeChecked();
       });
+    });
+
+    test('newly created court loads all implemented edit pages before any optional data is configured', async ({
+      addCourtPage,
+      playwright,
+    }) => {
+      await withTestCourtPrefix(
+        playwright,
+        'Add Court Empty Edit Pages Functional Test',
+        async ({ courtNamePrefix }) => {
+          const courtName = `${courtNamePrefix} Court`;
+
+          await addCourtPage.goto();
+          await addCourtPage.createCourt(courtName);
+
+          await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+
+          const addressHref = await addCourtPage.continueToAddressLink.getAttribute('href');
+          const createdCourtId = addressHref?.match(/\/courts\/([^/]+)\/edit\/address/)?.[1];
+          if (!createdCourtId) {
+            throw new Error(`Unable to extract created court id from address link: ${addressHref ?? 'missing href'}`);
+          }
+
+          for (const editPage of implementedEditPages) {
+            await test.step(`loads ${editPage.path}`, async () => {
+              const editPageUrl = new URL(`/courts/${createdCourtId}/edit/${editPage.path}`, addCourtPage.page.url());
+              const response = await addCourtPage.page.goto(editPageUrl.toString());
+
+              expect.soft(response?.status(), `${editPage.path} response status`).toBeLessThan(400);
+              await expect.soft(addCourtPage.heading, `${editPage.path} heading`).toContainText(editPage.heading);
+              await expect
+                .soft(addCourtPage.mainContent.content, `${editPage.path} should not show court-not-found copy`)
+                .not.toContainText('This court does not exist.');
+            });
+          }
+        }
+      );
     });
 
     test('creates a closed court and opens it after the first address is added', async ({
