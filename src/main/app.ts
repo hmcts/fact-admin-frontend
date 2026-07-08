@@ -30,7 +30,15 @@ const limiter = RateLimit({
 });
 
 const publicRoutes = ['/health', '/info', '/favicon.ico', '/sso/login', '/sso/return', '/sso/logout'];
-const adminRoutes = ['/', '/download', '/add-court', '/add-service-centre', '/courts', '/service-centres'];
+const adminRoutes = [
+  '/',
+  '/download',
+  '/add-court',
+  '/add-service-centre',
+  '/approvals',
+  '/courts',
+  '/service-centres',
+];
 const superAdminRoutes = ['/audits', '/users'];
 
 export const app = express();

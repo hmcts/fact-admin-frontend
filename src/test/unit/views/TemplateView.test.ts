@@ -8,10 +8,11 @@ describe('Template View', () => {
 
     expect(html).toContain('Find a Court or Tribunal Admin');
     expect(html).toContain('govuk-service-navigation app-service-navigation');
-    expect(html).toContain('Courts');
+    expect(html).toContain('Locations');
     expect(html).toContain('Download csv');
     expect(html).toContain('Add new court');
     expect(html).toContain('Add new service centre');
+    expect(html).toContain('Approvals tracker');
     expect(html).not.toContain('Audit');
     expect(html).not.toContain('Users');
   });
@@ -24,5 +25,6 @@ describe('Template View', () => {
 
     expect(html).toContain('Audit');
     expect(html).toContain('Users');
+    expect(html).toContain('Approvals tracker');
   });
 });

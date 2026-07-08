@@ -10,6 +10,7 @@
   {% set isDownloadPage = pagePath.startsWith("/download") %}
   {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
   {% set isAddServiceCentrePage = pagePath.startsWith("/add-service-centre") %}
+  {% set isApprovalsPage = pagePath.startsWith("/approvals") %}
   {% set isAuditPage = pagePath.startsWith("/audits") %}
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
@@ -25,7 +26,7 @@
     navigation: [
       {
         href: "/",
-        text: "Courts",
+        text: "Locations",
         current: isCourtsPage
       },
       {
@@ -42,6 +43,11 @@
         href: "/add-service-centre",
         text: "Add new service centre",
         current: isAddServiceCentrePage
+      },
+      {
+        href: "/approvals",
+        text: "Approvals tracker",
+        current: isApprovalsPage
       },
       {
         href: "/audits",

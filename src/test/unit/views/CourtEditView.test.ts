@@ -10,6 +10,7 @@ describe('Court Edit View', () => {
       courtName: 'Reading Crown Court',
       pagePath: courtEditPath,
       pageTitle: 'Editing - Reading Crown Court',
+      showApproveData: false,
     });
 
     expect(html).toContain('Editing - Reading Crown Court');
@@ -24,5 +25,25 @@ describe('Court Edit View', () => {
     expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);
     expect(html).toContain('TODO');
+    expect(html).not.toContain('Approve data');
+  });
+
+  test('renders the approve data prompt and link', () => {
+    const html = env.render('court-edit.njk', {
+      approvePath: `${courtEditPath}/approve`,
+      courtId,
+      courtName: 'Reading Crown Court',
+      pagePath: courtEditPath,
+      pageTitle: 'Editing - Reading Crown Court',
+      showApproveData: true,
+    });
+
+    expect(html).toContain(
+      'Once you have reviewed all the inputted data for this court/service centre/tribunal, please approve.'
+    );
+    expect(html).toContain('nationalsupportunit@justice.gov.uk');
+    expect(html).toContain('Approve data');
+    expect(html).toContain(`href="${courtEditPath}/approve"`);
+    expect(html.indexOf('court-edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
   });
 });

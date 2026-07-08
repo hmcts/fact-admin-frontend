@@ -417,6 +417,39 @@ describe('DataApiRequests', () => {
     expect(response).toEqual(serviceCentre);
   });
 
+  it('returns parsed service centre when the service centre by id response is valid', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+    const serviceCentre = {
+      createdAt: '2026-04-29T09:00:00Z',
+      id: serviceCentreId,
+      lastUpdatedAt: '2026-04-29T10:00:00Z',
+      name: 'National Business Centre',
+      open: true,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      serviceAreaIds: ['77777777-7777-4777-8777-777777777777'],
+      slug: 'national-business-centre',
+      warningNotice: null,
+    };
+
+    getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).resolves({
+      data: serviceCentre,
+    });
+
+    const response = await dataApiRequests.getServiceCentreById(serviceCentreId);
+
+    expect(response).toEqual(serviceCentre);
+  });
+
+  it('returns not found when the service centre by id endpoint returns a 404', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+
+    getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getServiceCentreById(serviceCentreId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
   it('returns not found when the service centre by exact name endpoint returns a 404', async () => {
     const serviceCentreName = 'National Business Centre';
 
@@ -2969,6 +3002,139 @@ describe('DataApiRequests', () => {
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
       `Error fetching audit details for id ${auditId}:`,
       nonAxiosError
+    );
+  });
+
+  it('returns parsed approvals when the response is valid', async () => {
+    const approvals = [
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT',
+        name: 'Reading Crown Court',
+        approved: true,
+        approvalId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        user: {
+          email: 'approver@justice.gov.uk',
+        },
+        lastUpdatedAt: '2026-06-26T09:10:11.123Z',
+      },
+      {
+        subjectId: '22222222-2222-4222-8222-222222222222',
+        subjectType: 'SERVICE_CENTRE',
+        name: 'Birmingham Service Centre',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ];
+
+    getStub.withArgs('/approvals/v1').resolves({ data: approvals });
+
+    const response = await dataApiRequests.getApprovals();
+
+    expect(response).toEqual(approvals);
+  });
+
+  it('returns internal server error and logs when approvals response fails schema validation', async () => {
+    getStub.withArgs('/approvals/v1').resolves({
+      data: [
+        {
+          subjectId: 'not-a-uuid',
+          name: 'Invalid Approval',
+        },
+      ],
+    });
+
+    const response = await dataApiRequests.getApprovals();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching approvals:', expect.anything());
+  });
+
+  it('returns axios status and logs when approvals endpoint errors', async () => {
+    const serviceUnavailableError = {
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: HttpStatusCode.ServiceUnavailable,
+      },
+    };
+
+    getStub.withArgs('/approvals/v1').rejects(serviceUnavailableError);
+
+    const response = await dataApiRequests.getApprovals();
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching approvals:', serviceUnavailableError);
+  });
+
+  it('returns create status when create approval succeeds', async () => {
+    const approval = {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT' as const,
+      userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    };
+
+    postStub.withArgs('/approvals/v1', approval).resolves({ status: HttpStatusCode.Created });
+
+    const response = await dataApiRequests.createApproval(approval);
+
+    expect(response).toBe(HttpStatusCode.Created);
+  });
+
+  it('returns axios status and logs when create approval endpoint errors', async () => {
+    const approval = {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT' as const,
+      userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    };
+    const notFoundError = {
+      isAxiosError: true,
+      response: {
+        data: 'not found',
+        status: HttpStatusCode.NotFound,
+      },
+    };
+
+    postStub.withArgs('/approvals/v1', approval).rejects(notFoundError);
+
+    const response = await dataApiRequests.createApproval(approval);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error creating approval:', notFoundError);
+  });
+
+  it('returns delete status when delete approval succeeds', async () => {
+    const approvalId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+    deleteStub.withArgs(`/approvals/${approvalId}/v1`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.deleteApproval(approvalId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns axios status and logs when delete approval endpoint errors', async () => {
+    const approvalId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const notFoundError = {
+      isAxiosError: true,
+      response: {
+        data: 'not found',
+        status: HttpStatusCode.NotFound,
+      },
+    };
+
+    deleteStub.withArgs(`/approvals/${approvalId}/v1`).rejects(notFoundError);
+
+    const response = await dataApiRequests.deleteApproval(approvalId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error deleting approval for id ${approvalId}:`,
+      notFoundError
     );
   });
 });

@@ -1,8 +1,14 @@
+import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
+import { ApprovalService } from '../../main/services/ApprovalService';
 
 describe('Authentication routing', () => {
+  beforeEach(() => {
+    restore();
+  });
+
   test('keeps health routes public', async () => {
     const response = await request(app).get('/health/liveness').set('x-test-unauthenticated', 'true');
 
@@ -29,5 +35,18 @@ describe('Authentication routing', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Users');
+  });
+
+  test('allows admin users to access approval routes', async () => {
+    stub(ApprovalService.prototype, 'getApprovalsTracker').resolves({
+      approvals: [],
+      nameFilter: '',
+      pageTitle: 'Approvals tracker',
+      statusFilter: '',
+    });
+
+    const response = await request(app).get('/approvals').set('x-test-role', 'Admin');
+
+    expect(response.status).toBe(200);
   });
 });

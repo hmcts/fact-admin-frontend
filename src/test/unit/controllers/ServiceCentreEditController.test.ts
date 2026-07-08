@@ -1,11 +1,22 @@
 import type { Response } from 'express';
-import { mock } from 'sinon';
+import { mock, restore, stub } from 'sinon';
 
 import ServiceCentreEditController from '../../../main/controllers/ServiceCentreEditController';
+import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('ServiceCentreEditController', () => {
-  test('renders the service centre edit view', () => {
+  beforeEach(() => {
+    restore();
+  });
+
+  test('renders the service centre edit view', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: '22222222-2222-4222-8222-222222222222',
+      name: 'National Business Centre',
+      open: true,
+      slug: 'national-business-centre',
+    } as never);
     const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
@@ -18,14 +29,17 @@ describe('ServiceCentreEditController', () => {
       pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
       pageTitle: 'Editing service centre',
       serviceCentreId: '22222222-2222-4222-8222-222222222222',
+      serviceCentreName: 'National Business Centre',
+      showApproveData: false,
+      approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
     });
 
-    controller.get(request, response);
+    await controller.get(request, response);
 
     responseMock.verify();
   });
 
-  test('renders the generic not found page for an invalid UUID', () => {
+  test('renders the generic not found page for an invalid UUID', async () => {
     const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
@@ -38,7 +52,7 @@ describe('ServiceCentreEditController', () => {
     responseMock.expects('status').once().withArgs(404).returns(response);
     responseMock.expects('render').once().withArgs('not-found');
 
-    controller.get(request, response);
+    await controller.get(request, response);
 
     responseMock.verify();
   });

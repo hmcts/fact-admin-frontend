@@ -1,0 +1,106 @@
+import { GET, POST, route } from 'awilix-express';
+import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
+
+import { isSuperAdmin } from '../modules/authentication/authenticationHelper';
+import { ApprovalService, ApprovalTrackerViewModel, UndoApprovalViewModel } from '../services/ApprovalService';
+import { isUuid, parseString } from '../utils/valueParsers';
+
+@route('/approvals')
+export default class ApprovalsController {
+  constructor(private readonly approvalService = new ApprovalService()) {}
+
+  @GET()
+  public async get(req: Request, res: Response): Promise<void> {
+    const viewModel = await this.approvalService.getApprovalsTracker({
+      name: parseString(req.query?.name),
+      status: parseString(req.query?.status),
+    });
+
+    if (this.renderStatusResponse(res, viewModel)) {
+      return;
+    }
+
+    res.render('approvals', viewModel);
+  }
+
+  @route('/:approvalId/undo')
+  @GET()
+  public async getUndoApproval(req: Request, res: Response): Promise<void> {
+    if (!this.requireSuperAdmin(req, res)) {
+      return;
+    }
+
+    const approvalId = this.resolveApprovalId(req, res);
+    if (!approvalId) {
+      return;
+    }
+
+    const viewModel = await this.approvalService.getUndoApproval(approvalId);
+
+    if (this.renderStatusResponse(res, viewModel)) {
+      return;
+    }
+
+    res.render('approval-undo-confirm', viewModel);
+  }
+
+  @route('/:approvalId/undo')
+  @POST()
+  public async postUndoApproval(req: Request, res: Response): Promise<void> {
+    if (!this.requireSuperAdmin(req, res)) {
+      return;
+    }
+
+    const approvalId = this.resolveApprovalId(req, res);
+    if (!approvalId) {
+      return;
+    }
+
+    const viewModel = await this.approvalService.undoApproval(approvalId);
+
+    if (this.renderStatusResponse(res, viewModel)) {
+      return;
+    }
+
+    res.render('approval-undo-success', {
+      ...viewModel,
+      pageTitle: `Approval undone - ${viewModel.name}`,
+    });
+  }
+
+  private renderStatusResponse(
+    res: Response,
+    result: ApprovalTrackerViewModel | UndoApprovalViewModel | HttpStatusCode
+  ): result is HttpStatusCode {
+    if (typeof result !== 'number') {
+      return false;
+    }
+
+    res.status(result);
+    res.render('error');
+    return true;
+  }
+
+  private requireSuperAdmin(req: Request, res: Response): boolean {
+    if (isSuperAdmin(req)) {
+      return true;
+    }
+
+    res.status(HttpStatusCode.Forbidden);
+    res.render('access-denied');
+    return false;
+  }
+
+  private resolveApprovalId(req: Request, res: Response): string | undefined {
+    const approvalId = parseString(req.params?.approvalId);
+
+    if (isUuid(approvalId)) {
+      return approvalId;
+    }
+
+    res.status(HttpStatusCode.NotFound);
+    res.render('not-found');
+    return undefined;
+  }
+}
