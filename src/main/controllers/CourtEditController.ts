@@ -5,10 +5,7 @@ import { Request, Response } from 'express';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { LockService } from '../services/LockService';
-import {
-  isUuid,
-  parseNumber,
-} from '../utils/valueParsers';
+import { isUuid, parseNumber } from '../utils/valueParsers';
 
 const dataApiRequests = new DataApiRequests();
 const courtLockService = new LockService(dataApiRequests);
@@ -53,7 +50,7 @@ export default class CourtEditController {
       courtName: courtResponse.name,
       pageTitle: `Editing - ${courtResponse.name}`,
       courtLocks,
-      timeoutMins: this.getTimeoutMinsFromQuery(req.query)
+      timeoutMins: this.getTimeoutMinsFromQuery(req.query),
     });
   }
 

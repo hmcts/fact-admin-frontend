@@ -27,7 +27,6 @@ export class LockingInterceptor {
     app.use(this.handleRequest.bind(this));
   }
 
-
   private async handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
     const dataApi = await this.getDataApi();
     const userId = getFactUserId(req);
@@ -59,9 +58,10 @@ export class LockingInterceptor {
     }
 
     // calculate the correct sign out URL based on the subject type
-    const signOutUrl = lockDetails.subject === SubjectType.SERVICE_CENTRE
-      ? `/service-centres/${lockDetails.subjectId}/edit`
-      : `/courts/${lockDetails.subjectId}/edit`;
+    const signOutUrl =
+      lockDetails.subject === SubjectType.SERVICE_CENTRE
+        ? `/service-centres/${lockDetails.subjectId}/edit`
+        : `/courts/${lockDetails.subjectId}/edit`;
 
     // setup timeout dialog config so that the dialog shows up.
     res.locals.timeoutDialogConfig = {
@@ -69,7 +69,7 @@ export class LockingInterceptor {
       timeout: TIMEOUT_SECONDS,
       countdown: WARN_SECONDS,
       signOutUrl,
-      timeOutUrl: `${signOutUrl}?timeout=${Math.ceil(Math.max(1,TIMEOUT_SECONDS/60))}`,
+      timeOutUrl: `${signOutUrl}?timeout=${Math.ceil(Math.max(1, TIMEOUT_SECONDS / 60))}`,
     };
 
     // we have the lock, so we can move on
