@@ -33,6 +33,13 @@ module.exports = {
           loader: 'sass-loader',
           options: {
             sassOptions: {
+              // silence the moj deprecation warning (temporarily)
+              logger: {
+                warn: message => {
+                  if (message.includes('govuk-text-colour')) return;
+                  console.log(message);
+                },
+              },
               quietDeps: true,
             },
           },

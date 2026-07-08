@@ -1,6 +1,9 @@
 import { Page } from '@playwright/test';
 
+import { AccessibilityPage } from './accessibility.po';
 import { AddCourtPage } from './add-court.po';
+import { AuditDetailPage } from './audit-detail.po';
+import { AuditListPage } from './audit-list.po';
 import { BuildingFacilitiesPage } from './building-facilities.po';
 import { CasesHeardPage } from './cases-heard.po';
 import { CounterServiceOpeningHoursPage } from './counter-service-opening-hours.po';
@@ -11,19 +14,25 @@ import { CourtAddressEditPage } from './court-address-edit.po';
 import { CourtAddressFindPage } from './court-address-find.po';
 import { CourtAddressListPage } from './court-address-list.po';
 import { CourtAddressSelectPage } from './court-address-select.po';
+import { CourtContactDetailsPage } from './court-contact-details.po';
 import { CourtEditPage } from './court-edit.po';
+import { CourtOpeningHoursPage } from './court-opening-hours.po';
 import { GeneralPage } from './general.po';
 import { HomePage } from './home.po';
 import { LocalAuthoritiesPage } from './local-authorities.po';
 import { ProfessionalInformationPage } from './professional-information.po';
+import { SinglePointsOfEntryPage } from './single-points-of-entry.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 
 export interface PageFixtures {
   determinePage: Page;
   addCourtPage: AddCourtPage;
   homePage: HomePage;
+  auditListPage: AuditListPage;
+  auditDetailPage: AuditDetailPage;
   courtEditPage: CourtEditPage;
   casesHeardPage: CasesHeardPage;
+  accessibilityPage: AccessibilityPage;
   buildingFacilitiesPage: BuildingFacilitiesPage;
   translationAndInterpretationPage: TranslationAndInterpretationPage;
   courtAddressListPage: CourtAddressListPage;
@@ -33,8 +42,11 @@ export interface PageFixtures {
   courtAddressDeletePage: CourtAddressDeletePage;
   courtAddressEditSuccessPage: CourtAddressEditSuccessPage;
   courtAddressDeleteSuccessPage: CourtAddressDeleteSuccessPage;
+  courtContactDetailsPage: CourtContactDetailsPage;
+  courtOpeningHoursPage: CourtOpeningHoursPage;
   generalPage: GeneralPage;
   localAuthoritiesPage: LocalAuthoritiesPage;
+  singlePointsOfEntryPage: SinglePointsOfEntryPage;
   professionalInformationPage: ProfessionalInformationPage;
   counterServiceOpeningHoursPage: CounterServiceOpeningHoursPage;
 }
@@ -62,6 +74,14 @@ export const pageFixtures = {
     await homePage.goto();
     await use(homePage);
   },
+  auditListPage: async ({ determinePage }, use): Promise<void> => {
+    const auditListPage = new AuditListPage(determinePage);
+    await use(auditListPage);
+  },
+  auditDetailPage: async ({ determinePage }, use): Promise<void> => {
+    const auditDetailPage = new AuditDetailPage(determinePage);
+    await use(auditDetailPage);
+  },
   courtEditPage: async ({ determinePage }, use): Promise<void> => {
     const courtEditPage = new CourtEditPage(determinePage);
     await use(courtEditPage);
@@ -73,6 +93,10 @@ export const pageFixtures = {
   casesHeardPage: async ({ determinePage }, use): Promise<void> => {
     const casesHeardPage = new CasesHeardPage(determinePage);
     await use(casesHeardPage);
+  },
+  accessibilityPage: async ({ determinePage }, use): Promise<void> => {
+    const accessibilityPage = new AccessibilityPage(determinePage);
+    await use(accessibilityPage);
   },
   buildingFacilitiesPage: async ({ determinePage }, use): Promise<void> => {
     const buildingFacilitiesPage = new BuildingFacilitiesPage(determinePage);
@@ -106,6 +130,14 @@ export const pageFixtures = {
     const courtAddressDeleteSuccessPage = new CourtAddressDeleteSuccessPage(determinePage);
     await use(courtAddressDeleteSuccessPage);
   },
+  courtContactDetailsPage: async ({ determinePage }, use): Promise<void> => {
+    const courtContactDetailsPage = new CourtContactDetailsPage(determinePage);
+    await use(courtContactDetailsPage);
+  },
+  courtOpeningHoursPage: async ({ determinePage }, use): Promise<void> => {
+    const courtOpeningHoursPage = new CourtOpeningHoursPage(determinePage);
+    await use(courtOpeningHoursPage);
+  },
   generalPage: async ({ determinePage }, use): Promise<void> => {
     const generalPage = new GeneralPage(determinePage);
     await use(generalPage);
@@ -113,6 +145,10 @@ export const pageFixtures = {
   localAuthoritiesPage: async ({ determinePage }, use): Promise<void> => {
     const localAuthoritiesPage = new LocalAuthoritiesPage(determinePage);
     await use(localAuthoritiesPage);
+  },
+  singlePointsOfEntryPage: async ({ determinePage }, use): Promise<void> => {
+    const singlePointsOfEntryPage = new SinglePointsOfEntryPage(determinePage);
+    await use(singlePointsOfEntryPage);
   },
   professionalInformationPage: async ({ determinePage }, use): Promise<void> => {
     const professionalInformationPage = new ProfessionalInformationPage(determinePage);

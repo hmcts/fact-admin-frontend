@@ -3,9 +3,9 @@ import { z } from 'zod';
 export const courtEntitySchema = z.object({
   createdAt: z.string(),
   id: z.string(),
-  isServiceCentre: z.boolean(),
   lastUpdatedAt: z.string(),
   mrdId: z.string().nullable(),
+  isServiceCentre: z.boolean().optional(),
   name: z.string(),
   open: z.boolean(),
   openOnCath: z.boolean().nullable(),

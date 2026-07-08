@@ -1,0 +1,315 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% macro modelDrivenErrorSummary(model) %}
+  {% set errorList = [] %}
+  {% for field, errors in model.errors %}
+    {% if field !== "timestamp" %}
+      {% set fieldErrors = [] %}
+      {% for error in errors %}
+        {% set href = "#" + field if field !== "message" else null %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: href
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: errorList
+  }) }}
+{% endmacro %}
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% set parkingBookingHTML %}
+{{ govukInput({
+  id: "accessibleParkingPhoneNumber",
+  name: "accessibleParkingPhoneNumber",
+  type: "tel",
+  value: model.accessibleParkingPhoneNumber,
+  autoComplete: "tel",
+  classes: "govuk-!-width-one-third",
+  label: {
+    text: "Enter the parking booking number for booking (optional)"
+  },
+  errorMessage: {
+    text: model.errors.accessibleParkingPhoneNumber[0]
+  } if model.errors and model.errors.accessibleParkingPhoneNumber else null
+}) }}
+{% endset -%}
+
+{% set supportBooking %}
+{{ govukInput({
+  id: "accessibleEntrancePhoneNumber",
+  name: "accessibleEntrancePhoneNumber",
+  type: "tel",
+  value: model.accessibleEntrancePhoneNumber,
+  autoComplete: "tel",
+  classes: "govuk-!-width-one-third",
+  label: {
+    text: "Enter telephone number for organising support at court"
+  },
+  errorMessage: {
+    text: model.errors.accessibleEntrancePhoneNumber[0]
+  } if model.errors and model.errors.accessibleEntrancePhoneNumber else null
+}) }}
+{% endset -%}
+
+{% set liftSupportBooking %}
+{{ govukInput({
+  id: "liftSupportPhoneNumber",
+  name: "liftSupportPhoneNumber",
+  type: "tel",
+  value: model.liftSupportPhoneNumber,
+  autoComplete: "tel",
+  classes: "govuk-!-width-one-third",
+  label: {
+    text: "Enter telephone number for organising support at court"
+  },
+  errorMessage: {
+    text: model.errors.liftSupportPhoneNumber[0]
+  } if model.errors and model.errors.liftSupportPhoneNumber else null
+}) }}
+{% endset -%}
+
+{% set liftDetails %}
+{{ govukInput({
+  id: "liftDoorWidth",
+  name: "liftDoorWidth",
+  value: model.liftDoorWidth,
+  label: {
+    text: "Enter the door width in centimetres"
+  },
+  suffix: {
+    text: "cm"
+  },
+  attributes: {
+      maxlength: "6"
+  },
+  classes: "govuk-input--width-5",
+  spellcheck: false,
+  errorMessage: {
+    text: model.errors.liftDoorWidth[0]
+  } if model.errors and model.errors.liftDoorWidth else null
+}) }}
+
+{{ govukInput({
+  id: "liftDoorLimit",
+  name: "liftDoorLimit",
+  value: model.liftDoorLimit,
+  label: {
+    text: "Enter the weight limit in kilograms"
+  },
+  attributes: {
+    maxlength: "6"
+  },
+  suffix: {
+    text: "kg"
+  },
+  classes: "govuk-input--width-5",
+  spellcheck: false,
+  errorMessage: {
+    text: model.errors.liftDoorLimit[0]
+  } if model.errors and model.errors.liftDoorLimit else null
+}) }}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Accessibility</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/accessibility/success">
+      <h2 class="govuk-heading-m">Accessible parking</h2>
+        {{ govukRadios({
+          classes: "govuk-radios",
+          id: "accessibleParking",
+          name: "accessibleParking",
+          fieldset: {
+            legend: {
+              text: "Is there accessible parking?"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: true if model.accessibleParking === true else false,
+              conditional: {
+                html: parkingBookingHTML
+              }
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: true if model.accessibleParking === false else false
+            }
+          ],
+          errorMessage: {
+            text: model.errors.accessibleParking[0]
+          } if model.errors and model.errors.accessibleParking else null
+        }) }}
+      <h2 class="govuk-heading-m">Accessible toilet</h2>
+        {{ govukTextarea({
+          name: "accessibleToiletDescription",
+          id: "accessibleToiletDescription",
+          value: model.accessibleToiletDescription,
+          classes: "govuk-!-width-two-thirds",
+          label: {
+            text: "Where is the accessible toilet?"
+          },
+          hint: {
+            text: "For example, 'Available on the ground, first and third floors.'."
+          },
+          errorMessage: {
+                      text: model.errors.accessibleToiletDescription[0]
+                    } if model.errors and model.errors.accessibleToiletDescription else null
+        }) }}
+
+        <h2 class="govuk-heading-m">Accessible entrance</h2>
+        {{ govukRadios({
+          classes: "govuk-radios",
+          id: "accessibleEntrance",
+          name: "accessibleEntrance",
+          fieldset: {
+            legend: {
+              text: "Is there an accessible entrance"
+            }
+          },
+          items: [
+            {
+              value: "true",
+              text: "Yes",
+              checked: true if model.accessibleEntrance == "true" or model.accessibleEntrance == true else false
+            },
+            {
+              value: "false",
+              text: "No",
+              checked: true if model.accessibleEntrance == false or model.accessibleEntrance == "false" else false,
+              conditional: {
+                html: supportBooking
+              }
+            }
+          ],
+          errorMessage: {
+            text: model.errors.accessibleEntrance[0]
+          } if model.errors and model.errors.accessibleEntrance else null
+        }) }}
+        <h2 class="govuk-heading-m">Hearing enhancement equipment</h2>
+        {{ govukRadios({
+            classes: "govuk-radios",
+            id: "hearingEnhancementEquipment",
+            name: "hearingEnhancementEquipment",
+            fieldset: {
+              legend: {
+                 text: "What hearing enhancement equipment is available?"
+                 }
+              },
+                  items: [
+                    {
+                      value: "infraredAndHearingLoop",
+                      text: "Infrared systems and hearing loop systems are available at this court",
+                      checked: true if model.hearingEnhancementEquipment == "infraredAndHearingLoop" else false
+                    },
+                    {
+                      value: "infrared",
+                      text: "Infrared systems are available at this court",
+                      checked: true if model.hearingEnhancementEquipment == "infrared" else false
+                    },
+                    {
+                      value: "hearingLoop",
+                      text: "Hearing loop systems are available at this court",
+                      checked: true if model.hearingEnhancementEquipment == "hearingLoop" else false
+                    }
+                  ],
+                  errorMessage: {
+                    text: model.errors.hearingEnhancementEquipment[0]
+                  } if model.errors and model.errors.hearingEnhancementEquipment else null
+                }) }}
+        <h2 class="govuk-heading-m">Lift</h2>
+        {{ govukRadios({
+            classes: "govuk-radios",
+            id: "lift",
+            name: "lift",
+            fieldset: {
+              legend: {
+                text: "Is there a lift?"
+              }
+            },
+            items: [
+              {
+              value: "true",
+              text: "Yes",
+              checked: true if model.lift == true else false,
+              conditional:{
+                html: liftDetails
+                }
+              },
+              {
+              value: "false",
+              text: "No",
+              checked: true if model.lift == false else false,
+              conditional: {
+                html: liftSupportBooking
+              }
+              }
+            ],
+            errorMessage: {
+              text: model.errors.lift[0]
+              } if model.errors and model.errors.lift else null
+              }) }}
+
+        <h2 class="govuk-heading-m">Quiet room</h2>
+        {{ govukRadios({
+           classes: "govuk-radios",
+           id: "quietRoom",
+           name: "quietRoom",
+           fieldset: {
+             legend: {
+                text: "Is there a quiet room?"
+                }
+             },
+           items: [
+             {
+             value: "true",
+             text: "Yes",
+             checked: true if model.quietRoom == true else false
+             },
+             {
+             value: "false",
+             text: "No",
+             checked: true if model.quietRoom == false else false
+             }
+             ],
+             errorMessage: {
+               text: model.errors.quietRoom[0]
+               } if model.errors and model.errors.quietRoom else null
+        }) }}
+  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+  <h2 class="govuk-heading-m">Other information displayed on the page</h2>
+      <p class="govuk-body">Assistance dogs are welcome</p>
+      <p class="govuk-body">Hidden disabilities sunflower network</p>
+
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

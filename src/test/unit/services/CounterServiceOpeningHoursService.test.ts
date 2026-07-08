@@ -16,8 +16,8 @@ describe('CounterServiceOpeningHoursService', () => {
   const existingRecord = {
     id: counterServiceId,
     courtId,
-    CounterService: true,
-    courtType: [],
+    counterService: true,
+    courtTypes: [],
     assistWithForms: true,
     assistWithDocuments: false,
     assistWithSupport: false,
@@ -29,12 +29,10 @@ describe('CounterServiceOpeningHoursService', () => {
   function buildService(overrides: Partial<DataApiRequests> = {}) {
     const dataApiRequests = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      getOpeningHourTypes: jest.fn().mockResolvedValue([existingRecord]),
-      getCourtOpeningHours: jest.fn().mockResolvedValue([existingRecord]),
+      getCounterServiceOpeningHours: jest.fn().mockResolvedValue([existingRecord]),
+      getCounterServiceOpeningHoursById: jest.fn().mockResolvedValue(existingRecord),
       saveCounterServiceOpeningHours: jest.fn(),
       deleteCounterServiceOpeningHours: jest.fn(),
-      getCourtOpeningHoursById: jest.fn(),
-      saveCourtOpeningHours: jest.fn(),
       ...overrides,
     } as unknown as DataApiRequests;
 
@@ -152,10 +150,47 @@ describe('CounterServiceOpeningHoursService', () => {
         assistWith: ['forms'],
         appointmentNeeded: 'no',
         sameTime: 'yes',
-        sameOpeningHour: '9',
+        sameOpeningHour: '09',
         sameOpeningMinute: '00',
         sameClosingHour: '17',
         sameClosingMinute: '00',
+      },
+    });
+  });
+
+  test('getEditPage returns pre-filled form for selected weekday opening hours', async () => {
+    const { service } = buildService({
+      getCounterServiceOpeningHoursById: jest.fn().mockResolvedValue({
+        ...existingRecord,
+        assistWithForms: false,
+        assistWithDocuments: true,
+        assistWithSupport: true,
+        appointmentNeeded: true,
+        appointmentContact: 'appointments@example.test',
+        openingTimesDetails: [
+          { dayOfWeek: 'MONDAY', openingTime: '10:15:00', closingTime: '16:45:00' },
+          { dayOfWeek: 'WEDNESDAY', openingTime: '09:00:00', closingTime: '12:30:00' },
+        ],
+      }),
+    });
+
+    const result = await service.getEditPage(courtId, counterServiceId);
+
+    expect(result).toMatchObject({
+      form: {
+        assistWith: ['documents', 'support'],
+        appointmentNeeded: 'yes',
+        appointmentContact: 'appointments@example.test',
+        sameTime: 'no',
+        selectedDays: ['MONDAY', 'WEDNESDAY'],
+        mondayOpeningHour: '10',
+        mondayOpeningMinute: '15',
+        mondayClosingHour: '16',
+        mondayClosingMinute: '45',
+        wednesdayOpeningHour: '09',
+        wednesdayOpeningMinute: '00',
+        wednesdayClosingHour: '12',
+        wednesdayClosingMinute: '30',
       },
     });
   });
@@ -173,13 +208,14 @@ describe('CounterServiceOpeningHoursService', () => {
     expect(result.type).toBe('success');
     expect(saveCounterServiceOpeningHours).toHaveBeenCalledWith(courtId, {
       courtId,
-      courtType: [],
+      id: counterServiceId,
+      counterService: true,
       assistWithForms: true,
       assistWithDocuments: false,
       assistWithSupport: false,
       appointmentNeeded: false,
       appointmentContact: null,
-      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00:00', closingTime: '17:00:00' }],
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
     });
   });
 
@@ -206,6 +242,7 @@ describe('CounterServiceOpeningHoursService', () => {
     expect(saveCounterServiceOpeningHours).toHaveBeenCalledWith(courtId, {
       courtId,
       id: undefined,
+      counterService: true,
       assistWithForms: true,
       assistWithDocuments: false,
       assistWithSupport: false,
@@ -230,10 +267,10 @@ describe('CounterServiceOpeningHoursService', () => {
       appointmentContact: 'test@test.com',
       sameTime: 'yes',
       selectedDays: [],
-      mondayOpeningHour: '9',
-      mondayOpeningMinute: '00',
-      mondayClosingHour: '1',
-      mondayClosingMinute: '00',
+      sameOpeningHour: '9',
+      sameOpeningMinute: '00',
+      sameClosingHour: '17',
+      sameClosingMinute: '00',
     });
 
     expect(result.type).toBe('success');
@@ -272,7 +309,7 @@ describe('CounterServiceOpeningHoursService', () => {
 
     expect(result).toEqual({
       type: 'success',
-      viewmodel: {
+      viewModel: {
         courtId,
         courtName: 'Reading Crown Court',
         assistanceAvailable: 'Forms',

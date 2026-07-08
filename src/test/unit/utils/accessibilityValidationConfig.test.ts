@@ -1,0 +1,165 @@
+import { validate } from '../../../main/utils/accessibilityValidationConfig';
+
+describe('accessibilityValidationConfig.validate', () => {
+  test('returns required errors for missing core fields', () => {
+    const result = validate({});
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        accessibleParking: ['Select whether accessible parking is available'],
+        accessibleEntrance: ['Select whether an accessible entrance is available'],
+        lift: ['Select whether a lift is available'],
+        quietRoom: ['Select whether a quiet room is available'],
+        accessibleToiletDescription: ['Enter a description of the accessible toilet facilities'],
+        hearingEnhancementEquipment: ['Select what hearing enhancement equipment is available'],
+      })
+    );
+  });
+
+  test('requires lift dimensions when lift is true', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: true,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        liftDoorWidth: ['Enter the lift door width'],
+        liftDoorLimit: ['Enter the lift weight limit'],
+      })
+    );
+  });
+
+  test('validates invalid lift numeric fields', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: true,
+      liftDoorWidth: Number.NaN,
+      liftDoorLimit: Number.NaN,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'infraredAndHearingLoop',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        liftDoorWidth: ['Lift door width must be a valid number'],
+        liftDoorLimit: ['Lift weight limit must be a valid number'],
+      })
+    );
+  });
+
+  test('validates lift min and max ranges', () => {
+    const tooSmall = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: true,
+      liftDoorWidth: 0,
+      liftDoorLimit: 0,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(tooSmall).toEqual(
+      expect.objectContaining({
+        liftDoorWidth: ['Lift door width needs to be over 1cm'],
+        liftDoorLimit: ['Lift weight limit should be at least 1kg'],
+      })
+    );
+
+    const tooLarge = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: true,
+      liftDoorWidth: 1001,
+      liftDoorLimit: 10001,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(tooLarge).toEqual(
+      expect.objectContaining({
+        liftDoorWidth: ['Lift door width needs to be under 1000cm'],
+        liftDoorLimit: ['Lift weight limit should be at most 10000kg'],
+      })
+    );
+  });
+
+  test('validates phone requirements and formats', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: 'abc',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '',
+      lift: true,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'hearingLoop',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        accessibleParkingPhoneNumber: ['Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'],
+        accessibleEntrancePhoneNumber: ['Enter a phone number for the accessible entrance'],
+      })
+    );
+  });
+
+  test('requires and validates lift support phone when lift is no', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: false,
+      liftSupportPhoneNumber: 'abc',
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'hearingLoop',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        liftSupportPhoneNumber: ['Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'],
+      })
+    );
+
+    const missingPhoneResult = validate({
+      accessibleParking: true,
+      accessibleEntrance: true,
+      lift: false,
+      liftSupportPhoneNumber: '',
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor',
+      hearingEnhancementEquipment: 'hearingLoop',
+    });
+
+    expect(missingPhoneResult).toEqual(
+      expect.objectContaining({
+        liftSupportPhoneNumber: ['Enter telephone number for organising support at court'],
+      })
+    );
+  });
+
+  test('returns undefined when model is valid', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: '01234567890',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '01234567891',
+      lift: true,
+      liftDoorWidth: 100,
+      liftDoorLimit: 500,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor and first floor',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toBeUndefined();
+  });
+});

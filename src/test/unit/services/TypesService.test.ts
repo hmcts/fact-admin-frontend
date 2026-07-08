@@ -47,4 +47,44 @@ describe('TypesService', () => {
 
     expect(result).toBe(HttpStatusCode.InternalServerError);
   });
+
+  test('lists opening hour types', async () => {
+    const openingHourTypes = [{ id: '11111111-1111-4111-8111-111111111111', name: 'Court open', nameCy: null }];
+    jest.spyOn(DataApiRequests.prototype, 'getOpeningHourTypes').mockResolvedValue(openingHourTypes as never);
+
+    const service = new TypesService();
+    const result = await service.listOpeningHourTypes();
+
+    expect(result).toEqual(openingHourTypes);
+    expect(DataApiRequests.prototype.getOpeningHourTypes).toHaveBeenCalledTimes(1);
+  });
+
+  test('returns status code when listing opening hour types fails', async () => {
+    jest.spyOn(DataApiRequests.prototype, 'getOpeningHourTypes').mockResolvedValue(HttpStatusCode.InternalServerError);
+
+    const service = new TypesService();
+    const result = await service.listOpeningHourTypes();
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('lists local authorities', async () => {
+    const localAuthorities = [{ id: '11111111-1111-4111-8111-111111111111', name: 'Reading' }];
+    jest.spyOn(DataApiRequests.prototype, 'getLocalAuthorities').mockResolvedValue(localAuthorities as never);
+
+    const service = new TypesService();
+    const result = await service.listLocalAuthorities();
+
+    expect(result).toEqual(localAuthorities);
+    expect(DataApiRequests.prototype.getLocalAuthorities).toHaveBeenCalledTimes(1);
+  });
+
+  test('returns status code when listing local authorities fails', async () => {
+    jest.spyOn(DataApiRequests.prototype, 'getLocalAuthorities').mockResolvedValue(HttpStatusCode.InternalServerError);
+
+    const service = new TypesService();
+    const result = await service.listLocalAuthorities();
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
 });

@@ -1,4 +1,5 @@
 import { test } from '../fixtures';
+import { seedAuditTrailViaUi } from '../helpers/auditTestSupport';
 import { withCreatedCourt } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -29,16 +30,11 @@ test.describe(
     });
 
     test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(
-        playwright,
-        'Cases Heard Performance Test',
-        { serviceCenter: false },
-        async ({ createdCourt }) => {
-          await casesHeardPage.goto(createdCourt.id);
-          await casesHeardPage.header.checkIsVisible();
-          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-        }
-      );
+      await withCreatedCourt(playwright, 'Cases Heard Performance Test', {}, async ({ createdCourt }) => {
+        await casesHeardPage.goto(createdCourt.id);
+        await casesHeardPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Translation and Interpretation Page Performance', async ({
@@ -49,7 +45,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Translation Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await translationAndInterpretationPage.goto(createdCourt.id);
           await translationAndInterpretationPage.header.checkIsVisible();
@@ -62,7 +58,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressListPage.goto(createdCourt.id);
           await courtAddressListPage.header.checkIsVisible();
@@ -75,7 +71,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressFindPage.goto(createdCourt.id);
           await courtAddressFindPage.header.checkIsVisible();
@@ -88,7 +84,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Address Edit Performance Test',
-        { serviceCenter: false, withTranslations: false },
+        { withTranslations: false },
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
           await courtAddressSelectPage.header.checkIsVisible();
@@ -103,16 +99,11 @@ test.describe(
         tag: '@performance',
       },
       async ({ generalPage, lighthouseUtils, playwright }) => {
-        await withCreatedCourt(
-          playwright,
-          'General Performance Test',
-          { serviceCenter: false },
-          async ({ createdCourt }) => {
-            await generalPage.goto(createdCourt.id);
-            await generalPage.header.checkIsVisible();
-            await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-          }
-        );
+        await withCreatedCourt(playwright, 'General Performance Test', {}, async ({ createdCourt }) => {
+          await generalPage.goto(createdCourt.id);
+          await generalPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        });
       }
     );
 
@@ -124,7 +115,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Information for Professionals Performance Test',
-        { serviceCenter: false },
+        {},
         async ({ createdCourt }) => {
           await professionalInformationPage.goto(createdCourt.id);
           await professionalInformationPage.header.checkIsVisible();
@@ -142,7 +133,7 @@ test.describe(
       await withCreatedCourt(
         playwright,
         'Local Authorities Performance Test',
-        { serviceCenter: false, forceFamilyCourt: true },
+        { forceFamilyCourt: true },
         async ({ createdCourt }) => {
           await casesHeardPage.goto(createdCourt.id);
           await casesHeardPage.selectAllCaseTypes();
@@ -154,6 +145,130 @@ test.describe(
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
+    });
+
+    test('Single Points of Entry Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      singlePointsOfEntryPage,
+    }) => {
+      await withCreatedCourt(playwright, 'Single Points Of Entry Performance Test', {}, async ({ createdCourt }) => {
+        await singlePointsOfEntryPage.goto(createdCourt.id);
+        await singlePointsOfEntryPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Audit List Page Performance', async ({
+      addCourtPage,
+      auditListPage,
+      courtAddressDeletePage,
+      generalPage,
+      lighthouseUtils,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        includeDelete: false,
+        page,
+        playwright,
+        prefixLabel: 'Audit Performance Test',
+        run: async ({ courtId }) => {
+          await auditListPage.goto();
+          await auditListPage.filterByCourt(courtId);
+          await auditListPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        },
+      });
+    });
+
+    test('Audit Detail Page Performance', async ({
+      addCourtPage,
+      auditListPage,
+      courtAddressDeletePage,
+      generalPage,
+      lighthouseUtils,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        includeDelete: false,
+        page,
+        playwright,
+        prefixLabel: 'Audit Detail Performance Test',
+        run: async ({ courtId }) => {
+          await auditListPage.goto();
+          await auditListPage.filterByCourt(courtId);
+
+          const detailHref = await auditListPage.getDetailsHrefForAction('UPDATE');
+          if (!detailHref) {
+            throw new Error('Expected a details link for an UPDATE audit row.');
+          }
+
+          await page.goto(config.urls.homePageUrl + detailHref);
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        },
+      });
+    });
+
+    test('Court Contact List Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact List Performance Test', {}, async ({ createdCourt }) => {
+        await courtContactDetailsPage.goto(createdCourt.id);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Court Contact Add Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact Add Performance Test', {}, async ({ createdCourt }) => {
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Court Contact Edit Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact Edit Performance Test', {}, async ({ createdCourt }) => {
+        const uniqueSuffix = Date.now();
+        const contactEmail = `perf-contact-${uniqueSuffix}@example.test`;
+
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.selectFirstAvailableContactType();
+        await courtContactDetailsPage.emailCheckbox.check();
+        await courtContactDetailsPage.emailInput.fill(contactEmail);
+        await courtContactDetailsPage.explanationInput.fill('Performance edit test contact');
+        await courtContactDetailsPage.save();
+        await courtContactDetailsPage.continueUpdatingLink.click();
+
+        await courtContactDetailsPage.clickEditForRowText(contactEmail);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Court Contact Delete Page Performance', async ({ courtContactDetailsPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Contact Delete Performance Test', {}, async ({ createdCourt }) => {
+        const uniqueSuffix = Date.now();
+        const contactEmail = `perf-delete-${uniqueSuffix}@example.test`;
+
+        await courtContactDetailsPage.gotoAdd(createdCourt.id);
+        await courtContactDetailsPage.selectFirstAvailableContactType();
+        await courtContactDetailsPage.emailCheckbox.check();
+        await courtContactDetailsPage.emailInput.fill(contactEmail);
+        await courtContactDetailsPage.explanationInput.fill('Performance delete test contact');
+        await courtContactDetailsPage.save();
+        await courtContactDetailsPage.continueUpdatingLink.click();
+
+        await courtContactDetailsPage.clickDeleteForRowText(contactEmail);
+        await courtContactDetailsPage.header.checkIsVisible();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
     });
 
     test('Counter Service Opening Hours List Page Performance', async ({

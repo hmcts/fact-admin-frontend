@@ -155,7 +155,7 @@ export class CounterServiceOpeningHoursService {
 
     const assistWith = this.getSelectedDays(form.assistWith);
 
-    const saveResponse = await this.dataApiRequests.saveCounterServiceOpeningHours(courtId, {
+    const payload = {
       courtId,
       id: counterServiceId,
       counterService: true,
@@ -165,7 +165,9 @@ export class CounterServiceOpeningHoursService {
       appointmentNeeded: form.appointmentNeeded === 'yes',
       appointmentContact: form.appointmentNeeded === 'yes' ? form.appointmentContact : null,
       openingTimesDetails: this.toOpeningTimesDetails(form),
-    });
+    };
+
+    const saveResponse = await this.dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
 
     if (this.isSuccessfulStatus(saveResponse)) {
       return {
@@ -173,7 +175,7 @@ export class CounterServiceOpeningHoursService {
         viewModel: {
           courtId,
           courtName: baseModel.courtName,
-          assistanceAvailable: this.formatAssistance(saveResponse as unknown as CounterServiceOpeningHours),
+          assistanceAvailable: this.formatAssistance(payload as CounterServiceOpeningHours),
         },
       };
     }
@@ -366,8 +368,6 @@ export class CounterServiceOpeningHoursService {
       existingRecord = counterServiceResponse;
     }
 
-    console.log('=== to form', JSON.stringify(existingRecord, null, 2));
-
     const form = postedForm ?? this.toForm(existingRecord);
 
     return {
@@ -395,12 +395,12 @@ export class CounterServiceOpeningHoursService {
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
-      errors.sameTimeYes = 'Select whether the court opens and closes at the same time Monday to Friday';
+      errors.sameTimeYes = 'Select whether the counter opens and closes at the same time Monday to Friday';
       return errors;
     }
 
     if (form.sameTime === 'yes') {
-      this.validateTimeGroup(errors, form, 'same', 'Opening');
+      this.validateTimeGroup(errors, form, 'same');
       return errors;
     }
 
@@ -423,17 +423,18 @@ export class CounterServiceOpeningHoursService {
     errors: Record<string, string>,
     form: CounterServiceOpeningHoursForm,
     prefix: string,
-    labelPrefix: string
+    labelPrefix = ''
   ): void {
     const openingHourKey = `${prefix}OpeningHour`;
     const openingMinuteKey = `${prefix}OpeningMinute`;
     const closingHourKey = `${prefix}ClosingHour`;
     const closingMinuteKey = `${prefix}ClosingMinute`;
+    const fieldLabel = (timePart: string) => (labelPrefix ? `${labelPrefix} ${timePart}` : timePart);
 
-    this.validateTimePart(errors, form[openingHourKey], openingHourKey, `${labelPrefix} opening hour`, 23);
-    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, `${labelPrefix} opening minute`, 59);
-    this.validateTimePart(errors, form[closingHourKey], closingHourKey, `${labelPrefix} closing hour`, 23);
-    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, `${labelPrefix} closing minute`, 59);
+    this.validateTimePart(errors, form[openingHourKey], openingHourKey, fieldLabel('Opening hour'), 23);
+    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, fieldLabel('Opening minute'), 59);
+    this.validateTimePart(errors, form[closingHourKey], closingHourKey, fieldLabel('Closing hour'), 23);
+    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, fieldLabel('Closing minute'), 59);
 
     if (errors[openingHourKey] || errors[openingMinuteKey] || errors[closingHourKey] || errors[closingMinuteKey]) {
       return;
@@ -534,22 +535,6 @@ export class CounterServiceOpeningHoursService {
         form[`${prefix}ClosingMinute`] = detail.closingTime.split(':')[1];
       });
     }
-
-    console.log(
-      '=== to form opening hours',
-      JSON.stringify(
-        {
-          sameTime: form.sameTime,
-          sameOpeningHour: form.sameOpeningHour,
-          sameOpeningMinute: form.sameOpeningMinute,
-          sameClosingHour: form.sameClosingHour,
-          sameClosingMinute: form.sameClosingMinute,
-          selectedDays: form.selectedDays,
-        },
-        null,
-        2
-      )
-    );
 
     return form;
   }
