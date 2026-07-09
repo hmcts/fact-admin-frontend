@@ -97,7 +97,7 @@ export class DataApiRequests {
    */
   public async getCourts(params: GetCourtsParams = {}): Promise<PagedCourts | HttpStatusCode> {
     try {
-      const response = await dataApi.get('/courts/v1', { params });
+      const response = await dataApi.get('/all/v1', { params });
       return pagedCourtsSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching courts:', error);

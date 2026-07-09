@@ -440,6 +440,7 @@ test.describe(
         {},
         async ({ createdCourt }) => {
           await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
           await counterServiceOpeningHoursPage.save();
           await expect(counterServiceOpeningHoursPage.mainContent.content).toContainText('There is a problem');
           await axeUtils.audit();
@@ -458,12 +459,12 @@ test.describe(
         {},
         async ({ createdCourt }) => {
           await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
           await counterServiceOpeningHoursPage.selectAssistWith('Forms');
           await counterServiceOpeningHoursPage.selectAppointmentNeeded('no');
           await counterServiceOpeningHoursPage.selectSameTime();
           await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
           await counterServiceOpeningHoursPage.save();
-          await counterServiceOpeningHoursPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
@@ -480,13 +481,13 @@ test.describe(
         {},
         async ({ createdCourt }) => {
           await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
           await counterServiceOpeningHoursPage.selectAssistWith('Forms');
           await counterServiceOpeningHoursPage.selectAppointmentNeeded('no');
           await counterServiceOpeningHoursPage.selectSameTime();
           await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
           await counterServiceOpeningHoursPage.save();
           await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
-          await counterServiceOpeningHoursPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
