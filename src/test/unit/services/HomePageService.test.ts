@@ -11,6 +11,7 @@ describe('HomePageService', () => {
 
     const filters = service.getFilters({
       includeClosed: 'true',
+      onlyServiceCentres: 'true',
       pageNumber: '2',
       pageSize: '10',
       partialCourtName: 'London',
@@ -21,6 +22,7 @@ describe('HomePageService', () => {
 
     expect(filters).toEqual({
       includeClosed: true,
+      onlyServiceCentres: true,
       pageNumber: 2,
       pageSize: 10,
       partialCourtName: 'London',
@@ -28,6 +30,7 @@ describe('HomePageService', () => {
       sortBy: 'name',
       sortOrder: 'desc',
       rawIncludeClosed: 'true',
+      rawOnlyServiceCentres: 'true',
       rawPageNumber: '2',
       rawPageSize: '10',
       rawSortBy: 'name',
@@ -48,6 +51,7 @@ describe('HomePageService', () => {
 
     expect(filters).toEqual({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 1000,
       pageSize: 1000,
       partialCourtName: '',
@@ -55,6 +59,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: '999999999999999999999',
       rawPageSize: '999999999999999999999',
       rawSortBy: undefined,
@@ -98,6 +103,7 @@ describe('HomePageService', () => {
     expect(filters.sortOrder).toBe('asc');
     expect(getCourts).toHaveBeenCalledWith({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
     });
@@ -154,6 +160,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -161,6 +168,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -181,9 +189,9 @@ describe('HomePageService', () => {
     expect(viewModel.errorMessage).toBeUndefined();
     expect(viewModel.errorSummary).toEqual([]);
     expect(viewModel.includeStatusColumn).toBe(false);
-    expect(viewModel.pageTitle).toBe('Courts and tribunals');
+    expect(viewModel.pageTitle).toBe('Courts, tribunals and service centres');
     expect(viewModel.partialCourtNameError).toBeUndefined();
-    expect(viewModel.resultsMessage).toBe('Showing 1 to 2 of 2 courts');
+    expect(viewModel.resultsMessage).toBe('Showing 1 to 2 of 2 courts, tribunals and service centres');
     expect(viewModel.regionOptions).toEqual([
       { selected: true, text: 'All regions', value: '' },
       {
@@ -229,6 +237,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: true,
       pageNumber: 1,
       pageSize: 25,
       partialCourtName: 'London',
@@ -236,6 +245,7 @@ describe('HomePageService', () => {
       sortBy: 'name',
       sortOrder: 'desc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: 'true',
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: 'name',
@@ -244,6 +254,7 @@ describe('HomePageService', () => {
 
     expect(getCourts).toHaveBeenCalledWith({
       includeClosed: false,
+      onlyServiceCentres: true,
       pageNumber: 1,
       pageSize: 25,
       partialCourtName: 'London',
@@ -252,13 +263,13 @@ describe('HomePageService', () => {
     });
     expect(viewModel.courtTableHead[0]).toEqual({
       attributes: { 'aria-sort': 'descending' },
-      html: '<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="/?partialCourtName=London&sortBy=name&sortOrder=asc&pageNumber=0">Name<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.4375 7L11 15.8687L6.5625 7L15.4375 7Z" fill="currentColor"/></svg><span class="govuk-visually-hidden">, sort ascending</span></a>',
+      html: '<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="/?partialCourtName=London&onlyServiceCentres=true&sortBy=name&sortOrder=asc&pageNumber=0">Name<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.4375 7L11 15.8687L6.5625 7L15.4375 7Z" fill="currentColor"/></svg><span class="govuk-visually-hidden">, sort ascending</span></a>',
     });
     expect(viewModel.pagination.next).toEqual({
-      href: '/?partialCourtName=London&sortBy=name&sortOrder=desc&pageNumber=2',
+      href: '/?partialCourtName=London&onlyServiceCentres=true&sortBy=name&sortOrder=desc&pageNumber=2',
     });
     expect(viewModel.pagination.previous).toEqual({
-      href: '/?partialCourtName=London&sortBy=name&sortOrder=desc&pageNumber=0',
+      href: '/?partialCourtName=London&onlyServiceCentres=true&sortBy=name&sortOrder=desc&pageNumber=0',
     });
   });
 
@@ -270,6 +281,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -277,16 +289,19 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
       rawSortOrder: undefined,
     });
 
-    expect(viewModel.errorMessage).toBe('There was a problem loading regions and courts.');
+    expect(viewModel.errorMessage).toBe(
+      'There was a problem loading regions and courts, tribunals and service centres.'
+    );
     expect(viewModel.errorSummary).toEqual([]);
     expect(viewModel.courtTableRows).toEqual([]);
-    expect(viewModel.resultsMessage).toBe('No courts found.');
+    expect(viewModel.resultsMessage).toBe('No courts, tribunals or service centres found.');
   });
 
   test('builds condensed pagination and page title for later pages', async () => {
@@ -320,6 +335,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: true,
+      onlyServiceCentres: false,
       pageNumber: 4,
       pageSize: 25,
       partialCourtName: '',
@@ -327,6 +343,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -334,7 +351,7 @@ describe('HomePageService', () => {
     });
 
     expect(viewModel.includeStatusColumn).toBe(true);
-    expect(viewModel.pageTitle).toBe('Courts and tribunals (page 5 of 10)');
+    expect(viewModel.pageTitle).toBe('Courts, tribunals and service centres (page 5 of 10)');
     expect(viewModel.pagination).toEqual({
       currentPage: 4,
       items: [
@@ -361,6 +378,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: 'London 123',
@@ -368,6 +386,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -392,6 +411,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -399,6 +419,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: '0',
       rawSortBy: undefined,
@@ -423,6 +444,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 1000,
       partialCourtName: '',
@@ -430,6 +452,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: '1001',
       rawSortBy: undefined,
@@ -454,6 +477,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -461,6 +485,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: '-1',
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -485,6 +510,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 1000,
       pageSize: 25,
       partialCourtName: '',
@@ -492,6 +518,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: '1001',
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -524,6 +551,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -531,6 +559,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: 'false',
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -550,6 +579,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -557,6 +587,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: 'maybe',
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -581,6 +612,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -588,6 +620,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -618,6 +651,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -625,6 +659,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -649,6 +684,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -656,6 +692,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'desc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -680,6 +717,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -687,6 +725,7 @@ describe('HomePageService', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: 'courtName',
@@ -711,6 +750,7 @@ describe('HomePageService', () => {
 
     const viewModel = await service.getHomePageViewModel({
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -718,6 +758,7 @@ describe('HomePageService', () => {
       sortBy: 'name',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: 'name',

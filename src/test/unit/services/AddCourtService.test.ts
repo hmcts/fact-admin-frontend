@@ -14,6 +14,17 @@ describe('AddCourtService', () => {
     slug: 'reading-crown-court',
     warningNotice: null,
   };
+  const createdServiceCentre = {
+    createdAt: '2026-06-10T10:00:00Z',
+    id: '33333333-3333-4333-8333-333333333333',
+    lastUpdatedAt: '2026-06-10T10:00:00Z',
+    name: 'National Business Centre',
+    open: false,
+    regionId: regions[0].id,
+    serviceAreaIds: ['44444444-4444-4444-8444-444444444444'],
+    slug: 'national-business-centre',
+    warningNotice: null,
+  };
 
   test('builds the add court view model with regions', async () => {
     const requests = {
@@ -99,6 +110,7 @@ describe('AddCourtService', () => {
       createCourt: jest.fn(),
       getCourtByName: jest.fn().mockResolvedValue(createdCourt),
       getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn(),
     };
     const service = new AddCourtService(requests as never);
 
@@ -113,6 +125,31 @@ describe('AddCourtService', () => {
       regions,
     });
     expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.getServiceCentreByName).not.toHaveBeenCalled();
+    expect(requests.createCourt).not.toHaveBeenCalled();
+  });
+
+  test('create returns duplicate name validation errors when a service centre already exists', async () => {
+    const requests = {
+      createCourt: jest.fn(),
+      getCourtByName: jest.fn().mockResolvedValue(404),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn().mockResolvedValue(createdServiceCentre),
+    };
+    const service = new AddCourtService(requests as never);
+
+    await expect(service.create({ name: createdServiceCentre.name, regionId: regions[0].id })).resolves.toEqual({
+      errors: {
+        name: [`A service centre with the entered name already exists: '${createdServiceCentre.name}'`],
+      },
+      name: createdServiceCentre.name,
+      pagePath: '/add-court',
+      pageTitle: 'Error: Add new court',
+      regionId: regions[0].id,
+      regions,
+    });
+    expect(requests.getCourtByName).toHaveBeenCalledWith(createdServiceCentre.name);
+    expect(requests.getServiceCentreByName).toHaveBeenCalledWith(createdServiceCentre.name);
     expect(requests.createCourt).not.toHaveBeenCalled();
   });
 
@@ -121,6 +158,7 @@ describe('AddCourtService', () => {
       createCourt: jest.fn().mockResolvedValue(createdCourt),
       getCourtByName: jest.fn().mockResolvedValue(404),
       getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
     const service = new AddCourtService(requests as never);
 
@@ -137,6 +175,7 @@ describe('AddCourtService', () => {
       regionId: regions[0].id,
     });
     expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.getServiceCentreByName).toHaveBeenCalledWith(createdCourt.name);
   });
 
   test('create trims leading and trailing whitespace before duplicate lookup and create API call', async () => {
@@ -144,12 +183,14 @@ describe('AddCourtService', () => {
       createCourt: jest.fn().mockResolvedValue(createdCourt),
       getCourtByName: jest.fn().mockResolvedValue(404),
       getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
     const service = new AddCourtService(requests as never);
 
     await service.create({ name: `  ${createdCourt.name}  `, regionId: regions[0].id });
 
     expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.getServiceCentreByName).toHaveBeenCalledWith(createdCourt.name);
     expect(requests.createCourt).toHaveBeenCalledWith({
       name: createdCourt.name,
       open: false,
@@ -167,6 +208,7 @@ describe('AddCourtService', () => {
       ),
       getCourtByName: jest.fn().mockResolvedValue(404),
       getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
     const service = new AddCourtService(requests as never);
 

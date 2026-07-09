@@ -1,0 +1,21 @@
+{% extends "template.njk" %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="hods-loading-spinner" role="status" data-redirect-url="{{ addressRedirectUrl }}" data-redirect-delay="7000">
+        <div class="hods-loading-spinner__spinner"></div>
+        <div class="hods-loading-spinner__content">
+          <h1 class="govuk-heading-m">New service centre has been created, you will be redirected to the edit address page shortly. If you do not add an address, this service centre will be marked as closed.</h1>
+        </div>
+      </div>
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ addressRedirectUrl }}">Continue to add an address for {{ serviceCentreName }}</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

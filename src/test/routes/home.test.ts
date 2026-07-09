@@ -7,6 +7,7 @@ import { HomePageService } from '../../main/services/HomePageService';
 function stubHomePage(): void {
   const filters = {
     includeClosed: false,
+    onlyServiceCentres: false,
     pageNumber: 0,
     pageSize: 25,
     partialCourtName: '',
@@ -14,6 +15,7 @@ function stubHomePage(): void {
     sortBy: '',
     sortOrder: 'asc',
     rawIncludeClosed: undefined,
+    rawOnlyServiceCentres: undefined,
     rawPageNumber: undefined,
     rawPageSize: undefined,
     rawSortBy: undefined,
@@ -27,7 +29,7 @@ function stubHomePage(): void {
     errorSummary: [],
     filters,
     includeStatusColumn: false,
-    pageTitle: 'Courts and tribunals',
+    pageTitle: 'Courts, tribunals and service centres',
     pagination: {
       currentPage: 0,
       items: [],
@@ -35,7 +37,7 @@ function stubHomePage(): void {
     },
     partialCourtNameError: undefined,
     regionOptions: [{ selected: true, text: 'All regions', value: '' }],
-    resultsMessage: 'No courts found.',
+    resultsMessage: 'No courts, tribunals or service centres found.',
   });
 }
 
@@ -50,10 +52,11 @@ describe('Home page', () => {
     const response = await request(app).get('/');
 
     expect(response.status).toBe(200);
-    expect(response.text).toContain('Courts and tribunals');
+    expect(response.text).toContain('Courts, tribunals and service centres');
     expect(response.text).toContain('Apply filters');
     expect(response.text).toContain('Download csv');
     expect(response.text).toContain('Add new court');
+    expect(response.text).toContain('Add new service centre');
     expect(response.text).not.toContain('Audit');
     expect(response.text).not.toContain('Users');
   });

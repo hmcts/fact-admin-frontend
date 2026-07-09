@@ -102,14 +102,15 @@ export class AddCourtService {
 
     const name = trimmedForm.name as string;
     const regionId = trimmedForm.regionId as string;
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
-    if (typeof duplicateCourt === 'number') {
-      if (duplicateCourt !== HttpStatusCode.NotFound) {
-        return duplicateCourt;
+    const duplicateLocationStatus = await this.checkDuplicateLocationName(name);
+    if (duplicateLocationStatus !== HttpStatusCode.NotFound) {
+      if (typeof duplicateLocationStatus === 'number') {
+        return duplicateLocationStatus;
       }
-    } else {
+
+      const duplicateLocationType = duplicateLocationStatus.type === 'serviceCentre' ? 'service centre' : 'court';
       return this.buildViewModelWithErrors(trimmedForm, regions, {
-        name: [`A court with the entered name already exists: '${duplicateCourt.name}'`],
+        name: [`A ${duplicateLocationType} with the entered name already exists: '${duplicateLocationStatus.name}'`],
       });
     }
 
@@ -141,6 +142,25 @@ export class AddCourtService {
       pagePath: '/add-court/success',
       pageTitle: `New court created - ${createResponse.name}`,
     };
+  }
+
+  private async checkDuplicateLocationName(
+    name: string
+  ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
+    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
+    if (typeof duplicateCourt !== 'number') {
+      return { name: duplicateCourt.name, type: 'court' };
+    }
+    if (duplicateCourt !== HttpStatusCode.NotFound) {
+      return duplicateCourt;
+    }
+
+    const duplicateServiceCentre = await this.dataApiRequests.getServiceCentreByName(name);
+    if (typeof duplicateServiceCentre !== 'number') {
+      return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
+    }
+
+    return duplicateServiceCentre;
   }
 
   /**
