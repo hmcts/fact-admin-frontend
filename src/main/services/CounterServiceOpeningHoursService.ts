@@ -306,6 +306,10 @@ export class CounterServiceOpeningHoursService {
       errors.appointmentNeeded = 'Select yes if an appointment is needed';
     }
 
+    if (form.appointmentNeeded === 'yes' && !form.appointmentContact) {
+      errors.appointmentNeeded = 'Enter a contact email address';
+    }
+
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
       errors.sameTimeYes = 'Select whether the counter opens and closes at the same time Monday to Friday';
       return errors;
