@@ -15,7 +15,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">Courts and tribunals</h1>
+      <h1 class="govuk-heading-xl">Courts, tribunals and service centres</h1>
 
       {% if errorSummary.length %}
         {{ govukErrorSummary({
@@ -35,7 +35,7 @@
               id: "partialCourtName",
               name: "partialCourtName",
               label: {
-                text: "Search courts and tribunals"
+                text: "Search courts, tribunals and service centres"
               },
               errorMessage: {
                 text: partialCourtNameError
@@ -54,7 +54,9 @@
               items: regionOptions
             }) }}
           </div>
-          <div class="govuk-grid-column-one-quarter govuk-!-padding-top-6">
+        </div>
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-quarter">
             {{ govukCheckboxes({
               idPrefix: "includeClosed",
               name: "includeClosed",
@@ -62,6 +64,19 @@
                 {
                   checked: filters.includeClosed,
                   text: "Include closed",
+                  value: "true"
+                }
+              ]
+            }) }}
+          </div>
+          <div class="govuk-grid-column-one-half">
+            {{ govukCheckboxes({
+              idPrefix: "onlyServiceCentres",
+              name: "onlyServiceCentres",
+              items: [
+                {
+                  checked: filters.onlyServiceCentres,
+                  text: "Only show service centres",
                   value: "true"
                 }
               ]
@@ -104,7 +119,7 @@
             }) }}
           {% endif %}
         {% else %}
-          <p class="govuk-body">No courts match the current filters.</p>
+          <p class="govuk-body">No courts, tribunals or service centres match the current filters.</p>
         {% endif %}
 
         {% if pagination.totalPages > 1 %}

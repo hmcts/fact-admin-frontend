@@ -7,6 +7,7 @@ export enum PageSection {
   LISTS = '/lists',
   DOWNLOAD = '/download',
   ADD_COURT = '/add-court',
+  ADD_SERVICE_CENTRE = '/add-service-centre',
   BULK_UPDATE = '/bulk-update',
   AUDITS = '/audits',
 }
@@ -17,6 +18,7 @@ export class HomePage extends Base {
   public readonly downloadNavigationLink: Locator;
   public readonly includeClosedCheckbox: Locator;
   public readonly noResultsMessage: Locator;
+  public readonly onlyServiceCentresCheckbox: Locator;
   public readonly regionSelect: Locator;
   public readonly paginationNextLink: Locator;
   public readonly paginationPreviousLink: Locator;
@@ -32,11 +34,12 @@ export class HomePage extends Base {
     this.clearFiltersButton = this.page.getByRole('button', { name: 'Clear filters' });
     this.downloadNavigationLink = this.page.getByRole('link', { name: 'Download csv' });
     this.includeClosedCheckbox = this.page.getByLabel('Include closed');
-    this.noResultsMessage = this.page.getByText('No courts match the current filters.');
+    this.noResultsMessage = this.page.getByText('No courts, tribunals or service centres match the current filters.');
+    this.onlyServiceCentresCheckbox = this.page.getByLabel('Only show service centres');
     this.regionSelect = this.page.getByLabel('Region');
     this.paginationNextLink = this.page.getByRole('link', { name: 'Next' });
     this.paginationPreviousLink = this.page.getByRole('link', { name: 'Previous' });
-    this.partialCourtNameInput = this.page.getByLabel('Search courts and tribunals');
+    this.partialCourtNameInput = this.page.getByLabel('Search courts, tribunals and service centres');
     this.resultsMessage = this.page.locator('#main-content .govuk-body').first();
     this.statusColumnHeader = this.page.getByRole('columnheader', { name: 'Status' });
     this.tableHeaders = this.page.locator('table.homepage-courts-table thead th');
@@ -73,6 +76,12 @@ export class HomePage extends Base {
       await this.includeClosedCheckbox.uncheck();
     }
 
+    await this.applyFiltersButton.click();
+  }
+
+  async searchForServiceCentresOnly(partialCourtName: string): Promise<void> {
+    await this.partialCourtNameInput.fill(partialCourtName);
+    await this.onlyServiceCentresCheckbox.check();
     await this.applyFiltersButton.click();
   }
 

@@ -1,6 +1,32 @@
 @use '@ministryofjustice/frontend/moj/all' as *;
 @use 'govuk-frontend';
 
+// Align the service navigation with page content on the left, while letting it use extra space on the right.
+.app-service-navigation .govuk-width-container {
+  max-width: none;
+  margin-right: 15px;
+  margin-left: max(15px, calc((100% - 960px) / 2));
+}
+
+@media (min-width: 40.0625em) {
+  .app-service-navigation .govuk-width-container {
+    margin-right: 30px;
+    margin-left: max(30px, calc((100% - 960px) / 2));
+  }
+
+  .app-service-navigation .govuk-service-navigation__container {
+    flex-wrap: nowrap;
+  }
+
+  .app-service-navigation .govuk-service-navigation__service-name {
+    flex: 0 0 auto;
+  }
+
+  .app-service-navigation .govuk-service-navigation__wrapper {
+    min-width: 0;
+  }
+}
+
 // Homepage and Audit List pagination
 .homepage-pagination,
 .audit-list-pagination {

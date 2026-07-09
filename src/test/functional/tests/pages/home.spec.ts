@@ -55,17 +55,19 @@ test.describe(
         tag: '@smoke',
       },
       async ({ homePage }) => {
-        await expect(homePage.heading).toContainText('Courts and tribunals');
+        await expect(homePage.heading).toContainText('Courts, tribunals and service centres');
       }
     );
 
     test('visibility test', async ({ homePage }) => {
       await homePage.expectVisibleElements();
-      await expect(homePage.heading).toContainText('Courts and tribunals');
+      await expect(homePage.heading).toContainText('Courts, tribunals and service centres');
       await homePage.header.expectNavigationLink('Courts');
       await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
+      await homePage.header.expectNavigationLink('Add new service centre');
       await expect(homePage.regionSelect).toBeVisible();
+      await expect(homePage.onlyServiceCentresCheckbox).toBeVisible();
     });
 
     test.describe('Super admin role navigation', () => {
@@ -76,6 +78,7 @@ test.describe(
         await homePage.header.expectNavigationLink('Courts');
         await homePage.header.expectNavigationLink('Download csv');
         await homePage.header.expectNavigationLink('Add new court');
+        await homePage.header.expectNavigationLink('Add new service centre');
         await homePage.header.expectNavigationLink('Audit');
         await homePage.header.expectNavigationLink('Users');
       });
@@ -89,6 +92,7 @@ test.describe(
         await homePage.header.expectNavigationLink('Courts');
         await homePage.header.expectNavigationLink('Download csv');
         await homePage.header.expectNavigationLink('Add new court');
+        await homePage.header.expectNavigationLink('Add new service centre');
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Audit' })).toHaveCount(0);
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Users' })).toHaveCount(0);
       });
@@ -123,7 +127,7 @@ test.describe(
     test('shows a no results message when no courts match the filter', async ({ homePage }) => {
       await homePage.searchForCourt(`No Matching Court ${generateRandomSuffix()}`);
 
-      await expect(homePage.resultsMessage).toContainText('No courts found.');
+      await expect(homePage.resultsMessage).toContainText('No courts, tribunals or service centres found.');
       await expect(homePage.noResultsMessage).toBeVisible();
     });
 
@@ -134,6 +138,7 @@ test.describe(
       await expect(homePage.page).toHaveURL(/\/$/);
       await expect(homePage.partialCourtNameInput).toHaveValue('');
       await expect(homePage.includeClosedCheckbox).not.toBeChecked();
+      await expect(homePage.onlyServiceCentresCheckbox).not.toBeChecked();
     });
 
     test('shows the status column only when include closed is selected', async ({ homePage, playwright }) => {
@@ -192,10 +197,7 @@ test.describe(
       });
     });
 
-    test('shows service centre rows with public view and temporary edit not found actions', async ({
-      homePage,
-      playwright,
-    }) => {
+    test('shows service centre rows with public view and edit actions', async ({ homePage, playwright }) => {
       await withCreatedServiceCentre(
         playwright,
         'Home Service Centre Functional Test',
@@ -210,8 +212,45 @@ test.describe(
 
           await homePage.clickEditForCourt(createdServiceCentre.name);
 
-          await expect(homePage.heading).toContainText('Page Not Found');
+          await expect(homePage.heading).toContainText('Editing service centre');
           await expect(homePage.page).toHaveURL(new RegExp(`/service-centres/${createdServiceCentre.id}/edit$`));
+          await expect(homePage.mainContent.content).toContainText('General');
+          await expect(homePage.mainContent.content).toContainText('Warning notice');
+          await expect(homePage.mainContent.content).toContainText('Address');
+          await expect(homePage.mainContent.content).toContainText('Contact details');
+          await expect(homePage.mainContent.content).toContainText('Cases heard');
+        }
+      );
+    });
+
+    test('filters to only service centres', async ({ homePage, playwright }) => {
+      await withTestLocationPrefix(
+        playwright,
+        'Home Service Centre Only Functional Test',
+        async ({ apiContext, courtNamePrefix }) => {
+          const courtName = `${courtNamePrefix} Court`;
+          const serviceCentreName = `${courtNamePrefix} Service Centre`;
+
+          await createTestCourt(apiContext, {
+            courtName,
+            open: true,
+          });
+          await createTestServiceCentre(apiContext, {
+            open: true,
+            serviceCentreName,
+          });
+
+          await homePage.searchForCourt(courtNamePrefix);
+          await homePage.expectCourtVisible(courtName);
+          await homePage.expectCourtVisible(serviceCentreName);
+
+          await homePage.searchForServiceCentresOnly(courtNamePrefix);
+          await expect(homePage.page).toHaveURL(/onlyServiceCentres=true/);
+          await homePage.expectCourtHidden(courtName);
+          await homePage.expectCourtVisible(serviceCentreName);
+
+          await homePage.clickSortByName();
+          await expect(homePage.page).toHaveURL(/onlyServiceCentres=true/);
         }
       );
     });
