@@ -21,8 +21,20 @@ test.describe('Court Edit Page Tests', () => {
       await courtEditPage.expectVisibleElements();
       await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
       await expect(courtEditPage.mainContent.content).toContainText('Accessibility');
+      await expect(courtEditPage.mainContent.content).toContainText('Address');
+      await expect(courtEditPage.mainContent.content).toContainText('Cases heard');
+      await expect(courtEditPage.mainContent.content).toContainText('Contact details');
+      await expect(courtEditPage.mainContent.content).toContainText('Counter service opening hours');
+      await expect(courtEditPage.mainContent.content).toContainText('Court opening hours');
+      await expect(courtEditPage.mainContent.content).toContainText('General');
+      await expect(courtEditPage.mainContent.content).toContainText('Building facilities');
       await expect(courtEditPage.mainContent.content).toContainText('Information for professionals');
-      await expect(courtEditPage.mainContent.content).toContainText('TODO');
+      await expect(courtEditPage.mainContent.content).toContainText('Local authorities');
+      await expect(courtEditPage.mainContent.content).toContainText('Photo');
+      await expect(courtEditPage.mainContent.content).toContainText('Single points of entry');
+      await expect(courtEditPage.mainContent.content).toContainText('Translation and interpretation');
+      await expect(courtEditPage.mainContent.content).toContainText('Warning notice');
+      await expect(courtEditPage.mainContent.content).toContainText('Available');
     });
   });
 
