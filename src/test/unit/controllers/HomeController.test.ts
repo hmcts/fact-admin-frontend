@@ -15,6 +15,7 @@ describe('HomeController', () => {
     const responseMock = mock(response);
     const filters = {
       includeClosed: false,
+      onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
       partialCourtName: '',
@@ -22,6 +23,7 @@ describe('HomeController', () => {
       sortBy: '',
       sortOrder: 'asc',
       rawIncludeClosed: undefined,
+      rawOnlyServiceCentres: undefined,
       rawPageNumber: undefined,
       rawPageSize: undefined,
       rawSortBy: undefined,
@@ -38,10 +40,10 @@ describe('HomeController', () => {
         items: [],
         totalPages: 0,
       },
-      pageTitle: 'Courts and tribunals',
+      pageTitle: 'Courts, tribunals and service centres',
       partialCourtNameError: undefined,
       regionOptions: [],
-      resultsMessage: 'No courts found.',
+      resultsMessage: 'No courts, tribunals or service centres found.',
     };
     const getFiltersStub = stub(HomePageService.prototype, 'getFilters').returns(filters);
     const getHomePageViewModelStub = stub(HomePageService.prototype, 'getHomePageViewModel').resolves(viewModel);
