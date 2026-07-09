@@ -2,8 +2,9 @@ import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
 import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
-import { PATH_TO_PAGE_MAP } from '../../schemas/lockSchema';
+import { PATH_TO_PAGE_MAP, Page } from '../../schemas/lockSchema';
 import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
+import { isUuid } from '../../utils/valueParsers';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenticationHelper';
 
 let dataApiRequests: DataApiRequestsType | undefined;
@@ -52,12 +53,18 @@ export class LockingInterceptor {
     }
 
     // attempt to acquire the lock, and if we can't, render the appropriate error page
-    const errorPageRendered = await this.handleLockAcquisition(dataApi, userId, lockDetails, res);
-    if (errorPageRendered) {
+    const acquisitionResponse = await this.handleLockAcquisition(dataApi, userId, lockDetails, res);
+    if (typeof acquisitionResponse === 'number') {
+      // likely a 404 on the subject, let the real page deal with that
+      return next();
+    } else if (acquisitionResponse) {
+      // we rendered our own error, stop here
       return;
     }
 
-    // calculate the correct sign out URL based on the subject type
+    // we have the lock, so we can inject the timeout dialog config and move on to the next page
+
+    // calculate the correct sign-out URL based on the subject type
     const signOutUrl =
       lockDetails.subject === SubjectType.SERVICE_CENTRE
         ? `/service-centres/${lockDetails.subjectId}/edit`
@@ -72,7 +79,7 @@ export class LockingInterceptor {
       timeOutUrl: `${signOutUrl}?timeout=${Math.ceil(Math.max(1, TIMEOUT_SECONDS / 60))}`,
     };
 
-    // we have the lock, so we can move on
+    // move on
     return next();
   }
 
@@ -92,7 +99,7 @@ export class LockingInterceptor {
     const subjectId = matches[2];
     const pageKey = matches[3];
 
-    return { subject, subjectId, pageKey };
+    return isUuid(subjectId) ? { subject, subjectId, pageKey } : undefined;
   }
 
   private async handleLockAcquisition(
@@ -100,9 +107,10 @@ export class LockingInterceptor {
     userId: string,
     details: LockRequirements,
     res: express.Response
-  ): Promise<boolean> {
+  ): Promise<boolean | number> {
     const page = PATH_TO_PAGE_MAP[details.pageKey];
     const subjectStr = (details.subject as string).toLowerCase().replaceAll('_', ' ');
+
     if (!page) {
       // we don't have a page mapping for that key so fail the lock
       res.status(HttpStatusCode.BadRequest);
@@ -117,27 +125,46 @@ export class LockingInterceptor {
     const lock = await dataApi.acquireLock(details.subject, details.subjectId, page, userId);
 
     if (typeof lock === 'number') {
-      res.status(lock);
-      const pageStr = (page as string).toLowerCase().replaceAll('_', ' ');
-      if (lock === HttpStatusCode.Conflict) {
-        // someone else has the lock to retrieve it and render the already locked page.
-        const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
-        res.render('lock-exists', {
-          subject: subjectStr,
-          page: pageStr,
-          lock: existingLock,
-        });
+      if (lock === HttpStatusCode.NotFound) {
+        // if the court/service-centre was not found, then simply propagate at this point.
+        // We could render the court/service-centre not found page, but that is technically
+        // the purview of the destination page, and doing it here would interfere with any
+        // other logic that the page might want to perform in that instance.
+        return lock;
       } else {
-        // something else went wrong, so just render the generic lock failed page
-        res.render('lock-failed', {
-          subject: subjectStr,
-          page: pageStr,
-        });
+        await this.handleLockingFailure(dataApi, res, lock, page, details, subjectStr);
       }
       return true;
     }
 
     return false;
+  }
+
+  private async handleLockingFailure(
+    dataApi: DataApiRequestsType,
+    res: express.Response,
+    lock: HttpStatusCode,
+    page: typeof Page,
+    details: LockRequirements,
+    subjectStr: string
+  ) {
+    res.status(lock);
+    const pageStr = (page as unknown as string).toLowerCase().replaceAll('_', ' ');
+    if (lock === HttpStatusCode.Conflict) {
+      // someone else has the lock to retrieve it and render the already locked page.
+      const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
+      res.render('lock-exists', {
+        subject: subjectStr,
+        page: pageStr,
+        lock: existingLock,
+      });
+    } else {
+      // something else went wrong, so just render the generic lock failed page
+      res.render('lock-failed', {
+        subject: subjectStr,
+        page: pageStr,
+      });
+    }
   }
 }
 
