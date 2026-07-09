@@ -12,6 +12,7 @@ import {
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
+const UK_TIME_ZONE = 'Europe/London';
 const SORT_ICON_PATHS = {
   ascending: '<path d="M6.5625 15.5L11 6.63125L15.4375 15.5H6.5625Z" fill="currentColor"/>',
   descending: '<path d="M15.4375 7L11 15.8687L6.5625 7L15.4375 7Z" fill="currentColor"/>',
@@ -184,6 +185,7 @@ export class UsersPageViewService {
       hour: '2-digit',
       minute: '2-digit',
       month: 'short',
+      timeZone: UK_TIME_ZONE,
       year: 'numeric',
     }).format(parsedDate);
   }
