@@ -28,4 +28,31 @@ describe('Court Edit View', () => {
     expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);
   });
+
+  test('renders timeout warning banner when timeoutMins is provided', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      pagePath: courtEditPath,
+      pageTitle: 'Editing - Reading Crown Court',
+      courtLocks: [],
+      timeoutMins: 15,
+    });
+
+    expect(html).toContain('Editing session timed out');
+    expect(html).toContain('You were inactive for 15 minutes and have been returned to the edit page.');
+    expect(html).toContain('Any unsaved changes you made have not been saved.');
+  });
+
+  test('does not render timeout warning banner when timeoutMins is missing', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      pagePath: courtEditPath,
+      pageTitle: 'Editing - Reading Crown Court',
+      courtLocks: [],
+    });
+
+    expect(html).not.toContain('Editing session timed out');
+  });
 });
