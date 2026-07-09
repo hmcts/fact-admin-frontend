@@ -180,7 +180,7 @@ describe('LockingInterceptor', () => {
       timeout: 900,
       countdown: 120,
       signOutUrl: `/service-centres/${subjectId}/edit`,
-      timeOutUrl: `/service-centres/${subjectId}/edit?timeout=15`,
+      timeoutUrl: `/service-centres/${subjectId}/edit?timeout=15`,
     });
   });
 });

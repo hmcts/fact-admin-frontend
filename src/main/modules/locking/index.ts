@@ -76,7 +76,7 @@ export class LockingInterceptor {
       timeout: TIMEOUT_SECONDS,
       countdown: WARN_SECONDS,
       signOutUrl,
-      timeOutUrl: `${signOutUrl}?timeout=${Math.ceil(Math.max(1, TIMEOUT_SECONDS / 60))}`,
+      timeoutUrl: `${signOutUrl}?timeout=${Math.ceil(Math.max(1, TIMEOUT_SECONDS / 60))}`,
     };
 
     // move on

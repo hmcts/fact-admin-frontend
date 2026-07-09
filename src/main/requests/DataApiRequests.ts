@@ -927,7 +927,7 @@ export class DataApiRequests {
    */
   public async clearUserLocks(userId: string): Promise<HttpStatusCode> {
     try {
-      return await dataApi.delete(`/user/v1/${userId}/locks`);
+      return (await dataApi.delete(`/user/v1/${userId}/locks`)).status;
     } catch (error: unknown) {
       logger.error(`Error acquiring removing locks for user with id: ${userId}`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
