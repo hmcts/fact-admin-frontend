@@ -527,8 +527,16 @@ describe('ProfessionalInformationService', () => {
             text: 'DX code 4: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
           },
           {
+            href: '#dxCodeDescriptionCy-3',
+            text: 'DX code 4: Enter a Welsh explanation',
+          },
+          {
             href: '#faxNumber-4',
             text: 'Fax number 5: You have entered a description without a fax number, please add a number or remove the description',
+          },
+          {
+            href: '#faxNumberDescriptionCy-4',
+            text: 'Fax number 5: Enter a Welsh description',
           },
         ],
       },

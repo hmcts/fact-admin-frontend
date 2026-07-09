@@ -350,13 +350,13 @@ export class ProfessionalInformationService {
           text: `DX code ${formIndex + 1}: You have entered a DX code welsh explanation without a DX code, please add a code or remove the welsh explanation`,
         });
       }
-      if (code && hasEnglishDescriptionOnly) {
+      if (hasEnglishDescriptionOnly) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
           text: `DX code ${formIndex + 1}: Enter a Welsh explanation`,
         });
       }
-      if (code && hasWelshDescriptionOnly) {
+      if (hasWelshDescriptionOnly) {
         errors.push({
           href: `#dxCodeDescription-${formIndex}`,
           text: `DX code ${formIndex + 1}: Enter an explanation`,
@@ -420,13 +420,13 @@ export class ProfessionalInformationService {
           text: `Fax number ${formIndex + 1}: ${faxNumberFormatError}`,
         });
       }
-      if (code && hasEnglishDescriptionOnly) {
+      if (hasEnglishDescriptionOnly) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
           text: `Fax number ${formIndex + 1}: Enter a Welsh description`,
         });
       }
-      if (code && hasWelshDescriptionOnly) {
+      if (hasWelshDescriptionOnly) {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
           text: `Fax number ${formIndex + 1}: Enter a description`,
