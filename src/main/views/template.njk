@@ -9,6 +9,7 @@
   {% set isCourtsPage = pagePath == "/" %}
   {% set isDownloadPage = pagePath.startsWith("/download") %}
   {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
+  {% set isAddServiceCentrePage = pagePath.startsWith("/add-service-centre") %}
   {% set isAuditPage = pagePath.startsWith("/audits") %}
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
@@ -18,6 +19,7 @@
     }
   }) }}
   {{ govukServiceNavigation({
+    classes: "app-service-navigation",
     serviceName: "Find a Court or Tribunal Admin",
     serviceUrl: "/",
     navigation: [
@@ -35,6 +37,11 @@
         href: "/add-court",
         text: "Add new court",
         current: isAddCourtPage
+      },
+      {
+        href: "/add-service-centre",
+        text: "Add new service centre",
+        current: isAddServiceCentrePage
       },
       {
         href: "/audits",

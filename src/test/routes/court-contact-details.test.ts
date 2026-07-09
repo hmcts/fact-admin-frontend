@@ -92,7 +92,7 @@ describe('Court contact details routes', () => {
       .send(`contact-type=${CONTACT_TYPE_ID}&contact-methods=email&contact-email=enquiries%40example.test`);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Contact detailsadded: enquiries@example.test');
+    expect(response.text).toContain('Contact details added: enquiries@example.test');
     expect(response.text).toContain(
       'contact details of General enquiries for Reading Crown Court have been successfully created.'
     );
