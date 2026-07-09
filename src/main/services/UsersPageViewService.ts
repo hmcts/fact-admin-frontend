@@ -20,12 +20,7 @@ const SORT_ICON_PATHS = {
 
 export class UsersPageViewService {
   public buildUserTableHead(filters: UsersPageFilters): UsersPageTableHeadCell[] {
-    return [
-      { text: 'Email' },
-      { text: 'SSO ID' },
-      this.buildSortableHeadItem('Last login', filters),
-      { text: 'Role(s)' },
-    ];
+    return [{ text: 'Email' }, { text: 'SSO ID' }, this.buildSortableHeadItem('Last login', filters), { text: 'Role' }];
   }
 
   public buildUserTableRows(usersPage: PagedUsers): UsersPageTableCell[][] {

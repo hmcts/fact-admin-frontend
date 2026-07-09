@@ -19,7 +19,7 @@ describe('Users View', () => {
       pagePath: '/users',
       pageTitle: 'Users',
       resultsMessage: 'Showing 1 to 2 of 2 users',
-      userTableHead: [{ text: 'Email' }, { text: 'SSO ID' }, { text: 'Last login' }, { text: 'Role(s)' }],
+      userTableHead: [{ text: 'Email' }, { text: 'SSO ID' }, { text: 'Last login' }, { text: 'Role' }],
       userTableRows: [
         [
           { text: 'admin@example.com' },
@@ -33,10 +33,11 @@ describe('Users View', () => {
     expect(html).toContain('Users');
     expect(html).toContain('Audit');
     expect(html).toContain('Search by email or SSO ID');
+    expect(html).toContain('users-table-wrapper');
     expect(html).toContain('Email');
     expect(html).toContain('SSO ID');
     expect(html).toContain('Last login');
-    expect(html).toContain('Role(s)');
+    expect(html).toContain('Role');
     expect(html).toContain('admin@example.com');
   });
 });

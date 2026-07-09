@@ -61,25 +61,27 @@
 
       <p class="govuk-body">{{ resultsMessage }}</p>
 
-      {{ govukTable({
-        classes: "homepage-courts-table",
-        firstCellIsHeader: false,
-        head: userTableHead,
-        rows: userTableRows
-      }) }}
-
-      {% if not userTableRows.length %}
-        <p class="govuk-body">No users match the current filters.</p>
-      {% endif %}
-
-      {% if pagination.totalPages > 1 %}
-        {{ govukPagination({
-          classes: "homepage-pagination",
-          items: pagination.items,
-          next: pagination.next,
-          previous: pagination.previous
+      <div class="users-table-wrapper">
+        {{ govukTable({
+          classes: "homepage-courts-table",
+          firstCellIsHeader: false,
+          head: userTableHead,
+          rows: userTableRows
         }) }}
-      {% endif %}
+
+        {% if not userTableRows.length %}
+          <p class="govuk-body">No users match the current filters.</p>
+        {% endif %}
+
+        {% if pagination.totalPages > 1 %}
+          {{ govukPagination({
+            classes: "homepage-pagination",
+            items: pagination.items,
+            next: pagination.next,
+            previous: pagination.previous
+          }) }}
+        {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}

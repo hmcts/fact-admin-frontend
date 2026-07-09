@@ -48,7 +48,7 @@ describe('Users routes', () => {
       },
       resultsMessage: 'Showing 1 to 1 of 2 users',
       users: [],
-      userTableHead: [{ text: 'Email' }, { text: 'SSO ID' }, { text: 'Last login' }, { text: 'Role(s)' }],
+      userTableHead: [{ text: 'Email' }, { text: 'SSO ID' }, { text: 'Last login' }, { text: 'Role' }],
       userTableRows: [
         [
           { text: 'admin@example.com' },
@@ -67,7 +67,7 @@ describe('Users routes', () => {
     expect(response.text).toContain('Email');
     expect(response.text).toContain('SSO ID');
     expect(response.text).toContain('Last login');
-    expect(response.text).toContain('Role(s)');
+    expect(response.text).toContain('Role');
     expect(response.text).toContain('admin@example.com');
     expect(response.text).toContain('Next');
   });

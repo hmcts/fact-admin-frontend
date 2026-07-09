@@ -22,6 +22,7 @@ import { LocalAuthoritiesPage } from './local-authorities.po';
 import { ProfessionalInformationPage } from './professional-information.po';
 import { SinglePointsOfEntryPage } from './single-points-of-entry.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
+import { UsersPage } from './users.po';
 
 export interface PageFixtures {
   determinePage: Page;
@@ -47,6 +48,7 @@ export interface PageFixtures {
   localAuthoritiesPage: LocalAuthoritiesPage;
   singlePointsOfEntryPage: SinglePointsOfEntryPage;
   professionalInformationPage: ProfessionalInformationPage;
+  usersPage: UsersPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -151,6 +153,10 @@ export const pageFixtures = {
   professionalInformationPage: async ({ determinePage }, use): Promise<void> => {
     const professionalInformationPage = new ProfessionalInformationPage(determinePage);
     await use(professionalInformationPage);
+  },
+  usersPage: async ({ determinePage }, use): Promise<void> => {
+    const usersPage = new UsersPage(determinePage);
+    await use(usersPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
