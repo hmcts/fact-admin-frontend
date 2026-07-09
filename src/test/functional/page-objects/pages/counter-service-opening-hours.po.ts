@@ -40,7 +40,11 @@ export class CounterServiceOpeningHoursPage extends Base {
   }
 
   async selectAppointmentNeeded(value: 'yes' | 'no'): Promise<void> {
-    await this.page.locator(`input[name="AppointmentNeeded"][value="${value}"]`).check();
+    await this.page.locator(`input[name="appointmentNeeded"][value="${value}"]`).check();
+  }
+
+  async selectNo(fieldName: string): Promise<void> {
+    await this.page.locator(`input[name="${fieldName}"][value="false"]`).check();
   }
 
   async fillAppointmentContact(contact: string): Promise<void> {

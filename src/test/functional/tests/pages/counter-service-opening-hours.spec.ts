@@ -44,7 +44,7 @@ test.describe(
           await counterServiceOpeningHoursPage.save();
 
           await expect(counterServiceOpeningHoursPage.successPanel).toContainText(
-            `Opening hours for ${createdCourt.name} have been successfully updated.`
+            `Counter service opening hours for ${createdCourt.name} have been successfully updated.`
           );
           await expect(counterServiceOpeningHoursPage.successPanel).toContainText(
             'Counter service opening hours saved'
@@ -77,9 +77,6 @@ test.describe(
           );
           await expect(counterServiceOpeningHoursPage.mainContent.content).toContainText('Forms');
           await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
-          await expect(counterServiceOpeningHoursPage.successPanel).toContainText(
-            'Counter service opening hours deleted'
-          );
           await expect(counterServiceOpeningHoursPage.successPanel).toContainText(
             'Counter service opening hours deleted'
           );
