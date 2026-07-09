@@ -7,6 +7,7 @@ const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_PARAM = 1000;
 const DEFAULT_SORT_ORDER = 'asc';
+const SEARCH_MAX_LENGTH = 254;
 const SEARCH_PATTERN = /^[A-Za-z0-9._+\-@]*$/;
 const VALID_SORT_BY_VALUES = ['lastLogin'] as const;
 const VALID_SORT_ORDER_VALUES = ['asc', 'desc'] as const;
@@ -34,7 +35,7 @@ export class UsersPageFiltersService {
   public validateFilters(filters: UsersPageFilters): UsersPageValidationError[] {
     const errors: UsersPageValidationError[] = [];
 
-    if (filters.search.length > 254 || !SEARCH_PATTERN.test(filters.search)) {
+    if (filters.search.length > SEARCH_MAX_LENGTH || !SEARCH_PATTERN.test(filters.search)) {
       errors.push({
         href: '#search',
         text: 'Search must only include letters, numbers, @ symbols, dots, underscores, plus signs and hyphens.',
