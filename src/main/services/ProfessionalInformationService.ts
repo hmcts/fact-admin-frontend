@@ -723,7 +723,7 @@ export class ProfessionalInformationService {
       const code = this.toString(form[`${codePrefix}-${index}`]);
       const description = this.toString(form[`${descriptionPrefix}-${index}`]);
       const descriptionCy = this.toString(form[`${descriptionCyPrefix}-${index}`]);
-      if (code || description || index === 0) {
+      if (code || description || descriptionCy || index === 0) {
         entries.push({ code, description, descriptionCy, formIndex: index });
       }
     }
@@ -745,7 +745,7 @@ export class ProfessionalInformationService {
         formIndex: index,
       })) ?? [];
 
-    return entries.length ? entries : [{ code: '', description: '', formIndex: 0 }];
+    return entries.length ? entries : [{ code: '', description: '', descriptionCy: '', formIndex: 0 }];
   }
 
   private toArray(value: string | string[] | undefined): string[] {
