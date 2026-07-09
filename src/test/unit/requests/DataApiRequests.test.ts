@@ -1,12 +1,14 @@
 import { HttpStatusCode } from 'axios';
 import sinon, { restore, stub } from 'sinon';
 
+const mockDataApiLogger = {
+  error: jest.fn(),
+  info: jest.fn(),
+};
+
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
-    getLogger: jest.fn().mockReturnValue({
-      error: jest.fn(),
-      info: jest.fn(),
-    }),
+    getLogger: jest.fn().mockReturnValue(mockDataApiLogger),
   },
 }));
 
@@ -36,6 +38,7 @@ describe('DataApiRequests', () => {
 
   beforeEach(() => {
     restore();
+    jest.clearAllMocks();
     getStub = stub(dataApi, 'get');
     postStub = stub(dataApi, 'post');
     putStub = stub(dataApi, 'put');
@@ -118,24 +121,43 @@ describe('DataApiRequests', () => {
     const courts = {
       content: [
         {
+          createdAt: '2026-04-29T09:00:00Z',
           id: '44444444-4444-4444-8444-444444444444',
-          isServiceCentre: false,
           lastUpdatedAt: '2026-04-29T10:00:00Z',
+          locationType: 'COURT',
+          mrdId: 'MRD-123',
           name: 'London Civil and Family Court',
           open: true,
+          openOnCath: true,
           regionId: '33333333-3333-4333-8333-333333333333',
+          serviceCentre: false,
           slug: 'london-civil-and-family-court',
+          warningNotice: null,
+        },
+        {
+          createdAt: '2026-04-29T09:30:00Z',
+          id: '55555555-5555-4555-8555-555555555555',
+          lastUpdatedAt: '2026-04-29T11:00:00Z',
+          locationType: 'SERVICE_CENTRE',
+          mrdId: null,
+          name: 'National Business Centre',
+          open: true,
+          openOnCath: null,
+          regionId: '33333333-3333-4333-8333-333333333333',
+          serviceCentre: true,
+          slug: 'national-business-centre',
+          warningNotice: null,
         },
       ],
       page: {
         number: 0,
         size: 25,
-        totalElements: 1,
+        totalElements: 2,
         totalPages: 1,
       },
     };
 
-    getStub.withArgs('/courts/v1', { params }).resolves({ data: courts });
+    getStub.withArgs('/all/v1', { params }).resolves({ data: courts });
 
     const response = await dataApiRequests.getCourts(params);
 
@@ -151,7 +173,7 @@ describe('DataApiRequests', () => {
       },
     };
 
-    getStub.withArgs('/courts/v1', { params: {} }).rejects(forbiddenError);
+    getStub.withArgs('/all/v1', { params: {} }).rejects(forbiddenError);
 
     const response = await dataApiRequests.getCourts();
 
@@ -159,7 +181,7 @@ describe('DataApiRequests', () => {
   });
 
   it('returns internal server error when the courts response fails schema validation', async () => {
-    getStub.withArgs('/courts/v1', { params: {} }).resolves({
+    getStub.withArgs('/all/v1', { params: {} }).resolves({
       data: {
         content: [
           {
@@ -185,7 +207,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: courtId,
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'London Civil and Family Court',
@@ -232,7 +253,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: courtName,
@@ -288,7 +308,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -308,7 +327,6 @@ describe('DataApiRequests', () => {
 
   it('returns parsed court details when create court succeeds', async () => {
     const payload = {
-      isServiceCentre: false,
       name: 'Reading Crown Court',
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
@@ -316,7 +334,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: null,
       name: payload.name,
@@ -337,7 +354,6 @@ describe('DataApiRequests', () => {
 
   it('returns a validation map when create court returns a 400', async () => {
     const payload = {
-      isServiceCentre: false,
       name: 'Reading Crown Court',
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
@@ -361,7 +377,6 @@ describe('DataApiRequests', () => {
 
   it('returns status code when create court fails with non-400 axios error', async () => {
     const payload = {
-      isServiceCentre: false,
       name: 'Reading Crown Court',
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
@@ -384,7 +399,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -421,7 +435,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -450,7 +463,6 @@ describe('DataApiRequests', () => {
     const court = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '55555555-5555-4555-8555-555555555555',
-      isServiceCentre: false,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
       mrdId: 'MRD-123',
       name: 'Updated London Civil and Family Court',
@@ -536,6 +548,220 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns parsed opening hour types when the response is valid', async () => {
+    const openingHourTypes = [
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Court open',
+        nameCy: 'Oriau agor y Llys',
+      },
+    ];
+
+    getStub.withArgs('/types/v1/opening-hours-types').resolves({ data: openingHourTypes });
+
+    const response = await dataApiRequests.getOpeningHourTypes();
+
+    expect(response).toEqual(openingHourTypes);
+  });
+
+  it('returns not found when fetching opening hour types fails with an axios status', async () => {
+    getStub.withArgs('/types/v1/opening-hours-types').rejects(errorResponse);
+
+    const response = await dataApiRequests.getOpeningHourTypes();
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when fetching opening hour types throws a non-axios error', async () => {
+    getStub.withArgs('/types/v1/opening-hours-types').rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.getOpeningHourTypes();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court opening hours when the response is valid', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHours = [
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        courtId,
+        openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+        openingHourType: {
+          id: '33333333-3333-4333-8333-333333333333',
+          name: 'Court open',
+          nameCy: 'Oriau agor y Llys',
+        },
+        openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({ data: openingHours, status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toEqual(openingHours);
+  });
+
+  it('returns no content when court opening hours endpoint returns 204', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns not found when fetching court opening hours fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when court opening hours response fails schema validation', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({
+      data: [{ courtId }],
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court opening hours by id when the response is valid', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+    const openingHours = {
+      id: openingHoursId,
+      courtId,
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).resolves({ data: openingHours });
+
+    const response = await dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+
+    expect(response).toEqual(openingHours);
+  });
+
+  it('returns not found when fetching court opening hours by id fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('saves court opening hours and returns the parsed response', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+    const savedOpeningHours = {
+      id: '22222222-2222-4222-8222-222222222222',
+      ...payload,
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).resolves({ data: savedOpeningHours });
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toEqual(savedOpeningHours);
+  });
+
+  it('returns no content when save court opening hours succeeds without a response body', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      id: '22222222-2222-4222-8222-222222222222',
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '16:30' }],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns validation errors map when save court opening hours endpoint returns 400', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      openingHourTypeId: '',
+      openingTimesDetails: [],
+    };
+    const apiErrors = {
+      openingHourTypeId: 'Select an opening hours type',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns not found when save court opening hours fails with a non-400 axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload = {
+      courtId,
+      openingHourTypeId: '33333333-3333-4333-8333-333333333333',
+      openingTimesDetails: [],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).rejects(errorResponse);
+
+    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns delete status when delete court opening hours succeeds', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub
+      .withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`)
+      .resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns not found when delete court opening hours fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const openingHoursId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
   it('returns ok when court areas of law are updated successfully', async () => {
     const payload = {
       areasOfLaw: ['66666666-6666-4666-8666-666666666666'],
@@ -571,7 +797,7 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.BadRequest);
   });
 
-  it('returns parsed court details when the bulk court response is valid', async () => {
+  it('returns parsed location details when the bulk location response is valid', async () => {
     const allCourts = [
       {
         id: '55555555-5555-4555-8555-555555555555',
@@ -743,6 +969,7 @@ describe('DataApiRequests', () => {
                 displayName: null,
                 displayNameCy: null,
               },
+              '77777777-7777-4777-8777-777777777777',
             ],
           },
         ],
@@ -755,25 +982,70 @@ describe('DataApiRequests', () => {
       },
     ];
 
-    getStub.withArgs('/courts/all/v1').resolves({ data: allCourts });
+    const allLocations = [
+      {
+        locationType: 'COURT',
+        serviceCentre: false,
+        court: allCourts[0],
+        serviceCentreDetails: null,
+      },
+      {
+        locationType: 'SERVICE_CENTRE',
+        serviceCentre: true,
+        court: null,
+        serviceCentreDetails: {
+          id: '88888888-8888-4888-8888-888888888888',
+          name: 'National Business Centre',
+          slug: 'national-business-centre',
+          open: true,
+          warningNotice: null,
+          createdAt: '2026-04-29T09:00:00Z',
+          lastUpdatedAt: '2026-04-29T10:00:00Z',
+          serviceAreas: [
+            {
+              id: '99999999-9999-4999-8999-999999999999',
+              name: 'Family',
+              nameCy: 'Teulu',
+            },
+            '10101010-1010-4010-8010-101010101010',
+          ],
+          catchmentType: 'NATIONAL',
+          serviceCentreAddresses: [],
+          serviceCentreContactDetails: [],
+          serviceCentreAreasOfLaw: [
+            {
+              areasOfLaw: ['11111111-1111-4111-8111-111111111111'],
+            },
+          ],
+        },
+      },
+    ];
 
-    const response = await dataApiRequests.getAllCourts();
+    getStub.withArgs('/all/details/v1').resolves({ data: allLocations });
+
+    const response = await dataApiRequests.getAllLocations();
 
     expect(response).toEqual([
       {
-        ...allCourts[0],
-        courtFacilities: [
-          {
-            ...allCourts[0].courtFacilities[0],
-            waitingArea: true,
-            waitingAreaChildren: false,
-          },
-        ],
+        ...allLocations[0],
+        court: {
+          ...allCourts[0],
+          courtFacilities: [
+            {
+              ...allCourts[0].courtFacilities[0],
+              waitingArea: true,
+              waitingAreaChildren: false,
+            },
+          ],
+        },
+      },
+      {
+        ...allLocations[1],
       },
     ]);
   });
 
-  it('returns bad request when the bulk court endpoint returns a 400', async () => {
+  it('returns bad request when the bulk location endpoint returns a 400', async () => {
     const badRequestError = {
       isAxiosError: true,
       response: {
@@ -782,15 +1054,15 @@ describe('DataApiRequests', () => {
       },
     };
 
-    getStub.withArgs('/courts/all/v1').rejects(badRequestError);
+    getStub.withArgs('/all/details/v1').rejects(badRequestError);
 
-    const response = await dataApiRequests.getAllCourts();
+    const response = await dataApiRequests.getAllLocations();
 
     expect(response).toBe(HttpStatusCode.BadRequest);
   });
 
-  it('returns internal server error when the bulk court response fails schema validation', async () => {
-    getStub.withArgs('/courts/all/v1').resolves({
+  it('returns internal server error when the bulk location response fails schema validation', async () => {
+    getStub.withArgs('/all/details/v1').resolves({
       data: [
         {
           name: 'Incomplete court',
@@ -798,7 +1070,7 @@ describe('DataApiRequests', () => {
       ],
     });
 
-    const response = await dataApiRequests.getAllCourts();
+    const response = await dataApiRequests.getAllLocations();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1363,6 +1635,66 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
 
+  it('returns parsed contact description types when response is valid', async () => {
+    const contactDescriptionTypes = [
+      {
+        id: '33333333-3333-4333-8333-333333333333',
+        name: 'Enquiries',
+      },
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Listing enquiries',
+      },
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
+      },
+    ];
+
+    getStub.withArgs('/types/v1/contact-description-types').resolves({ data: contactDescriptionTypes });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toEqual([
+      {
+        id: '33333333-3333-4333-8333-333333333333',
+        name: 'Enquiries',
+      },
+      {
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'General enquiries',
+      },
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        name: 'Listing enquiries',
+      },
+    ]);
+  });
+
+  it('returns internal server error when contact description types response fails schema validation', async () => {
+    getStub.withArgs('/types/v1/contact-description-types').resolves({
+      data: [{ name: 'Missing id' }],
+    });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns service unavailable when contact description types endpoint returns a 503', async () => {
+    getStub.withArgs('/types/v1/contact-description-types').rejects({
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: HttpStatusCode.ServiceUnavailable,
+      },
+    });
+
+    const response = await dataApiRequests.getContactDescriptionTypes();
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+  });
+
   it('returns parsed translation services when the response is valid', async () => {
     const courtId = '55555555-5555-4555-8555-555555555555';
     const translationServices = {
@@ -1576,6 +1908,106 @@ describe('DataApiRequests', () => {
     putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).rejects(new Error('Unexpected error'));
 
     const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed court single point of entry when response is valid', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const singlePointOfEntry = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        nameCy: 'Plant',
+        selected: true,
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).resolves({ data: singlePointOfEntry });
+
+    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+
+    expect(response).toEqual(singlePointOfEntry);
+  });
+
+  it('returns not found when court single point of entry endpoint returns a 404', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+
+    getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when court single point of entry response fails schema validation', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+
+    getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).resolves({
+      data: [{ name: 'Children' }],
+    });
+
+    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns ok when court single point of entry is updated successfully', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        selected: true,
+      },
+    ];
+
+    putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).resolves({ status: HttpStatusCode.Ok });
+
+    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns validation errors map when update court single point of entry endpoint returns a 400', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        selected: true,
+      },
+    ];
+    const apiErrors = {
+      Children: 'Invalid single point of entry setting',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: 400,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when update court single point of entry throws a non-axios error', async () => {
+    const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const payload = [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        name: 'Children',
+        selected: true,
+      },
+    ];
+
+    putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1844,6 +2276,519 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns parsed accessibility options when the response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const accessibility = {
+      id: '66666666-6666-4666-8666-666666666666',
+      courtId,
+      accessibleParking: true,
+      accessibleEntrance: true,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS',
+      lift: false,
+      quietRoom: true,
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/accessibility-options`).resolves({
+      data: accessibility,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getAccessibility(courtId);
+
+    expect(response).toEqual(
+      expect.objectContaining({
+        id: accessibility.id,
+        courtId,
+        hearingEnhancementEquipment: 'infrared',
+      })
+    );
+  });
+
+  it('returns null when accessibility options do not exist for the court', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/accessibility-options`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await dataApiRequests.getAccessibility(courtId);
+
+    expect(response).toBeNull();
+  });
+
+  it('returns internal server error when accessibility response fails schema validation', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/accessibility-options`).resolves({
+      data: {
+        id: '66666666-6666-4666-8666-666666666666',
+        courtId,
+        hearingEnhancementEquipment: 'INVALID_ENUM',
+      },
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getAccessibility(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('posts accessibility payload and returns parsed response', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      accessibleParking: true,
+      accessibleEntrance: true,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS' as const,
+      lift: false,
+      quietRoom: true,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).resolves({
+      data: {
+        id: '66666666-6666-4666-8666-666666666666',
+        ...payload,
+      },
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+
+    expect(response).toEqual(
+      expect.objectContaining({
+        id: '66666666-6666-4666-8666-666666666666',
+        courtId,
+        hearingEnhancementEquipment: 'infrared',
+      })
+    );
+  });
+
+  it('returns validation errors map when update accessibility endpoint returns a 400', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS' as const,
+    };
+    const apiErrors = {
+      hearingEnhancementEquipment: 'Invalid value',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when update accessibility throws a non-axios error', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      hearingEnhancementEquipment: 'INFRARED_SYSTEMS' as const,
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('creates court contact detail and returns response status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).resolves({ status: HttpStatusCode.Created });
+
+    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Created);
+  });
+
+  it('returns validation errors map when create contact detail endpoint returns a 400', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      courtContactDescriptionId: '',
+      courtId,
+      email: 'invalid-email',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+    const apiErrors = {
+      courtContactDescriptionId: 'Select a contact type',
+      email: 'Enter an email address in the correct format',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns conflict when create contact detail endpoint returns a non-400 axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
+  it('updates court contact detail and returns response status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload).resolves({
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns validation errors map when update contact detail endpoint returns a 400', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'invalid-email',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+    const apiErrors = {
+      email: 'Enter an email address in the correct format',
+      phoneNumber: 'Enter a phone number in the correct format',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns gone when update contact detail endpoint returns a non-400 axios error', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+    const payload = {
+      courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+      courtId,
+      email: 'contact@example.com',
+      explanation: 'For enquiries',
+      phoneNumber: '01234 567890',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'gone',
+        status: HttpStatusCode.Gone,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+
+    expect(response).toBe(HttpStatusCode.Gone);
+  });
+
+  it('returns parsed audit subject options when response is valid', async () => {
+    const responseBody = {
+      COURT: [{ id: '11111111-1111-4111-8111-111111111111', name: 'Reading Crown Court' }],
+      SERVICE_CENTRE: [{ id: '22222222-2222-4222-8222-222222222222', name: 'Birmingham Service Centre' }],
+    };
+
+    getStub.withArgs('/audits/subjectoptions/v1').resolves({ data: responseBody });
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toEqual(
+      new Map([
+        ['COURT', [{ id: '11111111-1111-4111-8111-111111111111', name: 'Reading Crown Court' }]],
+        ['SERVICE_CENTRE', [{ id: '22222222-2222-4222-8222-222222222222', name: 'Birmingham Service Centre' }]],
+      ])
+    );
+  });
+
+  it('returns internal server error and logs when audit subject options response fails schema validation', async () => {
+    getStub.withArgs('/audits/subjectoptions/v1').resolves({
+      data: {
+        COURT: [{ id: 'not-a-uuid', name: 'Invalid Court' }],
+      },
+    });
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', expect.anything());
+  });
+
+  it('returns axios status and logs when audit subject options endpoint errors', async () => {
+    const badGatewayError = {
+      isAxiosError: true,
+      response: {
+        data: 'bad gateway',
+        status: HttpStatusCode.BadGateway,
+      },
+    };
+
+    getStub.withArgs('/audits/subjectoptions/v1').rejects(badGatewayError);
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toBe(HttpStatusCode.BadGateway);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', badGatewayError);
+  });
+
+  it('returns internal server error and logs when audit subject options endpoint throws non-axios error', async () => {
+    const nonAxiosError = new Error('Unexpected subject options error');
+    getStub.withArgs('/audits/subjectoptions/v1').rejects(nonAxiosError);
+
+    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', nonAxiosError);
+  });
+
+  it('returns parsed paged audits when response is valid', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+      toDate: '2026-06-26',
+      email: 'admin@example.com',
+      subjectType: 'COURT',
+      courtId: '11111111-1111-4111-8111-111111111111',
+      serviceCentreId: undefined,
+    };
+    const audits = {
+      content: [
+        {
+          id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          subjectId: '11111111-1111-4111-8111-111111111111',
+          subjectType: 'COURT',
+          userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          user: {
+            email: 'admin@example.com',
+            favouriteCourts: null,
+            id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+            lastLogin: '2026-06-26T09:10:11.123Z',
+            role: 'SUPER_ADMIN',
+            ssoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+          },
+          actionType: 'UPDATE',
+          actionEntity: 'court',
+          actionDataDiff: null,
+          createdAt: '2026-06-26T09:10:11.123Z',
+        },
+      ],
+      page: {
+        number: 0,
+        size: 25,
+        totalElements: 1,
+        totalPages: 1,
+      },
+    };
+
+    getStub.withArgs('/audits/v1', { params }).resolves({ data: audits });
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toEqual(audits);
+  });
+
+  it('returns internal server error and logs when audits response fails schema validation', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+    };
+
+    getStub.withArgs('/audits/v1', { params }).resolves({
+      data: {
+        content: [{ id: 'missing-required-fields' }],
+        page: {
+          number: 0,
+          size: 25,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', expect.anything());
+  });
+
+  it('returns axios status and logs when audits endpoint errors', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+    };
+    const serviceUnavailableError = {
+      isAxiosError: true,
+      response: {
+        data: 'service unavailable',
+        status: HttpStatusCode.ServiceUnavailable,
+      },
+    };
+
+    getStub.withArgs('/audits/v1', { params }).rejects(serviceUnavailableError);
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', serviceUnavailableError);
+  });
+
+  it('returns internal server error and logs when audits endpoint throws non-axios error', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-20',
+    };
+    const nonAxiosError = new Error('Unexpected audits error');
+
+    getStub.withArgs('/audits/v1', { params }).rejects(nonAxiosError);
+
+    const response = await dataApiRequests.getAudits(params);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', nonAxiosError);
+  });
+
+  it('returns parsed audit by id when response is valid', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const audit = {
+      id: auditId,
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT',
+      userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      user: {
+        email: 'admin@example.com',
+        favouriteCourts: null,
+        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        lastLogin: '2026-06-26T09:10:11.123Z',
+        role: 'SUPER_ADMIN',
+        ssoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      },
+      actionType: 'UPDATE',
+      actionEntity: 'court',
+      actionDataDiff: null,
+      createdAt: '2026-06-26T09:10:11.123Z',
+    };
+
+    getStub.withArgs(`/audits/${auditId}/v1`).resolves({ data: audit });
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toEqual(audit);
+  });
+
+  it('returns internal server error and logs when audit by id response fails schema validation', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+    getStub.withArgs(`/audits/${auditId}/v1`).resolves({
+      data: {
+        id: auditId,
+      },
+    });
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      expect.anything()
+    );
+  });
+
+  it('returns axios status and logs when audit by id endpoint errors', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const notFoundError = {
+      isAxiosError: true,
+      response: {
+        data: 'not found',
+        status: HttpStatusCode.NotFound,
+      },
+    };
+
+    getStub.withArgs(`/audits/${auditId}/v1`).rejects(notFoundError);
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      notFoundError
+    );
+  });
+
+  it('returns internal server error and logs when audit by id endpoint throws non-axios error', async () => {
+    const auditId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const nonAxiosError = new Error('Unexpected audit by id error');
+
+    getStub.withArgs(`/audits/${auditId}/v1`).rejects(nonAxiosError);
+
+    const response = await dataApiRequests.getAuditById(auditId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching audit details for id ${auditId}:`,
+      nonAxiosError
+    );
+  });
+
   it('returns parsed counter service opening hours when the response is valid', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const counterServiceId = '22222222-2222-4222-8222-222222222222';
@@ -1851,6 +2796,7 @@ describe('DataApiRequests', () => {
       id: counterServiceId,
       courtId,
       counterService: true,
+      courtTypes: [],
       assistWithForms: true,
       assistWithDocuments: true,
       assistWithSupport: true,
@@ -1895,7 +2841,7 @@ describe('DataApiRequests', () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`).resolves({
-      data: [courtId],
+      data: [{ courtId }],
       status: HttpStatusCode.Ok,
     });
 
@@ -1911,17 +2857,17 @@ describe('DataApiRequests', () => {
       id: counterServiceId,
       courtId,
       counterService: true,
+      courtTypes: [],
       assistWithForms: true,
-      assistWithDocuments: true,
-      assistWithSupport: true,
-      appointmentNeeded: true,
-      appointmentContact: 'test@test.com',
+      assistWithDocuments: false,
+      assistWithSupport: false,
+      appointmentNeeded: false,
+      appointmentContact: null,
       openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
     };
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`).resolves({
       data: counterServiceOpeningHours,
-      status: HttpStatusCode.Ok,
     });
 
     const response = await dataApiRequests.getCounterServiceOpeningHoursById(courtId, counterServiceId);
@@ -1940,24 +2886,9 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.NotFound);
   });
 
-  it('returns internal server error when counter service opening hours by id response fails schema validation', async () => {
-    const courtId = '11111111-1111-4111-8111-111111111111';
-    const counterServiceId = '22222222-2222-4222-8222-222222222222';
-
-    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`).resolves({
-      data: [courtId],
-      status: HttpStatusCode.Ok,
-    });
-
-    const response = await dataApiRequests.getCounterServiceOpeningHoursById(courtId, counterServiceId);
-
-    expect(response).toBe(HttpStatusCode.InternalServerError);
-  });
-
   it('saves counter service opening hours and returns parsed response', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const counterServiceId = '22222222-2222-4222-8222-222222222222';
-
     const payload: Partial<CounterServiceOpeningHours> = {
       courtId,
       counterService: true,
@@ -1968,11 +2899,9 @@ describe('DataApiRequests', () => {
       appointmentContact: 'test@test.com',
       openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
     };
-
     const saveResponse = {
       id: counterServiceId,
       ...payload,
-      counterService: true,
       courtTypes: [],
     };
 
@@ -1988,7 +2917,6 @@ describe('DataApiRequests', () => {
 
   it('returns status code when save counter service opening hours returns 2xx with no data', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
-
     const payload: Partial<CounterServiceOpeningHours> = {
       courtId,
       counterService: true,
@@ -2012,7 +2940,6 @@ describe('DataApiRequests', () => {
 
   it('returns validation errors map when save counter service opening hours returns 400', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
-
     const payload: Partial<CounterServiceOpeningHours> = {
       courtId,
       assistWithForms: false,
@@ -2022,7 +2949,6 @@ describe('DataApiRequests', () => {
       appointmentContact: null,
       openingTimesDetails: [],
     };
-
     const apiErrors = {
       assistWithForms: 'Select what the counter can assist with',
     };
@@ -2042,7 +2968,6 @@ describe('DataApiRequests', () => {
 
   it('returns not found when save counter service opening hours fails with an axios status', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
-
     const payload: Partial<CounterServiceOpeningHours> = {
       courtId,
       assistWithForms: true,
@@ -2062,7 +2987,6 @@ describe('DataApiRequests', () => {
 
   it('returns internal server error when save counter service opening hours throws a non-axios error', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
-
     const payload: Partial<CounterServiceOpeningHours> = {
       courtId,
       assistWithForms: true,
@@ -2095,7 +3019,7 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.Ok);
   });
 
-  it('returns not found when deletes counter service opening hours fails with and axios status code', async () => {
+  it('returns not found when delete counter service opening hours fails with an axios status code', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const counterServiceId = '22222222-2222-4222-8222-222222222222';
 
@@ -2108,7 +3032,7 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.NotFound);
   });
 
-  it('returns internal server error when delete counter service opening hours throws a nom-axios error', async () => {
+  it('returns internal server error when delete counter service opening hours throws a non-axios error', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const counterServiceId = '22222222-2222-4222-8222-222222222222';
 
