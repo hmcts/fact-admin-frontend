@@ -101,6 +101,6 @@ export class CounterServiceOpeningHoursPage extends Base {
   }
 
   buildListUrl(courtId: string): string {
-    return config.urls.homePageUrl + `/courts/${courtId}/edit/counter-service--opening-hours`;
+    return config.urls.homePageUrl + `/courts/${courtId}/edit/counter-service-opening-hours`;
   }
 }
