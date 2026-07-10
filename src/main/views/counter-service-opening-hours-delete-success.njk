@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-  {{ successPanel("Counter service opening hours deleted", assistanceAvailable) }}
+  {{ successPanel("Opening hours deleted", assistanceAvailable) }}
 
   <p class="govuk-body govuk-!-text-align-center govuk-!-margin-bottom-6">
      You have removed this counter service opening hour for {{ courtName }}.
@@ -14,6 +14,6 @@
 
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li><a href="/courts/{{ courtId }}/edit/counter-service-opening-hours" class="govuk-link govuk-link--no-visited-state">Back to counter service opening hours</a></li>
+    <li><a href="/courts/{{ courtId }}/edit/counter-service-opening-hours" class="govuk-link govuk-link--no-visited-state">Back to Counter service opening hours</a></li>
   </ul>
 {% endblock %}

@@ -77,9 +77,7 @@ test.describe(
           );
           await expect(counterServiceOpeningHoursPage.mainContent.content).toContainText('Forms');
           await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
-          await expect(counterServiceOpeningHoursPage.successPanel).toContainText(
-            'Counter service opening hours deleted'
-          );
+          await expect(counterServiceOpeningHoursPage.successPanel).toContainText('Opening hours deleted');
           await expect(counterServiceOpeningHoursPage.successPanel).toContainText('Forms');
           await expect(counterServiceOpeningHoursPage.mainContent.content).toContainText(
             `You have removed this counter service opening hour for ${createdCourt.name}.`
