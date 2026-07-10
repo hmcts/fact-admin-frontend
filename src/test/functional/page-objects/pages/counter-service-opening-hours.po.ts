@@ -15,7 +15,7 @@ export class CounterServiceOpeningHoursPage extends Base {
   constructor(page: Page) {
     super(page);
     this.addCounterServiceButton = this.page.getByRole('button', { name: 'Add opening hours' });
-    this.backToCounterServiceLink = this.page.getByRole('link', { name: 'Back to counter service opening hours' });
+    this.backToCounterServiceLink = this.page.getByRole('link', { name: 'Back to Counter service opening hours' });
     this.deleteOpeningHoursButton = this.page.getByRole('button', { name: 'Delete opening hours' });
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.counterServiceTable = this.page.getByRole('table');
@@ -41,10 +41,6 @@ export class CounterServiceOpeningHoursPage extends Base {
 
   async selectAppointmentNeeded(value: 'yes' | 'no'): Promise<void> {
     await this.page.locator(`input[name="appointmentNeeded"][value="${value}"]`).check();
-  }
-
-  async selectNo(fieldName: string): Promise<void> {
-    await this.page.locator(`input[name="${fieldName}"][value="false"]`).check();
   }
 
   async fillAppointmentContact(contact: string): Promise<void> {

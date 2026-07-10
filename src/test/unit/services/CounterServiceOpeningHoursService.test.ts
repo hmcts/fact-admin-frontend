@@ -65,7 +65,6 @@ describe('CounterServiceOpeningHoursService', () => {
     expect(service.getSelectedDays(undefined)).toEqual([]);
   });
 
-  // getListPage;
   test('getListPage returns status when court lookup fails', async () => {
     const { service } = buildService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
@@ -111,7 +110,6 @@ describe('CounterServiceOpeningHoursService', () => {
     });
   });
 
-  // getEditList
   test('getEditPage returns status when court lookup fails', async () => {
     const { service } = buildService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
@@ -328,7 +326,6 @@ describe('CounterServiceOpeningHoursService', () => {
     expect(result).toMatchObject({ status: HttpStatusCode.NotFound, type: 'status' });
   });
 
-  //v
   test('requires at least one assistance type', async () => {
     const { saveCounterServiceOpeningHours, service } = buildService();
 

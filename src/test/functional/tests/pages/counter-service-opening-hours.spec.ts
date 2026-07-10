@@ -35,7 +35,6 @@ test.describe(
         'Counter Service Opening Hours Functional Test',
         {},
         async ({ createdCourt }) => {
-          //Add
           await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
           await counterServiceOpeningHoursPage.selectAssistWith('Forms');
           await counterServiceOpeningHoursPage.selectAppointmentNeeded('no');
@@ -56,7 +55,6 @@ test.describe(
             'Monday to Friday: 9am to 5pm'
           );
 
-          //Edit
           await counterServiceOpeningHoursPage.clickFirstEditLink();
           await counterServiceOpeningHoursPage.selectSameTime();
           await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '16', '30');
@@ -70,7 +68,6 @@ test.describe(
             'Monday to Friday: 9am to 4:30pm'
           );
 
-          //Delete
           await counterServiceOpeningHoursPage.clickFirstDeleteLink();
           await expect(counterServiceOpeningHoursPage.heading).toContainText(
             'Are you sure you want to delete these opening hours?'

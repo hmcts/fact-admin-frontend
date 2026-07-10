@@ -5,7 +5,6 @@ export const courtEntitySchema = z.object({
   id: z.string(),
   lastUpdatedAt: z.string(),
   mrdId: z.string().nullable(),
-  isServiceCentre: z.boolean().optional(),
   name: z.string(),
   open: z.boolean(),
   openOnCath: z.boolean().nullable(),
