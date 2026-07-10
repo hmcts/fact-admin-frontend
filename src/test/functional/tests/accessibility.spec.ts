@@ -500,6 +500,8 @@ test.describe(
           await counterServiceOpeningHoursPage.selectSameTime();
           await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
           await counterServiceOpeningHoursPage.save();
+          await counterServiceOpeningHoursPage.clickBackToCounterService();
+          await counterServiceOpeningHoursPage.clickFirstDeleteLink();
           await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
           await axeUtils.audit();
         }
