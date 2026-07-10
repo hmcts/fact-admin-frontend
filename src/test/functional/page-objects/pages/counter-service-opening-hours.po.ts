@@ -51,6 +51,12 @@ export class CounterServiceOpeningHoursPage extends Base {
     await this.page.locator('#appointmentContact').fill(contact);
   }
 
+  counterServiceRow(assistanceAvailable: string): Locator {
+    return this.counterServiceTable.locator('tbody tr').filter({
+      has: this.page.getByRole('cell', { name: assistanceAvailable, exact: true }),
+    });
+  }
+
   async selectSameTime(): Promise<void> {
     await this.page.locator('input[name="sameTime"][value="yes"]').check();
   }
