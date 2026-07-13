@@ -1,5 +1,6 @@
 export type GetCourtsParams = {
   includeClosed?: boolean;
+  onlyServiceCentres?: boolean;
   pageNumber?: number;
   pageSize?: number;
   partialCourtName?: string;

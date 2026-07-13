@@ -31,6 +31,19 @@ test.describe(
       await axeUtils.audit();
     });
 
+    test('Add Service Centre Page Accessibility', async ({ addServiceCentrePage, axeUtils }) => {
+      await addServiceCentrePage.goto();
+      await addServiceCentrePage.expectVisibleElements();
+      await axeUtils.audit();
+    });
+
+    test('Add Service Centre Validation Accessibility', async ({ addServiceCentrePage, axeUtils }) => {
+      await addServiceCentrePage.goto();
+      await addServiceCentrePage.submitInvalidServiceCentre();
+      await expect(addServiceCentrePage.mainContent.content).toContainText('There is a problem');
+      await axeUtils.audit();
+    });
+
     test('Court Edit Page Accessibility', async ({ axeUtils, courtEditPage, playwright }) => {
       await withCreatedCourt(playwright, 'Court Edit Accessibility Test', {}, async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);

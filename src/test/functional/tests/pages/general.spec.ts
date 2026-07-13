@@ -111,7 +111,7 @@ test.describe('General Page Tests', () => {
       await generalPage.mainContent.content.getByRole('link', { name: 'Home' }).click();
 
       expect(new URL(generalPage.page.url()).pathname).toBe('/');
-      await expect(generalPage.heading).toContainText('Courts and tribunals');
+      await expect(generalPage.heading).toContainText('Courts, tribunals and service centres');
     });
   });
 

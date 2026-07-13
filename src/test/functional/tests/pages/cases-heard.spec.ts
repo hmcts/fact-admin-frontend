@@ -181,7 +181,7 @@ test.describe('Cases Heard Page Tests', () => {
       await casesHeardPage.save();
       await casesHeardPage.mainContent.content.getByRole('link', { name: 'Home' }).click();
       expect(new URL(casesHeardPage.page.url()).pathname).toBe('/');
-      await expect(casesHeardPage.heading).toContainText('Courts and tribunals');
+      await expect(casesHeardPage.heading).toContainText('Courts, tribunals and service centres');
     });
   });
 

@@ -8,6 +8,7 @@ describe('Home View', () => {
       errorSummary: [],
       filters: {
         includeClosed: false,
+        onlyServiceCentres: false,
         pageNumber: 0,
         pageSize: 25,
         partialCourtName: '',
@@ -17,7 +18,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
-      pageTitle: 'Courts and tribunals',
+      pageTitle: 'Courts, tribunals and service centres',
       pagination: {
         currentPage: 0,
         items: [],
@@ -25,24 +26,27 @@ describe('Home View', () => {
       },
       partialCourtNameError: undefined,
       regionOptions: [{ selected: true, text: 'All regions', value: '' }],
-      resultsMessage: 'No courts found.',
+      resultsMessage: 'No courts, tribunals or service centres found.',
     });
 
-    expect(html).toContain('Courts and tribunals');
+    expect(html).toContain('Courts, tribunals and service centres');
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
-    expect(html).toContain('No courts found.');
-    expect(html).toContain('No courts match the current filters.');
+    expect(html).toContain('Search courts, tribunals and service centres');
+    expect(html).toContain('Only show service centres');
+    expect(html).toContain('No courts, tribunals or service centres found.');
+    expect(html).toContain('No courts, tribunals or service centres match the current filters.');
   });
 
   test('renders error summary and pagination when provided', () => {
     const html = env.render('home.njk', {
       courtTableHead: [{ text: 'Name' }, { text: 'Actions' }],
       courtTableRows: [[{ text: 'Reading Crown Court' }, { text: 'Edit' }]],
-      errorMessage: 'There was a problem loading courts.',
+      errorMessage: 'There was a problem loading courts, tribunals and service centres.',
       errorSummary: [{ href: '#partialCourtName', text: 'Enter a court name' }],
       filters: {
         includeClosed: false,
+        onlyServiceCentres: false,
         pageNumber: 0,
         pageSize: 25,
         partialCourtName: 'Reading',
@@ -52,7 +56,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
-      pageTitle: 'Courts and tribunals',
+      pageTitle: 'Courts, tribunals and service centres',
       pagination: {
         currentPage: 0,
         items: [
@@ -64,12 +68,12 @@ describe('Home View', () => {
       },
       partialCourtNameError: 'Enter a court name',
       regionOptions: [{ selected: true, text: 'All regions', value: '' }],
-      resultsMessage: 'Showing 1 to 1 of 1 courts',
+      resultsMessage: 'Showing 1 to 1 of 1 courts, tribunals and service centres',
     });
 
     expect(html).toContain('There is a problem');
     expect(html).toContain('Enter a court name');
-    expect(html).toContain('There was a problem loading courts.');
+    expect(html).toContain('There was a problem loading courts, tribunals and service centres.');
     expect(html).toContain('href="/?pageNumber=1"');
   });
 });

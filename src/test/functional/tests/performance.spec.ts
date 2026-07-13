@@ -68,6 +68,10 @@ test.describe(
         );
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
+    test('Add Service Centre Page Performance', async ({ addServiceCentrePage, lighthouseUtils }) => {
+      await addServiceCentrePage.goto();
+      await addServiceCentrePage.header.checkIsVisible();
+      await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
     test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
