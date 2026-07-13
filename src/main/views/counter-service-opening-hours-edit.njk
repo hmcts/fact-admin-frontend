@@ -96,8 +96,8 @@
             },
             value: form.appointmentContact,
             errorMessage: {
-              text: form.errors.appointmentContact[0]
-            } if form.errors and form.errors.appointmentContact else null
+              text: errors.appointmentContact
+            } if errors.appointmentContact else null
           }) }}
       {% endset %}
 
@@ -164,7 +164,7 @@
             }
           ],
           errorMessage: {
-            text: error.assistWith
+            text: errors.assistWith
           }  if errors.assistWith else null
         }) }}
 
@@ -195,7 +195,7 @@
           ],
           errorMessage: {
             text: errors.appointmentNeeded
-          } if errors and form.errors.appointmentNeeded else null
+          } if errors and errors.appointmentNeeded else null
         }) }}
 
         <h3 class="govuk-heading-s">Enter opening hours</h3>

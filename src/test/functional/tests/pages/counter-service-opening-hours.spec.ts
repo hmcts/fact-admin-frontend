@@ -81,7 +81,7 @@ test.describe(
           );
 
           await counterServiceOpeningHoursPage.clickBackToCounterService();
-          await expect(counterServiceOpeningHoursPage.counterServiceRow('Froms')).toHaveCount(0);
+          await expect(counterServiceOpeningHoursPage.counterServiceRow('Forms')).toHaveCount(0);
         }
       );
     });

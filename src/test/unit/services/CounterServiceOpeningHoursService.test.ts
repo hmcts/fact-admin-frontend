@@ -534,4 +534,40 @@ describe('CounterServiceOpeningHoursService', () => {
       assistanceAvailable: 'Forms',
     });
   });
+
+  test('rejects invalid email address for appointment contact', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'yes',
+      appointmentContact: 'not-a-valid-email',
+    });
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCounterServiceOpeningHours).not.toHaveBeenCalled();
+    expect((result as ValidationErrorResult).viewModel.errorSummary).toContainEqual({
+      href: '#appointmentContact',
+      text: 'Enter a valid contact email address',
+    });
+  });
+
+  test('accepts valid email address for appointment contact', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService({
+      saveCounterServiceOpeningHours: jest.fn().mockResolvedValue({
+        ...existingRecord,
+        appointmentNeeded: true,
+        appointmentContact: 'test@test.com',
+      }),
+    });
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'yes',
+      appointmentContact: 'test@test.com',
+    });
+
+    expect(result.type).toBe('success');
+    expect(saveCounterServiceOpeningHours).toHaveBeenCalled();
+  });
 });

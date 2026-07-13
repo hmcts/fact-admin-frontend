@@ -79,6 +79,9 @@ const days: Day[] = [
   { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
   { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
 ];
+
+const EMAIL_PATTERN = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+
 export class CounterServiceOpeningHoursService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
@@ -306,8 +309,11 @@ export class CounterServiceOpeningHoursService {
       errors.appointmentNeeded = 'Select yes if an appointment is needed';
     }
 
-    if (form.appointmentNeeded === 'yes' && !form.appointmentContact) {
-      errors.appointmentNeeded = 'Enter a contact email address';
+    if (
+      form.appointmentNeeded === 'yes' &&
+      (!form.appointmentContact || !EMAIL_PATTERN.test(form.appointmentContact))
+    ) {
+      errors.appointmentContact = 'Enter a valid contact email address';
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
