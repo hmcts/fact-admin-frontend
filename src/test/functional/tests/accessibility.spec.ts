@@ -16,6 +16,13 @@ test.describe(
       await axeUtils.audit();
     });
 
+    test('Users Page Accessibility', async ({ axeUtils, usersPage }) => {
+      await usersPage.goto();
+      await usersPage.expectVisibleElements();
+      await usersPage.expectTableHeadings();
+      await axeUtils.audit();
+    });
+
     test('Add Court Page Accessibility', async ({ addCourtPage, axeUtils }) => {
       await addCourtPage.goto();
       await addCourtPage.expectVisibleElements();

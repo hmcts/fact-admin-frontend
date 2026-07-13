@@ -23,6 +23,12 @@ test.describe(
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
+    test('Users Page Performance', async ({ lighthouseUtils, usersPage }) => {
+      await usersPage.goto();
+      await usersPage.header.checkIsVisible();
+      await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+    });
+
     test('Add Court Page Performance', async ({ addCourtPage, lighthouseUtils }) => {
       await addCourtPage.goto();
       await addCourtPage.header.checkIsVisible();

@@ -23,7 +23,7 @@ describe('Accessibility page', () => {
     expect(response.text).toContain('aria-label="Breadcrumb"');
     expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
     expect(response.text).toContain(
-      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Reading Crown Court</a>`
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Edit Reading Crown Court</a>`
     );
   });
 
@@ -115,7 +115,7 @@ describe('Accessibility page', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('There is a problem');
     expect(response.text).toContain('Enter the lift door width');
-    expect(response.text).toContain('Enter the lift door limit');
+    expect(response.text).toContain('Enter the lift weight limit');
     expect(response.text).toContain('Enter a description of the accessible toilet facilities');
     expect(updateAccessibilityStub.notCalled).toBe(true);
   });
