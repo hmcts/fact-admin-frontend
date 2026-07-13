@@ -21,12 +21,22 @@ describe('ServiceCentreEditController', () => {
       name: 'Reading Service Centre',
     } as never);
 
-    responseMock.expects('render').once().withArgs('service-centre-edit', {
-      pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-      pageTitle: 'Editing - Reading Service Centre',
-      serviceCentreName: 'Reading Service Centre',
-      serviceCentreId: '22222222-2222-4222-8222-222222222222',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('service-centre-edit', {
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          {
+            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+            text: 'Edit Reading Service Centre',
+          },
+        ],
+        pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+        pageTitle: 'Editing - Reading Service Centre',
+        serviceCentreName: 'Reading Service Centre',
+        serviceCentreId: '22222222-2222-4222-8222-222222222222',
+      });
 
     try {
       await controller.get(request, response);
