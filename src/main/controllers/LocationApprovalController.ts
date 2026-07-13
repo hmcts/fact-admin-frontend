@@ -55,7 +55,7 @@ export class LocationApprovalController {
       return;
     }
 
-    res.render(this.options.editView, {
+    return res.render(this.options.editView, {
       ...approvalAction,
       ...(this.options.buildBreadcrumbs
         ? { breadcrumbs: this.options.buildBreadcrumbs(locationId, location.name) }
@@ -78,7 +78,7 @@ export class LocationApprovalController {
       return;
     }
 
-    res.render('approval-confirm', {
+    return res.render('approval-confirm', {
       ...approveData,
       pagePath: `${approveData.editPath}/approve`,
     });
@@ -97,9 +97,7 @@ export class LocationApprovalController {
     }
 
     if (!userId) {
-      res.status(HttpStatusCode.InternalServerError);
-      res.render('error');
-      return;
+      return res.status(HttpStatusCode.InternalServerError).render('error');
     }
 
     const location = await this.options.getLocation(locationId);
@@ -120,10 +118,14 @@ export class LocationApprovalController {
       return;
     }
 
-    res.render('approval-success', {
-      ...approveData,
+    return res.render('common-edit-success', {
+      continueUpdatingHref: approveData.editPath,
+      continueUpdatingText: `Back to ${isViewer(req) ? 'Reviewing' : 'Editing'} - ${location.name}`,
+      homeText: 'Back to Courts, tribunals and service centres list',
       pagePath: `${approveData.editPath}/approve`,
       pageTitle: `Approval saved - ${location.name}`,
+      successPanelBody: `You have approved the data for ${location.name}. If this was done in error please contact the NSU. nationalsupportunit@justice.gov.uk`,
+      successPanelTitle: 'Approval saved',
     });
   }
 
@@ -160,8 +162,7 @@ export class LocationApprovalController {
       return false;
     }
 
-    res.status(location);
-    res.render(location === HttpStatusCode.NotFound ? this.options.notFoundView : 'error');
+    res.status(location).render(location === HttpStatusCode.NotFound ? this.options.notFoundView : 'error');
     return true;
   }
 
@@ -173,8 +174,7 @@ export class LocationApprovalController {
       return false;
     }
 
-    res.status(response);
-    res.render(response === HttpStatusCode.NotFound ? 'not-found' : 'error');
+    res.status(response).render(response === HttpStatusCode.NotFound ? 'not-found' : 'error');
     return true;
   }
 
@@ -183,8 +183,7 @@ export class LocationApprovalController {
       return true;
     }
 
-    res.status(HttpStatusCode.Forbidden);
-    res.render('access-denied');
+    res.status(HttpStatusCode.Forbidden).render('access-denied');
     return false;
   }
 
@@ -193,8 +192,7 @@ export class LocationApprovalController {
     const locationId = Array.isArray(locationIdParam) ? locationIdParam[0] : locationIdParam;
 
     if (!locationId || !isUuid(locationId)) {
-      res.status(HttpStatusCode.NotFound);
-      res.render(this.options.notFoundView);
+      res.status(HttpStatusCode.NotFound).render(this.options.notFoundView);
       return undefined;
     }
 

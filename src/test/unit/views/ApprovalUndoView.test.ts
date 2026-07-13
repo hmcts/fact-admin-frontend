@@ -16,10 +16,14 @@ describe('Approval Undo Views', () => {
   });
 
   test('renders undo approval success page', () => {
-    const html = env.render('approval-undo-success.njk', {
-      name: 'Reading Crown Court',
+    const html = env.render('common-edit-success.njk', {
+      continueUpdatingHref: '/approvals',
+      continueUpdatingText: 'Back to Approval tracker',
+      homeText: 'Back to Courts, tribunals and service centres list',
       pagePath: '/approvals/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/undo',
       pageTitle: 'Approval undone - Reading Crown Court',
+      successPanelBody: 'You have undone the data approval for Reading Crown Court.',
+      successPanelTitle: 'Approval undone',
     });
 
     expect(html).toContain('You have undone the data approval for Reading Crown Court.');

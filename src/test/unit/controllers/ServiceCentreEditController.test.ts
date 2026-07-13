@@ -114,7 +114,7 @@ describe('ServiceCentreEditController', () => {
 
     expect(createApproval.calledOnce).toBe(true);
     expect(response.render).toHaveBeenCalledWith(
-      'approval-success',
+      'common-edit-success',
       expect.objectContaining({ pageTitle: 'Approval saved - National Business Centre' })
     );
   });

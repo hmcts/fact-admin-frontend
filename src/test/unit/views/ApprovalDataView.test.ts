@@ -23,13 +23,15 @@ describe('Approval Data View', () => {
   });
 
   test('renders approve data success page', () => {
-    const html = env.render('approval-success.njk', {
-      editPath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-      name: 'Birmingham Service Centre',
+    const html = env.render('common-edit-success.njk', {
+      continueUpdatingHref: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+      continueUpdatingText: 'Back to Editing - Birmingham Service Centre',
+      homeText: 'Back to Courts, tribunals and service centres list',
       pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
       pageTitle: 'Approval saved - Birmingham Service Centre',
-      subjectId: '22222222-2222-4222-8222-222222222222',
-      subjectType: 'SERVICE_CENTRE',
+      successPanelBody:
+        'You have approved the data for Birmingham Service Centre. If this was done in error please contact the NSU. nationalsupportunit@justice.gov.uk',
+      successPanelTitle: 'Approval saved',
     });
 
     expect(html).toContain(
@@ -41,14 +43,15 @@ describe('Approval Data View', () => {
   });
 
   test('renders viewer review wording on the approval success page', () => {
-    const html = env.render('approval-success.njk', {
-      editPath: '/courts/11111111-1111-4111-8111-111111111111/edit',
-      isViewer: true,
-      name: 'Reading Crown Court',
+    const html = env.render('common-edit-success.njk', {
+      continueUpdatingHref: '/courts/11111111-1111-4111-8111-111111111111/edit',
+      continueUpdatingText: 'Back to Reviewing - Reading Crown Court',
+      homeText: 'Back to Courts, tribunals and service centres list',
       pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',
       pageTitle: 'Approval saved - Reading Crown Court',
-      subjectId: '11111111-1111-4111-8111-111111111111',
-      subjectType: 'COURT',
+      successPanelBody:
+        'You have approved the data for Reading Crown Court. If this was done in error please contact the NSU. nationalsupportunit@justice.gov.uk',
+      successPanelTitle: 'Approval saved',
     });
 
     expect(html).toContain('Back to Reviewing - Reading Crown Court');

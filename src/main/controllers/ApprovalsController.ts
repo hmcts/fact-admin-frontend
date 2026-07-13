@@ -21,7 +21,7 @@ export default class ApprovalsController {
       return;
     }
 
-    res.render('approvals', viewModel);
+    return res.render('approvals', viewModel);
   }
 
   @route('/:approvalId/undo')
@@ -42,7 +42,7 @@ export default class ApprovalsController {
       return;
     }
 
-    res.render('approval-undo-confirm', viewModel);
+    return res.render('approval-undo-confirm', viewModel);
   }
 
   @route('/:approvalId/undo')
@@ -63,9 +63,13 @@ export default class ApprovalsController {
       return;
     }
 
-    res.render('approval-undo-success', {
-      ...viewModel,
+    return res.render('common-edit-success', {
+      continueUpdatingHref: '/approvals',
+      continueUpdatingText: 'Back to Approval tracker',
+      homeText: 'Back to Courts, tribunals and service centres list',
       pageTitle: `Approval undone - ${viewModel.name}`,
+      successPanelBody: `You have undone the data approval for ${viewModel.name}.`,
+      successPanelTitle: 'Approval undone',
     });
   }
 
@@ -77,8 +81,7 @@ export default class ApprovalsController {
       return false;
     }
 
-    res.status(result);
-    res.render('error');
+    res.status(result).render('error');
     return true;
   }
 
@@ -87,8 +90,7 @@ export default class ApprovalsController {
       return true;
     }
 
-    res.status(HttpStatusCode.Forbidden);
-    res.render('access-denied');
+    res.status(HttpStatusCode.Forbidden).render('access-denied');
     return false;
   }
 
@@ -99,8 +101,7 @@ export default class ApprovalsController {
       return approvalId;
     }
 
-    res.status(HttpStatusCode.NotFound);
-    res.render('not-found');
+    res.status(HttpStatusCode.NotFound).render('not-found');
     return undefined;
   }
 }

@@ -124,9 +124,13 @@ describe('ApprovalsController', () => {
     await controller.postUndoApproval(request('SuperAdmin', { approvalId }), res);
 
     expect(approvalService.undoApproval).toHaveBeenCalledWith(approvalId);
-    expect(res.render).toHaveBeenCalledWith('approval-undo-success', {
-      ...viewModel,
+    expect(res.render).toHaveBeenCalledWith('common-edit-success', {
+      continueUpdatingHref: '/approvals',
+      continueUpdatingText: 'Back to Approval tracker',
+      homeText: 'Back to Courts, tribunals and service centres list',
       pageTitle: 'Approval undone - Reading Crown Court',
+      successPanelBody: 'You have undone the data approval for Reading Crown Court.',
+      successPanelTitle: 'Approval undone',
     });
   });
 

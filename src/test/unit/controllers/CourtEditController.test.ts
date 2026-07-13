@@ -184,7 +184,7 @@ describe('CourtEditController', () => {
       userId: 'test-user-id',
     });
     expect(response.render).toHaveBeenCalledWith(
-      'approval-success',
+      'common-edit-success',
       expect.objectContaining({ pageTitle: 'Approval saved - Reading Crown Court' })
     );
   });
