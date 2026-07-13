@@ -61,6 +61,9 @@ describe('Local authorities routes', () => {
     expect(response.text).toContain('Reading Borough Council');
     expect(response.text).toContain('Wokingham Borough Council');
     expect(response.text).toContain(`<form method="post" action="/courts/${courtId}/edit/local-authorities/success">`);
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(`<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">`);
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {
