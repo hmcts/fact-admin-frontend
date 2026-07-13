@@ -51,6 +51,7 @@ test.describe(
     test('Accessibility Page Performance', async ({ accessibilityPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Accessibility Performance Test', {}, async ({ createdCourt }) => {
         await accessibilityPage.goto(createdCourt.id);
+        await accessibilityPage.header.checkIsVisible();
         const breadcrumb = accessibilityPage.page.getByLabel('Breadcrumb');
 
         await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
@@ -230,14 +231,6 @@ test.describe(
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
-    });
-
-    test('Accessibility Page Performance', async ({ accessibilityPage, lighthouseUtils, playwright }) => {
-      await withCreatedCourt(playwright, 'Accessibility Performance Test', {}, async ({ createdCourt }) => {
-        await accessibilityPage.goto(createdCourt.id);
-        await accessibilityPage.header.checkIsVisible();
-        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
-      });
     });
 
     test('Local Authorities Page Performance', async ({
