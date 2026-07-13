@@ -47,11 +47,13 @@ import { Region, regionsSchema } from '../schemas/regionSchema';
 import { ServiceArea, serviceAreaListSchema } from '../schemas/serviceAreaSchema';
 import { ServiceCentre, serviceCentreSchema } from '../schemas/serviceCentreSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
+import { PagedUsers, pagedUsersSchema } from '../schemas/userListSchema';
 import { User, userSchema } from '../schemas/userSchema';
 
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetAuditsParams } from './types/GetAuditsParams';
 import { GetCourtsParams } from './types/GetCourtsParams';
+import { GetUsersParams } from './types/GetUsersParams';
 import { SaveCourtContactDetailRequest } from './types/SaveCourtContactDetailRequest';
 import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
@@ -801,6 +803,21 @@ export class DataApiRequests {
       return userSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error creating/updating user with SSO ID ${user.ssoId}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a filtered and paginated list of admin users
+   */
+  public async getUsers(params: GetUsersParams = {}): Promise<PagedUsers | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/user/v1', { params });
+      return pagedUsersSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching users:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
