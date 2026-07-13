@@ -35,6 +35,15 @@ test.describe(
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
+    test('Approvals Tracker Page Performance', async ({ lighthouseUtils, page, playwright }) => {
+      await withCreatedCourt(playwright, 'Approvals Tracker Performance Test', {}, async ({ createdCourt }) => {
+        await page.goto(`${config.urls.homePageUrl}/approvals?name=${encodeURIComponent(createdCourt.name)}`);
+        await page.getByRole('heading', { name: 'Approvals tracker' }).waitFor();
+        await page.getByRole('row').filter({ hasText: createdCourt.name }).waitFor();
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Cases Heard Page Performance', async ({ casesHeardPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Cases Heard Performance Test', {}, async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);

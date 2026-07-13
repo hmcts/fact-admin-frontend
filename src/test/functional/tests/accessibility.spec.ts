@@ -50,6 +50,15 @@ test.describe(
       });
     });
 
+    test('Approvals Tracker Page Accessibility', async ({ axeUtils, page, playwright }) => {
+      await withCreatedCourt(playwright, 'Approvals Tracker Accessibility Test', {}, async ({ createdCourt }) => {
+        await page.goto(`${config.urls.homePageUrl}/approvals?name=${encodeURIComponent(createdCourt.name)}`);
+        await expect(page.getByRole('heading', { name: 'Approvals tracker' })).toBeVisible();
+        await expect(page.getByRole('row').filter({ hasText: createdCourt.name })).toBeVisible();
+        await axeUtils.audit();
+      });
+    });
+
     test('Cases Heard Page Accessibility', async ({ axeUtils, casesHeardPage, playwright }) => {
       await withCreatedCourt(playwright, 'Cases Heard Accessibility Test', {}, async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);

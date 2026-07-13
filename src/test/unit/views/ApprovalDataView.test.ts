@@ -39,4 +39,19 @@ describe('Approval Data View', () => {
     expect(html).toContain('Back to Courts, tribunals and service centres list');
     expect(html).toContain('govuk-panel govuk-panel--confirmation');
   });
+
+  test('renders viewer review wording on the approval success page', () => {
+    const html = env.render('approval-success.njk', {
+      editPath: '/courts/11111111-1111-4111-8111-111111111111/edit',
+      isViewer: true,
+      name: 'Reading Crown Court',
+      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',
+      pageTitle: 'Approval saved - Reading Crown Court',
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT',
+    });
+
+    expect(html).toContain('Back to Reviewing - Reading Crown Court');
+    expect(html).not.toContain('Back to Editing - Reading Crown Court');
+  });
 });

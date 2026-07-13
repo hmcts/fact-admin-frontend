@@ -13,7 +13,13 @@ import { HTTPError } from './HttpError';
 import { setupDev } from './development';
 import { AppInsights } from './modules/appinsights';
 import { Authentication } from './modules/authentication';
-import { getFactUser, getFactUserId, isAdmin, isSuperAdmin } from './modules/authentication/authenticationHelper';
+import {
+  getFactUser,
+  getFactUserId,
+  isAdmin,
+  isSuperAdmin,
+  isViewer,
+} from './modules/authentication/authenticationHelper';
 import { Container } from './modules/awilix';
 import { Helmet } from './modules/helmet';
 import { Nunjucks } from './modules/nunjucks';
@@ -40,6 +46,15 @@ const adminRoutes = [
   '/service-centres',
 ];
 const superAdminRoutes = ['/audits', '/users'];
+const viewerGetRoutes = [
+  /^\/$/,
+  /^\/courts\/[^/]+\/edit$/,
+  /^\/courts\/[^/]+\/edit\/(?:accessibility|address|building-facilities|cases-heard|general|information-for-professionals|local-authorities|single-point-of-entry|translation-and-interpretation|approve)$/,
+  /^\/courts\/[^/]+\/edit\/contact-details(?:\/edit\/[^/]+)?$/,
+  /^\/courts\/[^/]+\/edit\/court-opening-hours(?:\/edit\/[^/]+)?$/,
+  /^\/service-centres\/[^/]+\/edit(?:\/(?:address|approve))?$/,
+];
+const viewerApprovalRoute = /^\/(?:courts|service-centres)\/[^/]+\/edit\/approve$/;
 
 export const app = express();
 app.locals.ENV = env;
@@ -80,6 +95,7 @@ const requireAuthenticated = requiresAuth();
 
 app.use((req, res, next) => {
   res.locals.isSuperAdmin = false;
+  res.locals.isViewer = false;
 
   if (matchesRoute(req.path, publicRoutes)) {
     return next();
@@ -91,6 +107,11 @@ app.use((req, res, next) => {
     }
 
     res.locals.isSuperAdmin = isSuperAdmin(req);
+    res.locals.isViewer = isViewer(req);
+
+    if (isViewer(req)) {
+      return isViewerRoute(req) ? next() : denyAccess(req, res);
+    }
 
     if (matchesRoute(req.path, superAdminRoutes)) {
       return isSuperAdmin(req) ? next() : denyAccess(req, res);
@@ -127,6 +148,14 @@ app.use((err: HTTPError, req: express.Request, res: express.Response, _next: exp
 
 function matchesRoute(urlPath: string, routes: string[]): boolean {
   return routes.some(route => urlPath === route || urlPath.startsWith(`${route}/`));
+}
+
+function isViewerRoute(req: express.Request): boolean {
+  if (req.method === 'GET') {
+    return viewerGetRoutes.some(route => route.test(req.path));
+  }
+
+  return req.method === 'POST' && viewerApprovalRoute.test(req.path);
 }
 
 function denyAccess(req: express.Request, res: express.Response): void {

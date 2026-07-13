@@ -105,6 +105,14 @@ export class HomePage extends Base {
       .click();
   }
 
+  async clickReviewForCourt(courtName: string): Promise<void> {
+    await this.table
+      .locator('tr')
+      .filter({ hasText: courtName })
+      .getByRole('link', { name: `Review ${courtName}` })
+      .click();
+  }
+
   async getViewHrefForCourt(courtName: string): Promise<string | null> {
     return this.table
       .locator('tr')

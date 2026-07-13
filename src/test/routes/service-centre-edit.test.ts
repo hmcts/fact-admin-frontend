@@ -52,6 +52,29 @@ describe('Service centre edit page', () => {
     expect(response.text).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit/approve');
   });
 
+  test('renders the review page and approve data for viewer users when the service centre is not approved', async () => {
+    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '22222222-2222-4222-8222-222222222222',
+        subjectType: 'SERVICE_CENTRE',
+        name: 'National Business Centre',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+
+    const response = await request(app)
+      .get('/service-centres/22222222-2222-4222-8222-222222222222/edit')
+      .set('x-test-role', 'Viewer');
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('Reviewing - National Business Centre');
+    expect(response.text).toContain('Approve data');
+  });
+
   test('does not render approve data for super admin users when the service centre is approved', async () => {
     stub(DataApiRequests.prototype, 'getApprovals').resolves([
       {
@@ -140,6 +163,30 @@ describe('Service centre edit page', () => {
       'You have approved the data for National Business Centre. If this was done in error please contact the NSU. nationalsupportunit@justice.gov.uk'
     );
     expect(response.text).toContain('Back to Editing - National Business Centre');
+  });
+
+  test('allows viewer users to confirm service centre approval', async () => {
+    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '22222222-2222-4222-8222-222222222222',
+        subjectType: 'SERVICE_CENTRE',
+        name: 'National Business Centre',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+
+    const response = await request(app)
+      .post('/service-centres/22222222-2222-4222-8222-222222222222/edit/approve')
+      .set('x-test-role', 'Viewer');
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(createApprovalStub.calledOnce).toBe(true);
+    expect(response.text).toContain('Back to Reviewing - National Business Centre');
   });
 
   test('renders not found for an invalid UUID', async () => {

@@ -33,22 +33,22 @@
         href: "/download",
         text: "Download csv",
         current: isDownloadPage
-      },
+      } if not isViewer else false,
       {
         href: "/add-court",
         text: "Add new court",
         current: isAddCourtPage
-      },
+      } if not isViewer else false,
       {
         href: "/add-service-centre",
         text: "Add new service centre",
         current: isAddServiceCentrePage
-      },
+      } if not isViewer else false,
       {
         href: "/approvals",
         text: "Approvals tracker",
         current: isApprovalsPage
-      },
+      } if not isViewer else false,
       {
         href: "/audits",
         text: "Audits",

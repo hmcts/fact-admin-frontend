@@ -46,4 +46,18 @@ describe('Court Edit View', () => {
     expect(html).toContain(`href="${courtEditPath}/approve"`);
     expect(html.indexOf('court-edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
   });
+
+  test('renders the reviewing heading for viewer users', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      isViewer: true,
+      pagePath: courtEditPath,
+      pageTitle: 'Reviewing - Reading Crown Court',
+      showApproveData: false,
+    });
+
+    expect(html).toContain('Reviewing - Reading Crown Court');
+    expect(html).not.toContain('Editing - Reading Crown Court');
+  });
 });

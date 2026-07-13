@@ -54,6 +54,7 @@ describe('HomeController', () => {
       await controller.get(request, response);
       assert.calledOnce(getFiltersStub);
       assert.calledOnce(getHomePageViewModelStub);
+      assert.calledWith(getHomePageViewModelStub, filters, false);
       responseMock.verify();
     } finally {
       getFiltersStub.restore();

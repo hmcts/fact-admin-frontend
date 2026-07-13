@@ -1,8 +1,10 @@
 import { Request } from 'express';
 
+import { FactUserRole } from './types';
+
 type FactUser = {
   id?: string;
-  role?: string;
+  role?: FactUserRole;
 };
 
 type RequestWithAppSession = Request & {
@@ -27,4 +29,12 @@ export function isAdmin(req: Request): boolean {
 export function isSuperAdmin(req: Request): boolean {
   const role = getFactUser(req)?.role;
   return role === 'SuperAdmin';
+}
+
+export function isViewer(req: Request): boolean {
+  return getFactUser(req)?.role === 'Viewer';
+}
+
+export function canApprove(req: Request): boolean {
+  return isSuperAdmin(req) || isViewer(req);
 }

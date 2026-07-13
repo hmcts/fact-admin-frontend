@@ -16,9 +16,12 @@ describe('CourtEditController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
     const viewModel = {
+      approvePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',
+      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit',
       pageTitle: 'Editing - Reading Crown Court',
+      showApproveData: false,
     };
     const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',

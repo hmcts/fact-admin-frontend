@@ -27,7 +27,8 @@
     {% set items = (items.push({
       value: selection.id,
       text: selection.name,
-      checked: selection.selected
+      checked: selection.selected,
+      disabled: isViewer
     }), items) %}
   {% endfor %}
 
@@ -142,9 +143,11 @@
             items: items
           }) }}
 
-          {{ govukButton({
-            text: "Save"
-          }) }}
+          {% if not isViewer %}
+            {{ govukButton({
+              text: "Save"
+            }) }}
+          {% endif %}
 
         </form>
       </div>

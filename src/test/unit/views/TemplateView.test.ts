@@ -27,4 +27,19 @@ describe('Template View', () => {
     expect(html).toContain('Users');
     expect(html).toContain('Approvals tracker');
   });
+
+  test('renders only location navigation for viewer users', () => {
+    const html = env.render('template.njk', {
+      isViewer: true,
+      pagePath: '/',
+    });
+
+    expect(html).toContain('Locations');
+    expect(html).not.toContain('Download csv');
+    expect(html).not.toContain('Add new court');
+    expect(html).not.toContain('Add new service centre');
+    expect(html).not.toContain('Approvals tracker');
+    expect(html).not.toContain('Audits');
+    expect(html).not.toContain('Users');
+  });
 });

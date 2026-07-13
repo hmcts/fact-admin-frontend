@@ -10,7 +10,7 @@
 
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li><a href="{{ editPath }}" class="govuk-link govuk-link--no-visited-state">Back to Editing - {{ name }}</a></li>
+    <li><a href="{{ editPath }}" class="govuk-link govuk-link--no-visited-state">Back to {{ "Reviewing" if isViewer else "Editing" }} - {{ name }}</a></li>
     <li><a href="/" class="govuk-link govuk-link--no-visited-state">Back to Courts, tribunals and service centres list</a></li>
   </ul>
 {% endblock %}

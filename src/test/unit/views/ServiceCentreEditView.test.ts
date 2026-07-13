@@ -46,4 +46,18 @@ describe('Service Centre Edit View', () => {
     expect(html).toContain(`href="${serviceCentreEditPath}/approve"`);
     expect(html.indexOf('court-edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
   });
+
+  test('renders the reviewing heading for viewer users', () => {
+    const html = env.render('service-centre-edit.njk', {
+      isViewer: true,
+      pagePath: serviceCentreEditPath,
+      pageTitle: 'Reviewing - National Business Centre',
+      serviceCentreId,
+      serviceCentreName: 'National Business Centre',
+      showApproveData: false,
+    });
+
+    expect(html).toContain('Reviewing - National Business Centre');
+    expect(html).not.toContain('Editing - National Business Centre');
+  });
 });

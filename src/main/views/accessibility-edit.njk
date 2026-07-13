@@ -133,6 +133,8 @@
       <h1 class="govuk-heading-l">Accessibility</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/accessibility/success">
+      <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+      <legend class="govuk-fieldset__legend govuk-visually-hidden">Accessibility details</legend>
       <h2 class="govuk-heading-m">Accessible parking</h2>
         {{ govukRadios({
           classes: "govuk-radios",
@@ -304,10 +306,13 @@
       <p class="govuk-body">Hidden disabilities sunflower network</p>
 
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
 
+      </fieldset>
       </form>
 
     </div>

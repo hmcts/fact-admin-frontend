@@ -1279,6 +1279,29 @@ describe('DataApiRequests', () => {
     expect(response).toEqual(userEntity);
   });
 
+  it('sends Viewer when creating or updating a viewer user', async () => {
+    const user = {
+      email: 'viewer@justice.gov.uk',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+      role: 'Viewer' as const,
+    };
+    const userEntity = {
+      email: 'viewer@justice.gov.uk',
+      favouriteCourts: null,
+      id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      lastLogin: '2026-05-27T10:35:23.406Z',
+      role: 'Viewer',
+      ssoId: '00000000-0000-0000-0000-000000000000',
+    };
+
+    postStub.withArgs('/user/v1', user).resolves({ data: userEntity });
+
+    const response = await dataApiRequests.createUpdateUser(user);
+
+    expect(response).toEqual(userEntity);
+    expect(postStub.calledWith('/user/v1', user)).toBe(true);
+  });
+
   it('returns the user entity when create/update user response has no favourite courts', async () => {
     const user = {
       email: 'user@justice.gov.uk',

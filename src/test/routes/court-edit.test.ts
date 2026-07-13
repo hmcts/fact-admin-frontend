@@ -72,6 +72,33 @@ describe('Court edit page', () => {
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/approve');
   });
 
+  test('renders the review page and approve data for viewer users when the court is not approved', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT',
+        name: 'Reading Crown Court',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+
+    const response = await request(app)
+      .get('/courts/11111111-1111-4111-8111-111111111111/edit')
+      .set('x-test-role', 'Viewer');
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('Reviewing - Reading Crown Court');
+    expect(response.text).toContain('Approve data');
+  });
+
   test('does not render approve data for super admin users when the court is approved', async () => {
     stub(DataApiRequests.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
@@ -172,6 +199,34 @@ describe('Court edit page', () => {
       'You have approved the data for Reading Crown Court. If this was done in error please contact the NSU. nationalsupportunit@justice.gov.uk'
     );
     expect(response.text).toContain('Back to Editing - Reading Crown Court');
+  });
+
+  test('allows viewer users to confirm court approval', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT',
+        name: 'Reading Crown Court',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+
+    const response = await request(app)
+      .post('/courts/11111111-1111-4111-8111-111111111111/edit/approve')
+      .set('x-test-role', 'Viewer');
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(createApprovalStub.calledOnce).toBe(true);
+    expect(response.text).toContain('Back to Reviewing - Reading Crown Court');
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {

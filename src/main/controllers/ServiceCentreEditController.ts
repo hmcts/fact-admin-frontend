@@ -2,7 +2,7 @@ import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import { getFactUserId, isSuperAdmin } from '../modules/authentication/authenticationHelper';
+import { canApprove, getFactUserId, isViewer } from '../modules/authentication/authenticationHelper';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { ApprovalService, ApproveDataViewModel, EditApprovalAction } from '../services/ApprovalService';
 import { isUuid } from '../utils/valueParsers';
@@ -30,7 +30,7 @@ export default class ServiceCentreEditController {
       resolvedServiceCentreId,
       'SERVICE_CENTRE',
       `/service-centres/${resolvedServiceCentreId}/edit/approve`,
-      isSuperAdmin(req)
+      canApprove(req)
     );
 
     if (this.renderStatusResponse(approvalAction, res)) {
@@ -40,7 +40,7 @@ export default class ServiceCentreEditController {
     res.render('service-centre-edit', {
       ...approvalAction,
       pagePath: `/service-centres/${resolvedServiceCentreId}/edit`,
-      pageTitle: `Editing - ${serviceCentreResponse.name}`,
+      pageTitle: `${isViewer(req) ? 'Reviewing' : 'Editing'} - ${serviceCentreResponse.name}`,
       serviceCentreId: resolvedServiceCentreId,
       serviceCentreName: serviceCentreResponse.name,
     });
@@ -49,7 +49,7 @@ export default class ServiceCentreEditController {
   @GET()
   @route('/approve')
   public async getApprove(req: Request, res: Response): Promise<void> {
-    if (!this.requireSuperAdmin(req, res)) {
+    if (!this.requireCanApprove(req, res)) {
       return;
     }
 
@@ -72,7 +72,7 @@ export default class ServiceCentreEditController {
   @POST()
   @route('/approve')
   public async postApprove(req: Request, res: Response): Promise<void> {
-    if (!this.requireSuperAdmin(req, res)) {
+    if (!this.requireCanApprove(req, res)) {
       return;
     }
 
@@ -188,8 +188,8 @@ export default class ServiceCentreEditController {
     return true;
   }
 
-  private requireSuperAdmin(req: Request, res: Response): boolean {
-    if (isSuperAdmin(req)) {
+  private requireCanApprove(req: Request, res: Response): boolean {
+    if (canApprove(req)) {
       return true;
     }
 

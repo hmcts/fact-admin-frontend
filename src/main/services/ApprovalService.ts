@@ -113,9 +113,9 @@ export class ApprovalService {
     subjectId: string,
     subjectType: ApprovalSubjectType,
     approvePath: string,
-    isSuperAdmin: boolean
+    canApprove: boolean
   ): Promise<EditApprovalAction | HttpStatusCode> {
-    if (!isSuperAdmin) {
+    if (!canApprove) {
       return {
         approvePath,
         showApproveData: false,
