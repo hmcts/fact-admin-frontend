@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 
+import { buildServiceCentreEditBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -31,6 +32,7 @@ export default class ServiceCentreEditController {
     }
 
     res.render('service-centre-edit', {
+      breadcrumbs: buildServiceCentreEditBreadcrumbs(resolvedServiceCentreId, serviceCentreResponse.name),
       pagePath: `/service-centres/${resolvedServiceCentreId}/edit`,
       pageTitle: `Editing - ${serviceCentreResponse.name}`,
       serviceCentreName: serviceCentreResponse.name,

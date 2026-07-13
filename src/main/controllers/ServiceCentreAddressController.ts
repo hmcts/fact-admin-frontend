@@ -7,6 +7,7 @@ import { dpaAddressSchema } from '../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
 import { ServiceCentreAddressService } from '../services/ServiceCentreAddressService';
 
+import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -33,21 +34,17 @@ export default class ServiceCentreAddressController {
       return;
     }
 
-    const serviceCentreNameResponse = await serviceCentreAddressService.retrieveServiceCentreName(serviceCentreId);
-    if (serviceCentreNameResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof serviceCentreNameResponse === 'number') {
-      renderError(res, serviceCentreNameResponse);
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
       return;
     }
 
     res.render('service-centre-address-list', {
-      pageTitle: `Address - ${serviceCentreNameResponse}`,
+      pageTitle: `Address - ${serviceCentreName}`,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName),
       serviceCentreAddresses: addressesResponse,
       serviceCentreId,
-      serviceCentreName: serviceCentreNameResponse,
+      serviceCentreName,
     });
   }
 
@@ -60,8 +57,15 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
+      return;
+    }
+
     res.render('service-centre-address-find', {
       pageTitle: 'Find Address',
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+      serviceCentreName,
       serviceCentreId,
     });
   }
@@ -86,11 +90,18 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
+      return;
+    }
+
     res.render('service-centre-address-find', {
       addressId,
       pageTitle: 'Find Address',
-      postcode: addressResponse.postcode,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+      serviceCentreName,
       serviceCentreId,
+      postcode: addressResponse.postcode,
     });
   }
 
@@ -103,12 +114,20 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
+      return;
+    }
+
     const postcode = req.query?.postcode as string;
     if (!serviceCentreAddressService.isValidPostcode(postcode)) {
       res.render('service-centre-address-find', {
         error: serviceCentreAddressService.validatePostcode(postcode),
         pageTitle: 'Find Address',
+        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+        serviceCentreName,
         serviceCentreId,
+        postcode,
       });
       return;
     }
@@ -127,13 +146,18 @@ export default class ServiceCentreAddressController {
       res.render('service-centre-address-find', {
         error: searchResponse.error,
         pageTitle: 'Find Address',
+        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+        serviceCentreName,
         serviceCentreId,
+        postcode,
       });
       return;
     }
 
     res.render('service-centre-address-select', {
       addresses: searchResponse,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+      serviceCentreName,
       pageTitle: 'Select Address',
       postcode,
       serviceCentreId,
@@ -150,13 +174,21 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
+      return;
+    }
+
     const postcode = req.query?.postcode as string;
     if (!serviceCentreAddressService.isValidPostcode(postcode)) {
       res.render('service-centre-address-find', {
         addressId,
         error: serviceCentreAddressService.validatePostcode(postcode),
         pageTitle: 'Find Address',
+        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+        serviceCentreName,
         serviceCentreId,
+        postcode,
       });
       return;
     }
@@ -175,14 +207,19 @@ export default class ServiceCentreAddressController {
       res.render('service-centre-address-find', {
         addressId,
         error: searchResponse.error,
-        pageTitle: 'Find Address',
+        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+        serviceCentreName,
         serviceCentreId,
+        postcode,
+        pageTitle: 'Find Address',
       });
       return;
     }
 
     res.render('service-centre-address-select', {
       addresses: searchResponse,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+      serviceCentreName,
       addressId,
       pageTitle: 'Select Address',
       postcode,
@@ -199,7 +236,12 @@ export default class ServiceCentreAddressController {
       return;
     }
 
-    await this.renderAddressEdit(res, serviceCentreId, undefined, undefined, req.body?.address);
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
+      return;
+    }
+
+    await this.renderAddressEdit(res, serviceCentreId, serviceCentreName, undefined, undefined, req.body?.address);
   }
 
   @route('/details/success')
@@ -208,6 +250,11 @@ export default class ServiceCentreAddressController {
     const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
       renderServiceCentreNotFound(res);
+      return;
+    }
+
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
       return;
     }
 
@@ -226,7 +273,7 @@ export default class ServiceCentreAddressController {
     }
 
     if (saveResult.status === 'invalid') {
-      await this.renderAddressEdit(res, serviceCentreId, undefined, saveResult.address);
+      await this.renderAddressEdit(res, serviceCentreId, serviceCentreName, undefined, saveResult.address);
       return;
     }
 
@@ -234,6 +281,7 @@ export default class ServiceCentreAddressController {
       address: saveResult.address,
       pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
       serviceCentreId,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
       serviceCentreName: saveResult.serviceCentreName,
     });
   }
@@ -258,7 +306,19 @@ export default class ServiceCentreAddressController {
       return;
     }
 
-    await this.renderAddressEdit(res, serviceCentreId, addressId, addressResponse, req.body?.address);
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
+      return;
+    }
+
+    await this.renderAddressEdit(
+      res,
+      serviceCentreId,
+      serviceCentreName,
+      addressId,
+      addressResponse,
+      req.body?.address
+    );
   }
 
   @route('/details/success/:addressId')
@@ -268,6 +328,11 @@ export default class ServiceCentreAddressController {
     const addressId = getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
       renderServiceCentreNotFound(res);
+      return;
+    }
+
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
       return;
     }
 
@@ -287,7 +352,7 @@ export default class ServiceCentreAddressController {
     }
 
     if (saveResult.status === 'invalid') {
-      await this.renderAddressEdit(res, serviceCentreId, addressId, saveResult.address);
+      await this.renderAddressEdit(res, serviceCentreId, serviceCentreName, addressId, saveResult.address);
       return;
     }
 
@@ -295,6 +360,7 @@ export default class ServiceCentreAddressController {
       address: saveResult.address,
       pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
       serviceCentreId,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
       serviceCentreName: saveResult.serviceCentreName,
     });
   }
@@ -309,13 +375,8 @@ export default class ServiceCentreAddressController {
       return;
     }
 
-    const serviceCentreNameResponse = await serviceCentreAddressService.retrieveServiceCentreName(serviceCentreId);
-    if (serviceCentreNameResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof serviceCentreNameResponse === 'number') {
-      renderError(res, serviceCentreNameResponse);
+    const serviceCentreName = await this.resolveServiceCentreName(res, serviceCentreId);
+    if (typeof serviceCentreName !== 'string') {
       return;
     }
 
@@ -331,8 +392,9 @@ export default class ServiceCentreAddressController {
 
     res.render('service-centre-address-delete', {
       address: addressResponse,
-      pageTitle: `Delete address - ${serviceCentreNameResponse}`,
-      serviceCentreName: serviceCentreNameResponse,
+      pageTitle: `Delete address - ${serviceCentreName}`,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Delete address'),
+      serviceCentreName,
     });
   }
 
@@ -360,6 +422,7 @@ export default class ServiceCentreAddressController {
       address: deleteResult.address,
       pageTitle: `Address deleted - ${deleteResult.serviceCentreName}`,
       serviceCentreId,
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, deleteResult.serviceCentreName, 'Address deleted'),
       serviceCentreName: deleteResult.serviceCentreName,
     });
   }
@@ -367,6 +430,7 @@ export default class ServiceCentreAddressController {
   private async renderAddressEdit(
     res: Response,
     serviceCentreId: string,
+    serviceCentreName: string,
     addressId?: string,
     addressModel?: Partial<ServiceCentreAddress>,
     dpaAddressData?: string
@@ -377,6 +441,8 @@ export default class ServiceCentreAddressController {
       address,
       addressId,
       pageTitle: 'Address',
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Edit address'),
+      serviceCentreName,
       serviceCentreId,
     });
   }
@@ -433,5 +499,33 @@ export default class ServiceCentreAddressController {
     }
 
     return result;
+  }
+
+  private async resolveServiceCentreName(res: Response, serviceCentreId: string): Promise<string | undefined> {
+    let response: string | HttpStatusCode = HttpStatusCode.NotFound;
+    try {
+      response = await serviceCentreAddressService.retrieveServiceCentreName(serviceCentreId);
+    } catch (error) {
+      logger.warn('Unable to resolve service-centre name for breadcrumbs:', error);
+    }
+    if (typeof response === 'number') {
+      if (response === HttpStatusCode.NotFound) {
+        renderServiceCentreNotFound(res);
+      } else {
+        renderError(res, response);
+      }
+      return undefined;
+    }
+    return response;
+  }
+
+  private buildAddressBreadcrumbs(serviceCentreId: string, serviceCentreName: string, currentPage?: string) {
+    return buildServiceCentreSectionBreadcrumbs(
+      serviceCentreId,
+      serviceCentreName,
+      'Addresses',
+      'address',
+      currentPage
+    );
   }
 }

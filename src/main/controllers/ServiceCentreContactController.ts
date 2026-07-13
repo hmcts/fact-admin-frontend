@@ -6,6 +6,7 @@ import { ServiceCentreContactDetail } from '../schemas/serviceCentreContactDetai
 import { ServiceCentre } from '../schemas/serviceCentreSchema';
 import { ServiceCentreContactService } from '../services/ServiceCentreContactService';
 
+import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -32,6 +33,7 @@ export default class ServiceCentreContactController {
     }
 
     res.render('service-centre-contact-list', {
+      breadcrumbs: this.buildContactDetailsBreadcrumbs(serviceCentreId, serviceCentreResponse.name),
       pageTitle: `Manage Contact details - ${serviceCentreResponse.name}`,
       serviceCentreContactDetails: serviceCentreContactDetailsResponse,
       serviceCentreId,
@@ -59,6 +61,11 @@ export default class ServiceCentreContactController {
     }
 
     res.render('service-centre-contact-form', {
+      breadcrumbs: this.buildContactDetailsBreadcrumbs(
+        serviceCentreId,
+        serviceCentreResponse.name,
+        'Add contact details'
+      ),
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
       formHeading: 'Add contact details',
@@ -108,6 +115,11 @@ export default class ServiceCentreContactController {
     }
 
     res.render('service-centre-contact-form', {
+      breadcrumbs: this.buildContactDetailsBreadcrumbs(
+        serviceCentreId,
+        serviceCentreResponse.name,
+        'Edit contact details'
+      ),
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
       contactDetailId,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/edit/${contactDetailId}/success`,
@@ -194,6 +206,11 @@ export default class ServiceCentreContactController {
     const contactDescription = await serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
 
     res.render('service-centre-contact-delete', {
+      breadcrumbs: this.buildContactDetailsBreadcrumbs(
+        serviceCentreId,
+        serviceCentreResponse.name,
+        'Delete contact details'
+      ),
       contactDetail: {
         ...contactDetailResponse,
         description: contactDescription,
@@ -243,6 +260,11 @@ export default class ServiceCentreContactController {
 
     const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
     res.render('common-edit-success', {
+      breadcrumbs: this.buildContactDetailsBreadcrumbs(
+        serviceCentreId,
+        serviceCentreResponse.name,
+        'Contact details deleted'
+      ),
       continueUpdatingHref: `/service-centres/${serviceCentreId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
       courtId: serviceCentreId,
@@ -291,6 +313,11 @@ export default class ServiceCentreContactController {
     const detail = this.detailsGenerator(req.body, 'contact-email', 'contact-telephone');
 
     res.render('common-edit-success', {
+      breadcrumbs: this.buildContactDetailsBreadcrumbs(
+        options.serviceCentreId,
+        options.serviceCentreName,
+        'Contact details saved'
+      ),
       continueUpdatingHref: `/service-centres/${options.serviceCentreId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
       courtId: options.serviceCentreId,
@@ -364,5 +391,19 @@ export default class ServiceCentreContactController {
       detail = contactDetailResponse[email];
     }
     return detail;
+  }
+
+  private buildContactDetailsBreadcrumbs(
+    serviceCentreSchemaId: string,
+    serviceCentreSchemaName: string,
+    currentPageText?: string
+  ) {
+    return buildServiceCentreSectionBreadcrumbs(
+      serviceCentreSchemaId,
+      serviceCentreSchemaName,
+      'Contact details',
+      'contact-details',
+      currentPageText
+    );
   }
 }

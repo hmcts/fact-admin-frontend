@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 
 import { ServiceCentreCasesHeardService } from '../services/ServiceCentreCasesHeardService';
 
+import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -31,7 +32,10 @@ export default class ServiceCentreCasesHeardController {
       return;
     }
 
-    res.render('service-centre-cases-heard', viewModel);
+    res.render('service-centre-cases-heard', {
+      ...viewModel,
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(serviceCentreId, viewModel.serviceCentreName),
+    });
   }
 
   @route('/success')
@@ -48,7 +52,10 @@ export default class ServiceCentreCasesHeardController {
 
     if (saveResult.type === 'validation_error') {
       res.status(HttpStatusCode.BadRequest);
-      res.render('service-centre-cases-heard', saveResult.viewModel);
+      res.render('service-centre-cases-heard', {
+        ...saveResult.viewModel,
+        breadcrumbs: this.buildCasesHeardBreadcrumbs(serviceCentreId, saveResult.viewModel.serviceCentreName),
+      });
       return;
     }
 
@@ -62,6 +69,11 @@ export default class ServiceCentreCasesHeardController {
     }
 
     res.render('common-edit-success', {
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(
+        serviceCentreId,
+        saveResult.viewModel.serviceCentreName,
+        'Cases heard saved'
+      ),
       continueUpdatingHref: `/service-centres/${serviceCentreId}/edit`,
       continueUpdatingText: `Continue updating ${saveResult.viewModel.serviceCentreName}`,
       courtId: serviceCentreId,
@@ -70,5 +82,15 @@ export default class ServiceCentreCasesHeardController {
       successPanelBody: `Cases heard for ${saveResult.viewModel.serviceCentreName} have been saved successfully.`,
       successPanelTitle: 'Cases heard saved',
     });
+  }
+
+  private buildCasesHeardBreadcrumbs(serviceCentreId: string, serviceCentreName: string, currentPage?: string) {
+    return buildServiceCentreSectionBreadcrumbs(
+      serviceCentreId,
+      serviceCentreName,
+      'Cases heard',
+      'cases-heard',
+      currentPage
+    );
   }
 }
