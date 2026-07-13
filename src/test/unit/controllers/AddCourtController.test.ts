@@ -19,7 +19,16 @@ describe('AddCourtController', () => {
     };
     const getViewModelStub = stub(AddCourtService.prototype, 'getViewModel').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-court', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-court', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Add new court' },
+        ],
+      });
 
     try {
       await controller.get(mockRequest({}), response);
@@ -74,7 +83,16 @@ describe('AddCourtController', () => {
     };
     const createStub = stub(AddCourtService.prototype, 'create').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-court', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-court', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Add new court' },
+        ],
+      });
 
     try {
       await controller.createCourt(request, response);
@@ -104,7 +122,17 @@ describe('AddCourtController', () => {
     };
     const createStub = stub(AddCourtService.prototype, 'create').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-court-success', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-court-success', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
+          { href: '#', text: 'Addresses' },
+        ],
+      });
 
     try {
       await controller.createCourt(request, response);

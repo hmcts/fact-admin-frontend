@@ -29,6 +29,9 @@ describe('Court edit page', () => {
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/single-point-of-entry');
     expect(response.text).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/local-authorities');
     expect(response.text).not.toContain('Approve data');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain('Reading Crown Court');
   });
 
   test('does not render approve data for admin users when the court is not approved', async () => {

@@ -30,7 +30,16 @@ describe('CourtEditController', () => {
       name: 'Reading Crown Court',
     } as never);
 
-    responseMock.expects('render').once().withArgs('court-edit', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('court-edit', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
+        ],
+      });
 
     try {
       await controller.get(request, response);

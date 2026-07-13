@@ -31,7 +31,7 @@ export class BuildingFacilitiesService {
     // validate for errors
     const validationErrors = this.validate(model);
     if (validationErrors) {
-      return { ...model, errors: validationErrors };
+      return { ...model, errors: validationErrors, name: courtResponse.name };
     }
 
     // persist to the API

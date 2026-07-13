@@ -6,11 +6,14 @@ import { ApprovalSubjectType } from '../schemas/approvalSchema';
 import { ApprovalService, ApproveDataViewModel, EditApprovalAction } from '../services/ApprovalService';
 import { isUuid } from '../utils/valueParsers';
 
+import { BreadcrumbItem } from './helpers/breadcrumbs';
+
 type Location = {
   name: string;
 };
 
 type LocationApprovalControllerOptions = {
+  buildBreadcrumbs?: (locationId: string, locationName: string) => BreadcrumbItem[];
   editView: string;
   getLocation: (locationId: string) => Promise<Location | HttpStatusCode>;
   locationIdViewKey: string;
@@ -54,6 +57,9 @@ export class LocationApprovalController {
 
     res.render(this.options.editView, {
       ...approvalAction,
+      ...(this.options.buildBreadcrumbs
+        ? { breadcrumbs: this.options.buildBreadcrumbs(locationId, location.name) }
+        : {}),
       [this.options.locationIdViewKey]: locationId,
       [this.options.locationNameViewKey]: location.name,
       pagePath: editPath,

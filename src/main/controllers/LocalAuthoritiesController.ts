@@ -10,6 +10,8 @@ import {
 } from '../services/LocalAuthoritiesService';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const localAuthoritiesService = new LocalAuthoritiesService();
 const logger = Logger.getLogger('app');
 
@@ -35,7 +37,10 @@ export default class LocalAuthoritiesController {
       return res.render('error');
     }
 
-    res.render('local-authorities', viewModel);
+    return res.render('local-authorities', {
+      ...viewModel,
+      breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(resolvedCourtId, viewModel.courtName),
+    });
   }
 
   @route('/success')
@@ -74,7 +79,12 @@ export default class LocalAuthoritiesController {
       return res.render('error');
     }
 
-    res.render('local-authorities-success', {
+    return res.render('local-authorities-success', {
+      breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(
+        resolvedCourtId,
+        saveResult.courtName,
+        'Local authorities saved'
+      ),
       courtId: resolvedCourtId,
       courtName: saveResult.courtName,
     });
@@ -131,5 +141,9 @@ export default class LocalAuthoritiesController {
     }
 
     return selections;
+  }
+
+  private buildLocalAuthoritiesBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Local authorities', 'local-authorities', currentPage);
   }
 }

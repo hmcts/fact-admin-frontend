@@ -39,6 +39,9 @@ describe('Court address edit routes', () => {
     expect(response.text).toContain('Addresses');
     expect(response.text).toContain('Add address');
     expect(response.text.indexOf('Visit')).toBeLessThan(response.text.indexOf('Send documents to'));
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(`<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">`);
   });
 
   test('renders court not found for invalid court UUID on address list route', async () => {

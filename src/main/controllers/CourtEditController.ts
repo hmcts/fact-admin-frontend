@@ -5,10 +5,12 @@ import { DataApiRequests } from '../requests/DataApiRequests';
 import { ApprovalService } from '../services/ApprovalService';
 
 import { LocationApprovalController } from './LocationApprovalController';
+import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
 const dataApiRequests = new DataApiRequests();
 const locationApprovalController = new LocationApprovalController(
   {
+    buildBreadcrumbs: buildEditBreadcrumbs,
     editView: 'court-edit',
     getLocation: courtId => dataApiRequests.getCourtById(courtId),
     locationIdViewKey: 'courtId',
