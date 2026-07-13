@@ -31,6 +31,34 @@ describe('ServiceCentreWarningNoticeService', () => {
     expect(updateServiceCentreStub.notCalled).toBe(true);
   });
 
+  test('retrieves warning notice view model', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      warningNotice: 'Existing warning notice',
+    } as never);
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.retrieve(serviceCentreId);
+
+    expect(result).toEqual({
+      errors: undefined,
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      pageTitle: 'Warning notice - Reading Service Centre',
+      warningNotice: 'Existing warning notice',
+    });
+  });
+
+  test('returns status when retrieve service centre fails', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(HttpStatusCode.InternalServerError);
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.retrieve(serviceCentreId);
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
   test('trims warning notice before save', async () => {
     const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
@@ -70,5 +98,86 @@ describe('ServiceCentreWarningNoticeService', () => {
 
     expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
     expect(updateServiceCentreStub.notCalled).toBe(true);
+  });
+
+  test('stores empty warning notice as null and returns saved result', async () => {
+    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: 'Old warning',
+    } as never);
+    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+    } as never);
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, '   ');
+
+    expect(result).toEqual({
+      type: 'saved',
+      viewModel: {
+        errors: undefined,
+        id: serviceCentreId,
+        name: 'Reading Service Centre',
+        pageTitle: 'Warning notice - Reading Service Centre',
+        warningNotice: '',
+      },
+    });
+    expect(getServiceCentreByIdStub.calledOnce).toBe(true);
+    expect(updateServiceCentreStub.firstCall.args[0]).toMatchObject({ warningNotice: null });
+  });
+
+  test('returns status when update fails with status', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+    } as never);
+    stub(DataApiRequests.prototype, 'updateServiceCentre').resolves(HttpStatusCode.BadGateway);
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'Updated warning');
+
+    expect(result).toEqual({ status: HttpStatusCode.BadGateway, type: 'status' });
+  });
+
+  test('maps API validation map to view model errors and ignores timestamp key', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+    } as never);
+    stub(DataApiRequests.prototype, 'updateServiceCentre').resolves(
+      new Map([
+        ['warningNotice', 'Warning notice contains unsupported text'],
+        ['timestamp', '2026-07-13T00:00:00Z'],
+      ])
+    );
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'Updated warning');
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.viewModel.errors).toEqual({
+      warningNotice: ['Warning notice contains unsupported text'],
+    });
   });
 });

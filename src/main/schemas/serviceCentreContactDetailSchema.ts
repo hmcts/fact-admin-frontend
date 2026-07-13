@@ -9,17 +9,16 @@ const serviceCentreContactDescriptionSchema = z
   .nullable()
   .optional();
 
-export const serviceCentreContactDetailSchema = z
-  .object({
-    id: z.string(),
-    serviceCentreId: z.string(),
-    serviceCentreContactDescription: serviceCentreContactDescriptionSchema,
-    serviceCentreContactDescriptionId: z.string().optional(),
-    explanation: z.string().nullable().optional(),
-    explanationCy: z.string().nullable().optional(),
-    email: z.string().nullable().optional(),
-    phoneNumber: z.string().nullable().optional(),
-  });
+export const serviceCentreContactDetailSchema = z.object({
+  id: z.string(),
+  serviceCentreId: z.string(),
+  serviceCentreContactDescription: serviceCentreContactDescriptionSchema,
+  serviceCentreContactDescriptionId: z.string().optional(),
+  explanation: z.string().nullable().optional(),
+  explanationCy: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  phoneNumber: z.string().nullable().optional(),
+});
 
 export const serviceCentreContactDetailListSchema = z.array(serviceCentreContactDetailSchema);
 
