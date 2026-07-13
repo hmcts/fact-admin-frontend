@@ -1,5 +1,6 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "macros/Breadcrumb.macro.njk" import appBreadcrumb %}
 
 {% block head %}
   {% include "webpack/css.njk" %}
@@ -59,6 +60,12 @@
 
 {% block govukFooter %}
   {{ govukFooter({}) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {% if breadcrumbs and breadcrumbs.length %}
+    {{ appBreadcrumb(breadcrumbs) }}
+  {% endif %}
 {% endblock %}
 
 {% block bodyEnd %}
