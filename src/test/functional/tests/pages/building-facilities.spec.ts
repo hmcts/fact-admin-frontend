@@ -11,6 +11,14 @@ test.describe('Building Facilities Page Tests', () => {
       await withCreatedCourt(playwright, 'Building Facilities Functional Test', {}, async ({ createdCourt }) => {
         await buildingFacilitiesPage.goto(createdCourt.id);
         await expect(buildingFacilitiesPage.heading).toContainText('Building Facilities');
+
+        const breadcrumb = buildingFacilitiesPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await expect(breadcrumb).toContainText('Building Facilities');
       });
     }
   );
@@ -39,7 +47,10 @@ test.describe('Building Facilities Page Tests', () => {
       await expect(
         buildingFacilitiesPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
       ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-      await expect(buildingFacilitiesPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      await expect(buildingFacilitiesPage.mainContent.content.getByRole('link', { name: 'Home' })).toHaveAttribute(
+        'href',
+        '/'
+      );
     });
   });
 
