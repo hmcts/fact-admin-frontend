@@ -1,0 +1,47 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model.errors) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Warning notice</h1>
+      <p class="govuk-body">Use this field to display text relevant for this service centre only. This is limited to 250 characters</p>
+
+      <form method="post" action="/service-centres/{{ model.id }}/edit/warning-notice/success">
+        {{ govukTextarea({
+          id: "warningNotice",
+          name: "warningNotice",
+          label: {
+            text: "Warning notice (optional)",
+            classes: "govuk-label--m"
+          },
+          attributes: {
+            maxlength: 250
+          },
+          rows: 5,
+          value: model.warningNotice,
+          errorMessage: {
+            text: model.errors.warningNotice[0]
+          } if model.errors and model.errors.warningNotice else null
+        }) }}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+
+

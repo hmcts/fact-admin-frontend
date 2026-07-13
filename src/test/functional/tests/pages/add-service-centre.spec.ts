@@ -127,7 +127,7 @@ test.describe(
           await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
           await addServiceCentrePage.continueToAddress();
 
-          await expect(addServiceCentrePage.heading).toContainText('Service centre address');
+          await expect(addServiceCentrePage.heading).toContainText('Address');
           await expect(addServiceCentrePage.mainContent.content).toContainText(
             'If you do not add an address, this service centre will be marked as closed.'
           );
@@ -152,7 +152,7 @@ test.describe(
 
           await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
           await addServiceCentrePage.continueToAddress();
-          await expect(addServiceCentrePage.heading).toContainText('Service centre address');
+          await expect(addServiceCentrePage.heading).toContainText('Address');
 
           await homePage.goto();
           await homePage.searchForCourt(serviceCentreName, true);
@@ -180,7 +180,7 @@ test.describe(
         });
         expect(Date.now() - redirectStart).toBeGreaterThanOrEqual(6900);
 
-        await expect(addServiceCentrePage.heading).toContainText('Service centre address');
+        await expect(addServiceCentrePage.heading).toContainText('Address');
         await expect(addServiceCentrePage.mainContent.content).toContainText(
           'If you do not add an address, this service centre will be marked as closed.'
         );

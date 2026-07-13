@@ -94,10 +94,20 @@ describe('Add service centre page', () => {
     expect(response.text).toContain('hods-loading-spinner');
   });
 
-  test('renders the temporary service centre address placeholder', async () => {
+  test('renders the service centre address page after create flow', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'National Business Centre',
+      open: false,
+      slug: 'national-business-centre',
+      warningNotice: null,
+    } as never);
+    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
+
     const response = await request(app).get('/service-centres/11111111-1111-4111-8111-111111111111/edit/address');
 
     expect(response.status).toBe(200);
+    expect(response.text).toContain('You can have 0-1 addresses per service centre');
     expect(response.text).toContain('If you do not add an address, this service centre will be marked as closed.');
   });
 });

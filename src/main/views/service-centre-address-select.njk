@@ -1,0 +1,57 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{%- set actionUrl %}
+  {% if addressId %}
+    /service-centres/{{ serviceCentreId }}/edit/address/details/{{ addressId }}
+  {% else %}
+    /service-centres/{{ serviceCentreId }}/edit/address/details
+  {% endif %}
+{% endset -%}
+
+{% set addressOptions = [] %}
+{% if addresses.length %}
+  {% for row in addresses %}
+    {% set addressOptions = (addressOptions.push(
+      { value: row | dump, text: row.ADDRESS }
+    ), addressOptions) %}
+  {% endfor %}
+{% endif %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Select an address</h1>
+
+      <p class="govuk-body">Postcode: {{ postcode }}.</p>
+
+      <form method="POST" action="{{ actionUrl }}">
+        {{ govukSelect({
+          id: "address",
+          name: "address",
+          label: {
+            text: "Choose an address"
+          },
+          items: addressOptions
+        }) }}
+
+        {{ govukButton({
+          text: "Continue"
+        }) }}
+      </form>
+
+      <form method="POST" action="{{ actionUrl }}">
+        {{ govukButton({
+          text: "Enter address manually",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
+

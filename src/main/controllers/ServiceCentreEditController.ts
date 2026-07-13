@@ -2,35 +2,39 @@ import { GET, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import { isUuid } from '../utils/valueParsers';
+import { DataApiRequests } from '../requests/DataApiRequests';
+
+import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
+import { getUuidRouteParam } from './helpers/routeParams';
+
+const dataApiRequests = new DataApiRequests();
 
 @route('/service-centres/:serviceCentreId/edit')
 export default class ServiceCentreEditController {
   @GET()
-  public get(req: Request, res: Response): void {
-    const { serviceCentreId } = req.params;
-    const resolvedServiceCentreId = Array.isArray(serviceCentreId) ? serviceCentreId[0] : serviceCentreId;
+  public async get(req: Request, res: Response): Promise<void> {
+    const resolvedServiceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    if (!resolvedServiceCentreId) {
+      renderServiceCentreNotFound(res);
+      return;
+    }
 
-    if (!resolvedServiceCentreId || !isUuid(resolvedServiceCentreId)) {
-      res.status(HttpStatusCode.NotFound);
-      res.render('not-found');
+    const serviceCentreResponse = await dataApiRequests.getServiceCentreById(resolvedServiceCentreId);
+    if (serviceCentreResponse === HttpStatusCode.NotFound) {
+      renderServiceCentreNotFound(res);
+      return;
+    }
+
+    if (typeof serviceCentreResponse === 'number') {
+      renderError(res, serviceCentreResponse);
       return;
     }
 
     res.render('service-centre-edit', {
       pagePath: `/service-centres/${resolvedServiceCentreId}/edit`,
-      pageTitle: 'Editing service centre',
+      pageTitle: `Editing - ${serviceCentreResponse.name}`,
+      serviceCentreName: serviceCentreResponse.name,
       serviceCentreId: resolvedServiceCentreId,
-    });
-  }
-
-  @GET()
-  @route('/address')
-  public getAddressPlaceholder(req: Request, res: Response): void {
-    res.render('service-centre-address-placeholder', {
-      pagePath: `/service-centres/${req.params.serviceCentreId}/edit/address`,
-      pageTitle: 'Service centre address',
-      serviceCentreId: req.params.serviceCentreId,
     });
   }
 }

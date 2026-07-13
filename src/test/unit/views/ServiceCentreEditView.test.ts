@@ -7,11 +7,11 @@ describe('Service Centre Edit View', () => {
   test('renders the service centre edit page heading and section links', () => {
     const html = env.render('service-centre-edit.njk', {
       pagePath: serviceCentreEditPath,
-      pageTitle: 'Editing service centre',
+      pageTitle: 'Editing - Reading Service Centre',
       serviceCentreId,
     });
 
-    expect(html).toContain('Editing service centre');
+    expect(html).toContain('Editing - Reading Service Centre');
     expect(html).toContain(`${serviceCentreEditPath}/general`);
     expect(html).toContain('General');
     expect(html).toContain(`${serviceCentreEditPath}/warning-notice`);
