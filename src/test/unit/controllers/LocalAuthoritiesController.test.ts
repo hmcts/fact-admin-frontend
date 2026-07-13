@@ -26,6 +26,7 @@ describe('LocalAuthoritiesController', () => {
 
     const viewModel = {
       courtId: COURT_ID,
+      courtName: 'Court',
       courtTypes: { family: true },
       casesHeard: { Adoption: true, Children: true, Divorce: false },
       localAuthoritySelections: {
@@ -38,7 +39,17 @@ describe('LocalAuthoritiesController', () => {
 
     const retrieveStub = stub(LocalAuthoritiesService.prototype, 'retrieve').resolves(viewModel as never);
 
-    responseMock.expects('render').once().withArgs('local-authorities', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('local-authorities', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Court' },
+          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
+        ],
+      });
 
     try {
       await controller.renderLocalAuthoritiesView(request, response);
@@ -144,10 +155,19 @@ describe('LocalAuthoritiesController', () => {
       courtName: 'Reading Crown Court',
     });
 
-    responseMock.expects('render').once().withArgs('local-authorities-success', {
-      courtId: COURT_ID,
-      courtName: 'Reading Crown Court',
-    });
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('local-authorities-success', {
+        courtId: COURT_ID,
+        courtName: 'Reading Crown Court',
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
+          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
+          { href: '#', text: 'Local authorities saved' },
+        ],
+      });
 
     try {
       await controller.updateLocalAuthorities(request, response);

@@ -12,9 +12,37 @@ test.describe('General Page Tests', () => {
         await generalPage.goto(createdCourt.id);
 
         await expect(generalPage.heading).toContainText('General');
+        const breadcrumb = generalPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await expect(breadcrumb).toContainText('General');
       });
     }
   );
+
+  test('breadcrumb links navigate between home, court edit and general pages', async ({
+    courtEditPage,
+    generalPage,
+    playwright,
+  }) => {
+    await withCreatedCourt(playwright, 'General Functional Test', {}, async ({ createdCourt }) => {
+      await generalPage.goto(createdCourt.id);
+
+      const breadcrumb = generalPage.page.getByLabel('Breadcrumb');
+      await breadcrumb.getByRole('link', { name: createdCourt.name }).click();
+      await expect(generalPage.page).toHaveURL(generalPage.buildCourtEditUrl(createdCourt.id));
+      await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
+
+      await courtEditPage.sectionsTable.getByRole('link', { name: 'General', exact: true }).click();
+      await expect(generalPage.page).toHaveURL(generalPage.buildGeneralUrl(createdCourt.id));
+
+      await generalPage.page.getByLabel('Breadcrumb').getByRole('link', { name: 'Home' }).click();
+      await expect(generalPage.page).toHaveURL(/\/$/);
+    });
+  });
 
   test('renders the general form', async ({ generalPage, playwright }) => {
     await withCreatedCourt(playwright, 'General Functional Test', {}, async ({ createdCourt }) => {
@@ -47,7 +75,7 @@ test.describe('General Page Tests', () => {
       await expect(
         generalPage.page.getByRole('link', { name: `Continue updating ${updatedCourtName}` })
       ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-      await expect(generalPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      await expect(generalPage.mainContent.content.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
       await expect(generalPage.page.locator('a.govuk-link--no-visited-state')).toHaveCount(2);
     });
   });
@@ -80,10 +108,10 @@ test.describe('General Page Tests', () => {
 
       await generalPage.goto(createdCourt.id);
       await generalPage.save();
-      await generalPage.page.getByRole('link', { name: 'Home' }).click();
+      await generalPage.mainContent.content.getByRole('link', { name: 'Home' }).click();
 
       expect(new URL(generalPage.page.url()).pathname).toBe('/');
-      await expect(generalPage.heading).toContainText('Courts and tribunals');
+      await expect(generalPage.heading).toContainText('Courts, tribunals and service centres');
     });
   });
 

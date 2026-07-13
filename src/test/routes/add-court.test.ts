@@ -20,6 +20,9 @@ describe('Add court page', () => {
     expect(response.text).toContain('Add new court');
     expect(response.text).toContain('Court will be closed by default.');
     expect(response.text).toContain('South East');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain('Add new court');
   });
 
   test('re-renders the add court page with validation errors', async () => {
@@ -54,6 +57,7 @@ describe('Add court page', () => {
       { country: 'england', id: court.regionId, name: 'South East' },
     ]);
     stub(DataApiRequests.prototype, 'getCourtByName').resolves(404);
+    stub(DataApiRequests.prototype, 'getServiceCentreByName').resolves(404);
     const createCourtStub = stub(DataApiRequests.prototype, 'createCourt').resolves(court);
 
     const response = await request(app).post('/add-court').send({ name: court.name, regionId: court.regionId });

@@ -12,6 +12,13 @@ test.describe('Cases Heard Page Tests', () => {
         await casesHeardPage.goto(createdCourt.id);
 
         await expect(casesHeardPage.heading).toContainText('Cases heard');
+        const breadcrumb = casesHeardPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await expect(breadcrumb).toContainText('Cases heard');
       });
     }
   );
@@ -48,7 +55,7 @@ test.describe('Cases Heard Page Tests', () => {
       await expect(
         casesHeardPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
       ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-      await expect(casesHeardPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      await expect(casesHeardPage.mainContent.content.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
       await expect(casesHeardPage.page.locator('a.govuk-link--no-visited-state')).toHaveCount(2);
     });
   });
@@ -172,9 +179,9 @@ test.describe('Cases Heard Page Tests', () => {
       await casesHeardPage.goto(createdCourt.id);
       await casesHeardPage.selectFirstCaseType();
       await casesHeardPage.save();
-      await casesHeardPage.page.getByRole('link', { name: 'Home' }).click();
+      await casesHeardPage.mainContent.content.getByRole('link', { name: 'Home' }).click();
       expect(new URL(casesHeardPage.page.url()).pathname).toBe('/');
-      await expect(casesHeardPage.heading).toContainText('Courts and tribunals');
+      await expect(casesHeardPage.heading).toContainText('Courts, tribunals and service centres');
     });
   });
 

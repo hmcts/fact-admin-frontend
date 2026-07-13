@@ -35,6 +35,14 @@ describe('Single point of entry routes', () => {
     expect(response.text).toContain(
       `<form method="post" action="/courts/${courtId}/edit/single-point-of-entry/success">`
     );
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Edit Reading Crown Court</a>`
+    );
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit/single-point-of-entry">Single points of entry</a>`
+    );
     expect(response.text).toContain('type="checkbox" value="true"');
     expect(response.text).not.toContain('type="checkbox" value="true" checked');
   });
@@ -74,6 +82,8 @@ describe('Single point of entry routes', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('have been successfully updated');
     expect(response.text).toContain('Continue updating Reading Crown Court');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="#">Single points of entry saved</a>');
     expect(
       updateStub.calledOnceWith(courtId, {
         '22222222-2222-4222-8222-222222222222': true,

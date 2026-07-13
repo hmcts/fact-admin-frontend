@@ -13,6 +13,7 @@ export type HomePageTableCell = {
 
 export type HomePageFilters = {
   includeClosed: boolean;
+  onlyServiceCentres: boolean;
   pageNumber: number;
   pageSize: number;
   partialCourtName: string;
@@ -20,6 +21,7 @@ export type HomePageFilters = {
   sortBy: '' | 'lastUpdated' | 'name';
   sortOrder: 'asc' | 'desc';
   rawIncludeClosed?: string;
+  rawOnlyServiceCentres?: string;
   rawPageNumber?: string;
   rawPageSize?: string;
   rawSortBy?: string;

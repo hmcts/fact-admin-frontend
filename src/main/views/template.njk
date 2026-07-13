@@ -1,5 +1,6 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "macros/Breadcrumb.macro.njk" import appBreadcrumb %}
 {% from "macros/timeout-dialog.njk" import hmrcTimeoutDialog %}
 
 {% block head %}
@@ -28,6 +29,7 @@
   {% set isCourtsPage = pagePath == "/" %}
   {% set isDownloadPage = pagePath.startsWith("/download") %}
   {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
+  {% set isAddServiceCentrePage = pagePath.startsWith("/add-service-centre") %}
   {% set isAuditPage = pagePath.startsWith("/audits") %}
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
@@ -37,6 +39,7 @@
     }
   }) }}
   {{ govukServiceNavigation({
+    classes: "app-service-navigation",
     serviceName: "Find a Court or Tribunal Admin",
     serviceUrl: "/",
     navigation: [
@@ -56,6 +59,11 @@
         current: isAddCourtPage
       },
       {
+        href: "/add-service-centre",
+        text: "Add new service centre",
+        current: isAddServiceCentrePage
+      },
+      {
         href: "/audits",
         text: "Audits",
         current: isAuditPage
@@ -71,6 +79,12 @@
 
 {% block govukFooter %}
   {{ govukFooter({}) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {% if breadcrumbs and breadcrumbs.length %}
+    {{ appBreadcrumb(breadcrumbs) }}
+  {% endif %}
 {% endblock %}
 
 {% block bodyEnd %}

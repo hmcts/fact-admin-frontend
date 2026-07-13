@@ -7,6 +7,8 @@ import { SubjectType } from '../schemas/subjectTypeSchema';
 import { LockService } from '../services/LockService';
 import { isUuid, parseNumber } from '../utils/valueParsers';
 
+import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
+
 const dataApiRequests = new DataApiRequests();
 const courtLockService = new LockService(dataApiRequests);
 
@@ -46,6 +48,7 @@ export default class CourtEditController {
     }
 
     res.render('court-edit', {
+      breadcrumbs: buildEditBreadcrumbs(resolvedCourtId, courtResponse.name),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       pageTitle: `Editing - ${courtResponse.name}`,

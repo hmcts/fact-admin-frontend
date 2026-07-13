@@ -45,6 +45,8 @@ import {
 } from '../schemas/openingHoursSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
+import { ServiceArea, serviceAreaListSchema } from '../schemas/serviceAreaSchema';
+import { ServiceCentre, serviceCentreSchema } from '../schemas/serviceCentreSchema';
 import { Subject } from '../schemas/subjectTypeSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
 import { User, userSchema } from '../schemas/userSchema';
@@ -170,6 +172,45 @@ export class DataApiRequests {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
       logger.error('Error creating court:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a service centre entity by exact service centre name
+   */
+  public async getServiceCentreByName(serviceCentreName: string): Promise<ServiceCentre | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/service-centres/name/v1', { params: { name: serviceCentreName } });
+      return serviceCentreSchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound) {
+        return HttpStatusCode.NotFound;
+      }
+
+      logger.error(`Error fetching service centre details for name ${serviceCentreName}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create a service centre
+   */
+  public async createServiceCentre(
+    serviceCentre: Pick<ServiceCentre, 'name' | 'open' | 'regionId' | 'serviceAreaIds'>
+  ): Promise<ServiceCentre | HttpStatusCode | Map<string, string>> {
+    try {
+      const response = await dataApi.post('/service-centres/v1', serviceCentre);
+      return serviceCentreSchema.parse(response.data);
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+      logger.error('Error creating service centre:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -430,6 +471,21 @@ export class DataApiRequests {
       return areaOfLawListSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching area of law type details:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve service areas
+   */
+  public async getServiceAreas(): Promise<ServiceArea[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/types/v1/service-areas');
+      return serviceAreaListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching service area type details:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

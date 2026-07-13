@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import { CasesHeardService } from '../services/CasesHeardService';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const casesHeardService = new CasesHeardService();
 
 type Confirmations = {
@@ -21,23 +23,23 @@ export default class CasesHeardController {
     const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
 
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     const viewModel = await casesHeardService.getCasesHeardPage(resolvedCourtId);
 
     if (viewModel === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      return res.render('error');
+      return res.status(viewModel).render('error');
     }
 
-    res.render('cases-heard', viewModel);
+    return res.render('cases-heard', {
+      ...viewModel,
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, viewModel.courtName),
+    });
   }
 
   @route('/success')
@@ -47,8 +49,7 @@ export default class CasesHeardController {
     const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
 
     if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     const selectedAreasOfLaw = casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
@@ -69,21 +70,26 @@ export default class CasesHeardController {
     const saveResult = await casesHeardService.saveCasesHeard(resolvedCourtId, selectedAreasOfLaw);
 
     if (saveResult.type === 'validation_error') {
-      res.status(HttpStatusCode.BadRequest);
-      return res.render('cases-heard', saveResult.viewModel);
+      return res.status(HttpStatusCode.BadRequest).render('cases-heard', {
+        ...saveResult.viewModel,
+        breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, saveResult.viewModel.courtName),
+      });
     }
 
     if (saveResult.type === 'status' && saveResult.status === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return res.status(HttpStatusCode.NotFound).render('court-not-found');
     }
 
     if (saveResult.type === 'status') {
-      res.status(saveResult.status);
-      return res.render('error');
+      return res.status(saveResult.status).render('error');
     }
 
     return res.render('common-edit-success', {
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(
+        resolvedCourtId,
+        saveResult.viewModel.courtName,
+        'Cases heard saved'
+      ),
       courtId: resolvedCourtId,
       pageTitle: `Cases heard saved - ${saveResult.viewModel.courtName}`,
       successPanelTitle: 'Cases heard saved',
@@ -112,10 +118,15 @@ export default class CasesHeardController {
     }
 
     return res.render('cases-heard-confirm', {
+      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, courtName, 'Cases heard confirm update'),
       courtId: resolvedCourtId,
       courtName,
       selectedAreasOfLaw,
       message,
     });
+  }
+
+  private buildCasesHeardBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Cases heard', 'cases-heard', currentPage);
   }
 }
