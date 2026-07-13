@@ -76,11 +76,11 @@ test.describe(
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
-    test('Approvals Tracker Page Performance', async ({ lighthouseUtils, page, playwright }) => {
+    test('Approvals Tracker Page Performance', async ({ lighthousePage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Approvals Tracker Performance Test', {}, async ({ createdCourt }) => {
-        await page.goto(`${config.urls.homePageUrl}/approvals?name=${encodeURIComponent(createdCourt.name)}`);
-        await page.getByRole('heading', { name: 'Approvals tracker' }).waitFor();
-        await page.getByRole('row').filter({ hasText: createdCourt.name }).waitFor();
+        await lighthousePage.goto(`${config.urls.homePageUrl}/approvals?name=${encodeURIComponent(createdCourt.name)}`);
+        await lighthousePage.getByRole('heading', { name: 'Approvals tracker' }).waitFor();
+        await lighthousePage.getByRole('row').filter({ hasText: createdCourt.name }).waitFor();
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
     });

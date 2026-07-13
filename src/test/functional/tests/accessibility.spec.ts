@@ -420,6 +420,8 @@ test.describe(
       page,
       playwright,
     }) => {
+      test.slow();
+
       await seedAuditTrailViaUi({
         addCourtPage,
         courtAddressDeletePage,

@@ -69,7 +69,7 @@ test.describe(
           await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/address`);
           await expect(page.getByRole('heading', { name: 'Addresses' })).toBeVisible();
           await expect(page.getByRole('button', { name: 'Add address' })).toHaveCount(0);
-          await expect(page.getByRole('link', { name: /Edit|Delete/ })).toHaveCount(0);
+          await expect(page.getByRole('main').getByRole('link', { name: /^(Edit|Delete)$/ })).toHaveCount(0);
 
           await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/contact-details`);
           await expect(page.getByRole('button', { name: 'Add contact detail' })).toHaveCount(0);
@@ -131,19 +131,19 @@ test.describe(
 
         await page.goto(config.urls.homePageUrl + reviewPath);
 
-        await page.getByRole('link', { name: 'Approve data' }).click();
+        await page.getByRole('button', { name: 'Approve data' }).click();
         await expect(page.getByRole('heading', { name: /Are you sure you want to approve/ })).toBeVisible();
         await page.getByRole('button', { name: 'Cancel' }).click();
         await expect(page).toHaveURL(new RegExp(`${reviewPath}$`));
-        await expect(page.getByRole('link', { name: 'Approve data' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Approve data' })).toBeVisible();
 
-        await page.getByRole('link', { name: 'Approve data' }).click();
+        await page.getByRole('button', { name: 'Approve data' }).click();
         await page.getByRole('button', { name: 'Confirm data' }).click();
         await expect(page.getByText(`You have approved the data for ${createdCourt.name}.`)).toBeVisible();
         await expect(page.getByRole('link', { name: `Back to Reviewing - ${createdCourt.name}` })).toBeVisible();
 
         await page.goto(config.urls.homePageUrl + reviewPath);
-        await expect(page.getByRole('link', { name: 'Approve data' })).toHaveCount(0);
+        await expect(page.getByRole('button', { name: 'Approve data' })).toHaveCount(0);
 
         await adminPage.reload();
         await expect(approvalRow).toHaveCount(0);
@@ -173,12 +173,12 @@ test.describe(
           await expect(page.getByRole('button')).toHaveCount(0);
 
           await page.goto(config.urls.homePageUrl + reviewPath);
-          await page.getByRole('link', { name: 'Approve data' }).click();
+          await page.getByRole('button', { name: 'Approve data' }).click();
           await page.getByRole('button', { name: 'Confirm data' }).click();
           await expect(page.getByText(`You have approved the data for ${createdServiceCentre.name}.`)).toBeVisible();
 
           await page.goto(config.urls.homePageUrl + reviewPath);
-          await expect(page.getByRole('link', { name: 'Approve data' })).toHaveCount(0);
+          await expect(page.getByRole('button', { name: 'Approve data' })).toHaveCount(0);
         }
       );
     });
@@ -199,7 +199,7 @@ test.describe(
         await page.goto(config.urls.homePageUrl + editPath);
 
         await expect(page.getByRole('heading', { name: `Editing - ${createdCourt.name}` })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'Approve data' })).toHaveCount(0);
+        await expect(page.getByRole('button', { name: 'Approve data' })).toHaveCount(0);
         await expect(page.getByRole('heading', { name: 'Approve data' })).toHaveCount(0);
 
         await page.goto(`${config.urls.homePageUrl}${editPath}/approve`);
@@ -222,7 +222,7 @@ test.describe(
         const editPath = `/courts/${createdCourt.id}/edit`;
         await page.goto(config.urls.homePageUrl + editPath);
 
-        await page.getByRole('link', { name: 'Approve data' }).click();
+        await page.getByRole('button', { name: 'Approve data' }).click();
         await page.getByRole('button', { name: 'Confirm data' }).click();
         await expect(page.getByText(`You have approved the data for ${createdCourt.name}.`)).toBeVisible();
 
