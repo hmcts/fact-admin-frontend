@@ -10,7 +10,7 @@ const tokenMutex = new Mutex();
 
 const OPEN_URLS = new Set<string>(['/health']);
 const USER_ID_HEADER = 'X-User-Id';
-const USER_ID_EXCLUDED_ENDPOINTS = new Set<string>(['/user/v1', '/users']);
+const USER_ID_EXCLUDED_ENDPOINTS = new Set<string>(['POST /user/v1']);
 
 const clientAppRegId: string = config.get('secrets.fact-kv.FRONTEND_APP_REG_ID');
 const apiAppRegId: string = config.get('secrets.fact-kv.API_APP_REG_ID');
@@ -102,7 +102,7 @@ export async function processRequest(cfg: InternalAxiosRequestConfig): Promise<I
 }
 
 function shouldAddUserIdHeader(cfg: InternalAxiosRequestConfig): boolean {
-  return !USER_ID_EXCLUDED_ENDPOINTS.has(getUrlPathname(cfg.url ?? ''));
+  return !USER_ID_EXCLUDED_ENDPOINTS.has(`${(cfg.method ?? 'get').toUpperCase()} ${getUrlPathname(cfg.url ?? '')}`);
 }
 
 function getUrlPathname(url: string): string {

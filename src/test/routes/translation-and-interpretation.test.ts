@@ -25,6 +25,11 @@ describe('Translation and interpretation page', () => {
     expect(response.text).toContain('Translation and interpretation');
     expect(response.text).toContain('Select all that apply');
     expect(response.text).not.toContain('checked');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Reading Crown Court</a>`
+    );
   });
 
   test('renders checked options for non-empty translation service values', async () => {

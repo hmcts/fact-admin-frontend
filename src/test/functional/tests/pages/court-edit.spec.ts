@@ -11,6 +11,9 @@ test.describe('Court Edit Page Tests', () => {
       await withCreatedCourt(playwright, 'Court Edit Functional Test', {}, async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);
         await expect(courtEditPage.heading).toContainText(`Editing - ${createdCourt.name}`);
+        const breadcrumb = courtEditPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb).toContainText(createdCourt.name);
       });
     }
   );

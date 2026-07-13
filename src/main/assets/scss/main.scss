@@ -75,6 +75,18 @@
   flex-shrink: 0;
 }
 
+// Users table can extend beyond the standard GOV.UK content width.
+.users-table-wrapper {
+  overflow-x: auto;
+}
+
+@media (min-width: 1020px) {
+  .users-table-wrapper {
+    max-width: 1200px;
+    width: calc(100vw - ((100vw - 960px) / 2) - 60px);
+  }
+}
+
 // Court edit table layout
 .court-edit-table__wrapper {
   max-width: 720px;

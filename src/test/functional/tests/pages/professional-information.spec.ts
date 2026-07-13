@@ -17,6 +17,13 @@ test.describe('Information for Professionals Page Tests', () => {
 
           await professionalInformationPage.expectVisibleElements();
           await expect(professionalInformationPage.heading).toContainText('Information for professionals');
+          const breadcrumb = professionalInformationPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
+          await expect(breadcrumb).toContainText('Information for professionals');
         }
       );
     }
@@ -33,7 +40,9 @@ test.describe('Information for Professionals Page Tests', () => {
       {},
       async ({ createdCourt }) => {
         await courtEditPage.goto(createdCourt.id);
-        await courtEditPage.page.getByRole('link', { name: 'Information for professionals' }).click();
+        await courtEditPage.sectionsTable
+          .getByRole('link', { name: 'Information for professionals', exact: true })
+          .click();
 
         await expect(professionalInformationPage.page).toHaveURL(
           professionalInformationPage.buildProfessionalInformationUrl(createdCourt.id)
@@ -224,7 +233,9 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(
           professionalInformationPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
         ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-        await expect(professionalInformationPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(
+          professionalInformationPage.mainContent.content.getByRole('link', { name: 'Home' })
+        ).toHaveAttribute('href', '/');
 
         await professionalInformationPage.goto(createdCourt.id);
 

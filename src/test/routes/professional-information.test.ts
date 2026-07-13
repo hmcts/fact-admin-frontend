@@ -51,6 +51,11 @@ describe('Information for professionals page', () => {
     expect(response.text).toContain('value="DX 999"');
     expect(response.text).toContain('value="020 0000 0000"');
     expect(response.text).toContain('Professional schemes');
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Reading Crown Court</a>`
+    );
   });
 
   test('renders an empty form when the professional information endpoint returns no content', async () => {

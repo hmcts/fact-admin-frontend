@@ -10,6 +10,8 @@ import {
 } from '../services/ProfessionalInformationService';
 import { isUuid } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 type HiddenInput = {
   name: string;
   value: string;
@@ -46,7 +48,10 @@ export default class ProfessionalInformationController {
       return;
     }
 
-    res.render('professional-information', viewModel);
+    res.render('professional-information', {
+      ...viewModel,
+      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, viewModel.courtName),
+    });
   }
 
   @route('/success')
@@ -80,10 +85,18 @@ export default class ProfessionalInformationController {
 
     if (saveResponse.status === 'validationError') {
       res.status(HttpStatusCode.BadRequest);
-      return res.render('professional-information', saveResponse.viewModel);
+      return res.render('professional-information', {
+        ...saveResponse.viewModel,
+        breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
+      });
     }
 
     res.render('professional-information-success', {
+      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
+        courtId,
+        saveResponse.viewModel.courtName,
+        'Information for professionals saved'
+      ),
       courtId,
       courtName: saveResponse.viewModel.courtName,
     });
@@ -130,6 +143,11 @@ export default class ProfessionalInformationController {
     body: Request['body']
   ): void {
     res.render('professional-information-confirm', {
+      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
+        courtId,
+        confirmation.courtName,
+        'Information for professionals confirm update'
+      ),
       courtId,
       courtName: confirmation.courtName,
       hiddenInputs: this.buildHiddenInputs(body),
@@ -177,5 +195,15 @@ export default class ProfessionalInformationController {
         name,
         value: entry,
       }));
+  }
+
+  private buildProfessionalInformationBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(
+      courtId,
+      courtName,
+      'Information for professionals',
+      'information-for-professionals',
+      currentPage
+    );
   }
 }

@@ -28,6 +28,21 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    test(
+      'smoke test',
+      {
+        tag: '@smoke',
+      },
+      async ({ addCourtPage }) => {
+        await addCourtPage.goto();
+
+        const breadcrumb = addCourtPage.page.getByLabel('Breadcrumb');
+        await expect(addCourtPage.heading).toContainText('Add new court');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb).toContainText('Add new court');
+      }
+    );
+
     test('visibility test', async ({ addCourtPage }) => {
       await addCourtPage.goto();
 

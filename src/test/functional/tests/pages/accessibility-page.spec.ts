@@ -11,6 +11,14 @@ test.describe('Accessibility Page Tests', () => {
       await withCreatedCourt(playwright, 'Accessibility Functional Test', {}, async ({ createdCourt }) => {
         await accessibilityPage.goto(createdCourt.id);
         await expect(accessibilityPage.heading).toContainText('Accessibility');
+
+        const breadcrumb = accessibilityPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await expect(breadcrumb).toContainText('Accessibility');
       });
     }
   );

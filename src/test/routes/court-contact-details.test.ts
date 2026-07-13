@@ -43,6 +43,11 @@ describe('Court contact details routes', () => {
     expect(response.text).toContain(`/courts/${COURT_ID}/edit/contact-details/add`);
     expect(response.text).toContain(`/courts/${COURT_ID}/edit/contact-details/edit/${CONTACT_DETAIL_ID}`);
     expect(response.text).toContain(`/courts/${COURT_ID}/edit/contact-details/delete/${CONTACT_DETAIL_ID}`);
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${COURT_ID}/edit">Reading Crown Court</a>`
+    );
   });
 
   test('renders court not found for invalid court id on list page', async () => {

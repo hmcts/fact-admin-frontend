@@ -18,3 +18,4 @@ export { CourtOpeningHoursPage } from './court-opening-hours.po';
 export { LocalAuthoritiesPage } from './local-authorities.po';
 export { ProfessionalInformationPage } from './professional-information.po';
 export { SinglePointsOfEntryPage } from './single-points-of-entry.po';
+export { UsersPage } from './users.po';
