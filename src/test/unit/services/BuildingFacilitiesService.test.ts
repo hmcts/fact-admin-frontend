@@ -68,6 +68,7 @@ describe('BuildingFacilitiesService', () => {
 
     expect(result).toEqual({
       courtId,
+      name: 'Reading Crown Court',
       errors: {
         parking: ['Select whether the parking is available'],
         waitingArea: ['Select whether the waiting area is available'],
@@ -96,6 +97,7 @@ describe('BuildingFacilitiesService', () => {
 
     expect(result).toEqual({
       courtId,
+      name: 'Reading Crown Court',
       parking: true,
       waitingArea: true,
       quietRoom: false,
@@ -126,6 +128,7 @@ describe('BuildingFacilitiesService', () => {
 
     expect(result).toEqual({
       courtId,
+      name: 'Reading Crown Court',
       parking: true,
       waitingArea: true,
       quietRoom: false,

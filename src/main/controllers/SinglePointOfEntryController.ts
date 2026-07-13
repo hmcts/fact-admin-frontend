@@ -7,6 +7,8 @@ import { SinglePointOfEntryService } from '../services/SinglePointOfEntryService
 import { renderResponse, renderStatus } from '../utils/responseRendering';
 import { isUuid, parseBoolean, parseString } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const singlePointOfEntryService = new SinglePointOfEntryService();
 const logger = Logger.getLogger('app');
 const singlePointOfEntryFieldPrefix = 'singlePointOfEntry.';
@@ -20,7 +22,19 @@ export default class SinglePointOfEntryController {
       return renderStatus(res, HttpStatusCode.NotFound);
     }
 
-    return renderResponse(res, await singlePointOfEntryService.retrieve(courtId), 'single-point-of-entry');
+    const viewModel = await singlePointOfEntryService.retrieve(courtId);
+    if (typeof viewModel === 'number') {
+      return renderStatus(res, viewModel);
+    }
+
+    return renderResponse(
+      res,
+      {
+        ...viewModel,
+        breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(courtId, viewModel.courtName),
+      },
+      'single-point-of-entry'
+    );
   }
 
   @route('/success')
@@ -49,9 +63,18 @@ export default class SinglePointOfEntryController {
     }
 
     return void res.render('single-point-of-entry-success', {
+      breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(
+        courtId,
+        saveResult.courtName,
+        'Single points of entry saved'
+      ),
       courtId,
       courtName: saveResult.courtName,
     });
+  }
+
+  private buildSinglePointOfEntryBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Single points of entry', 'single-point-of-entry', currentPage);
   }
 
   private resolveCourtId(req: Request): string | undefined {

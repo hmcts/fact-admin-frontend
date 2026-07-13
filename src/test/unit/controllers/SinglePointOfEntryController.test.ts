@@ -13,6 +13,12 @@ const CHECKED_BODY = { [`singlePointOfEntry.${CHILDREN_AREA_ID}`]: ['false', 'tr
 const UNCHECKED_BODY = { [`singlePointOfEntry.${CHILDREN_AREA_ID}`]: 'false' };
 const SUCCESS_RESULT = { status: 'saved' as const, courtName: 'Reading Crown Court' };
 
+const expectedBreadcrumbs = [
+  { href: '/', text: 'Home' },
+  { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
+  { href: `/courts/${COURT_ID}/edit/single-point-of-entry`, text: 'Single points of entry' },
+];
+
 function buildRequest(params: Request['params'] = { courtId: COURT_ID }, body: unknown = CHECKED_BODY): Request {
   const request = mockRequest({});
   request.params = params;
@@ -93,7 +99,13 @@ describe('SinglePointOfEntryController', () => {
 
     await withStubbedRetrieve(viewModel, async ({ controller, request, response, stub: retrieveStub }) => {
       const responseMock = mock(response);
-      responseMock.expects('render').once().withArgs('single-point-of-entry', viewModel);
+      responseMock
+        .expects('render')
+        .once()
+        .withArgs('single-point-of-entry', {
+          ...viewModel,
+          breadcrumbs: expectedBreadcrumbs,
+        });
 
       await controller.renderSinglePointOfEntryView(request, response);
 
@@ -146,7 +158,14 @@ describe('SinglePointOfEntryController', () => {
       SUCCESS_RESULT,
       async ({ controller, request, response, stub: updateStub }) => {
         const responseMock = mock(response);
-        responseMock.expects('render').once().withArgs('single-point-of-entry-success');
+        responseMock
+          .expects('render')
+          .once()
+          .withArgs('single-point-of-entry-success', {
+            breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
+            courtId: COURT_ID,
+            courtName: 'Reading Crown Court',
+          });
 
         await controller.updateSinglePointOfEntry(request, response);
 
@@ -162,10 +181,14 @@ describe('SinglePointOfEntryController', () => {
       SUCCESS_RESULT,
       async ({ controller, request, response, stub: updateStub }) => {
         const responseMock = mock(response);
-        responseMock.expects('render').once().withArgs('single-point-of-entry-success', {
-          courtId: COURT_ID,
-          courtName: 'Reading Crown Court',
-        });
+        responseMock
+          .expects('render')
+          .once()
+          .withArgs('single-point-of-entry-success', {
+            breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
+            courtId: COURT_ID,
+            courtName: 'Reading Crown Court',
+          });
 
         await controller.updateSinglePointOfEntry(request, response);
 
