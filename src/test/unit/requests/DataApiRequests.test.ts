@@ -1315,6 +1315,62 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns paged users when the users list response is valid', async () => {
+    const params = {
+      pageNumber: 0,
+      pageSize: 25,
+      search: 'admin',
+    };
+    const users = {
+      content: [
+        {
+          email: 'admin@example.com',
+          favouriteCourts: null,
+          id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          lastLogin: '2026-05-27T10:35:23.406Z',
+          role: 'Admin',
+          ssoId: '00000000-0000-4000-8000-000000000000',
+        },
+      ],
+      page: {
+        number: 0,
+        size: 25,
+        totalElements: 1,
+        totalPages: 1,
+      },
+    };
+
+    getStub.withArgs('/user/v1', { params }).resolves({ data: users });
+
+    const response = await dataApiRequests.getUsers(params);
+
+    expect(response).toEqual(users);
+  });
+
+  it('returns internal server error when users list response fails schema validation', async () => {
+    getStub.withArgs('/user/v1', { params: {} }).resolves({
+      data: {
+        content: [
+          {
+            email: 'not-an-email',
+          },
+        ],
+      },
+    });
+
+    const response = await dataApiRequests.getUsers();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns the API status when users list fails with an axios response', async () => {
+    getStub.withArgs('/user/v1', { params: {} }).rejects(errorResponse);
+
+    const response = await dataApiRequests.getUsers();
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
   it('returns parsed court address details when the address list response is valid', async () => {
     const courtId = '77777777-7777-4777-8777-777777777777';
     const addresses = [
