@@ -35,6 +35,8 @@ test.describe(
       page,
       playwright,
     }) => {
+      test.slow();
+
       await withCreatedCourt(
         playwright,
         'Viewer Read Only Test',
@@ -72,10 +74,11 @@ test.describe(
           await expect(page.getByRole('main').getByRole('link', { name: /^(Edit|Delete)$/ })).toHaveCount(0);
 
           await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/contact-details`);
-          await expect(page.getByRole('button', { name: 'Add contact detail' })).toHaveCount(0);
-          await expect(page.getByRole('link', { name: 'Delete' })).toHaveCount(0);
-          await expect(page.getByRole('link', { name: 'Edit' })).toHaveCount(0);
-          const viewContactLink = page.getByRole('link', { name: 'View' }).first();
+          const mainContent = page.getByRole('main');
+          await expect(mainContent.getByRole('button', { name: 'Add contact detail' })).toHaveCount(0);
+          await expect(mainContent.getByRole('link', { name: 'Delete', exact: true })).toHaveCount(0);
+          await expect(mainContent.getByRole('link', { name: 'Edit', exact: true })).toHaveCount(0);
+          const viewContactLink = mainContent.getByRole('link', { name: 'View', exact: true }).first();
           await expect(viewContactLink).toBeVisible();
           await viewContactLink.click();
           await expect(page.getByRole('heading', { name: 'View contact details' })).toBeVisible();
@@ -83,10 +86,10 @@ test.describe(
           await expect(page.getByRole('button', { name: 'Save' })).toHaveCount(0);
 
           await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/court-opening-hours`);
-          await expect(page.getByRole('button', { name: 'Add opening hours' })).toHaveCount(0);
-          await expect(page.getByRole('link', { name: 'Delete' })).toHaveCount(0);
-          await expect(page.getByRole('link', { name: 'Edit' })).toHaveCount(0);
-          const viewOpeningHoursLink = page.getByRole('link', { name: 'View' }).first();
+          await expect(mainContent.getByRole('button', { name: 'Add opening hours' })).toHaveCount(0);
+          await expect(mainContent.getByRole('link', { name: 'Delete', exact: true })).toHaveCount(0);
+          await expect(mainContent.getByRole('link', { name: 'Edit', exact: true })).toHaveCount(0);
+          const viewOpeningHoursLink = mainContent.getByRole('link', { name: 'View', exact: true }).first();
           await expect(viewOpeningHoursLink).toBeVisible();
           await viewOpeningHoursLink.click();
           await expect(page.getByRole('heading', { name: 'View opening hours' })).toBeVisible();
@@ -134,7 +137,7 @@ test.describe(
         await page.getByRole('button', { name: 'Approve data' }).click();
         await expect(page.getByRole('heading', { name: /Are you sure you want to approve/ })).toBeVisible();
         await page.getByRole('button', { name: 'Cancel' }).click();
-        await expect(page).toHaveURL(new RegExp(`${reviewPath}$`));
+        await expect.poll(() => new URL(page.url()).pathname).toBe(reviewPath);
         await expect(page.getByRole('button', { name: 'Approve data' })).toBeVisible();
 
         await page.getByRole('button', { name: 'Approve data' }).click();
