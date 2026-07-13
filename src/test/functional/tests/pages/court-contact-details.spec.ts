@@ -14,6 +14,13 @@ test.describe('Court Contact Details Journey', () => {
         await courtContactDetailsPage.expectVisibleElements();
         await expect(courtContactDetailsPage.heading).toContainText('Contact details');
         await expect(courtContactDetailsPage.addContactDetailLink).toBeVisible();
+        const breadcrumb = courtContactDetailsPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await expect(breadcrumb).toContainText('Contact details');
       });
     }
   );

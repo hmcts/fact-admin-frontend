@@ -2,12 +2,18 @@ import { env } from '../../../testUtils/nunjucksHelper';
 
 describe('Single point of entry view', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
+  const breadcrumbs = [
+    { href: '/', text: 'Home' },
+    { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
+    { href: `/courts/${courtId}/edit/single-point-of-entry`, text: 'Single points of entry' },
+  ];
 
   test('renders single points of entry form with no selected by default', () => {
     const html = env.render('single-point-of-entry.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/single-point-of-entry`,
       pageTitle: 'Single points of entry - Reading Crown Court',
+      breadcrumbs,
       singlePointOfEntryServices: [
         {
           areaOfLawId: '22222222-2222-4222-8222-222222222222',
@@ -22,6 +28,10 @@ describe('Single point of entry view', () => {
       'Select the services where this court is the single point of entry. When selected, eligible public postcode searches will show this court as the only result when it is the closest matching court.'
     );
     expect(html).toContain('Childcare arrangements');
+    expect(html).toContain('aria-label="Breadcrumb"');
+    expect(html).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Edit Reading Crown Court</a>`
+    );
     expect(html).toContain('name="singlePointOfEntry.22222222-2222-4222-8222-222222222222"');
     expect(html).toContain(`/courts/${courtId}/edit/single-point-of-entry/success`);
     expect(html).toContain(
@@ -35,10 +45,12 @@ describe('Single point of entry view', () => {
     const html = env.render('single-point-of-entry-success.njk', {
       courtId,
       courtName: 'Reading Crown Court',
+      breadcrumbs: [...breadcrumbs, { href: '#', text: 'Single points of entry saved' }],
       pagePath: `/courts/${courtId}/edit/single-point-of-entry/success`,
     });
 
     expect(html).toContain('Single points of entry settings for Reading Crown Court have been successfully updated');
+    expect(html).toContain('Single points of entry saved');
     expect(html).toContain(
       `<a href="/courts/${courtId}/edit" class="govuk-link govuk-link--no-visited-state">Continue updating Reading Crown Court</a>`
     );

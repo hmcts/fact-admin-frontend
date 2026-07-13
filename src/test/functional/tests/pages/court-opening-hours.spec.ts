@@ -17,6 +17,13 @@ test.describe(
           await courtOpeningHoursPage.goto(createdCourt.id);
 
           await expect(courtOpeningHoursPage.heading).toContainText('Court opening hours');
+          const breadcrumb = courtOpeningHoursPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
+          await expect(breadcrumb).toContainText('Court opening hours');
         });
       }
     );

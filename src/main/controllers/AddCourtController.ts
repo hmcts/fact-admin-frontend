@@ -12,12 +12,16 @@ export default class AddCourtController {
     const viewModel = await addCourtService.getViewModel();
 
     if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      res.render('error');
-      return;
+      return res.status(viewModel).render('error');
     }
 
-    res.render('add-court', viewModel);
+    return res.render('add-court', {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '#', text: 'Add new court' },
+      ],
+    });
   }
 
   @POST()
@@ -28,16 +32,30 @@ export default class AddCourtController {
     });
 
     if (typeof createResult === 'number') {
-      res.status(createResult);
-      res.render('error');
-      return;
+      return res.status(createResult).render('error');
     }
 
     if ('errors' in createResult) {
-      res.render('add-court', createResult);
-      return;
+      return res.render('add-court', {
+        ...createResult,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Add new court' },
+        ],
+      });
     }
 
-    res.render('add-court-success', createResult);
+    if (!('courtId' in createResult)) {
+      return res.status(500).render('error');
+    }
+
+    return res.render('add-court-success', {
+      ...createResult,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${createResult.courtId}/edit`, text: createResult.courtName },
+        { href: '#', text: 'Addresses' },
+      ],
+    });
   }
 }

@@ -11,6 +11,6 @@ export class CourtAddressEditSuccessPage extends Base {
     super(page);
     this.successPanelTitle = this.page.locator('.govuk-panel__title');
     this.backToAddressesLink = this.page.getByRole('link', { name: 'Back to addresses' });
-    this.homeLink = this.page.getByRole('link', { name: 'Home' });
+    this.homeLink = this.mainContent.content.getByRole('link', { name: 'Home' });
   }
 }
