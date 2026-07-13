@@ -135,7 +135,7 @@ test.describe(
 
           await translationAndInterpretationPage.expectSuccessPage(createdCourt.name);
           await translationAndInterpretationPage.mainContent.content.getByRole('link', { name: 'Home' }).click();
-          await expect(homePage.heading).toContainText('Courts and tribunals');
+          await expect(homePage.heading).toContainText('Courts, tribunals and service centres');
           await expect(homePage.page).toHaveURL(/\/$/);
         }
       );
