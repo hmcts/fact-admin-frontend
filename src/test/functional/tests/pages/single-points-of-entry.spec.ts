@@ -10,6 +10,13 @@ test.describe('Single Points of Entry Page Tests', () => {
       await singlePointsOfEntryPage.goto(createdCourt.id);
 
       await expect(singlePointsOfEntryPage.heading).toContainText('Single points of entry');
+      const breadcrumb = singlePointsOfEntryPage.page.getByLabel('Breadcrumb');
+      await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      await expect(breadcrumb.getByRole('link', { name: `Edit ${createdCourt.name}` })).toHaveAttribute(
+        'href',
+        `/courts/${createdCourt.id}/edit`
+      );
+      await expect(breadcrumb).toContainText('Single points of entry');
       await expect(singlePointsOfEntryPage.mainContent.content).toContainText(
         'Select the services where this court is the single point of entry.'
       );
@@ -31,7 +38,10 @@ test.describe('Single Points of Entry Page Tests', () => {
       await expect(
         singlePointsOfEntryPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
       ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-      await expect(singlePointsOfEntryPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      await expect(singlePointsOfEntryPage.mainContent.content.getByRole('link', { name: 'Home' })).toHaveAttribute(
+        'href',
+        '/'
+      );
 
       await singlePointsOfEntryPage.goto(createdCourt.id);
       await expect(singlePointsOfEntryPage.singlePointOfEntryCheckbox('Childcare arrangements')).toBeChecked();

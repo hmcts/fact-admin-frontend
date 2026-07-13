@@ -19,6 +19,13 @@ test.describe(
           await courtAddressListPage.goto(createdCourt.id);
 
           await expect(courtAddressListPage.heading).toContainText('Addresses');
+          const breadcrumb = courtAddressListPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+            'href',
+            `/courts/${createdCourt.id}/edit`
+          );
+          await expect(breadcrumb).toContainText('Addresses');
         });
       }
     );

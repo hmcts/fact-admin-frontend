@@ -6,6 +6,8 @@ import { AccessibilityModel, AccessibilityService } from '../services/Accessibil
 import { isHearingEnhancementEquipment } from '../utils/mapper';
 import { isUuid, parseBoolean, parseLiftMetric } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const accessibilityService = new AccessibilityService();
 
 @route('/courts/:courtId/edit/accessibility')
@@ -31,6 +33,7 @@ export default class AccessibilityController {
     }
 
     return res.render('accessibility-edit', {
+      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model,
       pageTitle: `Accessibility - ${model.name}`,
@@ -101,6 +104,7 @@ export default class AccessibilityController {
       const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
 
       return res.render('accessibility-edit', {
+        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
         pageTitle: `Error: Accessibility - ${updateResponse.name}`,
@@ -108,11 +112,16 @@ export default class AccessibilityController {
     }
 
     return res.render('common-edit-success', {
+      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!, 'Accessibility saved'),
       courtId: resolvedCourtId,
       pageTitle: `Accessibility saved - ${updateResponse.name}`,
       successPanelTitle: 'Accessibility details saved',
       successPanelBody: `Accessibility details saved for ${updateResponse.name}`,
       courtName: updateResponse.name,
     });
+  }
+
+  private buildAccessibilityBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(courtId, courtName, 'Accessibility', 'accessibility', currentPage);
   }
 }
