@@ -19,8 +19,7 @@ export const serviceCentreContactDetailSchema = z
     explanationCy: z.string().nullable().optional(),
     email: z.string().nullable().optional(),
     phoneNumber: z.string().nullable().optional(),
-  })
-  .passthrough();
+  });
 
 export const serviceCentreContactDetailListSchema = z.array(serviceCentreContactDetailSchema);
 
