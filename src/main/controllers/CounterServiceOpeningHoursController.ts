@@ -9,6 +9,8 @@ import {
 import { renderResponse, renderStatus } from '../utils/responseRendering';
 import { isUuid, parseOptionalString, parseString } from '../utils/valueParsers';
 
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+
 const counterServiceOpeningHoursService = new CounterServiceOpeningHoursService();
 
 @route('/courts/:courtId/edit/counter-service-opening-hours')
@@ -23,7 +25,7 @@ export default class CounterServiceOpeningHoursController {
 
     const viewModel = await counterServiceOpeningHoursService.getListPage(courtId);
 
-    renderResponse(res, viewModel, 'counter-service-opening-hours');
+    renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'counter-service-opening-hours');
   }
 
   @route('/add')
@@ -37,7 +39,11 @@ export default class CounterServiceOpeningHoursController {
 
     const viewModel = await counterServiceOpeningHoursService.getEditPage(courtId);
 
-    renderResponse(res, viewModel, 'counter-service-opening-hours-edit');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
+      'counter-service-opening-hours-edit'
+    );
   }
 
   @route('/edit/:counterServiceId')
@@ -56,7 +62,12 @@ export default class CounterServiceOpeningHoursController {
 
     const viewModel = await counterServiceOpeningHoursService.getEditPage(courtId, counterServiceId);
 
-    renderResponse(res, viewModel, 'counter-service-opening-hours-edit', 'not-found');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
+      'counter-service-opening-hours-edit',
+      'not-found'
+    );
   }
 
   @route('/save')
@@ -87,7 +98,12 @@ export default class CounterServiceOpeningHoursController {
 
     const viewModel = await counterServiceOpeningHoursService.getDeletePage(courtId, counterServiceId);
 
-    renderResponse(res, viewModel, 'counter-service-opening-hours-delete', 'not-found');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Delete opening hours'),
+      'counter-service-opening-hours-delete',
+      'not-found'
+    );
   }
 
   @route('/delete/success/:counterServiceId')
@@ -106,7 +122,12 @@ export default class CounterServiceOpeningHoursController {
 
     const viewModel = await counterServiceOpeningHoursService.delete(courtId, counterServiceId);
 
-    renderResponse(res, viewModel, 'counter-service-opening-hours-delete-success', 'not-found');
+    renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted'),
+      'counter-service-opening-hours-delete-success',
+      'not-found'
+    );
   }
 
   private async save(req: Request, res: Response, counterServiceId?: string): Promise<void> {
@@ -134,7 +155,14 @@ export default class CounterServiceOpeningHoursController {
       return;
     }
 
-    res.render('counter-service-opening-hours-save-success', saveResult.viewModel);
+    res.render('counter-service-opening-hours-save-success', {
+      ...saveResult.viewModel,
+      breadcrumbs: this.buildCounterServiceBreadcrumbs(
+        courtId,
+        saveResult.viewModel.courtName,
+        'Counter service opening hours saved'
+      ),
+    });
   }
 
   private toForm(body: Record<string, unknown>): CounterServiceOpeningHoursForm {
@@ -160,5 +188,30 @@ export default class CounterServiceOpeningHoursController {
 
   private resolveParam(value: string | string[] | undefined): string {
     return Array.isArray(value) ? value[0] : (value ?? '');
+  }
+
+  private buildCounterServiceBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
+    return buildSectionBreadcrumbs(
+      courtId,
+      courtName,
+      'Counter service opening hours',
+      'counter-service-opening-hours',
+      currentPage
+    );
+  }
+
+  private withBreadcrumbs<T extends { courtName: string }>(
+    courtId: string,
+    viewModel: T | HttpStatusCode,
+    currentPage?: string
+  ): T | HttpStatusCode {
+    if (typeof viewModel === 'number') {
+      return viewModel;
+    }
+
+    return {
+      ...viewModel,
+      breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, viewModel.courtName, currentPage),
+    };
   }
 }
