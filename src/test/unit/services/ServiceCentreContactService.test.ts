@@ -353,14 +353,12 @@ describe('ServiceCentreContactService', () => {
   });
 
   test('getServiceCentreById delegates directly', async () => {
-    const getServiceCentreById = jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreById')
-      .mockResolvedValue({
-        id: serviceCentreId,
-        name: 'Reading Service Centre',
-        open: false,
-        slug: 'reading-service-centre',
-      } as never);
+    const getServiceCentreById = jest.spyOn(DataApiRequests.prototype, 'getServiceCentreById').mockResolvedValue({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: false,
+      slug: 'reading-service-centre',
+    } as never);
 
     const service = new ServiceCentreContactService();
     const result = await service.getServiceCentreById(serviceCentreId);
