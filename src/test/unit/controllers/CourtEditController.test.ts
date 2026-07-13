@@ -1,12 +1,14 @@
 import { HttpStatusCode } from 'axios';
-import type { Response } from 'express';
-import { assert, mock, stub } from 'sinon';
+import type { Request, Response } from 'express';
+import { assert, mock, restore, stub } from 'sinon';
 
 import CourtEditController from '../../../main/controllers/CourtEditController';
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtEditController', () => {
+  afterEach(() => restore());
+
   test('renders the court edit view when the court exists', async () => {
     const controller = new CourtEditController();
     const response = {
@@ -110,4 +112,107 @@ describe('CourtEditController', () => {
       getCourtByIdStub.restore();
     }
   });
+
+  test('renders approval confirmation for SuperAdmin', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT',
+        name: 'Reading Crown Court',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+    const controller = new CourtEditController();
+    const request = approvalRequest('SuperAdmin');
+    const response = approvalResponse();
+
+    await controller.getApprove(request, response);
+
+    expect(response.render).toHaveBeenCalledWith(
+      'approval-confirm',
+      expect.objectContaining({
+        name: 'Reading Crown Court',
+        pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',
+      })
+    );
+  });
+
+  test('approves court data for Viewer', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT',
+        name: 'Reading Crown Court',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+    const createApproval = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const controller = new CourtEditController();
+    const request = approvalRequest('Viewer');
+    const response = approvalResponse();
+
+    await controller.postApprove(request, response);
+
+    assert.calledWith(createApproval, {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT',
+      userId: 'test-user-id',
+    });
+    expect(response.render).toHaveBeenCalledWith(
+      'approval-success',
+      expect.objectContaining({ pageTitle: 'Approval saved - Reading Crown Court' })
+    );
+  });
+
+  test('denies Admin approval and handles invalid or failed approval requests', async () => {
+    const controller = new CourtEditController();
+
+    const deniedResponse = approvalResponse();
+    await controller.getApprove(approvalRequest('Admin'), deniedResponse);
+    expect(deniedResponse.status).toHaveBeenCalledWith(HttpStatusCode.Forbidden);
+    expect(deniedResponse.render).toHaveBeenCalledWith('access-denied');
+
+    const invalidRequest = approvalRequest('SuperAdmin');
+    invalidRequest.params = { courtId: 'invalid' };
+    const invalidResponse = approvalResponse();
+    await controller.getApprove(invalidRequest, invalidResponse);
+    expect(invalidResponse.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
+
+    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.BadGateway);
+    const failedResponse = approvalResponse();
+    await controller.getApprove(approvalRequest('SuperAdmin'), failedResponse);
+    expect(failedResponse.status).toHaveBeenCalledWith(HttpStatusCode.BadGateway);
+    expect(failedResponse.render).toHaveBeenCalledWith('error');
+  });
 });
+
+function approvalRequest(role: 'Admin' | 'SuperAdmin' | 'Viewer'): Request {
+  const request = mockRequest({}) as Request & {
+    appSession: { factUser: { id: string; role: 'Admin' | 'SuperAdmin' | 'Viewer' } };
+  };
+  request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
+  request.appSession = { factUser: { id: 'test-user-id', role } };
+  return request;
+}
+
+function approvalResponse(): Response {
+  const response = { render: jest.fn(), status: jest.fn() } as unknown as Response;
+  (response.status as jest.Mock).mockReturnValue(response);
+  return response;
+}
