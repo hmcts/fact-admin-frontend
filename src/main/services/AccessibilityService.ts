@@ -35,6 +35,7 @@ export class AccessibilityService {
       return {
         ...model,
         errors: validationErrors,
+        name: courtResponse.name,
       };
     }
 

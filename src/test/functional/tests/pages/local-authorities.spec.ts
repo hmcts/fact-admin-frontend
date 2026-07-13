@@ -12,6 +12,13 @@ test.describe('Local Authorities Page Tests', () => {
         await localAuthoritiesPage.goto(createdCourt.id);
 
         await expect(localAuthoritiesPage.warningText).toContainText('If you set a local authority for a court');
+        const breadcrumb = localAuthoritiesPage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await expect(breadcrumb).toContainText('Local Authorities');
       });
     }
   );
@@ -109,7 +116,10 @@ test.describe('Local Authorities Page Tests', () => {
         await expect(
           localAuthoritiesPage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
         ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
-        await expect(localAuthoritiesPage.page.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(localAuthoritiesPage.mainContent.content.getByRole('link', { name: 'Home' })).toHaveAttribute(
+          'href',
+          '/'
+        );
         await expect(localAuthoritiesPage.page.locator('a.govuk-link--no-visited-state')).toHaveCount(2);
 
         await localAuthoritiesPage.goto(createdCourt.id);

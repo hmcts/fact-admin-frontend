@@ -37,6 +37,30 @@ describe('General page', () => {
     expect(response.text).toContain(`<form method="post" action="/courts/${COURT_ID}/edit/general/success">`);
   });
 
+  test('renders breadcrumbs on the general edit page', async () => {
+    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+      id: COURT_ID,
+      name: 'Reading Crown Court',
+      open: true,
+      regionId: '22222222-2222-4222-8222-222222222222',
+    } as never);
+    stub(DataApiRequests.prototype, 'getRegions').resolves([
+      { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
+    ] as never);
+
+    const response = await request(app).get(`/courts/${COURT_ID}/edit/general`);
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('aria-label="Breadcrumb"');
+    expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${COURT_ID}/edit">Reading Crown Court</a>`
+    );
+    expect(response.text).toContain(
+      `<a class="govuk-breadcrumbs__link" href="/courts/${COURT_ID}/edit/general">General</a>`
+    );
+  });
+
   test('renders the dedicated court not found page for an invalid UUID on GET', async () => {
     const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
     const getRegionsStub = stub(DataApiRequests.prototype, 'getRegions');
