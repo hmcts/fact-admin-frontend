@@ -70,11 +70,11 @@ describe('processRequest', () => {
     expect(result.headers?.['X-User-Id']).toBeUndefined();
   });
 
-  it('does not add X-User-Id header to a POST to /users', async () => {
-    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/users' };
+  it('adds X-User-Id header to the paginated users GET', async () => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'get', url: '/user/v1' };
 
     const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
 
-    expect(result.headers?.['X-User-Id']).toBeUndefined();
+    expect(result.headers?.['X-User-Id']).toBe('user-123');
   });
 });

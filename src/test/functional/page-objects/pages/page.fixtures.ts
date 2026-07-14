@@ -35,6 +35,7 @@ import { ServiceCentreGeneralPage } from './service-centre-general.po';
 import { ServiceCentreWarningNoticePage } from './service-centre-warning-notice.po';
 import { SinglePointsOfEntryPage } from './single-points-of-entry.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
+import { UsersPage } from './users.po';
 
 export interface PageFixtures {
   determinePage: Page;
@@ -73,6 +74,7 @@ export interface PageFixtures {
   serviceCentreAddressDeleteSuccessPage: ServiceCentreAddressDeleteSuccessPage;
   serviceCentreContactDetailsPage: ServiceCentreContactDetailsPage;
   serviceCentreCasesHeardPage: ServiceCentreCasesHeardPage;
+  usersPage: UsersPage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -229,6 +231,10 @@ export const pageFixtures = {
   serviceCentreCasesHeardPage: async ({ determinePage }, use): Promise<void> => {
     const serviceCentreCasesHeardPage = new ServiceCentreCasesHeardPage(determinePage);
     await use(serviceCentreCasesHeardPage);
+  },
+  usersPage: async ({ determinePage }, use): Promise<void> => {
+    const usersPage = new UsersPage(determinePage);
+    await use(usersPage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
