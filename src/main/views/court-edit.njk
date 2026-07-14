@@ -1,85 +1,27 @@
 {% extends "template.njk" %}
-{% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "govuk/components/tag/macro.njk" import govukTag %}
-{% from "moj/components/alert/macro.njk" import mojAlert %}
+{% from "macros/lock-status-edit-table.njk" import lockStatusEditTable %}
 
 {% block pageTitle %}
   {{ pageTitle }}
 {% endblock %}
 
 {% block content %}
+  {% set editPath = '/courts/' + courtId + '/edit' %}
   {% set sections = [
-    { href: '/courts/' + courtId + '/edit/accessibility', label: 'Accessibility', page: 'accessibility' },
-    { href: '/courts/' + courtId + '/edit/address', label: 'Address', page: 'address' },
-    { href: '/courts/' + courtId + '/edit/cases-heard', label: 'Cases heard', page: 'cases-heard' },
-    { href: '/courts/' + courtId + '/edit/contact-details', label: 'Contact details', page: 'contact-details' },
-    { href: '/courts/' + courtId + '/edit/counter-service-opening-hours', label: 'Counter service opening hours', page: 'counter-service-opening-hours' },
-    { href: '/courts/' + courtId + '/edit/court-opening-hours', label: 'Court opening hours', page: 'court-opening-hours' },
-    { href: '/courts/' + courtId + '/edit/general', label: 'General', page: 'general' },
-    { href: '/courts/' + courtId + '/edit/building-facilities', label: 'Building facilities', page: 'building-facilities' },
-    { href: '/courts/' + courtId + '/edit/information-for-professionals', label: 'Information for professionals', page: 'information-for-professionals' },
-    { href: '/courts/' + courtId + '/edit/local-authorities', label: 'Local authorities', page: 'local-authorities' },
-    { href: '/courts/' + courtId + '/edit/photo', label: 'Photo', page: 'photo' },
-    { href: '/courts/' + courtId + '/edit/single-point-of-entry', label: 'Single points of entry', page: 'single-point-of-entry' },
-    { href: '/courts/' + courtId + '/edit/translation-and-interpretation', label: 'Translation and interpretation', page: 'translation-and-interpretation' },
-    { href: '/courts/' + courtId + '/edit/warning-notice', label: 'Warning notice', page: 'warning-notice' }
+    { href: editPath + '/accessibility', label: 'Accessibility', page: 'accessibility' },
+    { href: editPath + '/address', label: 'Address', page: 'address' },
+    { href: editPath + '/cases-heard', label: 'Cases heard', page: 'cases-heard' },
+    { href: editPath + '/contact-details', label: 'Contact details', page: 'contact-details' },
+    { href: editPath + '/counter-service-opening-hours', label: 'Counter service opening hours', page: 'counter-service-opening-hours' },
+    { href: editPath + '/court-opening-hours', label: 'Court opening hours', page: 'court-opening-hours' },
+    { href: editPath + '/general', label: 'General', page: 'general' },
+    { href: editPath + '/building-facilities', label: 'Building facilities', page: 'building-facilities' },
+    { href: editPath + '/information-for-professionals', label: 'Information for professionals', page: 'information-for-professionals' },
+    { href: editPath + '/local-authorities', label: 'Local authorities', page: 'local-authorities' },
+    { href: editPath + '/photo', label: 'Photo', page: 'photo' },
+    { href: editPath + '/single-point-of-entry', label: 'Single points of entry', page: 'single-point-of-entry' },
+    { href: editPath + '/translation-and-interpretation', label: 'Translation and interpretation', page: 'translation-and-interpretation' },
+    { href: editPath + '/warning-notice', label: 'Warning notice', page: 'warning-notice' }
   ] %}
-  {% set sectionRows = [] %}
-  {% for section in sections %}
-    {% set lock = null %}
-    {% for courtLock in courtLocks %}
-      {% if courtLock.pagePath === section.page %}
-        {% set lock = courtLock %}
-      {% endif %}
-    {% endfor %}
-    {% set statusId = "court-edit-" + loop.index + "-status" %}
-    {% set sectionRows = (sectionRows.push([
-      {
-        html: '<a class="govuk-link" href="' + section.href + '" aria-describedby="' + statusId + '">' + section.label + '</a>'
-      } if lock === null or lock.userId === userId else {
-        html: '<span aria-describedby="' + statusId + '">' + section.label + '</span>'
-      },
-      {
-        html: '<span id="' + statusId + '">' + govukTag({
-          text: 'Available',
-          classes: "govuk-tag--green fact-tag-max-width--unlimited"
-        } if lock === null or lock.userId === userId else {
-          text: 'Locked by ' + lock.user.email,
-          classes: "govuk-tag--red fact-tag-max-width--unlimited"
-        }) + '</span>',
-        classes: "fact-table-cell-align--right"
-      }
-    ]), sectionRows) %}
-  {% endfor %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">Editing - {{ courtName }}</h1>
-      <div class="court-edit-table__wrapper">
-        {% if timeoutMins %}
-          {{ mojAlert({
-            variant: "warning",
-            title: "Editing session timed out",
-            showTitleAsHeading: true,
-            text: "You were inactive for " + timeoutMins + " minutes and have been returned to the edit page. Any unsaved changes you made have not been saved."
-          }) }}
-        {% endif %}
-        {{ govukTable({
-          classes: "court-edit-table",
-          firstCellIsHeader: false,
-          head: [
-            {
-              text: "Section",
-              classes: "govuk-!-width-two-thirds"
-            },
-            {
-              text: "Edit Status",
-              classes: "govuk-!-width-one-third fact-table-cell-align--right"
-
-            }
-          ],
-          rows: sectionRows
-        }) }}
-      </div>
-    </div>
-  </div>
+  {{ lockStatusEditTable("court", courtName, courtLocks, sections, timeoutMins) }}
 {% endblock %}

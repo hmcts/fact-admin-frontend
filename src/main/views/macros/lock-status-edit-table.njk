@@ -1,0 +1,63 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+
+{% macro lockStatusEditTable(subject, subjectName, locks,  sections, timeoutMins) %}
+  {% set sectionRows = [] %}
+  {% for section in sections %}
+    {% set lock = null %}
+    {% for subjectLock in locks %}
+      {% if subjectLock.pagePath === section.page %}
+        {% set lock = subjectLock %}
+      {% endif %}
+    {% endfor %}
+    {% set statusId = subject + "-edit-" + loop.index + "-status" %}
+    {% set sectionRows = (sectionRows.push([
+      {
+        html: '<a class="govuk-link" href="' + section.href + '" aria-describedby="' + statusId + '">' + section.label + '</a>'
+      } if lock === null or lock.userId === userId else {
+        html: '<span aria-describedby="' + statusId + '">' + section.label + '</span>'
+      },
+      {
+        html: '<span id="' + statusId + '">' + govukTag({
+        text: 'Available',
+        classes: "govuk-tag--green fact-tag-max-width--unlimited"
+      } if lock === null or lock.userId === userId else {
+        text: 'Locked by ' + lock.user.email,
+        classes: "govuk-tag--red fact-tag-max-width--unlimited"
+      }) + '</span>',
+        classes: "fact-table-cell-align--right"
+      }
+    ]), sectionRows) %}
+  {% endfor %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Editing - {{ subjectName }}</h1>
+      <div class="edit-table__wrapper">
+        {% if timeoutMins %}
+          {{ mojAlert({
+            variant: "warning",
+            title: "Editing session timed out",
+            showTitleAsHeading: true,
+            text: "You were inactive for " + timeoutMins + " minutes and have been returned to the edit page. Any unsaved changes you made have not been saved."
+          }) }}
+        {% endif %}
+        {{ govukTable({
+          classes: "edit-table",
+          firstCellIsHeader: false,
+          head: [
+            {
+              text: "Section",
+              classes: "govuk-!-width-two-thirds"
+            },
+            {
+              text: "Edit Status",
+              classes: "govuk-!-width-one-third fact-table-cell-align--right"
+            }
+          ],
+          rows: sectionRows
+        }) }}
+      </div>
+    </div>
+  </div>
+{% endmacro %}

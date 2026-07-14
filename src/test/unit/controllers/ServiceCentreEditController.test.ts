@@ -4,6 +4,7 @@ import { assert, mock, stub } from 'sinon';
 
 import ServiceCentreEditController from '../../../main/controllers/ServiceCentreEditController';
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('ServiceCentreEditController', () => {
@@ -20,6 +21,7 @@ describe('ServiceCentreEditController', () => {
       id: '22222222-2222-4222-8222-222222222222',
       name: 'Reading Service Centre',
     } as never);
+    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves([]);
 
     responseMock
       .expects('render')
@@ -36,12 +38,16 @@ describe('ServiceCentreEditController', () => {
         pageTitle: 'Editing - Reading Service Centre',
         serviceCentreName: 'Reading Service Centre',
         serviceCentreId: '22222222-2222-4222-8222-222222222222',
+        serviceCentreLocks: [],
+        timeoutMins: undefined,
       });
 
     try {
       await controller.get(request, response);
       assert.calledOnce(getServiceCentreByIdStub);
       assert.calledWith(getServiceCentreByIdStub, '22222222-2222-4222-8222-222222222222');
+      assert.calledOnce(getLocksStub);
+      assert.calledWith(getLocksStub, SubjectType.SERVICE_CENTRE, '22222222-2222-4222-8222-222222222222');
       responseMock.verify();
     } finally {
       getServiceCentreByIdStub.restore();

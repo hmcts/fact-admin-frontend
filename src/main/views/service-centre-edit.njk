@@ -1,6 +1,5 @@
 {% extends "template.njk" %}
-{% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "macros/lock-status-edit-table.njk" import lockStatusEditTable %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -9,37 +8,11 @@
 {% block content %}
   {% set editPath = '/service-centres/' + serviceCentreId + '/edit' %}
   {% set sections = [
-    { href: editPath + '/general', label: 'General', status: 'TODO' },
-    { href: editPath + '/warning-notice', label: 'Warning notice', status: 'TODO' },
-    { href: editPath + '/address', label: 'Address', status: 'TODO' },
-    { href: editPath + '/contact-details', label: 'Contact details', status: 'TODO' },
-    { href: editPath + '/cases-heard', label: 'Cases heard', status: 'TODO' }
+    { href: editPath + '/address', label: 'Address', page: 'address' },
+    { href: editPath + '/cases-heard', label: 'Cases heard', page: 'cases-heard'  },
+    { href: editPath + '/contact-details', label: 'Contact details', page: 'contact-details' },
+    { href: editPath + '/general', label: 'General', page: 'general' },
+    { href: editPath + '/warning-notice', label: 'Warning notice', page: 'warning-notice' }
   ] %}
-  {% set sectionRows = [] %}
-  {% for section in sections %}
-    {% set statusId = "service-centre-edit-" + loop.index + "-status" %}
-    {% set sectionRows = (sectionRows.push([
-      {
-        html: '<a class="govuk-link" href="' + section.href + '" aria-describedby="' + statusId + '">' + section.label + '</a>'
-      },
-      {
-        html: '<span id="' + statusId + '">' + govukTag({
-          text: section.status,
-          classes: "govuk-tag--grey"
-        }) + '</span>'
-      }
-    ]), sectionRows) %}
-  {% endfor %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
-      <div class="court-edit-table__wrapper">
-        {{ govukTable({
-          classes: "court-edit-table",
-          firstCellIsHeader: false,
-          rows: sectionRows
-        }) }}
-      </div>
-    </div>
-  </div>
+  {{ lockStatusEditTable("service-centre", serviceCentreName, serviceCentreLocks, sections, timeoutMins) }}
 {% endblock %}
