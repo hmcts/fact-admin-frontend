@@ -250,14 +250,16 @@ export class CourtContactService {
       }
 
       if (!contactExplanationCy) {
-        formErrors.contactExplanationCy = 'Enter the Welsh translation for explanation';
+        formErrors.contactExplanationCy =
+          'Because you provided an explanation in English, the Welsh translation is now mandatory';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       }
     }
 
     if (contactExplanationCy) {
       if (!contactExplanation) {
-        formErrors.contactExplanation = 'Enter the English translation for explanation';
+        formErrors.contactExplanation =
+          'Because you provided an explanation in Welsh, the English translation is now mandatory';
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 

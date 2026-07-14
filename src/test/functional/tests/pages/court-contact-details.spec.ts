@@ -40,7 +40,9 @@ test.describe('Court Contact Details Journey', () => {
       await courtContactDetailsPage.explanationInput.fill('General enquiries desk');
       await courtContactDetailsPage.save();
 
-      await expect(courtContactDetailsPage.errorSummary).toContainText('Enter the Welsh translation for explanation');
+      await expect(courtContactDetailsPage.errorSummary).toContainText(
+        'Because you provided an explanation in English, the Welsh translation is now mandatory'
+      );
       await courtContactDetailsPage.fillWelshExplanation('Desg ymholiadau cyffredinol');
       await courtContactDetailsPage.save();
 

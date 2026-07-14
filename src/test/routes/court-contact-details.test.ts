@@ -97,7 +97,9 @@ describe('Court contact details routes', () => {
       );
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('Enter the Welsh translation for explanation');
+    expect(response.text).toContain(
+      'Because you provided an explanation in English, the Welsh translation is now mandatory'
+    );
     expect(response.text).toContain('href="#contact-explanation-cy"');
     expect(createCourtContactDetailStub.notCalled).toBe(true);
   });
@@ -120,7 +122,9 @@ describe('Court contact details routes', () => {
       );
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('Enter the English translation for explanation');
+    expect(response.text).toContain(
+      'Because you provided an explanation in Welsh, the English translation is now mandatory'
+    );
     expect(response.text).toContain('href="#contact-explanation"');
     expect(createCourtContactDetailStub.notCalled).toBe(true);
   });
