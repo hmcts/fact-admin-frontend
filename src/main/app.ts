@@ -16,6 +16,7 @@ import { Authentication } from './modules/authentication';
 import { getFactUser, getFactUserId, isAdmin, isSuperAdmin } from './modules/authentication/authenticationHelper';
 import { Container } from './modules/awilix';
 import { Helmet } from './modules/helmet';
+import { LockingInterceptor } from './modules/locking';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
 import { RedisModule } from './modules/redis/RedisModule';
@@ -96,6 +97,9 @@ app.use((req, res, next) => {
     return res.render('not-found');
   });
 });
+
+// add our custom page locking interceptor
+new LockingInterceptor().enableFor(app);
 
 app.use(loadControllers('controllers/**/*.+(ts|js)', { cwd: __dirname }));
 
