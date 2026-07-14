@@ -1,12 +1,11 @@
 import { z } from 'zod';
 
 import { pageMetadataSchema } from './pagedMetadataSchema';
+import { subjectTypeSchema } from './subjectTypeSchema';
 import { userSchema } from './userSchema';
 
-const auditSubjectTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
-
 export const auditSubjectOptionsSchema = z.map(
-  auditSubjectTypeSchema,
+  subjectTypeSchema,
   z.array(
     z.object({
       name: z.string(),
@@ -24,7 +23,7 @@ const actionDataDiffSchema = z.object({
 export const auditListItemSchema = z.object({
   id: z.string(),
   subjectId: z.uuid(),
-  subjectType: auditSubjectTypeSchema,
+  subjectType: subjectTypeSchema,
   // this is not currently in the result data returned from the API, but we will add it to the
   // schema so that we can use it in the various view models
   subjectName: z.string().optional().nullable(),
@@ -44,4 +43,3 @@ export const pagedAuditsSchema = z.object({
 export type PagedAudits = z.infer<typeof pagedAuditsSchema>;
 export type Audit = z.infer<typeof auditListItemSchema>;
 export type AuditSubjectOptionsMap = z.infer<typeof auditSubjectOptionsSchema>;
-export const AuditSubject = auditSubjectTypeSchema.enum;

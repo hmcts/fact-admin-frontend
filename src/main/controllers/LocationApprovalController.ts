@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 import { canApprove, getFactUserId, isViewer } from '../modules/authentication/authenticationHelper';
 import { ApprovalSubjectType } from '../schemas/approvalSchema';
-import { ApprovalService, ApproveDataViewModel, EditApprovalAction } from '../services/ApprovalService';
+import { ApprovalService, ApproveDataViewModel } from '../services/ApprovalService';
 import { isUuid } from '../utils/valueParsers';
 
 import { BreadcrumbItem } from './helpers/breadcrumbs';
@@ -12,9 +12,12 @@ type Location = {
   name: string;
 };
 
+type AdditionalEditViewModel = Record<string, unknown>;
+
 type LocationApprovalControllerOptions = {
   buildBreadcrumbs?: (locationId: string, locationName: string) => BreadcrumbItem[];
   editView: string;
+  getAdditionalEditViewModel?: (req: Request, locationId: string) => Promise<AdditionalEditViewModel | HttpStatusCode>;
   getLocation: (locationId: string) => Promise<Location | HttpStatusCode>;
   locationIdViewKey: string;
   locationNameViewKey: string;
@@ -43,6 +46,14 @@ export class LocationApprovalController {
       return;
     }
 
+    const additionalViewModel = this.options.getAdditionalEditViewModel
+      ? await this.options.getAdditionalEditViewModel(req, locationId)
+      : {};
+
+    if (this.renderStatusResponse(additionalViewModel, res)) {
+      return;
+    }
+
     const editPath = this.getEditPath(locationId);
     const approvalAction = await this.approvalService.getEditApprovalAction(
       locationId,
@@ -57,6 +68,7 @@ export class LocationApprovalController {
 
     return res.render(this.options.editView, {
       ...approvalAction,
+      ...additionalViewModel,
       ...(this.options.buildBreadcrumbs
         ? { breadcrumbs: this.options.buildBreadcrumbs(locationId, location.name) }
         : {}),
@@ -166,10 +178,7 @@ export class LocationApprovalController {
     return true;
   }
 
-  private renderStatusResponse(
-    response: ApproveDataViewModel | EditApprovalAction | HttpStatusCode,
-    res: Response
-  ): response is HttpStatusCode {
+  private renderStatusResponse<T>(response: T | HttpStatusCode, res: Response): response is HttpStatusCode {
     if (typeof response !== 'number') {
       return false;
     }
