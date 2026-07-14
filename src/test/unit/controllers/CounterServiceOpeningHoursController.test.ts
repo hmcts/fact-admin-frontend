@@ -38,8 +38,17 @@ describe('CounterServiceOpeningHoursController', () => {
 
     await controller.getList(request, response);
 
+    const expectedViewModel = {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+      ],
+    };
+
     expect(getListPage.calledWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours', viewModel);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours', expectedViewModel);
   });
 
   test('renders court not found when the list court id is invalid', async () => {
@@ -74,8 +83,18 @@ describe('CounterServiceOpeningHoursController', () => {
 
     await controller.getAdd(request, response);
 
+    const expectedViewModel = {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+        { href: '#', text: 'Edit opening hours' },
+      ],
+    };
+
     expect(getEditPage.calledWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', viewModel);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', expectedViewModel);
   });
 
   test('renders court not found when the add court id is invalid', async () => {
@@ -180,7 +199,7 @@ describe('CounterServiceOpeningHoursController', () => {
       days: [],
       errors: { mondayOpeningHour: 'Enter the monday opening hour' },
       errorSummary: [{ href: '#mondayOpeningHour', text: 'Enter the monday opening hour' }],
-      form: { assistWit: ['Forms'], selectedDays: ['MONDAY'], sameTime: 'no' },
+      form: { assistWit: ['forms'], selectedDays: ['MONDAY'], sameTime: 'no' },
       pageTitle: 'Error: Edit counter service opening hours - Reading Crown Court',
     };
     const save = stub(CounterServiceOpeningHoursService.prototype, 'save').resolves({
@@ -190,6 +209,16 @@ describe('CounterServiceOpeningHoursController', () => {
 
     await controller.postAdd(request, response);
 
+    const expectedViewModel = {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+        { href: '#', text: 'Edit opening hours' },
+      ],
+    };
+
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBeUndefined();
     expect(save.firstCall.args[2]).toMatchObject({
@@ -197,8 +226,9 @@ describe('CounterServiceOpeningHoursController', () => {
       sameTime: 'no',
       selectedDays: ['MONDAY'],
     });
+
     expect(response.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', viewModel);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', expectedViewModel);
   });
 
   test('renders save success when saving add succeeds', async () => {
@@ -227,9 +257,19 @@ describe('CounterServiceOpeningHoursController', () => {
 
     await controller.postAdd(request, response);
 
+    const expectedViewModel = {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+        { href: '#', text: 'Counter service opening hours saved' },
+      ],
+    };
+
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBeUndefined();
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', viewModel);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', expectedViewModel);
   });
 
   test('renders save success when saving edit succeeds', async () => {
@@ -258,9 +298,19 @@ describe('CounterServiceOpeningHoursController', () => {
 
     await controller.postEdit(request, response);
 
+    const expectedViewModel = {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+        { href: '#', text: 'Counter service opening hours saved' },
+      ],
+    };
+
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBe(counterServiceId);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', viewModel);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', expectedViewModel);
   });
 
   test('renders generic not found when saving edit returns 404', async () => {
@@ -324,10 +374,30 @@ describe('CounterServiceOpeningHoursController', () => {
     await controller.getDelete(deleteRequest, deleteResponse);
     await controller.postDelete(successRequest, successResponse);
 
-    expect(deleteResponse.render).toHaveBeenCalledWith('counter-service-opening-hours-delete', deleteViewModel);
+    const expectedDeleteViewModel = {
+      ...deleteViewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${deleteViewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+        { href: '#', text: 'Delete opening hours' },
+      ],
+    };
+
+    const expectedSuccessViewModel = {
+      ...successViewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: `/courts/${courtId}/edit`, text: `Edit ${successViewModel.courtName}` },
+        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
+        { href: '#', text: 'Opening hours deleted' },
+      ],
+    };
+
+    expect(deleteResponse.render).toHaveBeenCalledWith('counter-service-opening-hours-delete', expectedDeleteViewModel);
     expect(successResponse.render).toHaveBeenCalledWith(
       'counter-service-opening-hours-delete-success',
-      successViewModel
+      expectedSuccessViewModel
     );
   });
 

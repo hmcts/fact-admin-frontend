@@ -145,9 +145,10 @@ export default class CounterServiceOpeningHoursController {
     const saveResult = await counterServiceOpeningHoursService.save(courtId, counterServiceId, form);
 
     if (saveResult.type === 'validation_error') {
-      res.status(HttpStatusCode.BadRequest);
-      res.render('counter-service-opening-hours-edit', saveResult.viewModel);
-      return;
+      return res.status(HttpStatusCode.BadRequest).render('counter-service-opening-hours-edit', {
+        ...saveResult.viewModel,
+        breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Edit opening hours'),
+      });
     }
 
     if (saveResult.type === 'status') {
