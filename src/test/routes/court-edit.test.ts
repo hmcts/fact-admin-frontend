@@ -8,6 +8,7 @@ import { DataApiRequests } from '../../main/requests/DataApiRequests';
 describe('Court edit page', () => {
   beforeEach(() => {
     restore();
+    stub(DataApiRequests.prototype, 'getLocks').resolves([]);
   });
 
   test('renders the court edit page for a valid known court', async () => {

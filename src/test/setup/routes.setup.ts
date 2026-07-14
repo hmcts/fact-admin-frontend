@@ -13,6 +13,14 @@ jest.mock('redis', () => ({
   }),
 }));
 
+// Lock acquisition is covered by the LockingInterceptor unit tests. Route tests
+// isolate controller behavior and must not make live lock API calls.
+jest.mock('../../main/modules/locking', () => ({
+  LockingInterceptor: class {
+    public enableFor(): void {}
+  },
+}));
+
 jest.mock('express-openid-connect', () => ({
   auth: () => (req, res, next) => {
     const unauthenticated = req.headers['x-test-unauthenticated'] === 'true';
