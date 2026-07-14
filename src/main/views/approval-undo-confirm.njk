@@ -1,0 +1,27 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Are you sure you want to undo the data approval for this court/service centre/tribunal?</h1>
+
+      <p class="govuk-body govuk-!-font-weight-bold">{{ name }}</p>
+
+      <form method="post" action="/approvals/{{ approvalId }}/undo">
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Undo approval",
+            classes: "govuk-button--warning"
+          }) }}
+
+          <a class="govuk-link govuk-link--no-visited-state" href="/approvals">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

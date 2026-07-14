@@ -1,0 +1,43 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Are you sure you want to approve the data for this court/service centre/tribunal?</h1>
+      <p class="govuk-body">Make sure you have checked the data in all sections before approving.</p>
+
+      <form method="post" action="{{ editPath }}/approve">
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Court/service centre/tribunal" },
+              value: { text: name }
+            },
+            {
+              key: { text: "Confirm" },
+              value: { text: "Approve the data for this court/service centre/tribunal" }
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Confirm data",
+          classes: "govuk-button--warning"
+        }) }}
+      </form>
+
+      <form id="cancel_form" method="GET" action="{{ editPath }}">
+        {{ govukButton({
+          text: "Cancel",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

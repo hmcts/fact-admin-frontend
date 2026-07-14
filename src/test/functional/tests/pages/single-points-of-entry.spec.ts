@@ -23,6 +23,7 @@ test.describe('Single Points of Entry Page Tests', () => {
 
       const childcareCheckbox = singlePointsOfEntryPage.singlePointOfEntryCheckbox('Childcare arrangements');
       await expect(childcareCheckbox).toBeVisible();
+      await childcareCheckbox.uncheck();
       await expect(childcareCheckbox).not.toBeChecked();
 
       await childcareCheckbox.check();

@@ -1,5 +1,5 @@
 {% extends "template.njk" %}
-{% from "macros/lock-status-edit-table.njk" import lockStatusEditTable %}
+{% from "macros/lock-status-edit-view.njk" import lockStatusEditView %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -23,5 +23,14 @@
     { href: editPath + '/translation-and-interpretation', label: 'Translation and interpretation', page: 'translation-and-interpretation' },
     { href: editPath + '/warning-notice', label: 'Warning notice', page: 'warning-notice' }
   ] %}
-  {{ lockStatusEditTable("court", courtName, courtLocks, sections, timeoutMins) }}
+  {{ lockStatusEditView(
+    "court",
+    courtName,
+    courtLocks,
+    sections,
+    timeoutMins,
+    showApproveData,
+    approvePath,
+    isViewer)
+  }}
 {% endblock %}

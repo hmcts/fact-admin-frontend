@@ -10,6 +10,8 @@ describe('Court Edit View', () => {
       courtName: 'Reading Crown Court',
       pagePath: courtEditPath,
       pageTitle: 'Editing - Reading Crown Court',
+      showApproveData: false,
+      courtLocks: [],
     });
 
     expect(html).toContain('Editing - Reading Crown Court');
@@ -27,6 +29,63 @@ describe('Court Edit View', () => {
     expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
     expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);
+    expect(html).not.toContain('Approve data');
+  });
+
+  test('renders the approve data prompt and link', () => {
+    const html = env.render('court-edit.njk', {
+      approvePath: `${courtEditPath}/approve`,
+      courtId,
+      courtName: 'Reading Crown Court',
+      pagePath: courtEditPath,
+      pageTitle: 'Editing - Reading Crown Court',
+      showApproveData: true,
+      courtLocks: [],
+    });
+
+    expect(html).toContain(
+      'Once you have reviewed all the inputted data for this court/service centre/tribunal, please approve.'
+    );
+    expect(html).toContain('nationalsupportunit@justice.gov.uk');
+    expect(html).toContain('Approve data');
+    expect(html).toContain(`href="${courtEditPath}/approve"`);
+    expect(html.indexOf('edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
+  });
+
+  test('renders the reviewing heading for viewer users', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      isViewer: true,
+      pagePath: courtEditPath,
+      pageTitle: 'Reviewing - Reading Crown Court',
+      showApproveData: false,
+      courtLocks: [],
+    });
+
+    expect(html).toContain('Reviewing - Reading Crown Court');
+    expect(html).not.toContain('Editing - Reading Crown Court');
+  });
+
+  test('keeps sections available to a viewer when another user holds an edit lock', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      isViewer: true,
+      pagePath: courtEditPath,
+      pageTitle: 'Reviewing - Reading Crown Court',
+      showApproveData: false,
+      courtLocks: [
+        {
+          pagePath: 'general',
+          userId: 'another-user-id',
+          user: { email: 'editor@example.com' },
+        },
+      ],
+    });
+
+    expect(html).toContain(`href="${courtEditPath}/general"`);
+    expect(html).not.toContain('Locked by editor@example.com');
   });
 
   test('renders timeout warning banner when timeoutMins is provided', () => {

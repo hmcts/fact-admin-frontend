@@ -1,5 +1,5 @@
 {% extends "template.njk" %}
-{% from "macros/lock-status-edit-table.njk" import lockStatusEditTable %}
+{% from "macros/lock-status-edit-view.njk" import lockStatusEditView %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -14,5 +14,14 @@
     { href: editPath + '/general', label: 'General', page: 'general' },
     { href: editPath + '/warning-notice', label: 'Warning notice', page: 'warning-notice' }
   ] %}
-  {{ lockStatusEditTable("service-centre", serviceCentreName, serviceCentreLocks, sections, timeoutMins) }}
+  {{ lockStatusEditView(
+    "service-centre",
+    serviceCentreName,
+    serviceCentreLocks,
+    sections,
+    timeoutMins,
+    showApproveData,
+    approvePath,
+    isViewer)
+  }}
 {% endblock %}

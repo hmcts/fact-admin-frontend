@@ -138,6 +138,6 @@ describe('Service centre address routes', () => {
     const response = await request(app).get('/service-centres/not-a-uuid/edit/address');
 
     expect(response.status).toBe(HttpStatusCode.NotFound);
-    expect(response.text).toContain('Page Not Found');
+    expect(response.text).toContain('Service centre not found');
   });
 });

@@ -49,7 +49,7 @@ describe('Service centre general page', () => {
     const response = await request(app).get('/service-centres/not-a-uuid/edit/general');
 
     expect(response.status).toBe(HttpStatusCode.NotFound);
-    expect(response.text).toContain('Page Not Found');
+    expect(response.text).toContain('Service centre not found');
     expect(getServiceCentreByIdStub.notCalled).toBe(true);
   });
 

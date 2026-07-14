@@ -99,6 +99,42 @@
   width: 1%;
 }
 
+.approvals-table__status,
+.approvals-table__email,
+.approvals-table__date,
+.approvals-table__action {
+  white-space: nowrap;
+}
+
+.approvals-table-container {
+  max-width: 1280px;
+  margin-right: 15px;
+  margin-left: max(15px, calc((100% - 960px) / 2));
+}
+
+@media (min-width: 40.0625em) {
+  .approvals-table-container {
+    margin-right: 30px;
+    margin-left: max(30px, calc((100% - 960px) / 2));
+  }
+}
+
+.approvals-table__status {
+  width: 1%;
+}
+
+.approvals-table__email {
+  width: 18%;
+}
+
+.approvals-table__date {
+  width: 18%;
+}
+
+.approvals-table__action {
+  width: 1%;
+}
+
 // two column layout for checkboxes
 .app-checkboxes--two-columns {
   display: block;
