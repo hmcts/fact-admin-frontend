@@ -125,7 +125,7 @@
     "ip-address": "10.2.0",
     "joi": "18.2.3",
     "js-yaml@npm:^4": "npm:4.2.0",
-    "protobufjs": "7.6.4",
+    "protobufjs": "7.6.5",
     "uuid": "14.0.1"
   },
   "husky": {
