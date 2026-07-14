@@ -33,9 +33,23 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
 
   afterSuccess('akschartsinstall') {
-    yarnBuilder.yarn('playwright install')
-    yarnBuilder.yarn('playwright install ffmpeg')
     yarnBuilder.yarn('build')
+  }
+
+  before('smoketest:preview') {
+    yarnBuilder.yarn('playwright install')
+  }
+
+  before('smoketest:aat') {
+    yarnBuilder.yarn('playwright install')
+  }
+
+  before('functionalTest:preview') {
+    yarnBuilder.yarn('playwright install')
+  }
+
+  before('functionalTest:aat') {
+    yarnBuilder.yarn('playwright install')
   }
 
   // Report publishing
