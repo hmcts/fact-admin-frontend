@@ -52,6 +52,8 @@
       <h1 class="govuk-heading-l">General</h1>
 
       <form method="post" action="/courts/{{ model.id }}/edit/general/success">
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+          <legend class="govuk-fieldset__legend govuk-visually-hidden">General details</legend>
 
           {{ govukInput({
             label: {
@@ -116,10 +118,13 @@
           } if model.errors and model.errors.regionId else null
         }) }}
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
 
+        </fieldset>
       </form>
     </div>
   </div>

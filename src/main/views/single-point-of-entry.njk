@@ -16,7 +16,7 @@
 
       <form method="post" action="/courts/{{ courtId }}/edit/single-point-of-entry/success">
         <div class="govuk-form-group">
-          <fieldset class="govuk-fieldset">
+          <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
             <legend class="govuk-fieldset__legend govuk-visually-hidden">Services</legend>
             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
               {% for service in singlePointOfEntryServices %}
@@ -32,9 +32,11 @@
           </fieldset>
         </div>
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
       </form>
     </div>
   </div>

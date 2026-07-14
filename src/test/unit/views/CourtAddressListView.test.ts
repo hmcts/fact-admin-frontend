@@ -94,4 +94,29 @@ describe('Court Address List View', () => {
     expect(html).toContain(`/courts/${ids.courtId}/edit/address/find/${ids.addressA}`);
     expect(html).not.toContain(`/courts/${ids.courtId}/edit/address/delete/${ids.addressA}`);
   });
+
+  test('renders addresses without mutation actions for viewer users', () => {
+    const html = env.render('court-address-list.njk', {
+      courtAddresses: [
+        {
+          addressLine1: '1 High Street',
+          addressType: 'VISIT_US',
+          courtId: ids.courtId,
+          id: ids.addressA,
+          postcode: 'BS1 5AH',
+          townCity: 'Bristol',
+        },
+      ],
+      courtId: ids.courtId,
+      isViewer: true,
+      pagePath: `/courts/${ids.courtId}/edit/address`,
+      pageTitle: 'Addresses',
+    });
+
+    expect(html).toContain('1 High Street');
+    expect(html).not.toContain('Actions');
+    expect(html).not.toContain(`/courts/${ids.courtId}/edit/address/find/`);
+    expect(html).not.toContain(`/courts/${ids.courtId}/edit/address/delete/`);
+    expect(html).not.toContain('Add address');
+  });
 });

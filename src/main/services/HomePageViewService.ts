@@ -41,14 +41,18 @@ export class HomePageViewService {
   /**
    * Builds the homepage results table rows and action links.
    */
-  public buildCourtTableRows(filters: HomePageFilters, courtsPage: PagedCourts): HomePageTableCell[][] {
+  public buildCourtTableRows(
+    filters: HomePageFilters,
+    courtsPage: PagedCourts,
+    isReviewMode = false
+  ): HomePageTableCell[][] {
     return courtsPage.content.map(court => [
       { text: court.name },
       { text: this.formatDate(court.lastUpdatedAt) },
       ...(filters.includeClosed ? [{ text: court.open ? 'Open' : 'Closed' }] : []),
       {
         classes: 'homepage-courts-table__actions',
-        html: this.buildActionsHtml(court),
+        html: this.buildActionsHtml(court, isReviewMode),
       },
     ]);
   }
@@ -100,11 +104,12 @@ export class HomePageViewService {
   /**
    * Builds the row action list.
    */
-  private buildActionsHtml(location: LocationListItem): string {
+  private buildActionsHtml(location: LocationListItem, isReviewMode: boolean): string {
     const viewLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="${this.buildPublicLocationHref(location)}">View<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
     const editPathPrefix =
       location.serviceCentre || location.locationType === 'SERVICE_CENTRE' ? 'service-centres' : 'courts';
-    const editLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/${editPathPrefix}/${location.id}/edit">Edit<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
+    const editLabel = isReviewMode ? 'Review' : 'Edit';
+    const editLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/${editPathPrefix}/${location.id}/edit">${editLabel}<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
 
     return `<ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">${viewLink}${editLink}</ul>`;
   }

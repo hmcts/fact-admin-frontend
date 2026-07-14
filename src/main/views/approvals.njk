@@ -1,0 +1,154 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% set approvalTableRows = [] %}
+{% if approvals.length %}
+  {% for approval in approvals %}
+    {% set statusTagHtml %}
+      {{ govukTag({
+        text: approval.status,
+        classes: "govuk-tag--green" if approval.status === "Approved" else "govuk-tag--grey"
+      }) }}
+    {% endset %}
+
+    {% set approvalTableRow = [
+      {
+        text: approval.name
+      },
+      {
+        html: statusTagHtml,
+        classes: "approvals-table__status"
+      },
+      {
+        text: approval.approverEmail,
+        classes: "approvals-table__email"
+      },
+      {
+        text: approval.approvedAt,
+        classes: "approvals-table__date"
+      }
+    ] %}
+
+    {% if isSuperAdmin %}
+      {% set undoApprovalHtml %}
+        {% if approval.approved %}
+          <a class="govuk-link govuk-link--no-visited-state" href="/approvals/{{ approval.approvalId }}/undo">Undo approval</a>
+        {% endif %}
+      {% endset %}
+      {% set approvalTableRow = (approvalTableRow.push({
+        html: undoApprovalHtml,
+        classes: "approvals-table__action"
+      }), approvalTableRow) %}
+    {% endif %}
+
+    {% set approvalTableRows = (approvalTableRows.push(approvalTableRow), approvalTableRows) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block container %}
+  <main class="govuk-main-wrapper" id="main-content">
+    <div class="govuk-width-container">
+      <h1 class="govuk-heading-l">Approvals tracker</h1>
+
+      <form method="GET" action="/approvals" class="govuk-!-margin-bottom-6">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">
+            {{ govukInput({
+              label: {
+                text: "Search by name",
+                classes: "govuk-label--m"
+              },
+              id: "name",
+              name: "name",
+              value: nameFilter
+            }) }}
+          </div>
+
+          <div class="govuk-grid-column-one-third">
+            {{ govukSelect({
+              id: "status",
+              name: "status",
+              label: {
+                text: "Approval status",
+                classes: "govuk-label--m"
+              },
+              items: [
+                {
+                  value: "",
+                  text: "All",
+                  selected: not statusFilter
+                },
+                {
+                  value: "approved",
+                  text: "Approved",
+                  selected: statusFilter === "approved"
+                },
+                {
+                  value: "not-approved",
+                  text: "Not approved",
+                  selected: statusFilter === "not-approved"
+                }
+              ]
+            }) }}
+          </div>
+        </div>
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Apply filters"
+          }) }}
+
+          {% if nameFilter or statusFilter %}
+            <a class="govuk-link govuk-link--no-visited-state" href="/approvals">Clear filters</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <div class="approvals-table-container">
+  {% if approvalTableRows.length %}
+    {% set approvalTableHead = [
+      {
+        text: "Court/service centre/tribunal name"
+      },
+      {
+        text: "Status",
+        classes: "approvals-table__status"
+      },
+      {
+        text: "Email of approver",
+        classes: "approvals-table__email"
+      },
+      {
+        text: "Time and date of approval",
+        classes: "approvals-table__date"
+      }
+    ] %}
+
+    {% if isSuperAdmin %}
+      {% set approvalTableHead = (approvalTableHead.push({
+        text: "Action",
+        classes: "approvals-table__action"
+      }), approvalTableHead) %}
+    {% endif %}
+
+    {{ govukTable({
+      classes: "approvals-table",
+      firstCellIsHeader: false,
+      head: approvalTableHead,
+      rows: approvalTableRows
+    }) }}
+      {% else %}
+        <p class="govuk-body">No approvals found.</p>
+      {% endif %}
+    </div>
+  </main>
+{% endblock %}
