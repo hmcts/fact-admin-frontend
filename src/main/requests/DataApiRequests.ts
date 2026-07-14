@@ -35,6 +35,7 @@ import {
 } from '../schemas/courtSinglePointOfEntrySchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
+import { Lock, LockList, Page, lockListSchema, lockSchema } from '../schemas/lockSchema';
 import {
   CourtOpeningHours,
   OpeningHourType,
@@ -46,6 +47,7 @@ import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 import { ServiceArea, serviceAreaListSchema } from '../schemas/serviceAreaSchema';
 import { ServiceCentre, serviceCentreSchema } from '../schemas/serviceCentreSchema';
+import { Subject } from '../schemas/subjectTypeSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
 import { PagedUsers, pagedUsersSchema } from '../schemas/userListSchema';
 import { User, userSchema } from '../schemas/userSchema';
@@ -935,6 +937,72 @@ export class DataApiRequests {
       return auditListItemSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching audit details for id ${auditId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve a lock based on subject and page
+   */
+  public async getLock(subject: Subject, subjectId: string, page: typeof Page): Promise<Lock | null | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/locks/${subject}/${subjectId}/v1/${page}`);
+      if (response.status === HttpStatusCode.NoContent) {
+        return null;
+      }
+      return lockSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching lock information for subject ${subject}, id ${subjectId} and page ${page}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve all locks for a given subject
+   */
+  public async getLocks(subject: Subject, subjectId: string): Promise<LockList | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/locks/${subject}/${subjectId}/v1`);
+      if (response.status === HttpStatusCode.NoContent) {
+        return [];
+      }
+      return lockListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching lock information for subject: ${subject}, with id: ${subjectId}`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to acquire a lock
+   */
+  public async acquireLock(
+    subject: Subject,
+    subjectId: string,
+    page: typeof Page,
+    userId: string
+  ): Promise<Lock | HttpStatusCode> {
+    try {
+      const response = await dataApi.post(`/locks/${subject}/${subjectId}/v1/${page}`, userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return lockSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to clear all locks held by the given user
+   */
+  public async clearUserLocks(userId: string): Promise<HttpStatusCode> {
+    try {
+      return (await dataApi.delete(`/user/v1/${userId}/locks`)).status;
+    } catch (error: unknown) {
+      logger.error(`Error acquiring removing locks for user with id: ${userId}`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }

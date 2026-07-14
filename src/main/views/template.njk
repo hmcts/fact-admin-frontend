@@ -1,9 +1,28 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 {% from "macros/Breadcrumb.macro.njk" import appBreadcrumb %}
+{% from "macros/timeout-dialog.njk" import hmrcTimeoutDialog %}
 
 {% block head %}
   {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block bodyStart %}
+  {% if timeoutDialogConfig %}
+    {% set subject = timeoutDialogConfig.subject if timeoutDialogConfig.subject is defined else "main" %}
+    {{ hmrcTimeoutDialog ({
+      timeout: timeoutDialogConfig.timeout if timeoutDialogConfig.timeout is defined else 900,
+      countdown: timeoutDialogConfig.countdown if timeoutDialogConfig.countdown is defined else 120,
+      title: "Continue editing?",
+      message: "Are you still editing this page?  You will be automatically returned to the " + subject + " edit page in",
+      keepAliveUrl: "javascript: void(0)",
+      keepAliveButtonText: "Continue editing",
+      signOutButtonText: "Return to " + subject + " edit page",
+      signOutUrl: timeoutDialogConfig.signOutUrl if timeoutDialogConfig.signOutUrl is defined else "/",
+      timeoutUrl: timeoutDialogConfig.timeoutUrl if timeoutDialogConfig.timeoutUrl is defined else "/",
+      language: "en"
+    }) }}
+  {% endif %}
 {% endblock %}
 
 {% block govukHeader %}
