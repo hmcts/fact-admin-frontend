@@ -34,7 +34,10 @@ test.describe(
     tag: '@functional',
   },
   () => {
-    test('saves warning notice and persists value on re-open', async ({ serviceCentreWarningNoticePage, playwright }) => {
+    test('saves warning notice and persists value on re-open', async ({
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
       await withCreatedServiceCentre(
         playwright,
         'Service Centre Edit Warning Functional Test',
@@ -82,4 +85,3 @@ test.describe(
     });
   }
 );
-

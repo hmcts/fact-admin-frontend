@@ -14,7 +14,9 @@ export class ServiceCentreAddressDeletePage extends Base {
   }
 
   async goto(serviceCentreId: string, addressId: string): Promise<void> {
-    await this.page.goto(config.urls.homePageUrl + `/service-centres/${serviceCentreId}/edit/address/delete/${addressId}`);
+    await this.page.goto(
+      config.urls.homePageUrl + `/service-centres/${serviceCentreId}/edit/address/delete/${addressId}`
+    );
   }
 
   async clickDeleteAddress(): Promise<void> {

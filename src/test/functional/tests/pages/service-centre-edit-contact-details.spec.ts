@@ -1,7 +1,6 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedServiceCentre } from '../../helpers/testSupport';
 
-
 test.describe(
   'Service Centre Edit Contact Details',
   {
@@ -63,7 +62,9 @@ test.describe(
           await serviceCentreContactDetailsPage.explanationInput.fill('General service-centre enquiries');
           await serviceCentreContactDetailsPage.save();
 
-          await expect(serviceCentreContactDetailsPage.successPanel).toContainText(`Contact details added: ${contactEmail}`);
+          await expect(serviceCentreContactDetailsPage.successPanel).toContainText(
+            `Contact details added: ${contactEmail}`
+          );
           await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(
             `contact details of ${selectedContactTypeLabel} for ${createdServiceCentre.name} have been successfully created.`
           );
@@ -157,4 +158,3 @@ test.describe(
     });
   }
 );
-

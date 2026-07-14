@@ -53,10 +53,9 @@ test.describe(
           await expect(serviceCentreGeneralPage.successPanel).toContainText(
             `General details for ${updatedName} have been saved successfully.`
           );
-          await expect(serviceCentreGeneralPage.page.getByRole('link', { name: `Continue updating ${updatedName}` })).toHaveAttribute(
-            'href',
-            `/service-centres/${createdServiceCentre.id}/edit`
-          );
+          await expect(
+            serviceCentreGeneralPage.page.getByRole('link', { name: `Continue updating ${updatedName}` })
+          ).toHaveAttribute('href', `/service-centres/${createdServiceCentre.id}/edit`);
 
           await serviceCentreGeneralPage.goto(createdServiceCentre.id);
           await expect(serviceCentreGeneralPage.nameInput).toHaveValue(updatedName);
@@ -66,7 +65,10 @@ test.describe(
       );
     });
 
-    test('shows validation errors when general fields are missing', async ({ serviceCentreGeneralPage, playwright }) => {
+    test('shows validation errors when general fields are missing', async ({
+      serviceCentreGeneralPage,
+      playwright,
+    }) => {
       await withCreatedServiceCentre(
         playwright,
         'Service Centre Edit General Validation Functional Test',
@@ -79,7 +81,9 @@ test.describe(
           await serviceCentreGeneralPage.save();
 
           await expect(serviceCentreGeneralPage.errorSummary).toBeVisible();
-          await expect(serviceCentreGeneralPage.mainContent.content).toContainText('Enter a name for the service centre');
+          await expect(serviceCentreGeneralPage.mainContent.content).toContainText(
+            'Enter a name for the service centre'
+          );
           await expect(serviceCentreGeneralPage.mainContent.content).toContainText(
             'Select whether the service centre is open or closed'
           );
@@ -91,4 +95,3 @@ test.describe(
     });
   }
 );
-

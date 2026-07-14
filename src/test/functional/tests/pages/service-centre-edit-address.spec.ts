@@ -76,8 +76,11 @@ test.describe(
           await expect(serviceCentreAddressFindPage.heading).toContainText('Find address by postcode');
 
           await serviceCentreAddressFindPage.searchPostcode(TEST_POSTCODE);
-          await expect(serviceCentreAddressSelectPage.page)
-            .toHaveURL(new RegExp(`.+\\/service-centres\\/${createdServiceCentre.id}\\/edit\\/address\\/select\\?postcode=RG1\\+2AA`));
+          await expect(serviceCentreAddressSelectPage.page).toHaveURL(
+            new RegExp(
+              `.+\\/service-centres\\/${createdServiceCentre.id}\\/edit\\/address\\/select\\?postcode=RG1\\+2AA`
+            )
+          );
 
           await serviceCentreAddressSelectPage.selectFirstAddress();
           await serviceCentreAddressSelectPage.clickContinue();
@@ -222,4 +225,3 @@ test.describe(
     });
   }
 );
-

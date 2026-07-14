@@ -19,4 +19,3 @@ export class ServiceCentreEditPage extends Base {
     return this.sectionsTable.getByRole('link', { name: sectionName, exact: true }).getAttribute('href');
   }
 }
-

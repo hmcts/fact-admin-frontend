@@ -1,17 +1,13 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedServiceCentre } from '../../helpers/testSupport';
 
-
 test.describe(
   'Service Centre Edit Cases Heard - Smoke',
   {
     tag: '@smoke',
   },
   () => {
-    test('smoke test', async ({
-      playwright,
-      serviceCentreCasesHeardPage,
-    }) => {
+    test('smoke test', async ({ playwright, serviceCentreCasesHeardPage }) => {
       await withCreatedServiceCentre(
         playwright,
         'Service Centre Edit Cases Heard Smoke Test',
@@ -57,7 +53,9 @@ test.describe(
           );
 
           await serviceCentreCasesHeardPage.goto(createdServiceCentre.id);
-          await expect(serviceCentreCasesHeardPage.page.locator('input[name="areasOfLaw"]:checked').first()).toBeChecked();
+          await expect(
+            serviceCentreCasesHeardPage.page.locator('input[name="areasOfLaw"]:checked').first()
+          ).toBeChecked();
         }
       );
     });
@@ -84,4 +82,3 @@ test.describe(
     });
   }
 );
-
