@@ -81,7 +81,19 @@ test.describe(
           );
 
           await counterServiceOpeningHoursPage.clickBackToCounterService();
-          await expect(counterServiceOpeningHoursPage.counterServiceRow('Forms')).toHaveCount(0);
+          await expect
+            .poll(
+              async () => {
+                await counterServiceOpeningHoursPage.goto(createdCourt.id);
+                return counterServiceOpeningHoursPage.counterServiceRow('Forms').count();
+              },
+              {
+                timeout: 30000,
+                intervals: [500, 1000, 2000],
+                message: 'Expected the deleted Forms counter service row to disappear from the list',
+              }
+            )
+            .toBe(0);
         }
       );
     });

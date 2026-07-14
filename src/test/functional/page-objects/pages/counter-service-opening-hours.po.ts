@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 import { config } from '../../utils';
 import { Base } from '../base';
@@ -54,11 +54,15 @@ export class CounterServiceOpeningHoursPage extends Base {
   }
 
   async selectSameTime(): Promise<void> {
-    await this.page.locator('input[name="sameTime"][value="yes"]').check();
+    const sameTimeYes = this.page.locator('input[name="sameTime"][value="yes"]');
+    await expect(sameTimeYes).toBeVisible();
+    await sameTimeYes.check();
   }
 
   async selectDifferentTimes(): Promise<void> {
-    await this.page.locator('input[name="sameTime"][value="no"]').check();
+    const sameTimeNo = this.page.locator('input[name="sameTime"][value="no"]');
+    await expect(sameTimeNo).toBeVisible();
+    await sameTimeNo.check();
   }
 
   async fillSameOpeningTimes(
@@ -91,15 +95,17 @@ export class CounterServiceOpeningHoursPage extends Base {
   }
 
   async clickFirstEditLink(): Promise<void> {
-    await this.page.getByRole('link', { name: 'Edit' }).first().click();
+    await this.counterServiceTable.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    await expect(this.page.locator('input[name="sameTime"][value="yes"]')).toBeVisible();
   }
 
   async clickBackToCounterService(): Promise<void> {
     await this.backToCounterServiceLink.click();
+    await expect(this.counterServiceTable).toBeVisible();
   }
 
   async clickFirstDeleteLink(): Promise<void> {
-    await this.page.getByRole('link', { name: 'Delete' }).first().click();
+    await this.counterServiceTable.getByRole('link', { name: 'Delete', exact: true }).first().click();
   }
 
   async clickDeleteOpeningHours(): Promise<void> {
