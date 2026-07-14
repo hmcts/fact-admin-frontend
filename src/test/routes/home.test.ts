@@ -57,6 +57,7 @@ describe('Home page', () => {
     expect(response.text).toContain('Download csv');
     expect(response.text).toContain('Add new court');
     expect(response.text).toContain('Add new service centre');
+    expect(response.text).toContain('Approvals tracker');
     expect(response.text).not.toContain('Audit');
     expect(response.text).not.toContain('Users');
   });

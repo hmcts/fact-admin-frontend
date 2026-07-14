@@ -22,7 +22,7 @@ export class HomePageService {
   /**
    * Builds the full homepage view model from parsed filters and upstream API data.
    */
-  public async getHomePageViewModel(filters: HomePageFilters): Promise<HomePageViewModel> {
+  public async getHomePageViewModel(filters: HomePageFilters, isReviewMode = false): Promise<HomePageViewModel> {
     const regionsResponse = await this.dataApiRequests.getRegions();
     const regions = Array.isArray(regionsResponse) ? regionsResponse : [];
     const validationErrors = this.homePageFiltersService.validateFilters(filters, regions);
@@ -36,7 +36,7 @@ export class HomePageService {
 
     return {
       courtTableHead: this.homePageViewService.buildCourtTableHead(filters),
-      courtTableRows: this.homePageViewService.buildCourtTableRows(filters, courtsPage),
+      courtTableRows: this.homePageViewService.buildCourtTableRows(filters, courtsPage, isReviewMode),
       errorMessage: validationErrors.length === 0 ? this.buildErrorMessage(regionsResponse, courtsResponse) : undefined,
       errorSummary: validationErrors,
       filters,

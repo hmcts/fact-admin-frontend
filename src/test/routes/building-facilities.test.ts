@@ -37,7 +37,7 @@ describe('Building facilities page', () => {
     expect(response.text).toContain('aria-label="Breadcrumb"');
     expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
     expect(response.text).toContain(
-      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Reading Crown Court</a>`
+      `<a class="govuk-breadcrumbs__link" href="/courts/${courtId}/edit">Edit Reading Crown Court</a>`
     );
   });
 

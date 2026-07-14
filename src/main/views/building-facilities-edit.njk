@@ -68,6 +68,8 @@
       <h1 class="govuk-heading-l">Building Facilities</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/building-facilities/success">
+      <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+      <legend class="govuk-fieldset__legend govuk-visually-hidden">Building facilities details</legend>
       <h2 class="govuk-heading-m">Parking</h2>
         {{ govukRadios({
           classes: "govuk-radios",
@@ -246,10 +248,13 @@
       <p class="govuk-body">Security</p>
 
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
 
+      </fieldset>
       </form>
 
     </div>
