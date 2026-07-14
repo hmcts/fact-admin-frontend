@@ -1,27 +1,43 @@
-import { GET, route } from 'awilix-express';
-import { HttpStatusCode } from 'axios';
+import { GET, POST, route } from 'awilix-express';
 import { Request, Response } from 'express';
 
-import { isUuid } from '../utils/valueParsers';
+import { DataApiRequests } from '../requests/DataApiRequests';
+import { ApprovalService } from '../services/ApprovalService';
+
+import { LocationApprovalController } from './LocationApprovalController';
+
+const dataApiRequests = new DataApiRequests();
+const locationApprovalController = new LocationApprovalController(
+  {
+    editView: 'service-centre-edit',
+    getLocation: serviceCentreId => dataApiRequests.getServiceCentreById(serviceCentreId),
+    locationIdViewKey: 'serviceCentreId',
+    locationNameViewKey: 'serviceCentreName',
+    notFoundView: 'not-found',
+    paramName: 'serviceCentreId',
+    routeSegment: 'service-centres',
+    subjectType: 'SERVICE_CENTRE',
+  },
+  new ApprovalService(dataApiRequests)
+);
 
 @route('/service-centres/:serviceCentreId/edit')
 export default class ServiceCentreEditController {
   @GET()
-  public get(req: Request, res: Response): void {
-    const { serviceCentreId } = req.params;
-    const resolvedServiceCentreId = Array.isArray(serviceCentreId) ? serviceCentreId[0] : serviceCentreId;
+  public async get(req: Request, res: Response): Promise<void> {
+    await locationApprovalController.get(req, res);
+  }
 
-    if (!resolvedServiceCentreId || !isUuid(resolvedServiceCentreId)) {
-      res.status(HttpStatusCode.NotFound);
-      res.render('not-found');
-      return;
-    }
+  @GET()
+  @route('/approve')
+  public async getApprove(req: Request, res: Response): Promise<void> {
+    await locationApprovalController.getApprove(req, res);
+  }
 
-    res.render('service-centre-edit', {
-      pagePath: `/service-centres/${resolvedServiceCentreId}/edit`,
-      pageTitle: 'Editing service centre',
-      serviceCentreId: resolvedServiceCentreId,
-    });
+  @POST()
+  @route('/approve')
+  public async postApprove(req: Request, res: Response): Promise<void> {
+    await locationApprovalController.postApprove(req, res);
   }
 
   @GET()

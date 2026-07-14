@@ -24,6 +24,7 @@ export interface Config {
   users: {
     admin: UserDetails;
     superAdmin: UserDetails;
+    viewer: UserDetails;
   };
   urls: Urls;
 }
@@ -39,6 +40,11 @@ export const config: Config = {
       email: getEnvVar('SSO_TEST_SUPER_ADMIN_EMAIL'),
       password: getEnvVar('SSO_TEST_SUPER_ADMIN_PASSWORD'),
       sessionFile: path.join(__dirname, '..', '.sessions', 'super-admin.json'),
+    },
+    viewer: {
+      email: getEnvVar('SSO_TEST_VIEWER_EMAIL'),
+      password: getEnvVar('SSO_TEST_VIEWER_PASSWORD'),
+      sessionFile: path.join(__dirname, '..', '.sessions', 'viewer.json'),
     },
   },
   urls: {

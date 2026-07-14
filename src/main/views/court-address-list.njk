@@ -29,16 +29,34 @@
 {% block content %}
 
   {% set addressTableRows = [] %}
+  {% set addressTableHead = [
+    {
+      text: "Address type",
+      classes: "govuk-!-width-one-quarter"
+    },
+    {
+      text: "Address",
+      classes: "govuk-!-width-one-half"
+    }
+  ] %}
+  {% if not isViewer %}
+    {% set addressTableHead = (addressTableHead.push({
+      text: "Actions",
+      classes: "govuk-!-width-one-quarter"
+    }), addressTableHead) %}
+  {% endif %}
   {% if courtAddresses.length %}
     {% for address in courtAddresses %}
-      {% set addressTableRows = (addressTableRows.push([
+      {% set addressTableRow = [
         {
           html: addressType(address)
         },
         {
           html: addressBlock(address)
-        },
-        {
+        }
+      ] %}
+      {% if not isViewer %}
+        {% set addressTableRow = (addressTableRow.push({
           html: rowActions([
             {
               href: '/courts/' + address.courtId + '/edit/address/find/' + address.id,
@@ -49,8 +67,9 @@
               text: 'Delete'
             } if courtAddresses.length > 1 else null
           ])
-        }
-      ]), addressTableRows) %}
+        }), addressTableRow) %}
+      {% endif %}
+      {% set addressTableRows = (addressTableRows.push(addressTableRow), addressTableRows) %}
     {% endfor %}
   {% endif %}
 
@@ -67,27 +86,14 @@
       {% if addressTableRows.length %}
         {{ govukTable({
           firstCellIsHeader: false,
-          head: [
-            {
-              text: "Address type",
-              classes: "govuk-!-width-one-quarter"
-            },
-            {
-              text: "Address",
-              classes: "govuk-!-width-one-half"
-            },
-            {
-              text: "Actions",
-              classes: "govuk-!-width-one-quarter"
-            }
-          ],
+          head: addressTableHead,
           rows: addressTableRows
         }) }}
       {% else %}
         <p class="govuk-body">No addresses are currently configured.</p>
       {% endif %}
 
-      {%  if courtAddresses.length < 3 %}
+      {%  if not isViewer and courtAddresses.length < 3 %}
         {{ govukButton({
           text: "Add address",
           href: '/courts/' + courtId + '/edit/address/find/'

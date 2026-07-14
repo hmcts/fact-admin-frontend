@@ -2,6 +2,7 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
 import { Accessibility, AccessibilityScheme } from '../schemas/accessibilitySchema';
+import { ApprovalStatus, CreateApprovalRequest, approvalStatusListSchema } from '../schemas/approvalSchema';
 import {
   AreaOfLawType,
   CourtAreaOfLawSelection,
@@ -193,6 +194,21 @@ export class DataApiRequests {
       }
 
       logger.error(`Error fetching service centre details for name ${serviceCentreName}:`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get a service centre entity by id
+   */
+  public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/service-centres/${serviceCentreId}/entity/v1`);
+      return serviceCentreSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error(`Error fetching service centre details for id ${serviceCentreId}:`, error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -937,6 +953,45 @@ export class DataApiRequests {
       return auditListItemSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error(`Error fetching audit details for id ${auditId}:`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to get approval statuses for all courts and service centres
+   */
+  async getApprovals(): Promise<ApprovalStatus[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/approvals/v1');
+      return approvalStatusListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching approvals:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to create an approval
+   */
+  async createApproval(approval: CreateApprovalRequest): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.post('/approvals/v1', approval);
+      return response.status;
+    } catch (error: unknown) {
+      logger.error('Error creating approval:', error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to delete an approval by id
+   */
+  async deleteApproval(approvalId: string): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.delete(`/approvals/${approvalId}/v1`);
+      return response.status;
+    } catch (error: unknown) {
+      logger.error(`Error deleting approval for id ${approvalId}:`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
