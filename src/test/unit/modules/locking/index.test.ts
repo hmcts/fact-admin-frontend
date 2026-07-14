@@ -87,6 +87,28 @@ describe('LockingInterceptor', () => {
     expect(next).toHaveBeenCalledTimes(1);
   });
 
+  test.each([`/courts/${subjectId}/edit/approve`, `/service-centres/${subjectId}/edit/approve`])(
+    'does not acquire a lock for the approval page at %s',
+    async path => {
+      const dataApi = {
+        clearUserLocks: jest.fn().mockResolvedValue(HttpStatusCode.NoContent),
+        acquireLock: jest.fn(),
+        getLock: jest.fn(),
+      };
+      const middleware = createMiddleware(dataApi);
+      const req = { path } as express.Request;
+      const res = createResponse();
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+
+      expect(dataApi.clearUserLocks).toHaveBeenCalledWith('22222222-2222-4222-8222-222222222222');
+      expect(dataApi.acquireLock).not.toHaveBeenCalled();
+      expect(res.render).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledTimes(1);
+    }
+  );
+
   test('renders lock failed when page key is not mapped', async () => {
     const dataApi = {
       clearUserLocks: jest.fn(),

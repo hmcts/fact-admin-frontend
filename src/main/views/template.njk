@@ -30,6 +30,7 @@
   {% set isDownloadPage = pagePath.startsWith("/download") %}
   {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
   {% set isAddServiceCentrePage = pagePath.startsWith("/add-service-centre") %}
+  {% set isApprovalsPage = pagePath.startsWith("/approvals") %}
   {% set isAuditPage = pagePath.startsWith("/audits") %}
   {% set isUsersPage = pagePath.startsWith("/users") %}
   {{ govukHeader({
@@ -45,24 +46,29 @@
     navigation: [
       {
         href: "/",
-        text: "Courts",
+        text: "Locations",
         current: isCourtsPage
       },
       {
         href: "/download",
         text: "Download csv",
         current: isDownloadPage
-      },
+      } if not isViewer else false,
       {
         href: "/add-court",
         text: "Add new court",
         current: isAddCourtPage
-      },
+      } if not isViewer else false,
       {
         href: "/add-service-centre",
         text: "Add new service centre",
         current: isAddServiceCentrePage
-      },
+      } if not isViewer else false,
+      {
+        href: "/approvals",
+        text: "Approvals tracker",
+        current: isApprovalsPage
+      } if not isViewer else false,
       {
         href: "/audits",
         text: "Audits",

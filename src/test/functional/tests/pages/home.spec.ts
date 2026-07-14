@@ -62,7 +62,7 @@ test.describe(
     test('visibility test', async ({ homePage }) => {
       await homePage.expectVisibleElements();
       await expect(homePage.heading).toContainText('Courts, tribunals and service centres');
-      await homePage.header.expectNavigationLink('Courts');
+      await homePage.header.expectNavigationLink('Locations');
       await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
       await homePage.header.expectNavigationLink('Add new service centre');
@@ -75,7 +75,7 @@ test.describe(
 
       test('shows super admin navigation links', async ({ homePage }) => {
         await homePage.expectVisibleElements();
-        await homePage.header.expectNavigationLink('Courts');
+        await homePage.header.expectNavigationLink('Locations');
         await homePage.header.expectNavigationLink('Download csv');
         await homePage.header.expectNavigationLink('Add new court');
         await homePage.header.expectNavigationLink('Add new service centre');
@@ -89,7 +89,7 @@ test.describe(
 
       test('does not show super admin navigation links', async ({ homePage }) => {
         await homePage.expectVisibleElements();
-        await homePage.header.expectNavigationLink('Courts');
+        await homePage.header.expectNavigationLink('Locations');
         await homePage.header.expectNavigationLink('Download csv');
         await homePage.header.expectNavigationLink('Add new court');
         await homePage.header.expectNavigationLink('Add new service centre');
@@ -212,7 +212,7 @@ test.describe(
 
           await homePage.clickEditForCourt(createdServiceCentre.name);
 
-          await expect(homePage.heading).toContainText('Editing service centre');
+          await expect(homePage.heading).toContainText(`Editing - ${createdServiceCentre.name}`);
           await expect(homePage.page).toHaveURL(new RegExp(`/service-centres/${createdServiceCentre.id}/edit$`));
           await expect(homePage.mainContent.content).toContainText('General');
           await expect(homePage.mainContent.content).toContainText('Warning notice');

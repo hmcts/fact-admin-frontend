@@ -65,6 +65,22 @@ describe('Cases Heard View', () => {
     expect(html).toContain('Home');
   });
 
+  test('renders cases heard read-only for viewer users', () => {
+    const html = env.render('cases-heard.njk', {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      courtName: 'Reading Crown Court',
+      errorSummary: [],
+      isViewer: true,
+      leftColumnAreasOfLawItems: [{ checked: true, text: 'Adoption', value: 'a' }],
+      rightColumnAreasOfLawItems: [],
+      pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard',
+      pageTitle: 'Cases heard - Reading Crown Court',
+    });
+
+    expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(html).not.toContain('>Save<');
+  });
+
   test('renders the cases heard confirm page', () => {
     const html = env.render('cases-heard-confirm.njk', {
       courtId: '11111111-1111-4111-8111-111111111111',
