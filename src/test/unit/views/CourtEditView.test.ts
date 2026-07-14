@@ -13,16 +13,46 @@ describe('Court Edit View', () => {
     });
 
     expect(html).toContain('Editing - Reading Crown Court');
+    expect(html).toContain(`${courtEditPath}/address`);
     expect(html).toContain(`${courtEditPath}/accessibility`);
-    expect(html).toContain(`${courtEditPath}/general`);
     expect(html).toContain(`${courtEditPath}/cases-heard`);
+    expect(html).toContain(`${courtEditPath}/contact-details`);
+    expect(html).toContain(`${courtEditPath}/counter-service-opening-hours`);
+    expect(html).toContain(`${courtEditPath}/court-opening-hours`);
+    expect(html).toContain(`${courtEditPath}/general`);
+    expect(html).toContain(`${courtEditPath}/building-facilities`);
     expect(html).toContain(`${courtEditPath}/information-for-professionals`);
-    expect(html).toContain('Information for professionals');
-    expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
-    expect(html).toContain('Single points of entry');
-    expect(html).toContain('Local authorities');
+    expect(html).toContain(`${courtEditPath}/local-authorities`);
+    expect(html).toContain(`${courtEditPath}/photo`);
     expect(html).toContain(`${courtEditPath}/translation-and-interpretation`);
+    expect(html).toContain(`${courtEditPath}/single-point-of-entry`);
     expect(html).toContain(`${courtEditPath}/warning-notice`);
-    expect(html).toContain('TODO');
+  });
+
+  test('renders timeout warning banner when timeoutMins is provided', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      pagePath: courtEditPath,
+      pageTitle: 'Editing - Reading Crown Court',
+      courtLocks: [],
+      timeoutMins: 15,
+    });
+
+    expect(html).toContain('Editing session timed out');
+    expect(html).toContain('You were inactive for 15 minutes and have been returned to the edit page.');
+    expect(html).toContain('Any unsaved changes you made have not been saved.');
+  });
+
+  test('does not render timeout warning banner when timeoutMins is missing', () => {
+    const html = env.render('court-edit.njk', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      pagePath: courtEditPath,
+      pageTitle: 'Editing - Reading Crown Court',
+      courtLocks: [],
+    });
+
+    expect(html).not.toContain('Editing session timed out');
   });
 });
