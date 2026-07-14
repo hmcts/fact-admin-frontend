@@ -1,0 +1,14 @@
+{% extends "template.njk" %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Already Locked</h1>
+  {% if lock and lock.user %}
+    <p class="govuk-body">The {{ subject }} {{ page }} page is currently locked by user: {{  govukTag({
+      text: lock.user.email,
+      classes: "govuk-tag--grey fact-tag-max-width--unlimited"
+      }) }} </p>
+  {% else %}
+    <p class="govuk-body">The {{ subject }} {{ page }}  page is currently locked by another user.</p>
+  {% endif %}
+{% endblock %}

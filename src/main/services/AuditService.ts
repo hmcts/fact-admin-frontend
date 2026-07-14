@@ -9,7 +9,8 @@ import moment from 'moment';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { Audit, AuditSubject, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
+import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
+import { SubjectType } from '../schemas/subjectTypeSchema';
 
 const DEFAULT_PAGE_NUMBER = 0;
 const DEFAULT_PAGE_SIZE = 25;
@@ -237,8 +238,8 @@ export class AuditService {
       ];
     }
     // subject type check
-    if (params.subjectType && !Object.keys(AuditSubject).includes(params.subjectType)) {
-      errors.subjectType = ['Subject type must be one of: ' + Object.keys(AuditSubject).join(', ')];
+    if (params.subjectType && !Object.keys(SubjectType).includes(params.subjectType)) {
+      errors.subjectType = ['Subject type must be one of: ' + Object.keys(SubjectType).join(', ')];
     }
     // date range checks
     this.validateDateRange(params, errors);

@@ -3,11 +3,14 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { isUuid } from '../utils/valueParsers';
+import { SubjectType } from '../schemas/subjectTypeSchema';
+import { LockService } from '../services/LockService';
+import { isUuid, parseNumber } from '../utils/valueParsers';
 
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
 const dataApiRequests = new DataApiRequests();
+const courtLockService = new LockService(dataApiRequests);
 
 @route('/courts/:courtId/edit')
 export default class CourtEditController {
@@ -36,11 +39,26 @@ export default class CourtEditController {
       return;
     }
 
+    const courtLocks = await courtLockService.getLocks(SubjectType.COURT, resolvedCourtId);
+
+    if (typeof courtLocks === 'number') {
+      res.status(courtLocks);
+      res.render('error');
+      return;
+    }
+
     res.render('court-edit', {
       breadcrumbs: buildEditBreadcrumbs(resolvedCourtId, courtResponse.name),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       pageTitle: `Editing - ${courtResponse.name}`,
+      courtLocks,
+      timeoutMins: this.getTimeoutMinsFromQuery(req.query),
     });
+  }
+
+  private getTimeoutMinsFromQuery(query: Request['query']): number | undefined {
+    const timeoutMins = parseNumber(query?.timeout, -1);
+    return timeoutMins === -1 ? undefined : timeoutMins;
   }
 }
