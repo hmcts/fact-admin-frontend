@@ -7,7 +7,11 @@
 {% endblock %}
 
 {% block content %}
-  {{ successPanel("Address saved", "Address " + addressBlock(address, true) + " has been saved for " + serviceCentreName + ".") }}
+  {% set successMessage = "Addresses for " + serviceCentreName + " have been successfully updated." %}
+  {% if serviceCentreOpened %}
+    {% set successMessage = successMessage + " The service centre is now open." %}
+  {% endif %}
+  {{ successPanel("Address saved: " + addressBlock(address, true), successMessage) }}
   <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
   <ul class="govuk-list govuk-list--bullet">
     <li><a href="/service-centres/{{ serviceCentreId }}/edit/address" class="govuk-link govuk-link--no-visited-state">Back to address</a></li>

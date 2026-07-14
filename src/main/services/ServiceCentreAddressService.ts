@@ -9,6 +9,7 @@ export type SaveServiceCentreAddressResponse =
       status: 'saved';
       address: Partial<ServiceCentreAddress>;
       serviceCentreName: string;
+      serviceCentreOpened: boolean;
     }
   | {
       status: 'invalid';
@@ -126,7 +127,25 @@ export class ServiceCentreAddressService {
       return { status: 'invalid', address: { ...address, errors } };
     }
 
-    return { status: 'saved', address: result, serviceCentreName: serviceCentreResponse.name };
+    let serviceCentreOpened = false;
+    if (!addressId && existingAddresses.length === 0 && !serviceCentreResponse.open) {
+      const openServiceCentreResponse = await this.dataApiRequests.updateServiceCentre({
+        ...serviceCentreResponse,
+        open: true,
+      });
+
+      if (typeof openServiceCentreResponse === 'number') {
+        return openServiceCentreResponse;
+      }
+
+      if (openServiceCentreResponse instanceof Map) {
+        return HttpStatusCode.BadRequest;
+      }
+
+      serviceCentreOpened = true;
+    }
+
+    return { status: 'saved', address: result, serviceCentreName: serviceCentreResponse.name, serviceCentreOpened };
   }
 
   public async delete(serviceCentreId: string, addressId: string): Promise<DeleteServiceCentreAddressResponse> {

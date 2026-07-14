@@ -185,8 +185,28 @@ describe('ServiceCentreAddressService', () => {
   });
 
   test('save creates and updates addresses, and maps api validation errors', async () => {
+    const regions = [{ country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' }];
+    const serviceAreas = [
+      { id: '33333333-3333-4333-8333-333333333333', name: 'Money claims', nameCy: 'Money claims' },
+      { id: '44444444-4444-4444-8444-444444444444', name: 'Probate', nameCy: 'Probate' },
+    ];
     const newAddress = buildAddress({ id: null });
     const updatedAddress = buildAddress({ addressLine1: '2 High Street' });
+    const serviceCentre = {
+      createdAt: '2026-06-10T10:00:00Z',
+      id: '11111111-1111-4111-8111-111111111111',
+      lastUpdatedAt: '2026-06-10T10:00:00Z',
+      name: 'Reading Service Centre',
+      open: false,
+      regionId: regions[0].id,
+      serviceAreaIds: [serviceAreas[0].id],
+      slug: 'reading-service-centre',
+      warningNotice: null,
+    };
+    const updatedServiceCentre = {
+      ...serviceCentre,
+      open: true,
+    };
     const saveServiceCentreAddress = jest
       .spyOn(DataApiRequests.prototype, 'saveServiceCentreAddress')
       .mockResolvedValueOnce(newAddress as never)
@@ -201,16 +221,21 @@ describe('ServiceCentreAddressService', () => {
       .spyOn(DataApiRequests.prototype, 'updateServiceCentreAddress')
       .mockResolvedValue(updatedAddress as never);
 
+    const updateServiceCentre = jest
+      .spyOn(DataApiRequests.prototype, 'updateServiceCentre')
+      .mockResolvedValue(updatedServiceCentre as never);
+
     jest.spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails').mockResolvedValue([] as never);
     jest
       .spyOn(DataApiRequests.prototype, 'getServiceCentreById')
-      .mockResolvedValue({ id: serviceCentreId, name: 'Reading Service Centre' } as never);
+      .mockResolvedValue(serviceCentre as never);
 
     const service = new ServiceCentreAddressService();
 
     await expect(service.save(newAddress, serviceCentreId)).resolves.toEqual({
       status: 'saved',
       address: newAddress,
+      serviceCentreOpened: true,
       serviceCentreName: 'Reading Service Centre',
     });
 
@@ -228,11 +253,13 @@ describe('ServiceCentreAddressService', () => {
     await expect(service.save(updatedAddress, serviceCentreId, addressId)).resolves.toEqual({
       status: 'saved',
       address: updatedAddress,
+      serviceCentreOpened: false,
       serviceCentreName: 'Reading Service Centre',
     });
 
     expect(saveServiceCentreAddress).toHaveBeenCalledWith(newAddress, serviceCentreId);
     expect(updateServiceCentreAddress).toHaveBeenCalledWith(updatedAddress, serviceCentreId, addressId);
+    expect(updateServiceCentre).toHaveBeenCalledWith(updatedServiceCentre);
   });
 
   test('delete returns status for failed lookups and deletes when request succeeds', async () => {

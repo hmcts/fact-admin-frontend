@@ -283,6 +283,7 @@ export default class ServiceCentreAddressController {
       serviceCentreId,
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
       serviceCentreName: saveResult.serviceCentreName,
+      serviceCentreOpened: saveResult.serviceCentreOpened,
     });
   }
 
