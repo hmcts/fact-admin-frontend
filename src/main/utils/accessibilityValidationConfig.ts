@@ -136,7 +136,7 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
       key: 'accessibleToiletDescriptionCy',
       validate: m =>
         !m.accessibleToiletDescriptionCy?.trim()
-          ? ['Enter a welsh description of the accessible toilet facilities']
+          ? ['Enter a Welsh description of the accessible toilet facilities']
           : undefined,
     },
 
