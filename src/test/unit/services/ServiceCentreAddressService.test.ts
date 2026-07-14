@@ -226,9 +226,7 @@ describe('ServiceCentreAddressService', () => {
       .mockResolvedValue(updatedServiceCentre as never);
 
     jest.spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails').mockResolvedValue([] as never);
-    jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreById')
-      .mockResolvedValue(serviceCentre as never);
+    jest.spyOn(DataApiRequests.prototype, 'getServiceCentreById').mockResolvedValue(serviceCentre as never);
 
     const service = new ServiceCentreAddressService();
 
