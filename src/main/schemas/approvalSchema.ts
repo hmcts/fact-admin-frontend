@@ -4,7 +4,6 @@ export const approvalSubjectTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
 
 const approvalUserSchema = z.object({
   email: z.email().nullable().optional(),
-  favouriteCourts: z.array(z.uuid()).nullable().optional(),
   id: z.uuid().nullable().optional(),
   lastLogin: z.string().nullable().optional(),
   role: z.string().nullable().optional(),

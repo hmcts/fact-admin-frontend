@@ -44,6 +44,7 @@ const adminRoutes = [
   '/add-service-centre',
   '/approvals',
   '/courts',
+  '/favourites',
   '/service-centres',
 ];
 const superAdminRoutes = ['/audits', '/users'];
@@ -56,6 +57,8 @@ const viewerGetRoutes = [
   /^\/service-centres\/[^/]+\/edit(?:\/(?:address|approve))?$/,
 ];
 const viewerApprovalRoute = /^\/(?:courts|service-centres)\/[^/]+\/edit\/approve$/;
+const viewerFavouriteRoute =
+  /^\/favourites\/(?:COURT|SERVICE_CENTRE)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?:\/remove)?$/i;
 
 export const app = express();
 app.locals.ENV = env;
@@ -159,7 +162,7 @@ function isViewerRoute(req: express.Request): boolean {
     return viewerGetRoutes.some(route => route.test(req.path));
   }
 
-  return req.method === 'POST' && viewerApprovalRoute.test(req.path);
+  return req.method === 'POST' && (viewerApprovalRoute.test(req.path) || viewerFavouriteRoute.test(req.path));
 }
 
 function denyAccess(req: express.Request, res: express.Response): void {

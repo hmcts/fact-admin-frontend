@@ -110,6 +110,54 @@ describe('HomePageViewService', () => {
     expect(rows[1][2].html).toContain('Review<span class="govuk-visually-hidden"> National Business Centre');
   });
 
+  test('builds accessible outline and filled star controls with unique tooltips', () => {
+    const rows = service.buildCourtTableRows(
+      filters,
+      {
+        content: [court, serviceCentre],
+        page: { number: 0, size: 25, totalElements: 2, totalPages: 1 },
+      } as PagedCourts,
+      false,
+      new Map([
+        [`COURT:${court.id}`, false],
+        [`SERVICE_CENTRE:${serviceCentre.id}`, true],
+      ])
+    );
+
+    expect(rows[0][0].html).toContain('aria-pressed="false"');
+    expect(rows[0][0].html).toContain('Add to favourites');
+    expect(rows[0][0].html).toContain(`action="/favourites/COURT/${court.id}"`);
+    expect(rows[0][0].html).toContain(`Add ${court.name} to favourites`);
+    expect(rows[1][0].html).toContain('aria-pressed="true"');
+    expect(rows[1][0].html).toContain('Remove from favourites');
+    expect(rows[1][0].html).toContain(`Remove ${serviceCentre.name} from favourites`);
+    expect(rows[1][0].html).toContain(`action="/favourites/SERVICE_CENTRE/${serviceCentre.id}/remove"`);
+    expect(rows[0][0].html).not.toContain(`favourite-tooltip-courts-service_centre-${serviceCentre.id}`);
+    const nameCellHtml = rows[0][0].html ?? '';
+    expect(nameCellHtml.indexOf('favourite-location__form')).toBeLessThan(
+      nameCellHtml.indexOf('favourite-location__name')
+    );
+  });
+
+  test('builds independently paginated favourite rows with Viewer review actions', () => {
+    const page = {
+      content: [serviceCentre],
+      page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
+    } as PagedCourts;
+    const rows = service.buildFavouriteTableRows(filters, page, true);
+    const pagination = service.buildFavouritesPagination(page, filters);
+
+    expect(rows[0][0].html).toContain('aria-pressed="true"');
+    expect(rows[0][0].html).toContain('tab=favourites');
+    expect(rows[0][2].html).toContain('Review<span');
+    expect(pagination.previous?.href).toContain('favouritesPageNumber=0');
+    expect(pagination.previous?.href).toContain('tab=favourites');
+    expect(service.buildFavouritesResultsMessage(page)).toBe(
+      'Showing 26 to 26 of 30 favourite courts, tribunals and service centres'
+    );
+    expect(service.buildFavouritesPageTitle(page)).toBe('Favourites (page 2 of 2)');
+  });
+
   test('builds pagination links preserving filters, sorting and service centre checkbox', () => {
     const pagination = service.buildPagination(
       {

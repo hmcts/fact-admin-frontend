@@ -14,6 +14,29 @@ test.describe(
     test('Home Page Accessibility', async ({ homePage, axeUtils }) => {
       await homePage.expectVisibleElements();
       await axeUtils.audit();
+      await homePage.openFavouritesTab();
+      await axeUtils.audit();
+    });
+
+    test('Favourite star keyboard Accessibility', async ({ homePage, axeUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Favourite Accessibility Test', {}, async ({ createdCourt }) => {
+        await homePage.goto();
+        await homePage.searchForCourt(createdCourt.name);
+        const star = homePage.table.getByRole('button', {
+          exact: true,
+          name: `Add ${createdCourt.name} to favourites`,
+        });
+
+        await star.focus();
+        await expect(star).toBeFocused();
+        await axeUtils.audit();
+        await star.press('Enter');
+        await homePage.expectFavouriteButtonState(createdCourt.name, true);
+
+        await homePage.openFavouritesTab();
+        await homePage.expectFavouriteVisible(createdCourt.name);
+        await axeUtils.audit();
+      });
     });
 
     test('Users Page Accessibility', async ({ axeUtils, usersPage }) => {

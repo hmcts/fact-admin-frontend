@@ -77,6 +77,76 @@
   flex-shrink: 0;
 }
 
+.favourite-location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.favourite-location__form {
+  display: inline-flex;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.favourite-location__button {
+  display: inline-flex;
+  margin: 0;
+  padding: 3px;
+  border: 0;
+  color: #0b0c0c;
+  background: transparent;
+  cursor: pointer;
+}
+
+.favourite-location__star {
+  width: 26px;
+  height: 26px;
+  overflow: visible;
+  fill: transparent;
+  stroke: currentcolor;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.favourite-location__button[aria-pressed='true'] .favourite-location__star {
+  fill: #ffdd00;
+  stroke: #0b0c0c;
+}
+
+.favourite-location__button[aria-pressed='false']:hover .favourite-location__star {
+  fill: #fff7bf;
+}
+
+.favourite-location__button:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow: 0 3px #0b0c0c;
+}
+
+.favourite-location__tooltip {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  width: max-content;
+  max-width: 180px;
+  padding: 5px 8px;
+  transform: translateX(-50%);
+  color: #ffffff;
+  background: #0b0c0c;
+  font-size: 16px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.favourite-location__button:hover + .favourite-location__tooltip,
+.favourite-location__button:focus + .favourite-location__tooltip {
+  display: block;
+}
+
 // Users table can extend beyond the standard GOV.UK content width.
 .users-table-wrapper {
   overflow-x: auto;

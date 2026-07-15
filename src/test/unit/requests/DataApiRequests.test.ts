@@ -1265,7 +1265,6 @@ describe('DataApiRequests', () => {
     };
     const userEntity = {
       email: 'user@justice.gov.uk',
-      favouriteCourts: ['3fa85f64-5717-4562-b3fc-2c963f66afa6'],
       id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       lastLogin: '2026-05-27T10:35:23.406Z',
       role: 'ADMIN',
@@ -1287,7 +1286,6 @@ describe('DataApiRequests', () => {
     };
     const userEntity = {
       email: 'viewer@justice.gov.uk',
-      favouriteCourts: null,
       id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       lastLogin: '2026-05-27T10:35:23.406Z',
       role: 'Viewer',
@@ -1310,7 +1308,6 @@ describe('DataApiRequests', () => {
     };
     const userEntity = {
       email: 'user@justice.gov.uk',
-      favouriteCourts: null,
       id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       lastLogin: '2026-05-27T10:35:23.406Z',
       role: 'ADMIN',
@@ -1380,7 +1377,6 @@ describe('DataApiRequests', () => {
       content: [
         {
           email: 'admin@example.com',
-          favouriteCourts: null,
           id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
           lastLogin: '2026-05-27T10:35:23.406Z',
           role: 'Admin',
@@ -2912,7 +2908,6 @@ describe('DataApiRequests', () => {
           userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
           user: {
             email: 'admin@example.com',
-            favouriteCourts: null,
             id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
             lastLogin: '2026-06-26T09:10:11.123Z',
             role: 'SUPER_ADMIN',
@@ -3011,7 +3006,6 @@ describe('DataApiRequests', () => {
       userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
       user: {
         email: 'admin@example.com',
-        favouriteCourts: null,
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         lastLogin: '2026-06-26T09:10:11.123Z',
         role: 'SUPER_ADMIN',
@@ -3215,5 +3209,55 @@ describe('DataApiRequests', () => {
       `Error deleting approval for id ${approvalId}:`,
       notFoundError
     );
+  });
+
+  it('gets the current user favourites page', async () => {
+    const params = { pageNumber: 1, pageSize: 25 };
+    const responseBody = {
+      content: [],
+      page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
+    };
+    getStub.withArgs('/user/v1/favourites', { params }).resolves({ data: responseBody });
+
+    await expect(dataApiRequests.getFavourites(params)).resolves.toEqual(responseBody);
+  });
+
+  it('gets batched favourite statuses', async () => {
+    const subjects = [
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT' as const,
+      },
+    ];
+    const responseBody = [{ ...subjects[0], favourite: true }];
+    postStub.withArgs('/user/v1/favourites/status', { subjects }).resolves({ data: responseBody });
+
+    await expect(dataApiRequests.getFavouriteStatuses(subjects)).resolves.toEqual(responseBody);
+  });
+
+  it('adds and removes a subject favourite', async () => {
+    const favourite = {
+      subjectId: '22222222-2222-4222-8222-222222222222',
+      subjectType: 'SERVICE_CENTRE' as const,
+    };
+    postStub.withArgs('/user/v1/favourites', favourite).resolves({ status: HttpStatusCode.Created });
+    deleteStub
+      .withArgs(`/user/v1/favourites/${favourite.subjectType}/${favourite.subjectId}`)
+      .resolves({ status: HttpStatusCode.NoContent });
+
+    await expect(dataApiRequests.addFavourite(favourite)).resolves.toBe(HttpStatusCode.Created);
+    await expect(dataApiRequests.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns the upstream status when a favourite mutation fails', async () => {
+    const favourite = {
+      subjectId: '22222222-2222-4222-8222-222222222222',
+      subjectType: 'COURT' as const,
+    };
+    postStub.withArgs('/user/v1/favourites', favourite).rejects(errorResponse);
+    deleteStub.withArgs(`/user/v1/favourites/COURT/${favourite.subjectId}`).rejects(errorResponse);
+
+    await expect(dataApiRequests.addFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
+    await expect(dataApiRequests.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
   });
 });

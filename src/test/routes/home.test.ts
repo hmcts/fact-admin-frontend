@@ -6,6 +6,8 @@ import { HomePageService } from '../../main/services/HomePageService';
 
 function stubHomePage(): void {
   const filters = {
+    activeTab: 'courts' as const,
+    favouritesPageNumber: 0,
     includeClosed: false,
     onlyServiceCentres: false,
     pageNumber: 0,
@@ -15,6 +17,7 @@ function stubHomePage(): void {
     sortBy: '',
     sortOrder: 'asc',
     rawIncludeClosed: undefined,
+    rawFavouritesPageNumber: undefined,
     rawOnlyServiceCentres: undefined,
     rawPageNumber: undefined,
     rawPageSize: undefined,
@@ -27,6 +30,14 @@ function stubHomePage(): void {
     courtTableHead: [],
     courtTableRows: [],
     errorSummary: [],
+    favouriteTableHead: [],
+    favouriteTableRows: [],
+    favouritesPagination: {
+      currentPage: 0,
+      items: [],
+      totalPages: 0,
+    },
+    favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
     filters,
     includeStatusColumn: false,
     pageTitle: 'Courts, tribunals and service centres',
@@ -53,6 +64,7 @@ describe('Home page', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Courts, tribunals and service centres');
+    expect(response.text).toContain('Favourites');
     expect(response.text).toContain('Apply filters');
     expect(response.text).toContain('Download csv');
     expect(response.text).toContain('Add new court');

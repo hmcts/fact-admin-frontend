@@ -6,7 +6,13 @@ describe('Home View', () => {
       courtTableHead: [],
       courtTableRows: [],
       errorSummary: [],
+      favouriteTableHead: [],
+      favouriteTableRows: [],
+      favouritesPagination: { currentPage: 0, items: [], totalPages: 0 },
+      favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
       filters: {
+        activeTab: 'courts',
+        favouritesPageNumber: 0,
         includeClosed: false,
         onlyServiceCentres: false,
         pageNumber: 0,
@@ -44,7 +50,13 @@ describe('Home View', () => {
       courtTableRows: [[{ text: 'Reading Crown Court' }, { text: 'Edit' }]],
       errorMessage: 'There was a problem loading courts, tribunals and service centres.',
       errorSummary: [{ href: '#partialCourtName', text: 'Enter a court name' }],
+      favouriteTableHead: [],
+      favouriteTableRows: [],
+      favouritesPagination: { currentPage: 0, items: [], totalPages: 0 },
+      favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
       filters: {
+        activeTab: 'courts',
+        favouritesPageNumber: 0,
         includeClosed: false,
         onlyServiceCentres: false,
         pageNumber: 0,
@@ -75,5 +87,42 @@ describe('Home View', () => {
     expect(html).toContain('Enter a court name');
     expect(html).toContain('There was a problem loading courts, tribunals and service centres.');
     expect(html).toContain('href="/?pageNumber=1"');
+  });
+
+  test('renders the active Favourites table and its independent error', () => {
+    const html = env.render('home.njk', {
+      courtTableHead: [],
+      courtTableRows: [],
+      errorSummary: [],
+      favouriteTableHead: [{ text: 'Name' }, { text: 'Last updated' }, { text: 'Actions' }],
+      favouriteTableRows: [[{ html: 'Favourite Court star' }, { text: '14 Jul 2026' }, { text: 'Review' }]],
+      favouritesErrorMessage: 'There was a problem loading favourites.',
+      favouritesPagination: { currentPage: 0, items: [], totalPages: 0 },
+      favouritesResultsMessage: 'Showing 1 to 1 of 1 favourite courts, tribunals and service centres',
+      filters: {
+        activeTab: 'favourites',
+        favouritesPageNumber: 0,
+        includeClosed: false,
+        onlyServiceCentres: false,
+        pageNumber: 0,
+        pageSize: 25,
+        partialCourtName: '',
+        regionId: '',
+        sortBy: '',
+        sortOrder: 'asc',
+      },
+      includeStatusColumn: false,
+      pagePath: '/',
+      pageTitle: 'Favourites',
+      pagination: { currentPage: 0, items: [], totalPages: 0 },
+      regionOptions: [],
+      resultsMessage: 'No courts, tribunals or service centres found.',
+    });
+
+    expect(html).toContain('Favourites');
+    expect(html).toContain('There was a problem loading favourites.');
+    expect(html).toMatch(/govuk-tabs__list-item govuk-tabs__list-item--selected[^>]*>\s*<a[^>]*>Favourites<\/a>/);
+    expect(html).toContain('govuk-tabs__panel govuk-tabs__panel--hidden" id="courts"');
+    expect(html).toContain('govuk-tabs__panel" id="favourites"');
   });
 });

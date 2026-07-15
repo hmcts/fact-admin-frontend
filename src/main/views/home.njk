@@ -6,7 +6,6 @@
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "govuk/components/tabs/macro.njk" import govukTabs %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -24,100 +23,93 @@
         }) }}
       {% endif %}
 
-      {% if errorMessage %}
-        <p class="govuk-error-message">{{ errorMessage }}</p>
-      {% endif %}
-
-      <form method="get" action="/" class="govuk-!-margin-bottom-6">
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-half">
-            {{ govukInput({
-              id: "partialCourtName",
-              name: "partialCourtName",
-              label: {
-                text: "Search courts, tribunals and service centres"
-              },
-              errorMessage: {
-                text: partialCourtNameError
-              } if partialCourtNameError else undefined,
-              type: "search",
-              value: filters.partialCourtName
-            }) }}
-          </div>
-          <div class="govuk-grid-column-one-quarter">
-            {{ govukSelect({
-              id: "regionId",
-              name: "regionId",
-              label: {
-                text: "Region"
-              },
-              items: regionOptions
-            }) }}
-          </div>
-        </div>
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-quarter">
-            {{ govukCheckboxes({
-              idPrefix: "includeClosed",
-              name: "includeClosed",
-              items: [
-                {
-                  checked: filters.includeClosed,
-                  text: "Include closed",
-                  value: "true"
-                }
-              ]
-            }) }}
-          </div>
-          <div class="govuk-grid-column-one-half">
-            {{ govukCheckboxes({
-              idPrefix: "onlyServiceCentres",
-              name: "onlyServiceCentres",
-              items: [
-                {
-                  checked: filters.onlyServiceCentres,
-                  text: "Only show service centres",
-                  value: "true"
-                }
-              ]
-            }) }}
-          </div>
-        </div>
-        <input type="hidden" name="pageSize" value="{{ filters.pageSize }}">
-        {% if filters.sortBy %}
-          <input type="hidden" name="sortBy" value="{{ filters.sortBy }}">
-          <input type="hidden" name="sortOrder" value="{{ filters.sortOrder }}">
-        {% endif %}
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: "Apply filters"
-          }) }}
-          {{ govukButton({
-            classes: "govuk-button--secondary",
-            href: "/",
-            text: "Clear filters"
-          }) }}
-        </div>
-      </form>
-
       {% set courtsTableHtml %}
+        {% if errorMessage %}
+          <p class="govuk-error-message">{{ errorMessage }}</p>
+        {% endif %}
+        {% if courtFavouriteStatusErrorMessage %}
+          <p class="govuk-error-message">{{ courtFavouriteStatusErrorMessage }}</p>
+        {% endif %}
+
+        <form method="get" action="/" class="govuk-!-margin-bottom-6">
+          <input type="hidden" name="tab" value="courts">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half">
+              {{ govukInput({
+                id: "partialCourtName",
+                name: "partialCourtName",
+                label: {
+                  text: "Search courts, tribunals and service centres"
+                },
+                errorMessage: {
+                  text: partialCourtNameError
+                } if partialCourtNameError else undefined,
+                type: "search",
+                value: filters.partialCourtName
+              }) }}
+            </div>
+            <div class="govuk-grid-column-one-quarter">
+              {{ govukSelect({
+                id: "regionId",
+                name: "regionId",
+                label: {
+                  text: "Region"
+                },
+                items: regionOptions
+              }) }}
+            </div>
+          </div>
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+              {{ govukCheckboxes({
+                idPrefix: "includeClosed",
+                name: "includeClosed",
+                items: [
+                  {
+                    checked: filters.includeClosed,
+                    text: "Include closed",
+                    value: "true"
+                  }
+                ]
+              }) }}
+            </div>
+            <div class="govuk-grid-column-one-half">
+              {{ govukCheckboxes({
+                idPrefix: "onlyServiceCentres",
+                name: "onlyServiceCentres",
+                items: [
+                  {
+                    checked: filters.onlyServiceCentres,
+                    text: "Only show service centres",
+                    value: "true"
+                  }
+                ]
+              }) }}
+            </div>
+          </div>
+          <input type="hidden" name="pageSize" value="{{ filters.pageSize }}">
+          {% if filters.sortBy %}
+            <input type="hidden" name="sortBy" value="{{ filters.sortBy }}">
+            <input type="hidden" name="sortOrder" value="{{ filters.sortOrder }}">
+          {% endif %}
+          <div class="govuk-button-group">
+            {{ govukButton({ text: "Apply filters" }) }}
+            {{ govukButton({
+              classes: "govuk-button--secondary",
+              href: "/",
+              text: "Clear filters"
+            }) }}
+          </div>
+        </form>
+
         <p class="govuk-body">{{ resultsMessage }}</p>
         {% if courtTableRows.length %}
-          {% if includeStatusColumn %}
-            {{ govukTable({
-              classes: "homepage-courts-table",
-              firstCellIsHeader: false,
-              head: courtTableHead,
-              rows: courtTableRows
-            }) }}
-          {% else %}
-            {{ govukTable({
-              classes: "homepage-courts-table",
-              firstCellIsHeader: false,
-              head: courtTableHead,
-              rows: courtTableRows
-            }) }}
-          {% endif %}
+          {{ govukTable({
+            classes: "homepage-courts-table",
+            firstCellIsHeader: false,
+            head: courtTableHead,
+            rows: courtTableRows
+          }) }}
         {% else %}
           <p class="govuk-body">No courts, tribunals or service centres match the current filters.</p>
         {% endif %}
@@ -133,28 +125,49 @@
       {% endset %}
 
       {% set favouritesTabHtml %}
-        <p class="govuk-body">Coming soon.</p>
+        {% if favouritesErrorMessage %}
+          <p class="govuk-error-message">{{ favouritesErrorMessage }}</p>
+        {% else %}
+          <p class="govuk-body">{{ favouritesResultsMessage }}</p>
+          {% if favouriteTableRows.length %}
+            {{ govukTable({
+              classes: "homepage-courts-table homepage-favourites-table",
+              firstCellIsHeader: false,
+              head: favouriteTableHead,
+              rows: favouriteTableRows
+            }) }}
+          {% else %}
+            <p class="govuk-body">You have not added any favourite courts, tribunals or service centres.</p>
+          {% endif %}
+
+          {% if favouritesPagination.totalPages > 1 %}
+            {{ govukPagination({
+              classes: "homepage-pagination homepage-favourites-pagination",
+              items: favouritesPagination.items,
+              next: favouritesPagination.next,
+              previous: favouritesPagination.previous
+            }) }}
+          {% endif %}
+        {% endif %}
       {% endset %}
 
-      {{ govukTabs({
-        items: [
-          {
-            id: "courts",
-            label: "Courts",
-            current: true,
-            panel: {
-              html: courtsTableHtml
-            }
-          },
-          {
-            id: "favourites",
-            label: "Favourites",
-            panel: {
-              html: favouritesTabHtml
-            }
-          }
-        ]
-      }) }}
+      <div class="govuk-tabs" data-module="govuk-tabs">
+        <h2 class="govuk-tabs__title">Contents</h2>
+        <ul class="govuk-tabs__list">
+          <li class="govuk-tabs__list-item{% if filters.activeTab == 'courts' %} govuk-tabs__list-item--selected{% endif %}">
+            <a class="govuk-tabs__tab" href="#courts">Courts</a>
+          </li>
+          <li class="govuk-tabs__list-item{% if filters.activeTab == 'favourites' %} govuk-tabs__list-item--selected{% endif %}">
+            <a class="govuk-tabs__tab" href="#favourites">Favourites</a>
+          </li>
+        </ul>
+        <div class="govuk-tabs__panel{% if filters.activeTab != 'courts' %} govuk-tabs__panel--hidden{% endif %}" id="courts">
+          {{ courtsTableHtml | safe }}
+        </div>
+        <div class="govuk-tabs__panel{% if filters.activeTab != 'favourites' %} govuk-tabs__panel--hidden{% endif %}" id="favourites">
+          {{ favouritesTabHtml | safe }}
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
