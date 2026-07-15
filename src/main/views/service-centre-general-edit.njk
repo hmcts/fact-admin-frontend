@@ -19,51 +19,55 @@
       <h1 class="govuk-heading-l">General</h1>
 
       <form method="post" action="/service-centres/{{ model.id }}/edit/general/success">
-        {{ govukInput({
-          label: {
-            text: "Service centre name",
-            classes: "govuk-label--m"
-          },
-          hint: {
-            text: "Enter the name of the service centre. Only capitalise the first letter."
-          },
-          id: "name",
-          name: "name",
-          spellcheck: true,
-          value: model.name,
-          errorMessage: {
-            text: model.errors.name[0]
-          } if model.errors and model.errors.name else null
-        }) }}
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+          <legend class="govuk-fieldset__legend govuk-visually-hidden">General details</legend>
 
-        {{ govukRadios({
-          classes: "govuk-radios--inline",
-          id: "open",
-          name: "open",
-          fieldset: {
-            legend: {
-              text: "Service centre status",
-              classes: "govuk-fieldset__legend--m"
-            }
-          },
-          items: [
-            {
-              value: "true",
-              text: "Open",
-              checked: true if model.open else false
+          {{ govukInput({
+            label: {
+              text: "Service centre name",
+              classes: "govuk-label--m"
             },
-            {
-              value: "false",
-              text: "Closed",
-              checked: false if model.open else true
-            }
-          ],
-          errorMessage: {
-            text: model.errors.open[0]
-          } if model.errors and model.errors.open else null
-        }) }}
+            hint: {
+              text: "Enter the name of the service centre. Only capitalise the first letter."
+            },
+            id: "name",
+            name: "name",
+            spellcheck: true,
+            value: model.name,
+            errorMessage: {
+              text: model.errors.name[0]
+            } if model.errors and model.errors.name else null
+          }) }}
 
-        <fieldset class="govuk-fieldset">
+          {{ govukRadios({
+            classes: "govuk-radios--inline",
+            id: "open",
+            name: "open",
+            fieldset: {
+              legend: {
+                text: "Service centre status",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: [
+              {
+                value: "true",
+                text: "Open",
+                checked: true if model.open else false
+              },
+              {
+                value: "false",
+                text: "Closed",
+                checked: false if model.open else true
+              }
+            ],
+            errorMessage: {
+              text: model.errors.open[0]
+            } if model.errors and model.errors.open else null
+          }) }}
+        </fieldset>
+
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
           <div class="govuk-form-group{% if model.errors and model.errors.serviceAreaIds %} govuk-form-group--error{% endif %}" id="serviceAreaIds">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
               Service areas
@@ -97,9 +101,11 @@
           </div>
         </fieldset>
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
       </form>
     </div>
   </div>

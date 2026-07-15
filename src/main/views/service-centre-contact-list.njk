@@ -33,12 +33,12 @@
           html: rowActions([
             {
               href: contact.editHref,
-              text: 'Edit'
+              text: 'View' if isViewer else 'Edit'
             },
             {
               href: contact.deleteHref,
               text: 'Delete'
-            }
+            } if not isViewer else null
           ])
         }
       ]), contactTableRows) %}
@@ -72,10 +72,12 @@
         <p class="govuk-body">No contact details are currently configured.</p>
       {% endif %}
 
-      {{ govukButton({
-        text: "Add contact detail",
-        href: '/service-centres/' + serviceCentreId + '/edit/contact-details/add'
-      }) }}
+      {% if not isViewer %}
+        {{ govukButton({
+          text: "Add contact detail",
+          href: '/service-centres/' + serviceCentreId + '/edit/contact-details/add'
+        }) }}
+      {% endif %}
     </div>
   </div>
 {% endblock %}

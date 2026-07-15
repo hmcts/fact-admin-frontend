@@ -18,26 +18,31 @@
       <p class="govuk-body">Use this field to display text relevant for this service centre only. This is limited to 250 characters</p>
 
       <form method="post" action="/service-centres/{{ model.id }}/edit/warning-notice/success">
-        {{ govukTextarea({
-          id: "warningNotice",
-          name: "warningNotice",
-          label: {
-            text: "Warning notice (optional)",
-            classes: "govuk-label--m"
-          },
-          attributes: {
-            maxlength: 250
-          },
-          rows: 5,
-          value: model.warningNotice,
-          errorMessage: {
-            text: model.errors.warningNotice[0]
-          } if model.errors and model.errors.warningNotice else null
-        }) }}
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+          <legend class="govuk-fieldset__legend govuk-visually-hidden">Warning notice</legend>
+          {{ govukTextarea({
+            id: "warningNotice",
+            name: "warningNotice",
+            label: {
+              text: "Warning notice (optional)",
+              classes: "govuk-label--m"
+            },
+            attributes: {
+              maxlength: 250
+            },
+            rows: 5,
+            value: model.warningNotice,
+            errorMessage: {
+              text: model.errors.warningNotice[0]
+            } if model.errors and model.errors.warningNotice else null
+          }) }}
+        </fieldset>
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
       </form>
     </div>
   </div>

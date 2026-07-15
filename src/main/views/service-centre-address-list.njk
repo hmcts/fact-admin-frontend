@@ -10,16 +10,34 @@
 
 {% block content %}
   {% set addressTableRows = [] %}
+  {% set addressTableHead = [
+    {
+      text: "Address type",
+      classes: "govuk-!-width-one-quarter"
+    },
+    {
+      text: "Address",
+      classes: "govuk-!-width-one-half"
+    }
+  ] %}
+  {% if not isViewer %}
+    {% set addressTableHead = (addressTableHead.push({
+      text: "Actions",
+      classes: "govuk-!-width-one-quarter"
+    }), addressTableHead) %}
+  {% endif %}
   {% if serviceCentreAddresses.length %}
     {% for address in serviceCentreAddresses %}
-      {% set addressTableRows = (addressTableRows.push([
+      {% set addressTableRow = [
         {
           html: addressType(address)
         },
         {
           html: addressBlock(address)
-        },
-        {
+        }
+      ] %}
+      {% if not isViewer %}
+        {% set addressTableRow = (addressTableRow.push({
           html: rowActions([
             {
               href: '/service-centres/' + serviceCentreId + '/edit/address/find/' + address.id,
@@ -30,8 +48,9 @@
               text: 'Delete'
             }
           ])
-        }
-      ]), addressTableRows) %}
+        }), addressTableRow) %}
+      {% endif %}
+      {% set addressTableRows = (addressTableRows.push(addressTableRow), addressTableRows) %}
     {% endfor %}
   {% endif %}
 
@@ -50,27 +69,14 @@
       {% if addressTableRows.length %}
         {{ govukTable({
           firstCellIsHeader: false,
-          head: [
-            {
-              text: "Address type",
-              classes: "govuk-!-width-one-quarter"
-            },
-            {
-              text: "Address",
-              classes: "govuk-!-width-one-half"
-            },
-            {
-              text: "Actions",
-              classes: "govuk-!-width-one-quarter"
-            }
-          ],
+          head: addressTableHead,
           rows: addressTableRows
         }) }}
       {% else %}
         <p class="govuk-body">No addresses are currently configured.</p>
       {% endif %}
 
-      {% if serviceCentreAddresses.length === 0 %}
+      {% if not isViewer and serviceCentreAddresses.length === 0 %}
         {{ govukButton({
           text: "Add address",
           href: '/service-centres/' + serviceCentreId + '/edit/address/find'
