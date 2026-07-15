@@ -22,13 +22,13 @@
 
       <p class="govuk-body">Use this field to display a temporary notice of building closure or temporary disruption to court services. This is limited to 250 characters.</p>
 
-      <form method="post" action="/courts/{{ courtId }}/edit/warning-notice/save" novalidate>
+      <form method="post" action="/courts/{{ courtId }}/edit/warning-notice/success" novalidate>
 
         {{ govukTextarea({
           id: "warningNotice",
           name: "warningNotice",
           label: {
-            text: "Warning notice (English)",
+            text: "Add a warning message (English)",
             classes: "govuk-label--m"
           },
           value: form.warningNotice,
@@ -47,7 +47,7 @@
           id: "warningNoticeCy",
           name: "warningNoticeCy",
           label: {
-            text: "Warning notice (Welsh)",
+            text: "Add a warning message (Welsh)",
             classes: "govuk-label--m"
           },
           value: form.warningNoticeCy,
