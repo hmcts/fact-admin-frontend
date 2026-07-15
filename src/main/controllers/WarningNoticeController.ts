@@ -54,7 +54,7 @@ export default class WarningNoticeController {
 
     return res.render('court-warning-notice-save-success', {
       ...saveResult.viewModel,
-      breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, saveResult.viewModel.courtName, 'warning notice saved'),
+      breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Warning notice saved'),
     });
   }
 
