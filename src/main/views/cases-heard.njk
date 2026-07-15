@@ -35,7 +35,7 @@
           <input type="hidden" name="divorce" value="{{ confirmRemovalAreasOfLaw.divorce }}">
         {% endif -%}
 
-        <fieldset class="govuk-fieldset">
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
         <div class="govuk-form-group{% if areasOfLawError %} govuk-form-group--error{% endif %}" id="areas-of-law-group">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             Select the types of cases heard at this court.
@@ -65,9 +65,11 @@
         </div>
         </div>
         </fieldset>
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
       </form>
     </div>
   </div>

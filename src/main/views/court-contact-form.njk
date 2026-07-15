@@ -23,8 +23,10 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl">{{ formHeading }}</h1>
+      <h1 class="govuk-heading-xl">{{ "View contact details" if isViewer else formHeading }}</h1>
       <form action="{{ formAction }}" method="post" novalidate>
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+        <legend class="govuk-fieldset__legend govuk-visually-hidden">Contact details</legend>
         {{ govukSelect({
           id: "contact-type",
           name: "contact-type",
@@ -121,11 +123,13 @@
           ]
         }) }}
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
+        </fieldset>
       </form>
     </div>
   </div>
 {% endblock %}
-

@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.4.4")
 
 def type = "nodejs"
 def product = "fact"
@@ -14,6 +14,8 @@ def secrets = [
     secret('sso-test-admin-password', 'SSO_TEST_ADMIN_PASSWORD'),
     secret('sso-test-super-admin-email', 'SSO_TEST_SUPER_ADMIN_EMAIL'),
     secret('sso-test-super-admin-password', 'SSO_TEST_SUPER_ADMIN_PASSWORD'),
+    secret('sso-test-viewer-email', 'SSO_TEST_VIEWER_EMAIL'),
+    secret('sso-test-viewer-password', 'SSO_TEST_VIEWER_PASSWORD'),
   ]
 ]
 
@@ -33,9 +35,23 @@ withPipeline(type, product, component) {
   loadVaultSecrets(secrets)
 
   afterSuccess('akschartsinstall') {
-    yarnBuilder.yarn('playwright install')
-    yarnBuilder.yarn('playwright install ffmpeg')
     yarnBuilder.yarn('build')
+  }
+
+  before('smoketest:preview') {
+    yarnBuilder.yarn('playwright install')
+  }
+
+  before('smoketest:aat') {
+    yarnBuilder.yarn('playwright install')
+  }
+
+  before('functionalTest:preview') {
+    yarnBuilder.yarn('playwright install')
+  }
+
+  before('functionalTest:aat') {
+    yarnBuilder.yarn('playwright install')
   }
 
   // Report publishing

@@ -11,7 +11,7 @@
     {% for entry in entries %}
       {% set index = loop.index0 %}
       <div class="professional-information-repeatable" data-professional-information-item>
-        {% if not loop.first %}
+        {% if not loop.first and not isViewer %}
           <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }}</p>
         {% endif %}
 
@@ -66,7 +66,7 @@
           } if fieldErrors[type + "DescriptionCy-" + index] else null
         }) }}
 
-        {% if not loop.first %}
+        {% if not loop.first and not isViewer %}
           <button class="govuk-button govuk-button--warning professional-information-repeatable__remove" type="button" data-professional-information-remove>
             {{ removeButtonText }} {{ loop.index }}
           </button>
@@ -75,17 +75,19 @@
     {% endfor %}
   </div>
 
-  {{ govukButton({
-    text: addButtonText,
-    classes: "govuk-button--secondary govuk-!-display-none" if entries.length >= 5 else "govuk-button--secondary",
-    attributes: {
-      "data-professional-information-add": type,
-      "hidden": "hidden"
-    } if entries.length >= 5 else {
-      "data-professional-information-add": type
-    },
-    type: "button"
-  }) }}
+  {% if not isViewer %}
+    {{ govukButton({
+      text: addButtonText,
+      classes: "govuk-button--secondary govuk-!-display-none" if entries.length >= 5 else "govuk-button--secondary",
+      attributes: {
+        "data-professional-information-add": type,
+        "hidden": "hidden"
+      } if entries.length >= 5 else {
+        "data-professional-information-add": type
+      },
+      type: "button"
+    }) }}
+  {% endif %}
 {% endmacro %}
 
 {% block pageTitle %}
@@ -107,6 +109,8 @@
   </div>
 
   <form method="post" action="/courts/{{ courtId }}/edit/information-for-professionals/success" novalidate>
+    <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+    <legend class="govuk-fieldset__legend govuk-visually-hidden">Information for professionals details</legend>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Court Types and Codes</h2>
@@ -347,10 +351,13 @@
           ]
         }) }}
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
       </div>
     </div>
+    </fieldset>
   </form>
 {% endblock %}

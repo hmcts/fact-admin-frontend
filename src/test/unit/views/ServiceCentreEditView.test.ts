@@ -7,11 +7,13 @@ describe('Service Centre Edit View', () => {
   test('renders the service centre edit page heading and section links', () => {
     const html = env.render('service-centre-edit.njk', {
       pagePath: serviceCentreEditPath,
-      pageTitle: 'Editing service centre',
+      pageTitle: 'Editing - National Business Centre',
       serviceCentreId,
+      serviceCentreName: 'National Business Centre',
+      showApproveData: false,
     });
 
-    expect(html).toContain('Editing service centre');
+    expect(html).toContain('Editing - National Business Centre');
     expect(html).toContain(`${serviceCentreEditPath}/general`);
     expect(html).toContain('General');
     expect(html).toContain(`${serviceCentreEditPath}/warning-notice`);
@@ -23,5 +25,39 @@ describe('Service Centre Edit View', () => {
     expect(html).toContain(`${serviceCentreEditPath}/cases-heard`);
     expect(html).toContain('Cases heard');
     expect(html).toContain('TODO');
+    expect(html).not.toContain('Approve data');
+  });
+
+  test('renders the approve data prompt and link', () => {
+    const html = env.render('service-centre-edit.njk', {
+      approvePath: `${serviceCentreEditPath}/approve`,
+      pagePath: serviceCentreEditPath,
+      pageTitle: 'Editing - National Business Centre',
+      serviceCentreId,
+      serviceCentreName: 'National Business Centre',
+      showApproveData: true,
+    });
+
+    expect(html).toContain(
+      'Once you have reviewed all the inputted data for this court/service centre/tribunal, please approve.'
+    );
+    expect(html).toContain('nationalsupportunit@justice.gov.uk');
+    expect(html).toContain('Approve data');
+    expect(html).toContain(`href="${serviceCentreEditPath}/approve"`);
+    expect(html.indexOf('court-edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
+  });
+
+  test('renders the reviewing heading for viewer users', () => {
+    const html = env.render('service-centre-edit.njk', {
+      isViewer: true,
+      pagePath: serviceCentreEditPath,
+      pageTitle: 'Reviewing - National Business Centre',
+      serviceCentreId,
+      serviceCentreName: 'National Business Centre',
+      showApproveData: false,
+    });
+
+    expect(html).toContain('Reviewing - National Business Centre');
+    expect(html).not.toContain('Editing - National Business Centre');
   });
 });

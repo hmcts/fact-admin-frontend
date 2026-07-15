@@ -46,7 +46,7 @@ describe('Court contact details routes', () => {
     expect(response.text).toContain('aria-label="Breadcrumb"');
     expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
     expect(response.text).toContain(
-      `<a class="govuk-breadcrumbs__link" href="/courts/${COURT_ID}/edit">Reading Crown Court</a>`
+      `<a class="govuk-breadcrumbs__link" href="/courts/${COURT_ID}/edit">Edit Reading Crown Court</a>`
     );
   });
 
