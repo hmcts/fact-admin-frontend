@@ -8,7 +8,7 @@ export class ServiceCentreEditPage extends Base {
 
   constructor(page: Page) {
     super(page);
-    this.sectionsTable = this.page.locator('table.court-edit-table');
+    this.sectionsTable = this.page.locator('table.edit-table');
   }
 
   async goto(serviceCentreId: string): Promise<void> {

@@ -96,7 +96,7 @@ test.describe(
           );
           await expect(serviceCentreAddressEditSuccessPage.successPanelTitle).toContainText('Address saved');
           await expect(serviceCentreAddressEditSuccessPage.mainContent.content).toContainText(
-            `has been saved for ${createdServiceCentre.name}`
+            `Addresses for ${createdServiceCentre.name} have been successfully updated`
           );
           await expect(serviceCentreAddressEditSuccessPage.backToAddressesLink).toHaveAttribute(
             'href',
@@ -116,7 +116,7 @@ test.describe(
             new RegExp(`/service-centres/${createdServiceCentre.id}/edit/address/details/success/${addressId}$`)
           );
           await expect(serviceCentreAddressEditSuccessPage.mainContent.content).toContainText(
-            `has been saved for ${createdServiceCentre.name}`
+            `Addresses for ${createdServiceCentre.name} have been successfully updated`
           );
 
           await serviceCentreAddressFindPage.goto(createdServiceCentre.id, addressId);

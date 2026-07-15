@@ -171,7 +171,7 @@ test.describe(
           await expect(page.getByRole('heading', { name: `Reviewing - ${createdServiceCentre.name}` })).toBeVisible();
 
           await page.getByRole('link', { name: 'Address' }).click();
-          await expect(page.getByRole('heading', { name: 'Service centre address' })).toBeVisible();
+          await expect(page.getByRole('heading', { name: 'Address' })).toBeVisible();
           await expect(page.locator('form')).toHaveCount(0);
           await expect(page.getByRole('button')).toHaveCount(0);
 
