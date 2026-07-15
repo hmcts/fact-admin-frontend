@@ -25,7 +25,7 @@ export type Rule = {
 export const patternRule = (key: string, regex: RegExp, message: string): Rule => ({
   key,
   validate: m => {
-    const value = (m[key] as unknown as string)?.trim();
+    const value = m[key] as unknown as string;
     if (!value) {
       return undefined;
     } // let required rules handle empty

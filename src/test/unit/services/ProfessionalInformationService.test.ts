@@ -274,10 +274,14 @@ describe('ProfessionalInformationService', () => {
       status: 'validationError',
       viewModel: {
         fieldErrors: {
-          'dxCodeDescriptionCy-0': 'DX code 1: Enter a Welsh explanation',
-          'dxCodeDescription-1': 'DX code 2: Enter an explanation',
-          'faxNumberDescription-0': 'Fax number 1: Enter a description',
-          'faxNumberDescriptionCy-1': 'Fax number 2: Enter a Welsh description',
+          'dxCodeDescriptionCy-0':
+            'DX code 1: Because you provided an explanation in English, the Welsh translation is now mandatory',
+          'dxCodeDescription-1':
+            'DX code 2: Because you provided an explanation in Welsh, the English translation is now mandatory',
+          'faxNumberDescription-0':
+            'Fax number 1: Because you provided an description in Welsh, the English translation is now mandatory',
+          'faxNumberDescriptionCy-1':
+            'Fax number 2: Because you provided an description in English, the Welsh translation is now mandatory',
         },
       },
     });
@@ -528,7 +532,7 @@ describe('ProfessionalInformationService', () => {
           },
           {
             href: '#dxCodeDescriptionCy-3',
-            text: 'DX code 4: Enter a Welsh explanation',
+            text: 'DX code 4: Because you provided an explanation in English, the Welsh translation is now mandatory',
           },
           {
             href: '#faxNumber-4',
@@ -536,7 +540,7 @@ describe('ProfessionalInformationService', () => {
           },
           {
             href: '#faxNumberDescriptionCy-4',
-            text: 'Fax number 5: Enter a Welsh description',
+            text: 'Fax number 5: Because you provided an description in English, the Welsh translation is now mandatory',
           },
         ],
       },

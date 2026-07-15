@@ -353,13 +353,13 @@ export class ProfessionalInformationService {
       if (hasEnglishDescriptionOnly) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1}: Enter a Welsh explanation`,
+          text: `DX code ${formIndex + 1}: Because you provided an explanation in English, the Welsh translation is now mandatory`,
         });
       }
       if (hasWelshDescriptionOnly) {
         errors.push({
           href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1}: Enter an explanation`,
+          text: `DX code ${formIndex + 1}: Because you provided an explanation in Welsh, the English translation is now mandatory`,
         });
       }
       if (code.length > dxCodeMaxLength) {
@@ -412,7 +412,7 @@ export class ProfessionalInformationService {
       } else if (descriptionCy && !code) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a welsh description without a fax number, please add a number or remove the description`,
+          text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
         });
       } else if (code && !phoneNumberPattern.test(code)) {
         errors.push({
@@ -423,13 +423,13 @@ export class ProfessionalInformationService {
       if (hasEnglishDescriptionOnly) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Enter a Welsh description`,
+          text: `Fax number ${formIndex + 1}: Because you provided an description in English, the Welsh translation is now mandatory`,
         });
       }
       if (hasWelshDescriptionOnly) {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Enter a description`,
+          text: `Fax number ${formIndex + 1}: Because you provided an description in Welsh, the English translation is now mandatory`,
         });
       }
       if (description.length > repeatableDescriptionMaxLength) {

@@ -200,10 +200,18 @@ describe('Information for professionals page', () => {
       });
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('DX code 1: Enter a Welsh explanation');
-    expect(response.text).toContain('DX code 2: Enter an explanation');
-    expect(response.text).toContain('Fax number 1: Enter a Welsh description');
-    expect(response.text).toContain('Fax number 2: Enter a description');
+    expect(response.text).toContain(
+      'DX code 1: Because you provided an explanation in English, the Welsh translation is now mandatory'
+    );
+    expect(response.text).toContain(
+      'DX code 2: Because you provided an explanation in Welsh, the English translation is now mandatory'
+    );
+    expect(response.text).toContain(
+      'Fax number 1: Because you provided an description in English, the Welsh translation is now mandatory'
+    );
+    expect(response.text).toContain(
+      'Fax number 2: Because you provided an description in Welsh, the English translation is now mandatory'
+    );
     expect(saveStub.notCalled).toBe(true);
   });
 

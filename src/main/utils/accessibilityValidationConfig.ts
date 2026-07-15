@@ -144,12 +144,12 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     patternRule(
       'accessibleToiletDescription',
       TOILET_DESC_REGEX,
-      'Enter a valid description (letters, numbers, spaces and basic punctuation only)'
+      'Accessible toilet description in English must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
     ),
     patternRule(
       'accessibleToiletDescriptionCy',
       TOILET_DESC_REGEX,
-      'Enter a valid welsh description (letters, numbers, spaces and basic punctuation only)'
+      'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
     ),
 
     // Hearing equipment
