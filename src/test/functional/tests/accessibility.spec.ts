@@ -752,6 +752,7 @@ test.describe(
           await serviceCentreContactDetailsPage.emailCheckbox.check();
           await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
           await serviceCentreContactDetailsPage.explanationInput.fill('Accessibility edit test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Hygyrchedd golygu prawf cyswllt');
           await serviceCentreContactDetailsPage.save();
 
           await expect(serviceCentreContactDetailsPage.successPanel).toContainText('Contact details added:');
@@ -807,6 +808,7 @@ test.describe(
           await serviceCentreContactDetailsPage.emailCheckbox.check();
           await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
           await serviceCentreContactDetailsPage.explanationInput.fill('Accessibility delete test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Hygyrchedd dileu cyswllt prawf');
           await serviceCentreContactDetailsPage.save();
 
           await expect(serviceCentreContactDetailsPage.successPanel).toContainText('Contact details added:');

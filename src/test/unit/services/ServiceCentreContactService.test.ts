@@ -110,6 +110,7 @@ describe('ServiceCentreContactService', () => {
     expect(service.getEmptyFormValues()).toEqual({
       contactEmail: '',
       contactExplanation: '',
+      contactExplanationCy: '',
       contactMethods: [],
       contactTelephone: '',
     });
@@ -120,12 +121,14 @@ describe('ServiceCentreContactService', () => {
         serviceCentreId,
         email: 'enquiries@example.test',
         explanation: 'Ring us first',
+        explanationCy: 'Ffoniwch ni gyntaf',
         phoneNumber: '020 7946 0018',
         serviceCentreContactDescription: null,
       })
     ).toEqual({
       contactEmail: 'enquiries@example.test',
       contactExplanation: 'Ring us first',
+      contactExplanationCy: 'Ffoniwch ni gyntaf',
       contactMethods: ['email', 'phone'],
       contactTelephone: '020 7946 0018',
     });
@@ -201,6 +204,7 @@ describe('ServiceCentreContactService', () => {
     expect(createServiceCentreContactDetail).toHaveBeenCalledWith(serviceCentreId, {
       email: 'enquiries@example.test',
       explanation: '',
+      explanationCy: '',
       phoneNumber: undefined,
       serviceCentreContactDescriptionId: contactTypeId,
       serviceCentreId,

@@ -34,6 +34,9 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    const validEmailForTest = (suffix: string) => `service-centre-explanation-${suffix}@example.test`;
+    const tooLongExplanation = 'A'.repeat(251);
+
     test('adds, edits and deletes service-centre contact details', async ({
       playwright,
       serviceCentreContactDetailsPage,
@@ -60,6 +63,9 @@ test.describe(
           await serviceCentreContactDetailsPage.emailCheckbox.check();
           await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
           await serviceCentreContactDetailsPage.explanationInput.fill('General service-centre enquiries');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill(
+            "Ymholiadau cyffredinol i'r ganolfan wasanaeth"
+          );
           await serviceCentreContactDetailsPage.save();
 
           await expect(serviceCentreContactDetailsPage.successPanel).toContainText(
@@ -153,6 +159,202 @@ test.describe(
           await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(
             'Enter a phone number in the correct format'
           );
+        }
+      );
+    });
+
+    const openAddContactFormWithRequiredMinimum = async (
+      serviceCentreContactDetailsPage: {
+        gotoAdd: (serviceCentreId: string) => Promise<void>;
+        selectFirstAvailableContactType: () => Promise<string>;
+        emailCheckbox: { check: () => Promise<void> };
+        emailInput: { fill: (value: string) => Promise<void> };
+      },
+      serviceCentreId: string,
+      email: string
+    ) => {
+      await serviceCentreContactDetailsPage.gotoAdd(serviceCentreId);
+      await serviceCentreContactDetailsPage.selectFirstAvailableContactType();
+      await serviceCentreContactDetailsPage.emailCheckbox.check();
+      await serviceCentreContactDetailsPage.emailInput.fill(email);
+    };
+
+    test('shows validation error when English explanation is provided without Welsh translation', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Explanation English Requires Welsh Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          await openAddContactFormWithRequiredMinimum(
+            serviceCentreContactDetailsPage,
+            createdServiceCentre.id,
+            validEmailForTest(`${Date.now()}-en-only`)
+          );
+
+          await serviceCentreContactDetailsPage.explanationInput.fill('General enquiries');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('');
+          await serviceCentreContactDetailsPage.save();
+
+          const expectedError =
+            'Because you provided an explanation in English, the Welsh translation is now mandatory';
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
+          await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(expectedError);
+        }
+      );
+    });
+
+    test('shows validation error when Welsh explanation is provided without English translation', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Explanation Welsh Requires English Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          await openAddContactFormWithRequiredMinimum(
+            serviceCentreContactDetailsPage,
+            createdServiceCentre.id,
+            validEmailForTest(`${Date.now()}-cy-only`)
+          );
+
+          await serviceCentreContactDetailsPage.explanationInput.fill('');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill(
+            "Ymholiadau cyffredinol i'r ganolfan wasanaeth"
+          );
+          await serviceCentreContactDetailsPage.save();
+
+          const expectedError =
+            'Because you provided an explanation in Welsh, the English translation is now mandatory';
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
+          await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(expectedError);
+        }
+      );
+    });
+
+    test('shows validation error when English explanation exceeds 250 characters', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact English Explanation Max Length Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          await openAddContactFormWithRequiredMinimum(
+            serviceCentreContactDetailsPage,
+            createdServiceCentre.id,
+            validEmailForTest(`${Date.now()}-en-too-long`)
+          );
+
+          // Provide valid Welsh text so this test only asserts English max-length validation.
+          await serviceCentreContactDetailsPage.explanationInput.fill(tooLongExplanation);
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Esboniad Cymraeg dilys');
+          await serviceCentreContactDetailsPage.save();
+
+          const expectedError = 'Explanation must be 250 characters or fewer';
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
+          await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(expectedError);
+        }
+      );
+    });
+
+    test('shows validation error when Welsh explanation exceeds 250 characters', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Welsh Explanation Max Length Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          await openAddContactFormWithRequiredMinimum(
+            serviceCentreContactDetailsPage,
+            createdServiceCentre.id,
+            validEmailForTest(`${Date.now()}-cy-too-long`)
+          );
+
+          // Provide valid English text so this test only asserts Welsh max-length validation.
+          await serviceCentreContactDetailsPage.explanationInput.fill('Valid English explanation');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill(tooLongExplanation);
+          await serviceCentreContactDetailsPage.save();
+
+          const expectedError = 'Explanation in Welsh must be 250 characters or fewer';
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
+          await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(expectedError);
+        }
+      );
+    });
+
+    test('shows validation error when English explanation contains unsupported characters', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact English Explanation Character Validation Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          await openAddContactFormWithRequiredMinimum(
+            serviceCentreContactDetailsPage,
+            createdServiceCentre.id,
+            validEmailForTest(`${Date.now()}-en-invalid-char`)
+          );
+
+          // `!` is not allowed by explanationPattern.
+          await serviceCentreContactDetailsPage.explanationInput.fill('General enquiries!');
+          // Provide valid Welsh to avoid cross-field mandatory errors.
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Esboniad Cymraeg dilys');
+          await serviceCentreContactDetailsPage.save();
+
+          const expectedError =
+            'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
+          await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(expectedError);
+        }
+      );
+    });
+
+    test('shows validation error when Welsh explanation contains unsupported characters', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Welsh Explanation Character Validation Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          await openAddContactFormWithRequiredMinimum(
+            serviceCentreContactDetailsPage,
+            createdServiceCentre.id,
+            validEmailForTest(`${Date.now()}-cy-invalid-char`)
+          );
+
+          // Provide valid English to avoid cross-field mandatory errors.
+          await serviceCentreContactDetailsPage.explanationInput.fill('Valid English explanation');
+          // `!` is not allowed by explanationPattern.
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Ymholiadau!');
+          await serviceCentreContactDetailsPage.save();
+
+          const expectedError =
+            'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
+          await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(expectedError);
         }
       );
     });

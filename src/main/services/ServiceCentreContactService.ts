@@ -9,6 +9,7 @@ import { parseString } from '../utils/valueParsers';
 export type ServiceCentreContactFormValues = {
   contactEmail: string;
   contactExplanation: string;
+  contactExplanationCy: string;
   contactMethods: string[];
   contactTelephone: string;
 };
@@ -21,6 +22,7 @@ export type ServiceCentreContactValidationError = {
 export type ServiceCentreContactFormErrors = {
   contactEmail?: string;
   contactExplanation?: string;
+  contactExplanationCy?: string;
   contactMethods?: string;
   contactTelephone?: string;
   contactType?: string;
@@ -160,6 +162,7 @@ export class ServiceCentreContactService {
     return {
       contactEmail: '',
       contactExplanation: '',
+      contactExplanationCy: '',
       contactMethods: [],
       contactTelephone: '',
     };
@@ -173,6 +176,7 @@ export class ServiceCentreContactService {
     return {
       contactEmail: contactDetail.email ?? '',
       contactExplanation: contactDetail.explanation ?? '',
+      contactExplanationCy: contactDetail.explanationCy ?? '',
       contactMethods,
       contactTelephone: contactDetail.phoneNumber ?? '',
     };
@@ -269,6 +273,7 @@ export class ServiceCentreContactService {
     const formValues: ServiceCentreContactFormValues = {
       contactEmail,
       contactExplanation: parseString(body['contact-explanation']),
+      contactExplanationCy: parseString(body['contact-explanation-cy']),
       contactMethods: selectedContactMethods,
       contactTelephone,
     };
@@ -306,14 +311,7 @@ export class ServiceCentreContactService {
       }
     }
 
-    if (formValues.contactExplanation.length > maxExplanationLength) {
-      formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
-      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-    } else if (formValues.contactExplanation && !explanationPattern.test(formValues.contactExplanation)) {
-      formErrors.contactExplanation =
-        'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
-      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-    }
+    this.validateContactExplanationFields(formValues, formErrors, errorSummary);
 
     return {
       errorSummary,
@@ -321,6 +319,7 @@ export class ServiceCentreContactService {
       formValues,
       payload: {
         explanation: formValues.contactExplanation,
+        explanationCy: formValues.contactExplanationCy,
         email: selectedContactMethods.includes('email') ? contactEmail : undefined,
         phoneNumber: selectedContactMethods.includes('phone') ? contactTelephone : undefined,
         serviceCentreContactDescriptionId: selectedContactTypeId,
@@ -328,6 +327,46 @@ export class ServiceCentreContactService {
       },
       selectedContactTypeId,
     };
+  }
+
+  private validateContactExplanationFields(
+    formValues: ServiceCentreContactFormValues,
+    formErrors: ServiceCentreContactFormErrors,
+    errorSummary: ServiceCentreContactValidationError[]
+  ) {
+    const contactExplanationValidity = this.validateContactExplanation(formValues.contactExplanation, false);
+    if (contactExplanationValidity) {
+      formErrors.contactExplanation = contactExplanationValidity;
+      errorSummary.push({ href: '#contact-explanation', text: contactExplanationValidity });
+    }
+
+    const contactExplanationCyValidity = this.validateContactExplanation(formValues.contactExplanationCy, true);
+    if (contactExplanationCyValidity) {
+      formErrors.contactExplanationCy = contactExplanationCyValidity;
+      errorSummary.push({ href: '#contact-explanation-cy', text: contactExplanationCyValidity });
+    }
+
+    if (formValues.contactExplanation.length > 0 && formValues.contactExplanationCy.length === 0) {
+      formErrors.contactExplanationCy =
+        'Because you provided an explanation in English, the Welsh translation is now mandatory';
+      errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
+    }
+
+    if (formValues.contactExplanationCy.length > 0 && formValues.contactExplanation.length === 0) {
+      formErrors.contactExplanation =
+        'Because you provided an explanation in Welsh, the English translation is now mandatory';
+      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
+    }
+  }
+
+  private validateContactExplanation(contactExplanation: string, welsh: boolean) {
+    const insert = welsh ? 'in Welsh ' : '';
+    if (contactExplanation.length > maxExplanationLength) {
+      return `Explanation ${insert}must be 250 characters or fewer`;
+    } else if (contactExplanation && !explanationPattern.test(contactExplanation)) {
+      return `Explanation ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs`;
+    }
+    return undefined;
   }
 
   private async saveContactDetail(

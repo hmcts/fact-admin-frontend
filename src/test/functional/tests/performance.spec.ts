@@ -565,6 +565,7 @@ test.describe(
           await serviceCentreContactDetailsPage.emailCheckbox.check();
           await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
           await serviceCentreContactDetailsPage.explanationInput.fill('Performance edit test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Cyswllt prawf golygu perfformiad');
           await serviceCentreContactDetailsPage.save();
           await serviceCentreContactDetailsPage.backToContactDetailsLink.click();
 
@@ -593,6 +594,7 @@ test.describe(
           await serviceCentreContactDetailsPage.emailCheckbox.check();
           await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
           await serviceCentreContactDetailsPage.explanationInput.fill('Performance delete test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Cyswllt prawf dileu perfformiad');
           await serviceCentreContactDetailsPage.save();
           await serviceCentreContactDetailsPage.backToContactDetailsLink.click();
 
