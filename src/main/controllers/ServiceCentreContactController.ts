@@ -4,9 +4,10 @@ import { Request, Response } from 'express';
 
 import { ServiceCentreContactDetail } from '../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../schemas/serviceCentreSchema';
+import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreContactService } from '../services/ServiceCentreContactService';
 
-import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -398,12 +399,13 @@ export default class ServiceCentreContactController {
     serviceCentreSchemaName: string,
     currentPageText?: string
   ) {
-    return buildServiceCentreSectionBreadcrumbs(
+    return buildSectionBreadcrumbs(
       serviceCentreSchemaId,
       serviceCentreSchemaName,
       'Contact details',
       'contact-details',
-      currentPageText
+      currentPageText,
+      SubjectType.SERVICE_CENTRE
     );
   }
 }

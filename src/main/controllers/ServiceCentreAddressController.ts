@@ -5,10 +5,11 @@ import { Request, Response } from 'express';
 
 import { dpaAddressSchema } from '../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
+import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../services/ServiceCentreAddressService';
 import { isValidPostcode, validatePostcodeField } from '../utils/addressValidation';
 
-import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -522,12 +523,13 @@ export default class ServiceCentreAddressController {
   }
 
   private buildAddressBreadcrumbs(serviceCentreId: string, serviceCentreName: string, currentPage?: string) {
-    return buildServiceCentreSectionBreadcrumbs(
+    return buildSectionBreadcrumbs(
       serviceCentreId,
       serviceCentreName,
       'Addresses',
       'address',
-      currentPage
+      currentPage,
+      SubjectType.SERVICE_CENTRE
     );
   }
 }

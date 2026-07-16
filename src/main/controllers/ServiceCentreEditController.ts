@@ -9,13 +9,13 @@ import { LockService } from '../services/LockService';
 import { parseNumber } from '../utils/valueParsers';
 
 import { LocationApprovalController } from './LocationApprovalController';
-import { buildServiceCentreEditBreadcrumbs } from './helpers/breadcrumbs';
+import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
 const dataApiRequests = new DataApiRequests();
 const lockService = new LockService(dataApiRequests);
 const locationApprovalController = new LocationApprovalController(
   {
-    buildBreadcrumbs: buildServiceCentreEditBreadcrumbs,
+    buildBreadcrumbs: buildEditBreadcrumbs,
     editView: 'service-centre-edit',
     getAdditionalEditViewModel: async (req, serviceCentreId) => {
       if (isViewer(req)) {
@@ -33,7 +33,7 @@ const locationApprovalController = new LocationApprovalController(
     notFoundView: 'service-centre-not-found',
     paramName: 'serviceCentreId',
     routeSegment: 'service-centres',
-    subjectType: 'SERVICE_CENTRE',
+    subjectType: SubjectType.SERVICE_CENTRE,
   },
   new ApprovalService(dataApiRequests)
 );

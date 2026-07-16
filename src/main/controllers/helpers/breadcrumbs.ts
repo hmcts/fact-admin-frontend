@@ -1,12 +1,21 @@
+import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
+
 export type BreadcrumbItem = {
   href?: string;
   text: string;
 };
 
-export function buildEditBreadcrumbs(courtId: string, courtName: string): BreadcrumbItem[] {
+export function buildEditBreadcrumbs(
+  subjectId: string,
+  subjectName: string,
+  subjectType: Subject = SubjectType.COURT
+): BreadcrumbItem[] {
   return [
     { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: `Edit ${courtName}` },
+    {
+      href: `/${subjectType === SubjectType.COURT ? 'courts' : 'service-centres'}/${subjectId}/edit`,
+      text: `Edit ${subjectName}`,
+    },
   ];
 }
 
@@ -15,42 +24,15 @@ export function buildSectionBreadcrumbs(
   courtName: string,
   sectionText: string,
   sectionPath: string,
-  currentPage?: string
+  currentPage?: string,
+  subjectType: Subject = SubjectType.COURT
 ): BreadcrumbItem[] {
   const breadcrumbs: BreadcrumbItem[] = [
-    ...buildEditBreadcrumbs(courtId, courtName),
-    { href: `/courts/${courtId}/edit/${sectionPath}`, text: sectionText },
-  ];
-
-  if (currentPage) {
-    breadcrumbs.push({ text: currentPage, href: '#' });
-  }
-
-  return breadcrumbs;
-}
-
-// TODO: when the locking PR goes in, normalise this file to work for both subject types
-
-export function buildServiceCentreEditBreadcrumbs(
-  serviceCentreId: string,
-  serviceCentreName: string
-): BreadcrumbItem[] {
-  return [
-    { href: '/', text: 'Home' },
-    { href: `/service-centres/${serviceCentreId}/edit`, text: `Edit ${serviceCentreName}` },
-  ];
-}
-
-export function buildServiceCentreSectionBreadcrumbs(
-  serviceCentreId: string,
-  serviceCentreName: string,
-  sectionText: string,
-  sectionPath: string,
-  currentPage?: string
-): BreadcrumbItem[] {
-  const breadcrumbs: BreadcrumbItem[] = [
-    ...buildServiceCentreEditBreadcrumbs(serviceCentreId, serviceCentreName),
-    { href: `/service-centres/${serviceCentreId}/edit/${sectionPath}`, text: sectionText },
+    ...buildEditBreadcrumbs(courtId, courtName, subjectType),
+    {
+      href: `/${subjectType === SubjectType.COURT ? 'courts' : 'service-centres'}/${courtId}/edit/${sectionPath}`,
+      text: sectionText,
+    },
   ];
 
   if (currentPage) {

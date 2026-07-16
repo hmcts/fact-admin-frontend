@@ -2,9 +2,10 @@ import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
+import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreGeneralService } from '../services/ServiceCentreGeneralService';
 
-import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -118,12 +119,13 @@ export default class ServiceCentreGeneralController {
     section: string,
     currentPage?: string
   ) {
-    return buildServiceCentreSectionBreadcrumbs(
+    return buildSectionBreadcrumbs(
       serviceCentreId,
       serviceCentreName,
       section,
       section.toLowerCase().replaceAll(' ', '-'),
-      currentPage
+      currentPage,
+      SubjectType.SERVICE_CENTRE
     );
   }
 }

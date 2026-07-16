@@ -2,9 +2,10 @@ import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
+import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreCasesHeardService } from '../services/ServiceCentreCasesHeardService';
 
-import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
+import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
 import { getUuidRouteParam } from './helpers/routeParams';
 
@@ -85,12 +86,13 @@ export default class ServiceCentreCasesHeardController {
   }
 
   private buildCasesHeardBreadcrumbs(serviceCentreId: string, serviceCentreName: string, currentPage?: string) {
-    return buildServiceCentreSectionBreadcrumbs(
+    return buildSectionBreadcrumbs(
       serviceCentreId,
       serviceCentreName,
       'Cases heard',
       'cases-heard',
-      currentPage
+      currentPage,
+      SubjectType.SERVICE_CENTRE
     );
   }
 }
