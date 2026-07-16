@@ -1,0 +1,83 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro rowActions(items) %}
+  <ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">
+    {% for item in items %}
+      <li class="govuk-summary-list__actions-list-item">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ item.href }}">{{ item.text }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% set counterServiceOpeningHoursTableRows = [] %}
+  {% for item in counterServiceOpeningHours %}
+    {% set counterServiceOpeningHoursTableRows = (counterServiceOpeningHoursTableRows.push([
+      {
+        text: item.assistanceAvailable
+      },
+      {
+        html: item.appointmentNeeded
+      },
+      {
+        html: item.hours
+      },
+      {
+        html: rowActions([
+          {
+            href: "/courts/" + courtId + "/edit/counter-service-opening-hours/edit/" + item.id,
+            text: "Edit"
+          },
+          {
+            href: "/courts/" + courtId + "/edit/counter-service-opening-hours/delete/" + item.id,
+            text: "Delete"
+          }
+        ])
+      }
+    ]), counterServiceOpeningHoursTableRows) %}
+  {% endfor %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Counter service opening hours</h1>
+
+      {% if counterServiceOpeningHoursTableRows.length %}
+        {{ govukTable({
+          firstCellIsHeader: false,
+          head: [
+            {
+              text: "Assistance available"
+            },
+            {
+              text: "Is an appointment needed?"
+            },
+            {
+              text: "Hours"
+            },
+            {
+              text: "Actions",
+              classes: "govuk-!-width-one-quarter"
+            }
+          ],
+          rows: counterServiceOpeningHoursTableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">No counter service opening hours are currently configured.</p>
+      {% endif %}
+
+      {% if counterServiceOpeningHoursTableRows.length < 5 %}
+        {{ govukButton({
+          text: "Add opening hours",
+          href: "/courts/" + courtId + "/edit/counter-service-opening-hours/add"
+        }) }}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Are you sure you want to delete these opening hours?</h1>
+
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: {
+              text: "Court name"
+            },
+            value: {
+              text: courtName
+            }
+          },
+          {
+            key: {
+              text: "Assistance available"
+            },
+            value: {
+              text: assistanceAvailable
+            }
+          },
+          {
+            key: {
+              text: "Hours"
+            },
+            value: {
+              html: hours
+            }
+          }
+        ]
+      }) }}
+
+      <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/delete/success/{{ counterServiceId }}">
+        {{ govukButton({
+          text: "Delete opening hours",
+          classes: "govuk-button--warning"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
