@@ -90,6 +90,26 @@ describe('HomePageViewService', () => {
     expect(rows[1][3].html).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit');
   });
 
+  test('builds review actions for viewer rows', () => {
+    const rows = service.buildCourtTableRows(
+      filters,
+      {
+        content: [court, serviceCentre],
+        page: {
+          number: 0,
+          size: 25,
+          totalElements: 2,
+          totalPages: 1,
+        },
+      } as PagedCourts,
+      true
+    );
+
+    expect(rows[0][2].html).toContain('Review<span class="govuk-visually-hidden"> London Civil and Family Court');
+    expect(rows[0][2].html).not.toContain('Edit<span');
+    expect(rows[1][2].html).toContain('Review<span class="govuk-visually-hidden"> National Business Centre');
+  });
+
   test('builds pagination links preserving filters, sorting and service centre checkbox', () => {
     const pagination = service.buildPagination(
       {

@@ -30,6 +30,25 @@ describe('General View', () => {
     expect(html).toContain('Save');
   });
 
+  test('renders persisted fields read-only and removes save for viewer users', () => {
+    const html = env.render('general-edit.njk', {
+      isViewer: true,
+      model: {
+        errors: {},
+        id: courtId,
+        name: 'Reading Crown Court',
+        open: true,
+        regionId: '22222222-2222-4222-8222-222222222222',
+        regions: [{ id: '22222222-2222-4222-8222-222222222222', name: 'South East' }],
+      },
+      pagePath: `/courts/${courtId}/edit/general`,
+      pageTitle: 'General - Reading Crown Court',
+    });
+
+    expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(html).not.toContain('>Save<');
+  });
+
   test('renders validation errors in the summary and field message', () => {
     const html = env.render('general-edit.njk', {
       model: {

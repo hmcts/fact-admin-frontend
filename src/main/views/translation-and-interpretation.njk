@@ -24,6 +24,8 @@
       </p>
 
       <form method="post" action="/courts/{{ courtId }}/edit/translation-and-interpretation/success" novalidate>
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+        <legend class="govuk-fieldset__legend govuk-visually-hidden">Translation and interpretation details</legend>
         {{ govukCheckboxes({
           name: "contactMethods",
           hint: {
@@ -82,9 +84,12 @@
           ]
         }) }}
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
+        </fieldset>
       </form>
     </div>
   </div>

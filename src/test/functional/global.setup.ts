@@ -18,6 +18,8 @@ setup.describe('Global playwright setup', () => {
     requireEnvVar('SSO_TEST_ADMIN_PASSWORD');
     requireEnvVar('SSO_TEST_SUPER_ADMIN_EMAIL');
     requireEnvVar('SSO_TEST_SUPER_ADMIN_PASSWORD');
+    requireEnvVar('SSO_TEST_VIEWER_EMAIL');
+    requireEnvVar('SSO_TEST_VIEWER_PASSWORD');
   });
 
   setup('Create admin session', async ({ page }) => {
@@ -26,5 +28,9 @@ setup.describe('Global playwright setup', () => {
 
   setup('Create super admin session', async ({ page }) => {
     await createSession(page, config.users.superAdmin);
+  });
+
+  setup('Create viewer session', async ({ page }) => {
+    await createSession(page, config.users.viewer);
   });
 });

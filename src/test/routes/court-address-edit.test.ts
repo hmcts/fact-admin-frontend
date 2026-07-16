@@ -25,6 +25,7 @@ describe('Court address edit routes', () => {
 
   beforeEach(() => {
     restore();
+    stub(CourtAddressService.prototype, 'retrieveCourtName').resolves('Reading Crown Court');
   });
 
   test('renders the address list for a valid known court', async () => {
@@ -180,7 +181,6 @@ describe('Court address edit routes', () => {
   });
 
   test('renders delete confirmation page', async () => {
-    stub(CourtAddressService.prototype, 'retrieveCourtName').resolves('Reading Crown Court');
     stub(CourtAddressService.prototype, 'retrieve').resolves(address as never);
 
     const response = await request(app).get(`/courts/${courtId}/edit/address/delete/${addressId}`);
