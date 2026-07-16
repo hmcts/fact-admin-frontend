@@ -823,5 +823,67 @@ test.describe(
         }
       );
     });
+
+    test('Service Centre Warning Notice Page Accessibility', async ({
+      axeUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.expectVisibleElements();
+          const breadcrumb = serviceCentreWarningNoticePage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Service Centre Warning Notice Validation Accessibility', async ({
+      axeUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.warningNoticeInput.fill('Warning notice');
+          await serviceCentreWarningNoticePage.save();
+          await serviceCentreWarningNoticePage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Service Centre Warning Notice Success Page Accessibility', async ({
+      axeUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.warningNoticeInput.fill('Warning notice');
+          await serviceCentreWarningNoticePage.warningNoticeCyInput.fill('Hysbysiad rhybuddio');
+          await serviceCentreWarningNoticePage.save();
+          await serviceCentreWarningNoticePage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
   }
 );

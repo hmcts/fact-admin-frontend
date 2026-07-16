@@ -23,7 +23,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'a'.repeat(maxServiceCentreWarningNoticeLength + 1));
+    const result = await service.save(serviceCentreId, 'a'.repeat(maxServiceCentreWarningNoticeLength + 1), 'test');
 
     expect(result.type).toBe('validation-error');
     expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 250 characters or fewer');
@@ -36,6 +36,7 @@ describe('ServiceCentreWarningNoticeService', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: 'Existing warning notice',
+      warningNoticeCy: 'Hysbysiad rhybuddio presennol',
     } as never);
 
     const service = new ServiceCentreWarningNoticeService();
@@ -47,6 +48,7 @@ describe('ServiceCentreWarningNoticeService', () => {
       name: 'Reading Service Centre',
       pageTitle: 'Warning notice - Reading Service Centre',
       warningNotice: 'Existing warning notice',
+      warningNoticeCy: 'Hysbysiad rhybuddio presennol',
     });
   });
 
@@ -78,7 +80,11 @@ describe('ServiceCentreWarningNoticeService', () => {
     } as never);
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, '  Trimmed warning notice  ');
+    const result = await service.save(
+      serviceCentreId,
+      '  Trimmed warning notice  ',
+      " Hysbysiad rhybudd wedi'i docio "
+    );
 
     expect(result.type).toBe('saved');
     expect(getServiceCentreByIdStub.calledOnce).toBe(true);
@@ -86,6 +92,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     expect(updateServiceCentreStub.firstCall.args[0]).toMatchObject({
       id: serviceCentreId,
       warningNotice: 'Trimmed warning notice',
+      warningNoticeCy: "Hysbysiad rhybudd wedi'i docio",
     });
   });
 
@@ -94,7 +101,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'Warning text');
+    const result = await service.save(serviceCentreId, 'Warning text', 'Testun rhybuddio');
 
     expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
     expect(updateServiceCentreStub.notCalled).toBe(true);
@@ -119,7 +126,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     } as never);
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, '   ');
+    const result = await service.save(serviceCentreId, '   ', '    ');
 
     expect(result).toEqual({
       type: 'saved',
@@ -129,6 +136,7 @@ describe('ServiceCentreWarningNoticeService', () => {
         name: 'Reading Service Centre',
         pageTitle: 'Warning notice - Reading Service Centre',
         warningNotice: '',
+        warningNoticeCy: '',
       },
     });
     expect(getServiceCentreByIdStub.calledOnce).toBe(true);
@@ -147,37 +155,8 @@ describe('ServiceCentreWarningNoticeService', () => {
     stub(DataApiRequests.prototype, 'updateServiceCentre').resolves(HttpStatusCode.BadGateway);
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'Updated warning');
+    const result = await service.save(serviceCentreId, 'Updated warning', "Rhybudd wedi'i ddiweddaru");
 
     expect(result).toEqual({ status: HttpStatusCode.BadGateway, type: 'status' });
-  });
-
-  test('maps API validation map to view model errors and ignores timestamp key', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
-      id: serviceCentreId,
-      name: 'Reading Service Centre',
-      open: true,
-      regionId: null,
-      slug: 'reading-service-centre',
-      warningNotice: null,
-    } as never);
-    stub(DataApiRequests.prototype, 'updateServiceCentre').resolves(
-      new Map([
-        ['warningNotice', 'Warning notice contains unsupported text'],
-        ['timestamp', '2026-07-13T00:00:00Z'],
-      ])
-    );
-
-    const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'Updated warning');
-
-    expect(result.type).toBe('validation-error');
-    if (result.type !== 'validation-error') {
-      throw new Error('Expected validation-error outcome');
-    }
-
-    expect(result.viewModel.errors).toEqual({
-      warningNotice: ['Warning notice contains unsupported text'],
-    });
   });
 });

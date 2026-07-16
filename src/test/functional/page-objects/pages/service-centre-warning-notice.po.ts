@@ -5,6 +5,7 @@ import { Base } from '../base';
 
 export class ServiceCentreWarningNoticePage extends Base {
   public readonly warningNoticeInput: Locator;
+  public readonly warningNoticeCyInput: Locator;
   public readonly saveButton: Locator;
   public readonly errorSummary: Locator;
   public readonly successPanel: Locator;
@@ -12,6 +13,7 @@ export class ServiceCentreWarningNoticePage extends Base {
   constructor(page: Page) {
     super(page);
     this.warningNoticeInput = this.page.locator('#warningNotice');
+    this.warningNoticeCyInput = this.page.locator('#warningNoticeCy');
     this.saveButton = this.page.getByRole('button', { name: 'Save' });
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.successPanel = this.page.locator('.govuk-panel--confirmation');

@@ -47,7 +47,11 @@ export default class ServiceCentreWarningNoticeController {
       return;
     }
 
-    const saveResult = await serviceCentreWarningNoticeService.save(serviceCentreId, req.body?.warningNotice);
+    const saveResult = await serviceCentreWarningNoticeService.save(
+      serviceCentreId,
+      req.body?.warningNotice,
+      req.body?.warningNoticeCy
+    );
 
     if (saveResult.type === 'validation-error') {
       res.status(HttpStatusCode.BadRequest);

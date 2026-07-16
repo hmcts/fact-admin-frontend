@@ -604,5 +604,22 @@ test.describe(
         }
       );
     });
+
+    test('Service Centre Warning Notice Page Performance', async ({
+      lighthouseUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.expectVisibleElements();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
   }
 );
