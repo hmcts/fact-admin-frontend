@@ -55,4 +55,20 @@ describe('Translation and Interpretation View', () => {
     expect(html).toContain('There is a problem');
     expect(html).toContain('Enter an email address in the correct format');
   });
+
+  test('renders translation details read-only for viewer users', () => {
+    const html = env.render('translation-and-interpretation.njk', {
+      courtId,
+      email: 'translations@example.com',
+      emailSelected: true,
+      errorSummary: [],
+      isViewer: true,
+      pagePath,
+      phoneNumber: '+441234 567890',
+      phoneNumberSelected: true,
+    });
+
+    expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(html).not.toContain('>Save<');
+  });
 });

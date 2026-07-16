@@ -10,6 +10,7 @@ import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenti
 let dataApiRequests: DataApiRequestsType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
+const NON_LOCKABLE_EDIT_PAGES = new Set(['approve']);
 const TIMEOUT_SECONDS = 60 * 15;
 const WARN_SECONDS = 60 * 2;
 
@@ -99,7 +100,7 @@ export class LockingInterceptor {
     const subjectId = matches[2];
     const pageKey = matches[3];
 
-    return isUuid(subjectId) ? { subject, subjectId, pageKey } : undefined;
+    return isUuid(subjectId) && !NON_LOCKABLE_EDIT_PAGES.has(pageKey) ? { subject, subjectId, pageKey } : undefined;
   }
 
   private async handleLockAcquisition(

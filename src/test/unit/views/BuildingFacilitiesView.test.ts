@@ -43,6 +43,22 @@ describe('Building Facilities Views', () => {
     expect(html).not.toMatch(/<input[^>]*name="waitingArea"[^>]*value="false"[^>]*checked/);
   });
 
+  test('renders building facilities read-only for viewer users', () => {
+    const html = env.render('building-facilities-edit.njk', {
+      courtId,
+      isViewer: true,
+      model: {
+        id: 'fac-1',
+        parking: true,
+      },
+      pagePath: `/courts/${courtId}/edit/building-facilities`,
+      pageTitle: 'Building Facilities - Reading Crown Court',
+    });
+
+    expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(html).not.toContain('>Save<');
+  });
+
   test('renders waiting area No selected when posted value is string false', () => {
     const html = env.render('building-facilities-edit.njk', {
       courtId,

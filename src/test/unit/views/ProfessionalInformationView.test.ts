@@ -99,6 +99,43 @@ describe('Professional Information View', () => {
     );
   });
 
+  test('renders professional information read-only for viewer users', () => {
+    const html = env.render('professional-information.njk', {
+      accessScheme: true,
+      commonPlatform: false,
+      courtId,
+      courtName: 'Reading Crown Court',
+      courtTypeOptions,
+      dxCodes: [
+        { code: 'DX 123', description: 'Documents' },
+        { code: 'DX 456', description: 'Family documents' },
+      ],
+      errorSummary: [],
+      faxNumbers: [
+        { code: '0123 456789', description: 'Fax' },
+        { code: '0123 456780', description: 'Family fax' },
+      ],
+      fieldErrors: {},
+      gbs: 'GBS1',
+      interviewPhoneNumber: '',
+      interviewRoomCount: '',
+      interviewRooms: false,
+      isViewer: true,
+      pagePath,
+      pageTitle: 'Information for professionals - Reading Crown Court',
+      selectedCourtTypes: [],
+      selectedCourtTypeCodes: {},
+      videoHearings: false,
+    });
+
+    expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(html).not.toContain('Add another DX code');
+    expect(html).not.toContain('Add another Fax number');
+    expect(html).not.toContain('Remove DX code');
+    expect(html).not.toContain('Remove Fax number');
+    expect(html).not.toContain('>Save<');
+  });
+
   test('hides add another buttons when repeatable sections reach five entries', () => {
     const entries = Array.from({ length: 5 }, (_, index) => ({
       code: `Code ${index + 1}`,

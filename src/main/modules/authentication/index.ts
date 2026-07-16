@@ -5,6 +5,8 @@ import { auth } from 'express-openid-connect';
 import { FRONTEND_URL } from '../../envUrls';
 import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
 
+import { resolveFactUserRole } from './roleResolver';
+
 let dataApiRequests: DataApiRequestsType | undefined;
 
 export class Authentication {
@@ -45,18 +47,14 @@ export class Authentication {
             throw new Error('Unable to determine SSO user from request');
           }
 
-          const roles = Array.isArray(user.roles) ? user.roles : [];
-
-          if (!roles.includes('Admin') && !roles.includes('SuperAdmin')) {
-            throw new Error('Unable to determine user role');
-          }
+          const role = resolveFactUserRole(user.roles);
 
           const dataApi = await getDataApiRequests();
 
           session.factUser = await dataApi.createUpdateUser({
             email: user.preferred_username,
             ssoId: user.oid,
-            role: roles.includes('SuperAdmin') ? 'SuperAdmin' : 'Admin',
+            role,
           });
 
           return session;
