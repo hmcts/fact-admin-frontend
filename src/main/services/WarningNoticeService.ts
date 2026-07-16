@@ -78,14 +78,6 @@ export class WarningNoticeService {
       warningNoticeCy: form.warningNoticeCy?.trim() || null,
     };
 
-    console.log(
-      '== Warning notice ==',
-      JSON.stringify({
-        warningNotice: payload.warningNotice,
-        warningNoticeCy: payload.warningNoticeCy,
-      })
-    );
-
     const updateResponse = await this.dataApiRequests.updateCourt(payload);
 
     if (this.isHttpStatusCode(updateResponse)) {
