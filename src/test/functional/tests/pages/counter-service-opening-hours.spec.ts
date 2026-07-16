@@ -76,7 +76,7 @@ test.describe(
           await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
           await expect(counterServiceOpeningHoursPage.successPanel).toContainText('Opening hours deleted');
           await expect(counterServiceOpeningHoursPage.successPanel).toContainText('Forms');
-          await expect(counterServiceOpeningHoursPage.mainContent.content).toContainText(
+          await expect(counterServiceOpeningHoursPage.successPanel).toContainText(
             `You have removed this counter service opening hour for ${createdCourt.name}.`
           );
 
@@ -165,9 +165,9 @@ test.describe(
           await counterServiceOpeningHoursPage.fillDayOpeningTimes('monday', '10', '', '', '');
           await counterServiceOpeningHoursPage.save();
 
-          await expect(counterServiceOpeningHoursPage.errorSummary).toContainText('Enter the monday opening minute');
-          await expect(counterServiceOpeningHoursPage.errorSummary).toContainText('Enter the monday closing hour');
-          await expect(counterServiceOpeningHoursPage.errorSummary).toContainText('Enter the monday closing minute');
+          await expect(counterServiceOpeningHoursPage.errorSummary).toContainText('Enter the Monday opening minute');
+          await expect(counterServiceOpeningHoursPage.errorSummary).toContainText('Enter the Monday closing hour');
+          await expect(counterServiceOpeningHoursPage.errorSummary).toContainText('Enter the Monday closing minute');
         }
       );
     });

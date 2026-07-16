@@ -353,10 +353,10 @@ export class CounterServiceOpeningHoursService {
     const closingMinuteKey = `${prefix}ClosingMinute`;
     const fieldLabel = (timePart: string) => (labelPrefix ? `${labelPrefix} ${timePart}` : timePart);
 
-    this.validateTimePart(errors, form[openingHourKey], openingHourKey, fieldLabel('Opening hour'), 23);
-    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, fieldLabel('Opening minute'), 59);
-    this.validateTimePart(errors, form[closingHourKey], closingHourKey, fieldLabel('Closing hour'), 23);
-    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, fieldLabel('Closing minute'), 59);
+    this.validateTimePart(errors, form[openingHourKey], openingHourKey, fieldLabel('opening hour'), 23);
+    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, fieldLabel('opening minute'), 59);
+    this.validateTimePart(errors, form[closingHourKey], closingHourKey, fieldLabel('closing hour'), 23);
+    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, fieldLabel('closing minute'), 59);
 
     if (errors[openingHourKey] || errors[openingMinuteKey] || errors[closingHourKey] || errors[closingMinuteKey]) {
       return;
@@ -384,7 +384,7 @@ export class CounterServiceOpeningHoursService {
     const valueText = typeof value === 'string' ? value.trim() : '';
 
     if (!valueText) {
-      errors[key] = `Enter the ${label.toLowerCase()}`;
+      errors[key] = `Enter the ${label}`;
       return;
     }
 
