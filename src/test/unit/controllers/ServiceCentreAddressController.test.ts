@@ -4,6 +4,7 @@ import { assert, match, mock, stub } from 'sinon';
 
 import ServiceCentreAddressController from '../../../main/controllers/ServiceCentreAddressController';
 import { ServiceCentreAddressService } from '../../../main/services/ServiceCentreAddressService';
+import * as addressValidation from '../../../main/utils/addressValidation';
 import { mockRequest } from '../mocks/mockRequest';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
@@ -217,7 +218,7 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(true);
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
     const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves(
       HttpStatusCode.BadGateway
     );
@@ -251,7 +252,7 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(true);
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
     const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves(
       HttpStatusCode.NotFound
     );
@@ -282,10 +283,8 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(false);
-    const validatePostcodeStub = stub(ServiceCentreAddressService.prototype, 'validatePostcode').returns(
-      'Enter a postcode'
-    );
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(false);
+    const validatePostcodeStub = stub(addressValidation, 'validatePostcodeField').returns('Enter a postcode');
 
     responseMock.expects('render').once().withArgs('service-centre-address-find', match.has('addressId', ADDRESS_ID));
 
@@ -315,7 +314,7 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(true);
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
     const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves(
       HttpStatusCode.InternalServerError
     );
@@ -346,10 +345,8 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(false);
-    const validatePostcodeStub = stub(ServiceCentreAddressService.prototype, 'validatePostcode').returns(
-      'Enter a postcode'
-    );
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(false);
+    const validatePostcodeStub = stub(addressValidation, 'validatePostcodeField').returns('Enter a postcode');
     const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions');
 
     responseMock
@@ -392,7 +389,7 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(true);
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
     const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves({
       status: 'invalid',
       error: 'No matching address found',
@@ -432,7 +429,7 @@ describe('ServiceCentreAddressController', () => {
       ServiceCentreAddressService.prototype,
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
-    const isValidPostcodeStub = stub(ServiceCentreAddressService.prototype, 'isValidPostcode').returns(true);
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
     const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves([
       {
         ADDRESS: '1 Test Street',

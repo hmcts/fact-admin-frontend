@@ -2,10 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { ServiceCentreAddressType } from '../../../main/schemas/serviceCentreAddressSchema';
-import {
-  POSTCODE_ERROR_MESSAGES,
-  ServiceCentreAddressService,
-} from '../../../main/services/ServiceCentreAddressService';
+import { ServiceCentreAddressService } from '../../../main/services/ServiceCentreAddressService';
 
 describe('ServiceCentreAddressService', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';
@@ -289,19 +286,5 @@ describe('ServiceCentreAddressService', () => {
     });
 
     expect(getServiceCentreAddressDetails).toHaveBeenCalledTimes(4);
-  });
-
-  test('validates postcode rules and helper boolean', () => {
-    const service = new ServiceCentreAddressService();
-
-    expect(service.validatePostcode(undefined)).toBe(POSTCODE_ERROR_MESSAGES.blankPostcode);
-    expect(service.validatePostcode('   ')).toBe(POSTCODE_ERROR_MESSAGES.blankPostcode);
-    expect(service.validatePostcode('abc')).toBe(POSTCODE_ERROR_MESSAGES.invalidPostcode);
-    expect(service.validatePostcode('GY1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.guernseyPostcode);
-    expect(service.validatePostcode('IM1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.isleOfManPostcode);
-    expect(service.validatePostcode('JE1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.jerseyPostcode);
-    expect(service.validatePostcode('BT1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.northernIrelandPostcode);
-    expect(service.isValidPostcode('SW1A 1AA')).toBe(true);
-    expect(service.isValidPostcode('GY1 1AA')).toBe(false);
   });
 });

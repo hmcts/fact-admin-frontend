@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { dpaAddressSchema } from '../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
 import { ServiceCentreAddressService } from '../services/ServiceCentreAddressService';
+import { isValidPostcode, validatePostcodeField } from '../utils/addressValidation';
 
 import { buildServiceCentreSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
@@ -120,9 +121,9 @@ export default class ServiceCentreAddressController {
     }
 
     const postcode = req.query?.postcode as string;
-    if (!serviceCentreAddressService.isValidPostcode(postcode)) {
+    if (!isValidPostcode(postcode)) {
       res.render('service-centre-address-find', {
-        error: serviceCentreAddressService.validatePostcode(postcode),
+        error: validatePostcodeField(postcode),
         pageTitle: 'Find Address',
         breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
         serviceCentreName,
@@ -180,10 +181,10 @@ export default class ServiceCentreAddressController {
     }
 
     const postcode = req.query?.postcode as string;
-    if (!serviceCentreAddressService.isValidPostcode(postcode)) {
+    if (!isValidPostcode(postcode)) {
       res.render('service-centre-address-find', {
         addressId,
-        error: serviceCentreAddressService.validatePostcode(postcode),
+        error: validatePostcodeField(postcode),
         pageTitle: 'Find Address',
         breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
         serviceCentreName,

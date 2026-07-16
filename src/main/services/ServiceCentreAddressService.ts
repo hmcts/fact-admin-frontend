@@ -3,6 +3,14 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { DpaAddress } from '../schemas/osDataSchema';
 import { ServiceCentreAddress, ServiceCentreAddressType } from '../schemas/serviceCentreAddressSchema';
+import {
+  validateAddressLine1Field,
+  validateAddressLine2Field,
+  validateCountyField,
+  validatePostcodeField,
+  validateTownCityField,
+} from '../utils/addressValidation';
+import { addError } from '../utils/validation';
 
 export type SaveServiceCentreAddressResponse =
   | {
@@ -32,25 +40,6 @@ export type RetrieveAddressOptionsResponse =
       error: string;
     }
   | HttpStatusCode;
-
-const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
-const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
-
-const JURISDICTION_ERROR_REGEXES = {
-  guernseyPostcode: /^(GY)/i,
-  isleOfManPostcode: /^(IM)/i,
-  jerseyPostcode: /^(JE)/i,
-  northernIrelandPostcode: /^(BT)/i,
-};
-
-export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
-  blankPostcode: 'Enter a postcode',
-  guernseyPostcode: 'Guernsey postcodes are not supported for this service',
-  invalidPostcode: 'Postcode format is invalid',
-  isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
-  jerseyPostcode: 'Jersey postcodes are not supported for this service',
-  northernIrelandPostcode: 'Northern Ireland postcodes are not supported for this service',
-};
 
 export class ServiceCentreAddressService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
@@ -172,66 +161,21 @@ export class ServiceCentreAddressService {
     return { status: 'deleted', address, serviceCentreName: serviceCentreResponse.name };
   }
 
-  public isValidPostcode(value: string): boolean {
-    return this.validatePostcode(value) === undefined;
-  }
-
-  public validatePostcode(postcode: string | undefined): string | undefined {
-    if (!postcode) {
-      return POSTCODE_ERROR_MESSAGES.blankPostcode;
-    }
-
-    const trimmedPostcode = postcode.trim();
-    if (trimmedPostcode.length === 0) {
-      return POSTCODE_ERROR_MESSAGES.blankPostcode;
-    }
-    if (!VALID_POSTCODE_REGEX.test(trimmedPostcode)) {
-      return POSTCODE_ERROR_MESSAGES.invalidPostcode;
-    }
-
-    for (const [key, regex] of Object.entries(JURISDICTION_ERROR_REGEXES)) {
-      if (regex.test(trimmedPostcode)) {
-        return POSTCODE_ERROR_MESSAGES[key];
-      }
-    }
-
-    return undefined;
-  }
-
   private validateAddress(
     address: Partial<ServiceCentreAddress>,
     existingAddresses: ServiceCentreAddress[]
   ): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
 
-    const addressTypeErrors = this.validateAddressType(address, existingAddresses);
-    if (addressTypeErrors.length > 0) {
-      errors.addressType = addressTypeErrors;
-    }
+    addError(errors, 'addressType', this.validateAddressType(address, existingAddresses));
+    addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));
+    addError(errors, 'addressLine2', validateAddressLine2Field(address.addressLine2 ?? undefined));
+    addError(errors, 'townCity', validateTownCityField(address.townCity));
+    addError(errors, 'county', validateCountyField(address.county ?? undefined));
 
-    const addressLine1Errors = this.validateAddressLine1(address);
-    if (addressLine1Errors.length > 0) {
-      errors.addressLine1 = addressLine1Errors;
-    }
-
-    const addressLine2Errors = this.validateAddressLine2(address);
-    if (addressLine2Errors.length > 0) {
-      errors.addressLine2 = addressLine2Errors;
-    }
-
-    const townCityErrors = this.validateTownCity(address);
-    if (townCityErrors.length > 0) {
-      errors.townCity = townCityErrors;
-    }
-
-    const countyErrors = this.validateCounty(address);
-    if (countyErrors.length > 0) {
-      errors.county = countyErrors;
-    }
-
-    const postcodeValidation = this.validatePostcode(address.postcode);
+    const postcodeValidation = validatePostcodeField(address.postcode);
     if (postcodeValidation) {
-      errors.postcode = [postcodeValidation];
+      addError(errors, 'postcode', [postcodeValidation]);
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
@@ -257,71 +201,5 @@ export class ServiceCentreAddressService {
     }
 
     return addressTypeErrors;
-  }
-
-  private validateAddressLine1(address: Partial<ServiceCentreAddress>): string[] {
-    const addressLine1Errors: string[] = [];
-
-    if (!address.addressLine1 || address.addressLine1.trim().length === 0) {
-      addressLine1Errors.push('Enter address line 1, typically the building and street');
-    } else if (address.addressLine1.length > 255) {
-      addressLine1Errors.push('Address line 1 must be 255 characters or less');
-    }
-
-    if (address.addressLine1 && !VALID_ADDRESS_LINE_REGEX.test(address.addressLine1.trim())) {
-      addressLine1Errors.push(
-        "Address line 1 must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
-      );
-    }
-
-    return addressLine1Errors;
-  }
-
-  private validateAddressLine2(address: Partial<ServiceCentreAddress>): string[] {
-    const addressLine2Errors: string[] = [];
-
-    if (address.addressLine2 && address.addressLine2.length > 255) {
-      addressLine2Errors.push('Address line 2 must be 255 characters or less');
-    }
-
-    if (address.addressLine2 && !VALID_ADDRESS_LINE_REGEX.test(address.addressLine2.trim())) {
-      addressLine2Errors.push(
-        "Address line 2 must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
-      );
-    }
-
-    return addressLine2Errors;
-  }
-
-  private validateTownCity(address: Partial<ServiceCentreAddress>): string[] {
-    const townCityErrors: string[] = [];
-
-    if (!address.townCity || address.townCity.trim().length === 0) {
-      townCityErrors.push('Enter a town or city');
-    } else if (address.townCity.length > 100) {
-      townCityErrors.push('Town or city must be 100 characters or less');
-    }
-
-    if (address.townCity && !VALID_ADDRESS_LINE_REGEX.test(address.townCity.trim())) {
-      townCityErrors.push(
-        "Town or city must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
-      );
-    }
-
-    return townCityErrors;
-  }
-
-  private validateCounty(address: Partial<ServiceCentreAddress>): string[] {
-    const countyErrors: string[] = [];
-
-    if (address.county && address.county.length > 255) {
-      countyErrors.push('County must be 255 characters or less');
-    }
-
-    if (address.county && !VALID_ADDRESS_LINE_REGEX.test(address.county.trim())) {
-      countyErrors.push("County must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
-    }
-
-    return countyErrors;
   }
 }
