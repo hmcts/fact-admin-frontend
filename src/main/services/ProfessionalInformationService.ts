@@ -347,7 +347,7 @@ export class ProfessionalInformationService {
       if (descriptionCy && !code) {
         errors.push({
           href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: You have entered a DX code welsh explanation without a DX code, please add a code or remove the welsh explanation`,
+          text: `DX code ${formIndex + 1}: You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation`,
         });
       }
       if (hasEnglishDescriptionOnly) {
@@ -387,12 +387,12 @@ export class ProfessionalInformationService {
       if (descriptionCy.length > repeatableDescriptionMaxLength) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} welsh explanation: DX welsh explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
+          text: `DX code ${formIndex + 1} Welsh explanation: DX Welsh explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
         });
       } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} welsh explanation: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1} Welsh explanation: ${invalidCharactersError}`,
         });
       }
     });
@@ -409,7 +409,8 @@ export class ProfessionalInformationService {
           href: `#faxNumber-${formIndex}`,
           text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
         });
-      } else if (descriptionCy && !code) {
+      }
+      if (descriptionCy && !code) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
           text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
@@ -446,12 +447,12 @@ export class ProfessionalInformationService {
       if (descriptionCy.length > repeatableDescriptionMaxLength) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
+          text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
         });
       } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} welsh description: ${invalidCharactersError}`,
+          text: `Fax number ${formIndex + 1} Welsh description: ${invalidCharactersError}`,
         });
       }
     });

@@ -238,7 +238,7 @@ describe('ProfessionalInformationService', () => {
         errorSummary: [
           { href: '#dxCode-0', text: 'DX code 1: Value contains invalid characters' },
           { href: '#dxCodeDescription-0', text: 'DX code 1 explanation: Value contains invalid characters' },
-          { href: '#dxCodeDescriptionCy-0', text: 'DX code 1 welsh explanation: Value contains invalid characters' },
+          { href: '#dxCodeDescriptionCy-0', text: 'DX code 1 Welsh explanation: Value contains invalid characters' },
           {
             href: '#faxNumber-0',
             text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
@@ -246,7 +246,7 @@ describe('ProfessionalInformationService', () => {
           { href: '#faxNumberDescription-0', text: 'Fax number 1 description: Value contains invalid characters' },
           {
             href: '#faxNumberDescriptionCy-0',
-            text: 'Fax number 1 welsh description: Value contains invalid characters',
+            text: 'Fax number 1 Welsh description: Value contains invalid characters',
           },
         ],
       },
