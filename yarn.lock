@@ -9911,9 +9911,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-openid-connect@npm:3.1.0":
-  version: 3.1.0
-  resolution: "express-openid-connect@npm:3.1.0"
+"express-openid-connect@npm:3.2.0":
+  version: 3.2.0
+  resolution: "express-openid-connect@npm:3.2.0"
   dependencies:
     base64url: "npm:^3.0.1"
     clone: "npm:^2.1.2"
@@ -9927,7 +9927,7 @@ __metadata:
     util-promisify: "npm:3.0.0"
   peerDependencies:
     express: ">= 4.17.0"
-  checksum: 10/cd6c05e7aaf6b3cff10cb01739ada81d75e3d4c33e2e25c9ee2beefb64e201011be5bf6b1e0bb979c429b6454327093bce01fad39a65578dd1bc0a0383f6714d
+  checksum: 10/6b52d90e5cee7891d21b1ff76d3c983c36e453c283c01b5e85e0612b26e8e634945646020c0b8a8168f096f9a6093173029b2a7104ea02926a6b29bd2a419011
   languageName: node
   linkType: hard
 
@@ -10097,7 +10097,7 @@ __metadata:
     eslint-plugin-import: "npm:2.32.0"
     eslint-plugin-jest: "npm:29.15.4"
     express: "npm:5.2.1"
-    express-openid-connect: "npm:3.1.0"
+    express-openid-connect: "npm:3.2.0"
     express-rate-limit: "npm:8.5.2"
     get-port: "npm:^7.2.0"
     globals: "npm:17.7.0"
