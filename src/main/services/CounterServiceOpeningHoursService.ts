@@ -351,7 +351,7 @@ export class CounterServiceOpeningHoursService {
     const openingMinuteKey = `${prefix}OpeningMinute`;
     const closingHourKey = `${prefix}ClosingHour`;
     const closingMinuteKey = `${prefix}ClosingMinute`;
-    const fieldLabel = (timePart: string) => (labelPrefix ? `${labelPrefix} ${timePart}` : timePart);
+    const fieldLabel = (timePart: string): string => (labelPrefix ? `${labelPrefix} ${timePart}` : timePart);
 
     this.validateTimePart(errors, form[openingHourKey], openingHourKey, fieldLabel('opening hour'), 23);
     this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, fieldLabel('opening minute'), 59);
@@ -389,7 +389,8 @@ export class CounterServiceOpeningHoursService {
     }
 
     if (!/^\d{1,2}$/.test(valueText) || Number(valueText) > maximum) {
-      errors[key] = `${label} must be between 0 and ${maximum}`;
+      const sentenceLabel = `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
+      errors[key] = `${sentenceLabel} must be between 0 and ${maximum}`;
     }
   }
 
