@@ -399,5 +399,39 @@ test.describe(
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
     });
+
+    test('Counter Service Opening Hours List Page Performance', async ({
+      counterServiceOpeningHoursPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Performance Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.goto(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Counter Service Opening Hours Add Page Performance', async ({
+      counterServiceOpeningHoursPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Performance Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
   }
 );
