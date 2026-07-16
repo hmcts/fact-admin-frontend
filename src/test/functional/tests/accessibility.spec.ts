@@ -885,5 +885,105 @@ test.describe(
         }
       );
     });
+
+    test('Counter Service Opening Hours List Page Accessibility', async ({
+      axeUtils,
+      counterServiceOpeningHoursPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Accessibility Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.goto(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Counter Service Opening Hours Add Page Accessibility', async ({
+      axeUtils,
+      counterServiceOpeningHoursPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Accessibility Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Counter Service Opening Hours Validation Accessibility', async ({
+      axeUtils,
+      counterServiceOpeningHoursPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Accessibility Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await counterServiceOpeningHoursPage.save();
+          await expect(counterServiceOpeningHoursPage.mainContent.content).toContainText('There is a problem');
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Counter Service Opening Hours Success Page Accessibility', async ({
+      axeUtils,
+      counterServiceOpeningHoursPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Accessibility Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await counterServiceOpeningHoursPage.selectAssistWith('Forms');
+          await counterServiceOpeningHoursPage.selectAppointmentNeeded('no');
+          await counterServiceOpeningHoursPage.selectSameTime();
+          await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
+          await counterServiceOpeningHoursPage.save();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Counter Service Opening Hours Delete Page Accessibility', async ({
+      axeUtils,
+      counterServiceOpeningHoursPage,
+      playwright,
+    }) => {
+      await withCreatedCourt(
+        playwright,
+        'Counter Service Opening Hours Accessibility Test',
+        {},
+        async ({ createdCourt }) => {
+          await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
+          await counterServiceOpeningHoursPage.header.checkIsVisible();
+          await counterServiceOpeningHoursPage.selectAssistWith('Forms');
+          await counterServiceOpeningHoursPage.selectAppointmentNeeded('no');
+          await counterServiceOpeningHoursPage.selectSameTime();
+          await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
+          await counterServiceOpeningHoursPage.save();
+          await counterServiceOpeningHoursPage.clickBackToCounterService();
+          await counterServiceOpeningHoursPage.clickFirstDeleteLink();
+          await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
+          await axeUtils.audit();
+        }
+      );
+    });
   }
 );

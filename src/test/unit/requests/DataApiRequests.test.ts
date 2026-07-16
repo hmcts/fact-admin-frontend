@@ -14,6 +14,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
+import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
 
 const dataApiRequests = new DataApiRequests();
 
@@ -3084,6 +3085,44 @@ describe('DataApiRequests', () => {
     );
   });
 
+  it('returns parsed counter service opening hours when the response is valid', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+    const counterServiceOpeningHours = {
+      id: counterServiceId,
+      courtId,
+      counterService: true,
+      courtTypes: [],
+      assistWithForms: true,
+      assistWithDocuments: true,
+      assistWithSupport: true,
+      appointmentNeeded: true,
+      appointmentContact: 'test@test.com',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`).resolves({
+      data: [counterServiceOpeningHours],
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+
+    expect(response).toEqual([counterServiceOpeningHours]);
+  });
+
+  it('returns no content when counter service opening hours returns 204', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
   it('returns parsed approvals when the response is valid', async () => {
     const approvals = [
       {
@@ -3194,6 +3233,224 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.deleteApproval(approvalId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns not found when fetching counter service opening hours fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when counter service opening hours response fails schema validation', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`).resolves({
+      data: [{ courtId }],
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns parsed counter service opening hours by id when the response is valid', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+    const counterServiceOpeningHours = {
+      id: counterServiceId,
+      courtId,
+      counterService: true,
+      courtTypes: [],
+      assistWithForms: true,
+      assistWithDocuments: false,
+      assistWithSupport: false,
+      appointmentNeeded: false,
+      appointmentContact: null,
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`).resolves({
+      data: counterServiceOpeningHours,
+    });
+
+    const response = await dataApiRequests.getCounterServiceOpeningHoursById(courtId, counterServiceId);
+
+    expect(response).toEqual(counterServiceOpeningHours);
+  });
+
+  it('returns not found when fetching counter service opening hours by id fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+
+    getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCounterServiceOpeningHoursById(courtId, counterServiceId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('saves counter service opening hours and returns parsed response', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+    const payload: Partial<CounterServiceOpeningHours> = {
+      courtId,
+      counterService: true,
+      assistWithForms: true,
+      assistWithDocuments: true,
+      assistWithSupport: true,
+      appointmentNeeded: true,
+      appointmentContact: 'test@test.com',
+      openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
+    };
+    const saveResponse = {
+      id: counterServiceId,
+      ...payload,
+      courtTypes: [],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload).resolves({
+      data: saveResponse,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+
+    expect(response).toEqual(saveResponse);
+  });
+
+  it('returns status code when save counter service opening hours returns 2xx with no data', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload: Partial<CounterServiceOpeningHours> = {
+      courtId,
+      counterService: true,
+      assistWithForms: false,
+      assistWithDocuments: false,
+      assistWithSupport: false,
+      appointmentNeeded: false,
+      appointmentContact: null,
+      openingTimesDetails: [],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload).resolves({
+      data: null,
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns validation errors map when save counter service opening hours returns 400', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload: Partial<CounterServiceOpeningHours> = {
+      courtId,
+      assistWithForms: false,
+      assistWithDocuments: false,
+      assistWithSupport: false,
+      appointmentNeeded: false,
+      appointmentContact: null,
+      openingTimesDetails: [],
+    };
+    const apiErrors = {
+      assistWithForms: 'Select what the counter can assist with',
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns not found when save counter service opening hours fails with an axios status', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload: Partial<CounterServiceOpeningHours> = {
+      courtId,
+      assistWithForms: true,
+      assistWithDocuments: false,
+      assistWithSupport: false,
+      appointmentNeeded: false,
+      appointmentContact: null,
+      openingTimesDetails: [],
+    };
+
+    putStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload).rejects(errorResponse);
+
+    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when save counter service opening hours throws a non-axios error', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const payload: Partial<CounterServiceOpeningHours> = {
+      courtId,
+      assistWithForms: true,
+      assistWithDocuments: false,
+      assistWithSupport: false,
+      appointmentNeeded: false,
+      appointmentContact: null,
+      openingTimesDetails: [],
+    };
+
+    putStub
+      .withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload)
+      .rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('deletes counter service opening hours and returns status code', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`).resolves({
+      status: HttpStatusCode.Ok,
+    });
+
+    const response = await dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+
+    expect(response).toBe(HttpStatusCode.Ok);
+  });
+
+  it('returns not found when delete counter service opening hours fails with an axios status code', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub
+      .withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`)
+      .rejects(errorResponse);
+
+    const response = await dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when delete counter service opening hours throws a non-axios error', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    const counterServiceId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub
+      .withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`)
+      .rejects(new Error('Unexpected error'));
+
+    const response = await dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
   it('returns axios status and logs when delete approval endpoint errors', async () => {

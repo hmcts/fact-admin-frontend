@@ -7,6 +7,7 @@ import { AuditDetailPage } from './audit-detail.po';
 import { AuditListPage } from './audit-list.po';
 import { BuildingFacilitiesPage } from './building-facilities.po';
 import { CasesHeardPage } from './cases-heard.po';
+import { CounterServiceOpeningHoursPage } from './counter-service-opening-hours.po';
 import { CourtAddressDeleteSuccessPage } from './court-address-delete-success.po';
 import { CourtAddressDeletePage } from './court-address-delete.po';
 import { CourtAddressEditSuccessPage } from './court-address-edit-success.po';
@@ -62,6 +63,7 @@ export interface PageFixtures {
   localAuthoritiesPage: LocalAuthoritiesPage;
   singlePointsOfEntryPage: SinglePointsOfEntryPage;
   professionalInformationPage: ProfessionalInformationPage;
+  counterServiceOpeningHoursPage: CounterServiceOpeningHoursPage;
   serviceCentreEditPage: ServiceCentreEditPage;
   serviceCentreGeneralPage: ServiceCentreGeneralPage;
   serviceCentreWarningNoticePage: ServiceCentreWarningNoticePage;
@@ -183,6 +185,10 @@ export const pageFixtures = {
   professionalInformationPage: async ({ determinePage }, use): Promise<void> => {
     const professionalInformationPage = new ProfessionalInformationPage(determinePage);
     await use(professionalInformationPage);
+  },
+  counterServiceOpeningHoursPage: async ({ determinePage }, use): Promise<void> => {
+    const counterServiceOpeningHoursPage = new CounterServiceOpeningHoursPage(determinePage);
+    await use(counterServiceOpeningHoursPage);
   },
   serviceCentreEditPage: async ({ determinePage }, use): Promise<void> => {
     const serviceCentreEditPage = new ServiceCentreEditPage(determinePage);
