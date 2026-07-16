@@ -1,5 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
+import { Region } from '../../../main/schemas/regionSchema';
 import { ServiceCentreGeneralService } from '../../../main/services/ServiceCentreGeneralService';
 
 describe('ServiceCentreGeneralService', () => {
@@ -10,16 +11,26 @@ describe('ServiceCentreGeneralService', () => {
     serviceAreaIds: ['22222222-2222-4222-8222-222222222222'],
     slug: 'reading-service-centre',
     warningNotice: null,
+    regionId: '471dd8a0-d8db-49b1-8257-f42d7ac0329b',
   };
   const serviceAreas = [
     { id: '22222222-2222-4222-8222-222222222222', name: 'Adoption' },
     { id: '33333333-3333-4333-8333-333333333333', name: 'Children' },
   ];
 
+  const regions: Region[] = [
+    { id: '471dd8a0-d8db-49b1-8257-f42d7ac0329b', name: 'Eastern', country: 'England' },
+    { id: '1e4c93c2-e39b-4aee-90d5-45a68fcb0202', name: 'North West', country: 'England' },
+    { id: '01ed3123-c9c4-4c9f-9dbc-20f72c05c6ac', name: 'North East', country: 'England' },
+    { id: '03a67431-c650-4298-a7e7-38270ed04506', name: 'South East', country: 'England' },
+    { id: '1f02aa9a-fb39-45c3-a90a-25ae10608ab2', name: 'South West', country: 'England' },
+  ];
+
   test('retrieve returns populated view model', async () => {
     const requests = {
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
     };
 
     const service = new ServiceCentreGeneralService(requests as never);
@@ -33,12 +44,15 @@ describe('ServiceCentreGeneralService', () => {
       pageTitle: 'General - Reading Service Centre',
       rightColumnServiceAreaItems: [{ checked: false, text: 'Children', value: serviceAreas[1].id }],
       serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
+      regions,
     });
   });
 
   test('retrieve returns status when service centre cannot be loaded', async () => {
     const requests = {
       getServiceAreas: jest.fn(),
+      getRegions: jest.fn(),
       getServiceCentreById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
     };
 
@@ -47,11 +61,13 @@ describe('ServiceCentreGeneralService', () => {
 
     expect(result).toBe(HttpStatusCode.NotFound);
     expect(requests.getServiceAreas).not.toHaveBeenCalled();
+    expect(requests.getRegions).not.toHaveBeenCalled();
   });
 
   test('retrieve returns status when service areas cannot be loaded', async () => {
     const requests = {
       getServiceAreas: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
     };
 
@@ -59,12 +75,14 @@ describe('ServiceCentreGeneralService', () => {
     const result = await service.retrieve(serviceCentre.id);
 
     expect(result).toBe(HttpStatusCode.InternalServerError);
+    expect(requests.getRegions).not.toHaveBeenCalled();
   });
 
   test('save returns validation errors when service areas are empty', async () => {
     const requests = {
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
       updateServiceCentre: jest.fn(),
     };
 
@@ -74,6 +92,7 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Updated Service Centre',
       open: true,
       serviceAreaIds: [],
+      regionId: regions[0].id,
     });
 
     expect(result.type).toBe('validation-error');
@@ -87,6 +106,7 @@ describe('ServiceCentreGeneralService', () => {
     const requests = {
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
       getCourtByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getServiceCentreByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       updateServiceCentre: jest.fn().mockResolvedValue({
@@ -101,15 +121,18 @@ describe('ServiceCentreGeneralService', () => {
       name: '  Updated Service Centre  ',
       open: false,
       serviceAreaIds: [serviceAreas[1].id],
+      regionId: regions[1].id,
     });
 
     expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Service Centre');
     expect(requests.getServiceCentreByName).toHaveBeenCalledWith('Updated Service Centre');
+    expect(requests.getRegions).toHaveBeenCalled();
     expect(requests.updateServiceCentre).toHaveBeenCalledWith({
       ...serviceCentre,
       name: 'Updated Service Centre',
       open: false,
       serviceAreaIds: [serviceAreas[1].id],
+      regionId: regions[1].id,
     });
     expect(result.type).toBe('saved');
   });
@@ -118,6 +141,7 @@ describe('ServiceCentreGeneralService', () => {
     const requests = {
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
       getCourtByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getServiceCentreByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       updateServiceCentre: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
@@ -129,6 +153,7 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Updated Service Centre',
       open: false,
       serviceAreaIds: [serviceAreas[1].id],
+      regionId: regions[1].id,
     });
 
     expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
@@ -138,6 +163,7 @@ describe('ServiceCentreGeneralService', () => {
     const requests = {
       getServiceAreas: jest.fn(),
       getServiceCentreById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+      getRegions: jest.fn(),
       updateServiceCentre: jest.fn(),
     };
 
@@ -147,17 +173,20 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Updated Service Centre',
       open: true,
       serviceAreaIds: [],
+      regionId: regions[1].id,
     });
 
     expect(result).toEqual({ status: HttpStatusCode.NotFound, type: 'status' });
     expect(requests.getServiceAreas).not.toHaveBeenCalled();
     expect(requests.updateServiceCentre).not.toHaveBeenCalled();
+    expect(requests.getRegions).not.toHaveBeenCalled();
   });
 
   test('save returns status when service areas cannot be loaded', async () => {
     const requests = {
       getServiceAreas: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+      getRegions: jest.fn(),
       updateServiceCentre: jest.fn(),
     };
 
@@ -167,10 +196,12 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Updated Service Centre',
       open: true,
       serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
     });
 
     expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
     expect(requests.updateServiceCentre).not.toHaveBeenCalled();
+    expect(requests.getRegions).not.toHaveBeenCalled();
   });
 
   test('save returns validation-error when a court with the same name exists', async () => {
@@ -180,6 +211,7 @@ describe('ServiceCentreGeneralService', () => {
         .mockResolvedValue({ id: '44444444-4444-4444-8444-444444444444', name: 'Existing Court' }),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+      getRegions: jest.fn().mockResolvedValue(regions),
       updateServiceCentre: jest.fn(),
     };
 
@@ -189,6 +221,7 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Existing Court',
       open: true,
       serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
     });
 
     expect(result.type).toBe('validation-error');
@@ -206,6 +239,7 @@ describe('ServiceCentreGeneralService', () => {
     const requests = {
       getCourtByName: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
       updateServiceCentre: jest.fn(),
     };
@@ -216,6 +250,7 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Updated Service Centre',
       open: true,
       serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
     });
 
     expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
@@ -226,6 +261,7 @@ describe('ServiceCentreGeneralService', () => {
     const requests = {
       getCourtByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
       getServiceCentreByName: jest.fn().mockResolvedValue({
         id: '99999999-9999-4999-8999-999999999999',
@@ -240,6 +276,7 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Duplicate Service Centre',
       open: true,
       serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
     });
 
     expect(result.type).toBe('validation-error');
@@ -257,6 +294,7 @@ describe('ServiceCentreGeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+      getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreByName: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       updateServiceCentre: jest.fn().mockResolvedValue(
         new Map([
@@ -273,6 +311,7 @@ describe('ServiceCentreGeneralService', () => {
       name: 'Updated Service Centre',
       open: false,
       serviceAreaIds: [serviceAreas[1].id],
+      regionId: regions[1].id,
     });
 
     expect(result.type).toBe('validation-error');

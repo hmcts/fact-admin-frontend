@@ -51,6 +51,7 @@ export default class ServiceCentreGeneralController {
       name: req.body?.name,
       open: this.parseOpen(req.body?.open),
       serviceAreaIds: this.parseSelectedServiceAreaIds(req.body?.serviceAreaIds),
+      regionId: req.body?.regionId,
     });
 
     if (saveResult.type === 'validation-error') {

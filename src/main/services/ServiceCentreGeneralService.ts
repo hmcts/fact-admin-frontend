@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../schemas/serviceCentreSchema';
 
@@ -21,6 +22,8 @@ export type ServiceCentreGeneralViewModel = {
   pageTitle: string;
   rightColumnServiceAreaItems: ServiceAreaCheckboxItem[];
   serviceAreaIds?: string[];
+  regions: Region[];
+  regionId: string;
 };
 
 export type ServiceCentreGeneralSaveResult =
@@ -51,7 +54,12 @@ export class ServiceCentreGeneralService {
       return serviceAreasResponse;
     }
 
-    return this.toViewModel(serviceCentreResponse, serviceAreasResponse);
+    const regions = await this.dataApiRequests.getRegions();
+    if (typeof regions === 'number') {
+      return regions;
+    }
+
+    return this.toViewModel(serviceCentreResponse, serviceAreasResponse, regions);
   }
 
   public async save(model: {
@@ -59,6 +67,7 @@ export class ServiceCentreGeneralService {
     name?: string;
     open?: boolean;
     serviceAreaIds?: string[];
+    regionId?: string;
   }): Promise<ServiceCentreGeneralSaveResult> {
     const existingServiceCentre = await this.dataApiRequests.getServiceCentreById(model.id);
     if (typeof existingServiceCentre === 'number') {
@@ -70,12 +79,18 @@ export class ServiceCentreGeneralService {
       return { status: serviceAreasResponse, type: 'status' };
     }
 
+    const regions = await this.dataApiRequests.getRegions();
+    if (typeof regions === 'number') {
+      return { status: regions, type: 'status' };
+    }
+
     const trimmedName = model.name?.trim();
     const updatedServiceCentre: ServiceCentre = {
       ...existingServiceCentre,
       name: trimmedName ?? '',
       open: model.open ?? existingServiceCentre.open,
       serviceAreaIds: model.serviceAreaIds ?? [],
+      regionId: model.regionId ?? existingServiceCentre.regionId,
     };
 
     const validationErrors = this.validate({
@@ -86,7 +101,7 @@ export class ServiceCentreGeneralService {
     if (validationErrors) {
       return {
         type: 'validation-error',
-        viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, validationErrors),
+        viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, regions, validationErrors),
       };
     }
 
@@ -101,7 +116,7 @@ export class ServiceCentreGeneralService {
     } else {
       return {
         type: 'validation-error',
-        viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, {
+        viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, regions, {
           name: [
             `A ${duplicateLocationResult.type} with the entered name already exists: '${duplicateLocationResult.name}'`,
           ],
@@ -125,13 +140,13 @@ export class ServiceCentreGeneralService {
 
       return {
         type: 'validation-error',
-        viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, errors),
+        viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, regions, errors),
       };
     }
 
     return {
       type: 'saved',
-      viewModel: this.toViewModel(updateResponse, serviceAreasResponse),
+      viewModel: this.toViewModel(updateResponse, serviceAreasResponse, regions),
     };
   }
 
@@ -159,8 +174,9 @@ export class ServiceCentreGeneralService {
   }
 
   private toViewModel(
-    serviceCentre: Pick<ServiceCentre, 'id' | 'name' | 'open' | 'serviceAreaIds'>,
+    serviceCentre: Pick<ServiceCentre, 'id' | 'name' | 'open' | 'serviceAreaIds' | 'regionId'>,
     serviceAreas: ServiceArea[],
+    regions: Region[],
     errors?: Record<string, string[]>
   ): ServiceCentreGeneralViewModel {
     const selectedServiceAreaIds = serviceCentre.serviceAreaIds ?? [];
@@ -183,6 +199,8 @@ export class ServiceCentreGeneralService {
       pageTitle: errors ? `Error: General - ${serviceCentre.name}` : `General - ${serviceCentre.name}`,
       rightColumnServiceAreaItems: items.slice(midpoint),
       serviceAreaIds: selectedServiceAreaIds,
+      regions,
+      regionId: serviceCentre.regionId,
     };
   }
 

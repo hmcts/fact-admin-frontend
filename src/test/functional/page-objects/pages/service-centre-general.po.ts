@@ -8,6 +8,7 @@ export class ServiceCentreGeneralPage extends Base {
   public readonly nameInput: Locator;
   public readonly openRadio: Locator;
   public readonly closedRadio: Locator;
+  public readonly regionSelect: Locator;
   public readonly serviceAreaCheckboxes: Locator;
   public readonly saveButton: Locator;
   public readonly successPanel: Locator;
@@ -18,6 +19,7 @@ export class ServiceCentreGeneralPage extends Base {
     this.nameInput = this.page.getByLabel('Service centre name');
     this.openRadio = this.page.getByRole('radio', { name: 'Open' });
     this.closedRadio = this.page.getByRole('radio', { name: 'Closed' });
+    this.regionSelect = this.page.getByLabel('Region');
     this.serviceAreaCheckboxes = this.page.locator('input[name="serviceAreaIds"]');
     this.saveButton = this.page.getByRole('button', { name: 'Save' });
     this.successPanel = this.page.locator('.govuk-panel--confirmation');

@@ -7,6 +7,7 @@ import { ServiceCentreGeneralService } from '../../../main/services/ServiceCentr
 import { mockRequest } from '../mocks/mockRequest';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
+const REGION_ID = '22222222-2222-4222-8222-222222222222';
 
 describe('ServiceCentreGeneralController', () => {
   test('renders general page when retrieval succeeds', async () => {
@@ -98,6 +99,7 @@ describe('ServiceCentreGeneralController', () => {
       name: 'Reading Service Centre',
       open: 'true',
       serviceAreaIds: [],
+      regionId: REGION_ID,
     };
     const responseMock = mock(response);
 
@@ -124,6 +126,7 @@ describe('ServiceCentreGeneralController', () => {
         name: 'Reading Service Centre',
         open: true,
         serviceAreaIds: [],
+        regionId: REGION_ID,
       });
       responseMock.verify();
     } finally {
@@ -143,6 +146,7 @@ describe('ServiceCentreGeneralController', () => {
       name: 'Reading Service Centre',
       open: false,
       serviceAreaIds: 'aaa',
+      regionId: REGION_ID,
     };
     const responseMock = mock(response);
 
@@ -162,6 +166,7 @@ describe('ServiceCentreGeneralController', () => {
         name: 'Reading Service Centre',
         open: false,
         serviceAreaIds: ['aaa'],
+        regionId: REGION_ID,
       });
       responseMock.verify();
     } finally {

@@ -93,5 +93,39 @@ test.describe(
         }
       );
     });
+
+    test('updates region and persists selected value on re-open', async ({ serviceCentreGeneralPage, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Edit General Region Functional Test',
+        { open: true },
+        async ({ createdServiceCentre }) => {
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+
+          // Pick a non-placeholder region option so we can verify persistence.
+          const regionOptions = serviceCentreGeneralPage.regionSelect.locator('option');
+          const optionCount = await regionOptions.count();
+
+          let selectedRegionValue: string | null = null;
+          for (let index = 1; index < optionCount; index++) {
+            const value = await regionOptions.nth(index).getAttribute('value');
+            if (value) {
+              selectedRegionValue = value;
+              break;
+            }
+          }
+
+          expect(selectedRegionValue, 'Expected at least one selectable region option').toBeTruthy();
+
+          await serviceCentreGeneralPage.regionSelect.selectOption(selectedRegionValue!);
+          await serviceCentreGeneralPage.save();
+
+          await expect(serviceCentreGeneralPage.successPanel).toContainText('General details saved');
+
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+          await expect(serviceCentreGeneralPage.regionSelect).toHaveValue(selectedRegionValue!);
+        }
+      );
+    });
   }
 );
