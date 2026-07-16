@@ -1,11 +1,6 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
-import {
-  CounterServiceOpeningHours,
-  CounterServiceOpeningHoursListSchema,
-  CounterServiceOpeningHoursSchema,
-} from '../schemas/CounterServiceOpeningHoursSchema';
 import { Accessibility, AccessibilityScheme } from '../schemas/accessibilitySchema';
 import { ApprovalStatus, CreateApprovalRequest, approvalStatusListSchema } from '../schemas/approvalSchema';
 import {
@@ -25,6 +20,11 @@ import {
 } from '../schemas/auditSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { ContactDescriptionType, contactDescriptionTypeListSchema } from '../schemas/contactDescriptionTypeSchema';
+import {
+  CounterServiceOpeningHours,
+  CounterServiceOpeningHoursListSchema,
+  CounterServiceOpeningHoursSchema,
+} from '../schemas/counterServiceOpeningHoursSchema';
 import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../schemas/courtAddressSchema';
 import { CourtContactDetail, courtContactDetailListSchema } from '../schemas/courtContactDetailSchema';
 import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '../schemas/courtDetailsSchema';

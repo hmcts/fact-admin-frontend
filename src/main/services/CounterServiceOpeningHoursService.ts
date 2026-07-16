@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
-import { CounterServiceOpeningHours, OpeningTimeDetails } from '../schemas/CounterServiceOpeningHoursSchema';
+import { CounterServiceOpeningHours, OpeningTimeDetails } from '../schemas/counterServiceOpeningHoursSchema';
 
 type Day = {
   idPrefix: string;
