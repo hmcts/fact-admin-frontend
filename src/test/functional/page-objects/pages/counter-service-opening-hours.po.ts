@@ -53,6 +53,10 @@ export class CounterServiceOpeningHoursPage extends Base {
     });
   }
 
+  async getCounterServiceRowCount(): Promise<number> {
+    return this.counterServiceTable.locator('tbody tr').count();
+  }
+
   async selectSameTime(): Promise<void> {
     const sameTimeYes = this.page.locator('input[name="sameTime"][value="yes"]');
     await expect(sameTimeYes).toBeVisible();
@@ -101,7 +105,7 @@ export class CounterServiceOpeningHoursPage extends Base {
 
   async clickBackToCounterService(): Promise<void> {
     await this.backToCounterServiceLink.click();
-    await expect(this.counterServiceTable).toBeVisible();
+    await this.expectVisibleElements();
   }
 
   async clickFirstDeleteLink(): Promise<void> {

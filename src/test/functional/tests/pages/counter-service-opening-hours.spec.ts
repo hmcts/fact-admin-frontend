@@ -35,6 +35,18 @@ test.describe(
         'Counter Service Opening Hours Functional Test',
         {},
         async ({ createdCourt }) => {
+          // remove existing opening hours to ensure consistent test foundation
+          await counterServiceOpeningHoursPage.goto(createdCourt.id);
+          while ((await counterServiceOpeningHoursPage.getCounterServiceRowCount()) > 0) {
+            await counterServiceOpeningHoursPage.clickFirstDeleteLink();
+            await expect(counterServiceOpeningHoursPage.heading).toContainText(
+              'Are you sure you want to delete these opening hours?'
+            );
+            await counterServiceOpeningHoursPage.clickDeleteOpeningHours();
+            await expect(counterServiceOpeningHoursPage.successPanel).toContainText('Opening hours deleted');
+            await counterServiceOpeningHoursPage.clickBackToCounterService();
+          }
+
           await counterServiceOpeningHoursPage.gotoAdd(createdCourt.id);
           await counterServiceOpeningHoursPage.selectAssistWith('Forms');
           await counterServiceOpeningHoursPage.selectAppointmentNeeded('no');
