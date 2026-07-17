@@ -127,5 +127,26 @@ test.describe(
         }
       );
     });
+
+    test('shows validation error when region is not specified', async ({ serviceCentreGeneralPage, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Edit General Region Validation Functional Test',
+        { open: true },
+        async ({ createdServiceCentre }) => {
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+
+          // Select the placeholder option (first item): "Select a region"
+          await serviceCentreGeneralPage.regionSelect.selectOption({ index: 0 });
+
+          await serviceCentreGeneralPage.save();
+
+          await expect(serviceCentreGeneralPage.errorSummary).toBeVisible();
+          await expect(serviceCentreGeneralPage.mainContent.content).toContainText(
+            'Please specify the region for this service centre'
+          );
+        }
+      );
+    });
   }
 );

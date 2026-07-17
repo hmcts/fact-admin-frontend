@@ -23,7 +23,7 @@ export type ServiceCentreGeneralViewModel = {
   rightColumnServiceAreaItems: ServiceAreaCheckboxItem[];
   serviceAreaIds?: string[];
   regions: Region[];
-  regionId: string;
+  regionId?: string;
 };
 
 export type ServiceCentreGeneralSaveResult =
@@ -97,6 +97,8 @@ export class ServiceCentreGeneralService {
       name: trimmedName,
       open: model.open,
       serviceAreaIds: model.serviceAreaIds,
+      regionIds: regions.map(region => region.id),
+      regionId: model.regionId ?? existingServiceCentre.regionId ?? '',
     });
     if (validationErrors) {
       return {
@@ -200,7 +202,7 @@ export class ServiceCentreGeneralService {
       rightColumnServiceAreaItems: items.slice(midpoint),
       serviceAreaIds: selectedServiceAreaIds,
       regions,
-      regionId: serviceCentre.regionId,
+      regionId: serviceCentre.regionId ?? undefined,
     };
   }
 
@@ -208,6 +210,8 @@ export class ServiceCentreGeneralService {
     name?: string;
     open?: boolean;
     serviceAreaIds?: string[];
+    regionIds: string[];
+    regionId: string;
   }): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
 
@@ -232,6 +236,10 @@ export class ServiceCentreGeneralService {
 
     if (!model.serviceAreaIds || model.serviceAreaIds.length === 0) {
       errors.serviceAreaIds = ['Please specify the service areas of the service centre'];
+    }
+
+    if (!model.regionId || model.regionId.length === 0 || !model.regionIds.includes(model.regionId)) {
+      errors.regionId = ['Please specify the region for this service centre'];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;

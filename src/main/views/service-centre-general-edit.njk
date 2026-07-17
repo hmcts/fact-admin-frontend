@@ -89,8 +89,8 @@
             },
             items: regionOptions,
             errorMessage: {
-              text: errors.regionId[0]
-            } if errors and errors.regionId else null
+              text: model.errors.regionId[0]
+            } if model.errors and model.errors.regionId else null
           }) }}
 
         </fieldset>

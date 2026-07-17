@@ -143,8 +143,8 @@ describe('ServiceCentreAddressService', () => {
       status: 'invalid',
       address: expect.objectContaining({
         errors: expect.objectContaining({
-          addressType: [
-            'A service centre can only have one listed address for visiting and this service centre already has one. Please edit the other visit address first.',
+          message: [
+            'Only a single address can be added for a service centre, and this service centre already has an address assigned.',
           ],
           addressLine1: [
             "Address line 1 must only include letters a to z, and special characters '(',')',':',',','.' and '-'",

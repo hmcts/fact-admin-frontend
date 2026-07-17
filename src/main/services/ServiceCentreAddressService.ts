@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { DpaAddress } from '../schemas/osDataSchema';
-import { ServiceCentreAddress, ServiceCentreAddressType } from '../schemas/serviceCentreAddressSchema';
+import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
 import {
   validateAddressLine1Field,
   validateAddressLine2Field,
@@ -87,7 +87,7 @@ export class ServiceCentreAddressService {
       return existingAddresses;
     }
 
-    const validationErrors = this.validateAddress(address, existingAddresses);
+    const validationErrors = this.validateAddress(address, existingAddresses, addressId);
     if (validationErrors) {
       return { status: 'invalid', address: { ...address, errors: validationErrors } };
     }
@@ -163,11 +163,21 @@ export class ServiceCentreAddressService {
 
   private validateAddress(
     address: Partial<ServiceCentreAddress>,
-    existingAddresses: ServiceCentreAddress[]
+    existingAddresses: ServiceCentreAddress[],
+    addressId?: string
   ): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
 
-    addError(errors, 'addressType', this.validateAddressType(address, existingAddresses));
+    if (!addressId && existingAddresses.length > 0) {
+      addError(errors, 'message', [
+        'Only a single address can be added for a service centre, and this service centre already has an address assigned.',
+      ]);
+    }
+
+    if (!address.addressType) {
+      addError(errors, 'addressType', ['Select an address type']);
+    }
+
     addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));
     addError(errors, 'addressLine2', validateAddressLine2Field(address.addressLine2 ?? undefined));
     addError(errors, 'townCity', validateTownCityField(address.townCity));
@@ -179,27 +189,5 @@ export class ServiceCentreAddressService {
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
-  }
-
-  private validateAddressType(
-    address: Partial<ServiceCentreAddress>,
-    existingAddresses: ServiceCentreAddress[]
-  ): string[] {
-    const addressTypeErrors: string[] = [];
-
-    if (!address.addressType) {
-      addressTypeErrors.push('Select an address type');
-    } else if (
-      address.addressType === ServiceCentreAddressType.VISIT_US &&
-      existingAddresses.some(
-        existingAddress => existingAddress.addressType === address.addressType && existingAddress.id !== address.id
-      )
-    ) {
-      addressTypeErrors.push(
-        'A service centre can only have one listed address for visiting and this service centre already has one. Please edit the other visit address first.'
-      );
-    }
-
-    return addressTypeErrors;
   }
 }

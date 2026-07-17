@@ -144,15 +144,28 @@ test.describe(
     });
 
     test('shows validation errors for missing required address fields', async ({
+      page,
       playwright,
+      serviceCentreAddressDeletePage,
+      serviceCentreAddressDeleteSuccessPage,
       serviceCentreAddressEditPage,
       serviceCentreAddressFindPage,
+      serviceCentreAddressListPage,
     }) => {
       await withCreatedServiceCentre(
         playwright,
         'Service Centre Edit Address Validation Functional Test',
         { open: true },
         async ({ createdServiceCentre }) => {
+          await reduceServiceCentreAddressesCount(
+            page,
+            serviceCentreAddressListPage,
+            serviceCentreAddressDeletePage,
+            serviceCentreAddressDeleteSuccessPage,
+            createdServiceCentre.id,
+            0
+          );
+
           await serviceCentreAddressFindPage.goto(createdServiceCentre.id);
           await serviceCentreAddressFindPage.clickEnterAddressManually();
           await serviceCentreAddressEditPage.clickSave();

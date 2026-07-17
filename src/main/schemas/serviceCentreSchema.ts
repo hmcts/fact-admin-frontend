@@ -7,7 +7,7 @@ export const serviceCentreSchema = z.object({
   lastUpdatedAt: z.string().optional(),
   name: z.string(),
   open: z.boolean(),
-  regionId: z.uuid(),
+  regionId: z.uuid().optional().nullable(),
   serviceAreaIds: z.array(z.uuid()).optional(),
   slug: z.string(),
   warningNotice: z.string().nullable().optional(),
