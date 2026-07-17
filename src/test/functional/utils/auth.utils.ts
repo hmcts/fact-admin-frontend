@@ -6,6 +6,8 @@ import { type Page, expect } from '@playwright/test';
 import { type UserDetails, config } from './config.utils';
 
 const APP_SESSION_COOKIE = 'appSession';
+const MIN_SESSION_TIMEOUT_MINS = 1;
+const MAX_SESSION_TIMEOUT_MINS = 30;
 
 export async function loginAs(page: Page, user: UserDetails): Promise<void> {
   await page.goto(config.urls.homePageUrl);
@@ -52,6 +54,16 @@ export async function logout(page: Page): Promise<void> {
 
 function isSessionFileCurrent(sessionFile: string): boolean {
   try {
+    const timeoutMins = config.sessionPersistence.sessionFileTimeoutMinutes;
+    if (
+      !config.sessionPersistence.keepSessionFiles ||
+      Number.isNaN(timeoutMins) ||
+      timeoutMins < MIN_SESSION_TIMEOUT_MINS ||
+      timeoutMins > MAX_SESSION_TIMEOUT_MINS
+    ) {
+      return false;
+    }
+
     const data = JSON.parse(fs.readFileSync(sessionFile, 'utf-8'));
     const cookies = Array.isArray(data?.cookies) ? data.cookies : [];
     const appSession = cookies.find(
@@ -62,7 +74,7 @@ function isSessionFileCurrent(sessionFile: string): boolean {
       return false;
     }
 
-    return appSession.expires * 1_000 - Date.now() > 2 * 60 * 60 * 1_000;
+    return appSession.expires * 1_000 - Date.now() > timeoutMins * 60 * 1000;
   } catch {
     return false;
   }
