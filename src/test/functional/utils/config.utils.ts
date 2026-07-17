@@ -20,6 +20,11 @@ interface Urls {
   homePageUrl: string;
 }
 
+interface SessionPersistence {
+  keepSessionFiles: boolean;
+  sessionFileTimeoutMinutes: number;
+}
+
 export interface Config {
   users: {
     admin: UserDetails;
@@ -27,6 +32,7 @@ export interface Config {
     viewer: UserDetails;
   };
   urls: Urls;
+  sessionPersistence: SessionPersistence;
 }
 
 export const config: Config = {
@@ -50,6 +56,10 @@ export const config: Config = {
   urls: {
     dataApiUrl: getEnvVar('DATA_API_URL', 'http://localhost:8989'),
     homePageUrl: getEnvVar('TEST_URL', getEnvVar('TEST_URL', 'https://localhost:3355')),
+  },
+  sessionPersistence: {
+    keepSessionFiles: getEnvVar('KEEP_SESSION_FILES', 'false').toLowerCase() === 'true',
+    sessionFileTimeoutMinutes: Number.parseInt(getEnvVar('SESSION_FILE_TIMEOUT_MINS', '0')),
   },
 };
 
