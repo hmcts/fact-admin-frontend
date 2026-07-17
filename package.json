@@ -18,7 +18,7 @@
     "test:coverage": "jest --coverage",
     "test:routes": "jest -c jest.routes.config.js",
     "test:smoke": "yarn playwright test --grep @smoke",
-    "test:functional": "yarn playwright test --grep-invert='@smoke'",
+    "test:functional": "NODE_OPTIONS=--no-deprecation yarn playwright test --grep-invert='@smoke'",
     "test:performance": "yarn playwright test --grep='@performance'",
     "test:a11y": "echo 'a11y tests run as part of test:functional' && exit 0",
     "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
