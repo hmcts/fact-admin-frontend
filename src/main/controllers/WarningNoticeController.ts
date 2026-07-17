@@ -4,9 +4,10 @@ import { Request, Response } from 'express';
 
 import { WarningNoticeForm, WarningNoticeService } from '../services/WarningNoticeService';
 import { renderResponse, renderStatus } from '../utils/responseRendering';
-import { isUuid, parseOptionalString, parseString } from '../utils/valueParsers';
+import { parseOptionalString, parseString } from '../utils/valueParsers';
 
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
+import { ensureValidCourtId } from './helpers/routeParams';
 
 const warningNoticeService = new WarningNoticeService();
 
@@ -16,11 +17,11 @@ export default class WarningNoticeController {
   public async get(req: Request, res: Response): Promise<void> {
     const courtId: string = parseString(req.params.courtId);
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!ensureValidCourtId(courtId, res)) {
       return;
     }
 
-    const viewModel = await warningNoticeService.getPage(courtId);
+    const viewModel = await warningNoticeService.getWarningNoticePage(courtId);
 
     return renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-warning-notice-edit');
   }
@@ -30,13 +31,14 @@ export default class WarningNoticeController {
   public async post(req: Request, res: Response): Promise<void> {
     const courtId: string = parseString(req.params.courtId);
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!ensureValidCourtId(courtId, res)) {
       return;
     }
 
+    const { warningNotice, warningNoticeCy } = req.body;
     const form: WarningNoticeForm = {
-      warningNotice: parseOptionalString(req.body.warningNotice),
-      warningNoticeCy: parseOptionalString(req.body.warningNoticeCy),
+      warningNotice: parseOptionalString(warningNotice),
+      warningNoticeCy: parseOptionalString(warningNoticeCy),
     };
 
     const saveResult = await warningNoticeService.save(courtId, form);
@@ -52,8 +54,13 @@ export default class WarningNoticeController {
       return renderStatus(res, saveResult.status, 'court-not-found');
     }
 
-    return res.render('court-warning-notice-save-success', {
+    return res.render('common-edit-success.njk', {
       ...saveResult.viewModel,
+      pageTitle: 'Warning notice saved',
+      successPanelTitle: 'Warning notice saved',
+      successPanelBody: `Warning notice for ${saveResult.viewModel.courtName} has been successfully updated.`,
+      continueUpdatingHref: `/courts/${courtId}/edit/warning-notice`,
+      continueUpdatingText: 'Back to warning notice',
       breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Warning notice saved'),
     });
   }
@@ -75,15 +82,5 @@ export default class WarningNoticeController {
       ...viewModel,
       breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, viewModel.courtName, currentPage),
     };
-  }
-
-  private validateUuid(value: string, res: Response, template: string): boolean {
-    if (!value || !isUuid(value)) {
-      res.status(HttpStatusCode.NotFound);
-      res.render(template);
-      return false;
-    }
-
-    return true;
   }
 }

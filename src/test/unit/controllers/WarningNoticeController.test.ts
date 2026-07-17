@@ -38,7 +38,7 @@ describe('WarningNoticeController', () => {
       errorSummary: [],
       pageTitle: 'Warning notice - Reading Crown Court',
     };
-    const getPage = stub(WarningNoticeService.prototype, 'getPage').resolves(viewModel);
+    const getPage = stub(WarningNoticeService.prototype, 'getWarningNoticePage').resolves(viewModel);
 
     await controller.get(request, response);
 
@@ -60,7 +60,7 @@ describe('WarningNoticeController', () => {
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
-    const getPage = stub(WarningNoticeService.prototype, 'getPage');
+    const getPage = stub(WarningNoticeService.prototype, 'getWarningNoticePage');
 
     await controller.get(request, response);
 
@@ -74,7 +74,7 @@ describe('WarningNoticeController', () => {
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
-    stub(WarningNoticeService.prototype, 'getPage').resolves(HttpStatusCode.NotFound);
+    stub(WarningNoticeService.prototype, 'getWarningNoticePage').resolves(HttpStatusCode.NotFound);
 
     await controller.get(request, response);
 
@@ -171,6 +171,11 @@ describe('WarningNoticeController', () => {
 
     const expectedViewModel = {
       ...viewModel,
+      pageTitle: 'Warning notice saved',
+      successPanelTitle: 'Warning notice saved',
+      successPanelBody: `Warning notice for ${viewModel.courtName} has been successfully updated.`,
+      continueUpdatingHref: `/courts/${courtId}/edit/warning-notice`,
+      continueUpdatingText: 'Back to warning notice',
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
@@ -184,7 +189,7 @@ describe('WarningNoticeController', () => {
       warningNotice: ' English warning notice ',
       warningNoticeCy: ' Rhybudd Cymraeg ',
     });
-    expect(response.render).toHaveBeenCalledWith('court-warning-notice-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', expectedViewModel);
   });
 
   test('renders court not found when save returns 404 status', async () => {

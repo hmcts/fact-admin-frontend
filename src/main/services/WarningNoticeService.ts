@@ -1,6 +1,11 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { isHttpStatusCode } from '../utils/valueParsers';
+
+const ENGLISH_WARNING_NOTICE_ALLOWED_CHARACTERS = /^[\p{L}\p{N}\s.,'":;()!?-]*$/u;
+
+const WELSH_WARNING_NOTICE_ALLOWED_CHARACTERS = /^[\p{L}\p{N}\s.,'":;()!?-]*$/u;
 
 export type WarningNoticeForm = {
   warningNotice?: string;
@@ -29,10 +34,10 @@ export type SaveWarningNoticeResult =
 export class WarningNoticeService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
 
-  public async getPage(courtId: string): Promise<WarningNoticeViewModel | HttpStatusCode> {
+  public async getWarningNoticePage(courtId: string): Promise<WarningNoticeViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -52,7 +57,7 @@ export class WarningNoticeService {
   public async save(courtId: string, form: WarningNoticeForm): Promise<SaveWarningNoticeResult> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return { status: courtResponse, type: 'status' };
     }
 
@@ -72,15 +77,34 @@ export class WarningNoticeService {
       };
     }
 
+    const { warningNotice, warningNoticeCy } = form;
     const payload = {
       ...courtResponse,
-      warningNotice: form.warningNotice?.trim() || null,
-      warningNoticeCy: form.warningNoticeCy?.trim() || null,
+      warningNotice: warningNotice?.trim() || null,
+      warningNoticeCy: warningNoticeCy?.trim() || null,
     };
 
     const updateResponse = await this.dataApiRequests.updateCourt(payload);
 
-    if (this.isHttpStatusCode(updateResponse)) {
+    if (updateResponse instanceof Map) {
+      const apiErrors: Record<string, string> = {};
+      for (const [key, value] of updateResponse) {
+        apiErrors[key] = value;
+      }
+      return {
+        type: 'validation_error',
+        viewModel: {
+          courtId,
+          courtName: courtResponse.name,
+          form,
+          errors: apiErrors,
+          errorSummary: this.toErrorSummary(apiErrors),
+          pageTitle: `Error: Warning notice - ${courtResponse.name}`,
+        },
+      };
+    }
+
+    if (isHttpStatusCode(updateResponse)) {
       return { status: updateResponse, type: 'status' };
     }
 
@@ -96,20 +120,29 @@ export class WarningNoticeService {
   private validate(form: WarningNoticeForm): Record<string, string> {
     const errors: Record<string, string> = {};
 
-    if (form.warningNotice && !form.warningNoticeCy) {
+    const { warningNotice, warningNoticeCy } = form;
+    if (warningNotice && !warningNoticeCy) {
       errors.warningNoticeCy = 'Because you provided an explanation in English, the Welsh translation is now mandatory';
     }
 
-    if (form.warningNoticeCy && !form.warningNotice) {
+    if (warningNoticeCy && !warningNotice) {
       errors.warningNotice = 'Because you provided an explanation in Welsh, the English translation is now mandatory';
     }
 
-    if (form.warningNotice && form.warningNotice.length > 250) {
+    if (warningNotice && warningNotice.length > 250) {
       errors.warningNotice = 'Warning notice must be 250 characters or less';
     }
 
-    if (form.warningNoticeCy && form.warningNoticeCy.length > 250) {
+    if (warningNoticeCy && warningNoticeCy.length > 250) {
       errors.warningNoticeCy = 'Welsh warning notice must be 250 characters or less';
+    }
+
+    if (warningNotice && !ENGLISH_WARNING_NOTICE_ALLOWED_CHARACTERS.test(warningNotice)) {
+      errors.warningNotice = 'Warning notice contains invalid characters';
+    }
+
+    if (warningNoticeCy && !WELSH_WARNING_NOTICE_ALLOWED_CHARACTERS.test(warningNoticeCy)) {
+      errors.warningNoticeCy = 'Welsh warning notice contains invalid characters';
     }
 
     return errors;
@@ -117,9 +150,5 @@ export class WarningNoticeService {
 
   private toErrorSummary(errors: Record<string, string>): { href: string; text: string }[] {
     return Object.entries(errors).map(([field, text]) => ({ href: `#${field}`, text }));
-  }
-
-  private isHttpStatusCode(value: unknown): value is HttpStatusCode {
-    return typeof value === 'number';
   }
 }

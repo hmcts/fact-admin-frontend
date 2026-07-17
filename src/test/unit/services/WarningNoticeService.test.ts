@@ -30,7 +30,7 @@ describe('WarningNoticeService', () => {
   test('returns warning notice page view model', async () => {
     const { getCourtById, service } = buildService();
 
-    const result = await service.getPage(courtId);
+    const result = await service.getWarningNoticePage(courtId);
 
     expect(getCourtById).toHaveBeenCalledWith(courtId);
     expect(result).toEqual({
@@ -51,7 +51,7 @@ describe('WarningNoticeService', () => {
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     });
 
-    const result = await service.getPage(courtId);
+    const result = await service.getWarningNoticePage(courtId);
 
     expect(result).toBe(HttpStatusCode.InternalServerError);
   });
@@ -163,6 +163,37 @@ describe('WarningNoticeService', () => {
         errorSummary: [
           { href: '#warningNotice', text: 'Warning notice must be 250 characters or less' },
           { href: '#warningNoticeCy', text: 'Welsh warning notice must be 250 characters or less' },
+        ],
+        pageTitle: 'Error: Warning notice - Reading Crown Court',
+      },
+    });
+    expect(updateCourt).not.toHaveBeenCalled();
+  });
+
+  test('returns validation_error when warning notices contain invalid characters', async () => {
+    const { updateCourt, service } = buildService();
+
+    const result = await service.save(courtId, {
+      warningNotice: 'Temporary closure @ 5pm',
+      warningNoticeCy: 'Cau dros dro @ 5pm',
+    });
+
+    expect(result).toEqual({
+      type: 'validation_error',
+      viewModel: {
+        courtId,
+        courtName: 'Reading Crown Court',
+        form: {
+          warningNotice: 'Temporary closure @ 5pm',
+          warningNoticeCy: 'Cau dros dro @ 5pm',
+        },
+        errors: {
+          warningNotice: 'Warning notice contains invalid characters',
+          warningNoticeCy: 'Welsh warning notice contains invalid characters',
+        },
+        errorSummary: [
+          { href: '#warningNotice', text: 'Warning notice contains invalid characters' },
+          { href: '#warningNoticeCy', text: 'Welsh warning notice contains invalid characters' },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
       },
