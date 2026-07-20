@@ -227,7 +227,7 @@ describe('ServiceCentreAddressService', () => {
 
     const service = new ServiceCentreAddressService();
 
-    await expect(service.save(newAddress, serviceCentreId)).resolves.toEqual({
+    await expect(service.save(newAddress, serviceCentreId, undefined, true)).resolves.toEqual({
       status: 'saved',
       address: newAddress,
       serviceCentreOpened: true,

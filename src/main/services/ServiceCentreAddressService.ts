@@ -80,7 +80,8 @@ export class ServiceCentreAddressService {
   public async save(
     address: Partial<ServiceCentreAddress>,
     serviceCentreId: string,
-    addressId?: string
+    addressId?: string,
+    isNewSC: boolean = false
   ): Promise<SaveServiceCentreAddressResponse> {
     const existingAddresses = await this.list(serviceCentreId);
     if (typeof existingAddresses === 'number') {
@@ -117,7 +118,7 @@ export class ServiceCentreAddressService {
     }
 
     let serviceCentreOpened = false;
-    if (!addressId && existingAddresses.length === 0 && !serviceCentreResponse.open) {
+    if (!addressId && existingAddresses.length === 0 && !serviceCentreResponse.open && isNewSC) {
       const openServiceCentreResponse = await this.dataApiRequests.updateServiceCentre({
         ...serviceCentreResponse,
         open: true,

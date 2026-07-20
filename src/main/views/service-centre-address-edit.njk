@@ -27,6 +27,11 @@
       {% endset %}
 
       <form action="{{ actionUrl }}" method="post">
+
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
+
         {% call govukFieldset({
           legend: {
             text: "Enter an address",

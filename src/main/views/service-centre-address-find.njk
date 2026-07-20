@@ -32,7 +32,9 @@
 
       <form method="GET" action="{{ actionUrl }}">
         <p class="govuk-body">Update or add an address using postcode lookup or edit manually.</p>
-
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
         {{ govukInput({
           label: {
             text: "Postcode"
@@ -65,6 +67,9 @@
       {% endset %}
 
       <form method="POST" action="{{ manualEditUrl }}">
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"

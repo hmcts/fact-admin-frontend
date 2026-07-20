@@ -31,6 +31,11 @@
       <p class="govuk-body">Postcode: {{ postcode }}.</p>
 
       <form method="POST" action="{{ actionUrl }}">
+
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
+
         {{ govukSelect({
           id: "address",
           name: "address",
@@ -46,6 +51,11 @@
       </form>
 
       <form method="POST" action="{{ actionUrl }}">
+
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
+
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"

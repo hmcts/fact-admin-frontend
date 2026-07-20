@@ -41,12 +41,15 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const isNewSC = req.query?.isNewSC === 'true';
+
     res.render('service-centre-address-list', {
       pageTitle: `Address - ${serviceCentreName}`,
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName),
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, undefined, isNewSC),
       serviceCentreAddresses: addressesResponse,
       serviceCentreId,
       serviceCentreName,
+      isNewSC,
     });
   }
 
@@ -64,11 +67,19 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const isNewSC = req.query?.isNewSC === 'true';
+
     res.render('service-centre-address-find', {
       pageTitle: 'Find Address',
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+      breadcrumbs: this.buildAddressBreadcrumbs(
+        serviceCentreId,
+        serviceCentreName,
+        'Find address by postcode',
+        isNewSC
+      ),
       serviceCentreName,
       serviceCentreId,
+      isNewSC,
     });
   }
 
@@ -121,15 +132,23 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const isNewSC = req.query?.isNewSC === 'true';
+
     const postcode = req.query?.postcode as string;
     if (!isValidPostcode(postcode)) {
       res.render('service-centre-address-find', {
         error: validatePostcodeField(postcode),
         pageTitle: 'Find Address',
-        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+        breadcrumbs: this.buildAddressBreadcrumbs(
+          serviceCentreId,
+          serviceCentreName,
+          'Find address by postcode',
+          isNewSC
+        ),
         serviceCentreName,
         serviceCentreId,
         postcode,
+        isNewSC,
       });
       return;
     }
@@ -148,21 +167,33 @@ export default class ServiceCentreAddressController {
       res.render('service-centre-address-find', {
         error: searchResponse.error,
         pageTitle: 'Find Address',
-        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+        breadcrumbs: this.buildAddressBreadcrumbs(
+          serviceCentreId,
+          serviceCentreName,
+          'Find address by postcode',
+          isNewSC
+        ),
         serviceCentreName,
         serviceCentreId,
         postcode,
+        isNewSC,
       });
       return;
     }
 
     res.render('service-centre-address-select', {
       addresses: searchResponse,
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
+      breadcrumbs: this.buildAddressBreadcrumbs(
+        serviceCentreId,
+        serviceCentreName,
+        'Find address by postcode',
+        isNewSC
+      ),
       serviceCentreName,
       pageTitle: 'Select Address',
       postcode,
       serviceCentreId,
+      isNewSC,
     });
   }
 
@@ -243,7 +274,15 @@ export default class ServiceCentreAddressController {
       return;
     }
 
-    await this.renderAddressEdit(res, serviceCentreId, serviceCentreName, undefined, undefined, req.body?.address);
+    await this.renderAddressEdit(
+      res,
+      serviceCentreId,
+      serviceCentreName,
+      undefined,
+      undefined,
+      req.body?.address,
+      req.body?.isNewSC === 'true'
+    );
   }
 
   @route('/details/success')
@@ -260,9 +299,13 @@ export default class ServiceCentreAddressController {
       return;
     }
 
+    const isNewSC = req.body?.isNewSC === 'true';
+
     const saveResult = await serviceCentreAddressService.save(
       this.buildAddressFromRequestBody(req.body, serviceCentreId),
-      serviceCentreId
+      serviceCentreId,
+      undefined,
+      isNewSC
     );
 
     if (saveResult === HttpStatusCode.NotFound) {
@@ -275,7 +318,15 @@ export default class ServiceCentreAddressController {
     }
 
     if (saveResult.status === 'invalid') {
-      await this.renderAddressEdit(res, serviceCentreId, serviceCentreName, undefined, saveResult.address);
+      await this.renderAddressEdit(
+        res,
+        serviceCentreId,
+        serviceCentreName,
+        undefined,
+        saveResult.address,
+        undefined,
+        isNewSC
+      );
       return;
     }
 
@@ -436,7 +487,8 @@ export default class ServiceCentreAddressController {
     serviceCentreName: string,
     addressId?: string,
     addressModel?: Partial<ServiceCentreAddress>,
-    dpaAddressData?: string
+    dpaAddressData?: string,
+    isNewSC: boolean = false
   ): Promise<void> {
     const address = dpaAddressData ? this.buildAddressData(dpaAddressData, addressModel) : (addressModel ?? {});
 
@@ -444,9 +496,10 @@ export default class ServiceCentreAddressController {
       address,
       addressId,
       pageTitle: 'Address',
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Edit address'),
+      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Edit address', isNewSC),
       serviceCentreName,
       serviceCentreId,
+      isNewSC,
     });
   }
 
@@ -522,8 +575,13 @@ export default class ServiceCentreAddressController {
     return response;
   }
 
-  private buildAddressBreadcrumbs(serviceCentreId: string, serviceCentreName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(
+  private buildAddressBreadcrumbs(
+    serviceCentreId: string,
+    serviceCentreName: string,
+    currentPage?: string,
+    isNewSC: boolean = false
+  ) {
+    const breadcrumbs = buildSectionBreadcrumbs(
       serviceCentreId,
       serviceCentreName,
       'Addresses',
@@ -531,5 +589,11 @@ export default class ServiceCentreAddressController {
       currentPage,
       SubjectType.SERVICE_CENTRE
     );
+
+    if (isNewSC) {
+      breadcrumbs[2].href += '?isNewSC=true';
+    }
+
+    return breadcrumbs;
   }
 }

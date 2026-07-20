@@ -131,7 +131,7 @@ test.describe(
           await expect(addServiceCentrePage.mainContent.content).toContainText(
             'If you do not add an address, this service centre will be marked as closed.'
           );
-          await expect(addServiceCentrePage.page).toHaveURL(/\/service-centres\/[^/]+\/edit\/address$/);
+          await expect(addServiceCentrePage.page).toHaveURL(/\/service-centres\/[^/]+\/edit\/address\?isNewSC=true$/);
         }
       );
     });
@@ -175,7 +175,7 @@ test.describe(
 
         await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
         const redirectStart = Date.now();
-        await expect(addServiceCentrePage.page).toHaveURL(/\/service-centres\/[^/]+\/edit\/address$/, {
+        await expect(addServiceCentrePage.page).toHaveURL(/\/service-centres\/[^/]+\/edit\/address\?isNewSC=true$/, {
           timeout: 9000,
         });
         expect(Date.now() - redirectStart).toBeGreaterThanOrEqual(6900);
