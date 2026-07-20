@@ -1,10 +1,10 @@
 # ---- Base image ----
 FROM hmctsprod.azurecr.io/base/node:22-alpine as base
-COPY --chown=hmcts:hmcts . .
+COPY --chown=65532:65532 . .
 USER root
 RUN corepack enable
 WORKDIR /opt/app
-USER hmcts
+USER 65532:65532
 
 # ---- Build image ----
 FROM base as build
