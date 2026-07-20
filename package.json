@@ -29,7 +29,7 @@
     "@hmcts/info-provider": "^1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/nodejs-logging": "^4.0.4",
-    "@hmcts/properties-volume": "1.4.0",
+    "@hmcts/properties-volume": "1.4.1",
     "@ministryofjustice/frontend": "9.0.0",
     "applicationinsights": "3.15.1",
     "async-mutex": "0.5.0",
