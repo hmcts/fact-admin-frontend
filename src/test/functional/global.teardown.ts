@@ -22,9 +22,11 @@ async function globalTeardown(): Promise<void> {
     await apiContext.dispose();
   }
 
-  await cleanupSession(config.users.admin.sessionFile);
-  await cleanupSession(config.users.superAdmin.sessionFile);
-  await cleanupSession(config.users.viewer.sessionFile);
+  if (!config.sessionPersistence.keepSessionFiles) {
+    await cleanupSession(config.users.admin.sessionFile);
+    await cleanupSession(config.users.superAdmin.sessionFile);
+    await cleanupSession(config.users.viewer.sessionFile);
+  }
 }
 
 async function cleanupSession(sessionFile: string): Promise<void> {
