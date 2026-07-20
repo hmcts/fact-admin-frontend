@@ -387,9 +387,7 @@ export class HomePageViewService {
     const tooltipId = `favourite-tooltip-${table}-${location.locationType.toLowerCase()}-${location.id}`;
     const escapedName = this.escapeHtml(location.name);
     const escapedReturnPath = this.escapeHtml(returnPath);
-    const accessibleLabel = favourite
-      ? `Remove ${escapedName} from favourites`
-      : `Add ${escapedName} to favourites`;
+    const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
 
     return {
       html: [
