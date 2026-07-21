@@ -83,15 +83,4 @@ describe('Add Service Centre View', () => {
     expect(html).toContain(`data-redirect-url="/service-centres/${serviceCentreId}/edit/address"`);
     expect(html).toContain('Continue to add an address for National Business Centre');
   });
-
-  test('renders the service centre address placeholder', () => {
-    const html = env.render('service-centre-address-placeholder.njk', {
-      pagePath: '/service-centres/11111111-1111-4111-8111-111111111111/edit/address',
-      pageTitle: 'Service centre address',
-    });
-
-    expect(html).toContain('Service centre address');
-    expect(html).toContain('If you do not add an address, this service centre will be marked as closed.');
-    expect(html).toContain('Back to courts, tribunals and service centres');
-  });
 });

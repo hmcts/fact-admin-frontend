@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
 import { CourtEntity } from '../../../main/schemas/courtEntitySchema';
-import { CourtAddressService, POSTCODE_ERROR_MESSAGES } from '../../../main/services/CourtAddressService';
+import { CourtAddressService } from '../../../main/services/CourtAddressService';
 
 describe('CourtAddressService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -510,19 +510,6 @@ describe('CourtAddressService', () => {
     const result = await service.retrieveCourtName(courtId);
 
     expect(result).toBe(HttpStatusCode.NotFound);
-  });
-
-  test('returns postcode validation messages and boolean validity', () => {
-    const service = new CourtAddressService();
-
-    expect(service.validatePostcode(undefined)).toBe(POSTCODE_ERROR_MESSAGES.blankPostcode);
-    expect(service.validatePostcode('   ')).toBe(POSTCODE_ERROR_MESSAGES.blankPostcode);
-    expect(service.validatePostcode('abc')).toBe(POSTCODE_ERROR_MESSAGES.invalidPostcode);
-    expect(service.validatePostcode('BT1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.northernIrelandPostcode);
-    expect(service.validatePostcode('JE1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.jerseyPostcode);
-    expect(service.validatePostcode('IM1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.isleOfManPostcode);
-    expect(service.isValidPostcode('SW1A 1AA')).toBe(true);
-    expect(service.isValidPostcode('GY1 1AA')).toBe(false);
   });
 
   test('returns invalid response when attempting to delete the last address', async () => {

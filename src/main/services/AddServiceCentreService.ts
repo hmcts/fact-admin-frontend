@@ -139,7 +139,7 @@ export class AddServiceCentreService {
     }
 
     return {
-      addressRedirectUrl: `/service-centres/${createResponse.id}/edit/address`,
+      addressRedirectUrl: `/service-centres/${createResponse.id}/edit/address?isNewSC=true`,
       pagePath: '/add-service-centre/success',
       pageTitle: `New service centre created - ${createResponse.name}`,
       serviceCentreId: createResponse.id,

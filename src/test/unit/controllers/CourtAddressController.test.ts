@@ -4,8 +4,9 @@ import { assert, match, mock, stub } from 'sinon';
 
 import { CourtAddressController } from '../../../main/controllers/CourtAddressController';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
-import { CourtAddressService, POSTCODE_ERROR_MESSAGES } from '../../../main/services/CourtAddressService';
+import { CourtAddressService } from '../../../main/services/CourtAddressService';
 import { TypesService } from '../../../main/services/TypesService';
+import * as addressValidation from '../../../main/utils/addressValidation';
 import { mockRequest } from '../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
@@ -138,7 +139,7 @@ describe('CourtAddressController', () => {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         courtId: COURT_ID,
         pageTitle: 'Find Address',
-        error: POSTCODE_ERROR_MESSAGES.blankPostcode,
+        error: addressValidation.POSTCODE_ERROR_MESSAGES.blankPostcode,
       });
 
     try {
@@ -556,7 +557,7 @@ describe('CourtAddressController', () => {
         courtId: COURT_ID,
         addressId: ADDRESS_ID,
         pageTitle: 'Find Address',
-        error: POSTCODE_ERROR_MESSAGES.blankPostcode,
+        error: addressValidation.POSTCODE_ERROR_MESSAGES.blankPostcode,
       });
 
     try {
