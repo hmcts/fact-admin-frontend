@@ -50,7 +50,7 @@ const superAdminRoutes = ['/audits', '/users'];
 const viewerGetRoutes = [
   /^\/$/,
   /^\/courts\/[^/]+\/edit$/,
-  /^\/courts\/[^/]+\/edit\/(?:accessibility|address|building-facilities|cases-heard|general|information-for-professionals|local-authorities|single-point-of-entry|translation-and-interpretation|approve)$/,
+  /^\/courts\/[^/]+\/edit\/(?:accessibility|address|building-facilities|cases-heard|general|information-for-professionals|local-authorities|single-point-of-entry|translation-and-interpretation|approve|photo)$/,
   /^\/courts\/[^/]+\/edit\/contact-details(?:\/edit\/[^/]+)?$/,
   /^\/courts\/[^/]+\/edit\/court-opening-hours(?:\/edit\/[^/]+)?$/,
   /^\/service-centres\/[^/]+\/edit(?:\/(?:address|approve))?$/,
