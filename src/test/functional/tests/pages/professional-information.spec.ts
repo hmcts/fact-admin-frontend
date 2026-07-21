@@ -207,8 +207,10 @@ test.describe('Information for Professionals Page Tests', () => {
         await professionalInformationPage.page.locator('#gbs').fill('GBS123');
         await professionalInformationPage.dxCodeInput(0).fill('DX 12345');
         await professionalInformationPage.dxCodeDescriptionInput(0).fill('Main DX code');
+        await professionalInformationPage.dxCodeDescriptionCyInput(0).fill('Prif esboniad DX');
         await professionalInformationPage.faxNumberInput(0).fill('01273 800 900');
         await professionalInformationPage.faxNumberDescriptionInput(0).fill('Crown court fax');
+        await professionalInformationPage.faxNumberDescriptionCyInput(0).fill('Disgrifiad ffacs y llys');
         await professionalInformationPage.selectRadio('interviewRooms', 'Yes');
         await professionalInformationPage.page.locator('#interviewRoomCount').fill('2');
         await professionalInformationPage.page.locator('#interviewPhoneNumber').fill('020 7450 4000');
@@ -244,8 +246,10 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.page.locator('#gbs')).toHaveValue('GBS123');
         await expect(professionalInformationPage.dxCodeInput(0)).toHaveValue('DX 12345');
         await expect(professionalInformationPage.dxCodeDescriptionInput(0)).toHaveValue('Main DX code');
+        await expect(professionalInformationPage.dxCodeDescriptionCyInput(0)).toHaveValue('Prif esboniad DX');
         await expect(professionalInformationPage.faxNumberInput(0)).toHaveValue('01273 800 900');
         await expect(professionalInformationPage.faxNumberDescriptionInput(0)).toHaveValue('Crown court fax');
+        await expect(professionalInformationPage.faxNumberDescriptionCyInput(0)).toHaveValue('Disgrifiad ffacs y llys');
         await expect(
           professionalInformationPage.page.locator('input[name="interviewRooms"][value="true"]')
         ).toBeChecked();

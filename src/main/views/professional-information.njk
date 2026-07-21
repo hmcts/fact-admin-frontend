@@ -6,7 +6,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% macro repeatableSection(type, heading, entries, addButtonText, removeButtonText, firstLabel, secondLabel, firstHint, secondHint) %}
+{% macro repeatableSection(type, heading, entries, addButtonText, removeButtonText, firstLabel, secondLabel,thirdLabel, firstHint, secondHint,thirdHint) %}
   <div data-professional-information-list="{{ type }}" data-professional-information-max="5">
     {% for entry in entries %}
       {% set index = loop.index0 %}
@@ -47,6 +47,23 @@
           errorMessage: {
             text: fieldErrors[type + "Description-" + index]
           } if fieldErrors[type + "Description-" + index] else null
+        }) }}
+
+        {{ govukInput({
+          label: {
+            text: thirdLabel,
+            classes: "govuk-!-margin-bottom-1"
+          },
+          hint: {
+            text: thirdHint
+          } if secondHint else null,
+          classes: "govuk-input--width-20",
+          id: type + "DescriptionCy-" + index,
+          name: type + "DescriptionCy-" + index,
+          value: entry.descriptionCy,
+          errorMessage: {
+            text: fieldErrors[type + "DescriptionCy-" + index]
+          } if fieldErrors[type + "DescriptionCy-" + index] else null
         }) }}
 
         {% if not loop.first and not isViewer %}
@@ -176,8 +193,10 @@
           "Remove DX code",
           "DX code",
           "Explanation",
+          "Explanation (Welsh)",
           "Please enter the DX code you wish to display.",
-          "Enter the explanation text for this DX code."
+          "Enter the explanation text for this DX code.",
+          "Enter the explanation text for this DX code in Welsh."
         ) }}
 
         <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Fax numbers</h2>
@@ -189,6 +208,8 @@
           "Remove Fax number",
           "Fax number",
           "Description",
+          "Description (Welsh)",
+          "",
           "",
           ""
         ) }}

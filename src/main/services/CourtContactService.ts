@@ -9,6 +9,7 @@ import { parseString } from '../utils/valueParsers';
 export type CourtContactFormValues = {
   contactEmail: string;
   contactExplanation: string;
+  contactExplanationCy: string;
   contactMethods: string[];
   contactTelephone: string;
 };
@@ -21,6 +22,7 @@ export type CourtContactValidationError = {
 export type CourtContactFormErrors = {
   contactEmail?: string;
   contactExplanation?: string;
+  contactExplanationCy?: string;
   contactMethods?: string;
   contactTelephone?: string;
   contactType?: string;
@@ -152,6 +154,7 @@ export class CourtContactService {
     return {
       contactEmail: '',
       contactExplanation: '',
+      contactExplanationCy: '',
       contactMethods: [],
       contactTelephone: '',
     };
@@ -165,6 +168,7 @@ export class CourtContactService {
     return {
       contactEmail: contactDetail.email ?? '',
       contactExplanation: contactDetail.explanation ?? '',
+      contactExplanationCy: contactDetail.explanationCy ?? '',
       contactMethods,
       contactTelephone: contactDetail.phoneNumber ?? '',
     };
@@ -179,6 +183,7 @@ export class CourtContactService {
       courtId,
       courtContactDescriptionId: parseString(body['contact-type']),
       explanation: parseString(body['contact-explanation']),
+      explanationCy: parseString(body['contact-explanation']) ? parseString(body['contact-explanation-cy']) : undefined,
       email: includesEmail ? parseString(body['contact-email']) : undefined,
       phoneNumber: includesPhone ? parseString(body['contact-telephone']) : undefined,
     };
@@ -193,6 +198,7 @@ export class CourtContactService {
     const formValues: CourtContactFormValues = {
       contactEmail,
       contactExplanation: parseString(body['contact-explanation']),
+      contactExplanationCy: parseString(body['contact-explanation-cy']),
       contactMethods: selectedContactMethods,
       contactTelephone,
     };
@@ -231,13 +237,40 @@ export class CourtContactService {
     }
 
     const contactExplanation = formValues.contactExplanation;
-    if (contactExplanation.length > maxExplanationLength) {
-      formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
-      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-    } else if (contactExplanation && !explanationPattern.test(contactExplanation)) {
-      formErrors.contactExplanation =
-        'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
-      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
+    const contactExplanationCy = formValues.contactExplanationCy;
+
+    if (contactExplanation) {
+      if (contactExplanation.length > maxExplanationLength) {
+        formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
+        errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
+      } else if (!explanationPattern.test(contactExplanation)) {
+        formErrors.contactExplanation =
+          'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+        errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
+      }
+
+      if (!contactExplanationCy) {
+        formErrors.contactExplanationCy =
+          'Because you provided an explanation in English, the Welsh translation is now mandatory';
+        errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
+      }
+    }
+
+    if (contactExplanationCy) {
+      if (!contactExplanation) {
+        formErrors.contactExplanation =
+          'Because you provided an explanation in Welsh, the English translation is now mandatory';
+        errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
+      }
+
+      if (contactExplanationCy.length > maxExplanationLength) {
+        formErrors.contactExplanationCy = 'Welsh translation must be 250 characters or fewer';
+        errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
+      } else if (!explanationPattern.test(contactExplanationCy)) {
+        formErrors.contactExplanationCy =
+          'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+        errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
+      }
     }
 
     return {
@@ -414,6 +447,7 @@ export class CourtContactService {
       email: { formField: 'contactEmail', href: '#contact-email' },
       phoneNumber: { formField: 'contactTelephone', href: '#contact-telephone' },
       explanation: { formField: 'contactExplanation', href: '#contact-explanation' },
+      explanationCy: { formField: 'contactExplanationCy', href: '#contact-explanation-cy' },
     };
 
     for (const [field, message] of apiErrors.entries()) {

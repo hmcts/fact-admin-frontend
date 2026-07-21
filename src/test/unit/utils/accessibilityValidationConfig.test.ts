@@ -157,6 +157,7 @@ describe('accessibilityValidationConfig.validate', () => {
       liftDoorLimit: 500,
       quietRoom: true,
       accessibleToiletDescription: 'Ground floor and first floor',
+      accessibleToiletDescriptionCy: 'Llawr gwaelod a llawr cyntaf',
       hearingEnhancementEquipment: 'infrared',
     });
 

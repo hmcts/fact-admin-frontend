@@ -3,7 +3,13 @@
 // GOV.UK conditional radios currently add aria-expanded to radio inputs, which axe rejects for role=radio.
 type RepeatableType = 'dxCode' | 'faxNumber';
 
-type RepeatableFieldName = 'dxCode' | 'dxCodeDescription' | 'faxNumber' | 'faxNumberDescription';
+type RepeatableFieldName =
+  | 'dxCode'
+  | 'dxCodeDescription'
+  | 'dxCodeDescriptionCy'
+  | 'faxNumber'
+  | 'faxNumberDescription'
+  | 'faxNumberDescriptionCy';
 
 type RepeatableFieldConfig = {
   hint?: string;
@@ -38,6 +44,11 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
         name: 'dxCodeDescription',
         hint: 'Enter the explanation text for this DX code.',
       },
+      {
+        label: 'Explanation (Welsh)',
+        name: 'dxCodeDescriptionCy',
+        hint: 'Enter the welsh explanation text for this DX code.',
+      },
     ],
     removeText: 'Remove DX code',
   },
@@ -51,6 +62,10 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
       {
         label: 'Description',
         name: 'faxNumberDescription',
+      },
+      {
+        label: 'Description (Welsh)',
+        name: 'faxNumberDescriptionCy',
       },
     ],
     removeText: 'Remove Fax number',

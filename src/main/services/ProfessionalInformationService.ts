@@ -22,6 +22,7 @@ export type ProfessionalInformationError = {
 export type ProfessionalInformationEntry = {
   code?: string;
   description?: string;
+  descriptionCy?: string;
   formIndex?: number;
 };
 
@@ -234,9 +235,9 @@ export class ProfessionalInformationService {
       courtId,
       courtName,
       courtTypeOptions,
-      dxCodes: this.toEntries(professionalInformation?.dxCodes, 'dxCode', 'explanation'),
+      dxCodes: this.toEntries(professionalInformation?.dxCodes, 'dxCode', 'explanation', 'explanationCy'),
       errorSummary: [],
-      faxNumbers: this.toEntries(professionalInformation?.faxNumbers, 'faxNumber', 'description'),
+      faxNumbers: this.toEntries(professionalInformation?.faxNumbers, 'faxNumber', 'description', 'descriptionCy'),
       fieldErrors: {},
       gbs: codes?.gbs ?? '',
       interviewPhoneNumber: professionalInformation?.professionalInformation.interviewPhoneNumber ?? '',
@@ -271,9 +272,9 @@ export class ProfessionalInformationService {
       courtId,
       courtName,
       courtTypeOptions,
-      dxCodes: this.extractRepeatableEntries(form, 'dxCode', 'dxCodeDescription'),
+      dxCodes: this.extractRepeatableEntries(form, 'dxCode', 'dxCodeDescription', 'dxCodeDescriptionCy'),
       errorSummary: [],
-      faxNumbers: this.extractRepeatableEntries(form, 'faxNumber', 'faxNumberDescription'),
+      faxNumbers: this.extractRepeatableEntries(form, 'faxNumber', 'faxNumberDescription', 'faxNumberDescriptionCy'),
       fieldErrors: {},
       gbs: this.toString(form.gbs),
       interviewPhoneNumber: this.toString(form.interviewPhoneNumber),
@@ -334,10 +335,31 @@ export class ProfessionalInformationService {
       const formIndex = dxCode.formIndex ?? index;
       const code = dxCode.code?.trim() ?? '';
       const description = dxCode.description?.trim() ?? '';
+      const descriptionCy = dxCode.descriptionCy?.trim() ?? '';
+      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
+      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
       if (description && !code) {
         errors.push({
           href: `#dxCode-${formIndex}`,
           text: `DX code ${formIndex + 1}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
+        });
+      }
+      if (descriptionCy && !code) {
+        errors.push({
+          href: `#dxCode-${formIndex}`,
+          text: `DX code ${formIndex + 1}: You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation`,
+        });
+      }
+      if (hasEnglishDescriptionOnly) {
+        errors.push({
+          href: `#dxCodeDescriptionCy-${formIndex}`,
+          text: `DX code ${formIndex + 1}: Because you provided an explanation in English, the Welsh translation is now mandatory`,
+        });
+      }
+      if (hasWelshDescriptionOnly) {
+        errors.push({
+          href: `#dxCodeDescription-${formIndex}`,
+          text: `DX code ${formIndex + 1}: Because you provided an explanation in Welsh, the English translation is now mandatory`,
         });
       }
       if (code.length > dxCodeMaxLength) {
@@ -362,21 +384,53 @@ export class ProfessionalInformationService {
           text: `DX code ${formIndex + 1} explanation: ${invalidCharactersError}`,
         });
       }
+      if (descriptionCy.length > repeatableDescriptionMaxLength) {
+        errors.push({
+          href: `#dxCodeDescriptionCy-${formIndex}`,
+          text: `DX code ${formIndex + 1} Welsh explanation: DX Welsh explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
+        });
+      } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
+        errors.push({
+          href: `#dxCodeDescriptionCy-${formIndex}`,
+          text: `DX code ${formIndex + 1} Welsh explanation: ${invalidCharactersError}`,
+        });
+      }
     });
 
     viewModel.faxNumbers.forEach((faxNumber, index) => {
       const formIndex = faxNumber.formIndex ?? index;
       const code = faxNumber.code?.trim() ?? '';
       const description = faxNumber.description?.trim() ?? '';
+      const descriptionCy = faxNumber.descriptionCy?.trim() ?? '';
+      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
+      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
       if (description && !code) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
           text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
         });
+      }
+      if (descriptionCy && !code) {
+        errors.push({
+          href: `#faxNumber-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
+        });
       } else if (code && !phoneNumberPattern.test(code)) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
           text: `Fax number ${formIndex + 1}: ${faxNumberFormatError}`,
+        });
+      }
+      if (hasEnglishDescriptionOnly) {
+        errors.push({
+          href: `#faxNumberDescriptionCy-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: Because you provided an description in English, the Welsh translation is now mandatory`,
+        });
+      }
+      if (hasWelshDescriptionOnly) {
+        errors.push({
+          href: `#faxNumberDescription-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: Because you provided an description in Welsh, the English translation is now mandatory`,
         });
       }
       if (description.length > repeatableDescriptionMaxLength) {
@@ -388,6 +442,17 @@ export class ProfessionalInformationService {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
           text: `Fax number ${formIndex + 1} description: ${invalidCharactersError}`,
+        });
+      }
+      if (descriptionCy.length > repeatableDescriptionMaxLength) {
+        errors.push({
+          href: `#faxNumberDescriptionCy-${formIndex}`,
+          text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
+        });
+      } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
+        errors.push({
+          href: `#faxNumberDescriptionCy-${formIndex}`,
+          text: `Fax number ${formIndex + 1} Welsh description: ${invalidCharactersError}`,
         });
       }
     });
@@ -431,12 +496,14 @@ export class ProfessionalInformationService {
         .map(dxCode => ({
           dxCode: dxCode.code?.trim() ?? '',
           explanation: this.toNullableString(dxCode.description),
+          explanationCy: this.toNullableString(dxCode.descriptionCy),
         })),
       faxNumbers: viewModel.faxNumbers
         .filter(faxNumber => faxNumber.code?.trim())
         .map(faxNumber => ({
           faxNumber: faxNumber.code?.trim() ?? '',
           description: this.toNullableString(faxNumber.description),
+          descriptionCy: this.toNullableString(faxNumber.descriptionCy),
         })),
     };
   }
@@ -648,34 +715,38 @@ export class ProfessionalInformationService {
   private extractRepeatableEntries(
     form: ProfessionalInformationForm,
     codePrefix: string,
-    descriptionPrefix: string
+    descriptionPrefix: string,
+    descriptionCyPrefix: string
   ): ProfessionalInformationEntry[] {
     const entries: ProfessionalInformationEntry[] = [];
 
     for (let index = 0; index < maxRepeatableEntries; index++) {
       const code = this.toString(form[`${codePrefix}-${index}`]);
       const description = this.toString(form[`${descriptionPrefix}-${index}`]);
-      if (code || description || index === 0) {
-        entries.push({ code, description, formIndex: index });
+      const descriptionCy = this.toString(form[`${descriptionCyPrefix}-${index}`]);
+      if (code || description || descriptionCy || index === 0) {
+        entries.push({ code, description, descriptionCy, formIndex: index });
       }
     }
 
-    return entries.length ? entries : [{ code: '', description: '', formIndex: 0 }];
+    return entries.length ? entries : [{ code: '', description: '', descriptionCy: '', formIndex: 0 }];
   }
 
   private toEntries<T extends Record<string, unknown>>(
     items: T[] | null | undefined,
     codeKey: keyof T,
-    descriptionKey: keyof T
+    descriptionKey: keyof T,
+    descriptionCyKey: keyof T
   ): ProfessionalInformationEntry[] {
     const entries =
       items?.map((item, index) => ({
         code: this.toDisplayString(item[codeKey]),
         description: this.toDisplayString(item[descriptionKey]),
+        descriptionCy: this.toDisplayString(item[descriptionCyKey]),
         formIndex: index,
       })) ?? [];
 
-    return entries.length ? entries : [{ code: '', description: '', formIndex: 0 }];
+    return entries.length ? entries : [{ code: '', description: '', descriptionCy: '', formIndex: 0 }];
   }
 
   private toArray(value: string | string[] | undefined): string[] {
