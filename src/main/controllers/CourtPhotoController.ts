@@ -89,10 +89,24 @@ export default class CourtPhotoController {
       return renderError(res, updatedModel);
     }
 
-    return res.render('court-photo', {
-      breadcrumbs: buildSectionBreadcrumbs(courtId, updatedModel.courtName, 'Photo', 'photo'),
+    if (updatedModel.errors) {
+      return res.render('court-photo', {
+        breadcrumbs: buildSectionBreadcrumbs(courtId, updatedModel.courtName, 'Photo', 'photo'),
+        courtId,
+        model: updatedModel,
+      });
+    }
+
+    return res.render('court-photo-upload-success', {
+      breadcrumbs: buildSectionBreadcrumbs(
+        courtId,
+        updatedModel.courtName,
+        'Photo',
+        'photo',
+        'Court photo confirm update'
+      ),
       courtId,
-      model: updatedModel,
+      courtName: updatedModel.courtName,
     });
   }
 
@@ -109,14 +123,11 @@ export default class CourtPhotoController {
       return renderError(res, courtName);
     }
 
-    const response = await courtPhotoService.delete(courtId);
-    if (typeof response === 'number' && response !== HttpStatusCode.NoContent) {
-      return renderError(res, response);
-    }
-
     res.render('court-photo-delete-confirm', {
       breadcrumbs: buildSectionBreadcrumbs(courtId, courtName, 'Photo', 'photo', 'Court photo confirm delete'),
       courtId,
+      courtName,
+      message: 'Are you sure you want to delete the photo associated with this court?',
     });
   }
 
@@ -131,6 +142,11 @@ export default class CourtPhotoController {
     const courtName = await this.resolveCourtName(courtId);
     if (typeof courtName === 'number') {
       return renderError(res, courtName);
+    }
+
+    const response = await courtPhotoService.delete(courtId);
+    if (typeof response === 'number' && response !== HttpStatusCode.NoContent) {
+      return renderError(res, response);
     }
 
     res.render('court-photo-delete-success', {
