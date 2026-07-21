@@ -62,6 +62,36 @@ test.describe(
       });
     });
 
+    test('Warning Notice Page Performance', async ({ lighthouseUtils, playwright, warningNoticePage }) => {
+      await withCreatedCourt(playwright, 'Warning Notice Performance Test', {}, async ({ createdCourt }) => {
+        await warningNoticePage.goto(createdCourt.id);
+        const breadcrumb = warningNoticePage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
+    test('Warning Notice Route Performance', async ({
+      courtEditPage,
+      lighthouseUtils,
+      playwright,
+      warningNoticePage,
+    }) => {
+      await withCreatedCourt(playwright, 'Warning Notice Performance Test', {}, async ({ createdCourt }) => {
+        await courtEditPage.goto(createdCourt.id);
+        await courtEditPage.sectionsTable.getByRole('link', { name: 'Warning notice', exact: true }).click();
+
+        await expect(warningNoticePage.page).toHaveURL(warningNoticePage.buildWarningNoticeUrl(createdCourt.id));
+        await expect(warningNoticePage.heading).toContainText('Warning notice');
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Building Facilities Page Performance', async ({ buildingFacilitiesPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Building Facilities Performance Test', {}, async ({ createdCourt }) => {
         await buildingFacilitiesPage.goto(createdCourt.id);

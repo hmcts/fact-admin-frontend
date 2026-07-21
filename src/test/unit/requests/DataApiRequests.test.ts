@@ -215,6 +215,7 @@ describe('DataApiRequests', () => {
       regionId: '33333333-3333-4333-8333-333333333333',
       slug: 'london-civil-and-family-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
 
     getStub.withArgs(`/courts/${courtId}/entity/v1`).resolves({ data: court });
@@ -261,6 +262,7 @@ describe('DataApiRequests', () => {
       regionId: '33333333-3333-4333-8333-333333333333',
       slug: 'london-civil-and-family-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
 
     getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).resolves({ data: court });
@@ -316,6 +318,7 @@ describe('DataApiRequests', () => {
       regionId: '33333333-3333-4333-8333-333333333333',
       slug: 'london-civil-and-family-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
 
     putStub.withArgs(`/courts/${court.id}/v1`, court).resolves({ data: court });
@@ -342,6 +345,7 @@ describe('DataApiRequests', () => {
       regionId: payload.regionId,
       slug: 'reading-crown-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
 
     postStub.withArgs('/courts/v1', payload).resolves({ data: court });
@@ -590,6 +594,7 @@ describe('DataApiRequests', () => {
       regionId: '33333333-3333-4333-8333-333333333333',
       slug: 'london-civil-and-family-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
     const badRequestError = {
       isAxiosError: true,
@@ -626,6 +631,7 @@ describe('DataApiRequests', () => {
       regionId: '33333333-3333-4333-8333-333333333333',
       slug: 'london-civil-and-family-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
     const conflictError = {
       isAxiosError: true,
@@ -654,6 +660,7 @@ describe('DataApiRequests', () => {
       regionId: '33333333-3333-4333-8333-333333333333',
       slug: 'london-civil-and-family-court',
       warningNotice: null,
+      warningNoticeCy: null,
     };
 
     putStub.withArgs(`/courts/${court.id}/v1`, court).resolves({
@@ -988,6 +995,7 @@ describe('DataApiRequests', () => {
         slug: 'london-civil-and-family-court',
         open: true,
         warningNotice: null,
+        warningNoticeCy: null,
         lastUpdatedAt: '2026-04-29T10:00:00Z',
         openOnCath: true,
         mrdId: 'MRD-123',
@@ -1182,6 +1190,7 @@ describe('DataApiRequests', () => {
           slug: 'national-business-centre',
           open: true,
           warningNotice: null,
+          warningNoticeCy: null,
           createdAt: '2026-04-29T09:00:00Z',
           lastUpdatedAt: '2026-04-29T10:00:00Z',
           serviceAreas: [

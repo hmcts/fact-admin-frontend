@@ -11,6 +11,7 @@ export const courtEntitySchema = z.object({
   regionId: z.string(),
   slug: z.string(),
   warningNotice: z.string().nullable(),
+  warningNoticeCy: z.string().nullable(),
 });
 
 export type CourtEntity = z.infer<typeof courtEntitySchema>;
