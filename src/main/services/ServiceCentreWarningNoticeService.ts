@@ -138,7 +138,7 @@ export class ServiceCentreWarningNoticeService {
     if (warningNotice.length > maxServiceCentreWarningNoticeLength) {
       return `Warning notice ${insert}must be ${maxServiceCentreWarningNoticeLength} characters or fewer`;
     } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {
-      return `Warning notice ${insert}may only contain letters, numbers, spaces, and standard punctuation or symbols (@, +)`;
+      return `Warning notice ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses`;
     }
     return undefined;
   }

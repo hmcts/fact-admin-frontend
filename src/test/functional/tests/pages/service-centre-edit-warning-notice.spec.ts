@@ -157,9 +157,9 @@ test.describe(
           await serviceCentreWarningNoticePage.save();
 
           const expectedEnglish =
-            'Warning notice may only contain letters, numbers, spaces, and standard punctuation or symbols (@, +)';
+            'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
           const expectedWelsh =
-            'Warning notice in welsh may only contain letters, numbers, spaces, and standard punctuation or symbols (@, +)';
+            'Warning notice in welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 
           await expect(serviceCentreWarningNoticePage.successPanel).not.toBeVisible();
           await expect(serviceCentreWarningNoticePage.page.locator('#warningNotice-error')).toContainText(

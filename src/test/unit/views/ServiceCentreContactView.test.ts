@@ -52,7 +52,7 @@ describe('Service Centre Contact Views', () => {
     expect(html).toContain('Add contact details');
     expect(html).toContain('Contact type');
     expect(html).toContain('Explanation (optional)');
-    expect(html).toContain('Explanation in welsh (optional)');
+    expect(html).toContain('Explanation in Welsh (optional)');
     expect(html).toContain('Select all that apply');
     expect(html).toContain(`/service-centres/${serviceCentreId}/edit/contact-details/add/success`);
   });
