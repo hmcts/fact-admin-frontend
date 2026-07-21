@@ -92,6 +92,37 @@ test.describe(
       });
     });
 
+    test('Warning Notice Page Accessibility', async ({ axeUtils, playwright, warningNoticePage }) => {
+      await withCreatedCourt(playwright, 'Warning Notice Accessibility Test', {}, async ({ createdCourt }) => {
+        await warningNoticePage.goto(createdCourt.id);
+
+        await expect(warningNoticePage.page.getByRole('heading', { name: 'Warning notice' })).toBeVisible();
+        const breadcrumb = warningNoticePage.page.getByLabel('Breadcrumb');
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+
+        await axeUtils.audit();
+      });
+    });
+
+    test('Warning Notice Validation Accessibility', async ({ axeUtils, playwright, warningNoticePage }) => {
+      await withCreatedCourt(playwright, 'Warning Notice Accessibility Test', {}, async ({ createdCourt }) => {
+        await warningNoticePage.goto(createdCourt.id);
+
+        await warningNoticePage.fillWarningNotice('Temporary service disruption due to maintenance works.');
+        await warningNoticePage.save();
+
+        await expect(warningNoticePage.mainContent.content).toContainText('There is a problem');
+        await expect(warningNoticePage.mainContent.content).toContainText(
+          'Because you provided an explanation in English, the Welsh translation is now mandatory'
+        );
+        await axeUtils.audit();
+      });
+    });
+
     test('Building Facilities Page Breadcrumb Accessibility', async ({
       axeUtils,
       buildingFacilitiesPage,
