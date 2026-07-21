@@ -7,6 +7,7 @@ import { CourtAddress } from '../schemas/courtAddressSchema';
 import { dpaAddressSchema } from '../schemas/osDataSchema';
 import { CourtAddressService } from '../services/CourtAddressService';
 import { TypesService } from '../services/TypesService';
+import { isValidPostcode, validatePostcodeField } from '../utils/addressValidation';
 import { isUuid } from '../utils/valueParsers';
 
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
@@ -114,12 +115,12 @@ export class CourtAddressController {
     }
 
     const postcode = req.query?.postcode as string;
-    if (!courtAddressService.isValidPostcode(postcode)) {
+    if (!isValidPostcode(postcode)) {
       res.render('court-address-find', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
-        error: courtAddressService.validatePostcode(postcode),
+        error: validatePostcodeField(postcode),
       });
       return;
     }
@@ -164,13 +165,13 @@ export class CourtAddressController {
       return;
     }
     const postcode = req.query?.postcode as string;
-    if (!courtAddressService.isValidPostcode(postcode)) {
+    if (!isValidPostcode(postcode)) {
       res.render('court-address-find', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
-        error: courtAddressService.validatePostcode(postcode),
+        error: validatePostcodeField(postcode),
       });
       return;
     }

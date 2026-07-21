@@ -22,6 +22,18 @@ import { GeneralPage } from './general.po';
 import { HomePage } from './home.po';
 import { LocalAuthoritiesPage } from './local-authorities.po';
 import { ProfessionalInformationPage } from './professional-information.po';
+import { ServiceCentreAddressDeleteSuccessPage } from './service-centre-address-delete-success.po';
+import { ServiceCentreAddressDeletePage } from './service-centre-address-delete.po';
+import { ServiceCentreAddressEditSuccessPage } from './service-centre-address-edit-success.po';
+import { ServiceCentreAddressEditPage } from './service-centre-address-edit.po';
+import { ServiceCentreAddressFindPage } from './service-centre-address-find.po';
+import { ServiceCentreAddressListPage } from './service-centre-address-list.po';
+import { ServiceCentreAddressSelectPage } from './service-centre-address-select.po';
+import { ServiceCentreCasesHeardPage } from './service-centre-cases-heard.po';
+import { ServiceCentreContactDetailsPage } from './service-centre-contact-details.po';
+import { ServiceCentreEditPage } from './service-centre-edit.po';
+import { ServiceCentreGeneralPage } from './service-centre-general.po';
+import { ServiceCentreWarningNoticePage } from './service-centre-warning-notice.po';
 import { SinglePointsOfEntryPage } from './single-points-of-entry.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 import { UsersPage } from './users.po';
@@ -52,6 +64,18 @@ export interface PageFixtures {
   singlePointsOfEntryPage: SinglePointsOfEntryPage;
   professionalInformationPage: ProfessionalInformationPage;
   counterServiceOpeningHoursPage: CounterServiceOpeningHoursPage;
+  serviceCentreEditPage: ServiceCentreEditPage;
+  serviceCentreGeneralPage: ServiceCentreGeneralPage;
+  serviceCentreWarningNoticePage: ServiceCentreWarningNoticePage;
+  serviceCentreAddressListPage: ServiceCentreAddressListPage;
+  serviceCentreAddressFindPage: ServiceCentreAddressFindPage;
+  serviceCentreAddressSelectPage: ServiceCentreAddressSelectPage;
+  serviceCentreAddressEditPage: ServiceCentreAddressEditPage;
+  serviceCentreAddressDeletePage: ServiceCentreAddressDeletePage;
+  serviceCentreAddressEditSuccessPage: ServiceCentreAddressEditSuccessPage;
+  serviceCentreAddressDeleteSuccessPage: ServiceCentreAddressDeleteSuccessPage;
+  serviceCentreContactDetailsPage: ServiceCentreContactDetailsPage;
+  serviceCentreCasesHeardPage: ServiceCentreCasesHeardPage;
   usersPage: UsersPage;
 }
 
@@ -165,6 +189,54 @@ export const pageFixtures = {
   counterServiceOpeningHoursPage: async ({ determinePage }, use): Promise<void> => {
     const counterServiceOpeningHoursPage = new CounterServiceOpeningHoursPage(determinePage);
     await use(counterServiceOpeningHoursPage);
+  },
+  serviceCentreEditPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreEditPage = new ServiceCentreEditPage(determinePage);
+    await use(serviceCentreEditPage);
+  },
+  serviceCentreGeneralPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreGeneralPage = new ServiceCentreGeneralPage(determinePage);
+    await use(serviceCentreGeneralPage);
+  },
+  serviceCentreWarningNoticePage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreWarningNoticePage = new ServiceCentreWarningNoticePage(determinePage);
+    await use(serviceCentreWarningNoticePage);
+  },
+  serviceCentreAddressListPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressListPage = new ServiceCentreAddressListPage(determinePage);
+    await use(serviceCentreAddressListPage);
+  },
+  serviceCentreAddressFindPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressFindPage = new ServiceCentreAddressFindPage(determinePage);
+    await use(serviceCentreAddressFindPage);
+  },
+  serviceCentreAddressSelectPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressSelectPage = new ServiceCentreAddressSelectPage(determinePage);
+    await use(serviceCentreAddressSelectPage);
+  },
+  serviceCentreAddressEditPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressEditPage = new ServiceCentreAddressEditPage(determinePage);
+    await use(serviceCentreAddressEditPage);
+  },
+  serviceCentreAddressDeletePage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressDeletePage = new ServiceCentreAddressDeletePage(determinePage);
+    await use(serviceCentreAddressDeletePage);
+  },
+  serviceCentreAddressEditSuccessPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressEditSuccessPage = new ServiceCentreAddressEditSuccessPage(determinePage);
+    await use(serviceCentreAddressEditSuccessPage);
+  },
+  serviceCentreAddressDeleteSuccessPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreAddressDeleteSuccessPage = new ServiceCentreAddressDeleteSuccessPage(determinePage);
+    await use(serviceCentreAddressDeleteSuccessPage);
+  },
+  serviceCentreContactDetailsPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreContactDetailsPage = new ServiceCentreContactDetailsPage(determinePage);
+    await use(serviceCentreContactDetailsPage);
+  },
+  serviceCentreCasesHeardPage: async ({ determinePage }, use): Promise<void> => {
+    const serviceCentreCasesHeardPage = new ServiceCentreCasesHeardPage(determinePage);
+    await use(serviceCentreCasesHeardPage);
   },
   usersPage: async ({ determinePage }, use): Promise<void> => {
     const usersPage = new UsersPage(determinePage);

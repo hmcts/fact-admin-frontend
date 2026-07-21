@@ -1,9 +1,10 @@
 import { HttpStatusCode } from 'axios';
 import type { Request, Response } from 'express';
-import { mock, restore, stub } from 'sinon';
+import { assert, mock, restore, stub } from 'sinon';
 
 import ServiceCentreEditController from '../../../main/controllers/ServiceCentreEditController';
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('ServiceCentreEditController', () => {
@@ -26,17 +27,32 @@ describe('ServiceCentreEditController', () => {
     request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
 
-    responseMock.expects('render').once().withArgs('service-centre-edit', {
-      pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-      pageTitle: 'Editing - National Business Centre',
-      serviceCentreId: '22222222-2222-4222-8222-222222222222',
-      serviceCentreName: 'National Business Centre',
-      showApproveData: false,
-      approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
-    });
+    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('service-centre-edit', {
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          {
+            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+            text: 'Edit National Business Centre',
+          },
+        ],
+        pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+        pageTitle: 'Editing - National Business Centre',
+        serviceCentreId: '22222222-2222-4222-8222-222222222222',
+        serviceCentreName: 'National Business Centre',
+        showApproveData: false,
+        approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
+        serviceCentreLocks: [],
+        timeoutMins: undefined,
+      });
 
     await controller.get(request, response);
-
+    assert.calledOnce(getLocksStub);
+    assert.calledWith(getLocksStub, SubjectType.SERVICE_CENTRE, '22222222-2222-4222-8222-222222222222');
     responseMock.verify();
   });
 
@@ -51,11 +67,36 @@ describe('ServiceCentreEditController', () => {
     const responseMock = mock(response);
 
     responseMock.expects('status').once().withArgs(404).returns(response);
-    responseMock.expects('render').once().withArgs('not-found');
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
 
     await controller.get(request, response);
 
     responseMock.verify();
+  });
+
+  test('renders generic error when service-centre lookup fails', async () => {
+    const controller = new ServiceCentreEditController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
+    const responseMock = mock(response);
+    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(
+      HttpStatusCode.InternalServerError
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+    }
   });
 
   test('renders approval confirmation for SuperAdmin', async () => {

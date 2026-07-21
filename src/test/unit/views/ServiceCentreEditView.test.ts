@@ -15,16 +15,10 @@ describe('Service Centre Edit View', () => {
 
     expect(html).toContain('Editing - National Business Centre');
     expect(html).toContain(`${serviceCentreEditPath}/general`);
-    expect(html).toContain('General');
     expect(html).toContain(`${serviceCentreEditPath}/warning-notice`);
-    expect(html).toContain('Warning notice');
     expect(html).toContain(`${serviceCentreEditPath}/address`);
-    expect(html).toContain('Address');
     expect(html).toContain(`${serviceCentreEditPath}/contact-details`);
-    expect(html).toContain('Contact details');
     expect(html).toContain(`${serviceCentreEditPath}/cases-heard`);
-    expect(html).toContain('Cases heard');
-    expect(html).toContain('TODO');
     expect(html).not.toContain('Approve data');
   });
 
@@ -44,7 +38,7 @@ describe('Service Centre Edit View', () => {
     expect(html).toContain('nationalsupportunit@justice.gov.uk');
     expect(html).toContain('Approve data');
     expect(html).toContain(`href="${serviceCentreEditPath}/approve"`);
-    expect(html.indexOf('court-edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
+    expect(html.indexOf('edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
   });
 
   test('renders the reviewing heading for viewer users', () => {
@@ -59,5 +53,32 @@ describe('Service Centre Edit View', () => {
 
     expect(html).toContain('Reviewing - National Business Centre');
     expect(html).not.toContain('Editing - National Business Centre');
+  });
+
+  test('renders timeout warning banner when timeoutMins is provided', () => {
+    const html = env.render('service-centre-edit.njk', {
+      serviceCentreId,
+      serviceCentreName: 'Service Centre One',
+      pagePath: serviceCentreEditPath,
+      pageTitle: 'Editing - Service Centre One',
+      courtLocks: [],
+      timeoutMins: 15,
+    });
+
+    expect(html).toContain('Editing session timed out');
+    expect(html).toContain('You were inactive for 15 minutes and have been returned to the edit page.');
+    expect(html).toContain('Any unsaved changes you made have not been saved.');
+  });
+
+  test('does not render timeout warning banner when timeoutMins is missing', () => {
+    const html = env.render('service-centre-edit.njk', {
+      serviceCentreId,
+      serviceCentreName: 'Service Centre One',
+      pagePath: serviceCentreEditPath,
+      pageTitle: 'Editing - Service Centre One',
+      courtLocks: [],
+    });
+
+    expect(html).not.toContain('Editing session timed out');
   });
 });

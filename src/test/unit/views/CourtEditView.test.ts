@@ -49,7 +49,7 @@ describe('Court Edit View', () => {
     expect(html).toContain('nationalsupportunit@justice.gov.uk');
     expect(html).toContain('Approve data');
     expect(html).toContain(`href="${courtEditPath}/approve"`);
-    expect(html.indexOf('court-edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
+    expect(html.indexOf('edit-table__wrapper')).toBeLessThan(html.indexOf('id="approve-data-heading"'));
   });
 
   test('renders the reviewing heading for viewer users', () => {

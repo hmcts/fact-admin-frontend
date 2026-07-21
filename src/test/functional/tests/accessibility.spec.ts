@@ -1,6 +1,6 @@
 import { expect, test } from '../fixtures';
 import { seedAuditTrailViaUi } from '../helpers/auditTestSupport';
-import { withCreatedCourt } from '../helpers/testSupport';
+import { withCreatedCourt, withCreatedServiceCentre } from '../helpers/testSupport';
 import { config } from '../utils';
 
 test.describe(
@@ -62,6 +62,22 @@ test.describe(
       });
     });
 
+    test('Service Centre Edit Page Accessibility', async ({ axeUtils, serviceCentreEditPage, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Edit Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreEditPage.goto(createdServiceCentre.id);
+          await serviceCentreEditPage.expectVisibleElements();
+          const breadcrumb = serviceCentreEditPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb).toContainText(createdServiceCentre.name);
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Accessibility Page Breadcrumb Accessibility', async ({ accessibilityPage, axeUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Accessibility Accessibility Test', {}, async ({ createdCourt }) => {
         await accessibilityPage.goto(createdCourt.id);
@@ -117,6 +133,29 @@ test.describe(
       });
     });
 
+    test('Service Centre Cases Heard Page Accessibility', async ({
+      axeUtils,
+      serviceCentreCasesHeardPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Cases Heard Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreCasesHeardPage.goto(createdServiceCentre.id);
+          await serviceCentreCasesHeardPage.expectVisibleElements();
+          const breadcrumb = serviceCentreCasesHeardPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Cases Heard Validation Accessibility', async ({ axeUtils, casesHeardPage, playwright }) => {
       await withCreatedCourt(playwright, 'Cases Heard Accessibility Test', {}, async ({ createdCourt }) => {
         await casesHeardPage.goto(createdCourt.id);
@@ -125,6 +164,25 @@ test.describe(
         await casesHeardPage.header.checkIsVisible();
         await axeUtils.audit();
       });
+    });
+
+    test('Service Centre Cases Heard Validation Accessibility', async ({
+      axeUtils,
+      serviceCentreCasesHeardPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Cases Heard Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreCasesHeardPage.goto(createdServiceCentre.id);
+          await serviceCentreCasesHeardPage.clearSelectedCaseTypes();
+          await serviceCentreCasesHeardPage.save();
+          await serviceCentreCasesHeardPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
     });
 
     test('Cases Heard Success Page Accessibility', async ({ axeUtils, casesHeardPage, playwright }) => {
@@ -137,12 +195,52 @@ test.describe(
       });
     });
 
+    test('Service Centre Cases Heard Success Page Accessibility', async ({
+      axeUtils,
+      serviceCentreCasesHeardPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Cases Heard Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreCasesHeardPage.goto(createdServiceCentre.id);
+          await serviceCentreCasesHeardPage.selectFirstCaseType();
+          await serviceCentreCasesHeardPage.save();
+          await serviceCentreCasesHeardPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('General Page Accessibility', async ({ axeUtils, generalPage, playwright }) => {
       await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
         await generalPage.goto(createdCourt.id);
         await generalPage.expectVisibleElements();
         await axeUtils.audit();
       });
+    });
+
+    test('Service Centre General Page Accessibility', async ({ axeUtils, serviceCentreGeneralPage, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre General Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+          await serviceCentreGeneralPage.expectVisibleElements();
+          const breadcrumb = serviceCentreGeneralPage.page.getByLabel('Breadcrumb');
+
+          await expect(breadcrumb).toBeVisible();
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await axeUtils.audit();
+        }
+      );
     });
 
     test('General Breadcrumb Accessibility', async ({ axeUtils, generalPage, playwright }) => {
@@ -170,6 +268,25 @@ test.describe(
       });
     });
 
+    test('Service Centre General Validation Accessibility', async ({
+      axeUtils,
+      serviceCentreGeneralPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre General Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+          await serviceCentreGeneralPage.nameInput.clear();
+          await serviceCentreGeneralPage.save();
+          await serviceCentreGeneralPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('General Success Page Accessibility', async ({ axeUtils, generalPage, playwright }) => {
       await withCreatedCourt(playwright, 'General Accessibility Test', {}, async ({ createdCourt }) => {
         await generalPage.goto(createdCourt.id);
@@ -177,6 +294,24 @@ test.describe(
         await generalPage.header.checkIsVisible();
         await axeUtils.audit();
       });
+    });
+
+    test('Service Centre General Success Page Accessibility', async ({
+      axeUtils,
+      serviceCentreGeneralPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre General Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+          await serviceCentreGeneralPage.save();
+          await serviceCentreGeneralPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
     });
 
     test('Translation and Interpretation Page Accessibility', async ({
@@ -229,6 +364,12 @@ test.describe(
       await axeUtils.audit();
     });
 
+    test('Service Centre Not Found Page Accessibility', async ({ axeUtils, serviceCentreEditPage }) => {
+      await serviceCentreEditPage.goto('not-a-uuid');
+      await serviceCentreEditPage.expectVisibleElements();
+      await axeUtils.audit();
+    });
+
     test('Address List Page Accessibility', async ({ axeUtils, courtAddressListPage, playwright }) => {
       await withCreatedCourt(
         playwright,
@@ -248,6 +389,29 @@ test.describe(
       );
     });
 
+    test('Service Centre Address List Page Accessibility', async ({
+      axeUtils,
+      serviceCentreAddressListPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address Edit Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressListPage.goto(createdServiceCentre.id);
+          await serviceCentreAddressListPage.header.checkIsVisible();
+          const breadcrumb = serviceCentreAddressListPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Address Find Page Accessibility', async ({ axeUtils, playwright, courtAddressFindPage }) => {
       await withCreatedCourt(
         playwright,
@@ -261,6 +425,23 @@ test.describe(
       );
     });
 
+    test('Service Centre Address Find Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      serviceCentreAddressFindPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address Edit Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressFindPage.goto(createdServiceCentre.id);
+          await serviceCentreAddressFindPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Address Select Page Accessibility', async ({ axeUtils, playwright, courtAddressSelectPage }) => {
       await withCreatedCourt(
         playwright,
@@ -269,6 +450,23 @@ test.describe(
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
           await courtAddressSelectPage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Service Centre Address Select Page Accessibility', async ({
+      axeUtils,
+      playwright,
+      serviceCentreAddressSelectPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address Edit Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressSelectPage.goto(createdServiceCentre.id, 'SW1A 1AA');
+          await serviceCentreAddressSelectPage.header.checkIsVisible();
           await axeUtils.audit();
         }
       );
@@ -466,12 +664,52 @@ test.describe(
       });
     });
 
+    test('Service Centre Contact List Page Accessibility', async ({
+      axeUtils,
+      serviceCentreContactDetailsPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact List Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreContactDetailsPage.goto(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.expectVisibleElements();
+          const breadcrumb = serviceCentreContactDetailsPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Court Contact Add Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
       await withCreatedCourt(playwright, 'Court Contact Add Accessibility Test', {}, async ({ createdCourt }) => {
         await courtContactDetailsPage.gotoAdd(createdCourt.id);
         await courtContactDetailsPage.expectVisibleElements();
         await axeUtils.audit();
       });
+    });
+
+    test('Service Centre Contact Add Page Accessibility', async ({
+      axeUtils,
+      serviceCentreContactDetailsPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Add Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.expectVisibleElements();
+          await axeUtils.audit();
+        }
+      );
     });
 
     test('Court Contact Edit Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
@@ -496,6 +734,38 @@ test.describe(
       });
     });
 
+    test('Service Centre Contact Edit Page Accessibility', async ({
+      axeUtils,
+      serviceCentreContactDetailsPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Edit Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          const uniqueSuffix = Date.now();
+          const contactEmail = `a11y-contact-${uniqueSuffix}@example.test`;
+
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.selectFirstAvailableContactType();
+          await serviceCentreContactDetailsPage.emailCheckbox.check();
+          await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
+          await serviceCentreContactDetailsPage.explanationInput.fill('Accessibility edit test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Hygyrchedd golygu prawf cyswllt');
+          await serviceCentreContactDetailsPage.save();
+
+          await expect(serviceCentreContactDetailsPage.successPanel).toContainText('Contact details added:');
+          await serviceCentreContactDetailsPage.backToContactDetailsLink.click();
+          await serviceCentreContactDetailsPage.clickEditForRowText(contactEmail);
+
+          await serviceCentreContactDetailsPage.expectVisibleElements();
+          await expect(serviceCentreContactDetailsPage.heading).toContainText('Edit contact details');
+          await axeUtils.audit();
+        }
+      );
+    });
+
     test('Court Contact Delete Page Accessibility', async ({ axeUtils, courtContactDetailsPage, playwright }) => {
       await withCreatedCourt(playwright, 'Court Contact Delete Accessibility Test', {}, async ({ createdCourt }) => {
         const uniqueSuffix = Date.now();
@@ -518,6 +788,102 @@ test.describe(
         );
         await axeUtils.audit();
       });
+    });
+
+    test('Service Centre Contact Delete Page Accessibility', async ({
+      axeUtils,
+      serviceCentreContactDetailsPage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Delete Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          const uniqueSuffix = Date.now();
+          const contactEmail = `a11y-delete-${uniqueSuffix}@example.test`;
+
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.selectFirstAvailableContactType();
+          await serviceCentreContactDetailsPage.emailCheckbox.check();
+          await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
+          await serviceCentreContactDetailsPage.explanationInput.fill('Accessibility delete test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Hygyrchedd dileu cyswllt prawf');
+          await serviceCentreContactDetailsPage.save();
+
+          await expect(serviceCentreContactDetailsPage.successPanel).toContainText('Contact details added:');
+          await serviceCentreContactDetailsPage.backToContactDetailsLink.click();
+          await serviceCentreContactDetailsPage.clickDeleteForRowText(contactEmail);
+
+          await serviceCentreContactDetailsPage.expectVisibleElements();
+          await expect(serviceCentreContactDetailsPage.heading).toContainText(
+            'Are you sure you want to delete these contact details?'
+          );
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Service Centre Warning Notice Page Accessibility', async ({
+      axeUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.expectVisibleElements();
+          const breadcrumb = serviceCentreWarningNoticePage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Service Centre Warning Notice Validation Accessibility', async ({
+      axeUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.warningNoticeInput.fill('Warning notice');
+          await serviceCentreWarningNoticePage.save();
+          await serviceCentreWarningNoticePage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
+    });
+
+    test('Service Centre Warning Notice Success Page Accessibility', async ({
+      axeUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Accessibility Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.warningNoticeInput.fill('Warning notice');
+          await serviceCentreWarningNoticePage.warningNoticeCyInput.fill('Hysbysiad rhybuddio');
+          await serviceCentreWarningNoticePage.save();
+          await serviceCentreWarningNoticePage.header.checkIsVisible();
+          await axeUtils.audit();
+        }
+      );
     });
 
     test('Counter Service Opening Hours List Page Accessibility', async ({

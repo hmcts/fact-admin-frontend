@@ -8,7 +8,7 @@ export class CourtEditPage extends Base {
 
   constructor(page: Page) {
     super(page);
-    this.sectionsTable = this.page.locator('table.court-edit-table');
+    this.sectionsTable = this.page.locator('table.edit-table');
   }
 
   async goto(courtId: string): Promise<void> {

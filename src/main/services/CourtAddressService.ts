@@ -3,6 +3,14 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { CourtAddress, CourtAddressType } from '../schemas/courtAddressSchema';
 import { DpaAddress } from '../schemas/osDataSchema';
+import {
+  validateAddressLine1Field,
+  validateAddressLine2Field,
+  validateCountyField,
+  validatePostcodeField,
+  validateTownCityField,
+} from '../utils/addressValidation';
+import { addError } from '../utils/validation';
 
 export type SaveCourtAddressResponse =
   | {
@@ -38,25 +46,7 @@ export type DeleteCourtAddressResponse =
     }
   | HttpStatusCode;
 
-const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
-const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
 const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
-
-const JURISDICTION_ERROR_REGEXES = {
-  northernIrelandPostcode: /^(BT)/i,
-  guernseyPostcode: /^(GY)/i,
-  jerseyPostcode: /^(JE)/i,
-  isleOfManPostcode: /^(IM)/i,
-};
-
-export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
-  northernIrelandPostcode: 'Northern Ireland postcodes are not supported for this service',
-  guernseyPostcode: 'Guernsey postcodes are not supported for this service',
-  jerseyPostcode: 'Jersey postcodes are not supported for this service',
-  isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
-  blankPostcode: 'Enter a postcode',
-  invalidPostcode: 'Postcode format is invalid',
-};
 
 const dataApiRequests = new DataApiRequests();
 
@@ -225,59 +215,28 @@ export class CourtAddressService {
   ): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
 
-    // addressType
-    const addressTypeErrors = this.validateAddressType(address, existingAddresses);
-    if (addressTypeErrors.length > 0) {
-      errors.addressType = addressTypeErrors;
-    }
+    addError(errors, 'addressType', this.validateAddressType(address, existingAddresses));
+    addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));
+    addError(errors, 'addressLine2', validateAddressLine2Field(address.addressLine2 ?? undefined));
+    addError(errors, 'townCity', validateTownCityField(address.townCity));
+    addError(errors, 'county', validateCountyField(address.county ?? undefined));
 
-    // addressLine1 (mandatory)
-    const addressLine1Errors = this.validateAddressLine1(address);
-    if (addressLine1Errors.length > 0) {
-      errors.addressLine1 = addressLine1Errors;
-    }
-
-    // addressLine2 (optional, but if you've added one it needs to be right)
-    const addressLine2Errors = this.validateAddressLine2(address);
-    if (addressLine2Errors.length > 0) {
-      errors.addressLine2 = addressLine2Errors;
-    }
-
-    // townCity (mandatory)
-    const townCityErrors = this.validateTownCity(address);
-    if (townCityErrors.length > 0) {
-      errors.townCity = townCityErrors;
-    }
-
-    // county (optional, but if you've added one it needs to be right)
-    const countyErrors = this.validateCounty(address);
-    if (countyErrors.length > 0) {
-      errors.county = countyErrors;
-    }
-
-    // validate postcode
-    const postcodeValidation = this.validatePostcode(address.postcode);
+    const postcodeValidation = validatePostcodeField(address.postcode);
     if (postcodeValidation) {
-      errors.postcode = [postcodeValidation];
+      addError(errors, 'postcode', [postcodeValidation]);
     }
 
-    // validate epimId
-    const epimIdValidation = this.validateEpimId(address);
-    if (epimIdValidation.length > 0) {
-      errors.epimId = epimIdValidation;
-    }
+    addError(errors, 'epimId', this.validateEpimId(address));
 
-    // validate areas of law
     if (aolSelected && (!address.areasOfLaw || address.areasOfLaw.length === 0 || address.areasOfLaw.length > 5)) {
-      errors.areasOfLaw = ['Please select between 1 and 5 areas of law that this address is relevant for'];
+      addError(errors, 'areasOfLaw', ['Please select between 1 and 5 areas of law that this address is relevant for']);
     }
 
-    // validate courtTypes
     if (
       courtTypesSelected &&
       (!address.courtTypes || address.courtTypes.length === 0 || address.courtTypes.length > 5)
     ) {
-      errors.courtTypes = ['Please select at least one court type that this address is relevant for'];
+      addError(errors, 'courtTypes', ['Please select at least one court type that this address is relevant for']);
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
@@ -301,60 +260,6 @@ export class CourtAddressService {
     return addressTypeErrors;
   }
 
-  private validateAddressLine1(address: Partial<CourtAddress>): string[] {
-    const addressLine1Errors: string[] = [];
-    if (!address.addressLine1 || address.addressLine1.trim().length === 0) {
-      addressLine1Errors.push('Enter address line 1, typically the building and street');
-    } else if (address.addressLine1.length > 255) {
-      addressLine1Errors.push('Address line 1 must be 255 characters or less');
-    }
-    if (address.addressLine1 && !VALID_ADDRESS_LINE_REGEX.test(address.addressLine1.trim())) {
-      addressLine1Errors.push(
-        "Address line 1 must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
-      );
-    }
-    return addressLine1Errors;
-  }
-
-  private validateAddressLine2(address: Partial<CourtAddress>): string[] {
-    const addressLine2Errors: string[] = [];
-    if (address.addressLine2 && address.addressLine2.length > 255) {
-      addressLine2Errors.push('Address line 2 must be 255 characters or less');
-    }
-    if (address.addressLine2 && !VALID_ADDRESS_LINE_REGEX.test(address.addressLine2.trim())) {
-      addressLine2Errors.push(
-        "Address line 2 must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
-      );
-    }
-    return addressLine2Errors;
-  }
-
-  private validateTownCity(address: Partial<CourtAddress>): string[] {
-    const townCityErrors: string[] = [];
-    if (!address.townCity || address.townCity.trim().length === 0) {
-      townCityErrors.push('Enter a town or city');
-    } else if (address.townCity.length > 100) {
-      townCityErrors.push('Town or city must be 100 characters or less');
-    }
-    if (address.townCity && !VALID_ADDRESS_LINE_REGEX.test(address.townCity.trim())) {
-      townCityErrors.push(
-        "Town or city must only include letters a to z, and special characters '(',')',':',',','.' and '-'"
-      );
-    }
-    return townCityErrors;
-  }
-
-  private validateCounty(address: Partial<CourtAddress>): string[] {
-    const countyErrors: string[] = [];
-    if (address.county && address.county.length > 255) {
-      countyErrors.push('County must be 255 characters or less');
-    }
-    if (address.county && !VALID_ADDRESS_LINE_REGEX.test(address.county.trim())) {
-      countyErrors.push("County must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
-    }
-    return countyErrors;
-  }
-
   private validateEpimId(address: Partial<CourtAddress>): string[] {
     const epimIdErrors: string[] = [];
     if (address.epimId && address.epimId.length > 10) {
@@ -364,42 +269,5 @@ export class CourtAddressService {
       epimIdErrors.push('ePIMS Ref ID must only include letters a to z, spaces and dashes.');
     }
     return epimIdErrors;
-  }
-
-  /**
-   * Checks whether a value is a valid and acceptable postcode
-   */
-  public isValidPostcode(value: string): boolean {
-    return this.validatePostcode(value) === undefined;
-  }
-
-  /**
-   * Checks the postcode and returns an appropriate error message if there are any issues with the
-   * postcode. If there are no issues, returns undefined.
-   * @param postcode
-   */
-  public validatePostcode(postcode: string | undefined): string | undefined {
-    // might be missing
-    if (!postcode) {
-      return POSTCODE_ERROR_MESSAGES.blankPostcode;
-    }
-
-    // might be structurally invalid
-    const trimmedPostcode = postcode.trim();
-    if (trimmedPostcode.length === 0) {
-      return POSTCODE_ERROR_MESSAGES.blankPostcode;
-    } else if (!VALID_POSTCODE_REGEX.test(trimmedPostcode)) {
-      return POSTCODE_ERROR_MESSAGES.invalidPostcode;
-    }
-
-    // might be in an unhandled jurisdiction
-    for (const [key, regex] of Object.entries(JURISDICTION_ERROR_REGEXES)) {
-      if (regex.test(trimmedPostcode)) {
-        return POSTCODE_ERROR_MESSAGES[key];
-      }
-    }
-
-    // no obvious issues with the postcode
-    return undefined;
   }
 }
