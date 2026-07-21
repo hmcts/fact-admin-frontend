@@ -119,10 +119,12 @@ describe('ProfessionalInformationService', () => {
       'dxCode-0': ' DX 12345 ',
       'dxCode-1': '',
       'dxCodeDescription-0': ' Documents ',
+      'dxCodeDescriptionCy-0': ' Dogfennau ',
       'dxCodeDescription-1': '',
       familyCourtCode: '123',
       'faxNumber-0': ' 01273 800 900 ',
       'faxNumberDescription-0': ' Main fax ',
+      'faxNumberDescriptionCy-0': ' Prif ffacs ',
       gbs: ' GBS123 ',
       interviewPhoneNumber: ' 020 7450 4000 ',
       interviewRoomCount: '2',
@@ -145,8 +147,8 @@ describe('ProfessionalInformationService', () => {
         magistrateCourtCode: null,
         tribunalCode: null,
       },
-      dxCodes: [{ dxCode: 'DX 12345', explanation: 'Documents' }],
-      faxNumbers: [{ faxNumber: '01273 800 900', description: 'Main fax' }],
+      dxCodes: [{ dxCode: 'DX 12345', explanation: 'Documents', explanationCy: 'Dogfennau' }],
+      faxNumbers: [{ faxNumber: '01273 800 900', description: 'Main fax', descriptionCy: 'Prif ffacs' }],
       professionalInformation: {
         accessScheme: false,
         commonPlatform: true,
@@ -224,8 +226,10 @@ describe('ProfessionalInformationService', () => {
     const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
       'dxCode-0': '@£@$&()@$)(@()$',
       'dxCodeDescription-0': '@£@$&()@$)(@()$',
+      'dxCodeDescriptionCy-0': '@£@$&()@$)(@()$',
       'faxNumber-0': '@£@$&()@$)(@()$',
       'faxNumberDescription-0': '@£@$&()@$)(@()$',
+      'faxNumberDescriptionCy-0': '@£@$&()@$)(@()$',
     });
 
     expect(result).toMatchObject({
@@ -234,12 +238,51 @@ describe('ProfessionalInformationService', () => {
         errorSummary: [
           { href: '#dxCode-0', text: 'DX code 1: Value contains invalid characters' },
           { href: '#dxCodeDescription-0', text: 'DX code 1 explanation: Value contains invalid characters' },
+          { href: '#dxCodeDescriptionCy-0', text: 'DX code 1 Welsh explanation: Value contains invalid characters' },
           {
             href: '#faxNumber-0',
             text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           },
           { href: '#faxNumberDescription-0', text: 'Fax number 1 description: Value contains invalid characters' },
+          {
+            href: '#faxNumberDescriptionCy-0',
+            text: 'Fax number 1 Welsh description: Value contains invalid characters',
+          },
         ],
+      },
+    });
+    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+  });
+
+  test('returns directional errors when either English or Welsh descriptions are missing', async () => {
+    const dataApiRequests = buildDataApiRequests() as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+      'dxCode-0': 'DX 12345',
+      'dxCodeDescription-0': 'Documents',
+      'dxCode-1': 'DX 54321',
+      'dxCodeDescriptionCy-1': 'Dogfennau',
+      'faxNumber-0': '01273 800 900',
+      'faxNumberDescriptionCy-0': 'Prif ffacs',
+      'faxNumber-1': '020 7450 4000',
+      'faxNumberDescription-1': 'Main fax',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        fieldErrors: {
+          'dxCodeDescriptionCy-0':
+            'DX code 1: Because you provided an explanation in English, the Welsh translation is now mandatory',
+          'dxCodeDescription-1':
+            'DX code 2: Because you provided an explanation in Welsh, the English translation is now mandatory',
+          'faxNumberDescription-0':
+            'Fax number 1: Because you provided an description in Welsh, the English translation is now mandatory',
+          'faxNumberDescriptionCy-1':
+            'Fax number 2: Because you provided an description in English, the Welsh translation is now mandatory',
+        },
       },
     });
     expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
@@ -367,9 +410,11 @@ describe('ProfessionalInformationService', () => {
       'dxCode-0': 'DX 123',
       'dxCode-1': 'Invalid DX',
       'dxCodeDescription-1': 'Invalid DX explanation',
+      'dxCodeDescriptionCy-1': 'Esboniad DX annilys',
       'faxNumber-0': '020 0000 0000',
       'faxNumber-1': '020 0000 0001',
       'faxNumberDescription-1': 'Invalid fax description',
+      'faxNumberDescriptionCy-1': 'Disgrifiad ffacs annilys',
     });
 
     expect(result).toMatchObject({
@@ -452,8 +497,8 @@ describe('ProfessionalInformationService', () => {
     expect(dataApiRequests.saveCourtProfessionalInformation).toHaveBeenCalledWith(
       courtId,
       expect.objectContaining({
-        dxCodes: [{ dxCode: 'Invalid DX 4', explanation: null }],
-        faxNumbers: [{ faxNumber: '020 0000 0004', description: null }],
+        dxCodes: [{ dxCode: 'Invalid DX 4', explanation: null, explanationCy: null }],
+        faxNumbers: [{ faxNumber: '020 0000 0004', description: null, descriptionCy: null }],
       })
     );
     expect(result).toMatchObject({
@@ -486,8 +531,16 @@ describe('ProfessionalInformationService', () => {
             text: 'DX code 4: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
           },
           {
+            href: '#dxCodeDescriptionCy-3',
+            text: 'DX code 4: Because you provided an explanation in English, the Welsh translation is now mandatory',
+          },
+          {
             href: '#faxNumber-4',
             text: 'Fax number 5: You have entered a description without a fax number, please add a number or remove the description',
+          },
+          {
+            href: '#faxNumberDescriptionCy-4',
+            text: 'Fax number 5: Because you provided an description in English, the Welsh translation is now mandatory',
           },
         ],
       },

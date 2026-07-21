@@ -55,6 +55,22 @@
           } if formErrors.contactExplanation else null
         }) }}
 
+        {{ govukInput({
+          label: {
+            text: "Explanation in Welsh (optional)"
+          },
+          hint: {
+            text: "Add a short explanation if required. For example, 'Mae Lle i Anadlu yn rhoi'r hawl i rywun sydd mewn dyled gael amddiffyniad cyfreithiol'."
+          },
+          id: "contact-explanation-cy",
+          name: "contact-explanation-cy",
+          type: "text",
+          value: formValues.contactExplanationCy,
+          errorMessage: {
+            text: formErrors.contactExplanationCy
+          } if formErrors.contactExplanationCy else null
+        }) }}
+
         {{ govukCheckboxes({
           idPrefix: "contact-methods",
           name: "contact-methods",
