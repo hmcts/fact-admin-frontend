@@ -1,0 +1,74 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block container %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+
+        {% if model.errors %}
+          {{ modelDrivenErrorSummary(model.errors) }}
+        {% endif %}
+
+        <h1 class="govuk-heading-l">Court photo</h1>
+
+        <form action="/courts/{{ courtId }}/edit/photo/delete" method="post">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              <h1 class="govuk-fieldset__heading">
+                Existing court photo
+              </h1>
+            </legend>
+            {% if model.fileLink %}
+              <p class="govuk-body">This is the current court photo for {{ model.courtName }}.</p>
+              <img src="{{ model.fileLink }}" alt="Court photo" />
+            {% else %}
+              <p class="govuk-body">There is no photo currently specified for {{ model.courtName }}.</p>
+            {% endif %}
+          </fieldset>
+          {% if not isViewer and model.fileLink %}
+            {{ govukButton({
+              text: "Delete",
+              classes: "govuk-button--warning"
+            }) }}
+          {% endif %}
+        </form>
+
+        <form action="/courts/{{ courtId }}/edit/photo/upload" method="post" enctype="multipart/form-data">
+          <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              <h1 class="govuk-fieldset__heading">
+                Add or update court photo
+              </h1>
+            </legend>
+            {% if not isViewer %}
+              {{ govukFileUpload({
+                id: "photo",
+                name: "photo",
+                attributes: {
+                  "accept": ".jpg,.jpeg,.png"
+                },
+                label: {
+                  text: "Upload a photo"
+                },
+                javascript: true
+              }) }}
+            {% endif %}
+            {% if not isViewer %}
+              {{ govukButton({
+                text: "Upload"
+              }) }}
+            {% endif %}
+          </fieldset>
+        </form>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

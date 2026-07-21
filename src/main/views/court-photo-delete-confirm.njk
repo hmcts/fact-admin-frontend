@@ -1,0 +1,49 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}
+  Court photo confirm delete - {{ courtName }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-xl">Are you sure you want to make these changes to the Court photo?</h1>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/photo/delete/success">
+
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Court name" },
+              value: { text: courtName }
+            },
+            {
+              key: { text: "Confirm" },
+              value: { text: message }
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Continue",
+          classes: "govuk-button--warning"
+        }) }}
+
+      </form>
+
+      <form id="cancel_form" method="GET" action="/courts/{{ courtId }}/edit/photo">
+        {{ govukButton({
+          text: "Cancel",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+
+    </div>
+  </div>
+
+
+{% endblock %}
