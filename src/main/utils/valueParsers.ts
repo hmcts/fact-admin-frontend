@@ -1,3 +1,4 @@
+import { HttpStatusCode } from 'axios';
 import moment from 'moment-timezone';
 
 const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -125,4 +126,11 @@ export function parseDate(value: string | undefined): Date {
 export function toUkDateTimeString(value: string, format = 'DD/MM/YYYY HH:mm:ss.SSS'): string {
   const parsedUtc = moment.utc(value, moment.ISO_8601, true);
   return parsedUtc.isValid() ? parsedUtc.tz(UK_TIME_ZONE).format(format) : value;
+}
+
+/**
+ * Checks whether a value is an HTTP status code represented as a number.
+ */
+export function isHttpStatusCode(value: unknown): value is HttpStatusCode {
+  return typeof value === 'number';
 }

@@ -31,3 +31,4 @@ export { ServiceCentreEditPage } from './service-centre-edit.po';
 export { ServiceCentreGeneralPage } from './service-centre-general.po';
 export { ServiceCentreWarningNoticePage } from './service-centre-warning-notice.po';
 export { UsersPage } from './users.po';
+export { WarningNoticePage } from './warning-notice.po';

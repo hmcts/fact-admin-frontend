@@ -37,6 +37,7 @@ import { ServiceCentreWarningNoticePage } from './service-centre-warning-notice.
 import { SinglePointsOfEntryPage } from './single-points-of-entry.po';
 import { TranslationAndInterpretationPage } from './translation-and-interpretation.po';
 import { UsersPage } from './users.po';
+import { WarningNoticePage } from './warning-notice.po';
 
 export interface PageFixtures {
   determinePage: Page;
@@ -77,6 +78,7 @@ export interface PageFixtures {
   serviceCentreContactDetailsPage: ServiceCentreContactDetailsPage;
   serviceCentreCasesHeardPage: ServiceCentreCasesHeardPage;
   usersPage: UsersPage;
+  warningNoticePage: WarningNoticePage;
 }
 
 /* Instantiates pages and provides page to the test via use()
@@ -241,6 +243,10 @@ export const pageFixtures = {
   usersPage: async ({ determinePage }, use): Promise<void> => {
     const usersPage = new UsersPage(determinePage);
     await use(usersPage);
+  },
+  warningNoticePage: async ({ determinePage }, use): Promise<void> => {
+    const warningNoticePage = new WarningNoticePage(determinePage);
+    await use(warningNoticePage);
   },
   /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 };
