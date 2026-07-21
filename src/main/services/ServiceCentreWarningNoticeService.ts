@@ -134,7 +134,7 @@ export class ServiceCentreWarningNoticeService {
   }
 
   private validateWarningNotice(warningNotice: string, welsh: boolean): string | undefined {
-    const insert = welsh ? 'in welsh ' : '';
+    const insert = welsh ? 'in Welsh ' : '';
     if (warningNotice.length > maxServiceCentreWarningNoticeLength) {
       return `Warning notice ${insert}must be ${maxServiceCentreWarningNoticeLength} characters or fewer`;
     } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {

@@ -159,7 +159,7 @@ test.describe(
           const expectedEnglish =
             'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
           const expectedWelsh =
-            'Warning notice in welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+            'Warning notice in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 
           await expect(serviceCentreWarningNoticePage.successPanel).not.toBeVisible();
           await expect(serviceCentreWarningNoticePage.page.locator('#warningNotice-error')).toContainText(
