@@ -1,0 +1,97 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/common-components.njk" import addressBlock, addressType, rowActions %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% set addressTableRows = [] %}
+  {% set addressTableHead = [
+    {
+      text: "Address type",
+      classes: "govuk-!-width-one-quarter"
+    },
+    {
+      text: "Address",
+      classes: "govuk-!-width-one-half"
+    }
+  ] %}
+  {% if not isViewer %}
+    {% set addressTableHead = (addressTableHead.push({
+      text: "Actions",
+      classes: "govuk-!-width-one-quarter"
+    }), addressTableHead) %}
+  {% endif %}
+  {% if serviceCentreAddresses.length %}
+    {% for address in serviceCentreAddresses %}
+      {% set addressTableRow = [
+        {
+          html: addressType(address)
+        },
+        {
+          html: addressBlock(address)
+        }
+      ] %}
+      {% if not isViewer %}
+        {% set addressTableRow = (addressTableRow.push({
+          html: rowActions([
+            {
+              href: '/service-centres/' + serviceCentreId + '/edit/address/find/' + address.id,
+              text: 'Edit'
+            },
+            {
+              href: '/service-centres/' + serviceCentreId + '/edit/address/delete/' + address.id,
+              text: 'Delete'
+            }
+          ])
+        }), addressTableRow) %}
+      {% endif %}
+      {% set addressTableRows = (addressTableRows.push(addressTableRow), addressTableRows) %}
+    {% endfor %}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Address</h1>
+      <span class="govuk-caption-l">You can have 0-1 addresses per service centre</span>
+
+      {% if serviceCentreAddresses.length === 0 and isNewSC %}
+        {{ govukWarningText({
+          text: "If you do not add an address, this service centre will be marked as closed.",
+          iconFallbackText: "Warning"
+        }) }}
+      {% endif %}
+
+      {% if addressTableRows.length %}
+        {{ govukTable({
+          firstCellIsHeader: false,
+          head: addressTableHead,
+          rows: addressTableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">No addresses are currently configured.</p>
+      {% endif %}
+
+      {% if not isViewer and serviceCentreAddresses.length === 0 %}
+
+        {% set findUrl %}
+          {% if isNewSC %}
+            /service-centres/{{ serviceCentreId }}/edit/address/find?isNewSC=true
+          {% else %}
+            /service-centres/{{ serviceCentreId }}/edit/address/find
+          {% endif %}
+        {% endset %}
+
+        {{ govukButton({
+          text: "Add address",
+          href: findUrl
+        }) }}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+

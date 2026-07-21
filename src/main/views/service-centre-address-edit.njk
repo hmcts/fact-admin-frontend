@@ -1,0 +1,146 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% if address.errors %}
+    {{ modelDrivenErrorSummary(address.errors) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">Address</h1>
+
+      {% set actionUrl %}
+        {% if addressId %}
+          /service-centres/{{ serviceCentreId }}/edit/address/details/success/{{ addressId }}
+        {% else %}
+          /service-centres/{{ serviceCentreId }}/edit/address/details/success
+        {% endif %}
+      {% endset %}
+
+      <form action="{{ actionUrl }}" method="post">
+
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
+
+        {% call govukFieldset({
+          legend: {
+            text: "Enter an address",
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+          }
+        }) %}
+          {{ govukRadios({
+            idPrefix: "addressType",
+            name: "addressType",
+            id: "addressType",
+            fieldset: {
+              legend: {
+                text: "Select what applies"
+              }
+            },
+            items: [
+              { value: "VISIT_US", text: "Visit", checked: address.addressType == "VISIT_US" },
+              { value: "WRITE_TO_US", text: "Send documents to", checked: address.addressType == "WRITE_TO_US" },
+              { value: "VISIT_OR_CONTACT_US", text: "Visit and send documents to", checked: address.addressType == "VISIT_OR_CONTACT_US" }
+            ],
+            errorMessage: {
+              text: address.errors.addressType[0]
+            } if address.errors.addressType else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Address line 1"
+            },
+            spellcheck: false,
+            id: "addressLine1",
+            name: "addressLine1",
+            autocomplete: "address-line1",
+            value: address.addressLine1,
+            errorMessage: {
+              text: address.errors.addressLine1[0]
+            } if address.errors.addressLine1 else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Address line 2 (optional)"
+            },
+            spellcheck: false,
+            id: "addressLine2",
+            name: "addressLine2",
+            autocomplete: "address-line2",
+            value: address.addressLine2,
+            errorMessage: {
+              text: address.errors.addressLine2[0]
+            } if address.errors.addressLine2 else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Town or city"
+            },
+            spellcheck: false,
+            classes: "govuk-!-width-two-thirds",
+            id: "townCity",
+            name: "townCity",
+            autocomplete: "address-level2",
+            value: address.townCity,
+            errorMessage: {
+              text: address.errors.townCity[0]
+            } if address.errors.townCity else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "County (optional)"
+            },
+            spellcheck: false,
+            classes: "govuk-!-width-two-thirds",
+            id: "county",
+            name: "county",
+            value: address.county,
+            errorMessage: {
+              text: address.errors.county[0]
+            } if address.errors.county else null
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Postcode"
+            },
+            hint: {
+              text: "Please enter full UK postcode, for example BS1 6GR"
+            },
+            classes: "govuk-input--width-10",
+            id: "postcode",
+            name: "postcode",
+            spellcheck: false,
+            autocomplete: "postal-code",
+            value: address.postcode,
+            errorMessage: {
+              text: address.errors.postcode[0]
+            } if address.errors.postcode else null
+          }) }}
+
+        {% endcall %}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+

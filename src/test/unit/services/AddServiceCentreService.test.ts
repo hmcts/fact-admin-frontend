@@ -174,7 +174,7 @@ describe('AddServiceCentreService', () => {
     await expect(
       service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
     ).resolves.toEqual({
-      addressRedirectUrl: `/service-centres/${createdServiceCentre.id}/edit/address`,
+      addressRedirectUrl: `/service-centres/${createdServiceCentre.id}/edit/address?isNewSC=true`,
       pagePath: '/add-service-centre/success',
       pageTitle: `New service centre created - ${createdServiceCentre.name}`,
       serviceCentreId: createdServiceCentre.id,

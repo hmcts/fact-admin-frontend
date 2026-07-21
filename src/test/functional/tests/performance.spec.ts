@@ -1,6 +1,6 @@
 import { expect, test } from '../fixtures';
 import { seedAuditTrailViaUi } from '../helpers/auditTestSupport';
-import { withCreatedCourt } from '../helpers/testSupport';
+import { withCreatedCourt, withCreatedServiceCentre } from '../helpers/testSupport';
 import { config } from '../utils';
 
 const LIGHTHOUSE_THRESHOLDS = {
@@ -106,6 +106,29 @@ test.describe(
       });
     });
 
+    test('Service Centre Cases Heard Page Performance', async ({
+      serviceCentreCasesHeardPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Cases Heard Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreCasesHeardPage.goto(createdServiceCentre.id);
+          await serviceCentreCasesHeardPage.header.checkIsVisible();
+          const breadcrumb = serviceCentreCasesHeardPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
     test('Translation and Interpretation Page Performance', async ({
       lighthouseUtils,
       playwright,
@@ -148,6 +171,29 @@ test.describe(
       );
     });
 
+    test('Service Centre Address List Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      serviceCentreAddressListPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address Edit Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressListPage.goto(createdServiceCentre.id);
+          await serviceCentreAddressListPage.header.checkIsVisible();
+          const breadcrumb = serviceCentreAddressListPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
     test('Court Opening Hours Page Performance', async ({ courtOpeningHoursPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Opening Hours Performance Test', {}, async ({ createdCourt }) => {
         await courtOpeningHoursPage.goto(createdCourt.id);
@@ -175,6 +221,23 @@ test.describe(
       );
     });
 
+    test('Service Centre Address Find Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      serviceCentreAddressFindPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address Edit Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressFindPage.goto(createdServiceCentre.id);
+          await serviceCentreAddressFindPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
     test('Address Select Page Performance', async ({ lighthouseUtils, playwright, courtAddressSelectPage }) => {
       await withCreatedCourt(
         playwright,
@@ -183,6 +246,23 @@ test.describe(
         async ({ createdCourt }) => {
           await courtAddressSelectPage.goto(createdCourt.id, 'SW1A 1AA');
           await courtAddressSelectPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Service Centre Address Select Page Performance', async ({
+      lighthouseUtils,
+      playwright,
+      serviceCentreAddressSelectPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address Edit Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressSelectPage.goto(createdServiceCentre.id, 'SW1A 1AA');
+          await serviceCentreAddressSelectPage.header.checkIsVisible();
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         }
       );
@@ -201,6 +281,33 @@ test.describe(
           await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
           await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
         });
+      }
+    );
+
+    test(
+      'Service Centre General Page Performance',
+      {
+        tag: '@performance',
+      },
+      async ({ serviceCentreGeneralPage, lighthouseUtils, playwright }) => {
+        await withCreatedServiceCentre(
+          playwright,
+          'Service Centre General Performance Test',
+          {},
+          async ({ createdServiceCentre }) => {
+            await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+            await serviceCentreGeneralPage.header.checkIsVisible();
+            const breadcrumb = serviceCentreGeneralPage.page.getByLabel('Breadcrumb');
+
+            await expect(breadcrumb).toBeVisible();
+            await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+            await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+              'href',
+              `/service-centres/${createdServiceCentre.id}/edit`
+            );
+            await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+          }
+        );
       }
     );
 
@@ -401,6 +508,121 @@ test.describe(
         await courtContactDetailsPage.header.checkIsVisible();
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
+    });
+
+    test('Service Centre Contact List Page Performance', async ({
+      serviceCentreContactDetailsPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact List Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreContactDetailsPage.goto(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.header.checkIsVisible();
+          const breadcrumb = serviceCentreContactDetailsPage.page.getByLabel('Breadcrumb');
+          await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+          await expect(breadcrumb.getByRole('link', { name: createdServiceCentre.name })).toHaveAttribute(
+            'href',
+            `/service-centres/${createdServiceCentre.id}/edit`
+          );
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Service Centre Contact Add Page Performance', async ({
+      serviceCentreContactDetailsPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Add Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Service Centre Contact Edit Page Performance', async ({
+      serviceCentreContactDetailsPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Edit Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          const uniqueSuffix = Date.now();
+          const contactEmail = `perf-contact-${uniqueSuffix}@example.test`;
+
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.selectFirstAvailableContactType();
+          await serviceCentreContactDetailsPage.emailCheckbox.check();
+          await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
+          await serviceCentreContactDetailsPage.explanationInput.fill('Performance edit test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Cyswllt prawf golygu perfformiad');
+          await serviceCentreContactDetailsPage.save();
+          await serviceCentreContactDetailsPage.backToContactDetailsLink.click();
+
+          await serviceCentreContactDetailsPage.clickEditForRowText(contactEmail);
+          await serviceCentreContactDetailsPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Service Centre Contact Delete Page Performance', async ({
+      serviceCentreContactDetailsPage,
+      lighthouseUtils,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Delete Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          const uniqueSuffix = Date.now();
+          const contactEmail = `perf-delete-${uniqueSuffix}@example.test`;
+
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.selectFirstAvailableContactType();
+          await serviceCentreContactDetailsPage.emailCheckbox.check();
+          await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
+          await serviceCentreContactDetailsPage.explanationInput.fill('Performance delete test contact');
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Cyswllt prawf dileu perfformiad');
+          await serviceCentreContactDetailsPage.save();
+          await serviceCentreContactDetailsPage.backToContactDetailsLink.click();
+
+          await serviceCentreContactDetailsPage.clickDeleteForRowText(contactEmail);
+          await serviceCentreContactDetailsPage.header.checkIsVisible();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
+    });
+
+    test('Service Centre Warning Notice Page Performance', async ({
+      lighthouseUtils,
+      serviceCentreWarningNoticePage,
+      playwright,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Warning Notice Performance Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
+          await serviceCentreWarningNoticePage.expectVisibleElements();
+          await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+        }
+      );
     });
 
     test('Counter Service Opening Hours List Page Performance', async ({
