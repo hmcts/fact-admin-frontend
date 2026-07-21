@@ -2,7 +2,7 @@ import { Request } from 'express';
 
 import { isUuid } from '../../utils/valueParsers';
 
-export type RouteParamName = 'courtId' | 'contactDetailId';
+export type RouteParamName = 'courtId' | 'contactDetailId' | 'serviceCentreId' | 'addressId';
 
 export const getRouteParam = (req: Request, paramName: RouteParamName): string | undefined => {
   const paramValue = req.params[paramName];
