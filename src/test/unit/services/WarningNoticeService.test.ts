@@ -188,12 +188,20 @@ describe('WarningNoticeService', () => {
           warningNoticeCy: 'Cau dros dro @ 5pm',
         },
         errors: {
-          warningNotice: 'Warning notice contains invalid characters',
-          warningNoticeCy: 'Welsh warning notice contains invalid characters',
+          warningNotice:
+            'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+          warningNoticeCy:
+            'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
         },
         errorSummary: [
-          { href: '#warningNotice', text: 'Warning notice contains invalid characters' },
-          { href: '#warningNoticeCy', text: 'Welsh warning notice contains invalid characters' },
+          {
+            href: '#warningNotice',
+            text: 'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+          },
+          {
+            href: '#warningNoticeCy',
+            text: 'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+          },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
       },

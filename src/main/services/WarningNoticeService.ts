@@ -138,11 +138,13 @@ export class WarningNoticeService {
     }
 
     if (warningNotice && !ENGLISH_WARNING_NOTICE_ALLOWED_CHARACTERS.test(warningNotice)) {
-      errors.warningNotice = 'Warning notice contains invalid characters';
+      errors.warningNotice =
+        'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
     }
 
     if (warningNoticeCy && !WELSH_WARNING_NOTICE_ALLOWED_CHARACTERS.test(warningNoticeCy)) {
-      errors.warningNoticeCy = 'Welsh warning notice contains invalid characters';
+      errors.warningNoticeCy =
+        'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
     }
 
     return errors;
