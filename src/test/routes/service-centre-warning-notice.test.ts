@@ -17,6 +17,7 @@ describe('Service centre warning notice page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
+      warningNoticeCy: null,
     } as never);
 
     const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/warning-notice`);
@@ -32,6 +33,7 @@ describe('Service centre warning notice page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
+      warningNoticeCy: null,
     } as never);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
 
@@ -54,6 +56,7 @@ describe('Service centre warning notice page', () => {
       regionId: null,
       slug: 'reading-service-centre',
       warningNotice: null,
+      warningNoticeCy: null,
     } as never);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
@@ -62,12 +65,16 @@ describe('Service centre warning notice page', () => {
       regionId: null,
       slug: 'reading-service-centre',
       warningNotice: 'Trimmed warning notice',
+      warningNoticeCy: 'Hysbysiad rhybudd wedi ei docio',
     } as never);
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/warning-notice/success`)
       .type('form')
-      .send({ warningNotice: '  Trimmed warning notice  ' });
+      .send({
+        warningNotice: '  Trimmed warning notice  ',
+        warningNoticeCy: '  Hysbysiad rhybudd wedi ei docio  ',
+      });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Warning notice saved');
@@ -77,6 +84,7 @@ describe('Service centre warning notice page', () => {
     expect(updateServiceCentreStub.firstCall.args[0]).toMatchObject({
       id: serviceCentreId,
       warningNotice: 'Trimmed warning notice',
+      warningNoticeCy: 'Hysbysiad rhybudd wedi ei docio',
     });
   });
 });

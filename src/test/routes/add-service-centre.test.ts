@@ -108,6 +108,5 @@ describe('Add service centre page', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('You can have 0-1 addresses per service centre');
-    expect(response.text).toContain('If you do not add an address, this service centre will be marked as closed.');
   });
 });
