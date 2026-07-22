@@ -4,7 +4,6 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { DataApiRequests } from '../../main/requests/DataApiRequests';
-import { Region } from '../../main/schemas/regionSchema';
 
 describe('Service centre general page', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';
@@ -12,14 +11,7 @@ describe('Service centre general page', () => {
     { id: '22222222-2222-4222-8222-222222222222', name: 'Adoption' },
     { id: '33333333-3333-4333-8333-333333333333', name: 'Children' },
   ];
-
-  const regions: Region[] = [
-    { id: '471dd8a0-d8db-49b1-8257-f42d7ac0329b', name: 'Eastern', country: 'England' },
-    { id: '1e4c93c2-e39b-4aee-90d5-45a68fcb0202', name: 'North West', country: 'England' },
-    { id: '01ed3123-c9c4-4c9f-9dbc-20f72c05c6ac', name: 'North East', country: 'England' },
-    { id: '03a67431-c650-4298-a7e7-38270ed04506', name: 'South East', country: 'England' },
-    { id: '1f02aa9a-fb39-45c3-a90a-25ae10608ab2', name: 'South West', country: 'England' },
-  ];
+  const regions = [{ country: 'england', id: '44444444-4444-4444-8444-444444444444', name: 'South East' }];
 
   beforeEach(() => {
     restore();
@@ -30,12 +22,13 @@ describe('Service centre general page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
+      regionId: regions[0].id,
       serviceAreaIds: [serviceAreas[0].id],
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
     stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions as never);
+    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
 
     const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/general`);
 
@@ -68,22 +61,24 @@ describe('Service centre general page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
+      regionId: regions[0].id,
       serviceAreaIds: [serviceAreas[0].id],
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
     stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
     stub(DataApiRequests.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
     stub(DataApiRequests.prototype, 'getServiceCentreByName').resolves(HttpStatusCode.NotFound);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
       name: 'Updated Service Centre',
       open: false,
+      regionId: regions[0].id,
       serviceAreaIds: [serviceAreas[1].id],
       slug: 'updated-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions as never);
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/general/success`)
@@ -101,6 +96,7 @@ describe('Service centre general page', () => {
       id: serviceCentreId,
       name: 'Updated Service Centre',
       open: false,
+      regionId: regions[0].id,
       serviceAreaIds: [serviceAreas[1].id],
     });
   });
@@ -110,18 +106,19 @@ describe('Service centre general page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
+      regionId: regions[0].id,
       serviceAreaIds: [serviceAreas[0].id],
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
     stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions as never);
+    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/general/success`)
       .type('form')
-      .send('name=Updated%20Service%20Centre&open=true');
+      .send(`name=Updated%20Service%20Centre&open=true&regionId=${regions[0].id}`);
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('There is a problem');

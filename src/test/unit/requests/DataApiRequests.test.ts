@@ -1275,7 +1275,6 @@ describe('DataApiRequests', () => {
     };
     const userEntity = {
       email: 'user@justice.gov.uk',
-      favouriteCourts: ['3fa85f64-5717-4562-b3fc-2c963f66afa6'],
       id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       lastLogin: '2026-05-27T10:35:23.406Z',
       role: 'ADMIN',
@@ -1297,7 +1296,6 @@ describe('DataApiRequests', () => {
     };
     const userEntity = {
       email: 'viewer@justice.gov.uk',
-      favouriteCourts: null,
       id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       lastLogin: '2026-05-27T10:35:23.406Z',
       role: 'Viewer',
@@ -1312,13 +1310,13 @@ describe('DataApiRequests', () => {
     expect(postStub.calledWith('/user/v1', user)).toBe(true);
   });
 
-  it('returns the user entity when create/update user response has no favourite courts', async () => {
+  it('strips the legacy favouriteCourts field from a create/update user response', async () => {
     const user = {
       email: 'user@justice.gov.uk',
       ssoId: '00000000-0000-0000-0000-000000000000',
       role: 'Admin' as const,
     };
-    const userEntity = {
+    const legacyUserEntity = {
       email: 'user@justice.gov.uk',
       favouriteCourts: null,
       id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -1327,11 +1325,17 @@ describe('DataApiRequests', () => {
       ssoId: '00000000-0000-0000-0000-000000000000',
     };
 
-    postStub.withArgs('/user/v1', user).resolves({ data: userEntity });
+    postStub.withArgs('/user/v1', user).resolves({ data: legacyUserEntity });
 
     const response = await dataApiRequests.createUpdateUser(user);
 
-    expect(response).toEqual(userEntity);
+    expect(response).toEqual({
+      email: legacyUserEntity.email,
+      id: legacyUserEntity.id,
+      lastLogin: legacyUserEntity.lastLogin,
+      role: legacyUserEntity.role,
+      ssoId: legacyUserEntity.ssoId,
+    });
   });
 
   it('returns internal server error when create/update user response fails schema validation', async () => {
@@ -1390,7 +1394,6 @@ describe('DataApiRequests', () => {
       content: [
         {
           email: 'admin@example.com',
-          favouriteCourts: null,
           id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
           lastLogin: '2026-05-27T10:35:23.406Z',
           role: 'Admin',
@@ -2922,7 +2925,6 @@ describe('DataApiRequests', () => {
           userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
           user: {
             email: 'admin@example.com',
-            favouriteCourts: null,
             id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
             lastLogin: '2026-06-26T09:10:11.123Z',
             role: 'SUPER_ADMIN',
@@ -3021,7 +3023,6 @@ describe('DataApiRequests', () => {
       userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
       user: {
         email: 'admin@example.com',
-        favouriteCourts: null,
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         lastLogin: '2026-06-26T09:10:11.123Z',
         role: 'SUPER_ADMIN',
