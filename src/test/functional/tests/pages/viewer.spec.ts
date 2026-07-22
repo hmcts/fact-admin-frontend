@@ -177,7 +177,7 @@ test.describe(
           await expect(page.getByRole('heading', { name: `Reviewing - ${createdServiceCentre.name}` })).toBeVisible();
 
           await page.getByRole('link', { name: 'Address' }).click();
-          await expect(page.getByRole('heading', { name: 'Service centre address' })).toBeVisible();
+          await expect(page.getByRole('heading', { name: 'Address' })).toBeVisible();
           await expect(page.locator('form')).toHaveCount(0);
           await expect(page.getByRole('button')).toHaveCount(0);
 
@@ -188,6 +188,46 @@ test.describe(
 
           await page.goto(config.urls.homePageUrl + reviewPath);
           await expect(page.getByRole('button', { name: 'Approve data' })).toHaveCount(0);
+        }
+      );
+    });
+
+    test('renders every implemented service-centre page read-only and denies other admin pages', async ({
+      page,
+      playwright,
+    }) => {
+      test.slow();
+
+      await withCreatedServiceCentre(
+        playwright,
+        'Viewer Service Centre Read Only Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          for (const section of ['cases-heard', 'general', 'warning-notice']) {
+            await page.goto(`${config.urls.homePageUrl}/service-centres/${createdServiceCentre.id}/edit/${section}`);
+            await expect(page.locator('form fieldset[disabled]').first()).toBeVisible();
+            await expect(page.getByRole('button', { name: 'Save' })).toHaveCount(0);
+          }
+
+          await page.goto(`${config.urls.homePageUrl}/service-centres/${createdServiceCentre.id}/edit/address`);
+          await expect(page.getByRole('heading', { name: 'Address' })).toBeVisible();
+          await expect(page.getByRole('button', { name: 'Add address' })).toHaveCount(0);
+          await expect(page.getByRole('main').getByRole('link', { name: /^(Edit|Delete)$/ })).toHaveCount(0);
+
+          await page.goto(`${config.urls.homePageUrl}/service-centres/${createdServiceCentre.id}/edit/contact-details`);
+          const mainContent = page.getByRole('main');
+          await expect(mainContent.getByRole('button', { name: 'Add contact detail' })).toHaveCount(0);
+          await expect(mainContent.getByRole('link', { name: 'Delete', exact: true })).toHaveCount(0);
+          await expect(mainContent.getByRole('link', { name: 'Edit', exact: true })).toHaveCount(0);
+          const viewContactLink = mainContent.getByRole('link', { name: 'View', exact: true }).first();
+          await expect(viewContactLink).toBeVisible();
+          await viewContactLink.click();
+          await expect(page.getByRole('heading', { name: 'View contact details' })).toBeVisible();
+          await expect(page.locator('form fieldset[disabled]').first()).toBeVisible();
+          await expect(page.getByRole('button', { name: 'Save' })).toHaveCount(0);
+
+          await page.goto(`${config.urls.homePageUrl}/approvals`);
+          await expect(page.getByRole('heading', { name: 'Access Denied' })).toBeVisible();
         }
       );
     });
@@ -202,7 +242,7 @@ test.describe(
   () => {
     test.use({ storageState: config.users.admin.sessionFile });
 
-    test('does not show approval controls to Admin', async ({ page, playwright }) => {
+    test('does not show court approval controls to Admin', async ({ page, playwright }) => {
       await withCreatedCourt(playwright, 'Admin Approval Permission Test', {}, async ({ createdCourt }) => {
         const editPath = `/courts/${createdCourt.id}/edit`;
         await page.goto(config.urls.homePageUrl + editPath);
@@ -214,6 +254,25 @@ test.describe(
         await page.goto(`${config.urls.homePageUrl}${editPath}/approve`);
         await expect(page.getByRole('heading', { name: 'Access Denied' })).toBeVisible();
       });
+    });
+
+    test('does not show service-centre approval controls to Admin', async ({ page, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Admin Service Centre Approval Permission Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          const editPath = `/service-centres/${createdServiceCentre.id}/edit`;
+          await page.goto(config.urls.homePageUrl + editPath);
+
+          await expect(page.getByRole('heading', { name: `Editing - ${createdServiceCentre.name}` })).toBeVisible();
+          await expect(page.getByRole('button', { name: 'Approve data' })).toHaveCount(0);
+          await expect(page.getByRole('heading', { name: 'Approve data' })).toHaveCount(0);
+
+          await page.goto(`${config.urls.homePageUrl}${editPath}/approve`);
+          await expect(page.getByRole('heading', { name: 'Access Denied' })).toBeVisible();
+        }
+      );
     });
   }
 );
@@ -259,6 +318,50 @@ test.describe(
         await page.getByRole('button', { name: 'Apply filters' }).click();
         await expect(page.getByRole('row').filter({ hasText: createdCourt.name })).toContainText('Not approved');
       });
+    });
+
+    test('can approve a service centre and undo its approval from the tracker', async ({ page, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'SuperAdmin Approval Undo Test',
+        {},
+        async ({ createdServiceCentre }) => {
+          const editPath = `/service-centres/${createdServiceCentre.id}/edit`;
+          await page.goto(config.urls.homePageUrl + editPath);
+
+          await page.getByRole('button', { name: 'Approve data' }).click();
+          await page.getByRole('button', { name: 'Confirm data' }).click();
+          await expect(page.getByText(`You have approved the data for ${createdServiceCentre.name}.`)).toBeVisible();
+
+          await page.goto(`${config.urls.homePageUrl}/approvals`);
+          await page.getByLabel('Search by name').fill(createdServiceCentre.name);
+          await page.getByLabel('Approval status').selectOption('approved');
+          await page.getByRole('button', { name: 'Apply filters' }).click();
+
+          const approvalRow = page.getByRole('row').filter({ hasText: createdServiceCentre.name });
+          await expect(approvalRow).toContainText('Approved');
+          await approvalRow.getByRole('link', { name: 'Undo approval' }).click();
+
+          await expect(
+            page.getByRole('heading', {
+              name: 'Are you sure you want to undo the data approval for this court/service centre/tribunal?',
+            })
+          ).toBeVisible();
+          await expect(page.getByText(createdServiceCentre.name, { exact: true })).toBeVisible();
+          await page.getByRole('button', { name: 'Undo approval' }).click();
+          await expect(
+            page.getByText(`You have undone the data approval for ${createdServiceCentre.name}.`)
+          ).toBeVisible();
+
+          await page.getByRole('link', { name: 'Back to Approval tracker' }).click();
+          await page.getByLabel('Search by name').fill(createdServiceCentre.name);
+          await page.getByLabel('Approval status').selectOption('not-approved');
+          await page.getByRole('button', { name: 'Apply filters' }).click();
+          await expect(page.getByRole('row').filter({ hasText: createdServiceCentre.name })).toContainText(
+            'Not approved'
+          );
+        }
+      );
     });
   }
 );

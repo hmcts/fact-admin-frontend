@@ -1,12 +1,21 @@
+import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
+
 export type BreadcrumbItem = {
   href?: string;
   text: string;
 };
 
-export function buildEditBreadcrumbs(courtId: string, courtName: string): BreadcrumbItem[] {
+export function buildEditBreadcrumbs(
+  subjectId: string,
+  subjectName: string,
+  subjectType: Subject = SubjectType.COURT
+): BreadcrumbItem[] {
   return [
     { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: `Edit ${courtName}` },
+    {
+      href: `/${subjectType === SubjectType.COURT ? 'courts' : 'service-centres'}/${subjectId}/edit`,
+      text: `Edit ${subjectName}`,
+    },
   ];
 }
 
@@ -15,11 +24,15 @@ export function buildSectionBreadcrumbs(
   courtName: string,
   sectionText: string,
   sectionPath: string,
-  currentPage?: string
+  currentPage?: string,
+  subjectType: Subject = SubjectType.COURT
 ): BreadcrumbItem[] {
   const breadcrumbs: BreadcrumbItem[] = [
-    ...buildEditBreadcrumbs(courtId, courtName),
-    { href: `/courts/${courtId}/edit/${sectionPath}`, text: sectionText },
+    ...buildEditBreadcrumbs(courtId, courtName, subjectType),
+    {
+      href: `/${subjectType === SubjectType.COURT ? 'courts' : 'service-centres'}/${courtId}/edit/${sectionPath}`,
+      text: sectionText,
+    },
   ];
 
   if (currentPage) {

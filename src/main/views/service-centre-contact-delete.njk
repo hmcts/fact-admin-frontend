@@ -1,0 +1,53 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro contactDetailsBlock(contactDetail) %}
+  {% set parts = [] %}
+  {% if contactDetail.explanation %}
+    {% set parts = (parts.push(contactDetail.explanation), parts) %}
+  {% endif %}
+  {% if contactDetail.phoneNumber %}
+    {% set parts = (parts.push('Phone: ' + contactDetail.phoneNumber), parts) %}
+  {% endif %}
+  {% if contactDetail.email %}
+    {% set parts = (parts.push('Email: ' + contactDetail.email), parts) %}
+  {% endif %}
+  {{ parts.join('<br>') | safe }}
+{% endmacro %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Are you sure you want to delete these contact details?</h1>
+
+      <form method="POST" action="/service-centres/{{ serviceCentreId }}/edit/contact-details/delete/{{ contactDetailId }}/success">
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Service centre" },
+              value: { text: serviceCentreName }
+            },
+            {
+              key: { text: "Description" },
+              value: { text: contactDetail.description or '' }
+            },
+            {
+              key: { text: "Details" },
+              value: { html: contactDetailsBlock(contactDetail) }
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Yes, delete contact details",
+          classes: "govuk-button--warning"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

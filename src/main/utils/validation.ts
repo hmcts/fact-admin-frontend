@@ -10,7 +10,7 @@ export const addError = (
   key: string,
   messages?: string[] | undefined | null
 ): string[] | undefined => {
-  if (!messages) {
+  if (!messages || messages.length === 0) {
     return;
   }
   return (errors[key] = [...(errors[key] ?? []), ...messages]);
@@ -21,11 +21,11 @@ export type Rule = {
   validate: (model) => string[] | undefined | null;
 };
 
-//  Reusable pattern rule
+// Reusable pattern rule
 export const patternRule = (key: string, regex: RegExp, message: string): Rule => ({
   key,
   validate: m => {
-    const value = (m[key] as unknown as string)?.trim();
+    const value = m[key] as unknown as string;
     if (!value) {
       return undefined;
     } // let required rules handle empty

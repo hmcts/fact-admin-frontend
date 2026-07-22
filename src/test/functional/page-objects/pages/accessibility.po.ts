@@ -35,6 +35,10 @@ export class AccessibilityPage extends Base {
     await this.page.locator('#accessibleToiletDescription').fill(value);
   }
 
+  async fillAccessibleToiletDescriptionCy(value: string): Promise<void> {
+    await this.page.locator('#accessibleToiletDescriptionCy').fill(value);
+  }
+
   async fillAccessibleEntrancePhoneNumber(value: string): Promise<void> {
     await this.page.locator('#accessibleEntrancePhoneNumber').fill(value);
   }

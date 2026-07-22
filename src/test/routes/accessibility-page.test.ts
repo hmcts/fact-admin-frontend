@@ -80,6 +80,7 @@ describe('Accessibility page', () => {
     const response = await request(app).post(`/courts/${courtId}/edit/accessibility/success`).type('form').send({
       accessibleParking: 'true',
       accessibleToiletDescription: 'Accessible toilet available near reception',
+      accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
       accessibleEntrance: 'true',
       hearingEnhancementEquipment: 'infraredAndHearingLoop',
       lift: 'true',
@@ -146,6 +147,7 @@ describe('Accessibility page', () => {
     const response = await request(app).post(`/courts/${courtId}/edit/accessibility/success`).type('form').send({
       accessibleParking: 'true',
       accessibleToiletDescription: 'Accessible toilet available near reception',
+      accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
       accessibleEntrance: 'true',
       hearingEnhancementEquipment: 'infraredAndHearingLoop',
       lift: 'true',

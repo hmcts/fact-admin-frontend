@@ -1,0 +1,140 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% set regionOptions = [] %}
+{% if model.regions.length %}
+  {% set regionOptions = (regionOptions.push({ value: "", text: "Select a region" }), regionOptions) %}
+  {% for row in model.regions %}
+    {% set regionOptions = (regionOptions.push(
+      { value: row.id, text: row.name, selected: row.id === model.regionId }
+    ), regionOptions) %}
+  {% endfor %}
+{% endif %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model.errors) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">General</h1>
+
+      <form method="post" action="/service-centres/{{ model.id }}/edit/general/success">
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+          <legend class="govuk-fieldset__legend govuk-visually-hidden">General details</legend>
+
+          {{ govukInput({
+            label: {
+              text: "Service centre name",
+              classes: "govuk-label--m"
+            },
+            hint: {
+              text: "Enter the name of the service centre. Only capitalise the first letter."
+            },
+            id: "name",
+            name: "name",
+            spellcheck: true,
+            value: model.name,
+            errorMessage: {
+              text: model.errors.name[0]
+            } if model.errors and model.errors.name else null
+          }) }}
+
+          {{ govukRadios({
+            classes: "govuk-radios--inline",
+            id: "open",
+            name: "open",
+            fieldset: {
+              legend: {
+                text: "Service centre status",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: [
+              {
+                value: "true",
+                text: "Open",
+                checked: true if model.open else false
+              },
+              {
+                value: "false",
+                text: "Closed",
+                checked: false if model.open else true
+              }
+            ],
+            errorMessage: {
+              text: model.errors.open[0]
+            } if model.errors and model.errors.open else null
+          }) }}
+
+          {{ govukSelect({
+            id: "regionId",
+            name: "regionId",
+            label: {
+              text: "Region",
+              classes: "govuk-label--m"
+            },
+            hint: {
+              text: "Select the region in which the service centre is located."
+            },
+            items: regionOptions,
+            errorMessage: {
+              text: model.errors.regionId[0]
+            } if model.errors and model.errors.regionId else null
+          }) }}
+
+        </fieldset>
+
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+          <div class="govuk-form-group{% if model.errors and model.errors.serviceAreaIds %} govuk-form-group--error{% endif %}" id="serviceAreaIds">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              Service areas
+            </legend>
+            <div id="serviceAreaIds-hint" class="govuk-hint">
+              Please specify the service areas of the service centre. This affects citizen search results.
+            </div>
+            {% if model.errors and model.errors.serviceAreaIds %}
+              <p class="govuk-error-message" id="serviceAreaIds-error">
+                <span class="govuk-visually-hidden">Error:</span> {{ model.errors.serviceAreaIds[0] }}
+              </p>
+            {% endif %}
+            <div class="govuk-grid-row cases-heard-columns">
+              <div class="govuk-grid-column-one-half">
+                {{ govukCheckboxes({
+                  classes: "cases-heard-checkboxes",
+                  idPrefix: "serviceAreaIds-left",
+                  name: "serviceAreaIds",
+                  items: model.leftColumnServiceAreaItems
+                }) }}
+              </div>
+              <div class="govuk-grid-column-one-half">
+                {{ govukCheckboxes({
+                  classes: "cases-heard-checkboxes",
+                  idPrefix: "serviceAreaIds-right",
+                  name: "serviceAreaIds",
+                  items: model.rightColumnServiceAreaItems
+                }) }}
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
+      </form>
+    </div>
+  </div>
+{% endblock %}

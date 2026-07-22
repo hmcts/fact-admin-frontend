@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 
 import { canApprove, getFactUserId, isViewer } from '../modules/authentication/authenticationHelper';
 import { ApprovalSubjectType } from '../schemas/approvalSchema';
+import { Subject } from '../schemas/subjectTypeSchema';
 import { ApprovalService, ApproveDataViewModel } from '../services/ApprovalService';
 import { isUuid } from '../utils/valueParsers';
 
@@ -15,7 +16,7 @@ type Location = {
 type AdditionalEditViewModel = Record<string, unknown>;
 
 type LocationApprovalControllerOptions = {
-  buildBreadcrumbs?: (locationId: string, locationName: string) => BreadcrumbItem[];
+  buildBreadcrumbs?: (locationId: string, locationName: string, subjectType: Subject) => BreadcrumbItem[];
   editView: string;
   getAdditionalEditViewModel?: (req: Request, locationId: string) => Promise<AdditionalEditViewModel | HttpStatusCode>;
   getLocation: (locationId: string) => Promise<Location | HttpStatusCode>;
@@ -70,7 +71,7 @@ export class LocationApprovalController {
       ...approvalAction,
       ...additionalViewModel,
       ...(this.options.buildBreadcrumbs
-        ? { breadcrumbs: this.options.buildBreadcrumbs(locationId, location.name) }
+        ? { breadcrumbs: this.options.buildBreadcrumbs(locationId, location.name, this.options.subjectType) }
         : {}),
       [this.options.locationIdViewKey]: locationId,
       [this.options.locationNameViewKey]: location.name,

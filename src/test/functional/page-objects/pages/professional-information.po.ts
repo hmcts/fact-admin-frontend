@@ -83,12 +83,20 @@ export class ProfessionalInformationPage extends Base {
     return this.page.locator(`#dxCodeDescription-${index}`);
   }
 
+  dxCodeDescriptionCyInput(index: number): Locator {
+    return this.page.locator(`#dxCodeDescriptionCy-${index}`);
+  }
+
   faxNumberInput(index: number): Locator {
     return this.page.locator(`#faxNumber-${index}`);
   }
 
   faxNumberDescriptionInput(index: number): Locator {
     return this.page.locator(`#faxNumberDescription-${index}`);
+  }
+
+  faxNumberDescriptionCyInput(index: number): Locator {
+    return this.page.locator(`#faxNumberDescriptionCy-${index}`);
   }
 
   codeInput(id: string): Locator {
@@ -109,9 +117,5 @@ export class ProfessionalInformationPage extends Base {
 
   buildProfessionalInformationSuccessUrl(courtId: string): string {
     return config.urls.homePageUrl + `/courts/${courtId}/edit/information-for-professionals/success`;
-  }
-
-  buildCourtEditUrl(courtId: string): string {
-    return config.urls.homePageUrl + `/courts/${courtId}/edit`;
   }
 }

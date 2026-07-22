@@ -1,0 +1,16 @@
+{% extends "template.njk" %}
+{% from "macros/common-components.njk" import successPanel %}
+{% from "macros/common-components.njk" import addressBlock %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {{ successPanel("Address deleted: " + addressBlock(address, true), "You have removed this address for " + serviceCentreName) }}
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a href="/service-centres/{{ serviceCentreId }}/edit/address" class="govuk-link govuk-link--no-visited-state">Back to address</a></li>
+    <li><a href="/" class="govuk-link govuk-link--no-visited-state">Home</a></li>
+  </ul>
+{% endblock %}

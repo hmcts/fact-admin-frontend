@@ -1,0 +1,80 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% if error %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{
+        text: error,
+        href: "#postcode"
+      }]
+    }) }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Find address by postcode</h1>
+
+      {% set actionUrl %}
+        {% if addressId %}
+          /service-centres/{{ serviceCentreId }}/edit/address/select/{{ addressId }}
+        {% else %}
+          /service-centres/{{ serviceCentreId }}/edit/address/select
+        {% endif %}
+      {% endset %}
+
+      <form method="GET" action="{{ actionUrl }}">
+        <p class="govuk-body">Update or add an address using postcode lookup or edit manually.</p>
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
+        {{ govukInput({
+          label: {
+            text: "Postcode"
+          },
+          hint: {
+            text: "Please enter a full UK postcode, for example BS1 6GR"
+          },
+          classes: "govuk-input--width-10",
+          id: "postcode",
+          name: "postcode",
+          spellcheck: false,
+          autocomplete: "postal-code",
+          value: postcode,
+          errorMessage: {
+            text: error
+          } if error else null
+        }) }}
+
+        {{ govukButton({
+          text: "Find address"
+        }) }}
+      </form>
+
+      {% set manualEditUrl %}
+        {% if addressId %}
+          /service-centres/{{ serviceCentreId }}/edit/address/details/{{ addressId }}
+        {% else %}
+          /service-centres/{{ serviceCentreId }}/edit/address/details
+        {% endif %}
+      {% endset %}
+
+      <form method="POST" action="{{ manualEditUrl }}">
+        {% if isNewSC %}
+          <input type="hidden" name="isNewSC" value="true">
+        {% endif %}
+        {{ govukButton({
+          text: "Enter address manually",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
