@@ -70,6 +70,7 @@ describe('Accessibility page', () => {
     const updateAccessibilityStub = stub(DataApiRequests.prototype, 'updateAccessibility').resolves({
       accessibleParking: true,
       accessibleToiletDescription: 'Accessible toilet available near reception',
+      accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
       hearingEnhancementEquipment: 'HEARING_LOOP_SYSTEMS',
       lift: true,
       liftDoorLimit: 900,

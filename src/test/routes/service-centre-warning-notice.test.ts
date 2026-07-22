@@ -17,6 +17,7 @@ describe('Service centre warning notice page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
+      warningNoticeCy: null,
     } as never);
 
     const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/warning-notice`);
@@ -32,6 +33,7 @@ describe('Service centre warning notice page', () => {
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
+      warningNoticeCy: null,
     } as never);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
 
