@@ -9,9 +9,17 @@ export const courtPhotoSchema = z
     updatedByUserId: z.uuid().optional().nullable(),
   })
   .transform(courtPhoto => ({
-    // this is done to ensure that the photo link is unique. Azure's blob
-    // storage will ignore the odd param in the request
-    fileLink: courtPhoto.fileLink + '?' + crypto.randomUUID(),
+    fileLink: addCacheBuster(courtPhoto.fileLink),
   }));
+
+function addCacheBuster(fileLink: string | null | undefined): string | undefined {
+  if (!fileLink) {
+    return undefined;
+  }
+
+  const url = new URL(fileLink);
+  url.searchParams.set('cacheBust', crypto.randomUUID());
+  return url.toString();
+}
 
 export type CourtPhoto = z.infer<typeof courtPhotoSchema>;
