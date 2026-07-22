@@ -96,7 +96,7 @@
     "husky": "9.1.7",
     "jest": "30.4.2",
     "jest-html-reporter": "4.4.0",
-    "lighthouse": "13.4.0",
+    "lighthouse": "13.4.1",
     "lint-staged": "16.4.0",
     "mini-css-extract-plugin": "2.10.2",
     "odhin-reports-playwright": "1.1.8",
