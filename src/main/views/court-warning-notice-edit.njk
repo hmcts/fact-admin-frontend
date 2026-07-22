@@ -1,0 +1,73 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  {% if errorSummary and errorSummary.length %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errorSummary
+    }) }}
+  {% endif %}
+
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">Warning notice</h1>
+
+      <p class="govuk-body">Use this field to display a temporary notice of building closure or temporary disruption to court services. This is limited to 250 characters.</p>
+
+      <form method="post" action="/courts/{{ courtId }}/edit/warning-notice/success" novalidate>
+
+        {{ govukTextarea({
+          id: "warningNotice",
+          name: "warningNotice",
+          label: {
+            text: "Add a warning message (English)",
+            classes: "govuk-label--m"
+          },
+          value: form.warningNotice,
+          classes: "govuk-!-width-two-thirds",
+          hint: {
+            text: "For example: The court is temporarily closed due to maintenance."
+          },
+          maxLength: 250,
+          rows: 3,
+          errorMessage: {
+            text: errors.warningNotice
+            } if errors.warningNotice else null
+        }) }}
+
+        {{ govukTextarea({
+          id: "warningNoticeCy",
+          name: "warningNoticeCy",
+          label: {
+            text: "Add a warning message (Welsh)",
+            classes: "govuk-label--m"
+          },
+          value: form.warningNoticeCy,
+          classes: "govuk-!-width-two-thirds",
+          hint: {
+            text: "For example: Mae'r llys ar gau dros dro oherwydd gwaith cynnal a chadw."
+          },
+          maxLength: 250,
+          rows: 3,
+          errorMessage: {
+            text: errors.warningNoticeCy
+            } if errors.warningNoticeCy else null
+        }) }}
+
+        {{ govukButton({
+          text: "Save"
+        }) }}
+
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

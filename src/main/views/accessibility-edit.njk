@@ -180,6 +180,21 @@
                       text: model.errors.accessibleToiletDescription[0]
                     } if model.errors and model.errors.accessibleToiletDescription else null
         }) }}
+        {{ govukTextarea({
+          name: "accessibleToiletDescriptionCy",
+          id: "accessibleToiletDescriptionCy",
+          value: model.accessibleToiletDescriptionCy,
+          classes: "govuk-!-width-two-thirds",
+          label: {
+            text: "Where is the accessible toilet? (Welsh)"
+          },
+          hint: {
+            text: "For example, 'Ar gael ar y llawr gwaelod, y llawr cyntaf a'r trydydd llawr.'."
+          },
+          errorMessage: {
+                      text: model.errors.accessibleToiletDescriptionCy[0]
+                    } if model.errors and model.errors.accessibleToiletDescriptionCy else null
+        }) }}
 
         <h2 class="govuk-heading-m">Accessible entrance</h2>
         {{ govukRadios({

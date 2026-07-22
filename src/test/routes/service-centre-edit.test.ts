@@ -14,6 +14,7 @@ describe('Service centre edit page', () => {
       open: true,
       slug: 'national-business-centre',
     } as never);
+    stub(DataApiRequests.prototype, 'getLocks').resolves([]);
   });
 
   test('renders the service centre edit link page', async () => {
@@ -193,7 +194,7 @@ describe('Service centre edit page', () => {
     const response = await request(app).get('/service-centres/not-a-uuid/edit');
 
     expect(response.status).toBe(HttpStatusCode.NotFound);
-    expect(response.text).toContain('Page Not Found');
+    expect(response.text).toContain('Service centre not found');
   });
 
   test('redirects unauthenticated users to sign in', async () => {

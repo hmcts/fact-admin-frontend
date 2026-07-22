@@ -2,6 +2,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
+import { DataApiRequests } from '../../main/requests/DataApiRequests';
 import { ApprovalService } from '../../main/services/ApprovalService';
 import { HomePageService } from '../../main/services/HomePageService';
 import { UsersPageService } from '../../main/services/UsersPageService';
@@ -121,12 +122,23 @@ describe('Authentication routing', () => {
   });
 
   test('allows viewer users to access safe service centre review pages', async () => {
+    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
+    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Service Centre',
+      pageTitle: 'General - Reading Service Centre',
+      leftColumnServiceAreaItems: [],
+      rightColumnServiceAreaItems: [],
+      serviceAreaIds: [],
+      open: true,
+    });
+
     const response = await request(app)
       .get('/service-centres/22222222-2222-4222-8222-222222222222/edit/address')
       .set('x-test-role', 'Viewer');
 
     expect(response.status).toBe(200);
-    expect(response.text).toContain('Service centre address');
+    expect(response.text).toContain('Address - Reading Service Centre');
   });
 
   test.each(['/download', '/add-court', '/add-service-centre', '/approvals', '/audits', '/users'])(
