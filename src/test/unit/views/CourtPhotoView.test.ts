@@ -79,4 +79,15 @@ describe('Court Photo View', () => {
     expect(html).not.toContain(`action="/courts/${courtId}/edit/photo/upload"`);
     expect(html).not.toMatch(/>\s*Upload\s*</);
   });
+
+  test('describes a successful upload as an update in the page title', () => {
+    const html = env.render('court-photo-upload-success.njk', {
+      courtId,
+      courtName,
+      pagePath: `/courts/${courtId}/edit/photo/upload`,
+    });
+
+    expect(html).toMatch(/<title>\s*Photo updated\s*<\/title>/);
+    expect(html).not.toMatch(/<title>\s*Photo deleted\s*<\/title>/);
+  });
 });
