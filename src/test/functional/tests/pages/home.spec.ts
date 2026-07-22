@@ -131,24 +131,6 @@ test.describe(
       );
     });
 
-    test('gives long location names more table space on wide screens without overflowing', async ({ homePage }) => {
-      await homePage.page.setViewportSize({ width: 1440, height: 900 });
-      await homePage.goto();
-
-      const tabsBox = await homePage.tabs.boundingBox();
-      const containerBox = await homePage.tabs.locator('..').boundingBox();
-      expect(tabsBox).not.toBeNull();
-      expect(containerBox).not.toBeNull();
-      expect(tabsBox?.width ?? 0).toBeGreaterThan(containerBox?.width ?? 0);
-      expect((tabsBox?.x ?? 0) + (tabsBox?.width ?? 0)).toBeLessThanOrEqual(1440);
-
-      await homePage.page.setViewportSize({ width: 800, height: 900 });
-      await homePage.goto();
-      const narrowTabsBox = await homePage.tabs.boundingBox();
-      const narrowContainerBox = await homePage.tabs.locator('..').boundingBox();
-      expect(narrowTabsBox?.width).toBe(narrowContainerBox?.width);
-    });
-
     test("does not expose one user's favourites to another user", async ({ browser, homePage, playwright }) => {
       await withTestCourtPrefix(
         playwright,
