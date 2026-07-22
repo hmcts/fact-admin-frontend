@@ -69,7 +69,6 @@ import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
 
-
 const logger = Logger.getLogger('app');
 
 export class DataApiRequests {
