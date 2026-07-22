@@ -21,11 +21,13 @@
 
       {% if not isViewer %}
         <p class="govuk-hint">
-          You can upload a photo of the court to be displayed on the court's page. The photo must be a .jpg, .jpeg or .png file and no larger than 4MB.
+          You can upload a photo of the court to be displayed on the court's page.
+          The photo must be a .jpg, .jpeg or .png file and no larger than 4MB.
         </p>
 
         <p class="govuk-hint">
-          Uploaded photos may be resized to ensure they are displayed correctly on the website. If you upload a new photo, it will replace the existing one.
+          Uploaded photos may be resized to ensure they display correctly on the website; their aspect ratio will be preserved.
+          If you upload a new photo, it will replace the existing one.
         </p>
       {% endif %}
       <form action="/courts/{{ courtId }}/edit/photo/delete" method="post">
@@ -46,6 +48,9 @@
           {% endif %}
         </fieldset>
         {% if not isViewer and model.fileLink %}
+          <p class="govuk-hint">
+            You can delete the existing photo. This will mean no photo shows for this court.
+          </p>
           {{ govukButton({
             text: "Delete",
             classes: "govuk-button--warning"
