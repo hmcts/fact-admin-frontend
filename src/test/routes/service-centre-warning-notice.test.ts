@@ -54,6 +54,7 @@ describe('Service centre warning notice page', () => {
       regionId: null,
       slug: 'reading-service-centre',
       warningNotice: null,
+      warningNoticeCy: null,
     } as never);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
@@ -62,12 +63,16 @@ describe('Service centre warning notice page', () => {
       regionId: null,
       slug: 'reading-service-centre',
       warningNotice: 'Trimmed warning notice',
+      warningNoticeCy: 'Trimmed warning notice in Welsh',
     } as never);
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/warning-notice/success`)
       .type('form')
-      .send({ warningNotice: '  Trimmed warning notice  ' });
+      .send({
+        warningNotice: '  Trimmed warning notice  ',
+        warningNoticeCy: '    Trimmed warning notice in Welsh    ',
+      });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Warning notice saved');
