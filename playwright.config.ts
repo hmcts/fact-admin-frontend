@@ -192,6 +192,73 @@ const resolveVideoMode = (): 'off' | 'on' | 'retain-on-failure' | 'on-first-retr
   }
 };
 
+const setupProject = {
+  name: 'setup',
+  testMatch: /global\.setup\.ts/,
+};
+
+const browserProjects = [
+  {
+    ...ProjectsConfig.chrome,
+    use: {
+      ...ProjectsConfig.chrome.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+  },
+  {
+    ...ProjectsConfig.edge,
+    use: {
+      ...ProjectsConfig.edge.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+    grepInvert: /@performance/,
+  },
+  {
+    ...ProjectsConfig.firefox,
+    use: {
+      ...ProjectsConfig.firefox.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+    grepInvert: /@performance/,
+    testIgnore: /download\.spec\.ts/,
+  },
+  {
+    ...ProjectsConfig.webkit,
+    use: {
+      ...ProjectsConfig.webkit.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+    grepInvert: /@performance/,
+    testIgnore: /download\.spec\.ts/,
+  },
+];
+
+const resolveBrowserProjects = () => {
+  const configuredProjects = process.env.PLAYWRIGHT_PROJECTS?.trim();
+  if (!configuredProjects) {
+    return browserProjects;
+  }
+
+  const requestedProjects = new Set(
+    configuredProjects
+      .split(',')
+      .map(project => project.trim())
+      .filter(Boolean)
+  );
+  const availableProjects = new Set(browserProjects.map(project => project.name));
+  const unknownProjects = [...requestedProjects].filter(project => !availableProjects.has(project));
+
+  if (unknownProjects.length > 0) {
+    throw new Error(`Unknown Playwright project(s): ${unknownProjects.join(', ')}`);
+  }
+
+  return browserProjects.filter(project => requestedProjects.has(project.name));
+};
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -209,49 +276,7 @@ const config = defineConfig({
     video: resolveVideoMode(),
     ignoreHTTPSErrors: true,
   },
-  projects: [
-    {
-      name: 'setup',
-      testMatch: /global\.setup\.ts/,
-    },
-    {
-      ...ProjectsConfig.chrome,
-      use: {
-        ...ProjectsConfig.chrome.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-    },
-    {
-      ...ProjectsConfig.edge,
-      use: {
-        ...ProjectsConfig.edge.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-      grepInvert: /@performance/,
-    },
-    {
-      ...ProjectsConfig.firefox,
-      use: {
-        ...ProjectsConfig.firefox.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-      grepInvert: /@performance/,
-      testIgnore: /download\.spec\.ts/,
-    },
-    {
-      ...ProjectsConfig.webkit,
-      use: {
-        ...ProjectsConfig.webkit.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-      grepInvert: /@performance/,
-      testIgnore: /download\.spec\.ts/,
-    },
-  ],
+  projects: [setupProject, ...resolveBrowserProjects()],
 });
 
 if (safeBoolean(process.env.PW_DUMP_CONFIG, false)) {

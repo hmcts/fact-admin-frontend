@@ -7,6 +7,8 @@ def product = "fact"
 def component = "admin-frontend"
 
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
+def previewPlaywrightProjects = 'edge'
+def aatPlaywrightProjects = 'chrome,edge,firefox,webkit'
 
 def secrets = [
   'fact-bstrap-${env}-kv': [
@@ -39,18 +41,22 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
+    env.PLAYWRIGHT_PROJECTS = previewPlaywrightProjects
     yarnBuilder.yarn('playwright install')
   }
 
   before('smoketest:aat') {
+    env.PLAYWRIGHT_PROJECTS = aatPlaywrightProjects
     yarnBuilder.yarn('playwright install')
   }
 
   before('functionalTest:preview') {
+    env.PLAYWRIGHT_PROJECTS = previewPlaywrightProjects
     yarnBuilder.yarn('playwright install')
   }
 
   before('functionalTest:aat') {
+    env.PLAYWRIGHT_PROJECTS = aatPlaywrightProjects
     yarnBuilder.yarn('playwright install')
   }
 
