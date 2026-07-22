@@ -48,6 +48,26 @@ test.describe(
       });
     });
 
+    test('Court Photo Page Performance', async ({ courtPhotoPage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Photo Performance Test', {}, async ({ createdCourt }) => {
+        await courtPhotoPage.goto(createdCourt.id);
+        // Local test photos are served by Azurite over HTTP, which Lighthouse correctly flags as mixed content.
+        await courtPhotoPage.requestDelete();
+        await courtPhotoPage.confirmDelete();
+        await courtPhotoPage.goto(createdCourt.id);
+        await courtPhotoPage.header.checkIsVisible();
+        await expect(courtPhotoPage.noPhotoWarning).toBeVisible();
+        const breadcrumb = courtPhotoPage.page.getByLabel('Breadcrumb');
+
+        await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+        await expect(breadcrumb.getByRole('link', { name: `Edit ${createdCourt.name}` })).toHaveAttribute(
+          'href',
+          `/courts/${createdCourt.id}/edit`
+        );
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Accessibility Page Performance', async ({ accessibilityPage, lighthouseUtils, playwright }) => {
       await withCreatedCourt(playwright, 'Accessibility Performance Test', {}, async ({ createdCourt }) => {
         await accessibilityPage.goto(createdCourt.id);

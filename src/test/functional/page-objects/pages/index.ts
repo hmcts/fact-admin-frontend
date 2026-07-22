@@ -15,6 +15,7 @@ export { CourtAddressListPage } from './court-address-list.po';
 export { CourtAddressSelectPage } from './court-address-select.po';
 export { CourtContactDetailsPage } from './court-contact-details.po';
 export { CourtOpeningHoursPage } from './court-opening-hours.po';
+export { CourtPhotoPage, type PhotoFilePayload } from './court-photo.po';
 export { LocalAuthoritiesPage } from './local-authorities.po';
 export { ProfessionalInformationPage } from './professional-information.po';
 export { SinglePointsOfEntryPage } from './single-points-of-entry.po';
