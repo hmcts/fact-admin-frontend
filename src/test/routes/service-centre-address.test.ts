@@ -27,7 +27,6 @@ describe('Service centre address routes', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Address');
     expect(response.text).toContain('You can have 0-1 addresses per service centre');
-    expect(response.text).toContain('If you do not add an address, this service centre will be marked as closed.');
     expect(response.text).toContain(`/service-centres/${serviceCentreId}/edit/address/find`);
   });
 

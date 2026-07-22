@@ -47,7 +47,6 @@ describe('AuditController', () => {
             userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
             user: {
               email: 'admin@example.com',
-              favouriteCourts: null,
               id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
               lastLogin: '2026-06-25T10:00:00Z',
               role: 'SUPER_ADMIN',
@@ -197,7 +196,6 @@ describe('AuditController', () => {
         userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         user: {
           email: 'super-admin@example.com',
-          favouriteCourts: null,
           id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
           lastLogin: '2026-06-26T09:10:11.123Z',
           role: 'SUPER_ADMIN',
@@ -244,7 +242,6 @@ describe('AuditController', () => {
         userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         user: {
           email: 'super-admin@example.com',
-          favouriteCourts: null,
           id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
           lastLogin: '2026-06-26T09:10:11.123Z',
           role: 'SUPER_ADMIN',
@@ -438,7 +435,6 @@ describe('AuditController', () => {
             userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
             user: {
               email: 'admin@example.com',
-              favouriteCourts: null,
               id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
               lastLogin: '2026-06-25T10:00:00Z',
               role: 'SUPER_ADMIN',
