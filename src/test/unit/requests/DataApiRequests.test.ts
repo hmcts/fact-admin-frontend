@@ -3831,4 +3831,88 @@ describe('DataApiRequests', () => {
 
     getAllLocationsStub.restore();
   });
+
+  it('returns court photo file link when response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const fileLink = 'https://example.test/court-photo.jpg';
+
+    getStub.withArgs(`/courts/${courtId}/v1/photo`).resolves({
+      data: {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        courtId,
+        fileLink,
+        lastUpdatedAt: '2026-04-29T10:00:00Z',
+      },
+    });
+
+    const response = await dataApiRequests.getCourtPhotoFileLink(courtId);
+
+    expect(response).toMatch(new RegExp(`^${fileLink}\\?`));
+  });
+
+  it('returns not found when getting court photo fails with a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    getStub.withArgs(`/courts/${courtId}/v1/photo`).rejects(errorResponse);
+
+    const response = await dataApiRequests.getCourtPhotoFileLink(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns court photo file link when updating court photo succeeds', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const fileLink = 'https://example.test/court-photo.jpg';
+
+    postStub.withArgs(`/courts/${courtId}/v1/photo`).resolves({
+      data: {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        courtId,
+        fileLink,
+        lastUpdatedAt: '2026-04-29T10:00:00Z',
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
+
+    expect(response).toMatch(new RegExp(`^${fileLink}\\?`));
+  });
+
+  it('returns a validation map when updating court photo returns a 400', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    postStub.withArgs(`/courts/${courtId}/v1/photo`).rejects({
+      isAxiosError: true,
+      response: {
+        data: {
+          file: 'File type is not supported',
+        },
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await dataApiRequests.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
+
+    expect(response).toEqual(new Map([['file', 'File type is not supported']]));
+  });
+
+  it('returns delete status when deleting court photo succeeds', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/photo`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await dataApiRequests.deleteCourtPhoto(courtId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns not found when deleting court photo fails with a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/photo`).rejects(errorResponse);
+
+    const response = await dataApiRequests.deleteCourtPhoto(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
 });
