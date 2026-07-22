@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
 
 {% block pageTitle %}
@@ -18,6 +19,15 @@
 
       <h1 class="govuk-heading-l">Court photo</h1>
 
+      {% if not isViewer %}
+        <p class="govuk-hint">
+          You can upload a photo of the court to be displayed on the court's page. The photo must be a .jpg, .jpeg or .png file and no larger than 2MB.
+        </p>
+
+        <p class="govuk-hint">
+          Uploaded photos may be resized to ensure they are displayed correctly on the website. If you upload a new photo, it will replace the existing one.
+        </p>
+      {% endif %}
       <form action="/courts/{{ courtId }}/edit/photo/delete" method="post">
         <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -29,7 +39,10 @@
             <p class="govuk-body">This is the current court photo for {{ model.courtName }}.</p>
             <img src="{{ model.fileLink }}" alt="Court photo" />
           {% else %}
-            <p class="govuk-body">There is no photo currently specified for {{ model.courtName }}.</p>
+            {{ govukWarningText({
+              text: "There is no photo currently specified for " + model.courtName,
+              iconFallbackText: "Warning"
+            }) }}
           {% endif %}
         </fieldset>
         {% if not isViewer and model.fileLink %}
@@ -40,12 +53,12 @@
         {% endif %}
       </form>
 
-      <form action="/courts/{{ courtId }}/edit/photo/upload" method="post" enctype="multipart/form-data">
-        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m govuk-visually-hidden">
-            Add or update court photo
-          </legend>
-          {% if not isViewer %}
+      {% if not isViewer %}
+        <form action="/courts/{{ courtId }}/edit/photo/upload" method="post" enctype="multipart/form-data">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              Add or update court photo
+            </legend>
             {{ govukFileUpload({
               id: "photo",
               name: "photo",
@@ -55,19 +68,21 @@
               label: {
                 text: "Upload a photo"
               },
+              hint: {
+                text: "The photo must be a .jpg, .jpeg or .png file and no larger than 2MB."
+              },
               javascript: true,
               errorMessage: {
                 text: model.errors.photo
               } if model.errors and model.errors.photo else null
             }) }}
-          {% endif %}
-          {% if not isViewer %}
+
             {{ govukButton({
               text: "Upload"
             }) }}
-          {% endif %}
-        </fieldset>
-      </form>
+          </fieldset>
+        </form>
+      {% endif %}
 
     </div>
   </div>

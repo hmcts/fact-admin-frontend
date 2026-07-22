@@ -36,7 +36,7 @@ export default class CourtPhotoController {
 
   @route('/upload')
   @POST()
-  @before(photoUploadMiddleware('photo'))
+  @before(photoUploadMiddleware('photo', 4))
   public async update(req: Request, res: Response): Promise<void> {
     const courtId = getUuidRouteParam(req, 'courtId');
     if (!courtId) {
@@ -55,7 +55,7 @@ export default class CourtPhotoController {
         courtId,
         model: {
           ...model,
-          errors: { photo: req.uploadError.message },
+          errors: { photo: [req.uploadError.message] },
         },
       });
     }
@@ -67,7 +67,7 @@ export default class CourtPhotoController {
         courtId,
         model: {
           ...model,
-          errors: { photo: 'Select a JPG or PNG file' },
+          errors: { photo: ['Select a JPG or PNG file'] },
         },
       });
     }
@@ -78,7 +78,7 @@ export default class CourtPhotoController {
         courtId,
         model: {
           ...model,
-          errors: { photo: 'The selected file must be a JPG or PNG' },
+          errors: { photo: ['The selected file must be a JPG or PNG'] },
         },
       });
     }
