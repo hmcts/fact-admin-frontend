@@ -5,7 +5,7 @@
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
 
 {% block pageTitle %}
-  Court photo - {{ courtName }}
+  Court photo - {{ model.courtName }}
 {% endblock %}
 
 {% block content %}
@@ -21,7 +21,7 @@
 
       {% if not isViewer %}
         <p class="govuk-hint">
-          You can upload a photo of the court to be displayed on the court's page. The photo must be a .jpg, .jpeg or .png file and no larger than 2MB.
+          You can upload a photo of the court to be displayed on the court's page. The photo must be a .jpg, .jpeg or .png file and no larger than 4MB.
         </p>
 
         <p class="govuk-hint">

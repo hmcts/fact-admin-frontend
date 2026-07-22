@@ -24,7 +24,7 @@ export default class CourtPhotoController {
 
     const model = await courtPhotoService.retrieve(courtId);
     if (typeof model === 'number') {
-      return renderError(res, model);
+      return this.renderStatus(res, model);
     }
 
     res.render('court-photo', {
@@ -45,7 +45,7 @@ export default class CourtPhotoController {
 
     const model = await courtPhotoService.retrieve(courtId);
     if (typeof model === 'number') {
-      return renderError(res, model);
+      return this.renderStatus(res, model);
     }
 
     // Handle middleware-captured multer errors first (file too big, basically)
@@ -86,7 +86,7 @@ export default class CourtPhotoController {
     // Continue normal upload
     const updatedModel = await courtPhotoService.upload(courtId, file.buffer, file.mimetype);
     if (typeof updatedModel === 'number') {
-      return renderError(res, updatedModel);
+      return this.renderStatus(res, updatedModel);
     }
 
     if (updatedModel.errors) {
@@ -120,7 +120,7 @@ export default class CourtPhotoController {
 
     const courtName = await this.resolveCourtName(courtId);
     if (typeof courtName === 'number') {
-      return renderError(res, courtName);
+      return this.renderStatus(res, courtName);
     }
 
     res.render('court-photo-delete-confirm', {
@@ -141,12 +141,12 @@ export default class CourtPhotoController {
 
     const courtName = await this.resolveCourtName(courtId);
     if (typeof courtName === 'number') {
-      return renderError(res, courtName);
+      return this.renderStatus(res, courtName);
     }
 
     const response = await courtPhotoService.delete(courtId);
     if (typeof response === 'number' && response !== HttpStatusCode.NoContent) {
-      return renderError(res, response);
+      return this.renderStatus(res, response);
     }
 
     res.render('court-photo-delete-success', {
@@ -163,5 +163,13 @@ export default class CourtPhotoController {
       logger.warn('Unable to resolve court name for breadcrumbs:', error);
       return HttpStatusCode.NotFound;
     }
+  }
+
+  private renderStatus(res: Response, status: HttpStatusCode): void {
+    if (status === HttpStatusCode.NotFound) {
+      return renderCourtNotFound(res);
+    }
+
+    return renderError(res, status);
   }
 }
