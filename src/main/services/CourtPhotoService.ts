@@ -40,7 +40,8 @@ export class CourtPhotoService {
         if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
           continue;
         }
-        errors[key] = [value];
+        const field = key.toLowerCase() === 'file' ? 'photo' : key;
+        errors[field] = [value];
       }
       return this.buildResponseWithExistingLink(courtResponse, errors);
     }

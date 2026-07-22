@@ -114,7 +114,7 @@ describe('CourtPhotoService', () => {
     const { service } = buildService({
       updateCourtPhoto: jest.fn().mockResolvedValue(
         new Map([
-          ['photo', 'The image dimensions are invalid'],
+          ['file', 'The image dimensions are invalid'],
           ['timestamp', '2026-07-22T10:00:00Z'],
         ])
       ),
