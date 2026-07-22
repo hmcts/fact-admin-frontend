@@ -29,7 +29,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-  env.DATA_API_URL = 'https://fact-data-api-pr-319.preview.platform.hmcts.net'
+  env.DATA_API_URL = 'https://fact-data-api.aat.platform.hmcts.net'
   env.PLAYWRIGHT_WORKERS = 4
 
   loadVaultSecrets(secrets)

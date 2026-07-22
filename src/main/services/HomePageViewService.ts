@@ -31,6 +31,7 @@ export class HomePageViewService {
    */
   public buildCourtTableHead(filters: HomePageFilters): HomePageTableHeadCell[] {
     return [
+      { classes: 'homepage-courts-table__favourite', text: 'Favourite' },
       this.buildSortableHeadItem('Name', 'name', filters),
       this.buildSortableHeadItem('Last updated', 'lastUpdated', filters),
       ...(filters.includeClosed ? [{ text: 'Status' }] : []),
@@ -49,13 +50,14 @@ export class HomePageViewService {
   ): HomePageTableCell[][] {
     return courtsPage.content.map(court => [
       favouriteStatuses
-        ? this.buildNameCell(
+        ? this.buildFavouriteCell(
             court,
             favouriteStatuses.get(buildFavouriteKey(court.locationType, court.id)) ?? false,
             `${this.buildHref(filters, {})}#courts`,
             'courts'
           )
-        : { text: court.name },
+        : { classes: 'homepage-courts-table__favourite', html: '' },
+      { text: court.name },
       { text: this.formatDate(court.lastUpdatedAt) },
       ...(filters.includeClosed ? [{ text: court.open ? 'Open' : 'Closed' }] : []),
       {
@@ -66,7 +68,12 @@ export class HomePageViewService {
   }
 
   public buildFavouriteTableHead(): HomePageTableHeadCell[] {
-    return [{ text: 'Name' }, { text: 'Last updated' }, { classes: 'homepage-courts-table__actions', text: 'Actions' }];
+    return [
+      { classes: 'homepage-courts-table__favourite', text: 'Favourite' },
+      { text: 'Name' },
+      { text: 'Last updated' },
+      { classes: 'homepage-courts-table__actions', text: 'Actions' },
+    ];
   }
 
   public buildFavouriteTableRows(
@@ -77,7 +84,8 @@ export class HomePageViewService {
     const returnPath = this.buildFavouritesHref(filters, favouritesPage.page.number);
 
     return favouritesPage.content.map(location => [
-      this.buildNameCell(location, true, returnPath, 'favourites'),
+      this.buildFavouriteCell(location, true, returnPath, 'favourites'),
+      { text: location.name },
       { text: this.formatDate(location.lastUpdatedAt) },
       {
         classes: 'homepage-courts-table__actions',
@@ -376,7 +384,7 @@ export class HomePageViewService {
     }).format(new Date(date));
   }
 
-  private buildNameCell(
+  private buildFavouriteCell(
     location: LocationListItem,
     favourite: boolean,
     returnPath: string,
@@ -390,6 +398,7 @@ export class HomePageViewService {
     const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
 
     return {
+      classes: 'homepage-courts-table__favourite',
       html: [
         '<div class="favourite-location">',
         `<form class="favourite-location__form" method="post" action="${action}">`,
@@ -402,7 +411,6 @@ export class HomePageViewService {
         '</button>',
         `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip">${tooltip}</span>`,
         '</form>',
-        `<span class="favourite-location__name">${escapedName}</span>`,
         '</div>',
       ].join(''),
     };

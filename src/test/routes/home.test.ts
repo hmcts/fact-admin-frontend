@@ -64,6 +64,7 @@ describe('Home page', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Courts, tribunals and service centres');
+    expect(response.text).toContain('govuk-tabs homepage-tabs');
     expect(response.text).toContain('Favourites');
     expect(response.text).toContain('Apply filters');
     expect(response.text).toContain('Download csv');

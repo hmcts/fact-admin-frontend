@@ -64,6 +64,12 @@ test.describe(
       await expect(homePage.heading).toContainText('Courts, tribunals and service centres');
       await expect(homePage.courtsTab).toHaveAttribute('aria-selected', 'true');
       await expect(homePage.favouritesTab).toHaveAttribute('aria-selected', 'false');
+      await expect(homePage.tableHeaders).toHaveText(['Favourite', /Name/, /Last updated/, 'Actions']);
+      const favouriteHeader = homePage.table.getByRole('columnheader', { exact: true, name: 'Favourite' });
+      const nameHeader = homePage.table.getByRole('columnheader', { exact: true, name: 'Name' });
+      expect(await favouriteHeader.evaluate(element => getComputedStyle(element).verticalAlign)).toBe(
+        await nameHeader.evaluate(element => getComputedStyle(element).verticalAlign)
+      );
       await homePage.header.expectNavigationLink('Locations');
       await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
@@ -91,19 +97,31 @@ test.describe(
 
           await homePage.searchForCourt(courtNamePrefix);
           await homePage.expectFavouriteButtonState(court.name, false);
+          await homePage.expectFavouriteStarAppearance(court.name, false);
           await homePage.expectFavouriteTooltip(court.name, false);
 
           await homePage.addFavourite(court.name);
           await expect(homePage.page).toHaveURL(/partialCourtName=.*#courts$/);
           await homePage.expectFavouriteButtonState(court.name, true);
+          await homePage.expectFavouriteStarAppearance(court.name, true);
           await homePage.expectFavouriteTooltip(court.name, true);
 
           await homePage.addFavourite(serviceCentre.name);
           await homePage.expectFavouriteButtonState(serviceCentre.name, true);
 
           await homePage.openFavouritesTab();
+          await expect(homePage.favouritesTable.locator('thead th')).toHaveText([
+            'Favourite',
+            'Name',
+            'Last updated',
+            'Actions',
+          ]);
           await homePage.expectFavouriteVisible(court.name);
           await homePage.expectFavouriteVisible(serviceCentre.name);
+          await homePage.expectFavouriteStarAppearance(court.name, true, true);
+          const courtRow = homePage.favouritesTable.getByRole('row').filter({ hasText: court.name });
+          await expect(courtRow.getByRole('cell')).toHaveCount(4);
+          await expect(courtRow.getByRole('cell').nth(1)).toHaveText(court.name);
 
           await homePage.removeFavourite(court.name, true);
           await expect(homePage.page).toHaveURL(/tab=favourites/);
@@ -111,6 +129,24 @@ test.describe(
           await homePage.expectFavouriteVisible(serviceCentre.name);
         }
       );
+    });
+
+    test('gives long location names more table space on wide screens without overflowing', async ({ homePage }) => {
+      await homePage.page.setViewportSize({ width: 1440, height: 900 });
+      await homePage.goto();
+
+      const tabsBox = await homePage.tabs.boundingBox();
+      const containerBox = await homePage.tabs.locator('..').boundingBox();
+      expect(tabsBox).not.toBeNull();
+      expect(containerBox).not.toBeNull();
+      expect(Math.round((tabsBox?.width ?? 0) - (containerBox?.width ?? 0))).toBe(80);
+      expect((tabsBox?.x ?? 0) + (tabsBox?.width ?? 0)).toBeLessThanOrEqual(1440);
+
+      await homePage.page.setViewportSize({ width: 800, height: 900 });
+      await homePage.goto();
+      const narrowTabsBox = await homePage.tabs.boundingBox();
+      const narrowContainerBox = await homePage.tabs.locator('..').boundingBox();
+      expect(narrowTabsBox?.width).toBe(narrowContainerBox?.width);
     });
 
     test("does not expose one user's favourites to another user", async ({ browser, homePage, playwright }) => {

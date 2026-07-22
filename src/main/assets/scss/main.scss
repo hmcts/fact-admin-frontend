@@ -35,7 +35,20 @@
   justify-content: center;
 }
 
+// Give long location names a little more room without overflowing smaller viewports.
+@media (min-width: 64em) {
+  .homepage-tabs {
+    width: calc(100% + 80px);
+    max-width: calc(100vw - ((100vw - 960px) / 2) - 30px);
+  }
+}
+
 // Homepage courts table actions and sortable headers
+.homepage-courts-table .homepage-courts-table__favourite {
+  width: 1%;
+  white-space: nowrap;
+}
+
 .homepage-courts-table .homepage-courts-table__actions {
   white-space: nowrap;
   width: 1%;
@@ -78,9 +91,8 @@
 }
 
 .favourite-location {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
 }
 
 .favourite-location__form {
@@ -110,12 +122,8 @@
 }
 
 .favourite-location__button[aria-pressed='true'] .favourite-location__star {
-  fill: #ffdd00;
+  fill: #0b0c0c;
   stroke: #0b0c0c;
-}
-
-.favourite-location__button[aria-pressed='false']:hover .favourite-location__star {
-  fill: #fff7bf;
 }
 
 .favourite-location__button:focus {
@@ -123,6 +131,11 @@
   color: #0b0c0c;
   background-color: #ffdd00;
   box-shadow: 0 3px #0b0c0c;
+}
+
+.favourite-location__button:focus .favourite-location__star {
+  fill: transparent;
+  stroke: #0b0c0c;
 }
 
 .favourite-location__tooltip {

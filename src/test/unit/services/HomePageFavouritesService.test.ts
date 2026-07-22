@@ -21,7 +21,7 @@ describe('HomePageService favourites', () => {
 
     expect(requests.getFavouriteStatuses).toHaveBeenCalledWith([{ subjectId: court.id, subjectType: 'COURT' }]);
     expect(viewModel.courtTableRows[0][0].html).toContain('aria-pressed="true"');
-    expect(viewModel.favouriteTableRows[0][0].html).toContain(serviceCentre.name);
+    expect(viewModel.favouriteTableRows[0][1]).toEqual({ text: serviceCentre.name });
     expect(viewModel.favouritesResultsMessage).toContain('1 favourite');
     expect(viewModel.filters.activeTab).toBe('courts');
   });
@@ -55,7 +55,8 @@ describe('HomePageService favourites', () => {
 
     const viewModel = await service.getHomePageViewModel(service.getFilters({}));
 
-    expect(viewModel.courtTableRows[0][0]).toEqual({ text: court.name });
+    expect(viewModel.courtTableRows[0][0]).toEqual({ classes: 'homepage-courts-table__favourite', html: '' });
+    expect(viewModel.courtTableRows[0][1]).toEqual({ text: court.name });
     expect(viewModel.courtFavouriteStatusErrorMessage).toBe('There was a problem loading favourite status.');
   });
 

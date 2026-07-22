@@ -193,6 +193,10 @@ describe('HomePageService', () => {
 
     expect(viewModel.courtTableHead).toEqual([
       {
+        classes: 'homepage-courts-table__favourite',
+        text: 'Favourite',
+      },
+      {
         attributes: { 'aria-sort': 'none' },
         html: '<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="/?sortBy=name&sortOrder=asc&pageNumber=0">Name<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.1875 9.5L10.9609 3.95703L13.7344 9.5H8.1875Z" fill="currentColor"/><path d="M13.7344 12.0781L10.9609 17.6211L8.1875 12.0781H13.7344Z" fill="currentColor"/></svg><span class="govuk-visually-hidden">, sort ascending</span></a>',
       },
@@ -218,6 +222,7 @@ describe('HomePageService', () => {
     ]);
     expect(viewModel.courtTableRows).toEqual([
       [
+        { classes: 'homepage-courts-table__favourite', html: '' },
         { text: 'London Civil and Family Court' },
         { text: '29 Apr 2026' },
         {
@@ -226,6 +231,7 @@ describe('HomePageService', () => {
         },
       ],
       [
+        { classes: 'homepage-courts-table__favourite', html: '' },
         { text: 'National Business Centre' },
         { text: '30 Apr 2026' },
         {
@@ -279,7 +285,7 @@ describe('HomePageService', () => {
       sortBy: 'name',
       sortOrder: 'desc',
     });
-    expect(viewModel.courtTableHead[0]).toEqual({
+    expect(viewModel.courtTableHead[1]).toEqual({
       attributes: { 'aria-sort': 'descending' },
       html: '<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="/?partialCourtName=London&onlyServiceCentres=true&sortBy=name&sortOrder=asc&pageNumber=0">Name<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.4375 7L11 15.8687L6.5625 7L15.4375 7Z" fill="currentColor"/></svg><span class="govuk-visually-hidden">, sort ascending</span></a>',
     });
