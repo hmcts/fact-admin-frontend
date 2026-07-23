@@ -105,6 +105,11 @@ describe('AuditController', () => {
         match((renderModel: Record<string, unknown>) => {
           return (
             renderModel.pageTitle === 'Audits' &&
+            JSON.stringify(renderModel.breadcrumbs) ===
+              JSON.stringify([
+                { href: '/', text: 'Home' },
+                { href: '#', text: 'Audits' },
+              ]) &&
             renderModel.basePagerUrl ===
               '/audits?pageSize=25&email=admin%40example.com&subjectType=COURT&courtId=11111111-1111-4111-8111-111111111111&fromDate=25%2F6%2F2026&toDate=26%2F6%2F2026&pageNumber=' &&
             renderModel.downloadUrl ===
@@ -222,7 +227,16 @@ describe('AuditController', () => {
         'audit-detail',
         match((renderModel: Record<string, unknown>) => {
           const audit = renderModel.audit as { createdAt?: string };
-          return renderModel.pageTitle === 'Audit Detail' && typeof audit?.createdAt === 'string';
+          return (
+            renderModel.pageTitle === 'Audit Detail' &&
+            typeof audit?.createdAt === 'string' &&
+            JSON.stringify(renderModel.breadcrumbs) ===
+              JSON.stringify([
+                { href: '/', text: 'Home' },
+                { href: '/audits', text: 'Audits' },
+                { href: '#', text: 'Audit detail' },
+              ])
+          );
         })
       );
 

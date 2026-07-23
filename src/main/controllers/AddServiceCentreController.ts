@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 
 import { AddServiceCentreService } from '../services/AddServiceCentreService';
 
+import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
+
 const addServiceCentreService = new AddServiceCentreService();
 
 @route('/add-service-centre')
@@ -17,7 +19,10 @@ export default class AddServiceCentreController {
       return;
     }
 
-    res.render('add-service-centre', viewModel);
+    res.render('add-service-centre', {
+      ...viewModel,
+      breadcrumbs: buildPageBreadcrumbs('Add new service centre'),
+    });
   }
 
   @POST()
@@ -34,12 +39,25 @@ export default class AddServiceCentreController {
       return;
     }
 
-    if ('errors' in createResult) {
-      res.render('add-service-centre', createResult);
+    if (!('serviceCentreId' in createResult)) {
+      res.render('add-service-centre', {
+        ...createResult,
+        breadcrumbs: buildPageBreadcrumbs('Add new service centre'),
+      });
       return;
     }
 
-    res.render('add-service-centre-success', createResult);
+    res.render('add-service-centre-success', {
+      ...createResult,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        {
+          href: `/service-centres/${createResult.serviceCentreId}/edit`,
+          text: createResult.serviceCentreName,
+        },
+        { href: '#', text: 'Addresses' },
+      ],
+    });
   }
 
   private getSelectedServiceAreaIds(serviceAreaIds: unknown): string[] {

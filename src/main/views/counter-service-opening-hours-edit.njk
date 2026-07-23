@@ -80,7 +80,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">Edit counter service opening hours</h1>
+      <h1 class="govuk-heading-l">{{ "View counter service opening hours" if isViewer else "Edit counter service opening hours" }}</h1>
       <h2 class="govuk-heading-m">Counter service details</h2>
 
       {% set appointmentContact %}
@@ -134,6 +134,8 @@
       {% endset %}
 
       <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/save{% if counterServiceId %}/{{ counterServiceId }}{% endif %}" novalidate data-counter-service-opening-hours-form>
+        <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
+        <legend class="govuk-fieldset__legend govuk-visually-hidden">Counter service opening hours details</legend>
 
         {{ govukCheckboxes({
           id: "assistWith",
@@ -234,9 +236,12 @@
           if errors.sameTimeYes else null
         }) }}
 
-        {{ govukButton({
-          text: "Save"
-        }) }}
+        {% if not isViewer %}
+          {{ govukButton({
+            text: "Save"
+          }) }}
+        {% endif %}
+        </fieldset>
       </form>
     </div>
   </div>

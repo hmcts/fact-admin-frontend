@@ -298,7 +298,14 @@ export default class ServiceCentreContactController {
 
     if (submitFlowOutcome.type === 'validation-error') {
       res.status(HttpStatusCode.BadRequest);
-      res.render('service-centre-contact-form', submitFlowOutcome.formViewModel);
+      res.render('service-centre-contact-form', {
+        ...submitFlowOutcome.formViewModel,
+        breadcrumbs: this.buildContactDetailsBreadcrumbs(
+          options.serviceCentreId,
+          options.serviceCentreName,
+          options.formHeading === 'Add contact details' ? 'Add contact details' : 'Edit contact details'
+        ),
+      });
       return;
     }
 

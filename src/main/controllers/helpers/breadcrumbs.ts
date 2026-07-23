@@ -5,6 +5,13 @@ export type BreadcrumbItem = {
   text: string;
 };
 
+export function buildPageBreadcrumbs(pageText: string): BreadcrumbItem[] {
+  return [
+    { href: '/', text: 'Home' },
+    { href: '#', text: pageText },
+  ];
+}
+
 export function buildEditBreadcrumbs(
   subjectId: string,
   subjectName: string,

@@ -68,6 +68,7 @@ test.describe(
             'information-for-professionals',
             'single-point-of-entry',
             'translation-and-interpretation',
+            'warning-notice',
           ]) {
             await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/${section}`);
             await expect(page.locator('form fieldset[disabled]').first()).toBeVisible();
@@ -113,6 +114,11 @@ test.describe(
           await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/information-for-professionals`);
           await expect(page.locator('[data-professional-information-add]')).toHaveCount(0);
           await expect(page.locator('[data-professional-information-remove]')).toHaveCount(0);
+
+          await page.goto(`${config.urls.homePageUrl}/courts/${createdCourt.id}/edit/counter-service-opening-hours`);
+          await expect(page.getByRole('heading', { name: 'Counter service opening hours' })).toBeVisible();
+          await expect(page.getByRole('button', { name: 'Add opening hours' })).toHaveCount(0);
+          await expect(page.getByRole('main').getByRole('link', { name: /^(Edit|Delete)$/ })).toHaveCount(0);
 
           await page.goto(`${config.urls.homePageUrl}/approvals`);
           await expect(page.getByRole('heading', { name: 'Access Denied' })).toBeVisible();

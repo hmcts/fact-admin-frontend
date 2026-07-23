@@ -78,4 +78,62 @@ describe('Viewer nested details views', () => {
     expect(formHtml).toContain('<fieldset class="govuk-fieldset" disabled>');
     expect(formHtml).not.toContain('>Save<');
   });
+
+  test('shows counter service opening hours as view-only without add, delete, or save controls', () => {
+    const listHtml = env.render('counter-service-opening-hours.njk', {
+      counterServiceOpeningHours: [
+        {
+          appointmentNeeded: 'No',
+          assistanceAvailable: 'Forms',
+          hours: 'Monday to Friday 9am to 5pm',
+          id: 'counter-service-id',
+        },
+      ],
+      courtId,
+      isViewer: true,
+      pagePath: `/courts/${courtId}/edit/counter-service-opening-hours`,
+      pageTitle: 'Counter service opening hours',
+    });
+    const formHtml = env.render('counter-service-opening-hours-edit.njk', {
+      courtId,
+      counterServiceId: 'counter-service-id',
+      days: [],
+      errors: {},
+      errorSummary: [],
+      form: {
+        appointmentNeeded: 'no',
+        assistWith: ['forms'],
+        sameTime: 'yes',
+        selectedDays: [],
+      },
+      isViewer: true,
+      pagePath: `/courts/${courtId}/edit/counter-service-opening-hours/edit/counter-service-id`,
+      pageTitle: 'Counter service opening hours',
+    });
+
+    expect(listHtml).toContain('View');
+    expect(listHtml).not.toContain('Delete');
+    expect(listHtml).not.toContain('Add opening hours');
+    expect(formHtml).toContain('View counter service opening hours');
+    expect(formHtml).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(formHtml).not.toContain('>Save<');
+  });
+
+  test('shows court warning notices as view-only without a save control', () => {
+    const html = env.render('court-warning-notice-edit.njk', {
+      courtId,
+      errors: {},
+      errorSummary: [],
+      form: {
+        warningNotice: 'Court closed for maintenance.',
+        warningNoticeCy: 'Llys ar gau ar gyfer gwaith cynnal a chadw.',
+      },
+      isViewer: true,
+      pagePath: `/courts/${courtId}/edit/warning-notice`,
+      pageTitle: 'Warning notice',
+    });
+
+    expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expect(html).not.toContain('>Save<');
+  });
 });
