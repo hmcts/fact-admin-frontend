@@ -36,7 +36,10 @@ export class Helmet {
   }
 
   private setContentSecurityPolicy(app: express.Express) {
+    const photoImgSrc = process.env.PHOTO_IMG_SRC ? [process.env.PHOTO_IMG_SRC] : [];
+
     const formAction = [self, '*.hmcts.net', '*.gov.uk'];
+    const imgSrc = [self, 'data:', ...googleAnalyticsDomain, ...photoImgSrc];
     const scriptSrc = [...googleAnalyticsDomain, gov_uk_script_1, (req, res) => `'nonce-${res.locals.cspNonce}'`];
 
     if (this.developmentMode) {
@@ -59,7 +62,7 @@ export class Helmet {
             defaultSrc: ["'none'"],
             manifestSrc: [self],
             fontSrc: [self, 'data:'],
-            imgSrc: [self, ...googleAnalyticsDomain],
+            imgSrc,
             objectSrc: ["'none'"],
             scriptSrc,
             styleSrc: [self],
