@@ -62,12 +62,128 @@ test.describe(
     test('visibility test', async ({ homePage }) => {
       await homePage.expectVisibleElements();
       await expect(homePage.heading).toContainText('Courts, tribunals and service centres');
+      await expect(homePage.courtsTab).toHaveAttribute('aria-selected', 'true');
+      await expect(homePage.favouritesTab).toHaveAttribute('aria-selected', 'false');
+      await expect(homePage.tableHeaders).toHaveText(['Favourite', /Name/, /Last updated/, 'Actions']);
+      const favouriteHeader = homePage.table.getByRole('columnheader', { exact: true, name: 'Favourite' });
+      const nameHeader = homePage.tableHeaders.nth(1);
+      expect(await favouriteHeader.evaluate(element => getComputedStyle(element).verticalAlign)).toBe(
+        await nameHeader.evaluate(element => getComputedStyle(element).verticalAlign)
+      );
       await homePage.header.expectNavigationLink('Locations');
       await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
       await homePage.header.expectNavigationLink('Add new service centre');
       await expect(homePage.regionSelect).toBeVisible();
       await expect(homePage.onlyServiceCentresCheckbox).toBeVisible();
+    });
+
+    test('adds and removes court and service-centre favourites while preserving the Courts filters', async ({
+      homePage,
+      playwright,
+    }) => {
+      await withTestLocationPrefix(
+        playwright,
+        'Home Favourites Functional Test',
+        async ({ apiContext, courtNamePrefix }) => {
+          const court = await createTestCourt(apiContext, {
+            courtName: `${courtNamePrefix} Court`,
+            open: true,
+          });
+          const serviceCentre = await createTestServiceCentre(apiContext, {
+            open: true,
+            serviceCentreName: `${courtNamePrefix} Service Centre`,
+          });
+
+          await homePage.searchForCourt(courtNamePrefix);
+          await homePage.expectFavouriteButtonState(court.name, false);
+          await homePage.expectFavouriteStarAppearance(court.name, false);
+          await homePage.expectFavouriteTooltip(court.name, false);
+
+          await homePage.addFavourite(court.name);
+          await expect(homePage.page).toHaveURL(/partialCourtName=.*#courts$/);
+          await homePage.expectFavouriteButtonState(court.name, true);
+          await homePage.expectFavouriteStarAppearance(court.name, true);
+          await homePage.expectFavouriteTooltip(court.name, true);
+
+          await homePage.addFavourite(serviceCentre.name);
+          await homePage.expectFavouriteButtonState(serviceCentre.name, true);
+
+          await homePage.openFavouritesTab();
+          await expect(homePage.favouritesTable.locator('thead th')).toHaveText([
+            'Favourite',
+            'Name',
+            'Last updated',
+            'Actions',
+          ]);
+          await homePage.expectFavouriteVisible(court.name);
+          await homePage.expectFavouriteVisible(serviceCentre.name);
+          await homePage.expectFavouriteStarAppearance(court.name, true, true);
+          const courtRow = homePage.favouritesTable.getByRole('row').filter({ hasText: court.name });
+          await expect(courtRow.getByRole('cell')).toHaveCount(4);
+          await expect(courtRow.getByRole('cell').nth(1)).toHaveText(court.name);
+
+          await homePage.removeFavourite(court.name, true);
+          await expect(homePage.page).toHaveURL(/tab=favourites/);
+          await homePage.expectFavouriteHidden(court.name);
+          await homePage.expectFavouriteVisible(serviceCentre.name);
+        }
+      );
+    });
+
+    test("does not expose one user's favourites to another user", async ({ browser, homePage, playwright }) => {
+      await withTestCourtPrefix(
+        playwright,
+        'Home Favourite Isolation Test',
+        async ({ apiContext, courtNamePrefix }) => {
+          const court = await createTestCourt(apiContext, {
+            courtName: `${courtNamePrefix} Court`,
+            open: true,
+          });
+
+          await homePage.searchForCourt(court.name);
+          await homePage.addFavourite(court.name);
+
+          const viewerContext = await browser.newContext({ storageState: config.users.viewer.sessionFile });
+          const viewerPage = await viewerContext.newPage();
+          await viewerPage.goto(`${config.urls.homePageUrl}/?tab=favourites#favourites`);
+          await expect(viewerPage.locator('#favourites')).not.toContainText(court.name);
+          await viewerContext.close();
+        }
+      );
+    });
+
+    test('paginates favourites independently at 25 entries per page', async ({ homePage, playwright }) => {
+      test.slow();
+      await withTestCourtPrefix(
+        playwright,
+        'Home Favourite Pagination Test',
+        async ({ apiContext, courtNamePrefix }) => {
+          const courts = await createOpenTestCourts(
+            apiContext,
+            Array.from({ length: 26 }, (_, index) => `${courtNamePrefix} ${indexToAlphabetSuffix(index)}`)
+          );
+
+          for (const court of courts) {
+            const response = await homePage.page.request.post(
+              `${config.urls.homePageUrl}/favourites/COURT/${court.id}`,
+              {
+                form: { returnPath: '/' },
+                maxRedirects: 0,
+              }
+            );
+            expect(response.status()).toBe(303);
+          }
+
+          await homePage.page.goto(`${config.urls.homePageUrl}/?tab=favourites&favouritesPageNumber=0#favourites`);
+          await expect(homePage.favouritesTable.locator('tbody tr')).toHaveCount(25);
+          await expect(homePage.favouritesPaginationNextLink).toBeVisible();
+
+          await homePage.favouritesPaginationNextLink.click();
+          await expect(homePage.page).toHaveURL(/favouritesPageNumber=1/);
+          await expect(homePage.favouritesPaginationPreviousLink).toBeVisible();
+        }
+      );
     });
 
     test.describe('Super admin role navigation', () => {
@@ -340,8 +456,8 @@ test.describe(
 
         await homePage.searchForCourt(courtNamePrefix);
         await expect(homePage.page).not.toHaveURL(/sortBy=/);
-        await expect(homePage.tableHeaders.nth(0)).toHaveAttribute('aria-sort', 'none');
         await expect(homePage.tableHeaders.nth(1)).toHaveAttribute('aria-sort', 'none');
+        await expect(homePage.tableHeaders.nth(2)).toHaveAttribute('aria-sort', 'none');
         await homePage.expectCourtVisible(alphaCourtName);
         await homePage.expectCourtVisible(bravoCourtName);
       });
@@ -436,7 +552,7 @@ test.describe(
         await expect(homePage.partialCourtNameInput).toHaveValue(courtNamePrefix);
         await expect(homePage.includeClosedCheckbox).toBeChecked();
         await expect(homePage.page).toHaveURL(/sortBy=name&sortOrder=asc/);
-        await expect(homePage.tableHeaders.nth(0)).toHaveAttribute('aria-sort', 'ascending');
+        await expect(homePage.tableHeaders.nth(1)).toHaveAttribute('aria-sort', 'ascending');
         await expect.poll(() => homePage.getCourtNames()).toEqual([openCourtName, closedCourtName]);
       });
     });

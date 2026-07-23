@@ -34,7 +34,6 @@ describe('UsersPageService', () => {
       content: [
         {
           email: 'admin@example.com',
-          favouriteCourts: null,
           id: '11111111-1111-4111-8111-111111111111',
           lastLogin: '2026-07-08T09:30:00Z',
           role: 'ADMIN',
@@ -42,7 +41,6 @@ describe('UsersPageService', () => {
         },
         {
           email: 'super-admin@example.com',
-          favouriteCourts: null,
           id: '33333333-3333-4333-8333-333333333333',
           lastLogin: '2026-07-07T09:30:00Z',
           role: 'SuperAdmin',
@@ -170,7 +168,6 @@ describe('UsersPageService', () => {
       content: [
         {
           email: 'admin@example.com',
-          favouriteCourts: null,
           id: '11111111-1111-4111-8111-111111111111',
           lastLogin: '2026-07-08T09:30:00Z',
           role: 'ADMIN',
@@ -205,7 +202,6 @@ describe('UsersPageService', () => {
       content: [
         {
           email: 'blank-login@example.com',
-          favouriteCourts: null,
           id: '11111111-1111-4111-8111-111111111111',
           lastLogin: '',
           role: 'CUSTOM_ROLE',
@@ -213,7 +209,6 @@ describe('UsersPageService', () => {
         },
         {
           email: 'invalid-login@example.com',
-          favouriteCourts: null,
           id: '33333333-3333-4333-8333-333333333333',
           lastLogin: 'not-a-date',
           role: 'SUPER_ADMIN',

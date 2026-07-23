@@ -12,6 +12,8 @@ export type HomePageTableCell = {
 };
 
 export type HomePageFilters = {
+  activeTab?: 'courts' | 'favourites';
+  favouritesPageNumber?: number;
   includeClosed: boolean;
   onlyServiceCentres: boolean;
   pageNumber: number;
@@ -21,6 +23,7 @@ export type HomePageFilters = {
   sortBy: '' | 'lastUpdated' | 'name';
   sortOrder: 'asc' | 'desc';
   rawIncludeClosed?: string;
+  rawFavouritesPageNumber?: string;
   rawOnlyServiceCentres?: string;
   rawPageNumber?: string;
   rawPageSize?: string;
@@ -59,10 +62,16 @@ export type HomePageHrefOverrides = Partial<Pick<HomePageFilters, 'pageNumber' |
 export type HomePageViewModel = {
   courtTableHead: HomePageTableHeadCell[];
   courtTableRows: HomePageTableCell[][];
+  courtFavouriteStatusErrorMessage?: string;
   errorMessage?: string;
   errorSummary: HomePageValidationError[];
   filters: HomePageFilters;
   includeStatusColumn: boolean;
+  favouriteTableHead: HomePageTableHeadCell[];
+  favouriteTableRows: HomePageTableCell[][];
+  favouritesErrorMessage?: string;
+  favouritesPagination: HomePagePagination;
+  favouritesResultsMessage: string;
   pageTitle: string;
   partialCourtNameError?: string;
   pagination: HomePagePagination;

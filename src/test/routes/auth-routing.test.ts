@@ -85,6 +85,8 @@ describe('Authentication routing', () => {
 
   test('allows viewer users to access the location list', async () => {
     stub(HomePageService.prototype, 'getFilters').returns({
+      activeTab: 'courts',
+      favouritesPageNumber: 0,
       includeClosed: false,
       onlyServiceCentres: false,
       pageNumber: 0,
@@ -98,7 +100,13 @@ describe('Authentication routing', () => {
       courtTableHead: [],
       courtTableRows: [],
       errorSummary: [],
+      favouriteTableHead: [],
+      favouriteTableRows: [],
+      favouritesPagination: { currentPage: 0, items: [], totalPages: 0 },
+      favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
       filters: {
+        activeTab: 'courts',
+        favouritesPageNumber: 0,
         includeClosed: false,
         onlyServiceCentres: false,
         pageNumber: 0,
@@ -201,6 +209,45 @@ describe('Authentication routing', () => {
   test('denies viewer users non-approval posts', async () => {
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/general/success')
+      .set('x-test-role', 'Viewer');
+
+    expect(response.status).toBe(403);
+    expect(response.text).toContain('Access Denied');
+  });
+
+  test.each([
+    ['/favourites/COURT/11111111-1111-4111-8111-111111111111', 'add'],
+    ['/favourites/SERVICE_CENTRE/22222222-2222-4222-8222-222222222222/remove', 'remove'],
+  ])('allows Viewer favourite mutation %s', async (path, operation) => {
+    const method = operation === 'add' ? 'addFavourite' : 'removeFavourite';
+    stub(DataApiRequests.prototype, method).resolves(operation === 'add' ? 201 : 204);
+
+    const response = await request(app)
+      .post(path)
+      .set('x-test-role', 'Viewer')
+      .type('form')
+      .send({ returnPath: '/#courts' });
+
+    expect(response.status).toBe(303);
+    expect(response.headers.location).toBe('/#courts');
+  });
+
+  test.each(['Admin', 'SuperAdmin'])('allows %s users to mutate favourites', async role => {
+    stub(DataApiRequests.prototype, 'addFavourite').resolves(201);
+
+    const response = await request(app)
+      .post('/favourites/COURT/11111111-1111-4111-8111-111111111111')
+      .set('x-test-role', role)
+      .type('form')
+      .send({ returnPath: '/#courts' });
+
+    expect(response.status).toBe(303);
+    expect(response.headers.location).toBe('/#courts');
+  });
+
+  test('denies Viewer posts resembling but outside the strict favourite route', async () => {
+    const response = await request(app)
+      .post('/favourites/BUILDING/11111111-1111-4111-8111-111111111111')
       .set('x-test-role', 'Viewer');
 
     expect(response.status).toBe(403);
