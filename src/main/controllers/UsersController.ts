@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 
 import { UsersPageService } from '../services/UsersPageService';
 
+import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
+
 @route('/users')
 export default class UsersController {
   public constructor(private readonly usersPageService = new UsersPageService()) {}
@@ -12,6 +14,9 @@ export default class UsersController {
     const filters = this.usersPageService.getFilters(req.query as Record<string, unknown>);
     const viewModel = await this.usersPageService.getUsersPageViewModel(filters);
 
-    res.render('users', viewModel);
+    res.render('users', {
+      ...viewModel,
+      breadcrumbs: buildPageBreadcrumbs('Users'),
+    });
   }
 }

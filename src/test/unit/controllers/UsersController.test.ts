@@ -42,7 +42,16 @@ describe('UsersController', () => {
       render: () => '',
     } as unknown as Response;
     const responseMock = mock(response);
-    responseMock.expects('render').once().withArgs('users', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('users', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Users' },
+        ],
+      });
 
     await controller.get(request, response);
 

@@ -4,8 +4,10 @@ import request from 'supertest';
 import { app } from '../../main/app';
 import { DataApiRequests } from '../../main/requests/DataApiRequests';
 import { ApprovalService } from '../../main/services/ApprovalService';
+import { CounterServiceOpeningHoursService } from '../../main/services/CounterServiceOpeningHoursService';
 import { HomePageService } from '../../main/services/HomePageService';
 import { UsersPageService } from '../../main/services/UsersPageService';
+import { WarningNoticeService } from '../../main/services/WarningNoticeService';
 
 const emptyUsersFilters = {
   pageNumber: 0,
@@ -139,6 +141,39 @@ describe('Authentication routing', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Address - Reading Service Centre');
+  });
+
+  test('allows viewer users to access new read-only court review pages', async () => {
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    stub(CounterServiceOpeningHoursService.prototype, 'getListPage').resolves({
+      courtId,
+      courtName: 'Reading Crown Court',
+      counterServiceOpeningHours: [],
+      pageTitle: 'Counter service opening hours - Reading Crown Court',
+    });
+    stub(WarningNoticeService.prototype, 'getWarningNoticePage').resolves({
+      courtId,
+      courtName: 'Reading Crown Court',
+      errorSummary: [],
+      errors: {},
+      form: {
+        warningNotice: 'Court closed for maintenance.',
+        warningNoticeCy: 'Llys ar gau ar gyfer gwaith cynnal a chadw.',
+      },
+      pageTitle: 'Warning notice - Reading Crown Court',
+    });
+
+    const [counterServiceResponse, warningNoticeResponse] = await Promise.all([
+      request(app).get(`/courts/${courtId}/edit/counter-service-opening-hours`).set('x-test-role', 'Viewer'),
+      request(app).get(`/courts/${courtId}/edit/warning-notice`).set('x-test-role', 'Viewer'),
+    ]);
+
+    expect(counterServiceResponse.status).toBe(200);
+    expect(counterServiceResponse.text).toContain('Counter service opening hours');
+    expect(counterServiceResponse.text).not.toContain('Add opening hours');
+    expect(warningNoticeResponse.status).toBe(200);
+    expect(warningNoticeResponse.text).toContain('Warning notice');
+    expect(warningNoticeResponse.text).not.toContain('>Save<');
   });
 
   test.each(['/download', '/add-court', '/add-service-centre', '/approvals', '/audits', '/users'])(

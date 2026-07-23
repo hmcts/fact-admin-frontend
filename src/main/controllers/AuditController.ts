@@ -20,6 +20,8 @@ import {
   toUkDateTimeString,
 } from '../utils/valueParsers';
 
+import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
+
 const logger = Logger.getLogger('audit-controller');
 
 const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
@@ -47,6 +49,7 @@ export default class AuditController {
 
     res.render('audit-list', {
       ...viewModel,
+      breadcrumbs: buildPageBreadcrumbs('Audits'),
       filterCategories,
       basePagerUrl,
       downloadUrl: viewModel.errors || viewModel.audits.content.length === 0 ? undefined : downloadUrl,
@@ -100,6 +103,11 @@ export default class AuditController {
 
     res.render('audit-detail', {
       audit,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '/audits', text: 'Audits' },
+        { href: '#', text: 'Audit detail' },
+      ],
       pageTitle: 'Audit Detail',
     });
   }

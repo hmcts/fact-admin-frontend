@@ -124,6 +124,14 @@ describe('ServiceCentreEditController', () => {
     expect(response.render).toHaveBeenCalledWith(
       'approval-confirm',
       expect.objectContaining({
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          {
+            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+            text: 'Edit National Business Centre',
+          },
+          { href: '#', text: 'Approve data' },
+        ],
         name: 'National Business Centre',
         pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
       })
@@ -156,7 +164,17 @@ describe('ServiceCentreEditController', () => {
     expect(createApproval.calledOnce).toBe(true);
     expect(response.render).toHaveBeenCalledWith(
       'common-edit-success',
-      expect.objectContaining({ pageTitle: 'Approval saved - National Business Centre' })
+      expect.objectContaining({
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          {
+            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+            text: 'Edit National Business Centre',
+          },
+          { href: '#', text: 'Approval saved' },
+        ],
+        pageTitle: 'Approval saved - National Business Centre',
+      })
     );
   });
 

@@ -155,7 +155,26 @@ describe('ServiceCentreContactController', () => {
       contactTelephone: '',
     });
 
-    responseMock.expects('render').once().withArgs('service-centre-contact-form', match.object);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'service-centre-contact-form',
+        match({
+          breadcrumbs: [
+            { href: '/', text: 'Home' },
+            {
+              href: `/service-centres/${SERVICE_CENTRE_ID}/edit`,
+              text: 'Edit Reading Service Centre',
+            },
+            {
+              href: `/service-centres/${SERVICE_CENTRE_ID}/edit/contact-details`,
+              text: 'Contact details',
+            },
+            { href: '#', text: 'Add contact details' },
+          ],
+        })
+      );
 
     try {
       await controller.renderAdd(request, response);
