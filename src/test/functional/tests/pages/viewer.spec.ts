@@ -24,6 +24,12 @@ test.describe(
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Audits' })).toHaveCount(0);
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Users' })).toHaveCount(0);
 
+        await homePage.expectFavouriteButtonState(createdCourt.name, false);
+        await homePage.addFavourite(createdCourt.name);
+        await homePage.expectFavouriteButtonState(createdCourt.name, true);
+        await homePage.removeFavourite(createdCourt.name);
+        await homePage.expectFavouriteButtonState(createdCourt.name, false);
+
         await homePage.clickReviewForCourt(createdCourt.name);
         await expect(homePage.heading).toContainText(`Reviewing - ${createdCourt.name}`);
         await expect(homePage.page).toHaveURL(new RegExp(`/courts/${createdCourt.id}/edit$`));

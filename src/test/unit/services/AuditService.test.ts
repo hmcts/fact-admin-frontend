@@ -29,7 +29,6 @@ const baseAudit = {
   userId,
   user: {
     email: 'super-admin@example.com',
-    favouriteCourts: null,
     id: userId,
     lastLogin: '2026-06-26T09:10:11.123Z',
     role: 'SUPER_ADMIN',
