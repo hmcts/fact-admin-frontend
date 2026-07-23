@@ -42,6 +42,13 @@ import {
   courtSinglePointOfEntryListSchema,
 } from '../schemas/courtSinglePointOfEntrySchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
+import {
+  FavouriteReference,
+  FavouriteStatus,
+  PagedFavourites,
+  favouriteStatusListSchema,
+  pagedFavouritesSchema,
+} from '../schemas/favouriteSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
 import { Lock, LockList, Page, lockListSchema, lockSchema } from '../schemas/lockSchema';
 import {
@@ -72,6 +79,7 @@ import { User, userSchema } from '../schemas/userSchema';
 import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
 import { GetAuditsParams } from './types/GetAuditsParams';
 import { GetCourtsParams } from './types/GetCourtsParams';
+import { GetFavouritesParams } from './types/GetFavouritesParams';
 import { GetUsersParams } from './types/GetUsersParams';
 import { SaveCourtContactDetailRequest } from './types/SaveCourtContactDetailRequest';
 import { SaveServiceCentreContactDetailRequest } from './types/SaveServiceCentreContactDetailRequest';
@@ -120,6 +128,68 @@ export class DataApiRequests {
       return pagedCourtsSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching courts:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Gets the current user's paginated favourite courts and service centres.
+   */
+  public async getFavourites(params: GetFavouritesParams = {}): Promise<PagedFavourites | HttpStatusCode> {
+    try {
+      const response = await dataApi.get('/user/v1/favourites', { params });
+      return pagedFavouritesSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching favourites:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Gets favourite state for locations on the current Courts page.
+   */
+  public async getFavouriteStatuses(subjects: FavouriteReference[]): Promise<FavouriteStatus[] | HttpStatusCode> {
+    try {
+      const response = await dataApi.post('/user/v1/favourites/status', { subjects });
+      return favouriteStatusListSchema.parse(response.data);
+    } catch (error: unknown) {
+      logger.error('Error fetching favourite statuses:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Adds a favourite for the current user.
+   */
+  public async addFavourite(favourite: FavouriteReference): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.post('/user/v1/favourites', favourite);
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      logger.error('Error adding favourite:', error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Removes a favourite for the current user.
+   */
+  public async removeFavourite(favourite: FavouriteReference): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.delete(
+        `/user/v1/favourites/${encodeURIComponent(favourite.subjectType)}/${encodeURIComponent(favourite.subjectId)}`
+      );
+      return response.status as HttpStatusCode;
+    } catch (error: unknown) {
+      logger.error('Error removing favourite:', error);
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;

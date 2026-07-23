@@ -54,13 +54,17 @@ describe('HomePageViewService', () => {
       sortOrder: 'desc',
     });
 
-    expect(head).toHaveLength(4);
-    expect(head[0].attributes).toEqual({ 'aria-sort': 'none' });
-    expect(head[0].html).toContain('sortBy=name&sortOrder=asc');
-    expect(head[1].attributes).toEqual({ 'aria-sort': 'descending' });
-    expect(head[1].html).toContain('sortBy=lastUpdated&sortOrder=asc');
-    expect(head[2]).toEqual({ text: 'Status' });
-    expect(head[3]).toEqual({ classes: 'homepage-courts-table__actions', text: 'Actions' });
+    expect(head).toHaveLength(5);
+    expect(head[0]).toEqual({
+      classes: 'homepage-courts-table__favourite',
+      text: 'Favourite',
+    });
+    expect(head[1].attributes).toEqual({ 'aria-sort': 'none' });
+    expect(head[1].html).toContain('sortBy=name&sortOrder=asc');
+    expect(head[2].attributes).toEqual({ 'aria-sort': 'descending' });
+    expect(head[2].html).toContain('sortBy=lastUpdated&sortOrder=asc');
+    expect(head[3]).toEqual({ text: 'Status' });
+    expect(head[4]).toEqual({ classes: 'homepage-courts-table__actions', text: 'Actions' });
   });
 
   test('builds rows with court and service centre action links', () => {
@@ -80,14 +84,15 @@ describe('HomePageViewService', () => {
       } as PagedCourts
     );
 
-    expect(rows[0][0]).toEqual({ text: 'London Civil and Family Court' });
-    expect(rows[0][2]).toEqual({ text: 'Open' });
-    expect(rows[0][3].html).toContain('https://localhost:3344/courts/london-civil-and-family-court');
-    expect(rows[0][3].html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit');
-    expect(rows[1][0]).toEqual({ text: 'National Business Centre' });
-    expect(rows[1][2]).toEqual({ text: 'Closed' });
-    expect(rows[1][3].html).toContain('https://localhost:3344/service-centres/national-business-centre');
-    expect(rows[1][3].html).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit');
+    expect(rows[0][0]).toEqual({ classes: 'homepage-courts-table__favourite', html: '' });
+    expect(rows[0][1]).toEqual({ text: 'London Civil and Family Court' });
+    expect(rows[0][3]).toEqual({ text: 'Open' });
+    expect(rows[0][4].html).toContain('https://localhost:3344/courts/london-civil-and-family-court');
+    expect(rows[0][4].html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit');
+    expect(rows[1][1]).toEqual({ text: 'National Business Centre' });
+    expect(rows[1][3]).toEqual({ text: 'Closed' });
+    expect(rows[1][4].html).toContain('https://localhost:3344/service-centres/national-business-centre');
+    expect(rows[1][4].html).toContain('/service-centres/22222222-2222-4222-8222-222222222222/edit');
   });
 
   test('builds review actions for viewer rows', () => {
@@ -105,9 +110,68 @@ describe('HomePageViewService', () => {
       true
     );
 
-    expect(rows[0][2].html).toContain('Review<span class="govuk-visually-hidden"> London Civil and Family Court');
-    expect(rows[0][2].html).not.toContain('Edit<span');
-    expect(rows[1][2].html).toContain('Review<span class="govuk-visually-hidden"> National Business Centre');
+    expect(rows[0][3].html).toContain('Review<span class="govuk-visually-hidden"> London Civil and Family Court');
+    expect(rows[0][3].html).not.toContain('Edit<span');
+    expect(rows[1][3].html).toContain('Review<span class="govuk-visually-hidden"> National Business Centre');
+  });
+
+  test('builds accessible outline and filled star controls with unique tooltips', () => {
+    const rows = service.buildCourtTableRows(
+      filters,
+      {
+        content: [court, serviceCentre],
+        page: { number: 0, size: 25, totalElements: 2, totalPages: 1 },
+      } as PagedCourts,
+      false,
+      new Map([
+        [`COURT:${court.id}`, false],
+        [`SERVICE_CENTRE:${serviceCentre.id}`, true],
+      ])
+    );
+
+    expect(rows[0][0].html).toContain('aria-pressed="false"');
+    expect(rows[0][0].html).toContain(`aria-describedby="favourite-tooltip-courts-court-${court.id}"`);
+    expect(rows[0][0].html).toContain('Add to favourites');
+    expect(rows[0][0].html).toContain(`action="/favourites/COURT/${court.id}"`);
+    expect(rows[0][0].html).toContain(`Add ${court.name} to favourites`);
+    expect(rows[0][0].html).toContain('aria-hidden="true" focusable="false"');
+    expect(rows[0][0].html).toContain(
+      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip">Add to favourites`
+    );
+    expect(rows[1][0].html).toContain('aria-pressed="true"');
+    expect(rows[1][0].html).toContain('Remove from favourites');
+    expect(rows[1][0].html).toContain(`Remove ${serviceCentre.name} from favourites`);
+    expect(rows[1][0].html).toContain(`action="/favourites/SERVICE_CENTRE/${serviceCentre.id}/remove"`);
+    expect(rows[0][0].html).not.toContain(`favourite-tooltip-courts-service_centre-${serviceCentre.id}`);
+    expect(rows[0][0].classes).toBe('homepage-courts-table__favourite');
+    expect(rows[0][1]).toEqual({ text: court.name });
+    expect(rows[1][1]).toEqual({ text: serviceCentre.name });
+  });
+
+  test('builds independently paginated favourite rows with Viewer review actions', () => {
+    const page = {
+      content: [serviceCentre],
+      page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
+    } as PagedCourts;
+    const rows = service.buildFavouriteTableRows(filters, page, true);
+    const pagination = service.buildFavouritesPagination(page, filters);
+
+    expect(service.buildFavouriteTableHead()).toEqual([
+      { classes: 'homepage-courts-table__favourite', text: 'Favourite' },
+      { text: 'Name' },
+      { text: 'Last updated' },
+      { classes: 'homepage-courts-table__actions', text: 'Actions' },
+    ]);
+    expect(rows[0][0].html).toContain('aria-pressed="true"');
+    expect(rows[0][0].html).toContain('tab=favourites');
+    expect(rows[0][1]).toEqual({ text: serviceCentre.name });
+    expect(rows[0][3].html).toContain('Review<span');
+    expect(pagination.previous?.href).toContain('favouritesPageNumber=0');
+    expect(pagination.previous?.href).toContain('tab=favourites');
+    expect(service.buildFavouritesResultsMessage(page)).toBe(
+      'Showing 26 to 26 of 30 favourite courts, tribunals and service centres'
+    );
+    expect(service.buildFavouritesPageTitle(page)).toBe('Favourites (page 2 of 2)');
   });
 
   test('builds pagination links preserving filters, sorting and service centre checkbox', () => {

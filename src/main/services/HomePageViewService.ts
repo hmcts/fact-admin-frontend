@@ -31,6 +31,7 @@ export class HomePageViewService {
    */
   public buildCourtTableHead(filters: HomePageFilters): HomePageTableHeadCell[] {
     return [
+      { classes: 'homepage-courts-table__favourite', text: 'Favourite' },
       this.buildSortableHeadItem('Name', 'name', filters),
       this.buildSortableHeadItem('Last updated', 'lastUpdated', filters),
       ...(filters.includeClosed ? [{ text: 'Status' }] : []),
@@ -44,15 +45,51 @@ export class HomePageViewService {
   public buildCourtTableRows(
     filters: HomePageFilters,
     courtsPage: PagedCourts,
-    isReviewMode = false
+    isReviewMode = false,
+    favouriteStatuses?: Map<string, boolean>
   ): HomePageTableCell[][] {
     return courtsPage.content.map(court => [
+      favouriteStatuses
+        ? this.buildFavouriteCell(
+            court,
+            favouriteStatuses.get(buildFavouriteKey(court.locationType, court.id)) ?? false,
+            `${this.buildHref(filters, {})}#courts`,
+            'courts'
+          )
+        : { classes: 'homepage-courts-table__favourite', html: '' },
       { text: court.name },
       { text: this.formatDate(court.lastUpdatedAt) },
       ...(filters.includeClosed ? [{ text: court.open ? 'Open' : 'Closed' }] : []),
       {
         classes: 'homepage-courts-table__actions',
         html: this.buildActionsHtml(court, isReviewMode),
+      },
+    ]);
+  }
+
+  public buildFavouriteTableHead(): HomePageTableHeadCell[] {
+    return [
+      { classes: 'homepage-courts-table__favourite', text: 'Favourite' },
+      { text: 'Name' },
+      { text: 'Last updated' },
+      { classes: 'homepage-courts-table__actions', text: 'Actions' },
+    ];
+  }
+
+  public buildFavouriteTableRows(
+    filters: HomePageFilters,
+    favouritesPage: PagedCourts,
+    isReviewMode = false
+  ): HomePageTableCell[][] {
+    const returnPath = this.buildFavouritesHref(filters, favouritesPage.page.number);
+
+    return favouritesPage.content.map(location => [
+      this.buildFavouriteCell(location, true, returnPath, 'favourites'),
+      { text: location.name },
+      { text: this.formatDate(location.lastUpdatedAt) },
+      {
+        classes: 'homepage-courts-table__actions',
+        html: this.buildActionsHtml(location, isReviewMode),
       },
     ]);
   }
@@ -75,6 +112,32 @@ export class HomePageViewService {
     };
   }
 
+  public buildFavouritesPagination(favouritesPage: PagedCourts, filters: HomePageFilters): HomePagePagination {
+    const totalPages = favouritesPage.page.totalPages ?? 0;
+    const currentPage = favouritesPage.page.number ?? filters.favouritesPageNumber ?? DEFAULT_PAGE_NUMBER;
+    const pageIndexes = this.getVisiblePageIndexes(totalPages, currentPage);
+    const items: HomePagePaginationLink[] = [];
+
+    pageIndexes.forEach((pageIndex, index) => {
+      if (index > 0 && pageIndex - pageIndexes[index - 1] > 1) {
+        items.push({ ellipsis: true, href: '', number: -1 });
+      }
+      items.push({
+        current: pageIndex === currentPage,
+        href: this.buildFavouritesHref(filters, pageIndex),
+        number: pageIndex + 1,
+      });
+    });
+
+    return {
+      currentPage,
+      items: totalPages > 1 ? items : [],
+      next: currentPage < totalPages - 1 ? { href: this.buildFavouritesHref(filters, currentPage + 1) } : undefined,
+      previous: currentPage > 0 ? { href: this.buildFavouritesHref(filters, currentPage - 1) } : undefined,
+      totalPages,
+    };
+  }
+
   /**
    * Builds the page title, including validation and pagination context when needed.
    */
@@ -86,6 +149,12 @@ export class HomePageViewService {
     }
 
     return `${titlePrefix}${HOME_PAGE_TITLE}`;
+  }
+
+  public buildFavouritesPageTitle(favouritesPage: PagedCourts): string {
+    return (favouritesPage.page.totalPages ?? 0) > 1
+      ? `Favourites (page ${(favouritesPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${favouritesPage.page.totalPages})`
+      : 'Favourites';
   }
 
   /**
@@ -101,15 +170,27 @@ export class HomePageViewService {
     return `Showing ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + 1} to ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + courtsPage.content.length} of ${totalElements} courts, tribunals and service centres`;
   }
 
+  public buildFavouritesResultsMessage(favouritesPage: PagedCourts): string {
+    const totalElements = favouritesPage.page.totalElements ?? 0;
+    if (totalElements === 0 || favouritesPage.content.length === 0) {
+      return 'No favourite courts, tribunals or service centres found.';
+    }
+
+    const pageNumber = favouritesPage.page.number ?? DEFAULT_PAGE_NUMBER;
+    const pageSize = favouritesPage.page.size ?? DEFAULT_PAGE_SIZE;
+    return `Showing ${pageNumber * pageSize + 1} to ${pageNumber * pageSize + favouritesPage.content.length} of ${totalElements} favourite courts, tribunals and service centres`;
+  }
+
   /**
    * Builds the row action list.
    */
   private buildActionsHtml(location: LocationListItem, isReviewMode: boolean): string {
-    const viewLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="${this.buildPublicLocationHref(location)}">View<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
+    const escapedName = this.escapeHtml(location.name);
+    const viewLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="${this.buildPublicLocationHref(location)}">View<span class="govuk-visually-hidden"> ${escapedName}</span></a></li>`;
     const editPathPrefix =
       location.serviceCentre || location.locationType === 'SERVICE_CENTRE' ? 'service-centres' : 'courts';
     const editLabel = isReviewMode ? 'Review' : 'Edit';
-    const editLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/${editPathPrefix}/${location.id}/edit">${editLabel}<span class="govuk-visually-hidden"> ${location.name}</span></a></li>`;
+    const editLink = `<li class="govuk-summary-list__actions-list-item"><a class="govuk-link govuk-link--no-visited-state" href="/${editPathPrefix}/${location.id}/edit">${editLabel}<span class="govuk-visually-hidden"> ${escapedName}</span></a></li>`;
 
     return `<ul class="govuk-summary-list__actions-list govuk-!-margin-bottom-0">${viewLink}${editLink}</ul>`;
   }
@@ -213,6 +294,10 @@ export class HomePageViewService {
    * Builds a homepage URL with the current filters plus any pagination or sorting overrides.
    */
   private buildHref(filters: HomePageFilters, overrides: HomePageHrefOverrides): string {
+    return `/?${this.buildCourtQuery(filters, overrides).toString()}`;
+  }
+
+  private buildCourtQuery(filters: HomePageFilters, overrides: HomePageHrefOverrides): URLSearchParams {
     const query = new URLSearchParams();
     const pageNumber = overrides.pageNumber ?? filters.pageNumber;
     const sortBy = overrides.sortBy ?? filters.sortBy;
@@ -235,7 +320,14 @@ export class HomePageViewService {
 
     query.set('pageNumber', pageNumber.toString());
 
-    return `/?${query.toString()}`;
+    return query;
+  }
+
+  private buildFavouritesHref(filters: HomePageFilters, favouritesPageNumber: number): string {
+    const query = this.buildCourtQuery(filters, { pageNumber: filters.pageNumber });
+    query.set('tab', 'favourites');
+    query.set('favouritesPageNumber', favouritesPageNumber.toString());
+    return `/?${query.toString()}#favourites`;
   }
 
   /**
@@ -291,4 +383,49 @@ export class HomePageViewService {
       year: 'numeric',
     }).format(new Date(date));
   }
+
+  private buildFavouriteCell(
+    location: LocationListItem,
+    favourite: boolean,
+    returnPath: string,
+    table: 'courts' | 'favourites'
+  ): HomePageTableCell {
+    const tooltip = favourite ? 'Remove from favourites' : 'Add to favourites';
+    const action = `/favourites/${location.locationType}/${location.id}${favourite ? '/remove' : ''}`;
+    const tooltipId = `favourite-tooltip-${table}-${location.locationType.toLowerCase()}-${location.id}`;
+    const escapedName = this.escapeHtml(location.name);
+    const escapedReturnPath = this.escapeHtml(returnPath);
+    const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
+
+    return {
+      classes: 'homepage-courts-table__favourite',
+      html: [
+        '<div class="favourite-location">',
+        `<form class="favourite-location__form" method="post" action="${action}">`,
+        `<input type="hidden" name="returnPath" value="${escapedReturnPath}">`,
+        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}">`,
+        '<svg class="favourite-location__star" aria-hidden="true" focusable="false" viewBox="0 0 24 24">',
+        '<path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.42l-5.8 3.05L7.31 14l-4.7-4.58 6.49-.94L12 2.6z"/>',
+        '</svg>',
+        `<span class="govuk-visually-hidden">${accessibleLabel}</span>`,
+        '</button>',
+        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip">${tooltip}</span>`,
+        '</form>',
+        '</div>',
+      ].join(''),
+    };
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+}
+
+export function buildFavouriteKey(subjectType: string, subjectId: string): string {
+  return `${subjectType}:${subjectId}`;
 }
