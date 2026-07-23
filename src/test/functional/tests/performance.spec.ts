@@ -23,6 +23,17 @@ test.describe(
       await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
     });
 
+    test('Favourites Tab Performance', async ({ homePage, lighthouseUtils, playwright }) => {
+      await withCreatedCourt(playwright, 'Favourites Performance Test', {}, async ({ createdCourt }) => {
+        await homePage.goto();
+        await homePage.searchForCourt(createdCourt.name);
+        await homePage.addFavourite(createdCourt.name);
+        await homePage.openFavouritesTab();
+        await homePage.expectFavouriteVisible(createdCourt.name);
+        await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
+      });
+    });
+
     test('Users Page Performance', async ({ lighthouseUtils, usersPage }) => {
       await usersPage.goto();
       await usersPage.header.checkIsVisible();

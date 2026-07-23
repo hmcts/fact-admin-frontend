@@ -27,6 +27,8 @@ export class HomePageFiltersService {
     const rawSortOrder = parseOptionalString(query.sortOrder);
 
     return {
+      activeTab: query.tab === 'favourites' ? 'favourites' : 'courts',
+      favouritesPageNumber: Math.min(parseNumber(query.favouritesPageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),
       includeClosed: query.includeClosed === 'true' || query.includeClosed === 'on',
       onlyServiceCentres: query.onlyServiceCentres === 'true' || query.onlyServiceCentres === 'on',
       pageNumber: Math.min(parseNumber(query.pageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),
@@ -36,6 +38,7 @@ export class HomePageFiltersService {
       sortBy,
       sortOrder: rawSortOrder === 'desc' ? 'desc' : DEFAULT_SORT_ORDER,
       rawIncludeClosed: parseOptionalString(query.includeClosed),
+      rawFavouritesPageNumber: parseOptionalString(query.favouritesPageNumber),
       rawOnlyServiceCentres: parseOptionalString(query.onlyServiceCentres),
       rawPageNumber: parseOptionalString(query.pageNumber),
       rawPageSize: parseOptionalString(query.pageSize),
@@ -109,6 +112,21 @@ export class HomePageFiltersService {
         errors.push({
           href: '#main-content',
           text: `pageNumber must be less than or equal to ${MAX_PAGE_PARAM}`,
+        });
+      }
+    }
+
+    if (filters.rawFavouritesPageNumber !== undefined) {
+      const favouritesPageNumber = Number(filters.rawFavouritesPageNumber);
+      if (!Number.isInteger(favouritesPageNumber) || favouritesPageNumber < 0) {
+        errors.push({
+          href: '#favourites',
+          text: 'favouritesPageNumber must be greater than or equal to 0',
+        });
+      } else if (favouritesPageNumber > MAX_PAGE_PARAM) {
+        errors.push({
+          href: '#favourites',
+          text: `favouritesPageNumber must be less than or equal to ${MAX_PAGE_PARAM}`,
         });
       }
     }

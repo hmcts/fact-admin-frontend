@@ -104,7 +104,9 @@ describe('Add service centre page', () => {
     } as never);
     stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
 
-    const response = await request(app).get('/service-centres/11111111-1111-4111-8111-111111111111/edit/address');
+    const response = await request(app).get(
+      '/service-centres/11111111-1111-4111-8111-111111111111/edit/address?isNewSC=true'
+    );
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('You can have 0-1 addresses per service centre');

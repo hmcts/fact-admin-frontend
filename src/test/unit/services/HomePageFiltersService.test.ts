@@ -18,12 +18,15 @@ describe('HomePageFiltersService', () => {
         sortOrder: 'desc',
       })
     ).toEqual({
+      activeTab: 'courts',
+      favouritesPageNumber: 0,
       includeClosed: true,
       onlyServiceCentres: true,
       pageNumber: 3,
       pageSize: 50,
       partialCourtName: 'London',
       rawIncludeClosed: 'on',
+      rawFavouritesPageNumber: undefined,
       rawOnlyServiceCentres: 'true',
       rawPageNumber: '3',
       rawPageSize: '50',
