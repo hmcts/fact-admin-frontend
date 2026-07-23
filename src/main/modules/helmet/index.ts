@@ -7,13 +7,6 @@ const googleAnalyticsDomain = ['*.googletagmanager.com', 'https://tagmanager.goo
 const gov_uk_script_1 = "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='";
 const self = "'self'";
 const blockedFeatures = ['camera', 'geolocation', 'microphone', 'interest-cohort'];
-const factBlobStores = [
-  'https://factsaaat.blob.core.windows.net/',
-  'https://factsademo.blob.core.windows.net/',
-  'https://factsaithc.blob.core.windows.net/',
-  'https://factsaperftest.blob.core.windows.net/',
-  'https://factsaprod.blob.core.windows.net/',
-];
 
 export interface HelmetConfig {
   referrerPolicy?: ReferrerPolicy;
@@ -43,13 +36,14 @@ export class Helmet {
   }
 
   private setContentSecurityPolicy(app: express.Express) {
+    const photoImgSrc = process.env.PHOTO_IMG_SRC ? [process.env.PHOTO_IMG_SRC] : [];
+
     const formAction = [self, '*.hmcts.net', '*.gov.uk'];
-    const imgSrc = [self, 'data:', ...googleAnalyticsDomain, ...factBlobStores];
+    const imgSrc = [self, 'data:', ...googleAnalyticsDomain, ...photoImgSrc];
     const scriptSrc = [...googleAnalyticsDomain, gov_uk_script_1, (req, res) => `'nonce-${res.locals.cspNonce}'`];
 
     if (this.developmentMode) {
       formAction.push('http://localhost:*', 'https://localhost:*');
-      imgSrc.push('http://localhost:*', 'https://localhost:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*');
 
       // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
       // is not an allowed source of script in the following Content Security Policy directive.
