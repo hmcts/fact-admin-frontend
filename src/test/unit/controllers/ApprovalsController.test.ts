@@ -45,7 +45,13 @@ describe('ApprovalsController', () => {
     await controller.get(req, res);
 
     expect(approvalService.getApprovalsTracker).toHaveBeenCalledWith({ name: 'Reading', status: 'approved' });
-    expect(res.render).toHaveBeenCalledWith('approvals', viewModel);
+    expect(res.render).toHaveBeenCalledWith('approvals', {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '#', text: 'Approvals tracker' },
+      ],
+    });
   });
 
   test('renders an error when approvals cannot be loaded', async () => {
@@ -97,7 +103,14 @@ describe('ApprovalsController', () => {
     await controller.getUndoApproval(request('SuperAdmin', { approvalId }), res);
 
     expect(approvalService.getUndoApproval).toHaveBeenCalledWith(approvalId);
-    expect(res.render).toHaveBeenCalledWith('approval-undo-confirm', viewModel);
+    expect(res.render).toHaveBeenCalledWith('approval-undo-confirm', {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '/approvals', text: 'Approvals tracker' },
+        { href: '#', text: 'Undo approval' },
+      ],
+    });
   });
 
   test('renders an error when undo approval confirmation cannot be loaded', async () => {
@@ -125,6 +138,11 @@ describe('ApprovalsController', () => {
 
     expect(approvalService.undoApproval).toHaveBeenCalledWith(approvalId);
     expect(res.render).toHaveBeenCalledWith('common-edit-success', {
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '/approvals', text: 'Approvals tracker' },
+        { href: '#', text: 'Approval undone' },
+      ],
       continueUpdatingHref: '/approvals',
       continueUpdatingText: 'Back to Approval tracker',
       homeText: 'Back to Courts, tribunals and service centres list',

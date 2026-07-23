@@ -6,6 +6,8 @@ import { isSuperAdmin } from '../modules/authentication/authenticationHelper';
 import { ApprovalService, ApprovalTrackerViewModel, UndoApprovalViewModel } from '../services/ApprovalService';
 import { isUuid, parseString } from '../utils/valueParsers';
 
+import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
+
 @route('/approvals')
 export default class ApprovalsController {
   constructor(private readonly approvalService = new ApprovalService()) {}
@@ -21,7 +23,10 @@ export default class ApprovalsController {
       return;
     }
 
-    return res.render('approvals', viewModel);
+    return res.render('approvals', {
+      ...viewModel,
+      breadcrumbs: buildPageBreadcrumbs('Approvals tracker'),
+    });
   }
 
   @route('/:approvalId/undo')
@@ -42,7 +47,14 @@ export default class ApprovalsController {
       return;
     }
 
-    return res.render('approval-undo-confirm', viewModel);
+    return res.render('approval-undo-confirm', {
+      ...viewModel,
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '/approvals', text: 'Approvals tracker' },
+        { href: '#', text: 'Undo approval' },
+      ],
+    });
   }
 
   @route('/:approvalId/undo')
@@ -64,6 +76,11 @@ export default class ApprovalsController {
     }
 
     return res.render('common-edit-success', {
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '/approvals', text: 'Approvals tracker' },
+        { href: '#', text: 'Approval undone' },
+      ],
       continueUpdatingHref: '/approvals',
       continueUpdatingText: 'Back to Approval tracker',
       homeText: 'Back to Courts, tribunals and service centres list',

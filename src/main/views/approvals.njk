@@ -4,6 +4,7 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "macros/Breadcrumb.macro.njk" import appBreadcrumb %}
 
 {% set approvalTableRows = [] %}
 {% if approvals.length %}
@@ -54,6 +55,11 @@
 {% endblock %}
 
 {% block container %}
+  {% if breadcrumbs and breadcrumbs.length %}
+    <div class="govuk-width-container">
+      {{ appBreadcrumb(breadcrumbs) }}
+    </div>
+  {% endif %}
   <main class="govuk-main-wrapper" id="main-content">
     <div class="govuk-width-container">
       <h1 class="govuk-heading-l">Approvals tracker</h1>

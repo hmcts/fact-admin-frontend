@@ -93,6 +93,12 @@ export class LocationApprovalController {
 
     return res.render('approval-confirm', {
       ...approveData,
+      breadcrumbs: this.buildApprovalBreadcrumbs(
+        approveData.subjectId,
+        approveData.name,
+        this.options.subjectType,
+        'Approve data'
+      ),
       pagePath: `${approveData.editPath}/approve`,
     });
   }
@@ -132,6 +138,7 @@ export class LocationApprovalController {
     }
 
     return res.render('common-edit-success', {
+      breadcrumbs: this.buildApprovalBreadcrumbs(locationId, location.name, this.options.subjectType, 'Approval saved'),
       continueUpdatingHref: approveData.editPath,
       continueUpdatingText: `Back to ${isViewer(req) ? 'Reviewing' : 'Editing'} - ${location.name}`,
       homeText: 'Back to Courts, tribunals and service centres list',
@@ -168,6 +175,16 @@ export class LocationApprovalController {
 
   private getEditPath(locationId: string): string {
     return `/${this.options.routeSegment}/${locationId}/edit`;
+  }
+
+  private buildApprovalBreadcrumbs(
+    locationId: string,
+    locationName: string,
+    subjectType: Subject,
+    currentPage: string
+  ): BreadcrumbItem[] {
+    const breadcrumbs = this.options.buildBreadcrumbs?.(locationId, locationName, subjectType) ?? [];
+    return [...breadcrumbs, { href: '#', text: currentPage }];
   }
 
   private renderLocationResponseError(location: Location | HttpStatusCode, res: Response): location is HttpStatusCode {

@@ -20,7 +20,16 @@ describe('AddServiceCentreController', () => {
     };
     const getViewModelStub = stub(AddServiceCentreService.prototype, 'getViewModel').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-service-centre', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-service-centre', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Add new service centre' },
+        ],
+      });
 
     try {
       await controller.get(mockRequest({}), response);
@@ -76,7 +85,16 @@ describe('AddServiceCentreController', () => {
     };
     const createStub = stub(AddServiceCentreService.prototype, 'create').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-service-centre', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-service-centre', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Add new service centre' },
+        ],
+      });
 
     try {
       await controller.createServiceCentre(request, response);
@@ -143,7 +161,20 @@ describe('AddServiceCentreController', () => {
     };
     const createStub = stub(AddServiceCentreService.prototype, 'create').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-service-centre-success', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-service-centre-success', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          {
+            href: '/service-centres/11111111-1111-4111-8111-111111111111/edit',
+            text: 'National Business Centre',
+          },
+          { href: '#', text: 'Addresses' },
+        ],
+      });
 
     try {
       await controller.createServiceCentre(request, response);
@@ -179,7 +210,16 @@ describe('AddServiceCentreController', () => {
     };
     const createStub = stub(AddServiceCentreService.prototype, 'create').resolves(viewModel);
 
-    responseMock.expects('render').once().withArgs('add-service-centre', viewModel);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('add-service-centre', {
+        ...viewModel,
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: '#', text: 'Add new service centre' },
+        ],
+      });
 
     try {
       await controller.createServiceCentre(request, response);

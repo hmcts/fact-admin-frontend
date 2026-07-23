@@ -13,6 +13,10 @@ describe('Approvals View', () => {
           approvedAt: '26/06/2026 10:10:11',
         },
       ],
+      breadcrumbs: [
+        { href: '/', text: 'Home' },
+        { href: '#', text: 'Approvals tracker' },
+      ],
       nameFilter: 'reading',
       isSuperAdmin: true,
       pagePath: '/approvals',
@@ -21,6 +25,7 @@ describe('Approvals View', () => {
     });
 
     expect(html).toContain('Approvals tracker');
+    expect(html).toContain('aria-label="Breadcrumb"');
     expect(html).toContain('Search by name');
     expect(html).toContain('Approval status');
     expect(html).toContain('All');
