@@ -3032,13 +3032,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/frontend@npm:9.0.0":
-  version: 9.0.0
-  resolution: "@ministryofjustice/frontend@npm:9.0.0"
+"@ministryofjustice/frontend@npm:10.0.1":
+  version: 10.0.1
+  resolution: "@ministryofjustice/frontend@npm:10.0.1"
   peerDependencies:
     govuk-frontend: ^6.0.0
     moment: 2.30.1
-  checksum: 10/91402390dcbf26558684be9200c9b2ae47c77267fd074ae889bd907ec94e3c29072f40d1aebed8aae3cd2ae771806f8e90d57f03dcaf7de0f4fb470f3219a9a1
+  checksum: 10/98a796d642a6657644bef0c87926e5f6bdff0aac22b7a7a891c1059e8dcf2222e04b5bfe9bec1063b7a6adb90905f19c7f3eb833af947dc3195086c0a1a5d8e9
   languageName: node
   linkType: hard
 
@@ -10238,7 +10238,7 @@ __metadata:
     "@hmcts/nodejs-logging": "npm:^4.0.4"
     "@hmcts/playwright-common": "npm:^1.1.2"
     "@hmcts/properties-volume": "npm:1.4.1"
-    "@ministryofjustice/frontend": "npm:9.0.0"
+    "@ministryofjustice/frontend": "npm:10.0.1"
     "@playwright/test": "npm:1.61.1"
     "@types/babel__preset-env": "npm:7.10.0"
     "@types/chai": "npm:^5.2.3"
