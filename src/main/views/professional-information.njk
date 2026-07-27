@@ -166,7 +166,7 @@
           items: courtTypeItems
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code <span class="govuk-!-font-weight-regular">(optional)</span></h2>
         {{ govukInput({
           label: {
             text: "GBS code",
@@ -184,7 +184,7 @@
           } if fieldErrors.gbs else null
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes <span class="govuk-!-font-weight-regular">(optional)</span></h2>
         {{ repeatableSection(
           "dxCode",
           "DX code",
@@ -199,7 +199,7 @@
           "Enter the explanation text for this DX code in Welsh."
         ) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Fax numbers</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Fax numbers <span class="govuk-!-font-weight-regular">(optional)</span></h2>
         {{ repeatableSection(
           "faxNumber",
           "Fax number",
@@ -250,7 +250,7 @@
                   }) +
                   govukInput({
                     label: {
-                      text: "Phone number to book it",
+                      text: "Phone number to book it (optional)",
                       classes: "govuk-!-margin-bottom-1"
                     },
                     classes: "govuk-input--width-20",
