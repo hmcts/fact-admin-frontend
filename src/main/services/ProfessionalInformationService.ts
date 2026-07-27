@@ -108,7 +108,7 @@ const dxCodeMaxLength = 200;
 const repeatableDescriptionMaxLength = 250;
 const faxNumberFormatError = 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
 const interviewRoomCountError = 'Enter a number of interview rooms between 1 and 150, or select No';
-const invalidCharactersError = 'Value contains invalid characters';
+const invalidCharactersError = 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class ProfessionalInformationService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}

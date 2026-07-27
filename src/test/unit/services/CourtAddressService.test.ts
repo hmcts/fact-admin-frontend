@@ -234,7 +234,7 @@ describe('CourtAddressService', () => {
           ],
           county: [
             'County must be 255 characters or less',
-            'County must only include letters a to z, and special characters',
+            'County must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           epimId: [
             'ePIMS Ref ID must be 10 characters or less',
@@ -244,7 +244,7 @@ describe('CourtAddressService', () => {
           courtTypes: ['Please select at least one court type that this address is relevant for'],
           townCity: [
             'Town or city must be 100 characters or less',
-            'Town or city must only include letters a to z, and special characters',
+            'Town or city must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
         }),
       }),

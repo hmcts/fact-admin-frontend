@@ -236,9 +236,18 @@ describe('ProfessionalInformationService', () => {
       status: 'validationError',
       viewModel: {
         errorSummary: [
-          { href: '#dxCode-0', text: 'DX code 1: Value contains invalid characters' },
-          { href: '#dxCodeDescription-0', text: 'DX code 1 explanation: Value contains invalid characters' },
-          { href: '#dxCodeDescriptionCy-0', text: 'DX code 1 Welsh explanation: Value contains invalid characters' },
+          {
+            href: '#dxCode-0',
+            text: 'DX code 1: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#dxCodeDescription-0',
+            text: 'DX code 1 explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#dxCodeDescriptionCy-0',
+            text: 'DX code 1 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
           {
             href: '#faxNumber-0',
             text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
@@ -398,8 +407,11 @@ describe('ProfessionalInformationService', () => {
     const dataApiRequests = buildDataApiRequests({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          ['dxCodes[1].dxCode', 'Value contains invalid characters'],
-          ['dxCodes[1].explanation', 'Explanation contains invalid characters'],
+          ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+          [
+            'dxCodes[1].explanation',
+            'Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          ],
           ['faxNumbers[1].faxNumber', 'Fax number contains invalid characters'],
           ['faxNumbers[1].description', 'Description contains invalid characters'],
         ])
@@ -421,8 +433,14 @@ describe('ProfessionalInformationService', () => {
       status: 'validationError',
       viewModel: {
         errorSummary: [
-          { href: '#dxCode-1', text: 'DX code 2: Value contains invalid characters' },
-          { href: '#dxCodeDescription-1', text: 'DX code 2 explanation: Explanation contains invalid characters' },
+          {
+            href: '#dxCode-1',
+            text: 'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#dxCodeDescription-1',
+            text: 'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
           { href: '#faxNumber-1', text: 'Fax number 2: Fax number contains invalid characters' },
           {
             href: '#faxNumberDescription-1',
@@ -430,8 +448,10 @@ describe('ProfessionalInformationService', () => {
           },
         ],
         fieldErrors: {
-          'dxCode-1': 'DX code 2: Value contains invalid characters',
-          'dxCodeDescription-1': 'DX code 2 explanation: Explanation contains invalid characters',
+          'dxCode-1':
+            'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'dxCodeDescription-1':
+            'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           'faxNumber-1': 'Fax number 2: Fax number contains invalid characters',
           'faxNumberDescription-1': 'Fax number 2 description: Description contains invalid characters',
         },
@@ -443,8 +463,8 @@ describe('ProfessionalInformationService', () => {
     const dataApiRequests = buildDataApiRequests({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          ['dxCodes[0].dxCode', 'Value contains invalid characters'],
-          ['dxCodes[3].dxCode', 'Value contains invalid characters'],
+          ['dxCodes[0].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+          ['dxCodes[3].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
           ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
           ['faxNumbers[4].faxNumber', 'Value contains invalid characters'],
         ])
@@ -468,8 +488,14 @@ describe('ProfessionalInformationService', () => {
       status: 'validationError',
       viewModel: {
         errorSummary: [
-          { href: '#dxCode-0', text: 'DX code 1: Value contains invalid characters' },
-          { href: '#dxCode-3', text: 'DX code 4: Value contains invalid characters' },
+          {
+            href: '#dxCode-0',
+            text: 'DX code 1: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#dxCode-3',
+            text: 'DX code 4: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
           { href: '#faxNumber-0', text: 'Fax number 1: Value contains invalid characters' },
           { href: '#faxNumber-4', text: 'Fax number 5: Value contains invalid characters' },
         ],
@@ -481,7 +507,10 @@ describe('ProfessionalInformationService', () => {
     const dataApiRequests = buildDataApiRequests({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          ['dxCodes[0].dxCode', 'Value contains invalid characters'],
+          [
+            'dxCodes[0].dxCode',
+            'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          ],
           ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
         ])
       ),
@@ -505,7 +534,10 @@ describe('ProfessionalInformationService', () => {
       status: 'validationError',
       viewModel: {
         errorSummary: [
-          { href: '#dxCode-3', text: 'DX code 4: Value contains invalid characters' },
+          {
+            href: '#dxCode-3',
+            text: 'DX code 4: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
           { href: '#faxNumber-4', text: 'Fax number 5: Value contains invalid characters' },
         ],
       },
