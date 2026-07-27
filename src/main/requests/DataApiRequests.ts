@@ -1,5 +1,6 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
+import FormData from 'form-data';
 
 import { Accessibility, AccessibilityScheme } from '../schemas/accessibilitySchema';
 import { ApprovalStatus, CreateApprovalRequest, approvalStatusListSchema } from '../schemas/approvalSchema';
@@ -31,6 +32,7 @@ import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
 import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
+import { courtPhotoSchema } from '../schemas/courtPhotoSchema';
 import {
   CourtProfessionalInformation,
   courtProfessionalInformationSchema,
@@ -1458,6 +1460,66 @@ export class DataApiRequests {
       return (await dataApi.delete(`/user/v1/${userId}/locks`)).status;
     } catch (error: unknown) {
       logger.error(`Error acquiring removing locks for user with id: ${userId}`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve court photo file link for a given court
+   */
+  public async getCourtPhotoFileLink(courtId: string): Promise<string | undefined | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(`/courts/${courtId}/v1/photo`);
+      const photo = courtPhotoSchema.parse(response.data);
+      return photo.fileLink ?? undefined;
+    } catch (error: unknown) {
+      logger.error(`Error fetching court photo data: ${courtId}`, error);
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to upload court photo data for a given court
+   */
+  public async updateCourtPhoto(
+    courtId: string,
+    file: Buffer,
+    mimeType: string
+  ): Promise<string | undefined | HttpStatusCode | Map<string, string>> {
+    try {
+      const formData = new FormData();
+
+      // API expects field name "file"
+      formData.append('file', file, {
+        filename: 'image',
+        contentType: mimeType,
+      });
+
+      const response = await dataApi.post(`/courts/${courtId}/v1/photo`, formData);
+
+      const photo = courtPhotoSchema.parse(response.data);
+      return photo.fileLink ?? undefined;
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
+        return new Map(Object.entries(error.response.data) as [string, string][]);
+      }
+
+      logger.error(`Error saving court photo data: ${courtId}`, error);
+      return isAxiosError(error) && error.response?.status
+        ? (error.response.status as HttpStatusCode)
+        : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve court photo file link for a given court
+   */
+  public async deleteCourtPhoto(courtId: string): Promise<HttpStatusCode> {
+    try {
+      const response = await dataApi.delete(`/courts/${courtId}/v1/photo`);
+      return response.status;
+    } catch (error: unknown) {
+      logger.error(`Error removing court photo data: ${courtId}`, error);
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }

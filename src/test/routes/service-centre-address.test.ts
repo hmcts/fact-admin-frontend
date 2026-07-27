@@ -22,7 +22,7 @@ describe('Service centre address routes', () => {
     } as never);
     stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
 
-    const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/address`);
+    const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/address?isNewSC=true`);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Address');

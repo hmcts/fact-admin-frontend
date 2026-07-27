@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures';
 import { seedAuditTrailViaUi } from '../helpers/auditTestSupport';
+import { VALID_COURT_PHOTO } from '../helpers/courtPhotoTestData';
 import { withCreatedCourt, withCreatedServiceCentre } from '../helpers/testSupport';
 import { config } from '../utils';
 
@@ -92,6 +93,60 @@ test.describe(
         await expect(breadcrumb).toContainText(createdCourt.name);
         await axeUtils.audit();
       });
+    });
+
+    test('Court Photo Page Accessibility', async ({ axeUtils, courtPhotoPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Photo Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtPhotoPage.goto(createdCourt.id);
+        await expect(courtPhotoPage.currentPhoto).toBeVisible();
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Photo Validation Accessibility', async ({ axeUtils, courtPhotoPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Photo Validation Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtPhotoPage.goto(createdCourt.id);
+        await courtPhotoPage.uploadSelectedPhoto();
+        await expect(courtPhotoPage.errorSummary).toContainText('Select a JPG or PNG file');
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Photo Upload Success Accessibility', async ({ axeUtils, courtPhotoPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Photo Upload Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtPhotoPage.goto(createdCourt.id);
+        await courtPhotoPage.uploadPhoto(VALID_COURT_PHOTO);
+        await expect(courtPhotoPage.successPanel).toContainText(
+          `Photo for ${createdCourt.name} has been successfully updated`
+        );
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Photo Delete Confirmation Accessibility', async ({ axeUtils, courtPhotoPage, playwright }) => {
+      await withCreatedCourt(playwright, 'Court Photo Delete Accessibility Test', {}, async ({ createdCourt }) => {
+        await courtPhotoPage.goto(createdCourt.id);
+        await courtPhotoPage.requestDelete();
+        await expect(courtPhotoPage.heading).toContainText('Are you sure you want to remove this Court photo?');
+        await axeUtils.audit();
+      });
+    });
+
+    test('Court Photo Delete Success Accessibility', async ({ axeUtils, courtPhotoPage, playwright }) => {
+      await withCreatedCourt(
+        playwright,
+        'Court Photo Delete Success Accessibility Test',
+        {},
+        async ({ createdCourt }) => {
+          await courtPhotoPage.goto(createdCourt.id);
+          await courtPhotoPage.requestDelete();
+          await courtPhotoPage.confirmDelete();
+          await expect(courtPhotoPage.successPanel).toContainText(
+            `Photo for ${createdCourt.name} has been successfully deleted`
+          );
+          await axeUtils.audit();
+        }
+      );
     });
 
     test('Service Centre Edit Page Accessibility', async ({ axeUtils, serviceCentreEditPage, playwright }) => {

@@ -1,0 +1,94 @@
+{% extends "template.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+
+{% block pageTitle %}
+  Court photo - {{ model.courtName }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% if model.errors %}
+        {{ modelDrivenErrorSummary(model.errors) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Court photo</h1>
+
+      {% if not isViewer %}
+        <p class="govuk-hint">
+          You can upload a photo of the court to be displayed on the court's page.
+          The photo must be a .jpg, .jpeg or .png file and no larger than 4MB.
+        </p>
+
+        <p class="govuk-hint">
+          Uploaded photos may be resized to ensure they display correctly on the website; their aspect ratio will be preserved.
+          If you upload a new photo, it will replace the existing one.
+        </p>
+      {% endif %}
+      <form action="/courts/{{ courtId }}/edit/photo/delete" method="post">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h1 class="govuk-fieldset__heading">
+              Existing court photo
+            </h1>
+          </legend>
+          {% if model.fileLink %}
+            <p class="govuk-body">This is the current court photo for {{ model.courtName }}.</p>
+            <img src="{{ model.fileLink }}" alt="Court photo" />
+          {% else %}
+            {{ govukWarningText({
+              text: "There is no photo currently specified for " + model.courtName,
+              iconFallbackText: "Warning"
+            }) }}
+          {% endif %}
+        </fieldset>
+        {% if not isViewer and model.fileLink %}
+          <p class="govuk-hint">
+            You can delete the existing photo. This will mean no photo shows for this court.
+          </p>
+          {{ govukButton({
+            text: "Delete",
+            classes: "govuk-button--warning"
+          }) }}
+        {% endif %}
+      </form>
+
+      {% if not isViewer %}
+        <form action="/courts/{{ courtId }}/edit/photo/upload" method="post" enctype="multipart/form-data">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              Add or update court photo
+            </legend>
+            {{ govukFileUpload({
+              id: "photo",
+              name: "photo",
+              attributes: {
+                "accept": ".jpg,.jpeg,.png"
+              },
+              label: {
+                text: "Upload a photo"
+              },
+              hint: {
+                text: "The photo must be a .jpg, .jpeg or .png file and no larger than 4MB."
+              },
+              javascript: true,
+              errorMessage: {
+                text: model.errors.photo
+              } if model.errors and model.errors.photo else null
+            }) }}
+
+            {{ govukButton({
+              text: "Upload"
+            }) }}
+          </fieldset>
+        </form>
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock %}
