@@ -226,15 +226,15 @@ describe('CourtAddressService', () => {
         errors: expect.objectContaining({
           addressType: ['Select an address type'],
           addressLine1: [
-            "Address line 1 must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+            'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           addressLine2: [
             'Address line 2 must be 255 characters or less',
-            "Address line 2 must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+            'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           county: [
             'County must be 255 characters or less',
-            "County must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+            'County must only include letters a to z, and special characters',
           ],
           epimId: [
             'ePIMS Ref ID must be 10 characters or less',
@@ -244,7 +244,7 @@ describe('CourtAddressService', () => {
           courtTypes: ['Please select at least one court type that this address is relevant for'],
           townCity: [
             'Town or city must be 100 characters or less',
-            "Town or city must only include letters a to z, and special characters '(',')',':',',','.' and '-'",
+            'Town or city must only include letters a to z, and special characters',
           ],
         }),
       }),

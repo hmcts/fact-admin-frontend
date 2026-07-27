@@ -55,7 +55,7 @@ export const validateAddressLine1Field = (value: string | undefined): string[] =
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push("Address line 1 must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
+    errors.push('Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses');
   }
 
   return errors;
@@ -69,7 +69,7 @@ export const validateAddressLine2Field = (value: string | undefined): string[] =
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push("Address line 2 must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
+    errors.push('Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses');
   }
 
   return errors;
@@ -85,7 +85,7 @@ export const validateTownCityField = (value: string | undefined): string[] => {
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push("Town or city must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
+    errors.push('Town or city must only include letters a to z, and special characters');
   }
 
   return errors;
@@ -99,7 +99,7 @@ export const validateCountyField = (value: string | undefined): string[] => {
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push("County must only include letters a to z, and special characters '(',')',':',',','.' and '-'");
+    errors.push('County must only include letters a to z, and special characters');
   }
 
   return errors;
