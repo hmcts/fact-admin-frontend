@@ -102,13 +102,15 @@ export const courtTypeOptions: CourtTypeOption[] = [
 
 const maxRepeatableEntries = 5;
 const integerPattern = /^\d+$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
+const phoneNumberPattern = /^(?:\+44)?[0-9 ()-]{10,20}$/;
 const genericDescriptionPattern = /^[A-Za-z0-9 ()':,\-;.]+$/;
 const dxCodeMaxLength = 200;
 const repeatableDescriptionMaxLength = 250;
-const faxNumberFormatError = 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
+const faxNumberValidationError = 'Must only include numbers, spaces, hyphens, and parentheses';
+const gbsValidationError =
+  'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 const interviewRoomCountError = 'Enter a number of interview rooms between 1 and 150, or select No';
-const invalidCharactersError = 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+const dxValidationError = 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class ProfessionalInformationService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
@@ -309,6 +311,13 @@ export class ProfessionalInformationService {
       }
     }
 
+    if (viewModel.gbs.trim() && !genericDescriptionPattern.test(viewModel.gbs.trim())) {
+      errors.push({
+        href: '#gbs',
+        text: gbsValidationError,
+      });
+    }
+
     if (viewModel.interviewRooms === true) {
       if (!viewModel.interviewRoomCount.trim()) {
         errors.push({
@@ -370,7 +379,7 @@ export class ProfessionalInformationService {
       } else if (code && !genericDescriptionPattern.test(code)) {
         errors.push({
           href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1}: ${dxValidationError}`,
         });
       }
       if (description.length > repeatableDescriptionMaxLength) {
@@ -381,7 +390,7 @@ export class ProfessionalInformationService {
       } else if (description && !genericDescriptionPattern.test(description)) {
         errors.push({
           href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1} explanation: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1} explanation: ${dxValidationError}`,
         });
       }
       if (descriptionCy.length > repeatableDescriptionMaxLength) {
@@ -392,7 +401,7 @@ export class ProfessionalInformationService {
       } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} Welsh explanation: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1} Welsh explanation: ${dxValidationError}`,
         });
       }
     });
@@ -418,7 +427,7 @@ export class ProfessionalInformationService {
       } else if (code && !phoneNumberPattern.test(code)) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${faxNumberFormatError}`,
+          text: `Fax number ${formIndex + 1}: ${faxNumberValidationError}`,
         });
       }
       if (hasEnglishDescriptionOnly) {
@@ -441,7 +450,7 @@ export class ProfessionalInformationService {
       } else if (description && !genericDescriptionPattern.test(description)) {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: ${invalidCharactersError}`,
+          text: `Fax number ${formIndex + 1} description: ${faxNumberValidationError}`,
         });
       }
       if (descriptionCy.length > repeatableDescriptionMaxLength) {
@@ -452,7 +461,7 @@ export class ProfessionalInformationService {
       } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: ${invalidCharactersError}`,
+          text: `Fax number ${formIndex + 1} Welsh description: ${faxNumberValidationError}`,
         });
       }
     });
@@ -648,9 +657,16 @@ export class ProfessionalInformationService {
       return interviewRoomCountError;
     }
     if (this.isFaxNumberFormatApiError(normalizedField, normalizedText)) {
-      return faxNumberFormatError;
+      return faxNumberValidationError;
+    }
+    if (this.isFaxNumberInvalidCharactersApiError(normalizedField, normalizedText)) {
+      return faxNumberValidationError;
     }
     return text;
+  }
+
+  private isFaxNumberInvalidCharactersApiError(normalizedField: string, normalizedText: string): boolean {
+    return normalizedField.includes('fax') && normalizedText.includes('invalid characters');
   }
 
   private isFaxNumberApiError(normalizedField: string, normalizedText: string): boolean {
