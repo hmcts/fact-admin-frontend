@@ -83,6 +83,7 @@ export type ServiceCentreContactSubmitFlowOutcome =
 const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
+const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
@@ -361,9 +362,10 @@ export class ServiceCentreContactService {
 
   private validateContactExplanation(contactExplanation: string, welsh: boolean) {
     const insert = welsh ? 'in Welsh ' : '';
+    const pattern = welsh ? welshExplanationPattern : explanationPattern;
     if (contactExplanation.length > maxExplanationLength) {
       return `Explanation ${insert}must be 250 characters or fewer`;
-    } else if (contactExplanation && !explanationPattern.test(contactExplanation)) {
+    } else if (contactExplanation && !pattern.test(contactExplanation)) {
       return `Explanation ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs`;
     }
     return undefined;

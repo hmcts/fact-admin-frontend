@@ -3,7 +3,8 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 
 export const maxServiceCentreWarningNoticeLength = 250;
-const warningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
+const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
+const welshWarningFormatRegex = /^[\p{L}\p{N}\s.,'":;()!?-]*$/u;
 
 export type ServiceCentreWarningNoticeViewModel = {
   errors?: Record<string, string[]>;
@@ -135,6 +136,7 @@ export class ServiceCentreWarningNoticeService {
 
   private validateWarningNotice(warningNotice: string, welsh: boolean): string | undefined {
     const insert = welsh ? 'in Welsh ' : '';
+    const warningFormatRegex = welsh ? welshWarningFormatRegex : englishWarningFormatRegex;
     if (warningNotice.length > maxServiceCentreWarningNoticeLength) {
       return `Warning notice ${insert}must be ${maxServiceCentreWarningNoticeLength} characters or fewer`;
     } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {

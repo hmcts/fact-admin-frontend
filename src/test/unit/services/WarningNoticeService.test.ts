@@ -188,16 +188,10 @@ describe('WarningNoticeService', () => {
           warningNoticeCy: 'Cau dros dro @ 5pm',
         },
         errors: {
-          warningNotice:
-            'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
           warningNoticeCy:
             'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
         },
         errorSummary: [
-          {
-            href: '#warningNotice',
-            text: 'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
-          },
           {
             href: '#warningNoticeCy',
             text: 'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
