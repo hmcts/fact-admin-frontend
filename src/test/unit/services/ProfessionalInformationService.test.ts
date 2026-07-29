@@ -255,11 +255,11 @@ describe('ProfessionalInformationService', () => {
           },
           {
             href: '#faxNumberDescription-0',
-            text: 'Fax number 1 description: Must only include numbers, spaces, hyphens, and parentheses',
+            text: 'Fax number 1 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           },
           {
             href: '#faxNumberDescriptionCy-0',
-            text: 'Fax number 1 Welsh description: Must only include numbers, spaces, hyphens, and parentheses',
+            text: 'Fax number 1 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           },
         ],
       },
@@ -448,7 +448,7 @@ describe('ProfessionalInformationService', () => {
           { href: '#faxNumber-1', text: 'Fax number 2: Must only include numbers, spaces, hyphens, and parentheses' },
           {
             href: '#faxNumberDescription-1',
-            text: 'Fax number 2 description: Must only include numbers, spaces, hyphens, and parentheses',
+            text: 'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           },
         ],
         fieldErrors: {
@@ -457,7 +457,8 @@ describe('ProfessionalInformationService', () => {
           'dxCodeDescription-1':
             'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           'faxNumber-1': 'Fax number 2: Must only include numbers, spaces, hyphens, and parentheses',
-          'faxNumberDescription-1': 'Fax number 2 description: Must only include numbers, spaces, hyphens, and parentheses',
+          'faxNumberDescription-1':
+            'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
         },
       },
     });
