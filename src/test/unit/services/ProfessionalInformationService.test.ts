@@ -452,8 +452,7 @@ describe('ProfessionalInformationService', () => {
           },
         ],
         fieldErrors: {
-          'dxCode-1':
-            'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'dxCode-1': 'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           'dxCodeDescription-1':
             'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           'faxNumber-1': 'Fax number 2: Must only include numbers, spaces, hyphens, and parentheses',
@@ -512,10 +511,7 @@ describe('ProfessionalInformationService', () => {
     const dataApiRequests = buildDataApiRequests({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          [
-            'dxCodes[0].dxCode',
-            'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
-          ],
+          ['dxCodes[0].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
           ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
         ])
       ),
