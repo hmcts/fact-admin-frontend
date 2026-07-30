@@ -88,7 +88,7 @@ type ApiValidationMapping = {
 const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
-const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
+const welshExplanationPattern = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
 const maxExplanationLength = 250;
 
 const dataApiRequests = new DataApiRequests();

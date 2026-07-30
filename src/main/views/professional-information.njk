@@ -166,10 +166,10 @@
           items: courtTypeItems
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code (optional)</h2>
         {{ govukInput({
           label: {
-            text: "GBS code",
+            text: "GBS code (optional)",
             classes: "govuk-visually-hidden"
           },
           hint: {
@@ -184,14 +184,14 @@
           } if fieldErrors.gbs else null
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes</h2>
         {{ repeatableSection(
           "dxCode",
           "DX code",
           dxCodes,
           "Add another DX code",
           "Remove DX code",
-          "DX code",
+          "DX code (optional)",
           "Explanation",
           "Explanation (Welsh)",
           "Please enter the DX code you wish to display.",
@@ -199,14 +199,14 @@
           "Enter the explanation text for this DX code in Welsh."
         ) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Fax numbers <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Fax numbers</h2>
         {{ repeatableSection(
           "faxNumber",
           "Fax number",
           faxNumbers,
           "Add another Fax number",
           "Remove Fax number",
-          "Fax number",
+          "Fax number (optional)",
           "Description",
           "Description (Welsh)",
           "",

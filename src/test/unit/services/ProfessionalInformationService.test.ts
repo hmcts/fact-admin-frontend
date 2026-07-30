@@ -208,7 +208,8 @@ describe('ProfessionalInformationService', () => {
           'dxCode-0':
             'DX code 1: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
           familyCourtCode: 'Enter a family court code',
-          'faxNumber-0': 'Fax number 1: Must only include numbers, spaces, hyphens, and parentheses',
+          'faxNumber-0':
+            'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           'faxNumber-1':
             'Fax number 2: You have entered a description without a fax number, please add a number or remove the description',
           gbs: 'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
@@ -251,7 +252,7 @@ describe('ProfessionalInformationService', () => {
           },
           {
             href: '#faxNumber-0',
-            text: 'Fax number 1: Must only include numbers, spaces, hyphens, and parentheses',
+            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           },
           {
             href: '#faxNumberDescription-0',
@@ -346,7 +347,7 @@ describe('ProfessionalInformationService', () => {
           { href: '#interviewRoomCount', text: 'Enter a number of interview rooms between 1 and 150, or select No' },
           {
             href: '#faxNumber-0',
-            text: 'Must only include numbers, spaces, hyphens, and parentheses',
+            text: 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           },
         ],
       },
@@ -445,7 +446,10 @@ describe('ProfessionalInformationService', () => {
             href: '#dxCodeDescription-1',
             text: 'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           },
-          { href: '#faxNumber-1', text: 'Fax number 2: Must only include numbers, spaces, hyphens, and parentheses' },
+          {
+            href: '#faxNumber-1',
+            text: 'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          },
           {
             href: '#faxNumberDescription-1',
             text: 'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
@@ -455,7 +459,8 @@ describe('ProfessionalInformationService', () => {
           'dxCode-1': 'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           'dxCodeDescription-1':
             'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
-          'faxNumber-1': 'Fax number 2: Must only include numbers, spaces, hyphens, and parentheses',
+          'faxNumber-1':
+            'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           'faxNumberDescription-1':
             'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
         },
@@ -500,8 +505,14 @@ describe('ProfessionalInformationService', () => {
             href: '#dxCode-3',
             text: 'DX code 4: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           },
-          { href: '#faxNumber-0', text: 'Fax number 1: Must only include numbers, spaces, hyphens, and parentheses' },
-          { href: '#faxNumber-4', text: 'Fax number 5: Must only include numbers, spaces, hyphens, and parentheses' },
+          {
+            href: '#faxNumber-0',
+            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          },
+          {
+            href: '#faxNumber-4',
+            text: 'Fax number 5: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          },
         ],
       },
     });
@@ -539,7 +550,10 @@ describe('ProfessionalInformationService', () => {
             href: '#dxCode-3',
             text: 'DX code 4: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           },
-          { href: '#faxNumber-4', text: 'Fax number 5: Must only include numbers, spaces, hyphens, and parentheses' },
+          {
+            href: '#faxNumber-4',
+            text: 'Fax number 5: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          },
         ],
       },
     });

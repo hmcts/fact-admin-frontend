@@ -104,10 +104,10 @@ const maxRepeatableEntries = 5;
 const integerPattern = /^\d+$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ()-]{10,20}$/;
 const englishTextPattern = /^[A-Za-z0-9 ()':,\-;.]+$/;
-const welshTextPattern = /^[\p{L}\p{N}\s.,'":;()!?-]*$/u;
+const welshTextPattern = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
 const dxCodeMaxLength = 200;
 const repeatableDescriptionMaxLength = 250;
-const faxNumberValidationError = 'Must only include numbers, spaces, hyphens, and parentheses';
+const faxNumberValidationError = 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
 const gbsValidationError =
   'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 const interviewRoomCountError = 'Enter a number of interview rooms between 1 and 150, or select No';
