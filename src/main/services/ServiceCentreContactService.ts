@@ -83,7 +83,7 @@ export type ServiceCentreContactSubmitFlowOutcome =
 const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
-const welshExplanationPattern = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
+const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
@@ -413,10 +413,14 @@ export class ServiceCentreContactService {
       courtContactDescriptionId: { formField: 'contactType', href: '#contact-type' },
       email: { formField: 'contactEmail', href: '#contact-email' },
       explanation: { formField: 'contactExplanation', href: '#contact-explanation' },
+      explanationCy: { formField: 'contactExplanationCy', href: '#contact-explanation-cy' },
       phoneNumber: { formField: 'contactTelephone', href: '#contact-telephone' },
     };
 
     for (const [field, message] of apiErrors.entries()) {
+      if (field.toLowerCase() === 'timestamp') {
+        continue;
+      }
       const mapping = fieldMappings[field];
       if (!mapping) {
         errorSummary.push({ href: '#main-content', text: message });
