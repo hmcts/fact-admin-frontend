@@ -96,6 +96,37 @@ describe('ServiceCentreWarningNoticeService', () => {
     });
   });
 
+  test('accepts Welsh warning notice diacritics', async () => {
+    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+    } as never);
+    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: 'English warning',
+      warningNoticeCy: 'Rhybudd gyda ŵ ŷ â ê î ô û',
+    } as never);
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'English warning', 'Rhybudd gyda ŵ ŷ â ê î ô û');
+
+    expect(result.type).toBe('saved');
+    expect(getServiceCentreByIdStub.calledOnce).toBe(true);
+    expect(updateServiceCentreStub.calledOnce).toBe(true);
+    expect(updateServiceCentreStub.firstCall.args[0]).toMatchObject({
+      warningNotice: 'English warning',
+      warningNoticeCy: 'Rhybudd gyda ŵ ŷ â ê î ô û',
+    });
+  });
+
   test('passes through lookup status responses', async () => {
     stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(HttpStatusCode.InternalServerError);
     const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
