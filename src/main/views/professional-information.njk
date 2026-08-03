@@ -12,12 +12,12 @@
       {% set index = loop.index0 %}
       <div class="professional-information-repeatable" data-professional-information-item>
         {% if not loop.first and not isViewer %}
-          <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }}</p>
+          <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }} (optional)</p>
         {% endif %}
 
         {{ govukInput({
           label: {
-            text: firstLabel,
+            text: firstLabel if loop.first else firstLabel | replace(" (optional)", ""),
             classes: "govuk-!-margin-bottom-1"
           },
           hint: {
