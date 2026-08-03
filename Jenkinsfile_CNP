@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.4")
+@Library("Infrastructure@2.4.8")
 
 def type = "nodejs"
 def product = "fact"
@@ -29,7 +29,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-  env.DATA_API_URL = 'https://fact-data-api.aat.platform.hmcts.net'
+  env.DATA_API_URL = 'https://fact-data-api-pr-336.preview.platform.hmcts.net'
   env.PLAYWRIGHT_WORKERS = 4
 
   loadVaultSecrets(secrets)

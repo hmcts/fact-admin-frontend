@@ -29,17 +29,13 @@
           <input type="hidden" name="{{ input.name }}" value="{{ input.value }}">
         {% endfor %}
 
-        {{ govukButton({
-          text: "Continue",
-          classes: "govuk-button--warning"
-        }) }}
-      </form>
-
-      <form id="cancel_form" method="GET" action="/courts/{{ courtId }}/edit/information-for-professionals">
-        {{ govukButton({
-          text: "Cancel",
-          classes: "govuk-button--secondary"
-        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            classes: "govuk-button--warning"
+          }) }}
+          <a class="govuk-link govuk-link--no-visited-state" href="/courts/{{ courtId }}/edit/information-for-professionals">Cancel</a>
+        </div>
       </form>
     </div>
   </div>

@@ -203,7 +203,7 @@
           name: "accessibleEntrance",
           fieldset: {
             legend: {
-              text: "Is there an accessible entrance"
+              text: "Is there step free access from the street to the courtrooms?"
             }
           },
           items: [
@@ -250,6 +250,11 @@
                       value: "hearingLoop",
                       text: "Hearing loop systems are available at this court",
                       checked: true if model.hearingEnhancementEquipment == "hearingLoop" else false
+                    },
+                    {
+                      value: "none",
+                      text: "No hearing enhancement equipment is available at this court",
+                      checked: true if model.hearingEnhancementEquipment == "none" else false
                     }
                   ],
                   errorMessage: {

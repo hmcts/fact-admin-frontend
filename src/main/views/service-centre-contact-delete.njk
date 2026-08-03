@@ -43,10 +43,13 @@
           ]
         }) }}
 
-        {{ govukButton({
-          text: "Yes, delete contact details",
-          classes: "govuk-button--warning"
-        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Yes, delete contact details",
+            classes: "govuk-button--warning"
+          }) }}
+          <a class="govuk-link govuk-link--no-visited-state" href="/service-centres/{{ serviceCentreId }}/edit/contact-details">Cancel</a>
+        </div>
       </form>
     </div>
   </div>

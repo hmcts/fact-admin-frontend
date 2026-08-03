@@ -130,7 +130,7 @@ describe('Service centre edit page', () => {
     expect(response.text).toContain('Make sure you have checked the data in all sections before approving.');
     expect(response.text).toContain('National Business Centre');
     expect(response.text).toContain('Confirm data');
-    expect(response.text).toContain('action="/service-centres/22222222-2222-4222-8222-222222222222/edit"');
+    expect(response.text).toContain('href="/service-centres/22222222-2222-4222-8222-222222222222/edit">Cancel</a>');
   });
 
   test('approves service centre data and renders success page for super admin users', async () => {

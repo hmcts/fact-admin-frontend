@@ -315,18 +315,13 @@ test.describe('Information for Professionals Page Tests', () => {
           'You are removing the court type of Family court.'
         );
         await expect(professionalInformationPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
-        await expect(professionalInformationPage.page.getByRole('button', { name: 'Cancel' })).toBeVisible();
-        await expect(professionalInformationPage.page.locator('#cancel_form')).toHaveAttribute('method', 'GET');
-        await expect(professionalInformationPage.page.locator('#cancel_form')).toHaveAttribute(
-          'action',
+        await expect(professionalInformationPage.page.getByRole('link', { name: 'Cancel' })).toHaveAttribute(
+          'href',
           `/courts/${createdCourt.id}/edit/information-for-professionals`
-        );
-        await expect(professionalInformationPage.page.getByRole('button', { name: 'Cancel' })).toHaveClass(
-          /govuk-button--secondary/
         );
         await expect(professionalInformationPage.page.locator('.govuk-back-link')).toHaveCount(0);
 
-        await professionalInformationPage.page.getByRole('button', { name: 'Cancel' }).click();
+        await professionalInformationPage.page.getByRole('link', { name: 'Cancel' }).click();
         const professionalInformationUrl = professionalInformationPage.buildProfessionalInformationUrl(createdCourt.id);
         await expect(professionalInformationPage.page).toHaveURL(
           new RegExp(`^${professionalInformationUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\??$`)
