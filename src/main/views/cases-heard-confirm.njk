@@ -30,18 +30,14 @@
 
         <input type="hidden" name="areasOfLaw" value="{{ selectedAreasOfLaw }}">
 
-        {{ govukButton({
-          text: "Continue",
-          classes: "govuk-button--warning"
-        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            classes: "govuk-button--warning"
+          }) }}
+          <a class="govuk-link govuk-link--no-visited-state" href="/courts/{{ courtId }}/edit/cases-heard">Cancel</a>
+        </div>
 
-      </form>
-
-      <form id="cancel_form" method="GET" action="/courts/{{ courtId }}/edit/cases-heard">
-        {{ govukButton({
-          text: "Cancel",
-          classes: "govuk-button--secondary"
-        }) }}
       </form>
 
     </div>

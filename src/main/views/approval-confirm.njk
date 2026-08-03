@@ -26,17 +26,13 @@
           ]
         }) }}
 
-        {{ govukButton({
-          text: "Confirm data",
-          classes: "govuk-button--warning"
-        }) }}
-      </form>
-
-      <form id="cancel_form" method="GET" action="{{ editPath }}">
-        {{ govukButton({
-          text: "Cancel",
-          classes: "govuk-button--secondary"
-        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Confirm data",
+            classes: "govuk-button--warning"
+          }) }}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ editPath }}">Cancel</a>
+        </div>
       </form>
     </div>
   </div>

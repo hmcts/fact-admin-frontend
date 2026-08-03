@@ -41,10 +41,13 @@
       }) }}
 
       <form method="post" action="/courts/{{ courtId }}/edit/court-opening-hours/delete/success/{{ openingHoursId }}">
-        {{ govukButton({
-          text: "Delete opening hours",
-          classes: "govuk-button--warning"
-        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Delete opening hours",
+            classes: "govuk-button--warning"
+          }) }}
+          <a class="govuk-link govuk-link--no-visited-state" href="/courts/{{ courtId }}/edit/court-opening-hours">Cancel</a>
+        </div>
       </form>
     </div>
   </div>
