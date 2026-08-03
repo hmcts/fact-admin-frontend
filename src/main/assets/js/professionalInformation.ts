@@ -40,12 +40,12 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
         hint: 'Please enter the DX code you wish to display.',
       },
       {
-        label: 'Explanation',
+        label: 'Explanation (optional)',
         name: 'dxCodeDescription',
         hint: 'Enter the explanation text for this DX code.',
       },
       {
-        label: 'Explanation (Welsh)',
+        label: 'Explanation (Welsh) (optional)',
         name: 'dxCodeDescriptionCy',
         hint: 'Enter the welsh explanation text for this DX code.',
       },
@@ -60,11 +60,11 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
         name: 'faxNumber',
       },
       {
-        label: 'Description',
+        label: 'Description (optional)',
         name: 'faxNumberDescription',
       },
       {
-        label: 'Description (Welsh)',
+        label: 'Description (Welsh) (optional)',
         name: 'faxNumberDescriptionCy',
       },
     ],
