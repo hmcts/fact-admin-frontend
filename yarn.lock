@@ -9442,13 +9442,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.24.2":
-  version: 5.24.3
-  resolution: "enhanced-resolve@npm:5.24.3"
+"enhanced-resolve@npm:^5.24.4":
+  version: 5.24.5
+  resolution: "enhanced-resolve@npm:5.24.5"
   dependencies:
     graceful-fs: "npm:^4.2.4"
     tapable: "npm:^2.3.3"
-  checksum: 10/687023ac3231e9db322ba8064a3d4717d2a03c2238bd55457c491af4ceb5910b7ada809effc9e809bf15ce6752c83226851887d330a5009536575a4d55ec3baf
+  checksum: 10/cf3f6f62bd52c1d564d7967e474892d5b43690aedaf7a4e87c831fa6b4b065617baf08eb940907968c711965cbc6ccd773bcc67b8d87a71523c0512372be2a06
   languageName: node
   linkType: hard
 
@@ -10164,15 +10164,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-rate-limit@npm:8.6.0":
-  version: 8.6.0
-  resolution: "express-rate-limit@npm:8.6.0"
+"express-rate-limit@npm:8.6.1":
+  version: 8.6.1
+  resolution: "express-rate-limit@npm:8.6.1"
   dependencies:
     debug: "npm:^4.4.3"
     ip-address: "npm:^10.2.0"
   peerDependencies:
     express: ">= 4.11"
-  checksum: 10/193c346cfae0e2ce43d51d8f0c9d34f96dcd9d8d3675f463583f4440ba585deaab0fddc7a94722516699d9181b593902736b08a7374a6eb9082f7b62dfa8f1c1
+  checksum: 10/55e40d693fcb9b7dc1adb48e0d83b3552e902982d80ec1812ba3b60deaffda8b0c12392253018b1c70772df4c0fd40c040dad85dc18349e1e025aa3c8fc70aa2
   languageName: node
   linkType: hard
 
@@ -10333,9 +10333,9 @@ __metadata:
     eslint-plugin-jest: "npm:29.16.0"
     express: "npm:5.2.1"
     express-openid-connect: "npm:3.2.1"
-    express-rate-limit: "npm:8.6.0"
+    express-rate-limit: "npm:8.6.1"
     get-port: "npm:^7.2.0"
-    globals: "npm:17.7.0"
+    globals: "npm:17.8.0"
     govuk-frontend: "npm:6.4.0"
     helmet: "npm:8.3.0"
     html-webpack-plugin: "npm:5.6.8"
@@ -10366,7 +10366,7 @@ __metadata:
     ts-loader: "npm:9.6.2"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.9.3"
-    webpack: "npm:5.109.0"
+    webpack: "npm:5.109.2"
     webpack-cli: "npm:^6.0.1"
     webpack-dev-middleware: "npm:6.1.3"
     zod: "npm:4.4.3"
@@ -11131,10 +11131,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.7.0":
-  version: 17.7.0
-  resolution: "globals@npm:17.7.0"
-  checksum: 10/79304ccc4d2ca167ea15bdb25da346aa34ce3847b18fbd6c3cad182e152505305db3c9722fd5e292c62f6db97a8fa06e0c110a1e7703d7325498e5351d08cab4
+"globals@npm:17.8.0":
+  version: 17.8.0
+  resolution: "globals@npm:17.8.0"
+  checksum: 10/b7b854b2052d2608d1878884bf730c027e17b9e2d194834f48c3280a7f0005b06d5f51dba362d3149cc05eb90d36d990e5c996728ecd3585a43dc3b4a286ed85
   languageName: node
   linkType: hard
 
@@ -18739,9 +18739,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.109.0":
-  version: 5.109.0
-  resolution: "webpack@npm:5.109.0"
+"webpack@npm:5.109.2":
+  version: 5.109.2
+  resolution: "webpack@npm:5.109.2"
   dependencies:
     "@types/estree": "npm:^1.0.8"
     "@types/json-schema": "npm:^7.0.15"
@@ -18751,7 +18751,7 @@ __metadata:
     acorn: "npm:^8.16.0"
     browserslist: "npm:^4.28.1"
     chrome-trace-event: "npm:^1.0.2"
-    enhanced-resolve: "npm:^5.24.2"
+    enhanced-resolve: "npm:^5.24.4"
     es-module-lexer: "npm:^2.1.0"
     eslint-scope: "npm:5.1.1"
     events: "npm:^3.2.0"
@@ -18768,7 +18768,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/926e721ba027e62fcb97ef2455fcf9d0a40ac14805d3f6c5367b5e897c63e06fc2f8e2ac69814d192981cd7d72af4a195028cd8d827095ba78c7946195d7a4d2
+  checksum: 10/cb72358e4385719921085dbc9b937a6fef07ee690c6791c52c98b526d50a52e6c6aa73a70ba4d0588fab18739703028f2be02abdc0229dbf2008bd29dd477f93
   languageName: node
   linkType: hard
 
