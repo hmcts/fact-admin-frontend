@@ -24,7 +24,7 @@
     {% set statusId = subject + "-edit-" + loop.index + "-status" %}
     {% set sectionRows = (sectionRows.push([
       {
-        html: '<a class="govuk-link" href="' + section.href + '" aria-describedby="' + statusId + '">' + section.label + '</a>'
+        html: '<a class="govuk-link govuk-link--no-visited-state" href="' + section.href + '" aria-describedby="' + statusId + '">' + section.label + '</a>'
       } if isViewer or lock === null or lock.userId === userId else {
         html: '<span aria-describedby="' + statusId + '">' + section.label + '</span>'
       },
