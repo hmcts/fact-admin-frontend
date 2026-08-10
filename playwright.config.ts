@@ -243,13 +243,13 @@ const resolveProjects = () => {
 
   const env = process.env.ENV?.trim().toLowerCase();
 
-  if (env === 'prod') {
-    // Preserve existing behaviour for prod - running against all browsers.
-    return [setupProject, chromeProject, edgeProject, firefoxProject, webkitProject];
+  if (env === 'preview') {
+    // Only run setup and edge for preview environments (PR builds).
+    return [setupProject, edgeProject];
   }
 
-  // Faster/minimal config for non-prod environments.
-  return [setupProject, edgeProject];
+  // For any other environment run all projects.
+  return [setupProject, chromeProject, edgeProject, firefoxProject, webkitProject];
 };
 
 /**
