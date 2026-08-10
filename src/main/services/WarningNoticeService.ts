@@ -3,9 +3,8 @@ import { HttpStatusCode } from 'axios';
 import { DataApiRequests } from '../requests/DataApiRequests';
 import { isHttpStatusCode } from '../utils/valueParsers';
 
-const ENGLISH_WARNING_NOTICE_ALLOWED_CHARACTERS = /^[\p{L}\p{N}\s.,'":;()!?-]*$/u;
-
-const WELSH_WARNING_NOTICE_ALLOWED_CHARACTERS = /^[\p{L}\p{N}\s.,'":;()!?-]*$/u;
+const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
+const welshWarningFormatRegex = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
 
 export type WarningNoticeForm = {
   warningNotice?: string;
@@ -137,12 +136,12 @@ export class WarningNoticeService {
       errors.warningNoticeCy = 'Welsh warning notice must be 250 characters or less';
     }
 
-    if (warningNotice && !ENGLISH_WARNING_NOTICE_ALLOWED_CHARACTERS.test(warningNotice)) {
+    if (warningNotice && !englishWarningFormatRegex.test(warningNotice)) {
       errors.warningNotice =
         'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
     }
 
-    if (warningNoticeCy && !WELSH_WARNING_NOTICE_ALLOWED_CHARACTERS.test(warningNoticeCy)) {
+    if (warningNoticeCy && !welshWarningFormatRegex.test(warningNoticeCy)) {
       errors.warningNoticeCy =
         'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
     }

@@ -12,12 +12,12 @@
       {% set index = loop.index0 %}
       <div class="professional-information-repeatable" data-professional-information-item>
         {% if not loop.first and not isViewer %}
-          <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }}</p>
+          <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }} (optional)</p>
         {% endif %}
 
         {{ govukInput({
           label: {
-            text: firstLabel,
+            text: firstLabel if loop.first else firstLabel | replace(" (optional)", ""),
             classes: "govuk-!-margin-bottom-1"
           },
           hint: {
@@ -166,10 +166,10 @@
           items: courtTypeItems
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code (optional)</h2>
         {{ govukInput({
           label: {
-            text: "GBS code",
+            text: "GBS code (optional)",
             classes: "govuk-visually-hidden"
           },
           hint: {
@@ -191,9 +191,9 @@
           dxCodes,
           "Add another DX code",
           "Remove DX code",
-          "DX code",
-          "Explanation",
-          "Explanation (Welsh)",
+          "DX code (optional)",
+          "Explanation (optional)",
+          "Explanation (Welsh) (optional)",
           "Please enter the DX code you wish to display.",
           "Enter the explanation text for this DX code.",
           "Enter the explanation text for this DX code in Welsh."
@@ -206,9 +206,9 @@
           faxNumbers,
           "Add another Fax number",
           "Remove Fax number",
-          "Fax number",
-          "Description",
-          "Description (Welsh)",
+          "Fax number (optional)",
+          "Description (optional)",
+          "Description (Welsh) (optional)",
           "",
           "",
           ""
@@ -250,7 +250,7 @@
                   }) +
                   govukInput({
                     label: {
-                      text: "Phone number to book it",
+                      text: "Phone number to book it (optional)",
                       classes: "govuk-!-margin-bottom-1"
                     },
                     classes: "govuk-input--width-20",

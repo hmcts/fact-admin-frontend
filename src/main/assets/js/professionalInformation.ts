@@ -40,12 +40,12 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
         hint: 'Please enter the DX code you wish to display.',
       },
       {
-        label: 'Explanation',
+        label: 'Explanation (optional)',
         name: 'dxCodeDescription',
         hint: 'Enter the explanation text for this DX code.',
       },
       {
-        label: 'Explanation (Welsh)',
+        label: 'Explanation (Welsh) (optional)',
         name: 'dxCodeDescriptionCy',
         hint: 'Enter the welsh explanation text for this DX code.',
       },
@@ -60,11 +60,11 @@ const repeatableConfigs: { readonly [key in RepeatableType]: RepeatableConfig } 
         name: 'faxNumber',
       },
       {
-        label: 'Description',
+        label: 'Description (optional)',
         name: 'faxNumberDescription',
       },
       {
-        label: 'Description (Welsh)',
+        label: 'Description (Welsh) (optional)',
         name: 'faxNumberDescriptionCy',
       },
     ],
@@ -205,7 +205,7 @@ function buildHeading(text: string, index: number): HTMLParagraphElement {
   const heading = document.createElement('p');
   heading.className = 'govuk-body govuk-!-margin-bottom-1';
   heading.dataset.professionalInformationHeading = '';
-  heading.textContent = `${text} ${index + 1}`;
+  heading.textContent = `${text} ${index + 1} (optional)`;
   return heading;
 }
 
@@ -260,7 +260,7 @@ function reindexRepeatableItems(list: HTMLElement, type: RepeatableType): void {
   getRepeatableItems(list).forEach((item, index) => {
     const heading = item.querySelector('[data-professional-information-heading]');
     if (heading) {
-      heading.textContent = `${config.heading} ${index + 1}`;
+      heading.textContent = `${config.heading} ${index + 1} (optional)`;
     }
 
     config.fields.forEach(field => updateInput(item, list, field, index));
