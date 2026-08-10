@@ -192,6 +192,66 @@ const resolveVideoMode = (): 'off' | 'on' | 'retain-on-failure' | 'on-first-retr
   }
 };
 
+const resolveProjects = () => {
+  const setupProject = {
+    name: 'setup',
+    testMatch: /global\.setup\.ts/,
+  };
+
+  // edge runs everything
+  const edgeProject = {
+    ...ProjectsConfig.edge,
+    use: {
+      ...ProjectsConfig.edge.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+  };
+
+  // all others run everything other than performance tests and (for safari and firefox) download tests
+  const chromeProject = {
+    ...ProjectsConfig.chrome,
+    use: {
+      ...ProjectsConfig.chrome.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+    grepInvert: /@performance/,
+  };
+
+  const firefoxProject = {
+    ...ProjectsConfig.firefox,
+    use: {
+      ...ProjectsConfig.firefox.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+    grepInvert: /@performance/,
+    testIgnore: /download\.spec\.ts/,
+  };
+
+  const webkitProject = {
+    ...ProjectsConfig.webkit,
+    use: {
+      ...ProjectsConfig.webkit.use,
+      storageState: functionalConfig.users.admin.sessionFile,
+    },
+    dependencies: ['setup'],
+    grepInvert: /@performance/,
+    testIgnore: /download\.spec\.ts/,
+  };
+
+  const env = process.env.ENV?.trim().toLowerCase();
+
+  if (env === 'preview') {
+    // Only run setup and edge for preview environments (PR builds).
+    return [setupProject, edgeProject];
+  }
+
+  // For any other environment run all projects.
+  return [setupProject, chromeProject, edgeProject, firefoxProject, webkitProject];
+};
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -209,49 +269,7 @@ const config = defineConfig({
     video: resolveVideoMode(),
     ignoreHTTPSErrors: true,
   },
-  projects: [
-    {
-      name: 'setup',
-      testMatch: /global\.setup\.ts/,
-    },
-    {
-      ...ProjectsConfig.chrome,
-      use: {
-        ...ProjectsConfig.chrome.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-    },
-    {
-      ...ProjectsConfig.edge,
-      use: {
-        ...ProjectsConfig.edge.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-      grepInvert: /@performance/,
-    },
-    {
-      ...ProjectsConfig.firefox,
-      use: {
-        ...ProjectsConfig.firefox.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-      grepInvert: /@performance/,
-      testIgnore: /download\.spec\.ts/,
-    },
-    {
-      ...ProjectsConfig.webkit,
-      use: {
-        ...ProjectsConfig.webkit.use,
-        storageState: functionalConfig.users.admin.sessionFile,
-      },
-      dependencies: ['setup'],
-      grepInvert: /@performance/,
-      testIgnore: /download\.spec\.ts/,
-    },
-  ],
+  projects: resolveProjects(),
 });
 
 if (safeBoolean(process.env.PW_DUMP_CONFIG, false)) {
