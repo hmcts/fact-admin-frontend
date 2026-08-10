@@ -1,6 +1,6 @@
 {% extends "template.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/common-components.njk" import confirmationActions %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -26,13 +26,7 @@
           ]
         }) }}
 
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: "Confirm data",
-            classes: "govuk-button--warning"
-          }) }}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ editPath }}">Cancel</a>
-        </div>
+        {{ confirmationActions("Confirm data", cancelHref) }}
       </form>
     </div>
   </div>

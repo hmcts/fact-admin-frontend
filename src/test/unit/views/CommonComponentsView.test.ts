@@ -1,6 +1,21 @@
 import { env } from '../../../testUtils/nunjucksHelper';
 
 describe('Common Components View', () => {
+  test('renders reusable warning confirmation actions', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import confirmationActions %}
+      {{ confirmationActions("Delete address", "/courts/court-id/edit/address") }}
+    `,
+      {}
+    );
+
+    expect(html).toContain('class="govuk-button-group"');
+    expect(html).toContain('govuk-button--warning');
+    expect(html).toContain('Delete address');
+    expect(html).toContain('href="/courts/court-id/edit/address">Cancel</a>');
+  });
+
   test('renders a success panel with title and text', () => {
     const html = env.renderString(
       `

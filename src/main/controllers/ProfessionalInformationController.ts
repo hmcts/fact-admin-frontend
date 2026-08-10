@@ -148,6 +148,7 @@ export default class ProfessionalInformationController {
         confirmation.courtName,
         'Information for professionals confirm update'
       ),
+      cancelHref: `/courts/${courtId}/edit/information-for-professionals`,
       courtId,
       courtName: confirmation.courtName,
       hiddenInputs: this.buildHiddenInputs(body),

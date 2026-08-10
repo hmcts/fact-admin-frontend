@@ -379,6 +379,7 @@ describe('CourtOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Delete opening hours' },
       ],
+      cancelHref: `/courts/${courtId}/edit/court-opening-hours`,
     };
 
     const expectedSuccessViewModel = {

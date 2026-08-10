@@ -280,6 +280,7 @@ describe('CasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('cases-heard-confirm', {
+        cancelHref: '/courts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/edit/cases-heard',
         courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         courtName: 'Reading Crown Court',
         message:

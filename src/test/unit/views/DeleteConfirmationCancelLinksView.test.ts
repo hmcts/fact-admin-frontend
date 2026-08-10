@@ -67,7 +67,7 @@ describe('Delete confirmation cancel links', () => {
       cancelHref: `/courts/${courtId}/edit/court-opening-hours`,
     },
   ])('$view renders Cancel as a link to its section', ({ view, model, cancelHref }) => {
-    const html = env.render(view, { ...model, pagePath: '/test' });
+    const html = env.render(view, { ...model, cancelHref, pagePath: '/test' });
 
     expect(html).toContain('class="govuk-button-group"');
     expect(html).toContain(`href="${cancelHref}">Cancel</a>`);

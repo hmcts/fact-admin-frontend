@@ -164,6 +164,7 @@ describe('CourtEditController', () => {
           },
           { href: '#', text: 'Approve data' },
         ],
+        cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit',
         name: 'Reading Crown Court',
         pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',
       })

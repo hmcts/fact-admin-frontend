@@ -219,6 +219,7 @@ describe('CourtPhotoController', () => {
     expect(retrieveCourtName.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo-delete-confirm', {
       breadcrumbs: [...breadcrumbs, { href: '#', text: 'Court photo confirm delete' }],
+      cancelHref: `/courts/${courtId}/edit/photo`,
       courtId,
       courtName,
       message: 'Are you sure you want to delete the photo associated with this court?',

@@ -546,7 +546,13 @@ describe('ServiceCentreContactController', () => {
       'resolveContactDetailDescription'
     ).resolves('General enquiries');
 
-    responseMock.expects('render').once().withArgs('service-centre-contact-delete', match.object);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'service-centre-contact-delete',
+        match({ cancelHref: `/service-centres/${SERVICE_CENTRE_ID}/edit/contact-details` })
+      );
 
     try {
       await controller.renderDelete(request, response);

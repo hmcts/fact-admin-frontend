@@ -3,6 +3,7 @@ import { env } from '../../../testUtils/nunjucksHelper';
 describe('Approval Data View', () => {
   test('renders approve data confirmation page', () => {
     const html = env.render('approval-confirm.njk', {
+      cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit',
       editPath: '/courts/11111111-1111-4111-8111-111111111111/edit',
       name: 'Reading Crown Court',
       pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',

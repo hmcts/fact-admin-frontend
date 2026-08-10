@@ -1,7 +1,6 @@
 {% extends "template.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "macros/common-components.njk" import addressBlock, addressType %}
+{% from "macros/common-components.njk" import addressBlock, addressType, confirmationActions %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -30,13 +29,7 @@
           ]
         }) }}
 
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: "Delete address",
-            classes: "govuk-button--warning"
-          }) }}
-          <a class="govuk-link govuk-link--no-visited-state" href="/service-centres/{{ address.serviceCentreId }}/edit/address">Cancel</a>
-        </div>
+        {{ confirmationActions("Delete address", cancelHref) }}
       </form>
     </div>
   </div>

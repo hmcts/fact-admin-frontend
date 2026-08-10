@@ -382,6 +382,7 @@ describe('CounterServiceOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
         { href: '#', text: 'Delete opening hours' },
       ],
+      cancelHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
     };
 
     const expectedSuccessViewModel = {
