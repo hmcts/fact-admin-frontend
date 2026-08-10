@@ -163,4 +163,22 @@ describe('accessibilityValidationConfig.validate', () => {
 
     expect(result).toBeUndefined();
   });
+
+  test('accepts Welsh toilet descriptions with Welsh diacritics', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: '01234567890',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '01234567891',
+      lift: true,
+      liftDoorWidth: 100,
+      liftDoorLimit: 500,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor and first floor',
+      accessibleToiletDescriptionCy: 'Llawr gwaelod gyda ŵ ŷ â ê î ô û',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toBeUndefined();
+  });
 });

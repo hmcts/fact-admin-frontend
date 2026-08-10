@@ -102,13 +102,16 @@ export const courtTypeOptions: CourtTypeOption[] = [
 
 const maxRepeatableEntries = 5;
 const integerPattern = /^\d+$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
-const genericDescriptionPattern = /^[A-Za-z0-9 ()':,\-;.]+$/;
+const phoneNumberPattern = /^(?:\+44)?[0-9 ()-]{10,20}$/;
+const englishTextPattern = /^[A-Za-z0-9 ()':,\-;.]+$/;
+const welshTextPattern = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
 const dxCodeMaxLength = 200;
 const repeatableDescriptionMaxLength = 250;
-const faxNumberFormatError = 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
+const faxNumberValidationError = 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
+const gbsValidationError =
+  'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 const interviewRoomCountError = 'Enter a number of interview rooms between 1 and 150, or select No';
-const invalidCharactersError = 'Value contains invalid characters';
+const dxValidationError = 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class ProfessionalInformationService {
   public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
@@ -309,6 +312,13 @@ export class ProfessionalInformationService {
       }
     }
 
+    if (viewModel.gbs.trim() && !englishTextPattern.test(viewModel.gbs.trim())) {
+      errors.push({
+        href: '#gbs',
+        text: gbsValidationError,
+      });
+    }
+
     if (viewModel.interviewRooms === true) {
       if (!viewModel.interviewRoomCount.trim()) {
         errors.push({
@@ -367,10 +377,10 @@ export class ProfessionalInformationService {
           href: `#dxCode-${formIndex}`,
           text: `DX code ${formIndex + 1}: DX code must be ${dxCodeMaxLength} characters or fewer`,
         });
-      } else if (code && !genericDescriptionPattern.test(code)) {
+      } else if (code && !englishTextPattern.test(code)) {
         errors.push({
           href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1}: ${dxValidationError}`,
         });
       }
       if (description.length > repeatableDescriptionMaxLength) {
@@ -378,10 +388,10 @@ export class ProfessionalInformationService {
           href: `#dxCodeDescription-${formIndex}`,
           text: `DX code ${formIndex + 1} explanation: DX explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
         });
-      } else if (description && !genericDescriptionPattern.test(description)) {
+      } else if (description && !englishTextPattern.test(description)) {
         errors.push({
           href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1} explanation: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1} explanation: ${dxValidationError}`,
         });
       }
       if (descriptionCy.length > repeatableDescriptionMaxLength) {
@@ -389,10 +399,10 @@ export class ProfessionalInformationService {
           href: `#dxCodeDescriptionCy-${formIndex}`,
           text: `DX code ${formIndex + 1} Welsh explanation: DX Welsh explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
         });
-      } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
+      } else if (descriptionCy && !welshTextPattern.test(descriptionCy)) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} Welsh explanation: ${invalidCharactersError}`,
+          text: `DX code ${formIndex + 1} Welsh explanation: ${dxValidationError}`,
         });
       }
     });
@@ -418,7 +428,7 @@ export class ProfessionalInformationService {
       } else if (code && !phoneNumberPattern.test(code)) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${faxNumberFormatError}`,
+          text: `Fax number ${formIndex + 1}: ${faxNumberValidationError}`,
         });
       }
       if (hasEnglishDescriptionOnly) {
@@ -438,10 +448,10 @@ export class ProfessionalInformationService {
           href: `#faxNumberDescription-${formIndex}`,
           text: `Fax number ${formIndex + 1} description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
         });
-      } else if (description && !genericDescriptionPattern.test(description)) {
+      } else if (description && !englishTextPattern.test(description)) {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: ${invalidCharactersError}`,
+          text: `Fax number ${formIndex + 1} description: ${dxValidationError}`,
         });
       }
       if (descriptionCy.length > repeatableDescriptionMaxLength) {
@@ -449,10 +459,10 @@ export class ProfessionalInformationService {
           href: `#faxNumberDescriptionCy-${formIndex}`,
           text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
         });
-      } else if (descriptionCy && !genericDescriptionPattern.test(descriptionCy)) {
+      } else if (descriptionCy && !welshTextPattern.test(descriptionCy)) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: ${invalidCharactersError}`,
+          text: `Fax number ${formIndex + 1} Welsh description: ${dxValidationError}`,
         });
       }
     });
@@ -533,9 +543,10 @@ export class ProfessionalInformationService {
       .filter(([field]) => field.toLowerCase() !== 'timestamp')
       .map(([field, text]) => {
         const repeatableError = this.repeatableApiError(field, viewModel);
-        const errorText = this.apiErrorText(field, text);
+        const href = repeatableError?.href ?? this.apiErrorHref(field, text);
+        const errorText = this.apiErrorText(field, text, href);
         return {
-          href: repeatableError?.href ?? this.apiErrorHref(field, text),
+          href,
           text: repeatableError ? `${repeatableError.label}: ${errorText}` : errorText,
         };
       });
@@ -637,7 +648,7 @@ export class ProfessionalInformationService {
     return payloadEntries[payloadIndex]?.formIndex ?? payloadIndex;
   }
 
-  private apiErrorText(field: string, text: string): string {
+  private apiErrorText(field: string, text: string, href?: string): string {
     const normalizedField = field.toLowerCase();
     const normalizedText = text.toLowerCase();
     if (
@@ -648,9 +659,30 @@ export class ProfessionalInformationService {
       return interviewRoomCountError;
     }
     if (this.isFaxNumberFormatApiError(normalizedField, normalizedText)) {
-      return faxNumberFormatError;
+      return faxNumberValidationError;
+    }
+    if (normalizedText.includes('invalid characters')) {
+      if (href?.startsWith('#dxCode')) {
+        return dxValidationError;
+      }
+      if (href === '#gbs') {
+        return gbsValidationError;
+      }
+      if (href?.startsWith('#faxNumberDescription')) {
+        return dxValidationError;
+      }
+      if (href?.startsWith('#faxNumber')) {
+        return faxNumberValidationError;
+      }
+    }
+    if (this.isFaxNumberInvalidCharactersApiError(normalizedField, normalizedText)) {
+      return href?.startsWith('#faxNumberDescription') ? dxValidationError : faxNumberValidationError;
     }
     return text;
+  }
+
+  private isFaxNumberInvalidCharactersApiError(normalizedField: string, normalizedText: string): boolean {
+    return normalizedField.includes('fax') && normalizedText.includes('invalid characters');
   }
 
   private isFaxNumberApiError(normalizedField: string, normalizedText: string): boolean {

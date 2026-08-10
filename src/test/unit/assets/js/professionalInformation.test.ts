@@ -241,7 +241,9 @@ describe('professionalInformation repeatable fields', () => {
     mockDom.addButton.click();
 
     const addedItem = mockDom.list.querySelectorAll('[data-professional-information-item]')[1];
-    expect(addedItem.querySelector('[data-professional-information-heading]')?.textContent).toBe('DX code 2');
+    expect(addedItem.querySelector('[data-professional-information-heading]')?.textContent).toBe(
+      'DX code 2 (optional)'
+    );
     expect(addedItem.querySelector('input')?.name).toBe('dxCode-1');
     expect(addedItem.querySelector('input')?.attributes['aria-describedby']).toBe('dxCode-1-hint');
     expect(addedItem.querySelector('[data-professional-information-remove]')?.textContent).toBe('Remove DX code 2');
@@ -270,7 +272,9 @@ describe('professionalInformation repeatable fields', () => {
 
     const remainingItems = mockDom.list.querySelectorAll('[data-professional-information-item]');
     expect(remainingItems).toHaveLength(2);
-    expect(remainingItems[1].querySelector('[data-professional-information-heading]')?.textContent).toBe('DX code 2');
+    expect(remainingItems[1].querySelector('[data-professional-information-heading]')?.textContent).toBe(
+      'DX code 2 (optional)'
+    );
     expect(remainingItems[1].querySelector('input')?.name).toBe('dxCode-1');
     expect(remainingItems[1].querySelector('input')?.attributes['aria-describedby']).toBe('dxCode-1-hint');
     expect(mockDom.addButton.hidden).toBe(false);
