@@ -370,7 +370,9 @@ describe('Information for professionals page', () => {
     } as never);
     stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
     stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
-      new Map([['dxCodes[1].dxCode', 'Value contains invalid characters']])
+      new Map([
+        ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+      ])
     );
 
     const response = await request(app)
@@ -383,7 +385,9 @@ describe('Information for professionals page', () => {
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('href="#dxCode-1"');
-    expect(response.text).toContain('DX code 2: Value contains invalid characters');
+    expect(response.text).toContain(
+      'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+    );
   });
 
   test('renders confirmation page before removing family court type with local authority config', async () => {

@@ -88,6 +88,7 @@ type ApiValidationMapping = {
 const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
+const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 const dataApiRequests = new DataApiRequests();
@@ -266,7 +267,7 @@ export class CourtContactService {
       if (contactExplanationCy.length > maxExplanationLength) {
         formErrors.contactExplanationCy = 'Welsh translation must be 250 characters or fewer';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      } else if (!explanationPattern.test(contactExplanationCy)) {
+      } else if (!welshExplanationPattern.test(contactExplanationCy)) {
         formErrors.contactExplanationCy =
           'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });

@@ -6,6 +6,7 @@ import { Rule, addError, patternRule, validateBooleanField } from './validation'
 // Regex constants
 export const UK_PHONE_REGEX = /^((\+44|)[0-9 ]{10,20})$/; // kept same regex in backend ideally it should be 10-12 digit though
 export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
+export const TOILET_DESC_REGEX_WELSH = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
 
 const MIN_LIFT_DOOR_WIDTH_CM = 1;
 const MAX_LIFT_DOOR_WIDTH_CM = 1000;
@@ -152,7 +153,7 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     ),
     patternRule(
       'accessibleToiletDescriptionCy',
-      TOILET_DESC_REGEX,
+      TOILET_DESC_REGEX_WELSH,
       'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
     ),
 
