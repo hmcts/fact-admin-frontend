@@ -32,6 +32,10 @@ withPipeline(type, product, component) {
   env.DATA_API_URL = 'https://fact-data-api-pr-336.preview.platform.hmcts.net'
   env.PLAYWRIGHT_WORKERS = 4
 
+  onPR() {
+    env.ENV = 'preview'
+  }
+
   loadVaultSecrets(secrets)
 
   afterSuccess('akschartsinstall') {
