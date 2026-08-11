@@ -1,5 +1,16 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro confirmationActions(buttonText, cancelHref) %}
+  <div class="govuk-button-group">
+    {{ govukButton({
+      text: buttonText,
+      classes: "govuk-button--warning"
+    }) }}
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ cancelHref }}">Cancel</a>
+  </div>
+{% endmacro %}
 
 {% macro successPanel(title='', text='') %}
   {{ govukPanel({

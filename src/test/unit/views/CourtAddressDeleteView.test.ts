@@ -16,6 +16,7 @@ describe('Court Address Delete View', () => {
         townCity: 'London',
         addressType: 'VISIT_US',
       },
+      cancelHref: `/courts/${ids.courtId}/edit/address`,
       courtName: 'Reading Crown Court',
       pagePath: `/courts/${ids.courtId}/edit/address/delete/${ids.addressId}`,
       pageTitle: 'Delete address',

@@ -71,7 +71,7 @@ describe('Accessibility page', () => {
       accessibleParking: true,
       accessibleToiletDescription: 'Accessible toilet available near reception',
       accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
-      hearingEnhancementEquipment: 'HEARING_LOOP_SYSTEMS',
+      hearingEnhancementEquipment: 'NONE',
       lift: true,
       liftDoorLimit: 900,
       liftDoorWidth: 120,
@@ -83,7 +83,7 @@ describe('Accessibility page', () => {
       accessibleToiletDescription: 'Accessible toilet available near reception',
       accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
       accessibleEntrance: 'true',
-      hearingEnhancementEquipment: 'infraredAndHearingLoop',
+      hearingEnhancementEquipment: 'none',
       lift: 'true',
       liftDoorWidth: '120',
       liftDoorLimit: '900',
@@ -97,6 +97,9 @@ describe('Accessibility page', () => {
       `<a href="/courts/${courtId}/edit" class="govuk-link govuk-link--no-visited-state">`
     );
     expect(updateAccessibilityStub.calledOnce).toBe(true);
+    expect(updateAccessibilityStub.firstCall.args[1]).toEqual(
+      expect.objectContaining({ hearingEnhancementEquipment: 'NONE' })
+    );
   });
 
   test('renders validation errors on invalid POST payload', async () => {

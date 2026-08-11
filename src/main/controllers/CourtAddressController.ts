@@ -440,6 +440,7 @@ export class CourtAddressController {
     res.render('court-address-delete', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Delete address'),
       address: courtAddressResponse,
+      cancelHref: `/courts/${courtId}/edit/address`,
       courtName,
       courtId,
       pageTitle: 'Delete Address',
@@ -468,6 +469,7 @@ export class CourtAddressController {
       res.render('court-address-delete', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Delete address'),
         address: deleteResult['address'],
+        cancelHref: `/courts/${courtId}/edit/address`,
         courtName: deleteResult['courtName'],
         courtId,
         pageTitle: 'Delete Address',

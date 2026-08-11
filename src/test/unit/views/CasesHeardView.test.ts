@@ -83,6 +83,7 @@ describe('Cases Heard View', () => {
 
   test('renders the cases heard confirm page', () => {
     const html = env.render('cases-heard-confirm.njk', {
+      cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard',
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',
       message: 'Removing Adoption and Divorce will remove related local authority config.',
@@ -100,7 +101,8 @@ describe('Cases Heard View', () => {
     expect(html).toContain('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success');
     expect(html).toContain('Continue');
     expect(html).toContain('govuk-button--warning');
-    expect(html).toContain('action="/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard"');
+    expect(html).toContain('href="/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard">Cancel</a>');
+    expect(html).not.toContain('id="cancel_form"');
     expect(html).not.toContain('history.back()');
     expect(html).toContain('Cancel');
   });

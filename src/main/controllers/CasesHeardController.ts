@@ -119,6 +119,7 @@ export default class CasesHeardController {
 
     return res.render('cases-heard-confirm', {
       breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, courtName, 'Cases heard confirm update'),
+      cancelHref: `/courts/${resolvedCourtId}/edit/cases-heard`,
       courtId: resolvedCourtId,
       courtName,
       selectedAreasOfLaw,

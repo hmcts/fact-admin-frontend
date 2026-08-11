@@ -65,6 +65,39 @@ describe('CounterServiceOpeningHoursController', () => {
     expect(response.render).toHaveBeenCalledWith('court-not-found');
   });
 
+  test('renders court not found when the list court id is missing', async () => {
+    const controller = new CounterServiceOpeningHoursController();
+    const response = responseMock();
+    const request = mockRequest({});
+    request.params = {};
+    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage');
+
+    await controller.getList(request, response);
+
+    expect(getListPage.notCalled).toBe(true);
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
+    expect(response.render).toHaveBeenCalledWith('court-not-found');
+  });
+
+  test('uses the first court id when the list route parameter is an array', async () => {
+    const controller = new CounterServiceOpeningHoursController();
+    const response = responseMock();
+    const request = mockRequest({});
+    request.params = { courtId: [courtId] } as unknown as typeof request.params;
+    const viewModel = {
+      courtId,
+      courtName: 'Reading Crown Court',
+      openingHours: [],
+      pageTitle: 'Counter service opening hours - Reading Crown Court',
+    };
+    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage').resolves(viewModel);
+
+    await controller.getList(request, response);
+
+    expect(getListPage.calledWith(courtId)).toBe(true);
+    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours', expect.objectContaining({ courtId }));
+  });
+
   test('renders the add page when the service returns a view model', async () => {
     const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
@@ -382,6 +415,7 @@ describe('CounterServiceOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
         { href: '#', text: 'Delete opening hours' },
       ],
+      cancelHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
     };
 
     const expectedSuccessViewModel = {
@@ -399,6 +433,19 @@ describe('CounterServiceOpeningHoursController', () => {
       'counter-service-opening-hours-delete-success',
       expectedSuccessViewModel
     );
+  });
+
+  test('renders generic not found when a counter service to delete no longer exists', async () => {
+    const controller = new CounterServiceOpeningHoursController();
+    const response = responseMock();
+    const request = mockRequest({});
+    request.params = { courtId, counterServiceId };
+    stub(CounterServiceOpeningHoursService.prototype, 'getDeletePage').resolves(HttpStatusCode.NotFound);
+
+    await controller.getDelete(request, response);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
+    expect(response.render).toHaveBeenCalledWith('not-found');
   });
 
   test('renders not found pages for invalid delete route parameters', async () => {

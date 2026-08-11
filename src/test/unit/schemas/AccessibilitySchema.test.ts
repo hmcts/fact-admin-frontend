@@ -15,6 +15,15 @@ describe('AccessibilityScheme', () => {
     expect(result.hearingEnhancementEquipment).toBe('infraredAndHearingLoop');
   });
 
+  test('accepts none as a UI hearing enhancement value', () => {
+    const result = AccessibilityScheme.parse({
+      ...base,
+      hearingEnhancementEquipment: 'none',
+    });
+
+    expect(result.hearingEnhancementEquipment).toBe('none');
+  });
+
   test('accepts API hearing enhancement values and normalizes to UI values', () => {
     const result = AccessibilityScheme.parse({
       ...base,
@@ -22,6 +31,15 @@ describe('AccessibilityScheme', () => {
     });
 
     expect(result.hearingEnhancementEquipment).toBe('infrared');
+  });
+
+  test('normalizes the NONE API hearing enhancement value', () => {
+    const result = AccessibilityScheme.parse({
+      ...base,
+      hearingEnhancementEquipment: 'NONE',
+    });
+
+    expect(result.hearingEnhancementEquipment).toBe('none');
   });
 
   test('keeps welsh description undefined when omitted', () => {

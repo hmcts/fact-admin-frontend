@@ -860,6 +860,7 @@ describe('CourtContactController', () => {
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Delete contact details' },
         ],
+        cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details',
         courtId: '11111111-1111-4111-8111-111111111111',
         courtName: 'Reading Crown Court',
         contactDetail: {
@@ -933,6 +934,7 @@ describe('CourtContactController', () => {
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details', text: 'Contact details' },
           { href: '#', text: 'Delete contact details' },
         ],
+        cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit/contact-details',
         courtId: '11111111-1111-4111-8111-111111111111',
         courtName: 'Reading Crown Court',
         contactDetail: {
