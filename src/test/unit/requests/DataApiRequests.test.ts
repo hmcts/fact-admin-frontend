@@ -30,6 +30,14 @@ const errorMessage = {
   message: 'test',
 };
 
+function expectedAxiosError(status: HttpStatusCode) {
+  return {
+    name: 'AxiosError',
+    message: 'Data API request failed',
+    status,
+  };
+}
+
 describe('DataApiRequests', () => {
   let getStub: sinon.SinonStub;
   let postStub: sinon.SinonStub;
@@ -1368,6 +1376,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.NotFound);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      'Error creating/updating user:',
+      expectedAxiosError(HttpStatusCode.NotFound)
+    );
   });
 
   it('returns internal server error when create/update user fails without an axios response', async () => {
@@ -1382,6 +1394,44 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('redacts the bearer token from error logs', async () => {
+    const userId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    const bearerToken = 'secret-bearer-token';
+    deleteStub.withArgs(`/user/v1/${userId}/locks`).rejects({
+      name: 'AxiosError',
+      message: 'Request failed with status code 503',
+      code: 'ERR_BAD_RESPONSE',
+      isAxiosError: true,
+      config: {
+        method: 'delete',
+        url: `/user/v1/${userId}/locks`,
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'X-User-Id': userId,
+        },
+      },
+      response: {
+        status: HttpStatusCode.ServiceUnavailable,
+        data: {
+          userId,
+        },
+      },
+    });
+
+    const response = await dataApiRequests.clearUserLocks(userId);
+
+    expect(response).toBe(HttpStatusCode.ServiceUnavailable);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error removing locks for user:', {
+      name: 'AxiosError',
+      message: 'Request failed with status code 503',
+      status: HttpStatusCode.ServiceUnavailable,
+      method: 'DELETE',
+      requestPath: `/user/v1/${userId}/locks`,
+    });
+    const loggedError = JSON.stringify(mockDataApiLogger.error.mock.calls);
+    expect(loggedError).not.toContain(bearerToken);
   });
 
   it('returns paged users when the users list response is valid', async () => {
@@ -2892,7 +2942,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAuditSubjectOptionsMap();
 
     expect(response).toBe(HttpStatusCode.BadGateway);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', badGatewayError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      'Error fetching audit subject names:',
+      expectedAxiosError(HttpStatusCode.BadGateway)
+    );
   });
 
   it('returns internal server error and logs when audit subject options endpoint throws non-axios error', async () => {
@@ -2902,7 +2955,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAuditSubjectOptionsMap();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', nonAxiosError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', {
+      name: 'Error',
+      message: 'Unexpected subject options error',
+    });
   });
 
   it('returns parsed paged audits when response is valid', async () => {
@@ -2995,7 +3051,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAudits(params);
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', serviceUnavailableError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      'Error fetching audits:',
+      expectedAxiosError(HttpStatusCode.ServiceUnavailable)
+    );
   });
 
   it('returns internal server error and logs when audits endpoint throws non-axios error', async () => {
@@ -3011,7 +3070,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAudits(params);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', nonAxiosError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', {
+      name: 'Error',
+      message: 'Unexpected audits error',
+    });
   });
 
   it('returns parsed audit by id when response is valid', async () => {
@@ -3076,7 +3138,7 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.NotFound);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
       `Error fetching audit details for id ${auditId}:`,
-      notFoundError
+      expectedAxiosError(HttpStatusCode.NotFound)
     );
   });
 
@@ -3089,10 +3151,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getAuditById(auditId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
-      `Error fetching audit details for id ${auditId}:`,
-      nonAxiosError
-    );
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(`Error fetching audit details for id ${auditId}:`, {
+      name: 'Error',
+      message: 'Unexpected audit by id error',
+    });
   });
 
   it('returns parsed counter service opening hours when the response is valid', async () => {
@@ -3196,7 +3258,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.getApprovals();
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching approvals:', serviceUnavailableError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      'Error fetching approvals:',
+      expectedAxiosError(HttpStatusCode.ServiceUnavailable)
+    );
   });
 
   it('returns create status when create approval succeeds', async () => {
@@ -3232,7 +3297,10 @@ describe('DataApiRequests', () => {
     const response = await dataApiRequests.createApproval(approval);
 
     expect(response).toBe(HttpStatusCode.NotFound);
-    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error creating approval:', notFoundError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      'Error creating approval:',
+      expectedAxiosError(HttpStatusCode.NotFound)
+    );
   });
 
   it('returns delete status when delete approval succeeds', async () => {
@@ -3480,7 +3548,7 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.NotFound);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
       `Error deleting approval for id ${approvalId}:`,
-      notFoundError
+      expectedAxiosError(HttpStatusCode.NotFound)
     );
   });
 
