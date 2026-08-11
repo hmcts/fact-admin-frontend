@@ -132,6 +132,7 @@ describe('ServiceCentreEditController', () => {
           },
           { href: '#', text: 'Approve data' },
         ],
+        cancelHref: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
         name: 'National Business Centre',
         pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
       })

@@ -90,10 +90,17 @@ export default class CourtOpeningHoursController {
     }
 
     const viewModel = await courtOpeningHoursService.getDeletePage(courtId, openingHoursId);
+    const deleteViewModel =
+      typeof viewModel === 'number'
+        ? viewModel
+        : {
+            ...viewModel,
+            cancelHref: `/courts/${courtId}/edit/court-opening-hours`,
+          };
 
     renderResponse(
       res,
-      this.withBreadcrumbs(courtId, viewModel, 'Delete opening hours'),
+      this.withBreadcrumbs(courtId, deleteViewModel, 'Delete opening hours'),
       'court-opening-hours-delete',
       'not-found'
     );

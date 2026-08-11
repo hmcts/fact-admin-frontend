@@ -17,7 +17,7 @@ export class CourtPhotoPage extends Base {
   public readonly uploadButton: Locator;
   public readonly deleteButton: Locator;
   public readonly continueButton: Locator;
-  public readonly cancelButton: Locator;
+  public readonly cancelLink: Locator;
   public readonly errorSummary: Locator;
   public readonly confirmationDetails: Locator;
   public readonly successPanel: Locator;
@@ -33,7 +33,7 @@ export class CourtPhotoPage extends Base {
     this.uploadButton = this.page.getByRole('button', { name: 'Upload', exact: true });
     this.deleteButton = this.page.getByRole('button', { name: 'Delete', exact: true });
     this.continueButton = this.page.getByRole('button', { name: 'Continue', exact: true });
-    this.cancelButton = this.page.getByRole('button', { name: 'Cancel', exact: true });
+    this.cancelLink = this.page.getByRole('link', { name: 'Cancel', exact: true });
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.confirmationDetails = this.page.locator('.govuk-summary-list');
     this.successPanel = this.page.locator('.govuk-panel--confirmation');
@@ -67,7 +67,7 @@ export class CourtPhotoPage extends Base {
   }
 
   async cancelDelete(): Promise<void> {
-    await this.cancelButton.click();
+    await this.cancelLink.click();
   }
 
   buildCourtPhotoUrl(courtId: string): string {

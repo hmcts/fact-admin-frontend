@@ -31,7 +31,11 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     },
     {
       key: 'accessibleEntrance',
-      validate: m => validateBooleanField(m.accessibleEntrance, 'Select whether an accessible entrance is available'),
+      validate: m =>
+        validateBooleanField(
+          m.accessibleEntrance,
+          'Select whether there is step free access from the street to the courtrooms'
+        ),
     },
     {
       key: 'lift',

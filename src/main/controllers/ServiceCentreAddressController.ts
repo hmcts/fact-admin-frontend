@@ -446,8 +446,9 @@ export default class ServiceCentreAddressController {
 
     res.render('service-centre-address-delete', {
       address: addressResponse,
-      pageTitle: `Delete address - ${serviceCentreName}`,
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Delete address'),
+      cancelHref: `/service-centres/${serviceCentreId}/edit/address`,
+      pageTitle: `Delete address - ${serviceCentreName}`,
       serviceCentreName,
     });
   }

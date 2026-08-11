@@ -1,6 +1,6 @@
 {% extends "template.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/common-components.njk" import confirmationActions %}
 
 {% block pageTitle %}
   Cases heard confirm update - {{ courtName }}
@@ -30,18 +30,8 @@
 
         <input type="hidden" name="areasOfLaw" value="{{ selectedAreasOfLaw }}">
 
-        {{ govukButton({
-          text: "Continue",
-          classes: "govuk-button--warning"
-        }) }}
+        {{ confirmationActions("Continue", cancelHref) }}
 
-      </form>
-
-      <form id="cancel_form" method="GET" action="/courts/{{ courtId }}/edit/cases-heard">
-        {{ govukButton({
-          text: "Cancel",
-          classes: "govuk-button--secondary"
-        }) }}
       </form>
 
     </div>

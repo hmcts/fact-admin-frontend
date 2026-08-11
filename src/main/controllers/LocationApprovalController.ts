@@ -99,6 +99,7 @@ export class LocationApprovalController {
         this.options.subjectType,
         'Approve data'
       ),
+      cancelHref: approveData.editPath,
       pagePath: `${approveData.editPath}/approve`,
     });
   }

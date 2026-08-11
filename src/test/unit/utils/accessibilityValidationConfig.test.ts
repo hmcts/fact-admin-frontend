@@ -7,7 +7,7 @@ describe('accessibilityValidationConfig.validate', () => {
     expect(result).toEqual(
       expect.objectContaining({
         accessibleParking: ['Select whether accessible parking is available'],
-        accessibleEntrance: ['Select whether an accessible entrance is available'],
+        accessibleEntrance: ['Select whether there is step free access from the street to the courtrooms'],
         lift: ['Select whether a lift is available'],
         quietRoom: ['Select whether a quiet room is available'],
         accessibleToiletDescription: ['Enter a description of the accessible toilet facilities'],
