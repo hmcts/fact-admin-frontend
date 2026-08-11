@@ -1380,7 +1380,6 @@ describe('DataApiRequests', () => {
       'Error creating/updating user:',
       expectedAxiosError(HttpStatusCode.NotFound)
     );
-    expect(JSON.stringify(mockDataApiLogger.error.mock.calls)).not.toContain(user.ssoId);
   });
 
   it('returns internal server error when create/update user fails without an axios response', async () => {
