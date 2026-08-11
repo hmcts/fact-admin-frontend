@@ -410,6 +410,7 @@ describe('CourtAddressController', () => {
       .withArgs('court-address-delete', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Delete address'),
         address: invalidDeleteResponse.address,
+        cancelHref: `/courts/${COURT_ID}/edit/address`,
         courtName: 'Reading Crown Court',
         courtId: COURT_ID,
         pageTitle: 'Delete Address',
@@ -797,6 +798,7 @@ describe('CourtAddressController', () => {
       .withArgs('court-address-delete', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Delete address'),
         address: buildAddress(),
+        cancelHref: `/courts/${COURT_ID}/edit/address`,
         courtName: 'Reading Crown Court',
         courtId: COURT_ID,
         pageTitle: 'Delete Address',

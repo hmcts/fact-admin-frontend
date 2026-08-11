@@ -125,6 +125,7 @@ export default class CourtPhotoController {
 
     res.render('court-photo-delete-confirm', {
       breadcrumbs: buildSectionBreadcrumbs(courtId, courtName, 'Photo', 'photo', 'Court photo confirm delete'),
+      cancelHref: `/courts/${courtId}/edit/photo`,
       courtId,
       courtName,
       message: 'Are you sure you want to delete the photo associated with this court?',

@@ -4,6 +4,7 @@ export const HEARING_ENHANCEMENT_EQUIPMENT_MAP = {
   infraredAndHearingLoop: 'INFRARED_SYSTEMS_AND_HEARING_LOOP_SYSTEMS',
   infrared: 'INFRARED_SYSTEMS',
   hearingLoop: 'HEARING_LOOP_SYSTEMS',
+  none: 'NONE',
 } as const;
 
 export type HearingEnhancementEquipmentUi = keyof typeof HEARING_ENHANCEMENT_EQUIPMENT_MAP;
@@ -28,6 +29,7 @@ const HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE = {
   INFRARED_SYSTEMS_AND_HEARING_LOOP_SYSTEMS: 'infraredAndHearingLoop',
   INFRARED_SYSTEMS: 'infrared',
   HEARING_LOOP_SYSTEMS: 'hearingLoop',
+  NONE: 'none',
 } as const satisfies Record<HearingEnhancementEquipmentApi, HearingEnhancementEquipmentUi>;
 
 const normalizeHearingEnhancementEquipment = (

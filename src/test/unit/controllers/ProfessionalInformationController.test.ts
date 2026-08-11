@@ -163,6 +163,7 @@ describe('ProfessionalInformationController', () => {
       .withArgs(
         'professional-information-confirm',
         sinonMatch({
+          cancelHref: `/courts/${courtId}/edit/information-for-professionals`,
           courtId,
           courtName,
           hiddenInputs: [

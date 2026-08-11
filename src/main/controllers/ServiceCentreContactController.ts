@@ -212,6 +212,7 @@ export default class ServiceCentreContactController {
         serviceCentreResponse.name,
         'Delete contact details'
       ),
+      cancelHref: `/service-centres/${serviceCentreId}/edit/contact-details`,
       contactDetail: {
         ...contactDetailResponse,
         description: contactDescription,

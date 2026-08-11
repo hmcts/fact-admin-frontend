@@ -78,6 +78,7 @@ describe('mapper', () => {
       expect(isHearingEnhancementEquipment('infraredAndHearingLoop')).toBe(true);
       expect(isHearingEnhancementEquipment('infrared')).toBe(true);
       expect(isHearingEnhancementEquipment('hearingLoop')).toBe(true);
+      expect(isHearingEnhancementEquipment('none')).toBe(true);
       expect(isHearingEnhancementEquipment('bad-value')).toBe(false);
     });
 
@@ -87,6 +88,7 @@ describe('mapper', () => {
       );
       expect(mapHearingEnhancementEquipment('infrared')).toBe('INFRARED_SYSTEMS');
       expect(mapHearingEnhancementEquipment('hearingLoop')).toBe('HEARING_LOOP_SYSTEMS');
+      expect(mapHearingEnhancementEquipment('none')).toBe('NONE');
       expect(mapHearingEnhancementEquipment(undefined)).toBeUndefined();
     });
   });

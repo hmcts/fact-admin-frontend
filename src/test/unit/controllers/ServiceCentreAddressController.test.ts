@@ -963,7 +963,13 @@ describe('ServiceCentreAddressController', () => {
       addressType: 'VISIT_US',
     } as never);
 
-    responseMock.expects('render').once().withArgs('service-centre-address-delete', match.object);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'service-centre-address-delete',
+        match({ cancelHref: `/service-centres/${SERVICE_CENTRE_ID}/edit/address` })
+      );
 
     try {
       await controller.renderDeleteAddress(request, response);

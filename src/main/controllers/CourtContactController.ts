@@ -190,6 +190,7 @@ export default class CourtContactController {
 
     return res.render('court-contact-delete', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Delete contact details'),
+      cancelHref: `/courts/${resolvedCourtId}/edit/contact-details`,
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       contactDetail: {

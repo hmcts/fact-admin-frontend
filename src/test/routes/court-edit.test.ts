@@ -165,7 +165,7 @@ describe('Court edit page', () => {
     expect(response.text).toContain('Make sure you have checked the data in all sections before approving.');
     expect(response.text).toContain('Reading Crown Court');
     expect(response.text).toContain('Confirm data');
-    expect(response.text).toContain('action="/courts/11111111-1111-4111-8111-111111111111/edit"');
+    expect(response.text).toContain('href="/courts/11111111-1111-4111-8111-111111111111/edit">Cancel</a>');
   });
 
   test('approves court data and renders success page for super admin users', async () => {

@@ -1,6 +1,6 @@
 {% extends "template.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/common-components.njk" import confirmationActions %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -41,10 +41,7 @@
       }) }}
 
       <form method="post" action="/courts/{{ courtId }}/edit/court-opening-hours/delete/success/{{ openingHoursId }}">
-        {{ govukButton({
-          text: "Delete opening hours",
-          classes: "govuk-button--warning"
-        }) }}
+        {{ confirmationActions("Delete opening hours", cancelHref) }}
       </form>
     </div>
   </div>

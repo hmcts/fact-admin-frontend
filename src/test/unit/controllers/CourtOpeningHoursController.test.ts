@@ -379,6 +379,7 @@ describe('CourtOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Delete opening hours' },
       ],
+      cancelHref: `/courts/${courtId}/edit/court-opening-hours`,
     };
 
     const expectedSuccessViewModel = {
@@ -393,6 +394,19 @@ describe('CourtOpeningHoursController', () => {
 
     expect(deleteResponse.render).toHaveBeenCalledWith('court-opening-hours-delete', expectedDeleteViewModel);
     expect(successResponse.render).toHaveBeenCalledWith('court-opening-hours-delete-success', expectedSuccessViewModel);
+  });
+
+  test('renders generic not found when opening hours to delete no longer exist', async () => {
+    const controller = new CourtOpeningHoursController();
+    const response = responseMock();
+    const request = mockRequest({});
+    request.params = { courtId, openingHoursId };
+    stub(CourtOpeningHoursService.prototype, 'getDeletePage').resolves(HttpStatusCode.NotFound);
+
+    await controller.getDelete(request, response);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
+    expect(response.render).toHaveBeenCalledWith('not-found');
   });
 
   test('renders not found pages for invalid delete route parameters', async () => {
