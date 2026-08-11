@@ -2,7 +2,6 @@ import { AxiosError, isAxiosError } from 'axios';
 import { ZodError } from 'zod';
 
 const MAX_VALIDATION_ISSUES = 10;
-const USER_LOCK_PATH_PATTERN = /^(\/user\/v1\/)[^/]+(\/locks\/?$)/i;
 
 interface SafeValidationIssue {
   code: string;
@@ -50,10 +49,6 @@ function toSafeAxiosError(error: AxiosError) {
     name: error.name || 'AxiosError',
     message: error.message || 'Data API request failed',
   };
-
-  if (error.code) {
-    details.code = error.code;
-  }
   if (error.response?.status !== undefined) {
     details.status = error.response.status;
   }
@@ -88,10 +83,8 @@ function getSafeRequestPath(url: string | undefined): string | undefined {
   }
 
   try {
-    const requestPath = new URL(url, 'https://data-api.local').pathname;
-    return requestPath.replace(USER_LOCK_PATH_PATTERN, '$1[REDACTED]$2');
+    return new URL(url, 'https://data-api.local').pathname;
   } catch {
-    const requestPath = url.split(/[?#]/, 1)[0];
-    return requestPath.replace(USER_LOCK_PATH_PATTERN, '$1[REDACTED]$2');
+    return url.split(/[?#]/, 1)[0];
   }
 }

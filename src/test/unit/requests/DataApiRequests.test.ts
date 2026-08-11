@@ -1397,7 +1397,7 @@ describe('DataApiRequests', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
-  it('redacts the user id when clearing user locks fails', async () => {
+  it('redacts the bearer token from error logs', async () => {
     const userId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
     const bearerToken = 'secret-bearer-token';
     deleteStub.withArgs(`/user/v1/${userId}/locks`).rejects({
@@ -1427,13 +1427,11 @@ describe('DataApiRequests', () => {
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error removing locks for user:', {
       name: 'AxiosError',
       message: 'Request failed with status code 503',
-      code: 'ERR_BAD_RESPONSE',
       status: HttpStatusCode.ServiceUnavailable,
       method: 'DELETE',
-      requestPath: '/user/v1/[REDACTED]/locks',
+      requestPath: `/user/v1/${userId}/locks`,
     });
     const loggedError = JSON.stringify(mockDataApiLogger.error.mock.calls);
-    expect(loggedError).not.toContain(userId);
     expect(loggedError).not.toContain(bearerToken);
   });
 

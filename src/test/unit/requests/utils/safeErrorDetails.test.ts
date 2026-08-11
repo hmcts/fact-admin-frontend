@@ -42,22 +42,20 @@ describe('toSafeErrorDetails', () => {
     expect(details).toEqual({
       name: 'AxiosError',
       message: 'Request failed with status code 503',
-      code: 'ERR_BAD_RESPONSE',
       status: 503,
       method: 'DELETE',
-      requestPath: '/user/v1/[REDACTED]/locks',
+      requestPath: '/user/v1/user-123/locks',
     });
 
     const serialisedDetails = JSON.stringify(details);
     expect(serialisedDetails).not.toContain('secret-token');
-    expect(serialisedDetails).not.toContain('user-123');
     expect(serialisedDetails).not.toContain('admin@example.com');
     expect(serialisedDetails).not.toContain('headers');
     expect(serialisedDetails).not.toContain('response');
     expect(serialisedDetails).not.toContain('stack');
   });
 
-  it('retains a non-user resource id and removes query values from an Axios request path', () => {
+  it('retains a resource id and removes query values from an Axios request path', () => {
     const details = toSafeErrorDetails({
       name: 'AxiosError',
       message: 'Not found',
@@ -95,7 +93,6 @@ describe('toSafeErrorDetails', () => {
     expect(details).toEqual({
       name: 'AxiosError',
       message: 'socket hang up',
-      code: 'ECONNRESET',
       method: 'POST',
       requestPath: '/approvals/v1',
     });
