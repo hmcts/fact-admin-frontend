@@ -32,6 +32,12 @@ REDIS_LOCAL=true
 
 `REDIS_PASSWORD` is only needed when connecting to an environment Redis instance that requires authentication.
 
+### Maintenance mode
+
+Set `MAINTENANCE_MODE=true` to show a service unavailable page to authenticated Admin and Viewer users. SuperAdmin
+users retain access to the application. If the variable is missing or set to any value other than `true`, maintenance
+mode is disabled.
+
 ```bash
 yarn install
 ```
