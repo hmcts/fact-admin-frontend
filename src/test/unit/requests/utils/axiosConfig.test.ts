@@ -1,4 +1,4 @@
-import { EnvironmentCredential } from '@azure/identity';
+import { ClientSecretCredential } from '@azure/identity';
 import { InternalAxiosRequestConfig } from 'axios';
 
 import { processRequest, runWithDataApiUserId } from '../../../../main/requests/utils/axiosConfig';
@@ -11,7 +11,7 @@ describe('processRequest', () => {
   const mockRefreshAfterTimestamp = Date.now() + 5000;
 
   beforeEach(() => {
-    (EnvironmentCredential as unknown as jest.Mock).mockImplementation(() => ({
+    (ClientSecretCredential as unknown as jest.Mock).mockImplementation(() => ({
       getToken: jest.fn().mockResolvedValue({
         token: mockToken,
         expiresOnTimestamp: mockExpiresOnTimestamp,

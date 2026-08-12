@@ -2,6 +2,8 @@
   "secrets": {
     "fact-kv": {
       "API_APP_REG_ID": "API_APP_REG_ID",
+      "FRONTEND_APP_REG_ID": "FRONTEND_APP_REG_ID",
+      "FRONTEND_APP_REG_SECRET": "FRONTEND_APP_REG_SECRET",
       "SESSION_SECRET": "SESSION_SECRET"
     }
   }
