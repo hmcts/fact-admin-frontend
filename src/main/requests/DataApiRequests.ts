@@ -86,6 +86,7 @@ import { SaveServiceCentreContactDetailRequest } from './types/SaveServiceCentre
 import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
+import { toSafeErrorDetails } from './utils/safeErrorDetails';
 
 const logger = Logger.getLogger('app');
 
@@ -99,7 +100,7 @@ export class DataApiRequests {
       logger.info('Data API health check response:', response.data);
       return response.data.status === 'UP';
     } catch (error) {
-      logger.error('Error checking data API health:', error);
+      logger.error('Error checking data API health:', toSafeErrorDetails(error));
     }
     return false;
   }
@@ -112,7 +113,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/regions');
       return regionsSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching regions:', error);
+      logger.error('Error fetching regions:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -127,7 +128,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/all/v1', { params });
       return pagedCourtsSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching courts:', error);
+      logger.error('Error fetching courts:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -142,7 +143,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/user/v1/favourites', { params });
       return pagedFavouritesSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching favourites:', error);
+      logger.error('Error fetching favourites:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -157,7 +158,7 @@ export class DataApiRequests {
       const response = await dataApi.post('/user/v1/favourites/status', { subjects });
       return favouriteStatusListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching favourite statuses:', error);
+      logger.error('Error fetching favourite statuses:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -172,7 +173,7 @@ export class DataApiRequests {
       const response = await dataApi.post('/user/v1/favourites', favourite);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
-      logger.error('Error adding favourite:', error);
+      logger.error('Error adding favourite:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -189,7 +190,7 @@ export class DataApiRequests {
       );
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
-      logger.error('Error removing favourite:', error);
+      logger.error('Error removing favourite:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -204,7 +205,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/entity/v1`);
       return courtEntitySchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching court details for id ${courtId}:`, error);
+      logger.error(`Error fetching court details for id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -223,7 +224,7 @@ export class DataApiRequests {
         return HttpStatusCode.NotFound;
       }
 
-      logger.error(`Error fetching court details for name ${courtName}:`, error);
+      logger.error(`Error fetching court details for name ${courtName}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -241,7 +242,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error update court details for id ${court.id}:`, error);
+      logger.error(`Error update court details for id ${court.id}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -261,7 +262,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error creating court:', error);
+      logger.error('Error creating court:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -280,7 +281,7 @@ export class DataApiRequests {
         return HttpStatusCode.NotFound;
       }
 
-      logger.error(`Error fetching service centre details for name ${serviceCentreName}:`, error);
+      logger.error(`Error fetching service centre details for name ${serviceCentreName}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -295,7 +296,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/service-centres/${serviceCentreId}/entity/v1`);
       return serviceCentreSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching service centre details for id ${serviceCentreId}:`, error);
+      logger.error(`Error fetching service centre details for id ${serviceCentreId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -315,7 +316,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error creating service centre:', error);
+      logger.error('Error creating service centre:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -335,7 +336,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error update service centre details for id ${serviceCentre.id}:`, error);
+      logger.error(`Error update service centre details for id ${serviceCentre.id}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -350,7 +351,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/areas-of-law`);
       return parseCourtAreasOfLawResponse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching areas of law for court id ${courtId}:`, error);
+      logger.error(`Error fetching areas of law for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -365,7 +366,7 @@ export class DataApiRequests {
       const response = await dataApi.put(`/courts/${payload.courtId}/v1/areas-of-law`, payload);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
-      logger.error(`Error updating areas of law for court id ${payload.courtId}:`, error);
+      logger.error(`Error updating areas of law for court id ${payload.courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -382,7 +383,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/areas-of-law`);
       return parseCourtAreasOfLawResponse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching areas of law for service-centre id ${serviceCentreId}:`, error);
+      logger.error(`Error fetching areas of law for service-centre id ${serviceCentreId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -400,7 +401,10 @@ export class DataApiRequests {
       const response = await dataApi.put(`/service-centres/${payload.serviceCentreId}/v1/areas-of-law`, payload);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
-      logger.error(`Error updating areas of law for service-centre id ${payload.serviceCentreId}:`, error);
+      logger.error(
+        `Error updating areas of law for service-centre id ${payload.serviceCentreId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -428,7 +432,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/all/details/v1');
       return allLocationDetailsListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching all locations:', error);
+      logger.error('Error fetching all locations:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -443,7 +447,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/contact-details`);
       return courtContactDetailListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching court contact details for court id ${courtId}:`, error);
+      logger.error(`Error fetching court contact details for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -458,7 +462,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/address`);
       return courtAddressListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching court address details:', error);
+      logger.error('Error fetching court address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -473,7 +477,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/address/${addressId}`);
       return courtAddressSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching court address details:', error);
+      logger.error('Error fetching court address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -490,7 +494,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/address`);
       return serviceCentreAddressListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching service-centre address details:', error);
+      logger.error('Error fetching service-centre address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -508,7 +512,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/address/${addressId}`);
       return serviceCentreAddressSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching service-centre address details:', error);
+      logger.error('Error fetching service-centre address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -529,7 +533,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error adding service-centre address details:', error);
+      logger.error('Error adding service-centre address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -551,7 +555,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error updating service-centre address details:', error);
+      logger.error('Error updating service-centre address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -570,7 +574,7 @@ export class DataApiRequests {
       logger.error('Unexpected response status when deleting service-centre address:', response.status);
       return HttpStatusCode.InternalServerError;
     } catch (error: unknown) {
-      logger.error('Error deleting service-centre address details:', error);
+      logger.error('Error deleting service-centre address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -591,7 +595,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error adding court address details:', error);
+      logger.error('Error adding court address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -613,7 +617,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error updating court address details:', error);
+      logger.error('Error updating court address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -632,7 +636,7 @@ export class DataApiRequests {
       logger.error('Unexpected response status when deleting court address:', response.status);
       return HttpStatusCode.InternalServerError;
     } catch (error: unknown) {
-      logger.error('Error deleting court address details:', error);
+      logger.error('Error deleting court address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -653,7 +657,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error creating court contact detail:', error);
+      logger.error('Error creating court contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -675,7 +679,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error updating court contact detail:', error);
+      logger.error('Error updating court contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -694,7 +698,7 @@ export class DataApiRequests {
       logger.error('Unexpected response status when deleting court contact detail:', response.status);
       return HttpStatusCode.InternalServerError;
     } catch (error: unknown) {
-      logger.error('Error deleting court contact detail:', error);
+      logger.error('Error deleting court contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -711,7 +715,10 @@ export class DataApiRequests {
       const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/contact-details`);
       return serviceCentreContactDetailListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching service-centre contact details for id ${serviceCentreId}:`, error);
+      logger.error(
+        `Error fetching service-centre contact details for id ${serviceCentreId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -732,7 +739,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error creating service-centre contact detail:', error);
+      logger.error('Error creating service-centre contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -757,7 +764,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error updating service-centre contact detail:', error);
+      logger.error('Error updating service-centre contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -781,7 +788,7 @@ export class DataApiRequests {
       logger.error('Unexpected response status when deleting service-centre contact detail:', response.status);
       return HttpStatusCode.InternalServerError;
     } catch (error: unknown) {
-      logger.error('Error deleting service-centre contact detail:', error);
+      logger.error('Error deleting service-centre contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -799,7 +806,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error fetching OS postcode search results:', error);
+      logger.error('Error fetching OS postcode search results:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -814,7 +821,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/areas-of-law');
       return areaOfLawListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching area of law type details:', error);
+      logger.error('Error fetching area of law type details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -829,7 +836,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/service-areas');
       return serviceAreaListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching service area type details:', error);
+      logger.error('Error fetching service area type details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -844,7 +851,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/court-types');
       return courtTypeListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching court type details:', error);
+      logger.error('Error fetching court type details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -872,7 +879,7 @@ export class DataApiRequests {
         return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
       });
     } catch (error: unknown) {
-      logger.error('Error fetching contact description type details:', error);
+      logger.error('Error fetching contact description type details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -887,7 +894,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/opening-hours-types');
       return openingHourTypeListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching opening hour type details:', error);
+      logger.error('Error fetching opening hour type details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -907,7 +914,7 @@ export class DataApiRequests {
 
       return courtOpeningHoursListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching court opening hours for court id ${courtId}:`, error);
+      logger.error(`Error fetching court opening hours for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -925,7 +932,10 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`);
       return courtOpeningHoursSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching opening hours ${openingHoursId} for court id ${courtId}:`, error);
+      logger.error(
+        `Error fetching opening hours ${openingHoursId} for court id ${courtId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -950,7 +960,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error saving opening hours for court id ${courtId}:`, error);
+      logger.error(`Error saving opening hours for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -965,7 +975,10 @@ export class DataApiRequests {
       const response = await dataApi.delete(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
-      logger.error(`Error deleting opening hours ${openingHoursId} for court id ${courtId}:`, error);
+      logger.error(
+        `Error deleting opening hours ${openingHoursId} for court id ${courtId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -985,7 +998,7 @@ export class DataApiRequests {
 
       return translationServicesSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching translation services for court id ${courtId}:`, error);
+      logger.error(`Error fetching translation services for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1006,7 +1019,7 @@ export class DataApiRequests {
 
       return translationServicesSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error saving translation services for court id ${courtId}:`, error);
+      logger.error(`Error saving translation services for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1019,7 +1032,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/types/v1/local-authorities');
       return localAuthorityTypeListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching local authority type details:', error);
+      logger.error('Error fetching local authority type details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1034,7 +1047,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/local-authorities`);
       return courtLocalAuthoritiesListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching local authority data for court id ${courtId}:`, error);
+      logger.error(`Error fetching local authority data for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1055,7 +1068,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error updating court local authority details:', error);
+      logger.error('Error updating court local authority details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1070,7 +1083,7 @@ export class DataApiRequests {
       const { data } = await dataApi.get(`/courts/${courtId}/v1/single-point-of-entry`);
       return courtSinglePointOfEntryListSchema.parse(data);
     } catch (error: unknown) {
-      logger.error(`Error fetching single point of entry data for court id ${courtId}:`, error);
+      logger.error(`Error fetching single point of entry data for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1090,7 +1103,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error('Error updating court single point of entry details:', error);
+      logger.error('Error updating court single point of entry details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1110,7 +1123,7 @@ export class DataApiRequests {
       }
       return courtProfessionalInformationSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching professional information data for court id ${courtId}:`, error);
+      logger.error(`Error fetching professional information data for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1131,7 +1144,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error saving professional information data for court id ${courtId}:`, error);
+      logger.error(`Error saving professional information data for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1146,7 +1159,7 @@ export class DataApiRequests {
       const response = await dataApi.post('/user/v1', user);
       return userSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error creating/updating user with SSO ID ${user.ssoId}:`, error);
+      logger.error('Error creating/updating user:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1161,7 +1174,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/user/v1', { params });
       return pagedUsersSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching users:', error);
+      logger.error('Error fetching users:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1181,7 +1194,7 @@ export class DataApiRequests {
 
       return BuildingFacilitiesSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching court facilities for court id ${courtId}:`, error);
+      logger.error(`Error fetching court facilities for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1200,7 +1213,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error update court facilities for id ${courtId}:`, error);
+      logger.error(`Error update court facilities for id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1218,7 +1231,7 @@ export class DataApiRequests {
 
       return AccessibilityScheme.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching accessibility options for court id ${courtId}:`, error);
+      logger.error(`Error fetching accessibility options for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1237,7 +1250,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error updating accessibility options for court id ${courtId}:`, error);
+      logger.error(`Error updating accessibility options for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1257,7 +1270,10 @@ export class DataApiRequests {
 
       return CounterServiceOpeningHoursListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching court counter service opening hours for court id ${courtId}:`, error);
+      logger.error(
+        `Error fetching court counter service opening hours for court id ${courtId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1273,7 +1289,10 @@ export class DataApiRequests {
       const response = await dataApi.get(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`);
       return CounterServiceOpeningHoursSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching counter service opening hour ${counterServiceId} for court id ${courtId}:`, error);
+      logger.error(
+        `Error fetching counter service opening hour ${counterServiceId} for court id ${courtId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1298,7 +1317,7 @@ export class DataApiRequests {
       if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
-      logger.error(`Error saving counter service opening hours for court id ${courtId}:`, error);
+      logger.error(`Error saving counter service opening hours for court id ${courtId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1313,7 +1332,10 @@ export class DataApiRequests {
       const response = await dataApi.delete(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`);
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
-      logger.error(`Error deleting counter service opening hours ${counterServiceId} for court id ${courtId}:`, error);
+      logger.error(
+        `Error deleting counter service opening hours ${counterServiceId} for court id ${courtId}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1328,7 +1350,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/audits/subjectoptions/v1');
       return auditSubjectOptionsSchema.parse(new Map(Object.entries(response.data)));
     } catch (error: unknown) {
-      logger.error('Error fetching audit subject names:', error);
+      logger.error('Error fetching audit subject names:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1341,7 +1363,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/audits/v1', { params });
       return pagedAuditsSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching audits:', error);
+      logger.error('Error fetching audits:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1354,7 +1376,7 @@ export class DataApiRequests {
       const response = await dataApi.get(`/audits/${auditId}/v1`);
       return auditListItemSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching audit details for id ${auditId}:`, error);
+      logger.error(`Error fetching audit details for id ${auditId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1367,7 +1389,7 @@ export class DataApiRequests {
       const response = await dataApi.get('/approvals/v1');
       return approvalStatusListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error('Error fetching approvals:', error);
+      logger.error('Error fetching approvals:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1380,7 +1402,7 @@ export class DataApiRequests {
       const response = await dataApi.post('/approvals/v1', approval);
       return response.status;
     } catch (error: unknown) {
-      logger.error('Error creating approval:', error);
+      logger.error('Error creating approval:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1393,7 +1415,7 @@ export class DataApiRequests {
       const response = await dataApi.delete(`/approvals/${approvalId}/v1`);
       return response.status;
     } catch (error: unknown) {
-      logger.error(`Error deleting approval for id ${approvalId}:`, error);
+      logger.error(`Error deleting approval for id ${approvalId}:`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1409,7 +1431,10 @@ export class DataApiRequests {
       }
       return lockSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching lock information for subject ${subject}, id ${subjectId} and page ${page}:`, error);
+      logger.error(
+        `Error fetching lock information for subject ${subject}, id ${subjectId} and page ${page}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1425,7 +1450,10 @@ export class DataApiRequests {
       }
       return lockListSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error fetching lock information for subject: ${subject}, with id: ${subjectId}`, error);
+      logger.error(
+        `Error fetching lock information for subject: ${subject}, with id: ${subjectId}`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1447,7 +1475,10 @@ export class DataApiRequests {
       });
       return lockSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(`Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`, error);
+      logger.error(
+        `Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`,
+        toSafeErrorDetails(error)
+      );
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1459,7 +1490,7 @@ export class DataApiRequests {
     try {
       return (await dataApi.delete(`/user/v1/${userId}/locks`)).status;
     } catch (error: unknown) {
-      logger.error(`Error acquiring removing locks for user with id: ${userId}`, error);
+      logger.error('Error removing locks for user:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1473,7 +1504,7 @@ export class DataApiRequests {
       const photo = courtPhotoSchema.parse(response.data);
       return photo.fileLink ?? undefined;
     } catch (error: unknown) {
-      logger.error(`Error fetching court photo data: ${courtId}`, error);
+      logger.error(`Error fetching court photo data: ${courtId}`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
@@ -1504,7 +1535,7 @@ export class DataApiRequests {
         return new Map(Object.entries(error.response.data) as [string, string][]);
       }
 
-      logger.error(`Error saving court photo data: ${courtId}`, error);
+      logger.error(`Error saving court photo data: ${courtId}`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1519,7 +1550,7 @@ export class DataApiRequests {
       const response = await dataApi.delete(`/courts/${courtId}/v1/photo`);
       return response.status;
     } catch (error: unknown) {
-      logger.error(`Error removing court photo data: ${courtId}`, error);
+      logger.error(`Error removing court photo data: ${courtId}`, toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
