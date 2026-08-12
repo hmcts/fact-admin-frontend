@@ -3,11 +3,11 @@ import * as express from 'express';
 import { auth } from 'express-openid-connect';
 
 import { FRONTEND_URL } from '../../envUrls';
-import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
+import type { UserApi as UserApiType } from '../../requests/UserApi';
 
 import { resolveFactUserRole } from './roleResolver';
 
-let dataApiRequests: DataApiRequestsType | undefined;
+let userApi: UserApiType | undefined;
 
 export class Authentication {
   public enableFor(app: express.Express): void {
@@ -49,7 +49,7 @@ export class Authentication {
 
           const role = resolveFactUserRole(user.roles);
 
-          const dataApi = await getDataApiRequests();
+          const dataApi = await getUserApi();
 
           session.factUser = await dataApi.createUpdateUser({
             email: user.preferred_username,
@@ -64,11 +64,13 @@ export class Authentication {
   }
 }
 
-async function getDataApiRequests(): Promise<DataApiRequestsType> {
-  if (!dataApiRequests) {
-    const { DataApiRequests } = await import('../../requests/DataApiRequests');
-    dataApiRequests = new DataApiRequests();
+async function getUserApi(): Promise<UserApiType> {
+  if (!userApi) {
+    const { UserApi } = await import('../../requests/UserApi');
+    userApi = new UserApi();
   }
 
-  return dataApiRequests;
+  return userApi;
 }
+
+

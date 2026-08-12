@@ -3,6 +3,7 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { UserApi } from '../../main/requests/UserApi';
 import { ApprovalService } from '../../main/services/ApprovalService';
 import { CounterServiceOpeningHoursService } from '../../main/services/CounterServiceOpeningHoursService';
 import { HomePageService } from '../../main/services/HomePageService';
@@ -220,7 +221,7 @@ describe('Authentication routing', () => {
     ['/favourites/SERVICE_CENTRE/22222222-2222-4222-8222-222222222222/remove', 'remove'],
   ])('allows Viewer favourite mutation %s', async (path, operation) => {
     const method = operation === 'add' ? 'addFavourite' : 'removeFavourite';
-    stub(DataApiRequests.prototype, method).resolves(operation === 'add' ? 201 : 204);
+    stub(UserApi.prototype, method).resolves(operation === 'add' ? 201 : 204);
 
     const response = await request(app)
       .post(path)
@@ -233,7 +234,7 @@ describe('Authentication routing', () => {
   });
 
   test.each(['Admin', 'SuperAdmin'])('allows %s users to mutate favourites', async role => {
-    stub(DataApiRequests.prototype, 'addFavourite').resolves(201);
+    stub(UserApi.prototype, 'addFavourite').resolves(201);
 
     const response = await request(app)
       .post('/favourites/COURT/11111111-1111-4111-8111-111111111111')

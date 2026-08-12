@@ -13,10 +13,12 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 }));
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { UserApi } from '../../../main/requests/UserApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
 
 const dataApiRequests = new DataApiRequests();
+const userApi = new UserApi();
 
 const errorResponse = {
   isAxiosError: true,
@@ -1291,7 +1293,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/user/v1', user).resolves({ data: userEntity });
 
-    const response = await dataApiRequests.createUpdateUser(user);
+    const response = await userApi.createUpdateUser(user);
 
     expect(response).toEqual(userEntity);
   });
@@ -1312,7 +1314,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/user/v1', user).resolves({ data: userEntity });
 
-    const response = await dataApiRequests.createUpdateUser(user);
+    const response = await userApi.createUpdateUser(user);
 
     expect(response).toEqual(userEntity);
     expect(postStub.calledWith('/user/v1', user)).toBe(true);
@@ -1335,7 +1337,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/user/v1', user).resolves({ data: legacyUserEntity });
 
-    const response = await dataApiRequests.createUpdateUser(user);
+    const response = await userApi.createUpdateUser(user);
 
     expect(response).toEqual({
       email: legacyUserEntity.email,
@@ -1359,7 +1361,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createUpdateUser(user);
+    const response = await userApi.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1373,7 +1375,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/user/v1', user).rejects(errorResponse);
 
-    const response = await dataApiRequests.createUpdateUser(user);
+    const response = await userApi.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.NotFound);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -1391,7 +1393,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/user/v1', user).rejects(errorMessage);
 
-    const response = await dataApiRequests.createUpdateUser(user);
+    const response = await userApi.createUpdateUser(user);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1460,7 +1462,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/user/v1', { params }).resolves({ data: users });
 
-    const response = await dataApiRequests.getUsers(params);
+    const response = await userApi.getUsers(params);
 
     expect(response).toEqual(users);
   });
@@ -1476,7 +1478,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getUsers();
+    const response = await userApi.getUsers();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1484,7 +1486,7 @@ describe('DataApiRequests', () => {
   it('returns the API status when users list fails with an axios response', async () => {
     getStub.withArgs('/user/v1', { params: {} }).rejects(errorResponse);
 
-    const response = await dataApiRequests.getUsers();
+    const response = await userApi.getUsers();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -3560,7 +3562,7 @@ describe('DataApiRequests', () => {
     };
     getStub.withArgs('/user/v1/favourites', { params }).resolves({ data: responseBody });
 
-    await expect(dataApiRequests.getFavourites(params)).resolves.toEqual(responseBody);
+    await expect(userApi.getFavourites(params)).resolves.toEqual(responseBody);
   });
 
   it('gets batched favourite statuses', async () => {
@@ -3573,7 +3575,7 @@ describe('DataApiRequests', () => {
     const responseBody = [{ ...subjects[0], favourite: true }];
     postStub.withArgs('/user/v1/favourites/status', { subjects }).resolves({ data: responseBody });
 
-    await expect(dataApiRequests.getFavouriteStatuses(subjects)).resolves.toEqual(responseBody);
+    await expect(userApi.getFavouriteStatuses(subjects)).resolves.toEqual(responseBody);
   });
 
   it('adds and removes a subject favourite', async () => {
@@ -3586,8 +3588,8 @@ describe('DataApiRequests', () => {
       .withArgs(`/user/v1/favourites/${favourite.subjectType}/${favourite.subjectId}`)
       .resolves({ status: HttpStatusCode.NoContent });
 
-    await expect(dataApiRequests.addFavourite(favourite)).resolves.toBe(HttpStatusCode.Created);
-    await expect(dataApiRequests.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NoContent);
+    await expect(userApi.addFavourite(favourite)).resolves.toBe(HttpStatusCode.Created);
+    await expect(userApi.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NoContent);
   });
 
   it('returns the upstream status when a favourite mutation fails', async () => {
@@ -3598,8 +3600,8 @@ describe('DataApiRequests', () => {
     postStub.withArgs('/user/v1/favourites', favourite).rejects(errorResponse);
     deleteStub.withArgs(`/user/v1/favourites/COURT/${favourite.subjectId}`).rejects(errorResponse);
 
-    await expect(dataApiRequests.addFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
-    await expect(dataApiRequests.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
+    await expect(userApi.addFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
+    await expect(userApi.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
   });
 
   it('returns parsed service centre details when service centre by id response is valid', async () => {
