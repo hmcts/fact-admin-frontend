@@ -14,11 +14,13 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { UserApi } from '../../../main/requests/UserApi';
+import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
 
 const dataApiRequests = new DataApiRequests();
 const userApi = new UserApi();
+const operationsApi = new OperationsApi();
 
 const errorResponse = {
   isAxiosError: true,
@@ -2907,7 +2909,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/audits/subjectoptions/v1').resolves({ data: responseBody });
 
-    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+    const response = await o.getAuditSubjectOptionsMap();
 
     expect(response).toEqual(
       new Map([
@@ -2924,7 +2926,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+    const response = await operationsApi.getAuditSubjectOptionsMap();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', expect.anything());
@@ -2941,7 +2943,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/audits/subjectoptions/v1').rejects(badGatewayError);
 
-    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+    const response = await operationsApi.getAuditSubjectOptionsMap();
 
     expect(response).toBe(HttpStatusCode.BadGateway);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -2954,7 +2956,7 @@ describe('DataApiRequests', () => {
     const nonAxiosError = new Error('Unexpected subject options error');
     getStub.withArgs('/audits/subjectoptions/v1').rejects(nonAxiosError);
 
-    const response = await dataApiRequests.getAuditSubjectOptionsMap();
+    const response = await operationsApi.getAuditSubjectOptionsMap();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audit subject names:', {
