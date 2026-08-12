@@ -1,6 +1,9 @@
-import process from 'process';
+import process from 'node:process';
 
-import { defaultClient, setup } from 'applicationinsights';
+import { useAzureMonitor } from '@azure/monitor-opentelemetry';
+import { Logger } from '@hmcts/nodejs-logging';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import config from 'config';
 
 export class AppInsights {
@@ -13,12 +16,20 @@ export class AppInsights {
     }
 
     if (appInsightsConnectionString) {
-      setup(appInsightsConnectionString).setSendLiveMetrics(true).start();
-
-      defaultClient.context.tags[defaultClient.context.keys.cloudRole] = 'fact-admin-frontend';
-      defaultClient.trackTrace({
-        message: 'App insights activated',
+      const customResource = resourceFromAttributes({
+        [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'fact-admin-frontend',
       });
+
+      const options = {
+        resource: customResource,
+        azureMonitorExporterOptions: {
+          connectionString: appInsightsConnectionString,
+        },
+      };
+
+      useAzureMonitor(options);
+
+      Logger.getLogger('app').info('App insights activated');
     }
   }
 }
