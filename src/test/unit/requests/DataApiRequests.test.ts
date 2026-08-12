@@ -2909,7 +2909,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/audits/subjectoptions/v1').resolves({ data: responseBody });
 
-    const response = await o.getAuditSubjectOptionsMap();
+    const response = await operationsApi.getAuditSubjectOptionsMap();
 
     expect(response).toEqual(
       new Map([
@@ -3006,7 +3006,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/audits/v1', { params }).resolves({ data: audits });
 
-    const response = await dataApiRequests.getAudits(params);
+    const response = await operationsApi.getAudits(params);
 
     expect(response).toEqual(audits);
   });
@@ -3030,7 +3030,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getAudits(params);
+    const response = await operationsApi.getAudits(params);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', expect.anything());
@@ -3052,7 +3052,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/audits/v1', { params }).rejects(serviceUnavailableError);
 
-    const response = await dataApiRequests.getAudits(params);
+    const response = await operationsApi.getAudits(params);
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -3071,7 +3071,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/audits/v1', { params }).rejects(nonAxiosError);
 
-    const response = await dataApiRequests.getAudits(params);
+    const response = await operationsApi.getAudits(params);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching audits:', {
@@ -3102,7 +3102,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/audits/${auditId}/v1`).resolves({ data: audit });
 
-    const response = await dataApiRequests.getAuditById(auditId);
+    const response = await operationsApi.getAuditById(auditId);
 
     expect(response).toEqual(audit);
   });
@@ -3116,7 +3116,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getAuditById(auditId);
+    const response = await operationsApi.getAuditById(auditId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -3137,7 +3137,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/audits/${auditId}/v1`).rejects(notFoundError);
 
-    const response = await dataApiRequests.getAuditById(auditId);
+    const response = await operationsApi.getAuditById(auditId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -3152,7 +3152,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/audits/${auditId}/v1`).rejects(nonAxiosError);
 
-    const response = await dataApiRequests.getAuditById(auditId);
+    const response = await operationsApi.getAuditById(auditId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(`Error fetching audit details for id ${auditId}:`, {

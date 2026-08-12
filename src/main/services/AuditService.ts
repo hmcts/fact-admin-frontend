@@ -7,7 +7,6 @@ import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode } from 'axios';
 import moment from 'moment';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
 import { OperationsApi } from '../requests/OperationsApi';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
