@@ -4,8 +4,5 @@
       "API_APP_REG_ID": "API_APP_REG_ID",
       "SESSION_SECRET": "SESSION_SECRET"
     }
-  },
-  "auth": {
-    "azure-identity-token": "AZURE_FEDERATED_TOKEN_FILE"
   }
 }

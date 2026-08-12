@@ -1,5 +1,4 @@
-import { ChainedTokenCredential, EnvironmentCredential, WorkloadIdentityCredential } from '@azure/identity';
-import { Logger } from '@hmcts/nodejs-logging';
+import { EnvironmentCredential } from '@azure/identity';
 import { Mutex } from 'async-mutex';
 import { InternalAxiosRequestConfig, create } from 'axios';
 import config from 'config';
@@ -12,11 +11,7 @@ const OPEN_URLS = new Set<string>(['/health']);
 const USER_ID_HEADER = 'X-User-Id';
 const USER_ID_EXCLUDED_ENDPOINTS = new Set<string>(['POST /user/v1']);
 
-const clientAppRegId: string = config.get('secrets.fact-kv.FRONTEND_APP_REG_ID');
 const apiAppRegId: string = config.get('secrets.fact-kv.API_APP_REG_ID');
-const federatedTokenPath: string = config.get('auth.azure-identity-token-path');
-
-const logger = Logger.getLogger('server');
 
 export const dataApiUrl = process.env.DATA_API_URL || 'http://localhost:8989';
 
@@ -33,13 +28,7 @@ export { runWithDataApiUserId };
 function getToken(): Promise<string> {
   return tokenMutex.runExclusive(async () => {
     if (!cachedToken || Date.now() > cachedTokenRefreshTS) {
-      const cred = new ChainedTokenCredential(
-        new WorkloadIdentityCredential({
-          clientId: clientAppRegId,
-          tokenFilePath: federatedTokenPath,
-        }),
-        new EnvironmentCredential()
-      );
+      const cred = new EnvironmentCredential();
 
       const at = await cred.getToken(`api://${apiAppRegId}/.default`);
 
@@ -52,8 +41,6 @@ function getToken(): Promise<string> {
         cachedTokenRefreshTS = Date.now() + lifeSpan / 2;
       }
       cachedToken = at.token;
-
-      logger.info('Bearer token created or refreshed');
     }
     return cachedToken;
   });
