@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { OperationsApi } from '../requests/OperationsApi';
 import { ApprovalStatus, ApprovalSubjectType } from '../schemas/approvalSchema';
 import { toUkDateTimeString } from '../utils/valueParsers';
 
@@ -47,12 +48,13 @@ export type ApproveDataViewModel = {
 };
 
 export class ApprovalService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+                     private readonly operationsApi = new OperationsApiRequests()) {}
 
   public async getApprovalsTracker(
     filters: ApprovalTrackerFilters = {}
   ): Promise<ApprovalTrackerViewModel | HttpStatusCode> {
-    const approvalsResponse = await this.dataApiRequests.getApprovals();
+    const approvalsResponse = await this.operationsApi.getApprovals();
 
     if (typeof approvalsResponse === 'number') {
       return approvalsResponse;
@@ -102,7 +104,7 @@ export class ApprovalService {
       return undoApproval;
     }
 
-    const deleteStatus = await this.dataApiRequests.deleteApproval(approvalId);
+    const deleteStatus = await this.operationsApi.deleteApproval(approvalId);
 
     return deleteStatus >= HttpStatusCode.Ok && deleteStatus < HttpStatusCode.MultipleChoices
       ? undoApproval
@@ -172,7 +174,7 @@ export class ApprovalService {
       return approveData;
     }
 
-    const approvalStatus = await this.dataApiRequests.createApproval({
+    const approvalStatus = await this.operationsApi.createApproval({
       subjectId,
       subjectType,
       userId,
@@ -184,7 +186,7 @@ export class ApprovalService {
   }
 
   private async findApprovedApproval(approvalId: string): Promise<ApprovalStatus | HttpStatusCode> {
-    const approvalsResponse = await this.dataApiRequests.getApprovals();
+    const approvalsResponse = await this.operationsApi.getApprovals();
 
     if (typeof approvalsResponse === 'number') {
       return approvalsResponse;
@@ -200,7 +202,7 @@ export class ApprovalService {
     subjectId: string,
     subjectType: ApprovalSubjectType
   ): Promise<ApprovalStatus | HttpStatusCode> {
-    const approvalsResponse = await this.dataApiRequests.getApprovals();
+    const approvalsResponse = await this.operationsApi.getApprovals();
 
     if (typeof approvalsResponse === 'number') {
       return approvalsResponse;
