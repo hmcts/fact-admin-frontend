@@ -43,7 +43,7 @@
     classes: "app-service-navigation",
     serviceName: "Find a Court or Tribunal Admin",
     serviceUrl: "/",
-    navigation: [
+    navigation: [] if serviceUnavailable else [
       {
         href: "/",
         text: "Locations",
