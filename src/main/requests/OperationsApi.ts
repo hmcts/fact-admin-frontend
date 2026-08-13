@@ -17,7 +17,6 @@ import { GetAuditsParams } from './types/GetAuditsParams';
 import { dataApi } from './utils/axiosConfig';
 import { toSafeErrorDetails } from './utils/safeErrorDetails';
 
-
 const logger = Logger.getLogger('app');
 
 export class OperationsApi {

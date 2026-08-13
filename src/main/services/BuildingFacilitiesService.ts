@@ -8,22 +8,22 @@ import { validateBooleanField } from '../utils/validation';
 export type FacilityModel = Partial<BuildingFacilities> & { errors?: Record<string, string[]> } & { name?: string };
 
 export class BuildingFacilitiesService {
-  public constructor(private readonly dataApiRequests = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<Partial<FacilityModel> | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
-    const courtFacility = await this.dataApiRequests.getBuildingFacilities(courtId);
+    const courtFacility = await this.courtApi.getBuildingFacilities(courtId);
     if (typeof courtFacility === 'number') {
       return courtFacility;
     }
     return { ...courtFacility, name: courtResponse.name };
   }
   public async save(courtId: string, model: FacilityModel): Promise<FacilityModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
@@ -36,7 +36,7 @@ export class BuildingFacilitiesService {
 
     // persist to the API
 
-    const result = await this.dataApiRequests.updateBuildingFacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
+    const result = await this.courtApi.updateBuildingFacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
     if (typeof result === 'number') {
       return result;
     }

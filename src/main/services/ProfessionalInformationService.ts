@@ -114,15 +114,15 @@ const interviewRoomCountError = 'Enter a number of interview rooms between 1 and
 const dxValidationError = 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class ProfessionalInformationService {
-  public constructor(private readonly dataApiRequests = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async getViewModel(courtId: string): Promise<ProfessionalInformationViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
-    const professionalInformationResponse = await this.dataApiRequests.getCourtProfessionalInformation(courtId);
+    const professionalInformationResponse = await this.courtApi.getCourtProfessionalInformation(courtId);
     if (typeof professionalInformationResponse === 'number') {
       if (professionalInformationResponse !== HttpStatusCode.NotFound) {
         return professionalInformationResponse;
@@ -134,7 +134,7 @@ export class ProfessionalInformationService {
   }
 
   public async save(courtId: string, form: ProfessionalInformationForm): Promise<SaveProfessionalInformationResult> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
@@ -148,10 +148,7 @@ export class ProfessionalInformationService {
       };
     }
 
-    const saveResponse = await this.dataApiRequests.saveCourtProfessionalInformation(
-      courtId,
-      this.toPayload(viewModel)
-    );
+    const saveResponse = await this.courtApi.saveCourtProfessionalInformation(courtId, this.toPayload(viewModel));
 
     if (typeof saveResponse === 'number') {
       return saveResponse;
@@ -174,12 +171,12 @@ export class ProfessionalInformationService {
     courtId: string,
     form: ProfessionalInformationForm
   ): Promise<FamilyCourtRemovalConfirmation | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
-    const professionalInformationResponse = await this.dataApiRequests.getCourtProfessionalInformation(courtId);
+    const professionalInformationResponse = await this.courtApi.getCourtProfessionalInformation(courtId);
     if (typeof professionalInformationResponse === 'number') {
       if (professionalInformationResponse !== HttpStatusCode.NotFound) {
         return professionalInformationResponse;
@@ -199,7 +196,7 @@ export class ProfessionalInformationService {
       };
     }
 
-    const localAuthoritiesResponse = await this.dataApiRequests.getCourtLocalAuthorities(courtId);
+    const localAuthoritiesResponse = await this.courtApi.getCourtLocalAuthorities(courtId);
     if (typeof localAuthoritiesResponse === 'number') {
       if (localAuthoritiesResponse !== HttpStatusCode.NotFound) {
         return localAuthoritiesResponse;

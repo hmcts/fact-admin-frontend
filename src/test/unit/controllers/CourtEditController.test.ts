@@ -92,9 +92,7 @@ describe('CourtEditController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');

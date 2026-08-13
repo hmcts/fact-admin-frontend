@@ -10,10 +10,10 @@ export type CourtPhotoViewModel = {
 };
 
 export class CourtPhotoService {
-  public constructor(private readonly dataApiRequests = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<CourtPhotoViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
@@ -21,12 +21,12 @@ export class CourtPhotoService {
   }
 
   public async upload(courtId: string, file: Buffer, mimeType: string): Promise<CourtPhotoViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
-    const uploadResponse = await this.dataApiRequests.updateCourtPhoto(courtId, file, mimeType);
+    const uploadResponse = await this.courtApi.updateCourtPhoto(courtId, file, mimeType);
     if (typeof uploadResponse === 'number') {
       return uploadResponse;
     }
@@ -53,11 +53,11 @@ export class CourtPhotoService {
   }
 
   public async delete(courtId: string): Promise<HttpStatusCode> {
-    return this.dataApiRequests.deleteCourtPhoto(courtId);
+    return this.courtApi.deleteCourtPhoto(courtId);
   }
 
   public async retrieveCourtName(courtId: string): Promise<string | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
@@ -68,7 +68,7 @@ export class CourtPhotoService {
     court: CourtEntity,
     errors?: Record<string, string[]>
   ): Promise<CourtPhotoViewModel | HttpStatusCode> {
-    let fileLink = await this.dataApiRequests.getCourtPhotoFileLink(court.id);
+    let fileLink = await this.courtApi.getCourtPhotoFileLink(court.id);
     if (typeof fileLink === 'number') {
       if (fileLink === HttpStatusCode.NotFound) {
         fileLink = undefined;

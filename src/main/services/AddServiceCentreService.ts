@@ -40,8 +40,10 @@ type AddServiceCentreResult = AddServiceCentrePageModel | AddServiceCentreSucces
 const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 
 export class AddServiceCentreService {
-  public constructor(private readonly dataApiRequests = new CourtApi(),
-                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi()
+  ) {}
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {
     const modelData = await this.getModelData();
@@ -152,7 +154,7 @@ export class AddServiceCentreService {
   private async checkDuplicateLocationName(
     name: string
   ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
+    const duplicateCourt = await this.courtApi.getCourtByName(name);
     if (typeof duplicateCourt !== 'number') {
       return { name: duplicateCourt.name, type: 'court' };
     }
@@ -181,12 +183,12 @@ export class AddServiceCentreService {
   }
 
   private async getModelData(): Promise<{ regions: Region[]; serviceAreas: ServiceArea[] } | HttpStatusCode> {
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.courtApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
 
-    const serviceAreas = await this.dataApiRequests.getServiceAreas();
+    const serviceAreas = await this.courtApi.getServiceAreas();
     if (typeof serviceAreas === 'number') {
       return serviceAreas;
     }

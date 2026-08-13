@@ -108,9 +108,7 @@ describe('Cases heard page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(
-      HttpStatusCode.Ok
-    );
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success')

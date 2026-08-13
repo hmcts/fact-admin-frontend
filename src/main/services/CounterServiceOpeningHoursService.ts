@@ -83,16 +83,16 @@ const days: Day[] = [
 const EMAIL_PATTERN = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 export class CounterServiceOpeningHoursService {
-  public constructor(private readonly dataApiRequests = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async getListPage(courtId: string): Promise<CounterServiceListViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
-    const counterServiceResponse = await this.dataApiRequests.getCounterServiceOpeningHours(courtId);
+    const counterServiceResponse = await this.courtApi.getCounterServiceOpeningHours(courtId);
 
     if (this.isHttpStatusCode(counterServiceResponse)) {
       return this.isNoOpeningHoursResponse(counterServiceResponse)
@@ -170,7 +170,7 @@ export class CounterServiceOpeningHoursService {
       openingTimesDetails: this.toOpeningTimesDetails(form),
     };
 
-    const saveResponse = await this.dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+    const saveResponse = await this.courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
     if (this.isSuccessfulStatus(saveResponse)) {
       return {
@@ -205,16 +205,13 @@ export class CounterServiceOpeningHoursService {
     courtId: string,
     counterServiceId: string
   ): Promise<CounterServiceDeleteViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
-    const counterServiceResponse = await this.dataApiRequests.getCounterServiceOpeningHoursById(
-      courtId,
-      counterServiceId
-    );
+    const counterServiceResponse = await this.courtApi.getCounterServiceOpeningHoursById(courtId, counterServiceId);
     if (this.isHttpStatusCode(counterServiceResponse)) {
       return counterServiceResponse;
     }
@@ -239,7 +236,7 @@ export class CounterServiceOpeningHoursService {
       return deleteViewModel;
     }
 
-    const deleteResponse = await this.dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+    const deleteResponse = await this.courtApi.deleteCounterServiceOpeningHours(courtId, counterServiceId);
 
     if (deleteResponse < HttpStatusCode.Ok || deleteResponse >= HttpStatusCode.MultipleChoices) {
       return deleteResponse;
@@ -265,7 +262,7 @@ export class CounterServiceOpeningHoursService {
     counterServiceId?: string,
     postedForm?: CounterServiceOpeningHoursForm
   ): Promise<CounterServiceEditViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
@@ -273,10 +270,7 @@ export class CounterServiceOpeningHoursService {
 
     let existingRecord: CounterServiceOpeningHours | undefined;
     if (counterServiceId) {
-      const counterServiceResponse = await this.dataApiRequests.getCounterServiceOpeningHoursById(
-        courtId,
-        counterServiceId
-      );
+      const counterServiceResponse = await this.courtApi.getCounterServiceOpeningHoursById(courtId, counterServiceId);
       if (this.isHttpStatusCode(counterServiceResponse)) {
         return counterServiceResponse;
       }

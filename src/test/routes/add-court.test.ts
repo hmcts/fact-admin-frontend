@@ -54,9 +54,7 @@ describe('Add court page', () => {
       slug: 'reading-crown-court',
       warningNotice: null,
     };
-    stub(CourtApi.prototype, 'getRegions').resolves([
-      { country: 'england', id: court.regionId, name: 'South East' },
-    ]);
+    stub(CourtApi.prototype, 'getRegions').resolves([{ country: 'england', id: court.regionId, name: 'South East' }]);
     stub(CourtApi.prototype, 'getCourtByName').resolves(404);
     stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(404);
     const createCourtStub = stub(CourtApi.prototype, 'createCourt').resolves(court);

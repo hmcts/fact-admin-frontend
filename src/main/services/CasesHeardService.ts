@@ -34,7 +34,7 @@ export type SaveCasesHeardResult =
  * Builds and validates the cases-heard page state independently of HTTP concerns.
  */
 export class CasesHeardService {
-  public constructor(private readonly dataApiRequests = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   /**
    * Normalises the incoming checkbox values into a string array.
@@ -62,7 +62,7 @@ export class CasesHeardService {
     selectedAreasOfLaw?: string[],
     areasOfLawError?: string
   ): Promise<CasesHeardViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
@@ -75,7 +75,7 @@ export class CasesHeardService {
    * Validates and saves the cases-heard selection for a court.
    */
   public async saveCasesHeard(courtId: string, selectedAreasOfLaw: string[]): Promise<SaveCasesHeardResult> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return { status: courtResponse, type: 'status' };
@@ -96,7 +96,7 @@ export class CasesHeardService {
         : { type: 'validation_error', viewModel };
     }
 
-    const updateResponse = await this.dataApiRequests.updateCourtAreasOfLaw({
+    const updateResponse = await this.courtApi.updateCourtAreasOfLaw({
       areasOfLaw: selectedAreasOfLaw,
       courtId,
     });
@@ -121,7 +121,7 @@ export class CasesHeardService {
     selectedAreasOfLaw?: string[],
     areasOfLawError?: string
   ): Promise<CasesHeardViewModel | HttpStatusCode> {
-    const courtAreasOfLawResponse = await this.dataApiRequests.getCourtAreasOfLaw(courtId);
+    const courtAreasOfLawResponse = await this.courtApi.getCourtAreasOfLaw(courtId);
 
     if (this.isHttpStatusCode(courtAreasOfLawResponse)) {
       return courtAreasOfLawResponse;

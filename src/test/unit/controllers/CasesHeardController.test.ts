@@ -134,9 +134,7 @@ describe('CasesHeardController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
     const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
@@ -225,9 +223,7 @@ describe('CasesHeardController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(
-      HttpStatusCode.Ok
-    );
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
     responseMock
       .expects('render')
@@ -319,9 +315,7 @@ describe('CasesHeardController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(
-      HttpStatusCode.Ok
-    );
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
     responseMock
       .expects('render')

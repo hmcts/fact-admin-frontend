@@ -138,9 +138,7 @@ describe('TranslationAndInterpretationController', () => {
     const request = mockRequest({});
     request.params = { courtId };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');

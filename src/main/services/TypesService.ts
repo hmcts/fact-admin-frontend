@@ -6,24 +6,24 @@ import { CourtType } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType } from '../schemas/localAuthorityTypeSchema';
 import { OpeningHourType } from '../schemas/openingHoursSchema';
 
-const dataApiRequests = new CourtApi();
+const courtApi = new CourtApi();
 
 // TODO: decide if we need this. it's currently just wrapping calls the the data api, which is only useful
 //       if these things are needed outside of the service package.
 export class TypesService {
   public async listAreasOfLaw(): Promise<AreaOfLawType[] | HttpStatusCode> {
-    return dataApiRequests.getAreasOfLaw();
+    return courtApi.getAreasOfLaw();
   }
 
   public async listCourtTypes(): Promise<CourtType[] | HttpStatusCode> {
-    return dataApiRequests.getCourtTypes();
+    return courtApi.getCourtTypes();
   }
 
   public async listOpeningHourTypes(): Promise<OpeningHourType[] | HttpStatusCode> {
-    return dataApiRequests.getOpeningHourTypes();
+    return courtApi.getOpeningHourTypes();
   }
 
   public async listLocalAuthorities(): Promise<LocalAuthorityType[] | HttpStatusCode> {
-    return dataApiRequests.getLocalAuthorities();
+    return courtApi.getLocalAuthorities();
   }
 }

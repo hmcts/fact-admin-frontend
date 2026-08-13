@@ -55,13 +55,13 @@ export type CsvDownload = {
  * Loads all locations from the data API and maps them into a downloadable CSV export.
  */
 export class DownloadCsvService {
-  public constructor(private readonly dataApiRequests = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   /**
    * Returns the generated CSV and filename, or the upstream HTTP status code on failure.
    */
   public async getDownloadCsv(now = new Date()): Promise<CsvDownload | HttpStatusCode> {
-    const locationsResponse = await this.dataApiRequests.getAllLocations();
+    const locationsResponse = await this.courtApi.getAllLocations();
 
     if (!Array.isArray(locationsResponse)) {
       return locationsResponse;

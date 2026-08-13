@@ -30,14 +30,16 @@ type AddCourtResult =
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class AddCourtService {
-  public constructor(private readonly dataApiRequests = new CourtApi(),
-                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi()
+  ) {}
 
   /**
    * Builds the empty add-court page model, including regions for the mandatory dropdown.
    */
   public async getViewModel(form: AddCourtForm = {}): Promise<AddCourtPageModel | HttpStatusCode> {
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.courtApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -97,7 +99,7 @@ export class AddCourtService {
       return this.getViewModelWithErrors(trimmedForm, validationErrors);
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.courtApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -116,7 +118,7 @@ export class AddCourtService {
       });
     }
 
-    const createResponse = await this.dataApiRequests.createCourt({
+    const createResponse = await this.courtApi.createCourt({
       name,
       open: false,
       regionId,
@@ -149,7 +151,7 @@ export class AddCourtService {
   private async checkDuplicateLocationName(
     name: string
   ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
+    const duplicateCourt = await this.courtApi.getCourtByName(name);
     if (typeof duplicateCourt !== 'number') {
       return { name: duplicateCourt.name, type: 'court' };
     }
@@ -172,7 +174,7 @@ export class AddCourtService {
     form: AddCourtForm,
     errors: Record<string, string[]>
   ): Promise<AddCourtPageModel | HttpStatusCode> {
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.courtApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }

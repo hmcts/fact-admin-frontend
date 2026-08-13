@@ -16,7 +16,7 @@ import { HomePageFilters, HomePageViewModel } from './types/HomePage.types';
  */
 export class HomePageService {
   public constructor(
-    private readonly dataApiRequests = new CourtApi(),
+    private readonly courtApi = new CourtApi(),
     private readonly userApi = new UserApi(),
     private readonly homePageFiltersService = new HomePageFiltersService(),
     private readonly homePageViewService = new HomePageViewService()
@@ -28,14 +28,14 @@ export class HomePageService {
   public async getHomePageViewModel(filters: HomePageFilters, isReviewMode = false): Promise<HomePageViewModel> {
     const requestedFavouritesPage = filters.favouritesPageNumber ?? 0;
     const [regionsResponse, initialFavouritesResponse] = await Promise.all([
-      this.dataApiRequests.getRegions(),
+      this.courtApi.getRegions(),
       this.userApi.getFavourites({ pageNumber: requestedFavouritesPage, pageSize: 25 }),
     ]);
     const regions = Array.isArray(regionsResponse) ? regionsResponse : [];
     const validationErrors = this.homePageFiltersService.validateFilters(filters, regions);
     const courtsResponse =
       validationErrors.length === 0
-        ? await this.dataApiRequests.getCourts(this.homePageFiltersService.toGetCourtsParams(filters))
+        ? await this.courtApi.getCourts(this.homePageFiltersService.toGetCourtsParams(filters))
         : HttpStatusCode.BadRequest;
 
     const courtsPage = this.isPagedCourts(courtsResponse) ? courtsResponse : this.emptyCourtsPage(filters);

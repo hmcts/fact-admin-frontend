@@ -122,9 +122,7 @@ describe('CourtAddressService', () => {
   });
 
   test('returns status code when postcode search API returns an http status', async () => {
-    jest
-      .spyOn(CourtApi.prototype, 'getAddressesForPostcode')
-      .mockResolvedValue(HttpStatusCode.InternalServerError);
+    jest.spyOn(CourtApi.prototype, 'getAddressesForPostcode').mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new CourtAddressService();
     const result = await service.retrieveAddressOptions('SW1A 1AA');
@@ -173,9 +171,7 @@ describe('CourtAddressService', () => {
   });
 
   test('returns status code when loading existing addresses fails during save', async () => {
-    jest
-      .spyOn(CourtApi.prototype, 'getCourtAddressDetails')
-      .mockResolvedValue(HttpStatusCode.InternalServerError);
+    jest.spyOn(CourtApi.prototype, 'getCourtAddressDetails').mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new CourtAddressService();
     const result = await service.save(buildAddress(), courtId, false, false);
@@ -195,9 +191,7 @@ describe('CourtAddressService', () => {
   });
 
   test('returns optional field validation errors before saving', async () => {
-    const getCourtAddressDetails = jest
-      .spyOn(CourtApi.prototype, 'getCourtAddressDetails')
-      .mockResolvedValue([]);
+    const getCourtAddressDetails = jest.spyOn(CourtApi.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
     const saveCourtAddress = jest.spyOn(CourtApi.prototype, 'saveCourtAddress');
 
     const service = new CourtAddressService();
@@ -299,9 +293,7 @@ describe('CourtAddressService', () => {
     jest.spyOn(CourtApi.prototype, 'getCourtAddressDetails').mockResolvedValue([]);
     const court = buildCourt();
     jest.spyOn(CourtApi.prototype, 'getCourtById').mockResolvedValue(court);
-    const saveCourtAddress = jest
-      .spyOn(CourtApi.prototype, 'saveCourtAddress')
-      .mockResolvedValue(createdAddress);
+    const saveCourtAddress = jest.spyOn(CourtApi.prototype, 'saveCourtAddress').mockResolvedValue(createdAddress);
     const updateCourtAddress = jest.spyOn(CourtApi.prototype, 'updateCourtAddress');
     const openedCourt = { ...court, open: true };
     const updateCourt = jest.spyOn(CourtApi.prototype, 'updateCourt').mockResolvedValue(openedCourt);
@@ -390,9 +382,7 @@ describe('CourtAddressService', () => {
     const updatedAddress = buildAddress({ addressLine1: '2 High Street' });
     jest.spyOn(CourtApi.prototype, 'getCourtAddressDetails').mockResolvedValue([existingAddress]);
     jest.spyOn(CourtApi.prototype, 'getCourtById').mockResolvedValue(buildCourt());
-    const updateCourtAddress = jest
-      .spyOn(CourtApi.prototype, 'updateCourtAddress')
-      .mockResolvedValue(updatedAddress);
+    const updateCourtAddress = jest.spyOn(CourtApi.prototype, 'updateCourtAddress').mockResolvedValue(updatedAddress);
     const saveCourtAddress = jest.spyOn(CourtApi.prototype, 'saveCourtAddress');
     const updateCourt = jest.spyOn(CourtApi.prototype, 'updateCourt');
 

@@ -42,8 +42,10 @@ export type ServiceCentreGeneralSaveResult =
     };
 
 export class ServiceCentreGeneralService {
-  public constructor(private readonly dataApiRequests = new CourtApi(),
-                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi()
+  ) {}
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreGeneralViewModel | HttpStatusCode> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
@@ -51,12 +53,12 @@ export class ServiceCentreGeneralService {
       return serviceCentreResponse;
     }
 
-    const serviceAreasResponse = await this.dataApiRequests.getServiceAreas();
+    const serviceAreasResponse = await this.courtApi.getServiceAreas();
     if (typeof serviceAreasResponse === 'number') {
       return serviceAreasResponse;
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.courtApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -76,12 +78,12 @@ export class ServiceCentreGeneralService {
       return { status: existingServiceCentre, type: 'status' };
     }
 
-    const serviceAreasResponse = await this.dataApiRequests.getServiceAreas();
+    const serviceAreasResponse = await this.courtApi.getServiceAreas();
     if (typeof serviceAreasResponse === 'number') {
       return { status: serviceAreasResponse, type: 'status' };
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.courtApi.getRegions();
     if (typeof regions === 'number') {
       return { status: regions, type: 'status' };
     }
@@ -158,7 +160,7 @@ export class ServiceCentreGeneralService {
     name: string,
     serviceCentreId: string
   ): Promise<{ name: string; type: 'court' | 'service centre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
+    const duplicateCourt = await this.courtApi.getCourtByName(name);
     if (typeof duplicateCourt !== 'number') {
       return { name: duplicateCourt.name, type: 'court' };
     }

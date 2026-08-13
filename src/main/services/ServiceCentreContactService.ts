@@ -88,8 +88,10 @@ const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
-  public constructor(private readonly dataApiRequests = new CourtApi(),
-                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi()
+  ) {}
 
   public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
     return this.serviceCentreApi.getServiceCentreById(serviceCentreId);
@@ -105,7 +107,7 @@ export class ServiceCentreContactService {
   > {
     const [contactDetailsResponse, contactDescriptionTypesResponse] = await Promise.all([
       this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId),
-      this.dataApiRequests.getContactDescriptionTypes(),
+      this.courtApi.getContactDescriptionTypes(),
     ]);
 
     if (typeof contactDetailsResponse === 'number') {
@@ -146,7 +148,7 @@ export class ServiceCentreContactService {
   public async getContactDescriptionTypeItems(
     selectedId?: string
   ): Promise<ServiceCentreContactDescriptionTypeItem[] | HttpStatusCode> {
-    const contactDescriptionTypesResponse = await this.dataApiRequests.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await this.courtApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return contactDescriptionTypesResponse;
     }
@@ -258,7 +260,7 @@ export class ServiceCentreContactService {
   }
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await this.dataApiRequests.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await this.courtApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return 'Contact details';
     }

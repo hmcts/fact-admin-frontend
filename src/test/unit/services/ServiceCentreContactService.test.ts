@@ -51,9 +51,7 @@ describe('ServiceCentreContactService', () => {
 
   test('listContactDetails returns status when contact details request fails', async () => {
     jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreContactDetails').mockResolvedValue(HttpStatusCode.NotFound);
-    jest
-      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
-      .mockResolvedValue(HttpStatusCode.InternalServerError);
+    jest.spyOn(CourtApi.prototype, 'getContactDescriptionTypes').mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new ServiceCentreContactService();
     const result = await service.listContactDetails(serviceCentreId);

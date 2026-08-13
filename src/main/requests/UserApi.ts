@@ -20,7 +20,6 @@ import { toSafeErrorDetails } from './utils/safeErrorDetails';
 const logger = Logger.getLogger('app');
 
 export class UserApi {
-
   /**
    * Gets the current user's paginated favourite courts and service centres.
    */

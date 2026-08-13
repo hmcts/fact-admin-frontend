@@ -43,8 +43,10 @@ export type RetrieveAddressOptionsResponse =
   | HttpStatusCode;
 
 export class ServiceCentreAddressService {
-  public constructor(private readonly dataApiRequests = new CourtApi(),
-                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi()
+  ) {}
 
   public async list(serviceCentreId: string): Promise<ServiceCentreAddress[] | HttpStatusCode> {
     return this.serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
@@ -64,7 +66,7 @@ export class ServiceCentreAddressService {
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await this.dataApiRequests.getAddressesForPostcode(postcode);
+    const result = await this.courtApi.getAddressesForPostcode(postcode);
     if (typeof result === 'number') {
       return result;
     }

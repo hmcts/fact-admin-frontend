@@ -156,9 +156,7 @@ describe('CourtContactController', () => {
     const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves(
       HttpStatusCode.InternalServerError
     );
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves(
-      [] as never
-    );
+    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([] as never);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -302,9 +300,7 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');

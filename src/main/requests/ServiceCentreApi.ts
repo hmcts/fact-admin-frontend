@@ -1,10 +1,7 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
-import {
-  CourtAreaOfLawSelection,
-  parseCourtAreasOfLawResponse,
-} from '../schemas/areaOfLawSchema';
+import { CourtAreaOfLawSelection, parseCourtAreasOfLawResponse } from '../schemas/areaOfLawSchema';
 import {
   ServiceCentreAddress,
   serviceCentreAddressListSchema,

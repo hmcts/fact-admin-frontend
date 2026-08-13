@@ -72,5 +72,3 @@ async function getUserApi(): Promise<UserApiType> {
 
   return userApi;
 }
-
-
