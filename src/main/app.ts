@@ -114,6 +114,11 @@ app.use((req, res, next) => {
     res.locals.isSuperAdmin = isSuperAdmin(req);
     res.locals.isViewer = isViewer(req);
 
+    if (isMaintenanceModeEnabled() && !isSuperAdmin(req)) {
+      res.locals.serviceUnavailable = true;
+      return res.render('service-unavailable');
+    }
+
     if (isViewer(req)) {
       return isViewerRoute(req) ? next() : denyAccess(req, res);
     }
@@ -164,6 +169,10 @@ function isViewerRoute(req: express.Request): boolean {
   }
 
   return req.method === 'POST' && (viewerApprovalRoute.test(req.path) || viewerFavouriteRoute.test(req.path));
+}
+
+function isMaintenanceModeEnabled(): boolean {
+  return process.env.MAINTENANCE_MODE?.trim().toLowerCase() === 'true';
 }
 
 function denyAccess(req: express.Request, res: express.Response): void {

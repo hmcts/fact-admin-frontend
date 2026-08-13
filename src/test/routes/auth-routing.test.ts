@@ -26,9 +26,16 @@ const emptyUsersFilters = {
 describe('Authentication routing', () => {
   beforeEach(() => {
     restore();
+    delete process.env.MAINTENANCE_MODE;
   });
 
-  test('keeps health routes public', async () => {
+  afterAll(() => {
+    delete process.env.MAINTENANCE_MODE;
+  });
+
+  test('keeps health routes public during maintenance', async () => {
+    process.env.MAINTENANCE_MODE = 'true';
+
     const response = await request(app).get('/health/liveness').set('x-test-unauthenticated', 'true');
 
     expect(response.status).toBe(200);
@@ -36,10 +43,42 @@ describe('Authentication routing', () => {
   });
 
   test('redirects unauthenticated users from protected routes', async () => {
+    process.env.MAINTENANCE_MODE = 'true';
+
     const response = await request(app).get('/users').set('x-test-unauthenticated', 'true');
 
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe('/sso/login');
+  });
+
+  test.each([
+    ['Admin', '/'],
+    ['Viewer', '/courts/11111111-1111-4111-8111-111111111111/edit/general'],
+  ])('shows the service unavailable page to %s users for %s during maintenance', async (role, path) => {
+    process.env.MAINTENANCE_MODE = 'true';
+
+    const response = await request(app).get(path).set('x-test-role', role);
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('<h1 class="govuk-heading-xl">Service unavailable</h1>');
+    expect(response.text).toContain(
+      'The service is currently unavailable while updates are taking place. It will be available again soon.'
+    );
+    expect(response.text).not.toContain('Download csv');
+  });
+
+  test('allows admin users to access the application when maintenance mode is false', async () => {
+    process.env.MAINTENANCE_MODE = 'false';
+    stub(ApprovalService.prototype, 'getApprovalsTracker').resolves({
+      approvals: [],
+      nameFilter: '',
+      pageTitle: 'Approvals tracker',
+      statusFilter: '',
+    });
+
+    const response = await request(app).get('/approvals').set('x-test-role', 'Admin');
+
+    expect(response.status).toBe(200);
   });
 
   test('denies admin users access to super admin routes', async () => {
@@ -50,6 +89,7 @@ describe('Authentication routing', () => {
   });
 
   test('allows super admin users to access super admin routes', async () => {
+    process.env.MAINTENANCE_MODE = 'true';
     stub(UsersPageService.prototype, 'getFilters').returns(emptyUsersFilters);
     stub(UsersPageService.prototype, 'getUsersPageViewModel').resolves({
       errorSummary: [],

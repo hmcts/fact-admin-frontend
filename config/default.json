@@ -25,8 +25,5 @@
       "SSO_APP_REG_TENANT_ID": "",
       "SESSION_SECRET": "local-development-session-secret"
     }
-  },
-  "auth": {
-    "azure-identity-token-path": "/var/run/secrets/azure/tokens/azure-identity-token"
   }
 }
