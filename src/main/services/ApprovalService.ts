@@ -1,6 +1,5 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
 import { OperationsApi } from '../requests/OperationsApi';
 import { ApprovalStatus, ApprovalSubjectType } from '../schemas/approvalSchema';
 import { toUkDateTimeString } from '../utils/valueParsers';
@@ -48,8 +47,7 @@ export type ApproveDataViewModel = {
 };
 
 export class ApprovalService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests(),
-                     private readonly operationsApi = new OperationsApiRequests()) {}
+  public constructor(private readonly operationsApi = new OperationsApi()) {}
 
   public async getApprovalsTracker(
     filters: ApprovalTrackerFilters = {}
