@@ -6,6 +6,7 @@ import ServiceCentreEditController from '../../../main/controllers/ServiceCentre
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
+import { OperationsApi } from '../../../main/requests/OperationsApi';
 
 describe('ServiceCentreEditController', () => {
   beforeEach(() => {
@@ -27,7 +28,7 @@ describe('ServiceCentreEditController', () => {
     request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
 
-    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves([]);
 
     responseMock
       .expects('render')
@@ -104,7 +105,7 @@ describe('ServiceCentreEditController', () => {
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -144,7 +145,7 @@ describe('ServiceCentreEditController', () => {
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -156,7 +157,7 @@ describe('ServiceCentreEditController', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApproval = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApproval = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
     const controller = new ServiceCentreEditController();
     const response = approvalResponse();
 

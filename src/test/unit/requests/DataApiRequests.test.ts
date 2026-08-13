@@ -13,8 +13,8 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 }));
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
-import { UserApi } from '../../../main/requests/UserApi';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
+import { UserApi } from '../../../main/requests/UserApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
 
@@ -59,25 +59,25 @@ describe('DataApiRequests', () => {
 
   it('returns true when health status is UP', async () => {
     getStub.withArgs('/health').resolves({ data: { status: 'UP' } });
-    const response = await dataApiRequests.checkHealth();
+    const response = await operationsApi.checkHealth();
     expect(response).toBe(true);
   });
 
   it('returns false when health status is not UP', async () => {
     getStub.withArgs('/health').resolves({ data: { status: 'DOWN' } });
-    const response = await dataApiRequests.checkHealth();
+    const response = await operationsApi.checkHealth();
     expect(response).toBe(false);
   });
 
   it('returns false on error response', async () => {
     getStub.withArgs('/health').rejects(errorResponse);
-    const response = await dataApiRequests.checkHealth();
+    const response = await operationsApi.checkHealth();
     expect(response).toBe(false);
   });
 
   it('returns false on error message', async () => {
     getStub.withArgs('/health').rejects(errorMessage);
-    const response = await dataApiRequests.checkHealth();
+    const response = await operationsApi.checkHealth();
     expect(response).toBe(false);
   });
 
@@ -1424,7 +1424,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.clearUserLocks(userId);
+    const response = await operationsApi.clearUserLocks(userId);
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error removing locks for user:', {
@@ -3227,7 +3227,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/approvals/v1').resolves({ data: approvals });
 
-    const response = await dataApiRequests.getApprovals();
+    const response = await operationsApi.getApprovals();
 
     expect(response).toEqual(approvals);
   });
@@ -3242,7 +3242,7 @@ describe('DataApiRequests', () => {
       ],
     });
 
-    const response = await dataApiRequests.getApprovals();
+    const response = await operationsApi.getApprovals();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching approvals:', expect.anything());
@@ -3259,7 +3259,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/approvals/v1').rejects(serviceUnavailableError);
 
-    const response = await dataApiRequests.getApprovals();
+    const response = await operationsApi.getApprovals();
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -3277,7 +3277,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/approvals/v1', approval).resolves({ status: HttpStatusCode.Created });
 
-    const response = await dataApiRequests.createApproval(approval);
+    const response = await operationsApi.createApproval(approval);
 
     expect(response).toBe(HttpStatusCode.Created);
   });
@@ -3298,7 +3298,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/approvals/v1', approval).rejects(notFoundError);
 
-    const response = await dataApiRequests.createApproval(approval);
+    const response = await operationsApi.createApproval(approval);
 
     expect(response).toBe(HttpStatusCode.NotFound);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(
@@ -3312,7 +3312,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/approvals/${approvalId}/v1`).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.deleteApproval(approvalId);
+    const response = await operationsApi.deleteApproval(approvalId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -3547,7 +3547,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/approvals/${approvalId}/v1`).rejects(notFoundError);
 
-    const response = await dataApiRequests.deleteApproval(approvalId);
+    const response = await operationsApi.deleteApproval(approvalId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
     expect(mockDataApiLogger.error).toHaveBeenCalledWith(

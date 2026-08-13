@@ -6,6 +6,7 @@ import CourtEditController from '../../../main/controllers/CourtEditController';
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
+import { OperationsApi } from '../../../main/requests/OperationsApi';
 
 describe('CourtEditController', () => {
   afterEach(() => restore());
@@ -33,7 +34,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves([]);
 
     responseMock
       .expects('render')
@@ -135,7 +136,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -176,7 +177,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -249,7 +250,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -261,7 +262,7 @@ describe('CourtEditController', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks');
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks');
 
     await controller.get(request, response);
 
@@ -290,7 +291,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves([]);
 
     try {
       await controller.get(request, response);
@@ -325,7 +326,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves([]);
 
     try {
       await controller.get(request, response);
@@ -357,7 +358,7 @@ describe('CourtEditController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getLocksStub = stub(DataApiRequests.prototype, 'getLocks').resolves(HttpStatusCode.InternalServerError);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');

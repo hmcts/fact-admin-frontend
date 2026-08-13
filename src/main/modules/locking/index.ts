@@ -1,13 +1,13 @@
 import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
-import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
+  import { OperationsApi as OperationsApiType } from '../../requests/OperationsApi';
 import { PATH_TO_PAGE_MAP, Page } from '../../schemas/lockSchema';
 import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
 import { isUuid } from '../../utils/valueParsers';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenticationHelper';
 
-let dataApiRequests: DataApiRequestsType | undefined;
+let operationsApi: OperationsApiType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
 const NON_LOCKABLE_EDIT_PAGES = new Set(['approve']);
@@ -20,7 +20,7 @@ type LockRequirements = {
   pageKey: string;
 };
 
-type DataApiProvider = () => Promise<DataApiRequestsType>;
+type DataApiProvider = () => Promise<OperationsApiType>;
 
 export class LockingInterceptor {
   public constructor(private readonly getDataApi: DataApiProvider = getDataApiRequests) {}
@@ -104,7 +104,7 @@ export class LockingInterceptor {
   }
 
   private async handleLockAcquisition(
-    dataApi: DataApiRequestsType,
+    dataApi: OperationsApiType,
     userId: string,
     details: LockRequirements,
     res: express.Response
@@ -142,7 +142,7 @@ export class LockingInterceptor {
   }
 
   private async handleLockingFailure(
-    dataApi: DataApiRequestsType,
+    dataApi: OperationsApiType,
     res: express.Response,
     lock: HttpStatusCode,
     page: typeof Page,
@@ -169,10 +169,10 @@ export class LockingInterceptor {
   }
 }
 
-async function getDataApiRequests(): Promise<DataApiRequestsType> {
-  if (!dataApiRequests) {
-    const { DataApiRequests } = await import('../../requests/DataApiRequests');
-    dataApiRequests = new DataApiRequests();
+async function getDataApiRequests(): Promise<OperationsApiType> {
+  if (!operationsApi) {
+    const { OperationsApi } = await import('../../requests/OperationsApi');
+    operationsApi = new OperationsApi();
   }
-  return dataApiRequests;
+  return operationsApi;
 }

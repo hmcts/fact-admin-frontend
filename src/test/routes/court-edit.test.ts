@@ -4,11 +4,12 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { OperationsApi } from '../../main/requests/OperationsApi';
 
 describe('Court edit page', () => {
   beforeEach(() => {
     restore();
-    stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    stub(OperationsApi.prototype, 'getLocks').resolves([]);
   });
 
   test('renders the court edit page for a valid known court', async () => {
@@ -40,7 +41,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getApprovalsStub = stub(DataApiRequests.prototype, 'getApprovals');
+    const getApprovalsStub = stub(OperationsApi.prototype, 'getApprovals');
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit');
 
@@ -54,7 +55,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -81,7 +82,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -108,7 +109,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -141,7 +142,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -173,7 +174,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -185,7 +186,7 @@ describe('Court edit page', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApprovalStub = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
 
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/approve')
@@ -210,7 +211,7 @@ describe('Court edit page', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -222,7 +223,7 @@ describe('Court edit page', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApprovalStub = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
 
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/approve')
