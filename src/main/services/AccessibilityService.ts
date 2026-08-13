@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { UpdateAccessibilityRequest } from '../requests/types/UpdateAccessibilityRequest';
 import { Accessibility } from '../schemas/accessibilitySchema';
 import { validate } from '../utils/accessibilityValidationConfig';
@@ -9,7 +9,7 @@ import { mapHearingEnhancementEquipment } from '../utils/mapper';
 export type AccessibilityModel = Partial<Accessibility> & { errors?: Record<string, string[]> } & { name?: string };
 
 export class AccessibilityService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<Partial<AccessibilityModel> | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

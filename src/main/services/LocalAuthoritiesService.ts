@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
 import {
   CourtLocalAuthorities,
@@ -45,7 +45,7 @@ export const allowedLocalAuthorityAreas = new Set(['Adoption', 'Children', 'Divo
 const localAuthorityAreas = [...allowedLocalAuthorityAreas] as (keyof LocalAuthoritySelections)[];
 
 export class LocalAuthoritiesService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<LocalAuthoritiesViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

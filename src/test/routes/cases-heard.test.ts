@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 
 describe('Cases heard page', () => {
   beforeEach(() => {
@@ -11,11 +11,11 @@ describe('Cases heard page', () => {
   });
 
   test('renders the cases heard page for a valid known court', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtAreasOfLaw').resolves([
+    stub(CourtApi.prototype, 'getCourtAreasOfLaw').resolves([
       {
         areaOfLawType: {
           id: '22222222-2222-4222-8222-222222222222',
@@ -55,8 +55,8 @@ describe('Cases heard page', () => {
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
-    const getCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'getCourtAreasOfLaw');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/cases-heard');
 
@@ -68,8 +68,8 @@ describe('Cases heard page', () => {
   });
 
   test('renders the dedicated court not found page for a missing court', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
-    const getCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'getCourtAreasOfLaw');
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
 
@@ -80,8 +80,8 @@ describe('Cases heard page', () => {
   });
 
   test('renders the generic error page when the court lookup fails', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
-    const getCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'getCourtAreasOfLaw');
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
+    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
 
@@ -91,11 +91,11 @@ describe('Cases heard page', () => {
   });
 
   test('renders the generic error page when the areas of law lookup fails', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtAreasOfLaw').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtApi.prototype, 'getCourtAreasOfLaw').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard');
 
@@ -104,11 +104,11 @@ describe('Cases heard page', () => {
   });
 
   test('updates the selected areas of law and renders the success page', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'updateCourtAreasOfLaw').resolves(
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(
       HttpStatusCode.Ok
     );
 
@@ -129,7 +129,7 @@ describe('Cases heard page', () => {
   });
 
   test('does not render the success page for GET requests', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -141,11 +141,11 @@ describe('Cases heard page', () => {
   });
 
   test('renders a validation error when no areas of law are selected', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtAreasOfLaw').resolves([
+    stub(CourtApi.prototype, 'getCourtAreasOfLaw').resolves([
       {
         areaOfLawType: {
           id: '22222222-2222-4222-8222-222222222222',
@@ -155,7 +155,7 @@ describe('Cases heard page', () => {
         selected: true,
       },
     ] as never);
-    const updateCourtAreasOfLawStub = stub(DataApiRequests.prototype, 'updateCourtAreasOfLaw');
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw');
 
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard/success')

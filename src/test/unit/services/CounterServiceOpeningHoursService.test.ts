@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import {
   CounterServiceOpeningHoursForm,
   CounterServiceOpeningHoursService,
@@ -26,7 +26,7 @@ describe('CounterServiceOpeningHoursService', () => {
     openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00:00', closingTime: '17:00:00' }],
   };
 
-  function buildService(overrides: Partial<DataApiRequests> = {}) {
+  function buildService(overrides: Partial<CourtApi> = {}) {
     const dataApiRequests = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
       getCounterServiceOpeningHours: jest.fn().mockResolvedValue([existingRecord]),
@@ -34,7 +34,7 @@ describe('CounterServiceOpeningHoursService', () => {
       saveCounterServiceOpeningHours: jest.fn(),
       deleteCounterServiceOpeningHours: jest.fn(),
       ...overrides,
-    } as unknown as DataApiRequests;
+    } as unknown as CourtApi;
 
     return {
       dataApiRequests,

@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
-  import { OperationsApi as OperationsApiType } from '../../requests/OperationsApi';
+import { OperationsApi as OperationsApiType } from '../../requests/OperationsApi';
 import { PATH_TO_PAGE_MAP, Page } from '../../schemas/lockSchema';
 import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
 import { isUuid } from '../../utils/valueParsers';
@@ -23,7 +23,7 @@ type LockRequirements = {
 type DataApiProvider = () => Promise<OperationsApiType>;
 
 export class LockingInterceptor {
-  public constructor(private readonly getDataApi: DataApiProvider = getDataApiRequests) {}
+  public constructor(private readonly getDataApi: DataApiProvider = getOperationsApi) {}
 
   public enableFor(app: express.Express): void {
     app.use(this.handleRequest.bind(this));
@@ -169,7 +169,7 @@ export class LockingInterceptor {
   }
 }
 
-async function getDataApiRequests(): Promise<OperationsApiType> {
+async function getOperationsApi(): Promise<OperationsApiType> {
   if (!operationsApi) {
     const { OperationsApi } = await import('../../requests/OperationsApi');
     operationsApi = new OperationsApi();

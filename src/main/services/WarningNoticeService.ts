@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { isHttpStatusCode } from '../utils/valueParsers';
 
 const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
@@ -31,7 +31,7 @@ export type SaveWarningNoticeResult =
   | { type: 'status'; status: HttpStatusCode };
 
 export class WarningNoticeService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async getWarningNoticePage(courtId: string): Promise<WarningNoticeViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

@@ -12,14 +12,14 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { UserApi } from '../../../main/requests/UserApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
 
-const dataApiRequests = new DataApiRequests();
+const dataApiRequests = new CourtApi();
 const userApi = new UserApi();
 const operationsApi = new OperationsApi();
 const serviceCentreApi = new ServiceCentreApi();

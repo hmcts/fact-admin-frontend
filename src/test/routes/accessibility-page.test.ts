@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 
 describe('Accessibility page', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -13,8 +13,8 @@ describe('Accessibility page', () => {
   });
 
   test('renders the accessibility page for a valid known court with breadcrumbs', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
-    stub(DataApiRequests.prototype, 'getAccessibility').resolves(null as never);
+    stub(CourtApi.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
+    stub(CourtApi.prototype, 'getAccessibility').resolves(null as never);
 
     const response = await request(app).get(`/courts/${courtId}/edit/accessibility`);
 
@@ -28,7 +28,7 @@ describe('Accessibility page', () => {
   });
 
   test('renders court not found for invalid court id', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/accessibility');
 
@@ -38,7 +38,7 @@ describe('Accessibility page', () => {
   });
 
   test('renders court not found when the court does not exist', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     const response = await request(app).get(`/courts/${courtId}/edit/accessibility`);
 
@@ -47,7 +47,7 @@ describe('Accessibility page', () => {
   });
 
   test('renders generic error page when court lookup fails on GET', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get(`/courts/${courtId}/edit/accessibility`);
 
@@ -56,8 +56,8 @@ describe('Accessibility page', () => {
   });
 
   test('renders generic error page when accessibility lookup fails on GET', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
-    stub(DataApiRequests.prototype, 'getAccessibility').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtApi.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
+    stub(CourtApi.prototype, 'getAccessibility').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get(`/courts/${courtId}/edit/accessibility`);
 
@@ -66,8 +66,8 @@ describe('Accessibility page', () => {
   });
 
   test('saves accessibility details and renders success page on valid POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
-    const updateAccessibilityStub = stub(DataApiRequests.prototype, 'updateAccessibility').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
+    const updateAccessibilityStub = stub(CourtApi.prototype, 'updateAccessibility').resolves({
       accessibleParking: true,
       accessibleToiletDescription: 'Accessible toilet available near reception',
       accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
@@ -103,8 +103,8 @@ describe('Accessibility page', () => {
   });
 
   test('renders validation errors on invalid POST payload', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
-    const updateAccessibilityStub = stub(DataApiRequests.prototype, 'updateAccessibility');
+    stub(CourtApi.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
+    const updateAccessibilityStub = stub(CourtApi.prototype, 'updateAccessibility');
 
     const response = await request(app).post(`/courts/${courtId}/edit/accessibility/success`).type('form').send({
       accessibleParking: 'true',
@@ -126,7 +126,7 @@ describe('Accessibility page', () => {
   });
 
   test('renders court not found for invalid court id on POST', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).post('/courts/not-a-uuid/edit/accessibility/success').type('form').send({});
 
@@ -136,7 +136,7 @@ describe('Accessibility page', () => {
   });
 
   test('renders court not found when save cannot find the court on POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     const response = await request(app).post(`/courts/${courtId}/edit/accessibility/success`).type('form').send({});
 
@@ -145,8 +145,8 @@ describe('Accessibility page', () => {
   });
 
   test('renders generic error page when save fails on POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
-    stub(DataApiRequests.prototype, 'updateAccessibility').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtApi.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
+    stub(CourtApi.prototype, 'updateAccessibility').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).post(`/courts/${courtId}/edit/accessibility/success`).type('form').send({
       accessibleParking: 'true',

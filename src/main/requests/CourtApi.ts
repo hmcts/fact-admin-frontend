@@ -3,7 +3,6 @@ import { HttpStatusCode, isAxiosError } from 'axios';
 import FormData from 'form-data';
 
 import { Accessibility, AccessibilityScheme } from '../schemas/accessibilitySchema';
-import { ApprovalStatus, CreateApprovalRequest, approvalStatusListSchema } from '../schemas/approvalSchema';
 import {
   AreaOfLawType,
   CourtAreaOfLawSelection,
@@ -11,14 +10,6 @@ import {
   areaOfLawListSchema,
   parseCourtAreasOfLawResponse,
 } from '../schemas/areaOfLawSchema';
-import {
-  Audit,
-  AuditSubjectOptionsMap,
-  PagedAudits,
-  auditListItemSchema,
-  auditSubjectOptionsSchema,
-  pagedAuditsSchema,
-} from '../schemas/auditSchema';
 import { BuildingFacilities, BuildingFacilitiesSchema } from '../schemas/buildingFacilitiesSchema';
 import { ContactDescriptionType, contactDescriptionTypeListSchema } from '../schemas/contactDescriptionTypeSchema';
 import {
@@ -42,15 +33,7 @@ import {
   courtSinglePointOfEntryListSchema,
 } from '../schemas/courtSinglePointOfEntrySchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
-import {
-  FavouriteReference,
-  FavouriteStatus,
-  PagedFavourites,
-  favouriteStatusListSchema,
-  pagedFavouritesSchema,
-} from '../schemas/favouriteSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
-import { Lock, LockList, Page, lockListSchema, lockSchema } from '../schemas/lockSchema';
 import {
   CourtOpeningHours,
   OpeningHourType,
@@ -61,28 +44,10 @@ import {
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 import { ServiceArea, serviceAreaListSchema } from '../schemas/serviceAreaSchema';
-import {
-  ServiceCentreAddress,
-  serviceCentreAddressListSchema,
-  serviceCentreAddressSchema,
-} from '../schemas/serviceCentreAddressSchema';
-import {
-  ServiceCentreContactDetail,
-  serviceCentreContactDetailListSchema,
-} from '../schemas/serviceCentreContactDetailSchema';
-import { ServiceCentre, serviceCentreSchema } from '../schemas/serviceCentreSchema';
-import { Subject } from '../schemas/subjectTypeSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
-import { PagedUsers, pagedUsersSchema } from '../schemas/userListSchema';
-import { User, userSchema } from '../schemas/userSchema';
 
-import { CreateUpdateUserRequest } from './types/CreateUpdateUserRequest';
-import { GetAuditsParams } from './types/GetAuditsParams';
 import { GetCourtsParams } from './types/GetCourtsParams';
-import { GetFavouritesParams } from './types/GetFavouritesParams';
-import { GetUsersParams } from './types/GetUsersParams';
 import { SaveCourtContactDetailRequest } from './types/SaveCourtContactDetailRequest';
-import { SaveServiceCentreContactDetailRequest } from './types/SaveServiceCentreContactDetailRequest';
 import { UpdateAccessibilityRequest } from './types/UpdateAccessibilityRequest';
 import { UpdateBuildingFacilitiesRequest } from './types/UpdateBuildingFacilitiesRequest';
 import { dataApi } from './utils/axiosConfig';
@@ -90,21 +55,7 @@ import { toSafeErrorDetails } from './utils/safeErrorDetails';
 
 const logger = Logger.getLogger('app');
 
-export class DataApiRequests {
-  /**
-   * Request to data API to check health
-   */
-  public async checkHealth(): Promise<boolean> {
-    try {
-      const response = await dataApi.get('/health');
-      logger.info('Data API health check response:', response.data);
-      return response.data.status === 'UP';
-    } catch (error) {
-      logger.error('Error checking data API health:', toSafeErrorDetails(error));
-    }
-    return false;
-  }
-
+export class CourtApi {
   /**
    * Request to data API to get all regions
    */
@@ -129,68 +80,6 @@ export class DataApiRequests {
       return pagedCourtsSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching courts:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Gets the current user's paginated favourite courts and service centres.
-   */
-  public async getFavourites(params: GetFavouritesParams = {}): Promise<PagedFavourites | HttpStatusCode> {
-    try {
-      const response = await dataApi.get('/user/v1/favourites', { params });
-      return pagedFavouritesSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching favourites:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Gets favourite state for locations on the current Courts page.
-   */
-  public async getFavouriteStatuses(subjects: FavouriteReference[]): Promise<FavouriteStatus[] | HttpStatusCode> {
-    try {
-      const response = await dataApi.post('/user/v1/favourites/status', { subjects });
-      return favouriteStatusListSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching favourite statuses:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Adds a favourite for the current user.
-   */
-  public async addFavourite(favourite: FavouriteReference): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.post('/user/v1/favourites', favourite);
-      return response.status as HttpStatusCode;
-    } catch (error: unknown) {
-      logger.error('Error adding favourite:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Removes a favourite for the current user.
-   */
-  public async removeFavourite(favourite: FavouriteReference): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.delete(
-        `/user/v1/favourites/${encodeURIComponent(favourite.subjectType)}/${encodeURIComponent(favourite.subjectId)}`
-      );
-      return response.status as HttpStatusCode;
-    } catch (error: unknown) {
-      logger.error('Error removing favourite:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -270,80 +159,6 @@ export class DataApiRequests {
   }
 
   /**
-   * Request to data API to get a service centre entity by exact service centre name
-   */
-  public async getServiceCentreByName(serviceCentreName: string): Promise<ServiceCentre | HttpStatusCode> {
-    try {
-      const response = await dataApi.get('/service-centres/name/v1', { params: { name: serviceCentreName } });
-      return serviceCentreSchema.parse(response.data);
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound) {
-        return HttpStatusCode.NotFound;
-      }
-
-      logger.error(`Error fetching service centre details for name ${serviceCentreName}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get a service centre entity by id
-   */
-  public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/service-centres/${serviceCentreId}/entity/v1`);
-      return serviceCentreSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error(`Error fetching service centre details for id ${serviceCentreId}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to create a service centre
-   */
-  public async createServiceCentre(
-    serviceCentre: Pick<ServiceCentre, 'name' | 'open' | 'regionId' | 'serviceAreaIds'>
-  ): Promise<ServiceCentre | HttpStatusCode | Map<string, string>> {
-    try {
-      const response = await dataApi.post('/service-centres/v1', serviceCentre);
-      return serviceCentreSchema.parse(response.data);
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-        return new Map(Object.entries(error.response.data) as [string, string][]);
-      }
-      logger.error('Error creating service centre:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to update service centre details by id
-   */
-  public async updateServiceCentre(
-    serviceCentre: ServiceCentre
-  ): Promise<ServiceCentre | HttpStatusCode | Map<string, string>> {
-    try {
-      const response = await dataApi.put(`/service-centres/${serviceCentre.id}/v1`, serviceCentre);
-      return serviceCentreSchema.parse(response.data);
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-        return new Map(Object.entries(error.response.data) as [string, string][]);
-      }
-      logger.error(`Error update service centre details for id ${serviceCentre.id}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
    * Request to data API to get area of law selections by court id
    */
   public async getCourtAreasOfLaw(courtId: string): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
@@ -367,44 +182,6 @@ export class DataApiRequests {
       return response.status as HttpStatusCode;
     } catch (error: unknown) {
       logger.error(`Error updating areas of law for court id ${payload.courtId}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get area of law selections by service-centre id
-   */
-  public async getServiceCentreAreasOfLaw(
-    serviceCentreId: string
-  ): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/areas-of-law`);
-      return parseCourtAreasOfLawResponse(response.data);
-    } catch (error: unknown) {
-      logger.error(`Error fetching areas of law for service-centre id ${serviceCentreId}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to update area of law selections for a service centre
-   */
-  public async updateServiceCentreAreasOfLaw(payload: {
-    serviceCentreId: string;
-    areasOfLaw: string[];
-  }): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.put(`/service-centres/${payload.serviceCentreId}/v1/areas-of-law`, payload);
-      return response.status as HttpStatusCode;
-    } catch (error: unknown) {
-      logger.error(
-        `Error updating areas of law for service-centre id ${payload.serviceCentreId}:`,
-        toSafeErrorDetails(error)
-      );
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -478,103 +255,6 @@ export class DataApiRequests {
       return courtAddressSchema.parse(response.data);
     } catch (error: unknown) {
       logger.error('Error fetching court address details:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get address details for a given service centre
-   */
-  public async getServiceCentreAddressDetails(
-    serviceCentreId: string
-  ): Promise<ServiceCentreAddress[] | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/address`);
-      return serviceCentreAddressListSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching service-centre address details:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get specific address details for a given service centre
-   */
-  public async getServiceCentreAddressDetailsById(
-    serviceCentreId: string,
-    addressId: string
-  ): Promise<ServiceCentreAddress | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/address/${addressId}`);
-      return serviceCentreAddressSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching service-centre address details:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to save a new service-centre address
-   */
-  public async saveServiceCentreAddress(
-    address: Partial<ServiceCentreAddress>,
-    serviceCentreId: string
-  ): Promise<ServiceCentreAddress | HttpStatusCode | Map<string, string>> {
-    try {
-      const response = await dataApi.post(`/service-centres/${serviceCentreId}/v1/address`, address);
-      return serviceCentreAddressSchema.parse(response.data);
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-        return new Map(Object.entries(error.response.data) as [string, string][]);
-      }
-      logger.error('Error adding service-centre address details:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to update an existing service-centre address
-   */
-  public async updateServiceCentreAddress(
-    address: Partial<ServiceCentreAddress>,
-    serviceCentreId: string,
-    addressId: string
-  ): Promise<ServiceCentreAddress | HttpStatusCode | Map<string, string>> {
-    try {
-      const response = await dataApi.put(`/service-centres/${serviceCentreId}/v1/address/${addressId}`, address);
-      return serviceCentreAddressSchema.parse(response.data);
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-        return new Map(Object.entries(error.response.data) as [string, string][]);
-      }
-      logger.error('Error updating service-centre address details:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to delete an existing service-centre address
-   */
-  public async deleteServiceCentreAddress(serviceCentreId: string, addressId: string): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.delete(`/service-centres/${serviceCentreId}/v1/address/${addressId}`);
-      if (response.status === HttpStatusCode.NoContent) {
-        return response.status;
-      }
-      logger.error('Unexpected response status when deleting service-centre address:', response.status);
-      return HttpStatusCode.InternalServerError;
-    } catch (error: unknown) {
-      logger.error('Error deleting service-centre address details:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -699,96 +379,6 @@ export class DataApiRequests {
       return HttpStatusCode.InternalServerError;
     } catch (error: unknown) {
       logger.error('Error deleting court contact detail:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get contact details for a given service centre
-   */
-  public async getServiceCentreContactDetails(
-    serviceCentreId: string
-  ): Promise<ServiceCentreContactDetail[] | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/service-centres/${serviceCentreId}/v1/contact-details`);
-      return serviceCentreContactDetailListSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error(
-        `Error fetching service-centre contact details for id ${serviceCentreId}:`,
-        toSafeErrorDetails(error)
-      );
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to create a new service-centre contact detail
-   */
-  public async createServiceCentreContactDetail(
-    serviceCentreId: string,
-    payload: SaveServiceCentreContactDetailRequest
-  ): Promise<HttpStatusCode | Map<string, string>> {
-    try {
-      const response = await dataApi.post(`/service-centres/${serviceCentreId}/v1/contact-details`, payload);
-      return response.status as HttpStatusCode;
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-        return new Map(Object.entries(error.response.data) as [string, string][]);
-      }
-      logger.error('Error creating service-centre contact detail:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to update an existing service-centre contact detail
-   */
-  public async updateServiceCentreContactDetail(
-    serviceCentreId: string,
-    contactDetailId: string,
-    payload: SaveServiceCentreContactDetailRequest
-  ): Promise<HttpStatusCode | Map<string, string>> {
-    try {
-      const response = await dataApi.put(
-        `/service-centres/${serviceCentreId}/v1/contact-details/${contactDetailId}`,
-        payload
-      );
-      return response.status as HttpStatusCode;
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === HttpStatusCode.BadRequest) {
-        return new Map(Object.entries(error.response.data) as [string, string][]);
-      }
-      logger.error('Error updating service-centre contact detail:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to delete an existing service-centre contact detail
-   */
-  public async deleteServiceCentreContactDetail(
-    serviceCentreId: string,
-    contactDetailId: string
-  ): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.delete(
-        `/service-centres/${serviceCentreId}/v1/contact-details/${contactDetailId}`
-      );
-      if (response.status === HttpStatusCode.NoContent) {
-        return response.status;
-      }
-      logger.error('Unexpected response status when deleting service-centre contact detail:', response.status);
-      return HttpStatusCode.InternalServerError;
-    } catch (error: unknown) {
-      logger.error('Error deleting service-centre contact detail:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
@@ -1152,36 +742,6 @@ export class DataApiRequests {
   }
 
   /**
-   * Request to data API to create or update a user
-   */
-  public async createUpdateUser(user: CreateUpdateUserRequest): Promise<User | HttpStatusCode> {
-    try {
-      const response = await dataApi.post('/user/v1', user);
-      return userSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error creating/updating user:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get a filtered and paginated list of admin users
-   */
-  public async getUsers(params: GetUsersParams = {}): Promise<PagedUsers | HttpStatusCode> {
-    try {
-      const response = await dataApi.get('/user/v1', { params });
-      return pagedUsersSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching users:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status
-        ? (error.response.status as HttpStatusCode)
-        : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
    * Request to data API to get court facilities by court id
    */
   public async getBuildingFacilities(courtId: string): Promise<BuildingFacilities | null | HttpStatusCode> {
@@ -1339,159 +899,6 @@ export class DataApiRequests {
       return isAxiosError(error) && error.response?.status
         ? (error.response.status as HttpStatusCode)
         : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get a complete list audit subjects and their options
-   */
-  async getAuditSubjectOptionsMap(): Promise<AuditSubjectOptionsMap | HttpStatusCode> {
-    try {
-      const response = await dataApi.get('/audits/subjectoptions/v1');
-      return auditSubjectOptionsSchema.parse(new Map(Object.entries(response.data)));
-    } catch (error: unknown) {
-      logger.error('Error fetching audit subject names:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get a filtered and paginated list of audits
-   */
-  async getAudits(params: GetAuditsParams): Promise<PagedAudits | HttpStatusCode> {
-    try {
-      const response = await dataApi.get('/audits/v1', { params });
-      return pagedAuditsSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching audits:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get audit details by id
-   */
-  async getAuditById(auditId: string): Promise<Audit | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/audits/${auditId}/v1`);
-      return auditListItemSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error(`Error fetching audit details for id ${auditId}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to get approval statuses for all courts and service centres
-   */
-  async getApprovals(): Promise<ApprovalStatus[] | HttpStatusCode> {
-    try {
-      const response = await dataApi.get('/approvals/v1');
-      return approvalStatusListSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error('Error fetching approvals:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to create an approval
-   */
-  async createApproval(approval: CreateApprovalRequest): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.post('/approvals/v1', approval);
-      return response.status;
-    } catch (error: unknown) {
-      logger.error('Error creating approval:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to delete an approval by id
-   */
-  async deleteApproval(approvalId: string): Promise<HttpStatusCode> {
-    try {
-      const response = await dataApi.delete(`/approvals/${approvalId}/v1`);
-      return response.status;
-    } catch (error: unknown) {
-      logger.error(`Error deleting approval for id ${approvalId}:`, toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to retrieve a lock based on subject and page
-   */
-  public async getLock(subject: Subject, subjectId: string, page: typeof Page): Promise<Lock | null | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/locks/${subject}/${subjectId}/v1/${page}`);
-      if (response.status === HttpStatusCode.NoContent) {
-        return null;
-      }
-      return lockSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error(
-        `Error fetching lock information for subject ${subject}, id ${subjectId} and page ${page}:`,
-        toSafeErrorDetails(error)
-      );
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to retrieve all locks for a given subject
-   */
-  public async getLocks(subject: Subject, subjectId: string): Promise<LockList | HttpStatusCode> {
-    try {
-      const response = await dataApi.get(`/locks/${subject}/${subjectId}/v1`);
-      if (response.status === HttpStatusCode.NoContent) {
-        return [];
-      }
-      return lockListSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error(
-        `Error fetching lock information for subject: ${subject}, with id: ${subjectId}`,
-        toSafeErrorDetails(error)
-      );
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to acquire a lock
-   */
-  public async acquireLock(
-    subject: Subject,
-    subjectId: string,
-    page: typeof Page,
-    userId: string
-  ): Promise<Lock | HttpStatusCode> {
-    try {
-      const response = await dataApi.post(`/locks/${subject}/${subjectId}/v1/${page}`, userId, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      return lockSchema.parse(response.data);
-    } catch (error: unknown) {
-      logger.error(
-        `Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`,
-        toSafeErrorDetails(error)
-      );
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
-    }
-  }
-
-  /**
-   * Request to data API to clear all locks held by the given user
-   */
-  public async clearUserLocks(userId: string): Promise<HttpStatusCode> {
-    try {
-      return (await dataApi.delete(`/user/v1/${userId}/locks`)).status;
-    } catch (error: unknown) {
-      logger.error('Error removing locks for user:', toSafeErrorDetails(error));
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }
 

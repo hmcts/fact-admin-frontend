@@ -2,7 +2,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Add service centre page', () => {
@@ -14,8 +14,8 @@ describe('Add service centre page', () => {
   });
 
   test('renders the add service centre page for admin users', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas);
 
     const response = await request(app).get('/add-service-centre');
 
@@ -26,8 +26,8 @@ describe('Add service centre page', () => {
   });
 
   test('renders the add service centre page for super admin users', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas);
 
     const response = await request(app).get('/add-service-centre').set('x-test-role', 'SuperAdmin');
 
@@ -43,8 +43,8 @@ describe('Add service centre page', () => {
   });
 
   test('re-renders the add service centre page with validation errors', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas);
     const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre');
 
     const response = await request(app).post('/add-service-centre').send({ name: 'Te', regionId: '' });
@@ -69,9 +69,9 @@ describe('Add service centre page', () => {
       slug: 'national-business-centre',
       warningNotice: null,
     };
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
-    stub(DataApiRequests.prototype, 'getCourtByName').resolves(404);
+    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(CourtApi.prototype, 'getCourtByName').resolves(404);
     stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(404);
     const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre').resolves(serviceCentre);
 

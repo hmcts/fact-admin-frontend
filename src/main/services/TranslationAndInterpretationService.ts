@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { TranslationServices } from '../schemas/translationServicesSchema';
 
 export type TranslationAndInterpretationForm = {
@@ -41,7 +41,7 @@ const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z
 const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 
 export class TranslationAndInterpretationService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async getViewModel(courtId: string): Promise<TranslationAndInterpretationViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

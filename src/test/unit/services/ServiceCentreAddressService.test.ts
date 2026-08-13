@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { ServiceCentreAddressType } from '../../../main/schemas/serviceCentreAddressSchema';
 import { ServiceCentreAddressService } from '../../../main/services/ServiceCentreAddressService';
@@ -57,7 +57,7 @@ describe('ServiceCentreAddressService', () => {
   });
 
   test('maps postcode search results and filters null DPA values', async () => {
-    jest.spyOn(DataApiRequests.prototype, 'getAddressesForPostcode').mockResolvedValue({
+    jest.spyOn(CourtApi.prototype, 'getAddressesForPostcode').mockResolvedValue({
       results: [
         {
           DPA: {
@@ -92,7 +92,7 @@ describe('ServiceCentreAddressService', () => {
 
   test('retrieveAddressOptions returns invalid payload for map message and bad request fallback', async () => {
     const getAddressesForPostcode = jest
-      .spyOn(DataApiRequests.prototype, 'getAddressesForPostcode')
+      .spyOn(CourtApi.prototype, 'getAddressesForPostcode')
       .mockResolvedValueOnce(new Map([['message', 'Postcode is invalid']]))
       .mockResolvedValueOnce(new Map([['postcode', 'BAD']]))
       .mockResolvedValueOnce(HttpStatusCode.InternalServerError);

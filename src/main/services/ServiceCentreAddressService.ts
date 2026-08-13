@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { DpaAddress } from '../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
@@ -43,7 +43,7 @@ export type RetrieveAddressOptionsResponse =
   | HttpStatusCode;
 
 export class ServiceCentreAddressService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+  public constructor(private readonly dataApiRequests = new CourtApi(),
                      private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async list(serviceCentreId: string): Promise<ServiceCentreAddress[] | HttpStatusCode> {

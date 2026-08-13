@@ -3,10 +3,10 @@ import type { Request, Response } from 'express';
 import { assert, match, mock, restore, stub } from 'sinon';
 
 import CourtEditController from '../../../main/controllers/CourtEditController';
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
+import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
-import { OperationsApi } from '../../../main/requests/OperationsApi';
 
 describe('CourtEditController', () => {
   afterEach(() => restore());
@@ -30,7 +30,7 @@ describe('CourtEditController', () => {
       courtLocks: [],
       timeoutMins: undefined,
     };
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -69,7 +69,7 @@ describe('CourtEditController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -92,7 +92,7 @@ describe('CourtEditController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(
       HttpStatusCode.InternalServerError
     );
 
@@ -117,7 +117,7 @@ describe('CourtEditController', () => {
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -132,7 +132,7 @@ describe('CourtEditController', () => {
   });
 
   test('renders approval confirmation for SuperAdmin', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -173,7 +173,7 @@ describe('CourtEditController', () => {
   });
 
   test('approves court data for Viewer', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -189,7 +189,7 @@ describe('CourtEditController', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApproval = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApproval = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
     const controller = new CourtEditController();
     const request = approvalRequest('Viewer');
     const response = approvalResponse();
@@ -231,7 +231,7 @@ describe('CourtEditController', () => {
     await controller.getApprove(invalidRequest, invalidResponse);
     expect(invalidResponse.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
 
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.BadGateway);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.BadGateway);
     const failedResponse = approvalResponse();
     await controller.getApprove(approvalRequest('SuperAdmin'), failedResponse);
     expect(failedResponse.status).toHaveBeenCalledWith(HttpStatusCode.BadGateway);
@@ -246,7 +246,7 @@ describe('CourtEditController', () => {
       status: (status: number) => status,
     } as unknown as Response;
     const request = approvalRequest('Viewer');
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -287,7 +287,7 @@ describe('CourtEditController', () => {
     } as unknown as Response;
     const request = mockRequest({});
     request.params = { courtId: ['11111111-1111-4111-8111-111111111111'] };
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -322,7 +322,7 @@ describe('CourtEditController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     request.query = { timeout: '7' };
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -354,7 +354,7 @@ describe('CourtEditController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);

@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
@@ -42,7 +42,7 @@ export type ServiceCentreGeneralSaveResult =
     };
 
 export class ServiceCentreGeneralService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+  public constructor(private readonly dataApiRequests = new CourtApi(),
                      private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreGeneralViewModel | HttpStatusCode> {

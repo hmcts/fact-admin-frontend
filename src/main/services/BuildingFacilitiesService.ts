@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { UpdateBuildingFacilitiesRequest } from '../requests/types/UpdateBuildingFacilitiesRequest';
 import { BuildingFacilities } from '../schemas/buildingFacilitiesSchema';
 import { validateBooleanField } from '../utils/validation';
@@ -8,7 +8,7 @@ import { validateBooleanField } from '../utils/validation';
 export type FacilityModel = Partial<BuildingFacilities> & { errors?: Record<string, string[]> } & { name?: string };
 
 export class BuildingFacilitiesService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<Partial<FacilityModel> | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

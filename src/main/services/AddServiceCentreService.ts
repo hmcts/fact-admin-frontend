@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
@@ -40,7 +40,7 @@ type AddServiceCentreResult = AddServiceCentrePageModel | AddServiceCentreSucces
 const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 
 export class AddServiceCentreService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+  public constructor(private readonly dataApiRequests = new CourtApi(),
                      private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {

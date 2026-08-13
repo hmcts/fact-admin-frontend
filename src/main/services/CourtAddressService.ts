@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtAddress, CourtAddressType } from '../schemas/courtAddressSchema';
 import { DpaAddress } from '../schemas/osDataSchema';
 import {
@@ -48,7 +48,7 @@ export type DeleteCourtAddressResponse =
 
 const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 
-const dataApiRequests = new DataApiRequests();
+const dataApiRequests = new CourtApi();
 
 export class CourtAddressService {
   public async list(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {

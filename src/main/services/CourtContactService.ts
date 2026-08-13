@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { SaveCourtContactDetailRequest } from '../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
@@ -91,7 +91,7 @@ const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
 const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
-const dataApiRequests = new DataApiRequests();
+const dataApiRequests = new CourtApi();
 
 export class CourtContactService {
   public async getCourtById(courtId: string): Promise<CourtEntity | HttpStatusCode> {

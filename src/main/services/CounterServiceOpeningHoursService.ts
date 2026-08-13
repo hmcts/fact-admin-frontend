@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../schemas/counterServiceOpeningHoursSchema';
 
 type Day = {
@@ -83,7 +83,7 @@ const days: Day[] = [
 const EMAIL_PATTERN = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 export class CounterServiceOpeningHoursService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async getListPage(courtId: string): Promise<CounterServiceListViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

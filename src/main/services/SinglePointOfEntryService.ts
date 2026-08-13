@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtSinglePointOfEntryList } from '../schemas/courtSinglePointOfEntrySchema';
 
 const supportedSinglePointOfEntryServices = [
@@ -30,7 +30,7 @@ export type SinglePointOfEntrySaveModel = {
 };
 
 export class SinglePointOfEntryService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<SinglePointOfEntryViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

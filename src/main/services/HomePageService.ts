@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { UserApi } from '../requests/UserApi';
 import { PagedCourts } from '../schemas/courtListSchema';
 import { FavouriteStatus, PagedFavourites } from '../schemas/favouriteSchema';
@@ -16,7 +16,7 @@ import { HomePageFilters, HomePageViewModel } from './types/HomePage.types';
  */
 export class HomePageService {
   public constructor(
-    private readonly dataApiRequests = new DataApiRequests(),
+    private readonly dataApiRequests = new CourtApi(),
     private readonly userApi = new UserApi(),
     private readonly homePageFiltersService = new HomePageFiltersService(),
     private readonly homePageViewService = new HomePageViewService()

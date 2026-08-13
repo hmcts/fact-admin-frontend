@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
 
 export const areasOfLawValidationMessage = 'Select at least one type of case heard at this court.';
@@ -34,7 +34,7 @@ export type SaveCasesHeardResult =
  * Builds and validates the cases-heard page state independently of HTTP concerns.
  */
 export class CasesHeardService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   /**
    * Normalises the incoming checkbox values into a string array.

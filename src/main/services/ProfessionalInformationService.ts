@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtProfessionalInformation } from '../schemas/courtProfessionalInformationSchema';
 
 type CourtCodeField = 'magistrateCourtCode' | 'familyCourtCode' | 'tribunalCode' | 'countyCourtCode' | 'crownCourtCode';
@@ -114,7 +114,7 @@ const interviewRoomCountError = 'Enter a number of interview rooms between 1 and
 const dxValidationError = 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class ProfessionalInformationService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async getViewModel(courtId: string): Promise<ProfessionalInformationViewModel | HttpStatusCode> {
     const courtResponse = await this.dataApiRequests.getCourtById(courtId);

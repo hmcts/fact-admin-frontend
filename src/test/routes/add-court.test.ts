@@ -2,7 +2,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Add court page', () => {
@@ -11,7 +11,7 @@ describe('Add court page', () => {
   });
 
   test('renders the add court page', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves([
+    stub(CourtApi.prototype, 'getRegions').resolves([
       { country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ]);
 
@@ -27,10 +27,10 @@ describe('Add court page', () => {
   });
 
   test('re-renders the add court page with validation errors', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves([
+    stub(CourtApi.prototype, 'getRegions').resolves([
       { country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ]);
-    const createCourtStub = stub(DataApiRequests.prototype, 'createCourt');
+    const createCourtStub = stub(CourtApi.prototype, 'createCourt');
 
     const response = await request(app).post('/add-court').send({ name: 'Test', regionId: '' });
 
@@ -54,12 +54,12 @@ describe('Add court page', () => {
       slug: 'reading-crown-court',
       warningNotice: null,
     };
-    stub(DataApiRequests.prototype, 'getRegions').resolves([
+    stub(CourtApi.prototype, 'getRegions').resolves([
       { country: 'england', id: court.regionId, name: 'South East' },
     ]);
-    stub(DataApiRequests.prototype, 'getCourtByName').resolves(404);
+    stub(CourtApi.prototype, 'getCourtByName').resolves(404);
     stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(404);
-    const createCourtStub = stub(DataApiRequests.prototype, 'createCourt').resolves(court);
+    const createCourtStub = stub(CourtApi.prototype, 'createCourt').resolves(court);
 
     const response = await request(app).post('/add-court').send({ name: court.name, regionId: court.regionId });
 

@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
 
@@ -13,7 +13,7 @@ export type GeneralViewModel = Partial<CourtEntity> & {
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class GeneralService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<GeneralViewModel | HttpStatusCode> {
     const courtEntity = await this.dataApiRequests.getCourtById(courtId);

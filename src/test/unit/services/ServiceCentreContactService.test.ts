@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { ServiceCentreContactService } from '../../../main/services/ServiceCentreContactService';
 
@@ -29,7 +29,7 @@ describe('ServiceCentreContactService', () => {
       },
     ] as never);
     jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
 
     const service = new ServiceCentreContactService();
@@ -52,7 +52,7 @@ describe('ServiceCentreContactService', () => {
   test('listContactDetails returns status when contact details request fails', async () => {
     jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreContactDetails').mockResolvedValue(HttpStatusCode.NotFound);
     jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new ServiceCentreContactService();
@@ -88,7 +88,7 @@ describe('ServiceCentreContactService', () => {
 
   test('getContactDescriptionTypeItems returns status or selected options', async () => {
     jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValueOnce(HttpStatusCode.InternalServerError)
       .mockResolvedValueOnce([
         { id: contactTypeId, name: 'General enquiries' },
@@ -138,7 +138,7 @@ describe('ServiceCentreContactService', () => {
   test('submitContactDetailFlow returns validation-error when body is invalid', async () => {
     const createServiceCentreContactDetail = jest.spyOn(ServiceCentreApi.prototype, 'createServiceCentreContactDetail');
     jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
 
     const service = new ServiceCentreContactService();
@@ -166,7 +166,7 @@ describe('ServiceCentreContactService', () => {
   });
 
   test('submitContactDetailFlow returns save-error when type lookup fails during validation', async () => {
-    jest.spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes').mockResolvedValue(HttpStatusCode.BadGateway);
+    jest.spyOn(CourtApi.prototype, 'getContactDescriptionTypes').mockResolvedValue(HttpStatusCode.BadGateway);
 
     const service = new ServiceCentreContactService();
     const result = await service.submitContactDetailFlow({
@@ -220,7 +220,7 @@ describe('ServiceCentreContactService', () => {
       ]) as never
     );
     jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
 
     const service = new ServiceCentreContactService();
@@ -249,7 +249,7 @@ describe('ServiceCentreContactService', () => {
     jest
       .spyOn(ServiceCentreApi.prototype, 'createServiceCentreContactDetail')
       .mockResolvedValue(new Map([['email', 'Email already exists']]) as never);
-    jest.spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes').mockResolvedValue(HttpStatusCode.BadGateway);
+    jest.spyOn(CourtApi.prototype, 'getContactDescriptionTypes').mockResolvedValue(HttpStatusCode.BadGateway);
 
     const service = new ServiceCentreContactService();
     const result = await service.submitContactDetailFlow({
@@ -275,7 +275,7 @@ describe('ServiceCentreContactService', () => {
       .spyOn(ServiceCentreApi.prototype, 'updateServiceCentreContactDetail')
       .mockResolvedValue(HttpStatusCode.Ok);
     const getContactDescriptionTypes = jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValueOnce([{ id: contactTypeId, name: 'General enquiries' }] as never)
       .mockResolvedValueOnce(HttpStatusCode.InternalServerError);
 
@@ -332,7 +332,7 @@ describe('ServiceCentreContactService', () => {
 
   test('resolveContactDetailDescription prefers embedded text and falls back to type lookup', async () => {
     const getContactDescriptionTypes = jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(CourtApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
 
     const service = new ServiceCentreContactService();

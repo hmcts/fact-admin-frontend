@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../schemas/openingHoursSchema';
 
 type Day = {
@@ -91,7 +91,7 @@ const days: Day[] = [
 ];
 
 export class CourtOpeningHoursService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new CourtApi()) {}
 
   public getSelectedDays(value: unknown): string[] {
     if (Array.isArray(value)) {

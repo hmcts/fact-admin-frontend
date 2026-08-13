@@ -2,7 +2,7 @@ import { GET, POST, route } from 'awilix-express';
 import { Request, Response } from 'express';
 
 import { isViewer } from '../modules/authentication/authenticationHelper';
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { OperationsApi } from '../requests/OperationsApi';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ApprovalService } from '../services/ApprovalService';
@@ -12,7 +12,7 @@ import { parseNumber } from '../utils/valueParsers';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
-const dataApiRequests = new DataApiRequests();
+const dataApiRequests = new CourtApi();
 const operationsApi = new OperationsApi();
 const courtLockService = new LockService(operationsApi);
 const locationApprovalController = new LocationApprovalController(

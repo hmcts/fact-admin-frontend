@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../schemas/serviceCentreContactDetailSchema';
@@ -88,7 +88,7 @@ const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+  public constructor(private readonly dataApiRequests = new CourtApi(),
                      private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
