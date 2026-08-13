@@ -14,6 +14,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
+import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { UserApi } from '../../../main/requests/UserApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
@@ -21,6 +22,7 @@ import { CounterServiceOpeningHours } from '../../../main/schemas/counterService
 const dataApiRequests = new DataApiRequests();
 const userApi = new UserApi();
 const operationsApi = new OperationsApi();
+const serviceCentreApi = new ServiceCentreApi();
 
 const errorResponse = {
   isAxiosError: true,
@@ -429,7 +431,7 @@ describe('DataApiRequests', () => {
       data: serviceCentre,
     });
 
-    const response = await dataApiRequests.getServiceCentreByName(serviceCentreName);
+    const response = await serviceCentreApi.getServiceCentreByName(serviceCentreName);
 
     expect(response).toEqual(serviceCentre);
   });
@@ -452,7 +454,7 @@ describe('DataApiRequests', () => {
       data: serviceCentre,
     });
 
-    const response = await dataApiRequests.getServiceCentreById(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
 
     expect(response).toEqual(serviceCentre);
   });
@@ -462,7 +464,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getServiceCentreById(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -472,7 +474,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/service-centres/name/v1', { params: { name: serviceCentreName } }).rejects(errorResponse);
 
-    const response = await dataApiRequests.getServiceCentreByName(serviceCentreName);
+    const response = await serviceCentreApi.getServiceCentreByName(serviceCentreName);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -488,7 +490,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getServiceCentreByName(serviceCentreName);
+    const response = await serviceCentreApi.getServiceCentreByName(serviceCentreName);
 
     expect(response).toBe(HttpStatusCode.Conflict);
   });
@@ -498,7 +500,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/service-centres/name/v1', { params: { name: serviceCentreName } }).rejects(errorMessage);
 
-    const response = await dataApiRequests.getServiceCentreByName(serviceCentreName);
+    const response = await serviceCentreApi.getServiceCentreByName(serviceCentreName);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -524,7 +526,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/service-centres/v1', payload).resolves({ data: serviceCentre });
 
-    const response = await dataApiRequests.createServiceCentre(payload);
+    const response = await serviceCentreApi.createServiceCentre(payload);
 
     expect(response).toEqual(serviceCentre);
   });
@@ -548,7 +550,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/service-centres/v1', payload).rejects(badRequestError);
 
-    const response = await dataApiRequests.createServiceCentre(payload);
+    const response = await serviceCentreApi.createServiceCentre(payload);
 
     expect(response).toEqual(new Map([['name', 'Name already exists']]));
   });
@@ -569,7 +571,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createServiceCentre(payload);
+    const response = await serviceCentreApi.createServiceCentre(payload);
 
     expect(response).toBe(HttpStatusCode.Conflict);
   });
@@ -589,7 +591,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createServiceCentre(payload);
+    const response = await serviceCentreApi.createServiceCentre(payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -3622,7 +3624,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).resolves({ data: serviceCentre });
 
-    const response = await dataApiRequests.getServiceCentreById(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
 
     expect(response).toEqual(serviceCentre);
   });
@@ -3638,7 +3640,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getServiceCentreById(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
 
     expect(response).toBe(HttpStatusCode.Forbidden);
   });
@@ -3666,7 +3668,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateServiceCentre(serviceCentre);
+    const response = await serviceCentreApi.updateServiceCentre(serviceCentre);
 
     expect(response).toEqual(new Map([['name', 'Name already exists']]));
   });
@@ -3680,7 +3682,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/v1/areas-of-law`).resolves({ data: areasOfLaw });
 
-    const response = await dataApiRequests.getServiceCentreAreasOfLaw(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreAreasOfLaw(serviceCentreId);
 
     expect(response).toEqual([
       expect.objectContaining({ selected: true }),
@@ -3702,7 +3704,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateServiceCentreAreasOfLaw(payload);
+    const response = await serviceCentreApi.updateServiceCentreAreasOfLaw(payload);
 
     expect(response).toBe(HttpStatusCode.BadGateway);
   });
@@ -3726,7 +3728,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/v1/address`).resolves({ data: addresses });
 
-    const response = await dataApiRequests.getServiceCentreAddressDetails(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
 
     expect(response).toEqual(addresses);
   });
@@ -3749,7 +3751,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/v1/address/${addressId}`).resolves({ data: address });
 
-    const response = await dataApiRequests.getServiceCentreAddressDetailsById(serviceCentreId, addressId);
+    const response = await serviceCentreApi.getServiceCentreAddressDetailsById(serviceCentreId, addressId);
 
     expect(response).toEqual(address);
   });
@@ -3773,7 +3775,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.saveServiceCentreAddress(payload, serviceCentreId);
+    const response = await serviceCentreApi.saveServiceCentreAddress(payload, serviceCentreId);
 
     expect(response).toEqual(new Map([['postcode', 'Invalid postcode']]));
   });
@@ -3804,7 +3806,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/service-centres/${serviceCentreId}/v1/address/${addressId}`, payload)
       .resolves({ data: updatedAddress });
 
-    const response = await dataApiRequests.updateServiceCentreAddress(payload, serviceCentreId, addressId);
+    const response = await serviceCentreApi.updateServiceCentreAddress(payload, serviceCentreId, addressId);
 
     expect(response).toEqual(updatedAddress);
   });
@@ -3817,7 +3819,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.deleteServiceCentreAddress(serviceCentreId, addressId);
+    const response = await serviceCentreApi.deleteServiceCentreAddress(serviceCentreId, addressId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -3839,7 +3841,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/v1/contact-details`).resolves({ data: contactDetails });
 
-    const response = await dataApiRequests.getServiceCentreContactDetails(serviceCentreId);
+    const response = await serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
 
     expect(response).toEqual(contactDetails);
   });
@@ -3864,7 +3866,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createServiceCentreContactDetail(serviceCentreId, payload);
+    const response = await serviceCentreApi.createServiceCentreContactDetail(serviceCentreId, payload);
 
     expect(response).toEqual(new Map([['email', 'Email is invalid']]));
   });
@@ -3884,7 +3886,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/service-centres/${serviceCentreId}/v1/contact-details/${contactDetailId}`, payload)
       .resolves({ status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.updateServiceCentreContactDetail(serviceCentreId, contactDetailId, payload);
+    const response = await serviceCentreApi.updateServiceCentreContactDetail(serviceCentreId, contactDetailId, payload);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -3897,7 +3899,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/service-centres/${serviceCentreId}/v1/contact-details/${contactDetailId}`)
       .resolves({ status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.deleteServiceCentreContactDetail(serviceCentreId, contactDetailId);
+    const response = await serviceCentreApi.deleteServiceCentreContactDetail(serviceCentreId, contactDetailId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });

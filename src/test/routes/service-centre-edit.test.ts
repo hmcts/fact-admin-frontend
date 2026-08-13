@@ -3,13 +3,13 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
 import { OperationsApi } from '../../main/requests/OperationsApi';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre edit page', () => {
   beforeEach(() => {
     restore();
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
       open: true,

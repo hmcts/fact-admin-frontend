@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
 
 export const serviceCentreAreasOfLawValidationMessage =
@@ -27,7 +27,7 @@ export type SaveServiceCentreCasesHeardResult =
   | { type: 'validation_error'; viewModel: ServiceCentreCasesHeardViewModel };
 
 export class ServiceCentreCasesHeardService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public getSelectedAreasOfLaw(value: unknown): string[] {
     if (Array.isArray(value)) {
@@ -46,7 +46,7 @@ export class ServiceCentreCasesHeardService {
     selectedAreasOfLaw?: string[],
     areasOfLawError?: string
   ): Promise<ServiceCentreCasesHeardViewModel | HttpStatusCode> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
 
     if (this.isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
@@ -64,7 +64,7 @@ export class ServiceCentreCasesHeardService {
     serviceCentreId: string,
     selectedAreasOfLaw: string[]
   ): Promise<SaveServiceCentreCasesHeardResult> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
 
     if (this.isHttpStatusCode(serviceCentreResponse)) {
       return { status: serviceCentreResponse, type: 'status' };
@@ -85,7 +85,7 @@ export class ServiceCentreCasesHeardService {
         : { type: 'validation_error', viewModel };
     }
 
-    const updateResponse = await this.dataApiRequests.updateServiceCentreAreasOfLaw({
+    const updateResponse = await this.serviceCentreApi.updateServiceCentreAreasOfLaw({
       areasOfLaw: selectedAreasOfLaw,
       serviceCentreId,
     });
@@ -107,7 +107,7 @@ export class ServiceCentreCasesHeardService {
     selectedAreasOfLaw?: string[],
     areasOfLawError?: string
   ): Promise<ServiceCentreCasesHeardViewModel | HttpStatusCode> {
-    const areasOfLawResponse = await this.dataApiRequests.getServiceCentreAreasOfLaw(serviceCentreId);
+    const areasOfLawResponse = await this.serviceCentreApi.getServiceCentreAreasOfLaw(serviceCentreId);
 
     if (this.isHttpStatusCode(areasOfLawResponse)) {
       return areasOfLawResponse;

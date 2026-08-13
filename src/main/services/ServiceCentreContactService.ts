@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../schemas/serviceCentreSchema';
@@ -87,10 +88,11 @@ const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
-    return this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    return this.serviceCentreApi.getServiceCentreById(serviceCentreId);
   }
 
   public async listContactDetails(serviceCentreId: string): Promise<
@@ -102,7 +104,7 @@ export class ServiceCentreContactService {
     | HttpStatusCode
   > {
     const [contactDetailsResponse, contactDescriptionTypesResponse] = await Promise.all([
-      this.dataApiRequests.getServiceCentreContactDetails(serviceCentreId),
+      this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId),
       this.dataApiRequests.getContactDescriptionTypes(),
     ]);
 
@@ -133,7 +135,7 @@ export class ServiceCentreContactService {
     serviceCentreId: string,
     contactDetailId: string
   ): Promise<ServiceCentreContactDetail | undefined | HttpStatusCode> {
-    const contactDetailsResponse = await this.dataApiRequests.getServiceCentreContactDetails(serviceCentreId);
+    const contactDetailsResponse = await this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
     if (typeof contactDetailsResponse === 'number') {
       return contactDetailsResponse;
     }
@@ -241,7 +243,7 @@ export class ServiceCentreContactService {
   }
 
   public async deleteContactDetail(serviceCentreId: string, contactDetailId: string): Promise<HttpStatusCode> {
-    return this.dataApiRequests.deleteServiceCentreContactDetail(serviceCentreId, contactDetailId);
+    return this.serviceCentreApi.deleteServiceCentreContactDetail(serviceCentreId, contactDetailId);
   }
 
   public async resolveContactDetailDescription(contactDetail: ServiceCentreContactDetail): Promise<string> {
@@ -377,10 +379,10 @@ export class ServiceCentreContactService {
     contactDetailId?: string
   ): Promise<HttpStatusCode | Map<string, string>> {
     if (contactDetailId) {
-      return this.dataApiRequests.updateServiceCentreContactDetail(serviceCentreId, contactDetailId, payload);
+      return this.serviceCentreApi.updateServiceCentreContactDetail(serviceCentreId, contactDetailId, payload);
     }
 
-    return this.dataApiRequests.createServiceCentreContactDetail(serviceCentreId, payload);
+    return this.serviceCentreApi.createServiceCentreContactDetail(serviceCentreId, payload);
   }
 
   private buildValidationFormViewModel(

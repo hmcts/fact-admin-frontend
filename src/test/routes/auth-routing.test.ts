@@ -2,7 +2,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 import { UserApi } from '../../main/requests/UserApi';
 import { ApprovalService } from '../../main/services/ApprovalService';
 import { CounterServiceOpeningHoursService } from '../../main/services/CounterServiceOpeningHoursService';
@@ -133,8 +133,8 @@ describe('Authentication routing', () => {
   });
 
   test('allows viewer users to access safe service centre review pages', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').resolves([]);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Service Centre',
       pageTitle: 'General - Reading Service Centre',

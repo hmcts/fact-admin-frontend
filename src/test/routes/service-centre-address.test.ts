@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre address routes', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';
@@ -13,14 +13,14 @@ describe('Service centre address routes', () => {
   });
 
   test('renders address list with add button when no addresses exist', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: false,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').resolves([]);
 
     const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/address?isNewSC=true`);
 
@@ -31,14 +31,14 @@ describe('Service centre address routes', () => {
   });
 
   test('renders address list with edit and delete when one address exists', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').resolves([
       {
         id: '22222222-2222-4222-8222-222222222222',
         serviceCentreId,
@@ -67,14 +67,14 @@ describe('Service centre address routes', () => {
   });
 
   test('renders delete confirmation page', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetailsById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAddressDetailsById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       serviceCentreId,
       addressLine1: '1 Test Street',
@@ -99,14 +99,14 @@ describe('Service centre address routes', () => {
   });
 
   test('deletes address and renders success page', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').resolves([
       {
         id: '22222222-2222-4222-8222-222222222222',
         serviceCentreId,
@@ -121,7 +121,9 @@ describe('Service centre address routes', () => {
         addressType: 'VISIT_US',
       },
     ] as never);
-    const deleteStub = stub(DataApiRequests.prototype, 'deleteServiceCentreAddress').resolves(HttpStatusCode.NoContent);
+    const deleteStub = stub(ServiceCentreApi.prototype, 'deleteServiceCentreAddress').resolves(
+      HttpStatusCode.NoContent
+    );
 
     const response = await request(app).post(
       `/service-centres/${serviceCentreId}/edit/address/delete/success/22222222-2222-4222-8222-222222222222`

@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 
 type AddCourtForm = {
@@ -29,7 +30,8 @@ type AddCourtResult =
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class AddCourtService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   /**
    * Builds the empty add-court page model, including regions for the mandatory dropdown.
@@ -155,7 +157,7 @@ export class AddCourtService {
       return duplicateCourt;
     }
 
-    const duplicateServiceCentre = await this.dataApiRequests.getServiceCentreByName(name);
+    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
     if (typeof duplicateServiceCentre !== 'number') {
       return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
     }

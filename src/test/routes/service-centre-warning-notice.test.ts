@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre warning notice page', () => {
   const serviceCentreId = '22222222-2222-4222-8222-222222222222';
@@ -13,7 +13,7 @@ describe('Service centre warning notice page', () => {
   });
 
   test('renders warning notice edit page for a known service centre', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
@@ -29,13 +29,13 @@ describe('Service centre warning notice page', () => {
   });
 
   test('returns validation error when warning notice exceeds 250 chars', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
       warningNoticeCy: null,
     } as never);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/warning-notice/success`)
@@ -49,7 +49,7 @@ describe('Service centre warning notice page', () => {
   });
 
   test('trims and saves warning notice', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -58,7 +58,7 @@ describe('Service centre warning notice page', () => {
       warningNotice: null,
       warningNoticeCy: null,
     } as never);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,

@@ -3,10 +3,10 @@ import type { Request, Response } from 'express';
 import { assert, mock, restore, stub } from 'sinon';
 
 import ServiceCentreEditController from '../../../main/controllers/ServiceCentreEditController';
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { OperationsApi } from '../../../main/requests/OperationsApi';
+import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
-import { OperationsApi } from '../../../main/requests/OperationsApi';
 
 describe('ServiceCentreEditController', () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('renders the service centre edit view', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
       open: true,
@@ -84,7 +84,7 @@ describe('ServiceCentreEditController', () => {
     const request = mockRequest({});
     request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves(
       HttpStatusCode.InternalServerError
     );
 
@@ -101,7 +101,7 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('renders approval confirmation for SuperAdmin', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
     } as never);
@@ -141,7 +141,7 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('approves service centre data for Viewer', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
     } as never);
@@ -194,7 +194,7 @@ describe('ServiceCentreEditController', () => {
     await controller.getApprove(invalidRequest, invalidResponse);
     expect(invalidResponse.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
 
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(HttpStatusCode.BadGateway);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves(HttpStatusCode.BadGateway);
     const failedResponse = approvalResponse();
     await controller.getApprove(approvalRequest('SuperAdmin'), failedResponse);
     expect(failedResponse.status).toHaveBeenCalledWith(HttpStatusCode.BadGateway);

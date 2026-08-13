@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { DataApiRequests } from '../requests/DataApiRequests';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
 
@@ -39,7 +40,8 @@ type AddServiceCentreResult = AddServiceCentrePageModel | AddServiceCentreSucces
 const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 
 export class AddServiceCentreService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly dataApiRequests = new DataApiRequests(),
+                     private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {
     const modelData = await this.getModelData();
@@ -116,7 +118,7 @@ export class AddServiceCentreService {
       });
     }
 
-    const createResponse = await this.dataApiRequests.createServiceCentre({
+    const createResponse = await this.serviceCentreApi.createServiceCentre({
       name,
       open: false,
       regionId,
@@ -158,7 +160,7 @@ export class AddServiceCentreService {
       return duplicateCourt;
     }
 
-    const duplicateServiceCentre = await this.dataApiRequests.getServiceCentreByName(name);
+    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
     if (typeof duplicateServiceCentre !== 'number') {
       return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
     }
