@@ -13,17 +13,17 @@ describe('WarningNoticeService', () => {
   };
 
   function buildService(overrides: Partial<CourtApi> = {}) {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue(courtResponse),
       updateCourt: jest.fn().mockResolvedValue({}),
       ...overrides,
     } as unknown as CourtApi;
 
     return {
-      dataApiRequests,
-      getCourtById: dataApiRequests.getCourtById as jest.Mock,
-      updateCourt: dataApiRequests.updateCourt as jest.Mock,
-      service: new WarningNoticeService(dataApiRequests),
+      courtApi,
+      getCourtById: courtApi.getCourtById as jest.Mock,
+      updateCourt: courtApi.updateCourt as jest.Mock,
+      service: new WarningNoticeService(courtApi),
     };
   }
 

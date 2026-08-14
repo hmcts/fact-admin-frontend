@@ -27,7 +27,7 @@ describe('CounterServiceOpeningHoursService', () => {
   };
 
   function buildService(overrides: Partial<CourtApi> = {}) {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
       getCounterServiceOpeningHours: jest.fn().mockResolvedValue([existingRecord]),
       getCounterServiceOpeningHoursById: jest.fn().mockResolvedValue(existingRecord),
@@ -37,10 +37,10 @@ describe('CounterServiceOpeningHoursService', () => {
     } as unknown as CourtApi;
 
     return {
-      dataApiRequests,
-      saveCounterServiceOpeningHours: dataApiRequests.saveCounterServiceOpeningHours as jest.Mock,
-      deleteCounterServiceOpeningHours: dataApiRequests.deleteCounterServiceOpeningHours as jest.Mock,
-      service: new CounterServiceOpeningHoursService(dataApiRequests),
+      courtApi,
+      saveCounterServiceOpeningHours: courtApi.saveCounterServiceOpeningHours as jest.Mock,
+      deleteCounterServiceOpeningHours: courtApi.deleteCounterServiceOpeningHours as jest.Mock,
+      service: new CounterServiceOpeningHoursService(courtApi),
     };
   }
 
