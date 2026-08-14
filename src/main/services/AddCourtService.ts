@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 
@@ -32,14 +33,15 @@ const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 export class AddCourtService {
   public constructor(
     private readonly courtApi = new CourtApi(),
-    private readonly serviceCentreApi = new ServiceCentreApi()
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi(),
   ) {}
 
   /**
    * Builds the empty add-court page model, including regions for the mandatory dropdown.
    */
   public async getViewModel(form: AddCourtForm = {}): Promise<AddCourtPageModel | HttpStatusCode> {
-    const regions = await this.courtApi.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -99,7 +101,7 @@ export class AddCourtService {
       return this.getViewModelWithErrors(trimmedForm, validationErrors);
     }
 
-    const regions = await this.courtApi.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -174,7 +176,7 @@ export class AddCourtService {
     form: AddCourtForm,
     errors: Record<string, string[]>
   ): Promise<AddCourtPageModel | HttpStatusCode> {
-    const regions = await this.courtApi.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }

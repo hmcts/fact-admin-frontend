@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../schemas/courtAddressSchema';
 import { DpaAddress } from '../schemas/osDataSchema';
 import {
@@ -49,6 +50,7 @@ export type DeleteCourtAddressResponse =
 const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 
 const courtApi = new CourtApi();
+const referenceDataApi = new ReferenceDataApi();
 
 export class CourtAddressService {
   public async list(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {
@@ -64,7 +66,7 @@ export class CourtAddressService {
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await courtApi.getAddressesForPostcode(postcode);
+    const result = await referenceDataApi.getAddressesForPostcode(postcode);
     if (typeof result === 'number') {
       return result;
     }

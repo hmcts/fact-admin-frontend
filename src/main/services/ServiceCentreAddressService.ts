@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { DpaAddress } from '../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
@@ -44,8 +44,8 @@ export type RetrieveAddressOptionsResponse =
 
 export class ServiceCentreAddressService {
   public constructor(
-    private readonly courtApi = new CourtApi(),
-    private readonly serviceCentreApi = new ServiceCentreApi()
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
   ) {}
 
   public async list(serviceCentreId: string): Promise<ServiceCentreAddress[] | HttpStatusCode> {
@@ -66,7 +66,7 @@ export class ServiceCentreAddressService {
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await this.courtApi.getAddressesForPostcode(postcode);
+    const result = await this.referenceDataApi.getAddressesForPostcode(postcode);
     if (typeof result === 'number') {
       return result;
     }

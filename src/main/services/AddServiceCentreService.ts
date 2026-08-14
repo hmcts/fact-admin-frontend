@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
@@ -42,7 +43,8 @@ const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 export class AddServiceCentreService {
   public constructor(
     private readonly courtApi = new CourtApi(),
-    private readonly serviceCentreApi = new ServiceCentreApi()
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi(),
   ) {}
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {
@@ -183,12 +185,12 @@ export class AddServiceCentreService {
   }
 
   private async getModelData(): Promise<{ regions: Region[]; serviceAreas: ServiceArea[] } | HttpStatusCode> {
-    const regions = await this.courtApi.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
 
-    const serviceAreas = await this.courtApi.getServiceAreas();
+    const serviceAreas = await this.referenceDataApi.getServiceAreas();
     if (typeof serviceAreas === 'number') {
       return serviceAreas;
     }

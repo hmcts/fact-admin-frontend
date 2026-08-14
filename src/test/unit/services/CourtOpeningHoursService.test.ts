@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import {
   CourtOpeningHoursService,
   OpeningHoursForm,
@@ -23,20 +24,25 @@ describe('CourtOpeningHoursService', () => {
     nameCy: 'Oriau agor y tribiwnlys',
   };
 
-  function buildService(overrides: Partial<CourtApi> = {}) {
+  function buildService(overrides: Partial<CourtApi & ReferenceDataApi> = {}) {
     const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
-      getOpeningHourTypes: jest.fn().mockResolvedValue([courtOpenType, tribunalOpenType]),
       getCourtOpeningHours: jest.fn().mockResolvedValue([]),
       getCourtOpeningHoursById: jest.fn(),
       saveCourtOpeningHours: jest.fn(),
       ...overrides,
     } as unknown as CourtApi;
 
+    const referenceDataApi = {
+      getOpeningHourTypes: jest.fn().mockResolvedValue([courtOpenType, tribunalOpenType]),
+      ...overrides,
+    } as unknown as ReferenceDataApi;
+
     return {
       courtApi,
+      getOpeningHourTypes: referenceDataApi.getOpeningHourTypes as jest.Mock,
       saveCourtOpeningHours: courtApi.saveCourtOpeningHours as jest.Mock,
-      service: new CourtOpeningHoursService(courtApi),
+      service: new CourtOpeningHoursService(courtApi, referenceDataApi),
     };
   }
 

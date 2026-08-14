@@ -43,7 +43,7 @@ describe('AddServiceCentreService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
     };
-    const service = new AddServiceCentreService(requests as never, requests as never);
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
 
     await expect(service.getViewModel()).resolves.toEqual({
       ...unselectedServiceAreaColumns,
@@ -83,7 +83,7 @@ describe('AddServiceCentreService', () => {
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreByName: jest.fn(),
     };
-    const service = new AddServiceCentreService(requests as never, requests as never);
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
 
     await expect(service.create({ name: 'Te', regionId: '', serviceAreaIds: [] })).resolves.toEqual({
       errors: {
@@ -112,7 +112,7 @@ describe('AddServiceCentreService', () => {
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreByName: jest.fn().mockResolvedValue(createdServiceCentre),
     };
-    const service = new AddServiceCentreService(requests as never, requests as never);
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
 
     await expect(
       service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
@@ -140,7 +140,7 @@ describe('AddServiceCentreService', () => {
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreByName: jest.fn(),
     };
-    const service = new AddServiceCentreService(requests as never, requests as never);
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
 
     await expect(
       service.create({ name: createdCourt.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
@@ -169,7 +169,7 @@ describe('AddServiceCentreService', () => {
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
-    const service = new AddServiceCentreService(requests as never, requests as never);
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
 
     await expect(
       service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
@@ -201,7 +201,7 @@ describe('AddServiceCentreService', () => {
       getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
       getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
-    const service = new AddServiceCentreService(requests as never, requests as never);
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
 
     await expect(
       service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })

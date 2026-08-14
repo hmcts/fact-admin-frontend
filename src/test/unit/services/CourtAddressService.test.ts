@@ -4,6 +4,7 @@ import { CourtApi } from '../../../main/requests/CourtApi';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
 import { CourtEntity } from '../../../main/schemas/courtEntitySchema';
 import { CourtAddressService } from '../../../main/services/CourtAddressService';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 
 describe('CourtAddressService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -68,7 +69,7 @@ describe('CourtAddressService', () => {
   });
 
   test('maps postcode search result DPA entries and removes null values', async () => {
-    jest.spyOn(CourtApi.prototype, 'getAddressesForPostcode').mockResolvedValue({
+    jest.spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode').mockResolvedValue({
       results: [
         {
           DPA: {
@@ -103,7 +104,7 @@ describe('CourtAddressService', () => {
 
   test('returns invalid response when postcode search API returns a message map', async () => {
     jest
-      .spyOn(CourtApi.prototype, 'getAddressesForPostcode')
+      .spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode')
       .mockResolvedValue(new Map([['message', 'Postcode is invalid']]));
 
     const service = new CourtAddressService();
@@ -113,7 +114,7 @@ describe('CourtAddressService', () => {
   });
 
   test('returns bad request when postcode search API returns map without message', async () => {
-    jest.spyOn(CourtApi.prototype, 'getAddressesForPostcode').mockResolvedValue(new Map([['postcode', 'BAD']]));
+    jest.spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode').mockResolvedValue(new Map([['postcode', 'BAD']]));
 
     const service = new CourtAddressService();
     const result = await service.retrieveAddressOptions('BAD');
@@ -122,7 +123,7 @@ describe('CourtAddressService', () => {
   });
 
   test('returns status code when postcode search API returns an http status', async () => {
-    jest.spyOn(CourtApi.prototype, 'getAddressesForPostcode').mockResolvedValue(HttpStatusCode.InternalServerError);
+    jest.spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode').mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new CourtAddressService();
     const result = await service.retrieveAddressOptions('SW1A 1AA');

@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
@@ -44,7 +45,8 @@ export type ServiceCentreGeneralSaveResult =
 export class ServiceCentreGeneralService {
   public constructor(
     private readonly courtApi = new CourtApi(),
-    private readonly serviceCentreApi = new ServiceCentreApi()
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
   ) {}
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreGeneralViewModel | HttpStatusCode> {
@@ -53,12 +55,12 @@ export class ServiceCentreGeneralService {
       return serviceCentreResponse;
     }
 
-    const serviceAreasResponse = await this.courtApi.getServiceAreas();
+    const serviceAreasResponse = await this.referenceDataApi.getServiceAreas();
     if (typeof serviceAreasResponse === 'number') {
       return serviceAreasResponse;
     }
 
-    const regions = await this.courtApi.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -78,12 +80,12 @@ export class ServiceCentreGeneralService {
       return { status: existingServiceCentre, type: 'status' };
     }
 
-    const serviceAreasResponse = await this.courtApi.getServiceAreas();
+    const serviceAreasResponse = await this.referenceDataApi.getServiceAreas();
     if (typeof serviceAreasResponse === 'number') {
       return { status: serviceAreasResponse, type: 'status' };
     }
 
-    const regions = await this.courtApi.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return { status: regions, type: 'status' };
     }

@@ -5,6 +5,7 @@ import { SaveCourtContactDetailRequest } from '../requests/types/SaveCourtContac
 import { CourtContactDetail } from '../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { parseString } from '../utils/valueParsers';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 
 export type CourtContactFormValues = {
   contactEmail: string;
@@ -92,6 +93,7 @@ const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 const courtApi = new CourtApi();
+const referenceDataApi = new ReferenceDataApi();
 
 export class CourtContactService {
   public async getCourtById(courtId: string): Promise<CourtEntity | HttpStatusCode> {
@@ -108,7 +110,7 @@ export class CourtContactService {
   > {
     const [courtContactDetailsResponse, contactDescriptionTypesResponse] = await Promise.all([
       courtApi.getCourtContactDetails(courtId),
-      courtApi.getContactDescriptionTypes(),
+      referenceDataApi.getContactDescriptionTypes(),
     ]);
     if (typeof courtContactDetailsResponse === 'number') {
       return courtContactDetailsResponse;
@@ -143,7 +145,7 @@ export class CourtContactService {
   public async getContactDescriptionTypeItems(
     selectedId?: string
   ): Promise<CourtContactDescriptionTypeItem[] | HttpStatusCode> {
-    const contactDescriptionTypesResponse = await courtApi.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return contactDescriptionTypesResponse;
     }
@@ -358,7 +360,7 @@ export class CourtContactService {
   }
 
   public async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await courtApi.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return 'Contact details';
     }

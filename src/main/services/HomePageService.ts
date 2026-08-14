@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { UserApi } from '../requests/UserApi';
 import { PagedCourts } from '../schemas/courtListSchema';
 import { FavouriteStatus, PagedFavourites } from '../schemas/favouriteSchema';
@@ -10,6 +11,7 @@ import { HomePageFiltersService } from './HomePageFiltersService';
 import { HomePageViewService, buildFavouriteKey } from './HomePageViewService';
 import { HomePageFilters, HomePageViewModel } from './types/HomePage.types';
 
+
 /**
  * Coordinates homepage data loading and delegates filter and view-model concerns
  * to smaller focused services.
@@ -18,6 +20,7 @@ export class HomePageService {
   public constructor(
     private readonly courtApi = new CourtApi(),
     private readonly userApi = new UserApi(),
+    private readonly referenceDataApi = new ReferenceDataApi(),
     private readonly homePageFiltersService = new HomePageFiltersService(),
     private readonly homePageViewService = new HomePageViewService()
   ) {}
@@ -28,7 +31,7 @@ export class HomePageService {
   public async getHomePageViewModel(filters: HomePageFilters, isReviewMode = false): Promise<HomePageViewModel> {
     const requestedFavouritesPage = filters.favouritesPageNumber ?? 0;
     const [regionsResponse, initialFavouritesResponse] = await Promise.all([
-      this.courtApi.getRegions(),
+      this.referenceDataApi.getRegions(),
       this.userApi.getFavourites({ pageNumber: requestedFavouritesPage, pageSize: 25 }),
     ]);
     const regions = Array.isArray(regionsResponse) ? regionsResponse : [];

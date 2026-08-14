@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../schemas/serviceCentreContactDetailSchema';
@@ -89,8 +89,8 @@ const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
   public constructor(
-    private readonly courtApi = new CourtApi(),
-    private readonly serviceCentreApi = new ServiceCentreApi()
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
   ) {}
 
   public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
@@ -107,7 +107,7 @@ export class ServiceCentreContactService {
   > {
     const [contactDetailsResponse, contactDescriptionTypesResponse] = await Promise.all([
       this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId),
-      this.courtApi.getContactDescriptionTypes(),
+      this.referenceDataApi.getContactDescriptionTypes(),
     ]);
 
     if (typeof contactDetailsResponse === 'number') {
@@ -148,7 +148,7 @@ export class ServiceCentreContactService {
   public async getContactDescriptionTypeItems(
     selectedId?: string
   ): Promise<ServiceCentreContactDescriptionTypeItem[] | HttpStatusCode> {
-    const contactDescriptionTypesResponse = await this.courtApi.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return contactDescriptionTypesResponse;
     }
@@ -260,7 +260,7 @@ export class ServiceCentreContactService {
   }
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await this.courtApi.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return 'Contact details';
     }

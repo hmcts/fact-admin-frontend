@@ -14,6 +14,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 import { CourtApi } from '../../../main/requests/CourtApi';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { UserApi } from '../../../main/requests/UserApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
@@ -23,6 +24,7 @@ const courtApi = new CourtApi();
 const userApi = new UserApi();
 const operationsApi = new OperationsApi();
 const serviceCentreApi = new ServiceCentreApi();
+const referenceDataApi = new ReferenceDataApi();
 
 const errorResponse = {
   isAxiosError: true,
@@ -99,7 +101,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/regions').resolves({ data: regions });
 
-    const response = await courtApi.getRegions();
+    const response = await referenceDataApi.getRegions();
 
     expect(response).toEqual(regions);
   });
@@ -107,7 +109,7 @@ describe('DataApiRequests', () => {
   it('returns not found when the regions endpoint returns a 404', async () => {
     getStub.withArgs('/types/v1/regions').rejects(errorResponse);
 
-    const response = await courtApi.getRegions();
+    const response = await referenceDataApi.getRegions();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -117,7 +119,7 @@ describe('DataApiRequests', () => {
       data: [{ country: 'England' }],
     });
 
-    const response = await courtApi.getRegions();
+    const response = await referenceDataApi.getRegions();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -763,7 +765,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/opening-hours-types').resolves({ data: openingHourTypes });
 
-    const response = await courtApi.getOpeningHourTypes();
+    const response = await referenceDataApi.getOpeningHourTypes();
 
     expect(response).toEqual(openingHourTypes);
   });
@@ -771,7 +773,7 @@ describe('DataApiRequests', () => {
   it('returns not found when fetching opening hour types fails with an axios status', async () => {
     getStub.withArgs('/types/v1/opening-hours-types').rejects(errorResponse);
 
-    const response = await courtApi.getOpeningHourTypes();
+    const response = await referenceDataApi.getOpeningHourTypes();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -779,7 +781,7 @@ describe('DataApiRequests', () => {
   it('returns internal server error when fetching opening hour types throws a non-axios error', async () => {
     getStub.withArgs('/types/v1/opening-hours-types').rejects(new Error('Unexpected error'));
 
-    const response = await courtApi.getOpeningHourTypes();
+    const response = await referenceDataApi.getOpeningHourTypes();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1817,7 +1819,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects(errorResponse);
 
-    const response = await courtApi.getAddressesForPostcode(postcode);
+    const response = await referenceDataApi.getAddressesForPostcode(postcode);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -1827,7 +1829,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects(new Error('Unexpected error'));
 
-    const response = await courtApi.getAddressesForPostcode(postcode);
+    const response = await referenceDataApi.getAddressesForPostcode(postcode);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1858,7 +1860,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/search/address/v1/postcode/${postcode}`).resolves({ data: osData });
 
-    const response = await courtApi.getAddressesForPostcode(postcode);
+    const response = await referenceDataApi.getAddressesForPostcode(postcode);
 
     expect(response).toEqual(osData);
   });
@@ -1877,7 +1879,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await courtApi.getAddressesForPostcode(postcode);
+    const response = await referenceDataApi.getAddressesForPostcode(postcode);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -1891,7 +1893,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await courtApi.getAreasOfLaw();
+    const response = await referenceDataApi.getAreasOfLaw();
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
   });
@@ -1911,7 +1913,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/areas-of-law').resolves({ data: areasOfLaw });
 
-    const response = await courtApi.getAreasOfLaw();
+    const response = await referenceDataApi.getAreasOfLaw();
 
     expect(response).toEqual(areasOfLaw);
   });
@@ -1921,7 +1923,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing required fields' }],
     });
 
-    const response = await courtApi.getAreasOfLaw();
+    const response = await referenceDataApi.getAreasOfLaw();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1937,7 +1939,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/service-areas').resolves({ data: serviceAreas });
 
-    const response = await courtApi.getServiceAreas();
+    const response = await referenceDataApi.getServiceAreas();
 
     expect(response).toEqual(serviceAreas);
   });
@@ -1947,7 +1949,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing id' }],
     });
 
-    const response = await courtApi.getServiceAreas();
+    const response = await referenceDataApi.getServiceAreas();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1955,7 +1957,7 @@ describe('DataApiRequests', () => {
   it('returns status code when service areas request fails with axios error', async () => {
     getStub.withArgs('/types/v1/service-areas').rejects(errorResponse);
 
-    const response = await courtApi.getServiceAreas();
+    const response = await referenceDataApi.getServiceAreas();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -1970,7 +1972,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/court-types').resolves({ data: courtTypes });
 
-    const response = await courtApi.getCourtTypes();
+    const response = await referenceDataApi.getCourtTypes();
 
     expect(response).toEqual(courtTypes);
   });
@@ -1980,7 +1982,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing required fields' }],
     });
 
-    const response = await courtApi.getCourtTypes();
+    const response = await referenceDataApi.getCourtTypes();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1994,7 +1996,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await courtApi.getCourtTypes();
+    const response = await referenceDataApi.getCourtTypes();
 
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
@@ -2017,7 +2019,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/contact-description-types').resolves({ data: contactDescriptionTypes });
 
-    const response = await courtApi.getContactDescriptionTypes();
+    const response = await referenceDataApi.getContactDescriptionTypes();
 
     expect(response).toEqual([
       {
@@ -2040,7 +2042,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing id' }],
     });
 
-    const response = await courtApi.getContactDescriptionTypes();
+    const response = await referenceDataApi.getContactDescriptionTypes();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2054,7 +2056,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await courtApi.getContactDescriptionTypes();
+    const response = await referenceDataApi.getContactDescriptionTypes();
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
   });
@@ -2153,7 +2155,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/local-authorities').resolves({ data: localAuthorities });
 
-    const response = await courtApi.getLocalAuthorities();
+    const response = await referenceDataApi.getLocalAuthorities();
 
     expect(response).toEqual(localAuthorities);
   });
@@ -2163,7 +2165,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing required fields' }],
     });
 
-    const response = await courtApi.getLocalAuthorities();
+    const response = await referenceDataApi.getLocalAuthorities();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });

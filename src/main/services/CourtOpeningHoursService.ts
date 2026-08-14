@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../schemas/openingHoursSchema';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 
 type Day = {
   idPrefix: string;
@@ -91,7 +92,8 @@ const days: Day[] = [
 ];
 
 export class CourtOpeningHoursService {
-  public constructor(private readonly courtApi = new CourtApi()) {}
+  public constructor(private readonly courtApi = new CourtApi(),
+                     private readonly referenceDataApi = new ReferenceDataApi()) {}
 
   public getSelectedDays(value: unknown): string[] {
     if (Array.isArray(value)) {
@@ -279,7 +281,7 @@ export class CourtOpeningHoursService {
       return courtResponse;
     }
 
-    const openingHourTypesResponse = await this.courtApi.getOpeningHourTypes();
+    const openingHourTypesResponse = await this.referenceDataApi.getOpeningHourTypes();
     if (this.isHttpStatusCode(openingHourTypesResponse)) {
       return openingHourTypesResponse;
     }
@@ -536,7 +538,7 @@ export class CourtOpeningHoursService {
   }
 
   private async getOpeningHourTypesById(): Promise<Map<string, string>> {
-    const openingHourTypesResponse = await this.courtApi.getOpeningHourTypes();
+    const openingHourTypesResponse = await this.referenceDataApi.getOpeningHourTypes();
 
     if (this.isHttpStatusCode(openingHourTypesResponse)) {
       return new Map();

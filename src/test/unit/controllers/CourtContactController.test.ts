@@ -4,6 +4,7 @@ import { assert, match, mock, stub } from 'sinon';
 
 import CourtContactController from '../../../main/controllers/CourtContactController';
 import { CourtApi } from '../../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtContactController', () => {
@@ -32,7 +33,7 @@ describe('CourtContactController', () => {
         courtContactDescription: null,
       },
     ] as never);
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'desc-id',
         name: 'Enquiries',
@@ -156,7 +157,7 @@ describe('CourtContactController', () => {
     const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves(
       HttpStatusCode.InternalServerError
     );
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([] as never);
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([] as never);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -188,7 +189,7 @@ describe('CourtContactController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         name: 'General enquiries',
@@ -339,7 +340,7 @@ describe('CourtContactController', () => {
     const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail').resolves(
       HttpStatusCode.Created
     );
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         explanationCy: 'Desg ymholiadau cyffredinol',
@@ -445,7 +446,7 @@ describe('CourtContactController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         name: 'General enquiries',
@@ -513,7 +514,7 @@ describe('CourtContactController', () => {
         },
       },
     ] as never);
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         name: 'General enquiries',
@@ -661,7 +662,7 @@ describe('CourtContactController', () => {
     const updateCourtContactDetailStub = stub(CourtApi.prototype, 'updateCourtContactDetail').resolves(
       HttpStatusCode.Ok
     );
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         name: 'Listing enquiries',
@@ -778,7 +779,7 @@ describe('CourtContactController', () => {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         name: 'Listing enquiries',
@@ -916,7 +917,7 @@ describe('CourtContactController', () => {
         courtContactDescription: null,
       },
     ] as never);
-    const getContactDescriptionTypesStub = stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: 'desc-id', name: 'Enquiries', nameCy: 'Ymholiadau' },
     ] as never);
 
