@@ -19,7 +19,7 @@ import { UserApi } from '../../../main/requests/UserApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
 
-const dataApiRequests = new CourtApi();
+const courtApi = new CourtApi();
 const userApi = new UserApi();
 const operationsApi = new OperationsApi();
 const serviceCentreApi = new ServiceCentreApi();
@@ -99,7 +99,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/regions').resolves({ data: regions });
 
-    const response = await dataApiRequests.getRegions();
+    const response = await courtApi.getRegions();
 
     expect(response).toEqual(regions);
   });
@@ -107,7 +107,7 @@ describe('DataApiRequests', () => {
   it('returns not found when the regions endpoint returns a 404', async () => {
     getStub.withArgs('/types/v1/regions').rejects(errorResponse);
 
-    const response = await dataApiRequests.getRegions();
+    const response = await courtApi.getRegions();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -117,7 +117,7 @@ describe('DataApiRequests', () => {
       data: [{ country: 'England' }],
     });
 
-    const response = await dataApiRequests.getRegions();
+    const response = await courtApi.getRegions();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -173,7 +173,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/all/v1', { params }).resolves({ data: courts });
 
-    const response = await dataApiRequests.getCourts(params);
+    const response = await courtApi.getCourts(params);
 
     expect(response).toEqual(courts);
   });
@@ -189,7 +189,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/all/v1', { params: {} }).rejects(forbiddenError);
 
-    const response = await dataApiRequests.getCourts();
+    const response = await courtApi.getCourts();
 
     expect(response).toBe(HttpStatusCode.Forbidden);
   });
@@ -211,7 +211,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourts();
+    const response = await courtApi.getCourts();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -234,7 +234,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/entity/v1`).resolves({ data: court });
 
-    const response = await dataApiRequests.getCourtById(courtId);
+    const response = await courtApi.getCourtById(courtId);
 
     expect(response).toEqual(court);
   });
@@ -244,7 +244,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/entity/v1`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtById(courtId);
+    const response = await courtApi.getCourtById(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -258,7 +258,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtById(courtId);
+    const response = await courtApi.getCourtById(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -281,7 +281,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).resolves({ data: court });
 
-    const response = await dataApiRequests.getCourtByName(courtName);
+    const response = await courtApi.getCourtByName(courtName);
 
     expect(response).toEqual(court);
   });
@@ -291,7 +291,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtByName(courtName);
+    const response = await courtApi.getCourtByName(courtName);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -305,7 +305,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtByName(courtName);
+    const response = await courtApi.getCourtByName(courtName);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -315,7 +315,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/courts/name/v1', { params: { name: courtName } }).rejects(errorMessage);
 
-    const response = await dataApiRequests.getCourtByName(courtName);
+    const response = await courtApi.getCourtByName(courtName);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -337,7 +337,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${court.id}/v1`, court).resolves({ data: court });
 
-    const response = await dataApiRequests.updateCourt(court);
+    const response = await courtApi.updateCourt(court);
 
     expect(response).toEqual(court);
   });
@@ -364,7 +364,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/courts/v1', payload).resolves({ data: court });
 
-    const response = await dataApiRequests.createCourt(payload);
+    const response = await courtApi.createCourt(payload);
 
     expect(response).toEqual(court);
     expect(postStub.firstCall.args[1]).toEqual(payload);
@@ -388,7 +388,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs('/courts/v1', payload).rejects(badRequestError);
 
-    const response = await dataApiRequests.createCourt(payload);
+    const response = await courtApi.createCourt(payload);
 
     expect(response).toEqual(new Map([['name', 'Name already exists']]));
   });
@@ -408,7 +408,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createCourt(payload);
+    const response = await courtApi.createCourt(payload);
 
     expect(response).toBe(HttpStatusCode.Conflict);
   });
@@ -623,7 +623,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${court.id}/v1`, court).rejects(badRequestError);
 
-    const response = await dataApiRequests.updateCourt(court);
+    const response = await courtApi.updateCourt(court);
 
     expect(response).toEqual(
       new Map([
@@ -657,7 +657,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${court.id}/v1`, court).rejects(conflictError);
 
-    const response = await dataApiRequests.updateCourt(court);
+    const response = await courtApi.updateCourt(court);
 
     expect(response).toBe(HttpStatusCode.Conflict);
   });
@@ -684,7 +684,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourt(court);
+    const response = await courtApi.updateCourt(court);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -698,7 +698,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).resolves({ data: areasOfLaw });
 
-    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+    const response = await courtApi.getCourtAreasOfLaw(courtId);
 
     expect(response).toEqual([
       {
@@ -733,7 +733,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/areas-of-law`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+    const response = await courtApi.getCourtAreasOfLaw(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -747,7 +747,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtAreasOfLaw(courtId);
+    const response = await courtApi.getCourtAreasOfLaw(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -763,7 +763,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/opening-hours-types').resolves({ data: openingHourTypes });
 
-    const response = await dataApiRequests.getOpeningHourTypes();
+    const response = await courtApi.getOpeningHourTypes();
 
     expect(response).toEqual(openingHourTypes);
   });
@@ -771,7 +771,7 @@ describe('DataApiRequests', () => {
   it('returns not found when fetching opening hour types fails with an axios status', async () => {
     getStub.withArgs('/types/v1/opening-hours-types').rejects(errorResponse);
 
-    const response = await dataApiRequests.getOpeningHourTypes();
+    const response = await courtApi.getOpeningHourTypes();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -779,7 +779,7 @@ describe('DataApiRequests', () => {
   it('returns internal server error when fetching opening hour types throws a non-axios error', async () => {
     getStub.withArgs('/types/v1/opening-hours-types').rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.getOpeningHourTypes();
+    const response = await courtApi.getOpeningHourTypes();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -802,7 +802,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({ data: openingHours, status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+    const response = await courtApi.getCourtOpeningHours(courtId);
 
     expect(response).toEqual(openingHours);
   });
@@ -812,7 +812,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+    const response = await courtApi.getCourtOpeningHours(courtId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -822,7 +822,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+    const response = await courtApi.getCourtOpeningHours(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -835,7 +835,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getCourtOpeningHours(courtId);
+    const response = await courtApi.getCourtOpeningHours(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -852,7 +852,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).resolves({ data: openingHours });
 
-    const response = await dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+    const response = await courtApi.getCourtOpeningHoursById(courtId, openingHoursId);
 
     expect(response).toEqual(openingHours);
   });
@@ -863,7 +863,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+    const response = await courtApi.getCourtOpeningHoursById(courtId, openingHoursId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -882,7 +882,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).resolves({ data: savedOpeningHours });
 
-    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+    const response = await courtApi.saveCourtOpeningHours(courtId, payload);
 
     expect(response).toEqual(savedOpeningHours);
   });
@@ -898,7 +898,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+    const response = await courtApi.saveCourtOpeningHours(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -922,7 +922,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+    const response = await courtApi.saveCourtOpeningHours(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -937,7 +937,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/opening-hours`, payload).rejects(errorResponse);
 
-    const response = await dataApiRequests.saveCourtOpeningHours(courtId, payload);
+    const response = await courtApi.saveCourtOpeningHours(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -950,7 +950,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`)
       .resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+    const response = await courtApi.deleteCourtOpeningHours(courtId, openingHoursId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -961,7 +961,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/courts/${courtId}/v1/opening-hours/${openingHoursId}`).rejects(errorResponse);
 
-    const response = await dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+    const response = await courtApi.deleteCourtOpeningHours(courtId, openingHoursId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -976,7 +976,7 @@ describe('DataApiRequests', () => {
       .withArgs('/courts/55555555-5555-4555-8555-555555555555/v1/areas-of-law', payload)
       .resolves({ status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.updateCourtAreasOfLaw(payload);
+    const response = await courtApi.updateCourtAreasOfLaw(payload);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -996,7 +996,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs('/courts/55555555-5555-4555-8555-555555555555/v1/areas-of-law', payload).rejects(badRequestError);
 
-    const response = await dataApiRequests.updateCourtAreasOfLaw(payload);
+    const response = await courtApi.updateCourtAreasOfLaw(payload);
 
     expect(response).toBe(HttpStatusCode.BadRequest);
   });
@@ -1229,7 +1229,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/all/details/v1').resolves({ data: allLocations });
 
-    const response = await dataApiRequests.getAllLocations();
+    const response = await courtApi.getAllLocations();
 
     expect(response).toEqual([
       {
@@ -1262,7 +1262,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/all/details/v1').rejects(badRequestError);
 
-    const response = await dataApiRequests.getAllLocations();
+    const response = await courtApi.getAllLocations();
 
     expect(response).toBe(HttpStatusCode.BadRequest);
   });
@@ -1276,7 +1276,7 @@ describe('DataApiRequests', () => {
       ],
     });
 
-    const response = await dataApiRequests.getAllLocations();
+    const response = await courtApi.getAllLocations();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1517,7 +1517,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/address`).resolves({ data: addresses });
 
-    const response = await dataApiRequests.getCourtAddressDetails(courtId);
+    const response = await courtApi.getCourtAddressDetails(courtId);
 
     expect(response).toEqual(addresses);
   });
@@ -1533,7 +1533,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtAddressDetails(courtId);
+    const response = await courtApi.getCourtAddressDetails(courtId);
 
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
@@ -1545,7 +1545,7 @@ describe('DataApiRequests', () => {
       data: [{ addressLine1: 'Missing required fields' }],
     });
 
-    const response = await dataApiRequests.getCourtAddressDetails(courtId);
+    const response = await courtApi.getCourtAddressDetails(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1571,7 +1571,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({ data: address });
 
-    const response = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+    const response = await courtApi.getCourtAddressDetailsById(courtId, addressId);
 
     expect(response).toEqual(address);
   });
@@ -1586,7 +1586,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+    const response = await courtApi.getCourtAddressDetailsById(courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1597,7 +1597,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+    const response = await courtApi.getCourtAddressDetailsById(courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -1614,7 +1614,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+    const response = await courtApi.saveCourtAddress(payload, courtId);
 
     expect(response).toBe(HttpStatusCode.Forbidden);
   });
@@ -1642,7 +1642,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs(`/courts/${courtId}/v1/address`, payload).resolves({ data: savedAddress });
 
-    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+    const response = await courtApi.saveCourtAddress(payload, courtId);
 
     expect(response).toEqual(savedAddress);
   });
@@ -1663,7 +1663,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+    const response = await courtApi.saveCourtAddress(payload, courtId);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -1674,7 +1674,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs(`/courts/${courtId}/v1/address`, payload).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.saveCourtAddress(payload, courtId);
+    const response = await courtApi.saveCourtAddress(payload, courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1692,7 +1692,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+    const response = await courtApi.updateCourtAddress(payload, courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.Conflict);
   });
@@ -1704,7 +1704,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`, payload).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+    const response = await courtApi.updateCourtAddress(payload, courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1736,7 +1736,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`, payload).resolves({ data: updatedAddress });
 
-    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+    const response = await courtApi.updateCourtAddress(payload, courtId, addressId);
 
     expect(response).toEqual(updatedAddress);
   });
@@ -1757,7 +1757,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtAddress(payload, courtId, addressId);
+    const response = await courtApi.updateCourtAddress(payload, courtId, addressId);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -1768,7 +1768,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+    const response = await courtApi.deleteCourtAddress(courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -1779,7 +1779,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).resolves({ status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+    const response = await courtApi.deleteCourtAddress(courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1796,7 +1796,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+    const response = await courtApi.deleteCourtAddress(courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.Gone);
   });
@@ -1807,7 +1807,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/courts/${courtId}/v1/address/${addressId}`).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+    const response = await courtApi.deleteCourtAddress(courtId, addressId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1817,7 +1817,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+    const response = await courtApi.getAddressesForPostcode(postcode);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -1827,7 +1827,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/search/address/v1/postcode/${postcode}`).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+    const response = await courtApi.getAddressesForPostcode(postcode);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1858,7 +1858,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/search/address/v1/postcode/${postcode}`).resolves({ data: osData });
 
-    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+    const response = await courtApi.getAddressesForPostcode(postcode);
 
     expect(response).toEqual(osData);
   });
@@ -1877,7 +1877,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getAddressesForPostcode(postcode);
+    const response = await courtApi.getAddressesForPostcode(postcode);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -1891,7 +1891,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getAreasOfLaw();
+    const response = await courtApi.getAreasOfLaw();
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
   });
@@ -1911,7 +1911,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/areas-of-law').resolves({ data: areasOfLaw });
 
-    const response = await dataApiRequests.getAreasOfLaw();
+    const response = await courtApi.getAreasOfLaw();
 
     expect(response).toEqual(areasOfLaw);
   });
@@ -1921,7 +1921,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing required fields' }],
     });
 
-    const response = await dataApiRequests.getAreasOfLaw();
+    const response = await courtApi.getAreasOfLaw();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1937,7 +1937,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/service-areas').resolves({ data: serviceAreas });
 
-    const response = await dataApiRequests.getServiceAreas();
+    const response = await courtApi.getServiceAreas();
 
     expect(response).toEqual(serviceAreas);
   });
@@ -1947,7 +1947,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing id' }],
     });
 
-    const response = await dataApiRequests.getServiceAreas();
+    const response = await courtApi.getServiceAreas();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1955,7 +1955,7 @@ describe('DataApiRequests', () => {
   it('returns status code when service areas request fails with axios error', async () => {
     getStub.withArgs('/types/v1/service-areas').rejects(errorResponse);
 
-    const response = await dataApiRequests.getServiceAreas();
+    const response = await courtApi.getServiceAreas();
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -1970,7 +1970,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/court-types').resolves({ data: courtTypes });
 
-    const response = await dataApiRequests.getCourtTypes();
+    const response = await courtApi.getCourtTypes();
 
     expect(response).toEqual(courtTypes);
   });
@@ -1980,7 +1980,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing required fields' }],
     });
 
-    const response = await dataApiRequests.getCourtTypes();
+    const response = await courtApi.getCourtTypes();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -1994,7 +1994,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtTypes();
+    const response = await courtApi.getCourtTypes();
 
     expect(response).toBe(HttpStatusCode.Unauthorized);
   });
@@ -2017,7 +2017,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/contact-description-types').resolves({ data: contactDescriptionTypes });
 
-    const response = await dataApiRequests.getContactDescriptionTypes();
+    const response = await courtApi.getContactDescriptionTypes();
 
     expect(response).toEqual([
       {
@@ -2040,7 +2040,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing id' }],
     });
 
-    const response = await dataApiRequests.getContactDescriptionTypes();
+    const response = await courtApi.getContactDescriptionTypes();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2054,7 +2054,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getContactDescriptionTypes();
+    const response = await courtApi.getContactDescriptionTypes();
 
     expect(response).toBe(HttpStatusCode.ServiceUnavailable);
   });
@@ -2073,7 +2073,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getTranslationServices(courtId);
+    const response = await courtApi.getTranslationServices(courtId);
 
     expect(response).toEqual(translationServices);
   });
@@ -2085,7 +2085,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.NoContent,
     });
 
-    const response = await dataApiRequests.getTranslationServices(courtId);
+    const response = await courtApi.getTranslationServices(courtId);
 
     expect(response).toBeNull();
   });
@@ -2095,7 +2095,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/translation-services`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getTranslationServices(courtId);
+    const response = await courtApi.getTranslationServices(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -2116,7 +2116,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Created,
     });
 
-    const response = await dataApiRequests.saveTranslationServices(courtId, payload);
+    const response = await courtApi.saveTranslationServices(courtId, payload);
 
     expect(response).toEqual({
       ...payload,
@@ -2136,7 +2136,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.NoContent,
     });
 
-    const response = await dataApiRequests.saveTranslationServices(courtId, payload);
+    const response = await courtApi.saveTranslationServices(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -2153,7 +2153,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs('/types/v1/local-authorities').resolves({ data: localAuthorities });
 
-    const response = await dataApiRequests.getLocalAuthorities();
+    const response = await courtApi.getLocalAuthorities();
 
     expect(response).toEqual(localAuthorities);
   });
@@ -2163,7 +2163,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Missing required fields' }],
     });
 
-    const response = await dataApiRequests.getLocalAuthorities();
+    const response = await courtApi.getLocalAuthorities();
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2186,7 +2186,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/local-authorities`).resolves({ data: localAuthorities });
 
-    const response = await dataApiRequests.getCourtLocalAuthorities(courtId);
+    const response = await courtApi.getCourtLocalAuthorities(courtId);
 
     expect(response).toEqual(localAuthorities);
   });
@@ -2196,7 +2196,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/local-authorities`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtLocalAuthorities(courtId);
+    const response = await courtApi.getCourtLocalAuthorities(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -2208,7 +2208,7 @@ describe('DataApiRequests', () => {
       data: [{ areaOfLawName: 'Children' }],
     });
 
-    const response = await dataApiRequests.getCourtLocalAuthorities(courtId);
+    const response = await courtApi.getCourtLocalAuthorities(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2230,7 +2230,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).resolves({ status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+    const response = await courtApi.updateCourtLocalAuthorities(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -2255,7 +2255,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+    const response = await courtApi.updateCourtLocalAuthorities(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -2271,7 +2271,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/local-authorities`, payload).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.updateCourtLocalAuthorities(courtId, payload);
+    const response = await courtApi.updateCourtLocalAuthorities(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2289,7 +2289,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).resolves({ data: singlePointOfEntry });
 
-    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+    const response = await courtApi.getCourtSinglePointOfEntry(courtId);
 
     expect(response).toEqual(singlePointOfEntry);
   });
@@ -2299,7 +2299,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+    const response = await courtApi.getCourtSinglePointOfEntry(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -2311,7 +2311,7 @@ describe('DataApiRequests', () => {
       data: [{ name: 'Children' }],
     });
 
-    const response = await dataApiRequests.getCourtSinglePointOfEntry(courtId);
+    const response = await courtApi.getCourtSinglePointOfEntry(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2328,7 +2328,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).resolves({ status: HttpStatusCode.Ok });
 
-    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+    const response = await courtApi.updateCourtSinglePointOfEntry(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -2354,7 +2354,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+    const response = await courtApi.updateCourtSinglePointOfEntry(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -2371,7 +2371,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/single-point-of-entry`, payload).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.updateCourtSinglePointOfEntry(courtId, payload);
+    const response = await courtApi.updateCourtSinglePointOfEntry(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2411,7 +2411,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/professional-information`).resolves({ data: professionalInformation });
 
-    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+    const response = await courtApi.getCourtProfessionalInformation(courtId);
 
     expect(response).toEqual(professionalInformation);
   });
@@ -2421,7 +2421,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/professional-information`).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+    const response = await courtApi.getCourtProfessionalInformation(courtId);
 
     expect(response).toBeNull();
   });
@@ -2463,7 +2463,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/courts/${courtId}/v1/professional-information`, professionalInformation)
       .resolves({ data: professionalInformation });
 
-    const response = await dataApiRequests.saveCourtProfessionalInformation(courtId, professionalInformation);
+    const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
 
     expect(response).toEqual(professionalInformation);
   });
@@ -2479,7 +2479,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+    const response = await courtApi.getCourtProfessionalInformation(courtId);
 
     expect(response).toBe(HttpStatusCode.Forbidden);
   });
@@ -2495,7 +2495,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtProfessionalInformation(courtId);
+    const response = await courtApi.getCourtProfessionalInformation(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2522,7 +2522,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getBuildingFacilities(courtId);
+    const response = await courtApi.getBuildingFacilities(courtId);
 
     expect(response).toEqual(buildingFacilities);
   });
@@ -2534,7 +2534,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.NoContent,
     });
 
-    const response = await dataApiRequests.getBuildingFacilities(courtId);
+    const response = await courtApi.getBuildingFacilities(courtId);
 
     expect(response).toBeNull();
   });
@@ -2550,7 +2550,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getBuildingFacilities(courtId);
+    const response = await courtApi.getBuildingFacilities(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2580,7 +2580,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
+    const response = await courtApi.updateBuildingFacilities(courtId, payload);
 
     expect(response).toEqual(responseBody);
   });
@@ -2612,7 +2612,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
+    const response = await courtApi.updateBuildingFacilities(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -2635,7 +2635,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs(`/courts/${courtId}/v1/building-facilities`, payload).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.updateBuildingFacilities(courtId, payload);
+    const response = await courtApi.updateBuildingFacilities(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2657,7 +2657,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getAccessibility(courtId);
+    const response = await courtApi.getAccessibility(courtId);
 
     expect(response).toEqual(
       expect.objectContaining({
@@ -2675,7 +2675,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.NoContent,
     });
 
-    const response = await dataApiRequests.getAccessibility(courtId);
+    const response = await courtApi.getAccessibility(courtId);
 
     expect(response).toBeNull();
   });
@@ -2692,7 +2692,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getAccessibility(courtId);
+    const response = await courtApi.getAccessibility(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2716,7 +2716,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+    const response = await courtApi.updateAccessibility(courtId, payload);
 
     expect(response).toEqual(
       expect.objectContaining({
@@ -2745,7 +2745,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+    const response = await courtApi.updateAccessibility(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -2759,7 +2759,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs(`/courts/${courtId}/v1/accessibility-options`, payload).rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.updateAccessibility(courtId, payload);
+    const response = await courtApi.updateAccessibility(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -2776,7 +2776,7 @@ describe('DataApiRequests', () => {
 
     postStub.withArgs(`/courts/${courtId}/v1/contact-details`, payload).resolves({ status: HttpStatusCode.Created });
 
-    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+    const response = await courtApi.createCourtContactDetail(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.Created);
   });
@@ -2803,7 +2803,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+    const response = await courtApi.createCourtContactDetail(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -2826,7 +2826,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.createCourtContactDetail(courtId, payload);
+    const response = await courtApi.createCourtContactDetail(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.Conflict);
   });
@@ -2846,7 +2846,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+    const response = await courtApi.updateCourtContactDetail(courtId, contactDetailId, payload);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -2874,7 +2874,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+    const response = await courtApi.updateCourtContactDetail(courtId, contactDetailId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -2898,7 +2898,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+    const response = await courtApi.updateCourtContactDetail(courtId, contactDetailId, payload);
 
     expect(response).toBe(HttpStatusCode.Gone);
   });
@@ -3184,7 +3184,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+    const response = await courtApi.getCounterServiceOpeningHours(courtId);
 
     expect(response).toEqual([counterServiceOpeningHours]);
   });
@@ -3196,7 +3196,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.NoContent,
     });
 
-    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+    const response = await courtApi.getCounterServiceOpeningHours(courtId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -3324,7 +3324,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+    const response = await courtApi.getCounterServiceOpeningHours(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -3337,7 +3337,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.getCounterServiceOpeningHours(courtId);
+    const response = await courtApi.getCounterServiceOpeningHours(courtId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -3362,7 +3362,7 @@ describe('DataApiRequests', () => {
       data: counterServiceOpeningHours,
     });
 
-    const response = await dataApiRequests.getCounterServiceOpeningHoursById(courtId, counterServiceId);
+    const response = await courtApi.getCounterServiceOpeningHoursById(courtId, counterServiceId);
 
     expect(response).toEqual(counterServiceOpeningHours);
   });
@@ -3373,7 +3373,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCounterServiceOpeningHoursById(courtId, counterServiceId);
+    const response = await courtApi.getCounterServiceOpeningHoursById(courtId, counterServiceId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -3402,7 +3402,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+    const response = await courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
     expect(response).toEqual(saveResponse);
   });
@@ -3425,7 +3425,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+    const response = await courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -3453,7 +3453,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+    const response = await courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
     expect(response).toEqual(new Map(Object.entries(apiErrors)));
   });
@@ -3472,7 +3472,7 @@ describe('DataApiRequests', () => {
 
     putStub.withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload).rejects(errorResponse);
 
-    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+    const response = await courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -3493,7 +3493,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/courts/${courtId}/v1/opening-hours/counter-service`, payload)
       .rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.saveCounterServiceOpeningHours(courtId, payload);
+    const response = await courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -3506,7 +3506,7 @@ describe('DataApiRequests', () => {
       status: HttpStatusCode.Ok,
     });
 
-    const response = await dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+    const response = await courtApi.deleteCounterServiceOpeningHours(courtId, counterServiceId);
 
     expect(response).toBe(HttpStatusCode.Ok);
   });
@@ -3519,7 +3519,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`)
       .rejects(errorResponse);
 
-    const response = await dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+    const response = await courtApi.deleteCounterServiceOpeningHours(courtId, counterServiceId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -3532,7 +3532,7 @@ describe('DataApiRequests', () => {
       .withArgs(`/courts/${courtId}/v1/opening-hours/counter-service/${counterServiceId}`)
       .rejects(new Error('Unexpected error'));
 
-    const response = await dataApiRequests.deleteCounterServiceOpeningHours(courtId, counterServiceId);
+    const response = await courtApi.deleteCounterServiceOpeningHours(courtId, counterServiceId);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
@@ -3905,7 +3905,7 @@ describe('DataApiRequests', () => {
   });
 
   it('returns only court locations from all locations when getting all courts', async () => {
-    const getAllLocationsStub = stub(dataApiRequests, 'getAllLocations').resolves([
+    const getAllLocationsStub = stub(courtApi, 'getAllLocations').resolves([
       {
         locationType: 'COURT',
         court: {
@@ -3931,7 +3931,7 @@ describe('DataApiRequests', () => {
       },
     ] as never);
 
-    const response = await dataApiRequests.getAllCourts();
+    const response = await courtApi.getAllCourts();
 
     expect(response).toEqual([
       {
@@ -3948,9 +3948,9 @@ describe('DataApiRequests', () => {
   });
 
   it('returns status from getAllLocations when getting all courts and all locations fails', async () => {
-    const getAllLocationsStub = stub(dataApiRequests, 'getAllLocations').resolves(HttpStatusCode.BadGateway);
+    const getAllLocationsStub = stub(courtApi, 'getAllLocations').resolves(HttpStatusCode.BadGateway);
 
-    const response = await dataApiRequests.getAllCourts();
+    const response = await courtApi.getAllCourts();
 
     expect(response).toBe(HttpStatusCode.BadGateway);
 
@@ -3970,7 +3970,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.getCourtPhotoFileLink(courtId);
+    const response = await courtApi.getCourtPhotoFileLink(courtId);
 
     expect(response).toMatch(new RegExp(`^${fileLink}\\?`));
   });
@@ -3980,7 +3980,7 @@ describe('DataApiRequests', () => {
 
     getStub.withArgs(`/courts/${courtId}/v1/photo`).rejects(errorResponse);
 
-    const response = await dataApiRequests.getCourtPhotoFileLink(courtId);
+    const response = await courtApi.getCourtPhotoFileLink(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });
@@ -3998,7 +3998,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
+    const response = await courtApi.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
 
     expect(response).toMatch(new RegExp(`^${fileLink}\\?`));
   });
@@ -4016,7 +4016,7 @@ describe('DataApiRequests', () => {
       },
     });
 
-    const response = await dataApiRequests.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
+    const response = await courtApi.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
 
     expect(response).toEqual(new Map([['file', 'File type is not supported']]));
   });
@@ -4026,7 +4026,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/courts/${courtId}/v1/photo`).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await dataApiRequests.deleteCourtPhoto(courtId);
+    const response = await courtApi.deleteCourtPhoto(courtId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
@@ -4036,7 +4036,7 @@ describe('DataApiRequests', () => {
 
     deleteStub.withArgs(`/courts/${courtId}/v1/photo`).rejects(errorResponse);
 
-    const response = await dataApiRequests.deleteCourtPhoto(courtId);
+    const response = await courtApi.deleteCourtPhoto(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
   });

@@ -7,7 +7,7 @@ import type { UserApi as UserApiType } from '../../requests/UserApi';
 
 import { resolveFactUserRole } from './roleResolver';
 
-let userApi: UserApiType | undefined;
+let userApiInstance: UserApiType | undefined;
 
 export class Authentication {
   public enableFor(app: express.Express): void {
@@ -49,9 +49,9 @@ export class Authentication {
 
           const role = resolveFactUserRole(user.roles);
 
-          const dataApi = await getUserApi();
+          const userApi = await getUserApi();
 
-          session.factUser = await dataApi.createUpdateUser({
+          session.factUser = await userApi.createUpdateUser({
             email: user.preferred_username,
             ssoId: user.oid,
             role,
@@ -65,10 +65,10 @@ export class Authentication {
 }
 
 async function getUserApi(): Promise<UserApiType> {
-  if (!userApi) {
+  if (!userApiInstance) {
     const { UserApi } = await import('../../requests/UserApi');
-    userApi = new UserApi();
+    userApiInstance = new UserApi();
   }
 
-  return userApi;
+  return userApiInstance;
 }

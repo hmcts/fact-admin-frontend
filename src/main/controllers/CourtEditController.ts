@@ -12,7 +12,7 @@ import { parseNumber } from '../utils/valueParsers';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
-const dataApiRequests = new CourtApi();
+const courtApi = new CourtApi();
 const operationsApi = new OperationsApi();
 const courtLockService = new LockService(operationsApi);
 const locationApprovalController = new LocationApprovalController(
@@ -29,7 +29,7 @@ const locationApprovalController = new LocationApprovalController(
         ? courtLocks
         : { courtLocks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
     },
-    getLocation: courtId => dataApiRequests.getCourtById(courtId),
+    getLocation: courtId => courtApi.getCourtById(courtId),
     locationIdViewKey: 'courtId',
     locationNameViewKey: 'courtName',
     notFoundView: 'court-not-found',

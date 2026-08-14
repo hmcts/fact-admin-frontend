@@ -7,7 +7,7 @@ import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
 import { isUuid } from '../../utils/valueParsers';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenticationHelper';
 
-let operationsApi: OperationsApiType | undefined;
+let operationsApiInstance: OperationsApiType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
 const NON_LOCKABLE_EDIT_PAGES = new Set(['approve']);
@@ -20,17 +20,17 @@ type LockRequirements = {
   pageKey: string;
 };
 
-type DataApiProvider = () => Promise<OperationsApiType>;
+type OperationsApiProvider = () => Promise<OperationsApiType>;
 
 export class LockingInterceptor {
-  public constructor(private readonly getDataApi: DataApiProvider = getOperationsApi) {}
+  public constructor(private readonly operationsApiProvider: OperationsApiProvider = getOperationsApi) {}
 
   public enableFor(app: express.Express): void {
     app.use(this.handleRequest.bind(this));
   }
 
   private async handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
-    const dataApi = await this.getDataApi();
+    const operationsApi = await this.operationsApiProvider();
     const userId = getFactUserId(req);
     res.locals.userId = undefined;
     res.locals.timeoutDialogConfig = undefined;
@@ -49,12 +49,12 @@ export class LockingInterceptor {
       // if they navigate away from a lockable resource, we will clear their locks. If they
       // are still editing (e.g. they have multiple tabs open) then the lock will need to be
       // re-acquired when they refresh or save.
-      await dataApi.clearUserLocks(userId);
+      await operationsApi.clearUserLocks(userId);
       return next();
     }
 
     // attempt to acquire the lock, and if we can't, render the appropriate error page
-    const acquisitionResponse = await this.handleLockAcquisition(dataApi, userId, lockDetails, res);
+    const acquisitionResponse = await this.handleLockAcquisition(operationsApi, userId, lockDetails, res);
     if (typeof acquisitionResponse === 'number') {
       // likely a 404 on the subject, let the real page deal with that
       return next();
@@ -104,7 +104,7 @@ export class LockingInterceptor {
   }
 
   private async handleLockAcquisition(
-    dataApi: OperationsApiType,
+    operationsApi: OperationsApiType,
     userId: string,
     details: LockRequirements,
     res: express.Response
@@ -123,7 +123,7 @@ export class LockingInterceptor {
     }
 
     // just attempt the acquire the lock, we only need to do anything if we fail
-    const lock = await dataApi.acquireLock(details.subject, details.subjectId, page, userId);
+    const lock = await operationsApi.acquireLock(details.subject, details.subjectId, page, userId);
 
     if (typeof lock === 'number') {
       if (lock === HttpStatusCode.NotFound) {
@@ -133,7 +133,7 @@ export class LockingInterceptor {
         // other logic that the page might want to perform in that instance.
         return lock;
       } else {
-        await this.handleLockingFailure(dataApi, res, lock, page, details, subjectStr);
+        await this.handleLockingFailure(operationsApi, res, lock, page, details, subjectStr);
       }
       return true;
     }
@@ -142,7 +142,7 @@ export class LockingInterceptor {
   }
 
   private async handleLockingFailure(
-    dataApi: OperationsApiType,
+    operationsApi: OperationsApiType,
     res: express.Response,
     lock: HttpStatusCode,
     page: typeof Page,
@@ -153,7 +153,7 @@ export class LockingInterceptor {
     const pageStr = (page as unknown as string).toLowerCase().replaceAll('_', ' ');
     if (lock === HttpStatusCode.Conflict) {
       // someone else has the lock to retrieve it and render the already locked page.
-      const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
+      const existingLock = await operationsApi.getLock(details.subject, details.subjectId, page);
       res.render('lock-exists', {
         subject: subjectStr,
         page: pageStr,
@@ -170,9 +170,9 @@ export class LockingInterceptor {
 }
 
 async function getOperationsApi(): Promise<OperationsApiType> {
-  if (!operationsApi) {
+  if (!operationsApiInstance) {
     const { OperationsApi } = await import('../../requests/OperationsApi');
-    operationsApi = new OperationsApi();
+    operationsApiInstance = new OperationsApi();
   }
-  return operationsApi;
+  return operationsApiInstance;
 }
