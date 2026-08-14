@@ -1,11 +1,11 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { parseString } from '../utils/valueParsers';
-import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 
 export type CourtContactFormValues = {
   contactEmail: string;

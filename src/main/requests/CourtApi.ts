@@ -29,11 +29,7 @@ import {
   CourtSinglePointOfEntryList,
   courtSinglePointOfEntryListSchema,
 } from '../schemas/courtSinglePointOfEntrySchema';
-import {
-  CourtOpeningHours,
-  courtOpeningHoursListSchema,
-  courtOpeningHoursSchema,
-} from '../schemas/openingHoursSchema';
+import { CourtOpeningHours, courtOpeningHoursListSchema, courtOpeningHoursSchema } from '../schemas/openingHoursSchema';
 import { TranslationServices, translationServicesSchema } from '../schemas/translationServicesSchema';
 
 import { GetCourtsParams } from './types/GetCourtsParams';

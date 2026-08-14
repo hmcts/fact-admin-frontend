@@ -44,7 +44,7 @@ export class AddServiceCentreService {
   public constructor(
     private readonly courtApi = new CourtApi(),
     private readonly serviceCentreApi = new ServiceCentreApi(),
-    private readonly referenceDataApi = new ReferenceDataApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
   ) {}
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {

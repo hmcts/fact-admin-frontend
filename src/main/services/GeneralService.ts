@@ -14,8 +14,10 @@ export type GeneralViewModel = Partial<CourtEntity> & {
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class GeneralService {
-  public constructor(private readonly courtApi = new CourtApi(),
-                     private readonly referenceDataApi = new ReferenceDataApi()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   public async retrieve(courtId: string): Promise<GeneralViewModel | HttpStatusCode> {
     const courtEntity = await this.courtApi.getCourtById(courtId);

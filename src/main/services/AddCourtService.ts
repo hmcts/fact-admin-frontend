@@ -34,7 +34,7 @@ export class AddCourtService {
   public constructor(
     private readonly courtApi = new CourtApi(),
     private readonly serviceCentreApi = new ServiceCentreApi(),
-    private readonly referenceDataApi = new ReferenceDataApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
   ) {}
 
   /**

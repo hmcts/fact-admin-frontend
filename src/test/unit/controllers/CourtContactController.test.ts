@@ -157,7 +157,9 @@ describe('CourtContactController', () => {
     const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves(
       HttpStatusCode.InternalServerError
     );
-    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([] as never);
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves(
+      [] as never
+    );
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');

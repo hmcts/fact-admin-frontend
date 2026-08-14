@@ -1,10 +1,10 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
 import { CourtEntity } from '../../../main/schemas/courtEntitySchema';
 import { CourtAddressService } from '../../../main/services/CourtAddressService';
-import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 
 describe('CourtAddressService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -123,7 +123,9 @@ describe('CourtAddressService', () => {
   });
 
   test('returns status code when postcode search API returns an http status', async () => {
-    jest.spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode').mockResolvedValue(HttpStatusCode.InternalServerError);
+    jest
+      .spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode')
+      .mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new CourtAddressService();
     const result = await service.retrieveAddressOptions('SW1A 1AA');

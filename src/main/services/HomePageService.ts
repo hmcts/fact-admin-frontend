@@ -11,7 +11,6 @@ import { HomePageFiltersService } from './HomePageFiltersService';
 import { HomePageViewService, buildFavouriteKey } from './HomePageViewService';
 import { HomePageFilters, HomePageViewModel } from './types/HomePage.types';
 
-
 /**
  * Coordinates homepage data loading and delegates filter and view-model concerns
  * to smaller focused services.

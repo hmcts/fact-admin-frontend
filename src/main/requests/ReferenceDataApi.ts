@@ -1,17 +1,11 @@
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
-import {
-  AreaOfLawType,
-  areaOfLawListSchema,
-} from '../schemas/areaOfLawSchema';
+import { AreaOfLawType, areaOfLawListSchema } from '../schemas/areaOfLawSchema';
 import { ContactDescriptionType, contactDescriptionTypeListSchema } from '../schemas/contactDescriptionTypeSchema';
 import { CourtType, courtTypeListSchema } from '../schemas/courtTypeSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
-import {
-  OpeningHourType,
-  openingHourTypeListSchema,
-} from '../schemas/openingHoursSchema';
+import { OpeningHourType, openingHourTypeListSchema } from '../schemas/openingHoursSchema';
 import { OsData, osDataSchema } from '../schemas/osDataSchema';
 import { Region, regionsSchema } from '../schemas/regionSchema';
 import { ServiceArea, serviceAreaListSchema } from '../schemas/serviceAreaSchema';
