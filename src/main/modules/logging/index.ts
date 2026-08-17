@@ -1,20 +1,28 @@
 import { Logger as HmctsLogger } from '@hmcts/nodejs-logging';
-import { SeverityNumber, logs } from '@opentelemetry/api-logs';
 
 type LogLevel = 'silly' | 'debug' | 'verbose' | 'info' | 'warn' | 'error';
 
 type LoggerDelegate = Record<LogLevel, (...args: unknown[]) => unknown>;
 
-const severityByLevel: Record<LogLevel, SeverityNumber> = {
-  silly: SeverityNumber.TRACE,
-  debug: SeverityNumber.DEBUG,
-  verbose: SeverityNumber.DEBUG,
-  info: SeverityNumber.INFO,
-  warn: SeverityNumber.WARN,
-  error: SeverityNumber.ERROR,
+type AppInsightsClient = {
+  trackTrace: (telemetry: {
+    message: string;
+    severity: 'Verbose' | 'Information' | 'Warning' | 'Error';
+    properties: Record<string, string>;
+  }) => void;
+};
+
+const severityByLevel: Record<LogLevel, 'Verbose' | 'Information' | 'Warning' | 'Error'> = {
+  silly: 'Verbose',
+  debug: 'Verbose',
+  verbose: 'Verbose',
+  info: 'Information',
+  warn: 'Warning',
+  error: 'Error',
 };
 
 const loggerCache = new Map<string, TelemetryLogger>();
+let appInsightsClient: AppInsightsClient | undefined;
 
 class TelemetryLogger {
   public constructor(
@@ -50,18 +58,21 @@ class TelemetryLogger {
     this.delegate[level](...args);
 
     try {
-      logs.getLogger('fact-admin-frontend').emit({
-        body: formatLogMessage(args),
-        severityNumber: severityByLevel[level],
-        severityText: level.toUpperCase(),
-        attributes: {
-          'logger.name': this.name,
+      appInsightsClient?.trackTrace({
+        message: formatLogMessage(args),
+        severity: severityByLevel[level],
+        properties: {
+          loggerName: this.name,
         },
       });
     } catch {
       // Telemetry must never prevent the application from writing its normal console log.
     }
   }
+}
+
+export function setAppInsightsClient(client: AppInsightsClient): void {
+  appInsightsClient = client;
 }
 
 export class Logger {

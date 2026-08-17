@@ -6,8 +6,7 @@ const delegateLogger = {
   warn: jest.fn(),
   error: jest.fn(),
 };
-const emit = jest.fn();
-const getOpenTelemetryLogger = jest.fn().mockReturnValue({ emit });
+const trackTrace = jest.fn();
 
 jest.mock('@hmcts/nodejs-logging', () => ({
   Logger: {
@@ -15,27 +14,18 @@ jest.mock('@hmcts/nodejs-logging', () => ({
   },
 }));
 
-jest.mock('@opentelemetry/api-logs', () => ({
-  SeverityNumber: {
-    TRACE: 1,
-    DEBUG: 5,
-    INFO: 9,
-    WARN: 13,
-    ERROR: 17,
-  },
-  logs: {
-    getLogger: getOpenTelemetryLogger,
-  },
-}));
-
-import { Logger } from '../../../../main/modules/logging';
+import { Logger, setAppInsightsClient } from '../../../../main/modules/logging';
 
 describe('Logger', () => {
+  beforeAll(() => {
+    setAppInsightsClient({ trackTrace });
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('writes errors to the console logger and OpenTelemetry', () => {
+  test('writes errors to the console logger and Application Insights', () => {
     const logger = Logger.getLogger('app');
     const details = {
       name: 'ZodError',
@@ -53,24 +43,22 @@ describe('Logger', () => {
     logger.error('Error fetching accessibility options:', details);
 
     expect(delegateLogger.error).toHaveBeenCalledWith('Error fetching accessibility options:', details);
-    expect(getOpenTelemetryLogger).toHaveBeenCalledWith('fact-admin-frontend');
-    expect(emit).toHaveBeenCalledWith({
-      body: expect.stringContaining(
+    expect(trackTrace).toHaveBeenCalledWith({
+      message: expect.stringContaining(
         'Error fetching accessibility options: name=ZodError, message=Data API response failed schema validation'
       ),
-      severityNumber: 17,
-      severityText: 'ERROR',
-      attributes: {
-        'logger.name': 'app',
+      severity: 'Error',
+      properties: {
+        loggerName: 'app',
       },
     });
-    expect(emit.mock.calls[0][0].body).toContain(
+    expect(trackTrace.mock.calls[0][0].message).toContain(
       'issues=[code=invalid_type, path=accessibleToiletDescriptionCy, message=Invalid input: expected string, received null]'
     );
   });
 
   test('does not interrupt console logging if telemetry throws', () => {
-    getOpenTelemetryLogger.mockImplementationOnce(() => {
+    trackTrace.mockImplementationOnce(() => {
       throw new Error('telemetry unavailable');
     });
 

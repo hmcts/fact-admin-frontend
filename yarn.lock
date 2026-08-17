@@ -10312,7 +10312,6 @@ __metadata:
     "@hmcts/playwright-common": "npm:^1.1.2"
     "@hmcts/properties-volume": "npm:1.4.1"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@opentelemetry/api-logs": "npm:0.220.0"
     "@playwright/test": "npm:1.62.1"
     "@types/babel__preset-env": "npm:7.10.0"
     "@types/chai": "npm:^5.2.3"

@@ -1,9 +1,9 @@
 import process from 'node:process';
 
-import { useAzureMonitor } from 'applicationinsights';
+import * as appInsights from 'applicationinsights';
 import config from 'config';
 
-import { Logger } from '../logging';
+import { Logger, setAppInsightsClient } from '../logging';
 
 export class AppInsights {
   enable(): void {
@@ -17,23 +17,34 @@ export class AppInsights {
     if (appInsightsConnectionString) {
       process.env.OTEL_SERVICE_NAME ||= 'fact-admin-frontend';
 
-      const options = {
-        azureMonitorExporterOptions: {
-          connectionString: appInsightsConnectionString,
-        },
-        instrumentationOptions: {
-          http: {
-            enabled: true,
-            ignoreIncomingRequestHook: (request: { url?: string }) => {
-              const path = request.url?.split('?', 1)[0];
-              return path === '/health/liveness' || path === '/health/readiness';
-            },
-          },
+      const sdk = appInsights.setup(appInsightsConnectionString);
+      const httpInstrumentationOptions = {
+        enabled: true,
+        ignoreIncomingRequestHook: (request: { url?: string }) => {
+          const path = request.url?.split('?', 1)[0];
+          return path === '/health/liveness' || path === '/health/readiness';
         },
       };
 
-      useAzureMonitor(options);
+      appInsights.defaultClient.config.azureMonitorOpenTelemetryOptions = {
+        instrumentationOptions: {
+          http: httpInstrumentationOptions,
+        },
+      };
 
+      sdk
+        .setAutoCollectRequests(true)
+        .setAutoCollectPerformance(true, true)
+        .setAutoCollectExceptions(true)
+        .setAutoCollectDependencies(true)
+        .setAutoCollectConsole(false, false)
+        .setAutoCollectPreAggregatedMetrics(true)
+        .setSendLiveMetrics(false)
+        .setInternalLogging(false, true)
+        .enableWebInstrumentation(false)
+        .start();
+
+      setAppInsightsClient(appInsights.defaultClient);
       Logger.getLogger('app').info('App insights activated');
     }
   }
