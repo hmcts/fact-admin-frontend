@@ -1,10 +1,9 @@
 import process from 'node:process';
 
-import { useAzureMonitor } from '@azure/monitor-opentelemetry';
-import { Logger } from '@hmcts/nodejs-logging';
-import { resourceFromAttributes } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { useAzureMonitor } from 'applicationinsights';
 import config from 'config';
+
+import { Logger } from '../logging';
 
 export class AppInsights {
   enable(): void {
@@ -16,12 +15,9 @@ export class AppInsights {
     }
 
     if (appInsightsConnectionString) {
-      const customResource = resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'fact-admin-frontend',
-      });
+      process.env.OTEL_SERVICE_NAME ||= 'fact-admin-frontend';
 
       const options = {
-        resource: customResource,
         azureMonitorExporterOptions: {
           connectionString: appInsightsConnectionString,
         },
