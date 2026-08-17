@@ -21,6 +21,15 @@ export class AppInsights {
         azureMonitorExporterOptions: {
           connectionString: appInsightsConnectionString,
         },
+        instrumentationOptions: {
+          http: {
+            enabled: true,
+            ignoreIncomingRequestHook: (request: { url?: string }) => {
+              const path = request.url?.split('?', 1)[0];
+              return path === '/health/liveness' || path === '/health/readiness';
+            },
+          },
+        },
       };
 
       useAzureMonitor(options);

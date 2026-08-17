@@ -44,8 +44,21 @@ describe('AppInsights', () => {
       azureMonitorExporterOptions: {
         connectionString: 'InstrumentationKey=test',
       },
+      instrumentationOptions: {
+        http: {
+          enabled: true,
+          ignoreIncomingRequestHook: expect.any(Function),
+        },
+      },
     });
     expect(info).toHaveBeenCalledWith('App insights activated');
+
+    const ignoreIncomingRequestHook = useAzureMonitor.mock.calls[0][0].instrumentationOptions.http
+      .ignoreIncomingRequestHook as (request: { url?: string }) => boolean;
+    expect(ignoreIncomingRequestHook({ url: '/health/liveness' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ url: '/health/readiness?probe=true' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ url: '/health' })).toBe(false);
+    expect(ignoreIncomingRequestHook({ url: '/courts' })).toBe(false);
   });
 
   test('uses the configured Key Vault connection string as a fallback', () => {
@@ -56,6 +69,12 @@ describe('AppInsights', () => {
     expect(useAzureMonitor).toHaveBeenCalledWith({
       azureMonitorExporterOptions: {
         connectionString: 'InstrumentationKey=key-vault',
+      },
+      instrumentationOptions: {
+        http: {
+          enabled: true,
+          ignoreIncomingRequestHook: expect.any(Function),
+        },
       },
     });
   });
