@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -19,7 +20,7 @@ describe('General page', () => {
       open: true,
       regionId: '22222222-2222-4222-8222-222222222222',
     } as never);
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
       { id: '33333333-3333-4333-8333-333333333333', name: 'North West' },
     ] as never);
@@ -44,7 +45,7 @@ describe('General page', () => {
       open: true,
       regionId: '22222222-2222-4222-8222-222222222222',
     } as never);
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
 
@@ -63,7 +64,7 @@ describe('General page', () => {
 
   test('renders the dedicated court not found page for an invalid UUID on GET', async () => {
     const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
-    const getRegionsStub = stub(CourtApi.prototype, 'getRegions');
+    const getRegionsStub = stub(ReferenceDataApi.prototype, 'getRegions');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/general');
 
@@ -76,7 +77,7 @@ describe('General page', () => {
 
   test('renders the dedicated court not found page for a missing court on GET', async () => {
     stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
-    const getRegionsStub = stub(CourtApi.prototype, 'getRegions');
+    const getRegionsStub = stub(ReferenceDataApi.prototype, 'getRegions');
 
     const response = await request(app).get(`/courts/${COURT_ID}/edit/general`);
 
@@ -88,7 +89,7 @@ describe('General page', () => {
 
   test('renders the generic error page when the court lookup fails on GET', async () => {
     stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
-    const getRegionsStub = stub(CourtApi.prototype, 'getRegions');
+    const getRegionsStub = stub(ReferenceDataApi.prototype, 'getRegions');
 
     const response = await request(app).get(`/courts/${COURT_ID}/edit/general`);
 
@@ -104,7 +105,7 @@ describe('General page', () => {
       open: true,
       regionId: '22222222-2222-4222-8222-222222222222',
     } as never);
-    stub(CourtApi.prototype, 'getRegions').resolves(HttpStatusCode.InternalServerError);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get(`/courts/${COURT_ID}/edit/general`);
 
@@ -119,7 +120,7 @@ describe('General page', () => {
       open: true,
       regionId: '22222222-2222-4222-8222-222222222222',
     } as never);
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
     stub(CourtApi.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
@@ -152,7 +153,7 @@ describe('General page', () => {
       open: true,
       regionId: '22222222-2222-4222-8222-222222222222',
     } as never);
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
     const updateCourtStub = stub(CourtApi.prototype, 'updateCourt');
@@ -171,7 +172,7 @@ describe('General page', () => {
 
   test('renders the dedicated court not found page for an invalid UUID on POST', async () => {
     const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
-    const getRegionsStub = stub(CourtApi.prototype, 'getRegions');
+    const getRegionsStub = stub(ReferenceDataApi.prototype, 'getRegions');
     const updateCourtStub = stub(CourtApi.prototype, 'updateCourt');
 
     const response = await request(app).post('/courts/not-a-uuid/edit/general/success').type('form').send('name=Test');
@@ -185,7 +186,7 @@ describe('General page', () => {
 
   test('renders the dedicated court not found page when the court is missing on POST', async () => {
     stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
-    const getRegionsStub = stub(CourtApi.prototype, 'getRegions');
+    const getRegionsStub = stub(ReferenceDataApi.prototype, 'getRegions');
     const updateCourtStub = stub(CourtApi.prototype, 'updateCourt');
 
     const response = await request(app)
@@ -206,7 +207,7 @@ describe('General page', () => {
       open: true,
       regionId: '22222222-2222-4222-8222-222222222222',
     } as never);
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
     stub(CourtApi.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);

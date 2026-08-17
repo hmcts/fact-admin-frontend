@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre general page', () => {
@@ -28,8 +29,8 @@ describe('Service centre general page', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
 
     const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/general`);
 
@@ -67,8 +68,8 @@ describe('Service centre general page', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
     stub(CourtApi.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
     stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(HttpStatusCode.NotFound);
     const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves({
@@ -112,8 +113,8 @@ describe('Service centre general page', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(CourtApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(CourtApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
     const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const response = await request(app)

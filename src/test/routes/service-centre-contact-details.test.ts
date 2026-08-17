@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
@@ -35,7 +35,7 @@ describe('Service centre contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -76,7 +76,7 @@ describe('Service centre contact details routes', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -121,7 +121,7 @@ describe('Service centre contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
     const deleteStub = stub(ServiceCentreApi.prototype, 'deleteServiceCentreContactDetail').resolves(

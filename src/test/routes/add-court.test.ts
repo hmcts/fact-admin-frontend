@@ -3,6 +3,7 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Add court page', () => {
@@ -11,7 +12,7 @@ describe('Add court page', () => {
   });
 
   test('renders the add court page', async () => {
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ]);
 
@@ -27,7 +28,7 @@ describe('Add court page', () => {
   });
 
   test('re-renders the add court page with validation errors', async () => {
-    stub(CourtApi.prototype, 'getRegions').resolves([
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
       { country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ]);
     const createCourtStub = stub(CourtApi.prototype, 'createCourt');
@@ -54,7 +55,9 @@ describe('Add court page', () => {
       slug: 'reading-crown-court',
       warningNotice: null,
     };
-    stub(CourtApi.prototype, 'getRegions').resolves([{ country: 'england', id: court.regionId, name: 'South East' }]);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves([
+      { country: 'england', id: court.regionId, name: 'South East' },
+    ]);
     stub(CourtApi.prototype, 'getCourtByName').resolves(404);
     stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(404);
     const createCourtStub = stub(CourtApi.prototype, 'createCourt').resolves(court);

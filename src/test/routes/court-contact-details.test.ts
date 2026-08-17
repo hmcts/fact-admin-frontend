@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import { app } from '../../main/app';
 import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 const CONTACT_DETAIL_ID = '99999999-9999-4999-8999-999999999999';
@@ -30,7 +31,7 @@ describe('Court contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -65,7 +66,7 @@ describe('Court contact details routes', () => {
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -85,7 +86,7 @@ describe('Court contact details routes', () => {
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -110,7 +111,7 @@ describe('Court contact details routes', () => {
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -137,7 +138,7 @@ describe('Court contact details routes', () => {
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -179,7 +180,7 @@ describe('Court contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -208,7 +209,7 @@ describe('Court contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(CourtApi.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
     const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail').resolves(
