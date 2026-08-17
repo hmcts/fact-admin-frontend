@@ -4,8 +4,8 @@ export interface UpdateAccessibilityRequest {
   courtId?: string;
   accessibleParking?: boolean;
   accessibleParkingPhoneNumber?: string | null;
-  accessibleToiletDescription?: string;
-  accessibleToiletDescriptionCy?: string;
+  accessibleToiletDescription?: string | null;
+  accessibleToiletDescriptionCy?: string | null;
   accessibleEntrance?: boolean;
   accessibleEntrancePhoneNumber?: string | null;
   hearingEnhancementEquipment?: HearingEnhancementEquipmentApi;
