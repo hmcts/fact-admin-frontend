@@ -4,12 +4,14 @@ const courtDxCodeSchema = z.object({
   dxCode: z.string(),
   explanation: z.string().nullable().optional(),
   explanationCy: z.string().nullable().optional(),
+  explanationCyPresentWhenExplanationProvided: z.boolean().nullable().optional(),
 });
 
 const courtFaxCodeSchema = z.object({
   faxNumber: z.string(),
   description: z.string().nullable().optional(),
   descriptionCy: z.string().nullable().optional(),
+  descriptionCyPresentWhenDescriptionProvided: z.boolean().optional(),
 });
 
 const courtCodesSchema = z.object({
