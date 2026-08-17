@@ -34,10 +34,10 @@ export class AppInsights {
 
       sdk
         .setAutoCollectRequests(true)
-        .setAutoCollectPerformance(true, true)
+        .setAutoCollectPerformance(true, false)
         .setAutoCollectExceptions(true)
         .setAutoCollectDependencies(true)
-        .setAutoCollectConsole(false, false)
+        .setAutoCollectConsole(false, true)
         .setAutoCollectPreAggregatedMetrics(true)
         .setSendLiveMetrics(false)
         .setInternalLogging(false, true)

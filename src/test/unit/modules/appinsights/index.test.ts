@@ -73,7 +73,8 @@ describe('AppInsights', () => {
       },
     });
     expect(sdk.setAutoCollectRequests).toHaveBeenCalledWith(true);
-    expect(sdk.setAutoCollectConsole).toHaveBeenCalledWith(false, false);
+    expect(sdk.setAutoCollectPerformance).toHaveBeenCalledWith(true, false);
+    expect(sdk.setAutoCollectConsole).toHaveBeenCalledWith(false, true);
     expect(sdk.setSendLiveMetrics).toHaveBeenCalledWith(false);
     expect(sdk.start).toHaveBeenCalled();
     expect(setAppInsightsClient).toHaveBeenCalledWith(defaultClient);
