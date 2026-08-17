@@ -1113,8 +1113,8 @@ describe('DataApiRequests', () => {
         ],
         courtTranslations: [
           {
-            email: 'translations@example.com',
-            phoneNumber: '01234 567891',
+            email: null,
+            phoneNumber: null,
           },
         ],
         courtAccessibilityOptions: [
