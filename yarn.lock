@@ -44,14 +44,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@axe-core/playwright@npm:4.12.1":
-  version: 4.12.1
-  resolution: "@axe-core/playwright@npm:4.12.1"
+"@axe-core/playwright@npm:4.13.0":
+  version: 4.13.0
+  resolution: "@axe-core/playwright@npm:4.13.0"
   dependencies:
-    axe-core: "npm:~4.12.1"
+    axe-core: "npm:~4.13.0"
   peerDependencies:
     playwright-core: ">= 1.0.0"
-  checksum: 10/97c65b666fc95f41137b36a99d4226ea589151ccdf03786a1f5bbaff66b787d2bf38993869252bf6b88c06a3aaf4176d4875a69441fc58c3bbb7fb937d338c70
+  checksum: 10/2400e309d6f6d96b3f3f12b00a80e32cb0213726fcfc3c457b36d17f7136a3361f02a7523286024d7e8ceba9045a5f9c18edd8bc352f76b549faedce298fada2
   languageName: node
   linkType: hard
 
@@ -7015,10 +7015,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:^4.12.1, axe-core@npm:~4.12.1":
+"axe-core@npm:^4.12.1":
   version: 4.12.1
   resolution: "axe-core@npm:4.12.1"
   checksum: 10/08c2ff348524b57dfb68f4e866b1a6363147203b721c734ed00090c16eb911cd015cf71fd96a8bafe42609715f649d21b2e188fae622ac8ef6144b144582f6c4
+  languageName: node
+  linkType: hard
+
+"axe-core@npm:~4.13.0":
+  version: 4.13.0
+  resolution: "axe-core@npm:4.13.0"
+  checksum: 10/b9319bedc705fde00e4abd981d8724202cc20102e4ae6d8edfde33cb5265e0fb8f67f32adcb4ad33fbd4a2c8d7ad7ef5af1d933d9ad859bed90e3eae0ee8c52f
   languageName: node
   linkType: hard
 
@@ -9785,9 +9792,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:29.16.0":
-  version: 29.16.0
-  resolution: "eslint-plugin-jest@npm:29.16.0"
+"eslint-plugin-jest@npm:29.16.1":
+  version: 29.16.1
+  resolution: "eslint-plugin-jest@npm:29.16.1"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.0.0"
   peerDependencies:
@@ -9802,7 +9809,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/f57ddcfe950dde5792bee08a7dfe10e7a557c35a23a7e37f7c174e17271993b9310f180d253e3f4fbe31f205ffc1cff111131b47e24471601bef50493e4403a8
+  checksum: 10/c13741296e115c757f11f912712b49ad35eac1c09323c65a88a75898244ae4c42e9b5046c0e48263321a048701d891a0a887ae7a3650752873d22e86c9d564f8
   languageName: node
   linkType: hard
 
@@ -10279,7 +10286,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fact-admin-frontend@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:4.12.1"
+    "@axe-core/playwright": "npm:4.13.0"
     "@azure/identity": "npm:4.13.1"
     "@babel/core": "npm:7.29.7"
     "@babel/plugin-proposal-decorators": "npm:7.29.7"
@@ -10330,12 +10337,12 @@ __metadata:
     eslint: "npm:9.39.5"
     eslint-config-prettier: "npm:10.1.8"
     eslint-plugin-import: "npm:2.32.0"
-    eslint-plugin-jest: "npm:29.16.0"
+    eslint-plugin-jest: "npm:29.16.1"
     express: "npm:5.2.1"
     express-openid-connect: "npm:3.4.0"
     express-rate-limit: "npm:8.6.2"
     get-port: "npm:^7.2.0"
-    globals: "npm:17.8.0"
+    globals: "npm:17.11.0"
     govuk-frontend: "npm:6.4.0"
     helmet: "npm:8.3.0"
     html-webpack-plugin: "npm:5.6.8"
@@ -11131,10 +11138,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.8.0":
-  version: 17.8.0
-  resolution: "globals@npm:17.8.0"
-  checksum: 10/b7b854b2052d2608d1878884bf730c027e17b9e2d194834f48c3280a7f0005b06d5f51dba362d3149cc05eb90d36d990e5c996728ecd3585a43dc3b4a286ed85
+"globals@npm:17.11.0":
+  version: 17.11.0
+  resolution: "globals@npm:17.11.0"
+  checksum: 10/9cff5b8099b585862ab0d31e8b93dc1c3e7b59239dc58b59447a38709715751df8794ee0d28f434f8e421b01aee3cc10051e2455b5c967d960e79f882e68aa0f
   languageName: node
   linkType: hard
 
