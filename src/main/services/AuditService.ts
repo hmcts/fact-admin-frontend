@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode } from 'axios';
 import moment from 'moment';
 
+import { Logger } from '../modules/logging';
 import { OperationsApi } from '../requests/OperationsApi';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';

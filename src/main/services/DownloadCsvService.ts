@@ -113,7 +113,7 @@ export class DownloadCsvService {
       this.buildPublicCourtHref(court.slug),
       this.joinValues([
         ...court.courtContactDetails.flatMap(detail => (detail.email ? [detail.email] : [])),
-        ...court.courtTranslations.map(translation => translation.email),
+        ...court.courtTranslations.flatMap(translation => (translation.email ? [translation.email] : [])),
       ]),
       this.formatContacts(court),
       this.joinValues(

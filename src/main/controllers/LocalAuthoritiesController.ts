@@ -1,8 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
+import { Logger } from '../modules/logging';
 import {
   LocalAuthoritiesService,
   LocalAuthoritySelections,

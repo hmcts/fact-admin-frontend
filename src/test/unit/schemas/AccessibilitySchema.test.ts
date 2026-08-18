@@ -48,13 +48,15 @@ describe('AccessibilityScheme', () => {
     expect(result.accessibleToiletDescriptionCy).toBeUndefined();
   });
 
-  test('rejects null welsh description values', () => {
-    expect(() =>
-      AccessibilityScheme.parse({
-        ...base,
-        accessibleToiletDescriptionCy: null,
-      })
-    ).toThrow('Invalid input: expected string, received null');
+  test('accepts null toilet description values returned by the API', () => {
+    const result = AccessibilityScheme.parse({
+      ...base,
+      accessibleToiletDescription: null,
+      accessibleToiletDescriptionCy: null,
+    });
+
+    expect(result.accessibleToiletDescription).toBeNull();
+    expect(result.accessibleToiletDescriptionCy).toBeNull();
   });
   test('normalizes null for accessibleParkingPhoneNumber', () => {
     const result = AccessibilityScheme.parse({
