@@ -1,7 +1,7 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 import FormData from 'form-data';
 
+import { Logger } from '../modules/logging';
 import { Accessibility, AccessibilityScheme } from '../schemas/accessibilitySchema';
 import { ApprovalStatus, CreateApprovalRequest, approvalStatusListSchema } from '../schemas/approvalSchema';
 import {
