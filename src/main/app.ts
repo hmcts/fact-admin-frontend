@@ -1,6 +1,5 @@
 import * as path from 'path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import { loadControllers, scopePerRequest } from 'awilix-express';
 import * as bodyParser from 'body-parser';
 import config from 'config';
@@ -23,6 +22,7 @@ import {
 import { Container } from './modules/awilix';
 import { Helmet } from './modules/helmet';
 import { LockingInterceptor } from './modules/locking';
+import { Logger } from './modules/logging';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
 import { RedisModule } from './modules/redis/RedisModule';

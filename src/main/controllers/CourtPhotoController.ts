@@ -1,8 +1,8 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { GET, POST, before, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
+import { Logger } from '../modules/logging';
 import { CourtPhotoService } from '../services/CourtPhotoService';
 
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';

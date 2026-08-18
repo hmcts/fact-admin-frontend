@@ -1,6 +1,7 @@
-import { Logger } from '@hmcts/nodejs-logging';
 import { InjectionMode, asValue, createContainer } from 'awilix';
 import { Application } from 'express';
+
+import { Logger } from '../logging';
 
 const logger = Logger.getLogger('app');
 

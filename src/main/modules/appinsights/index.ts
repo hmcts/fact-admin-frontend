@@ -1,10 +1,9 @@
 import process from 'node:process';
 
-import { useAzureMonitor } from '@azure/monitor-opentelemetry';
-import { Logger } from '@hmcts/nodejs-logging';
-import { resourceFromAttributes } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import * as appInsights from 'applicationinsights';
 import config from 'config';
+
+import { Logger, setAppInsightsClient } from '../logging';
 
 export class AppInsights {
   enable(): void {
@@ -16,19 +15,36 @@ export class AppInsights {
     }
 
     if (appInsightsConnectionString) {
-      const customResource = resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'fact-admin-frontend',
-      });
+      process.env.OTEL_SERVICE_NAME ||= 'fact-admin-frontend';
 
-      const options = {
-        resource: customResource,
-        azureMonitorExporterOptions: {
-          connectionString: appInsightsConnectionString,
+      const sdk = appInsights.setup(appInsightsConnectionString);
+      const httpInstrumentationOptions = {
+        enabled: true,
+        ignoreIncomingRequestHook: (request: { url?: string }) => {
+          const path = request.url?.split('?', 1)[0];
+          return path === '/health/liveness' || path === '/health/readiness';
         },
       };
 
-      useAzureMonitor(options);
+      appInsights.defaultClient.config.azureMonitorOpenTelemetryOptions = {
+        instrumentationOptions: {
+          http: httpInstrumentationOptions,
+        },
+      };
 
+      sdk
+        .setAutoCollectRequests(true)
+        .setAutoCollectPerformance(true, false)
+        .setAutoCollectExceptions(true)
+        .setAutoCollectDependencies(true)
+        .setAutoCollectConsole(false, true)
+        .setAutoCollectPreAggregatedMetrics(true)
+        .setSendLiveMetrics(false)
+        .setInternalLogging(false, true)
+        .enableWebInstrumentation(false)
+        .start();
+
+      setAppInsightsClient(appInsights.defaultClient);
       Logger.getLogger('app').info('App insights activated');
     }
   }
