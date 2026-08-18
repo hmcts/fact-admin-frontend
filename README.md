@@ -1,6 +1,6 @@
 # Fact Admin Frontend
 
-## Getting Started
+## Getting Started:
 
 ### Prerequisites
 
