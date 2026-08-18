@@ -147,6 +147,10 @@ describe('DownloadCsvService', () => {
                 email: 'translations@example.com',
                 phoneNumber: '01234 567891',
               },
+              {
+                email: null,
+                phoneNumber: null,
+              },
             ],
             id: '11111111-1111-4111-8111-111111111111',
             lastUpdatedAt: '2026-04-29T10:00:00Z',

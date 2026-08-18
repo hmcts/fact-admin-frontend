@@ -1113,8 +1113,8 @@ describe('DataApiRequests', () => {
         ],
         courtTranslations: [
           {
-            email: 'translations@example.com',
-            phoneNumber: '01234 567891',
+            email: null,
+            phoneNumber: null,
           },
         ],
         courtAccessibilityOptions: [
@@ -2646,6 +2646,8 @@ describe('DataApiRequests', () => {
       id: '66666666-6666-4666-8666-666666666666',
       courtId,
       accessibleParking: true,
+      accessibleToiletDescription: null,
+      accessibleToiletDescriptionCy: null,
       accessibleEntrance: true,
       hearingEnhancementEquipment: 'INFRARED_SYSTEMS',
       lift: false,
@@ -2663,6 +2665,8 @@ describe('DataApiRequests', () => {
       expect.objectContaining({
         id: accessibility.id,
         courtId,
+        accessibleToiletDescription: null,
+        accessibleToiletDescriptionCy: null,
         hearingEnhancementEquipment: 'infrared',
       })
     );

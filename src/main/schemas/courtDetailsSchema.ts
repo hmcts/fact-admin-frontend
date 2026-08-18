@@ -58,8 +58,8 @@ const courtFacilitiesSchema = z.object({
 });
 
 const courtTranslationSchema = z.object({
-  email: z.string(),
-  phoneNumber: z.string(),
+  email: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
 });
 
 const courtContactDescriptionSchema = z.object({
