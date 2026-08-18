@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import { GET, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
+import { Logger } from '../modules/logging';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit } from '../schemas/auditSchema';
 import { AuditFilterCategoriesService } from '../services/AuditFilterCategoriesService';
