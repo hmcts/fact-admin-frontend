@@ -55,8 +55,8 @@ export const AccessibilityScheme = z.object({
   courtId: z.string(),
   accessibleParking: z.boolean().optional(),
   accessibleParkingPhoneNumber: z.string().optional().nullable(),
-  accessibleToiletDescription: z.string().optional(),
-  accessibleToiletDescriptionCy: z.string().optional(),
+  accessibleToiletDescription: z.string().optional().nullable(),
+  accessibleToiletDescriptionCy: z.string().optional().nullable(),
   accessibleEntrance: z.boolean().optional(),
   accessibleEntrancePhoneNumber: z.string().optional().nullable(),
   hearingEnhancementEquipment: z
