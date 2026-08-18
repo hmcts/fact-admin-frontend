@@ -65,4 +65,32 @@ describe('Logger', () => {
     expect(() => Logger.getLogger('app').warn('Application warning')).not.toThrow();
     expect(delegateLogger.warn).toHaveBeenCalledWith('Application warning');
   });
+
+  test('writes structured event properties to the console and Application Insights', () => {
+    const logger = Logger.getLogger('http');
+
+    logger.infoEvent('http.request.completed', {
+      durationMs: 12,
+      method: 'GET',
+      requestPath: '/courts/:id/edit',
+      statusCode: 404,
+      unused: undefined,
+    });
+
+    expect(delegateLogger.info).toHaveBeenCalledWith(
+      'http.request.completed: durationMs=12, method=GET, requestPath=/courts/:id/edit, statusCode=404'
+    );
+    expect(trackTrace).toHaveBeenCalledWith({
+      message: 'http.request.completed: durationMs=12, method=GET, requestPath=/courts/:id/edit, statusCode=404',
+      severity: 'Information',
+      properties: {
+        durationMs: '12',
+        eventName: 'http.request.completed',
+        loggerName: 'http',
+        method: 'GET',
+        requestPath: '/courts/:id/edit',
+        statusCode: '404',
+      },
+    });
+  });
 });

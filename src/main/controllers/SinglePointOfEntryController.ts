@@ -56,9 +56,9 @@ export default class SinglePointOfEntryController {
     }
 
     if (saveResult.status === 'invalid') {
-      Object.values(saveResult.errors ?? {})
-        .flat()
-        .forEach(message => logger.error(message));
+      logger.warnEvent('single_point_of_entry.save.invalid_state', {
+        errorCount: Object.values(saveResult.errors ?? {}).flat().length,
+      });
       return renderStatus(res, HttpStatusCode.BadRequest);
     }
 

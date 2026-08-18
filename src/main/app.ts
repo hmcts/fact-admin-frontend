@@ -26,6 +26,7 @@ import { Logger } from './modules/logging';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
 import { RedisModule } from './modules/redis/RedisModule';
+import { RequestLogging, normaliseRequestPath } from './modules/request-logging';
 import { runWithDataApiUserId } from './requests/utils/dataApiRequestContext';
 
 const env = process.env.NODE_ENV || 'development';
@@ -73,6 +74,7 @@ new Nunjucks(developmentMode).enableFor(app);
 new Helmet(config.get('security'), developmentMode).enableFor(app);
 new Container().enableFor(app);
 new RedisModule(logger).enableFor(app);
+new RequestLogging().enableFor(app);
 
 app.use(scopePerRequest(app.locals.container));
 
@@ -150,7 +152,15 @@ app.use((req, res) => {
 
 // error handler
 app.use((err: HTTPError, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  logger.error(`${err.stack || err}`);
+  logger.errorEvent(
+    'http.request.unhandled_error',
+    {
+      method: req.method,
+      requestPath: normaliseRequestPath(req.path),
+      statusCode: err.status || 500,
+    },
+    err
+  );
 
   // set locals, only providing error in development
   res.locals.message = err.message;
@@ -177,8 +187,10 @@ function isMaintenanceModeEnabled(): boolean {
 
 function denyAccess(req: express.Request, res: express.Response): void {
   const factUser = getFactUser(req);
-  logger.warn(
-    `Access denied: method=${req.method} path=${req.originalUrl} userId=${factUser?.id ?? 'unknown'} role=${factUser?.role ?? 'unknown'}`
-  );
+  logger.warnEvent('authorization.access_denied', {
+    method: req.method,
+    requestPath: normaliseRequestPath(req.path),
+    role: factUser?.role ?? 'unknown',
+  });
   res.status(403).render('access-denied');
 }
