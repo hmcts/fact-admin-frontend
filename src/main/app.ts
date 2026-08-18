@@ -10,7 +10,6 @@ import RateLimit from 'express-rate-limit';
 
 import { HTTPError } from './HttpError';
 import { setupDev } from './development';
-import { AppInsights } from './modules/appinsights';
 import { Authentication } from './modules/authentication';
 import {
   getFactUser,
@@ -24,7 +23,6 @@ import { Helmet } from './modules/helmet';
 import { LockingInterceptor } from './modules/locking';
 import { Logger } from './modules/logging';
 import { Nunjucks } from './modules/nunjucks';
-import { PropertiesVolume } from './modules/properties-volume';
 import { RedisModule } from './modules/redis/RedisModule';
 import { runWithDataApiUserId } from './requests/utils/dataApiRequestContext';
 
@@ -66,8 +64,6 @@ app.locals.ENV = env;
 
 const logger = Logger.getLogger('app');
 
-new PropertiesVolume().enableFor(app);
-new AppInsights().enable();
 new Nunjucks(developmentMode).enableFor(app);
 // secure the application by adding various HTTP headers to its responses
 new Helmet(config.get('security'), developmentMode).enableFor(app);

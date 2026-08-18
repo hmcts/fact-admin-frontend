@@ -1,31 +1,33 @@
-const delegateLogger = {
-  silly: jest.fn(),
-  debug: jest.fn(),
-  verbose: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+const childLogger = {
+  log: jest.fn(),
 };
-const trackTrace = jest.fn();
+const rootLogger = {
+  child: jest.fn().mockReturnValue(childLogger),
+};
+const createLogger = jest.fn().mockReturnValue(rootLogger);
+const consoleTransport = jest.fn();
 
-jest.mock('@hmcts/nodejs-logging', () => ({
-  Logger: {
-    getLogger: jest.fn().mockReturnValue(delegateLogger),
+jest.mock('winston', () => ({
+  createLogger,
+  format: {
+    combine: jest.fn(),
+    json: jest.fn(),
+    printf: jest.fn(),
+    timestamp: jest.fn(),
+  },
+  transports: {
+    Console: consoleTransport,
   },
 }));
 
-import { Logger, setAppInsightsClient } from '../../../../main/modules/logging';
+import { Logger } from '../../../../main/modules/logging';
 
 describe('Logger', () => {
-  beforeAll(() => {
-    setAppInsightsClient({ trackTrace });
-  });
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('writes errors to the console logger and Application Insights', () => {
+  test('writes formatted errors through Winston', () => {
     const logger = Logger.getLogger('app');
     const details = {
       name: 'ZodError',
@@ -42,27 +44,26 @@ describe('Logger', () => {
 
     logger.error('Error fetching accessibility options:', details);
 
-    expect(delegateLogger.error).toHaveBeenCalledWith('Error fetching accessibility options:', details);
-    expect(trackTrace).toHaveBeenCalledWith({
-      message: expect.stringContaining(
+    expect(childLogger.log).toHaveBeenCalledWith(
+      'error',
+      expect.stringContaining(
         'Error fetching accessibility options: name=ZodError, message=Data API response failed schema validation'
-      ),
-      severity: 'Error',
-      properties: {
-        loggerName: 'app',
-      },
-    });
-    expect(trackTrace.mock.calls[0][0].message).toContain(
+      )
+    );
+    expect(childLogger.log.mock.calls[0][1]).toContain(
       'issues=[code=invalid_type, path=accessibleToiletDescriptionCy, message=Invalid input: expected string, received null]'
     );
   });
 
-  test('does not interrupt console logging if telemetry throws', () => {
-    trackTrace.mockImplementationOnce(() => {
-      throw new Error('telemetry unavailable');
-    });
+  test('caches named child loggers', () => {
+    const first = Logger.getLogger('audit-service');
+    const second = Logger.getLogger('audit-service');
 
-    expect(() => Logger.getLogger('app').warn('Application warning')).not.toThrow();
-    expect(delegateLogger.warn).toHaveBeenCalledWith('Application warning');
+    expect(first).toBe(second);
+    expect(rootLogger.child).toHaveBeenCalledTimes(1);
+    expect(rootLogger.child).toHaveBeenCalledWith({
+      label: 'audit-service',
+      loggerName: 'audit-service',
+    });
   });
 });

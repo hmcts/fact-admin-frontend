@@ -9,7 +9,7 @@ const mockAuditControllerLogger = {
   info: jest.fn(),
 };
 
-jest.mock('@hmcts/nodejs-logging', () => ({
+jest.mock('../../../main/modules/logging', () => ({
   Logger: {
     getLogger: jest.fn().mockReturnValue(mockAuditControllerLogger),
   },

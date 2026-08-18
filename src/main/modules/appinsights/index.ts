@@ -3,10 +3,8 @@ import process from 'node:process';
 import * as appInsights from 'applicationinsights';
 import config from 'config';
 
-import { Logger, setAppInsightsClient } from '../logging';
-
 export class AppInsights {
-  enable(): void {
+  enable(): boolean {
     let appInsightsConnectionString: string | undefined;
     if (process.env.APP_INSIGHTS_CONNECTION_STRING) {
       appInsightsConnectionString = process.env.APP_INSIGHTS_CONNECTION_STRING;
@@ -37,15 +35,16 @@ export class AppInsights {
         .setAutoCollectPerformance(true, false)
         .setAutoCollectExceptions(true)
         .setAutoCollectDependencies(true)
-        .setAutoCollectConsole(false, true)
+        .setAutoCollectConsole(true, false)
         .setAutoCollectPreAggregatedMetrics(true)
         .setSendLiveMetrics(false)
         .setInternalLogging(false, true)
         .enableWebInstrumentation(false)
         .start();
 
-      setAppInsightsClient(appInsights.defaultClient);
-      Logger.getLogger('app').info('App insights activated');
+      return true;
     }
+
+    return false;
   }
 }

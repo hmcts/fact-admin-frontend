@@ -5,69 +5,88 @@ import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
 
-import { app } from './app';
-import { Logger } from './modules/logging';
+import { AppInsights } from './modules/appinsights';
+import { PropertiesVolume } from './modules/properties-volume';
 
-const logger = Logger.getLogger('server');
+async function startApplication(): Promise<void> {
+  new PropertiesVolume().enable();
+  const appInsightsEnabled = new AppInsights().enable();
 
-let server: http.Server | https.Server | null = null;
-let shutdownStarted = false;
-
-// used by shutdownCheck in readinessChecks
-app.locals.shutdown = false;
-
-// TODO: set the right port for your application
-const port: number = parseInt(process.env.PORT || '3355', 10);
-
-const env = process.env.NODE_ENV || 'development';
-const developmentMode = env === 'development';
-
-if (app.locals.ENV === 'development') {
-  const sslDirectory = path.join(__dirname, 'resources', 'localhost-ssl');
-  const sslOptions = {
-    cert: fs.readFileSync(path.join(sslDirectory, 'localhost.crt')),
-    key: fs.readFileSync(path.join(sslDirectory, 'localhost.key')),
-  };
-  server = https.createServer(sslOptions, app);
-  server.listen(port, () => {
-    logger.info(`Application started: https://localhost:${port}`);
-  });
-} else {
-  server = app.listen(port, () => {
-    logger.info(`Application started: http://localhost:${port}`);
-  });
-}
-
-function gracefulShutdownHandler(signal: string) {
-  if (shutdownStarted) {
-    return;
+  // Winston must be loaded after Application Insights starts so its
+  // OpenTelemetry instrumentation can attach to the logger.
+  const { Logger } = await import('./modules/logging');
+  if (appInsightsEnabled) {
+    Logger.getLogger('app').info('App insights activated');
   }
 
-  shutdownStarted = true;
-  logger.info(`⚠️ Caught ${signal}, gracefully shutting down. Setting readiness to DOWN`);
-  // stop the server from accepting new connections
-  app.locals.shutdown = true;
+  const { app } = await import('./app');
+  const logger = Logger.getLogger('server');
 
-  const shutdownDelayMs = developmentMode ? 0 : 4000;
-  const forceExitTimer = setTimeout(() => {
-    logger.info('Forcing process exit after shutdown timeout');
-    process.exit(0);
-  }, shutdownDelayMs + 5000);
+  let server: http.Server | https.Server | null = null;
+  let shutdownStarted = false;
 
-  setTimeout(() => {
-    logger.info('Shutting down application');
-    if (!server) {
-      clearTimeout(forceExitTimer);
-      process.exit(0);
+  // used by shutdownCheck in readinessChecks
+  app.locals.shutdown = false;
+
+  // TODO: set the right port for your application
+  const port: number = parseInt(process.env.PORT || '3355', 10);
+
+  const env = process.env.NODE_ENV || 'development';
+  const developmentMode = env === 'development';
+
+  if (app.locals.ENV === 'development') {
+    const sslDirectory = path.join(__dirname, 'resources', 'localhost-ssl');
+    const sslOptions = {
+      cert: fs.readFileSync(path.join(sslDirectory, 'localhost.crt')),
+      key: fs.readFileSync(path.join(sslDirectory, 'localhost.key')),
+    };
+    server = https.createServer(sslOptions, app);
+    server.listen(port, () => {
+      logger.info(`Application started: https://localhost:${port}`);
+    });
+  } else {
+    server = app.listen(port, () => {
+      logger.info(`Application started: http://localhost:${port}`);
+    });
+  }
+
+  function gracefulShutdownHandler(signal: string) {
+    if (shutdownStarted) {
+      return;
     }
 
-    server.close(() => {
-      logger.info('Server closed');
-      clearTimeout(forceExitTimer);
+    shutdownStarted = true;
+    logger.info(`⚠️ Caught ${signal}, gracefully shutting down. Setting readiness to DOWN`);
+    // stop the server from accepting new connections
+    app.locals.shutdown = true;
+
+    const shutdownDelayMs = developmentMode ? 0 : 4000;
+    const forceExitTimer = setTimeout(() => {
+      logger.info('Forcing process exit after shutdown timeout');
       process.exit(0);
-    });
-  }, shutdownDelayMs);
+    }, shutdownDelayMs + 5000);
+
+    setTimeout(() => {
+      logger.info('Shutting down application');
+      if (!server) {
+        clearTimeout(forceExitTimer);
+        process.exit(0);
+      }
+
+      server.close(() => {
+        logger.info('Server closed');
+        clearTimeout(forceExitTimer);
+        process.exit(0);
+      });
+    }, shutdownDelayMs);
+  }
+
+  process.on('SIGINT', gracefulShutdownHandler);
+  process.on('SIGTERM', gracefulShutdownHandler);
 }
 
-process.on('SIGINT', gracefulShutdownHandler);
-process.on('SIGTERM', gracefulShutdownHandler);
+void startApplication().catch(error => {
+  const details = error instanceof Error ? error.stack || error.message : String(error);
+  process.stderr.write(`Failed to start application: ${details}\n`);
+  process.exit(1);
+});

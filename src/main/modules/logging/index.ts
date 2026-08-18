@@ -1,34 +1,35 @@
-import { Logger as HmctsLogger } from '@hmcts/nodejs-logging';
+import { Logger as WinstonLogger, createLogger, format, transports } from 'winston';
 
 type LogLevel = 'silly' | 'debug' | 'verbose' | 'info' | 'warn' | 'error';
 
-type LoggerDelegate = Record<LogLevel, (...args: unknown[]) => unknown>;
+const supportedLogLevels = new Set<LogLevel>(['silly', 'debug', 'verbose', 'info', 'warn', 'error']);
+const configuredLogLevel = (process.env.LOG_LEVEL || 'info').trim().toLowerCase();
+const loggingDisabled = configuredLogLevel === 'off';
+const logLevel = supportedLogLevels.has(configuredLogLevel as LogLevel) ? configuredLogLevel : 'info';
+const jsonOutput = process.env.JSON_PRINT?.trim().toLowerCase() === 'true';
 
-type AppInsightsClient = {
-  trackTrace: (telemetry: {
-    message: string;
-    severity: 'Verbose' | 'Information' | 'Warning' | 'Error';
-    properties: Record<string, string>;
-  }) => void;
-};
+const outputFormat = jsonOutput
+  ? format.combine(format.timestamp(), format.json())
+  : format.combine(
+      format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ssZ' }),
+      format.printf(({ timestamp, level, label, message }) => `${timestamp} - ${level}: [${label}] ${String(message)}`)
+    );
 
-const severityByLevel: Record<LogLevel, 'Verbose' | 'Information' | 'Warning' | 'Error'> = {
-  silly: 'Verbose',
-  debug: 'Verbose',
-  verbose: 'Verbose',
-  info: 'Information',
-  warn: 'Warning',
-  error: 'Error',
-};
+const rootLogger = createLogger({
+  level: logLevel,
+  silent: loggingDisabled,
+  format: outputFormat,
+  transports: [
+    new transports.Console({
+      stderrLevels: ['error', 'debug'],
+    }),
+  ],
+});
 
-const loggerCache = new Map<string, TelemetryLogger>();
-let appInsightsClient: AppInsightsClient | undefined;
+const loggerCache = new Map<string, ApplicationLogger>();
 
-class TelemetryLogger {
-  public constructor(
-    private readonly name: string,
-    private readonly delegate: LoggerDelegate
-  ) {}
+class ApplicationLogger {
+  public constructor(private readonly delegate: WinstonLogger) {}
 
   public silly(...args: unknown[]): void {
     this.write('silly', args);
@@ -55,34 +56,23 @@ class TelemetryLogger {
   }
 
   private write(level: LogLevel, args: unknown[]): void {
-    this.delegate[level](...args);
-
-    try {
-      appInsightsClient?.trackTrace({
-        message: formatLogMessage(args),
-        severity: severityByLevel[level],
-        properties: {
-          loggerName: this.name,
-        },
-      });
-    } catch {
-      // Telemetry must never prevent the application from writing its normal console log.
-    }
+    this.delegate.log(level, formatLogMessage(args));
   }
 }
 
-export function setAppInsightsClient(client: AppInsightsClient): void {
-  appInsightsClient = client;
-}
-
 export class Logger {
-  public static getLogger(name: string): TelemetryLogger {
+  public static getLogger(name: string): ApplicationLogger {
     const existingLogger = loggerCache.get(name);
     if (existingLogger) {
       return existingLogger;
     }
 
-    const logger = new TelemetryLogger(name, HmctsLogger.getLogger(name) as LoggerDelegate);
+    const logger = new ApplicationLogger(
+      rootLogger.child({
+        label: name,
+        loggerName: name,
+      })
+    );
     loggerCache.set(name, logger);
     return logger;
   }

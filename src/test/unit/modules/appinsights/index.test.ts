@@ -12,12 +12,9 @@ const sdk = {
 };
 const defaultClient = {
   config: {} as Record<string, unknown>,
-  trackTrace: jest.fn(),
 };
 const setup = jest.fn().mockReturnValue(sdk);
-const info = jest.fn();
 const getConfig = jest.fn();
-const setAppInsightsClient = jest.fn();
 
 jest.mock('applicationinsights', () => ({
   defaultClient,
@@ -26,13 +23,6 @@ jest.mock('applicationinsights', () => ({
 
 jest.mock('config', () => ({
   get: getConfig,
-}));
-
-jest.mock('../../../../main/modules/logging', () => ({
-  Logger: {
-    getLogger: jest.fn().mockReturnValue({ info }),
-  },
-  setAppInsightsClient,
 }));
 
 import { AppInsights } from '../../../../main/modules/appinsights';
@@ -60,8 +50,9 @@ describe('AppInsights', () => {
       expect(defaultClient.config.azureMonitorOpenTelemetryOptions).toBeDefined();
     });
 
-    new AppInsights().enable();
+    const enabled = new AppInsights().enable();
 
+    expect(enabled).toBe(true);
     expect(process.env.OTEL_SERVICE_NAME).toBe('fact-admin-frontend');
     expect(setup).toHaveBeenCalledWith('InstrumentationKey=test');
     expect(defaultClient.config.azureMonitorOpenTelemetryOptions).toEqual({
@@ -74,11 +65,9 @@ describe('AppInsights', () => {
     });
     expect(sdk.setAutoCollectRequests).toHaveBeenCalledWith(true);
     expect(sdk.setAutoCollectPerformance).toHaveBeenCalledWith(true, false);
-    expect(sdk.setAutoCollectConsole).toHaveBeenCalledWith(false, true);
+    expect(sdk.setAutoCollectConsole).toHaveBeenCalledWith(true, false);
     expect(sdk.setSendLiveMetrics).toHaveBeenCalledWith(false);
     expect(sdk.start).toHaveBeenCalled();
-    expect(setAppInsightsClient).toHaveBeenCalledWith(defaultClient);
-    expect(info).toHaveBeenCalledWith('App insights activated');
 
     const options = defaultClient.config.azureMonitorOpenTelemetryOptions as {
       instrumentationOptions: { http: { ignoreIncomingRequestHook: (request: { url?: string }) => boolean } };
@@ -93,19 +82,19 @@ describe('AppInsights', () => {
   test('uses the configured Key Vault connection string as a fallback', () => {
     getConfig.mockReturnValue('InstrumentationKey=key-vault');
 
-    new AppInsights().enable();
+    const enabled = new AppInsights().enable();
 
+    expect(enabled).toBe(true);
     expect(setup).toHaveBeenCalledWith('InstrumentationKey=key-vault');
     expect(sdk.start).toHaveBeenCalled();
   });
 
   test('does not start Azure Monitor without a connection string', () => {
-    new AppInsights().enable();
+    const enabled = new AppInsights().enable();
 
+    expect(enabled).toBe(false);
     expect(setup).not.toHaveBeenCalled();
     expect(sdk.start).not.toHaveBeenCalled();
-    expect(setAppInsightsClient).not.toHaveBeenCalled();
-    expect(info).not.toHaveBeenCalled();
   });
 });
 

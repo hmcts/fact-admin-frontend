@@ -1,8 +1,9 @@
 import path from 'node:path';
 
-import { Logger } from '@hmcts/nodejs-logging';
 import { ConfigUtils } from '@hmcts/playwright-common';
 import dotenv from 'dotenv';
+
+import { Logger } from '../../../main/modules/logging';
 
 // This needs to be placed somewhere before attempting to access any environment variables
 dotenv.config({ quiet: true });

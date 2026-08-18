@@ -28,7 +28,6 @@
     "@azure/identity": "4.13.1",
     "@hmcts/info-provider": "^1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
-    "@hmcts/nodejs-logging": "^4.0.4",
     "@hmcts/properties-volume": "1.4.1",
     "@ministryofjustice/frontend": "9.0.0",
     "applicationinsights": "3.16.0",
@@ -50,6 +49,7 @@
     "redis": "^5.12.1",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
+    "winston": "3.19.0",
     "zod": "4.4.3"
   },
   "devDependencies": {
