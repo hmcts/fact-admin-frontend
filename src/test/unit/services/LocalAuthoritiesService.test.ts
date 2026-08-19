@@ -7,7 +7,7 @@ describe('LocalAuthoritiesService', () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const dataApiRequests = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({
-        codes: { familyCourtCode: 'FAMILY-001' },
+        codes: { familyCourtCode: 123 },
       }),
       getCourtAreasOfLaw: jest.fn().mockResolvedValue([
         { areaOfLawType: { id: '11111111-1111-4111-8111-111111111111', name: 'Adoption' }, selected: true },
