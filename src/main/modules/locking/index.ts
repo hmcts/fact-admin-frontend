@@ -21,8 +21,8 @@ type LockRequirements = {
   pageKey: string;
 };
 
-type LockingLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent' | 'warnEvent'>;
 type OperationsApiProvider = () => Promise<OperationsApiType>;
+type LockingLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent' | 'warnEvent'>;
 
 export class LockingInterceptor {
   public constructor(
@@ -54,7 +54,7 @@ export class LockingInterceptor {
       // if they navigate away from a lockable resource, we will clear their locks. If they
       // are still editing (e.g. they have multiple tabs open) then the lock will need to be
       // re-acquired when they refresh or save.
-      const clearStatus =  await operationsApi.clearUserLocks(userId);
+      const clearStatus = await operationsApi.clearUserLocks(userId);
       if (clearStatus >= HttpStatusCode.BadRequest) {
         this.logger.warnEvent('locking.clear_failed', { statusCode: clearStatus });
       }

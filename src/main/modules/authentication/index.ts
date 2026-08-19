@@ -10,12 +10,12 @@ import { resolveFactUserRole } from './roleResolver';
 
 let userApiInstance: UserApiType | undefined;
 
-type DataApiProvider = () => Promise<UserApiType>;
+type UserApiProvider = () => Promise<UserApiType>;
 type AuthenticationLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent'>;
 
 export class Authentication {
   public constructor(
-    private readonly getUserApi: DataApiProvider = getUserDataApi,
+    private readonly userApiProvider: UserApiProvider = getUserApi,
     private readonly logger: AuthenticationLogger = Logger.getLogger('authentication')
   ) {}
 
@@ -51,7 +51,7 @@ export class Authentication {
         },
         afterCallback: async (_req, _res, session) => {
           let stage = 'resolve_sso_user';
-          let dataApiStatusCode: number | undefined;
+          let userApiStatusCode: number | undefined;
 
           try {
             const user = _req.oidc.user;
@@ -63,8 +63,8 @@ export class Authentication {
             stage = 'resolve_role';
             const role = resolveFactUserRole(user.roles);
 
-          stage = 'provision_user';
-          const userApi = await this.getUserApi();
+            stage = 'provision_user';
+            const userApi = await this.userApiProvider();
             const factUser = await userApi.createUpdateUser({
               email: user.preferred_username,
               ssoId: user.oid,
@@ -72,8 +72,8 @@ export class Authentication {
             });
 
             if (typeof factUser === 'number') {
-              dataApiStatusCode = factUser;
-              throw new Error('Data API did not create or update the authenticated user');
+              userApiStatusCode = factUser;
+              throw new Error('User API did not create or update the authenticated user');
             }
 
             session.factUser = factUser;
@@ -83,7 +83,7 @@ export class Authentication {
             this.logger.errorEvent(
               'authentication.callback.failed',
               {
-                dataApiStatusCode,
+                userApiStatusCode,
                 errorName: error instanceof Error ? error.name : 'UnknownError',
                 stage,
               },
@@ -97,7 +97,7 @@ export class Authentication {
   }
 }
 
-async function getUserDataApi(): Promise<UserApiType> {
+async function getUserApi(): Promise<UserApiType> {
   if (!userApiInstance) {
     const { UserApi } = await import('../../requests/UserApi');
     userApiInstance = new UserApi();

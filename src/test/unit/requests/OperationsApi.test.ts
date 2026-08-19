@@ -14,6 +14,8 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 
 import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
+import { Page } from '../../../main/schemas/lockSchema';
+import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 
 const operationsApi = new OperationsApi();
 
@@ -509,5 +511,19 @@ describe('OperationsApi', () => {
       `Error deleting approval for id ${approvalId}:`,
       expectedAxiosError(HttpStatusCode.NotFound)
     );
+  });
+
+  it('returns lock conflicts without logging an expected user-contention error', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+    const userId = '22222222-2222-4222-8222-222222222222';
+    postStub.rejects({
+      isAxiosError: true,
+      response: { status: HttpStatusCode.Conflict },
+    });
+
+    const response = await operationsApi.acquireLock(SubjectType.COURT, subjectId, Page.ADDRESS, userId);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+    expect(mockDataApiLogger.error).not.toHaveBeenCalled();
   });
 });
