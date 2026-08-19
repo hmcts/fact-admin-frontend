@@ -8,8 +8,11 @@ jobs:
   autoupdate:
     name: autoupdate
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
     steps:
-      - uses: docker://chinthakagodawita/autoupdate-action:v1
+      - uses: docker://chinthakagodawita/autoupdate-action:v1@sha256:53d7013ad4689b703d2715d4b17d4901bb0a385e495e0b481f37adbe9b3cc3fc
         id: autoupdate
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}' # GitHub token used for auto updating

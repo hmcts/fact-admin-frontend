@@ -1,5 +1,6 @@
 module "redis-v6" {
-  source             = "git@github.com:hmcts/cnp-module-redis?ref=master"
+  # renovate: datasource=git-refs packageName=https://github.com/hmcts/cnp-module-redis currentValue=master
+  source             = "git@github.com:hmcts/cnp-module-redis?ref=f90db3a5ec7ef4bbcfbb0a2fe5b4d56553880a1e"
   product            = "${var.product}-${var.component}"
   location           = var.location
   env                = var.env
