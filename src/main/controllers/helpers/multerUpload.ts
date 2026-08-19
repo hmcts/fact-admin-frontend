@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import multer, { MulterError } from 'multer';
 
+import { Logger } from '../../modules/logging';
 import { dataApiRequestContext } from '../../requests/utils/dataApiRequestContext';
 
 type UploadErrorCode = 'fileTooLarge' | 'invalidType' | 'missingFile' | 'unknownUploadError';
@@ -9,6 +10,8 @@ export type UploadErrorInfo = {
   code: UploadErrorCode;
   message: string;
 };
+
+const logger = Logger.getLogger('upload');
 
 export function photoUploadMiddleware(fieldName: string, fileSizeMB: number = 2): RequestHandler {
   const uploader = multer({
@@ -23,6 +26,16 @@ export function photoUploadMiddleware(fieldName: string, fileSizeMB: number = 2)
     single(req, res, err => {
       if (err) {
         req.uploadError = mapUploadError(err, fileSizeMB);
+        const properties = {
+          limitMb: fileSizeMB,
+          reason: req.uploadError.code,
+        };
+
+        if (err instanceof MulterError) {
+          logger.warnEvent('photo.upload.rejected', properties);
+        } else {
+          logger.errorEvent('photo.upload.failed', properties, err);
+        }
       }
 
       if (requestContext) {

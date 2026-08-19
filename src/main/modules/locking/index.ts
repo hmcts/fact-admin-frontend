@@ -2,10 +2,11 @@ import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
 import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
-import { PATH_TO_PAGE_MAP, Page } from '../../schemas/lockSchema';
+import { type Lock, PATH_TO_PAGE_MAP } from '../../schemas/lockSchema';
 import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
 import { isUuid } from '../../utils/valueParsers';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenticationHelper';
+import { Logger } from '../logging';
 
 let dataApiRequests: DataApiRequestsType | undefined;
 
@@ -21,9 +22,13 @@ type LockRequirements = {
 };
 
 type DataApiProvider = () => Promise<DataApiRequestsType>;
+type LockingLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent' | 'warnEvent'>;
 
 export class LockingInterceptor {
-  public constructor(private readonly getDataApi: DataApiProvider = getDataApiRequests) {}
+  public constructor(
+    private readonly getDataApi: DataApiProvider = getDataApiRequests,
+    private readonly logger: LockingLogger = Logger.getLogger('locking')
+  ) {}
 
   public enableFor(app: express.Express): void {
     app.use(this.handleRequest.bind(this));
@@ -49,7 +54,10 @@ export class LockingInterceptor {
       // if they navigate away from a lockable resource, we will clear their locks. If they
       // are still editing (e.g. they have multiple tabs open) then the lock will need to be
       // re-acquired when they refresh or save.
-      await dataApi.clearUserLocks(userId);
+      const clearStatus = await dataApi.clearUserLocks(userId);
+      if (clearStatus >= HttpStatusCode.BadRequest) {
+        this.logger.warnEvent('locking.clear_failed', { statusCode: clearStatus });
+      }
       return next();
     }
 
@@ -114,6 +122,10 @@ export class LockingInterceptor {
 
     if (!page) {
       // we don't have a page mapping for that key so fail the lock
+      this.logger.warnEvent('locking.page_not_mapped', {
+        pageKey: details.pageKey,
+        subjectType: details.subject,
+      });
       res.status(HttpStatusCode.BadRequest);
       res.render('lock-failed', {
         subject: subjectStr,
@@ -145,7 +157,7 @@ export class LockingInterceptor {
     dataApi: DataApiRequestsType,
     res: express.Response,
     lock: HttpStatusCode,
-    page: typeof Page,
+    page: Lock['page'],
     details: LockRequirements,
     subjectStr: string
   ) {
@@ -153,6 +165,10 @@ export class LockingInterceptor {
     const pageStr = (page as unknown as string).toLowerCase().replaceAll('_', ' ');
     if (lock === HttpStatusCode.Conflict) {
       // someone else has the lock to retrieve it and render the already locked page.
+      this.logger.infoEvent('locking.acquire_conflict', {
+        page,
+        subjectType: details.subject,
+      });
       const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
       res.render('lock-exists', {
         subject: subjectStr,
@@ -161,6 +177,16 @@ export class LockingInterceptor {
       });
     } else {
       // something else went wrong, so just render the generic lock failed page
+      const properties = {
+        page,
+        statusCode: lock,
+        subjectType: details.subject,
+      };
+      if (lock >= HttpStatusCode.InternalServerError) {
+        this.logger.errorEvent('locking.acquire_failed', properties);
+      } else {
+        this.logger.warnEvent('locking.acquire_failed', properties);
+      }
       res.render('lock-failed', {
         subject: subjectStr,
         page: pageStr,

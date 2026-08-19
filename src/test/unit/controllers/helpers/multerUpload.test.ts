@@ -1,6 +1,21 @@
 import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
 
+const mockUploadLogger = {
+  debug: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn(),
+  silly: jest.fn(),
+  verbose: jest.fn(),
+  warn: jest.fn(),
+};
+
+jest.mock('@hmcts/nodejs-logging', () => ({
+  Logger: {
+    getLogger: jest.fn().mockReturnValue(mockUploadLogger),
+  },
+}));
+
 import { photoUploadMiddleware } from '../../../../main/controllers/helpers/multerUpload';
 import { dataApiRequestContext } from '../../../../main/requests/utils/dataApiRequestContext';
 
@@ -77,6 +92,7 @@ describe('photoUploadMiddleware', () => {
       code: 'fileTooLarge',
       message: 'The selected file must be smaller than 4MB',
     });
+    expect(mockUploadLogger.warn).toHaveBeenCalledWith('photo.upload.rejected: limitMb=4, reason=fileTooLarge');
     expect(next).toHaveBeenCalledTimes(1);
   });
 
@@ -93,7 +109,8 @@ describe('photoUploadMiddleware', () => {
   });
 
   test('maps non-Multer errors to a safe generic error', () => {
-    uploadHandlerMock.mockImplementation((_req, _res, callback) => callback(new Error('stream failed')));
+    const uploadError = new Error('stream failed');
+    uploadHandlerMock.mockImplementation((_req, _res, callback) => callback(uploadError));
     const request = requestMock();
 
     photoUploadMiddleware('photo')(request, response, jest.fn());
@@ -102,6 +119,10 @@ describe('photoUploadMiddleware', () => {
       code: 'unknownUploadError',
       message: 'There was a problem uploading the file',
     });
+    expect(mockUploadLogger.error).toHaveBeenCalledWith(
+      'photo.upload.failed: limitMb=2, reason=unknownUploadError',
+      uploadError
+    );
   });
 
   test('continues without adding an error after a successful upload', () => {
