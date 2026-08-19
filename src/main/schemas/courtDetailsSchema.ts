@@ -242,7 +242,6 @@ export const allLocationDetailsSchema = z.discriminatedUnion('locationType', [
   }),
 ]);
 
-export const courtDetailsListSchema = z.array(courtDetailsSchema);
 export const allLocationDetailsListSchema = z.array(allLocationDetailsSchema);
 
 export type CourtDetails = z.infer<typeof courtDetailsSchema>;
