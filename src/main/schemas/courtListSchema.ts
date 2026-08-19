@@ -24,10 +24,8 @@ export const pagedLocationsSchema = z.object({
   page: pageMetadataSchema,
 });
 
-export const courtListItemSchema = locationListItemSchema;
 export const pagedCourtsSchema = pagedLocationsSchema;
 
 export type LocationListItem = z.infer<typeof locationListItemSchema>;
 export type PagedLocations = z.infer<typeof pagedLocationsSchema>;
-export type CourtListItem = LocationListItem;
 export type PagedCourts = PagedLocations;
