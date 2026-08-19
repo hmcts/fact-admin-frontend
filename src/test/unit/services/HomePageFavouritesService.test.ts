@@ -15,7 +15,7 @@ describe('HomePageService favourites', () => {
       getFavourites: jest.fn().mockResolvedValue(page([serviceCentre], 0, 1, 1)),
       getRegions: jest.fn().mockResolvedValue([]),
     };
-    const service = new HomePageService(requests as never);
+    const service = buildHomePageService(requests);
 
     const viewModel = await service.getHomePageViewModel(service.getFilters({}));
 
@@ -35,7 +35,7 @@ describe('HomePageService favourites', () => {
       getFavourites: jest.fn().mockResolvedValue(HttpStatusCode.ServiceUnavailable),
       getRegions: jest.fn().mockResolvedValue([]),
     };
-    const service = new HomePageService(requests as never);
+    const service = buildHomePageService(requests);
 
     const viewModel = await service.getHomePageViewModel(service.getFilters({}));
 
@@ -51,7 +51,7 @@ describe('HomePageService favourites', () => {
       getFavourites: jest.fn().mockResolvedValue(page([], 0, 0, 0)),
       getRegions: jest.fn().mockResolvedValue([]),
     };
-    const service = new HomePageService(requests as never);
+    const service = buildHomePageService(requests);
 
     const viewModel = await service.getHomePageViewModel(service.getFilters({}));
 
@@ -70,7 +70,7 @@ describe('HomePageService favourites', () => {
         .mockResolvedValueOnce(page([serviceCentre], 1, 26, 2)),
       getRegions: jest.fn().mockResolvedValue([]),
     };
-    const service = new HomePageService(requests as never);
+    const service = buildHomePageService(requests);
 
     const viewModel = await service.getHomePageViewModel(
       service.getFilters({ favouritesPageNumber: '2', tab: 'favourites' })
@@ -106,5 +106,25 @@ describe('HomePageService favourites', () => {
       slug: name.toLowerCase().replaceAll(' ', '-'),
       warningNotice: null,
     };
+  }
+
+  function buildHomePageService(requests: {
+    getCourts: jest.Mock;
+    getFavouriteStatuses: jest.Mock;
+    getFavourites: jest.Mock;
+    getRegions: jest.Mock;
+  }): HomePageService {
+    const courtApi = {
+      getCourts: requests.getCourts,
+    };
+    const userApi = {
+      getFavourites: requests.getFavourites,
+      getFavouriteStatuses: requests.getFavouriteStatuses,
+    };
+    const referenceDataApi = {
+      getRegions: requests.getRegions,
+    };
+
+    return new HomePageService(courtApi as never, userApi as never, referenceDataApi as never);
   }
 });

@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { ServiceCentreAddressType } from '../../../main/schemas/serviceCentreAddressSchema';
 import { ServiceCentreAddressService } from '../../../main/services/ServiceCentreAddressService';
 
@@ -29,10 +30,10 @@ describe('ServiceCentreAddressService', () => {
   test('lists and retrieves addresses', async () => {
     const addresses = [buildAddress()];
     const getListSpy = jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails')
       .mockResolvedValue(addresses as never);
     const getByIdSpy = jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetailsById')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetailsById')
       .mockResolvedValue(addresses[0] as never);
 
     const service = new ServiceCentreAddressService();
@@ -45,7 +46,7 @@ describe('ServiceCentreAddressService', () => {
 
   test('retrieveServiceCentreName returns name or status', async () => {
     jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreById')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreById')
       .mockResolvedValueOnce({ id: serviceCentreId, name: 'Reading Service Centre' } as never)
       .mockResolvedValueOnce(HttpStatusCode.NotFound);
 
@@ -56,7 +57,7 @@ describe('ServiceCentreAddressService', () => {
   });
 
   test('maps postcode search results and filters null DPA values', async () => {
-    jest.spyOn(DataApiRequests.prototype, 'getAddressesForPostcode').mockResolvedValue({
+    jest.spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode').mockResolvedValue({
       results: [
         {
           DPA: {
@@ -91,7 +92,7 @@ describe('ServiceCentreAddressService', () => {
 
   test('retrieveAddressOptions returns invalid payload for map message and bad request fallback', async () => {
     const getAddressesForPostcode = jest
-      .spyOn(DataApiRequests.prototype, 'getAddressesForPostcode')
+      .spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode')
       .mockResolvedValueOnce(new Map([['message', 'Postcode is invalid']]))
       .mockResolvedValueOnce(new Map([['postcode', 'BAD']]))
       .mockResolvedValueOnce(HttpStatusCode.InternalServerError);
@@ -109,7 +110,7 @@ describe('ServiceCentreAddressService', () => {
 
   test('save returns status when existing addresses cannot be loaded', async () => {
     jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails')
       .mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const service = new ServiceCentreAddressService();
@@ -120,11 +121,11 @@ describe('ServiceCentreAddressService', () => {
 
   test('save returns local validation errors and does not call save apis', async () => {
     jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails')
       .mockResolvedValue([buildAddress()] as never);
-    const getServiceCentreById = jest.spyOn(DataApiRequests.prototype, 'getServiceCentreById');
-    const saveServiceCentreAddress = jest.spyOn(DataApiRequests.prototype, 'saveServiceCentreAddress');
-    const updateServiceCentreAddress = jest.spyOn(DataApiRequests.prototype, 'updateServiceCentreAddress');
+    const getServiceCentreById = jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreById');
+    const saveServiceCentreAddress = jest.spyOn(ServiceCentreApi.prototype, 'saveServiceCentreAddress');
+    const updateServiceCentreAddress = jest.spyOn(ServiceCentreApi.prototype, 'updateServiceCentreAddress');
 
     const service = new ServiceCentreAddressService();
     const result = await service.save(
@@ -172,8 +173,8 @@ describe('ServiceCentreAddressService', () => {
   });
 
   test('save returns status when service centre lookup fails after validation', async () => {
-    jest.spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails').mockResolvedValue([] as never);
-    jest.spyOn(DataApiRequests.prototype, 'getServiceCentreById').mockResolvedValue(HttpStatusCode.NotFound);
+    jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').mockResolvedValue([] as never);
+    jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreById').mockResolvedValue(HttpStatusCode.NotFound);
 
     const service = new ServiceCentreAddressService();
     const result = await service.save(buildAddress({ id: null }), serviceCentreId);
@@ -205,7 +206,7 @@ describe('ServiceCentreAddressService', () => {
       open: true,
     };
     const saveServiceCentreAddress = jest
-      .spyOn(DataApiRequests.prototype, 'saveServiceCentreAddress')
+      .spyOn(ServiceCentreApi.prototype, 'saveServiceCentreAddress')
       .mockResolvedValueOnce(newAddress as never)
       .mockResolvedValueOnce(
         new Map([
@@ -215,15 +216,15 @@ describe('ServiceCentreAddressService', () => {
       )
       .mockResolvedValueOnce(HttpStatusCode.BadGateway);
     const updateServiceCentreAddress = jest
-      .spyOn(DataApiRequests.prototype, 'updateServiceCentreAddress')
+      .spyOn(ServiceCentreApi.prototype, 'updateServiceCentreAddress')
       .mockResolvedValue(updatedAddress as never);
 
     const updateServiceCentre = jest
-      .spyOn(DataApiRequests.prototype, 'updateServiceCentre')
+      .spyOn(ServiceCentreApi.prototype, 'updateServiceCentre')
       .mockResolvedValue(updatedServiceCentre as never);
 
-    jest.spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails').mockResolvedValue([] as never);
-    jest.spyOn(DataApiRequests.prototype, 'getServiceCentreById').mockResolvedValue(serviceCentre as never);
+    jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').mockResolvedValue([] as never);
+    jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreById').mockResolvedValue(serviceCentre as never);
 
     const service = new ServiceCentreAddressService();
 
@@ -258,13 +259,13 @@ describe('ServiceCentreAddressService', () => {
   });
 
   test('delete returns status for failed lookups and deletes when request succeeds', async () => {
-    const deleteServiceCentreAddress = jest.spyOn(DataApiRequests.prototype, 'deleteServiceCentreAddress');
+    const deleteServiceCentreAddress = jest.spyOn(ServiceCentreApi.prototype, 'deleteServiceCentreAddress');
     jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreById')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreById')
       .mockResolvedValueOnce(HttpStatusCode.NotFound)
       .mockResolvedValue({ id: serviceCentreId, name: 'Reading Service Centre' } as never);
     const getServiceCentreAddressDetails = jest
-      .spyOn(DataApiRequests.prototype, 'getServiceCentreAddressDetails')
+      .spyOn(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails')
       .mockResolvedValueOnce(HttpStatusCode.InternalServerError)
       .mockResolvedValueOnce([buildAddress({ id: '33333333-3333-4333-8333-333333333333' })] as never)
       .mockResolvedValueOnce([buildAddress()] as never)

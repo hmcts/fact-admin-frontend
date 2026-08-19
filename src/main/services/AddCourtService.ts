@@ -1,6 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 
 type AddCourtForm = {
@@ -29,13 +31,17 @@ type AddCourtResult =
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class AddCourtService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   /**
    * Builds the empty add-court page model, including regions for the mandatory dropdown.
    */
   public async getViewModel(form: AddCourtForm = {}): Promise<AddCourtPageModel | HttpStatusCode> {
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -95,7 +101,7 @@ export class AddCourtService {
       return this.getViewModelWithErrors(trimmedForm, validationErrors);
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -114,7 +120,7 @@ export class AddCourtService {
       });
     }
 
-    const createResponse = await this.dataApiRequests.createCourt({
+    const createResponse = await this.courtApi.createCourt({
       name,
       open: false,
       regionId,
@@ -147,7 +153,7 @@ export class AddCourtService {
   private async checkDuplicateLocationName(
     name: string
   ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
+    const duplicateCourt = await this.courtApi.getCourtByName(name);
     if (typeof duplicateCourt !== 'number') {
       return { name: duplicateCourt.name, type: 'court' };
     }
@@ -155,7 +161,7 @@ export class AddCourtService {
       return duplicateCourt;
     }
 
-    const duplicateServiceCentre = await this.dataApiRequests.getServiceCentreByName(name);
+    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
     if (typeof duplicateServiceCentre !== 'number') {
       return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
     }
@@ -170,7 +176,7 @@ export class AddCourtService {
     form: AddCourtForm,
     errors: Record<string, string[]>
   ): Promise<AddCourtPageModel | HttpStatusCode> {
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }

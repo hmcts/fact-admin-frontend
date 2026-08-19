@@ -3,19 +3,19 @@ import * as express from 'express';
 import { auth } from 'express-openid-connect';
 
 import { FRONTEND_URL } from '../../envUrls';
-import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
+import type { UserApi as UserApiType } from '../../requests/UserApi';
 import { Logger } from '../logging';
 
 import { resolveFactUserRole } from './roleResolver';
 
-let dataApiRequests: DataApiRequestsType | undefined;
+let userApiInstance: UserApiType | undefined;
 
-type DataApiProvider = () => Promise<DataApiRequestsType>;
+type UserApiProvider = () => Promise<UserApiType>;
 type AuthenticationLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent'>;
 
 export class Authentication {
   public constructor(
-    private readonly getDataApi: DataApiProvider = getDataApiRequests,
+    private readonly userApiProvider: UserApiProvider = getUserApi,
     private readonly logger: AuthenticationLogger = Logger.getLogger('authentication')
   ) {}
 
@@ -51,7 +51,7 @@ export class Authentication {
         },
         afterCallback: async (_req, _res, session) => {
           let stage = 'resolve_sso_user';
-          let dataApiStatusCode: number | undefined;
+          let userApiStatusCode: number | undefined;
 
           try {
             const user = _req.oidc.user;
@@ -64,16 +64,16 @@ export class Authentication {
             const role = resolveFactUserRole(user.roles);
 
             stage = 'provision_user';
-            const dataApi = await this.getDataApi();
-            const factUser = await dataApi.createUpdateUser({
+            const userApi = await this.userApiProvider();
+            const factUser = await userApi.createUpdateUser({
               email: user.preferred_username,
               ssoId: user.oid,
               role,
             });
 
             if (typeof factUser === 'number') {
-              dataApiStatusCode = factUser;
-              throw new Error('Data API did not create or update the authenticated user');
+              userApiStatusCode = factUser;
+              throw new Error('User API did not create or update the authenticated user');
             }
 
             session.factUser = factUser;
@@ -83,7 +83,7 @@ export class Authentication {
             this.logger.errorEvent(
               'authentication.callback.failed',
               {
-                dataApiStatusCode,
+                userApiStatusCode,
                 errorName: error instanceof Error ? error.name : 'UnknownError',
                 stage,
               },
@@ -97,11 +97,11 @@ export class Authentication {
   }
 }
 
-async function getDataApiRequests(): Promise<DataApiRequestsType> {
-  if (!dataApiRequests) {
-    const { DataApiRequests } = await import('../../requests/DataApiRequests');
-    dataApiRequests = new DataApiRequests();
+async function getUserApi(): Promise<UserApiType> {
+  if (!userApiInstance) {
+    const { UserApi } = await import('../../requests/UserApi');
+    userApiInstance = new UserApi();
   }
 
-  return dataApiRequests;
+  return userApiInstance;
 }

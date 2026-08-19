@@ -3,18 +3,19 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { OperationsApi } from '../../main/requests/OperationsApi';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre edit page', () => {
   beforeEach(() => {
     restore();
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
       open: true,
       slug: 'national-business-centre',
     } as never);
-    stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    stub(OperationsApi.prototype, 'getLocks').resolves([]);
   });
 
   test('renders the service centre edit link page', async () => {
@@ -31,7 +32,7 @@ describe('Service centre edit page', () => {
   });
 
   test('renders approve data for super admin users when the service centre is not approved', async () => {
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -54,7 +55,7 @@ describe('Service centre edit page', () => {
   });
 
   test('renders the review page and approve data for viewer users when the service centre is not approved', async () => {
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -77,7 +78,7 @@ describe('Service centre edit page', () => {
   });
 
   test('does not render approve data for super admin users when the service centre is approved', async () => {
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -106,7 +107,7 @@ describe('Service centre edit page', () => {
   });
 
   test('renders approve data confirmation for super admin users', async () => {
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -134,7 +135,7 @@ describe('Service centre edit page', () => {
   });
 
   test('approves service centre data and renders success page for super admin users', async () => {
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -146,7 +147,7 @@ describe('Service centre edit page', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApprovalStub = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
 
     const response = await request(app)
       .post('/service-centres/22222222-2222-4222-8222-222222222222/edit/approve')
@@ -167,7 +168,7 @@ describe('Service centre edit page', () => {
   });
 
   test('allows viewer users to confirm service centre approval', async () => {
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -179,7 +180,7 @@ describe('Service centre edit page', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApprovalStub = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
 
     const response = await request(app)
       .post('/service-centres/22222222-2222-4222-8222-222222222222/edit/approve')

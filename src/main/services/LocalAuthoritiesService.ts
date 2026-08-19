@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../schemas/areaOfLawSchema';
 import {
   CourtLocalAuthorities,
@@ -45,16 +45,16 @@ export const allowedLocalAuthorityAreas = new Set(['Adoption', 'Children', 'Divo
 const localAuthorityAreas = [...allowedLocalAuthorityAreas] as (keyof LocalAuthoritySelections)[];
 
 export class LocalAuthoritiesService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<LocalAuthoritiesViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
     // we need to pull professional information to determine if this court has the family court type
-    const professionalInformationResponse = await this.dataApiRequests.getCourtProfessionalInformation(courtId);
+    const professionalInformationResponse = await this.courtApi.getCourtProfessionalInformation(courtId);
     if (typeof professionalInformationResponse === 'number') {
       if (professionalInformationResponse !== HttpStatusCode.NotFound) {
         return professionalInformationResponse;
@@ -66,13 +66,13 @@ export class LocalAuthoritiesService {
         : !!professionalInformationResponse?.codes?.familyCourtCode;
 
     // we need the cases heard in order to determine which areas of family law are handled
-    const casesHeardResponse = await this.dataApiRequests.getCourtAreasOfLaw(courtId);
+    const casesHeardResponse = await this.courtApi.getCourtAreasOfLaw(courtId);
     if (typeof casesHeardResponse === 'number') {
       return casesHeardResponse;
     }
 
     // and we'll need whatever configuration is currently in place
-    const courtLocalAuthoritiesResponse = await this.dataApiRequests.getCourtLocalAuthorities(courtId);
+    const courtLocalAuthoritiesResponse = await this.courtApi.getCourtLocalAuthorities(courtId);
     if (typeof courtLocalAuthoritiesResponse === 'number') {
       return courtLocalAuthoritiesResponse;
     }
@@ -96,7 +96,7 @@ export class LocalAuthoritiesService {
     selections: LocalAuthoritySelections
   ): Promise<LocalAuthoritiesSaveModel | HttpStatusCode> {
     // retrieve the court as we'll need its name
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
@@ -105,7 +105,7 @@ export class LocalAuthoritiesService {
       .map(area => selections[area])
       .filter((selection): selection is CourtLocalAuthorities => !!selection);
 
-    const updateResponse = await this.dataApiRequests.updateCourtLocalAuthorities(courtId, updatePayload);
+    const updateResponse = await this.courtApi.updateCourtLocalAuthorities(courtId, updatePayload);
     if (typeof updateResponse === 'number' && updateResponse !== HttpStatusCode.Ok) {
       return updateResponse;
     }

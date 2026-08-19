@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { DpaAddress } from '../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../schemas/serviceCentreAddressSchema';
 import {
@@ -42,18 +43,21 @@ export type RetrieveAddressOptionsResponse =
   | HttpStatusCode;
 
 export class ServiceCentreAddressService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   public async list(serviceCentreId: string): Promise<ServiceCentreAddress[] | HttpStatusCode> {
-    return this.dataApiRequests.getServiceCentreAddressDetails(serviceCentreId);
+    return this.serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
   }
 
   public async retrieve(serviceCentreId: string, addressId: string): Promise<ServiceCentreAddress | HttpStatusCode> {
-    return this.dataApiRequests.getServiceCentreAddressDetailsById(serviceCentreId, addressId);
+    return this.serviceCentreApi.getServiceCentreAddressDetailsById(serviceCentreId, addressId);
   }
 
   public async retrieveServiceCentreName(serviceCentreId: string): Promise<string | HttpStatusCode> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
     if (typeof serviceCentreResponse === 'number') {
       return serviceCentreResponse;
     }
@@ -62,7 +66,7 @@ export class ServiceCentreAddressService {
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await this.dataApiRequests.getAddressesForPostcode(postcode);
+    const result = await this.referenceDataApi.getAddressesForPostcode(postcode);
     if (typeof result === 'number') {
       return result;
     }
@@ -93,14 +97,14 @@ export class ServiceCentreAddressService {
       return { status: 'invalid', address: { ...address, errors: validationErrors } };
     }
 
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
     if (typeof serviceCentreResponse === 'number') {
       return serviceCentreResponse;
     }
 
     const result = addressId
-      ? await this.dataApiRequests.updateServiceCentreAddress(address, serviceCentreId, addressId)
-      : await this.dataApiRequests.saveServiceCentreAddress(address, serviceCentreId);
+      ? await this.serviceCentreApi.updateServiceCentreAddress(address, serviceCentreId, addressId)
+      : await this.serviceCentreApi.saveServiceCentreAddress(address, serviceCentreId);
 
     if (typeof result === 'number') {
       return result;
@@ -119,7 +123,7 @@ export class ServiceCentreAddressService {
 
     let serviceCentreOpened = false;
     if (!addressId && existingAddresses.length === 0 && !serviceCentreResponse.open && isNewSC) {
-      const openServiceCentreResponse = await this.dataApiRequests.updateServiceCentre({
+      const openServiceCentreResponse = await this.serviceCentreApi.updateServiceCentre({
         ...serviceCentreResponse,
         open: true,
       });
@@ -139,7 +143,7 @@ export class ServiceCentreAddressService {
   }
 
   public async delete(serviceCentreId: string, addressId: string): Promise<DeleteServiceCentreAddressResponse> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
     if (typeof serviceCentreResponse === 'number') {
       return serviceCentreResponse;
     }
@@ -154,7 +158,7 @@ export class ServiceCentreAddressService {
       return HttpStatusCode.NotFound;
     }
 
-    const deleteResponse = await this.dataApiRequests.deleteServiceCentreAddress(serviceCentreId, addressId);
+    const deleteResponse = await this.serviceCentreApi.deleteServiceCentreAddress(serviceCentreId, addressId);
     if (deleteResponse !== HttpStatusCode.NoContent) {
       return deleteResponse;
     }

@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { CourtContactService } from '../../../main/services/CourtContactService';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
@@ -13,10 +14,10 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
   test('returns validation-error with prebuilt form view model and does not save', async () => {
     const getContactDescriptionTypesSpy = jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
     const createCourtContactDetailSpy = jest
-      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .spyOn(CourtApi.prototype, 'createCourtContactDetail')
       .mockResolvedValue(HttpStatusCode.Created);
 
     const result = await new CourtContactService().submitContactDetailFlow({
@@ -59,10 +60,10 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
   test('returns validation-error when explanation is over 250 characters', async () => {
     const getContactDescriptionTypesSpy = jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
     const createCourtContactDetailSpy = jest
-      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .spyOn(CourtApi.prototype, 'createCourtContactDetail')
       .mockResolvedValue(HttpStatusCode.Created);
 
     const result = await new CourtContactService().submitContactDetailFlow({
@@ -94,10 +95,10 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
   test('returns validation-error when explanation contains unsupported characters', async () => {
     const getContactDescriptionTypesSpy = jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
     const createCourtContactDetailSpy = jest
-      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .spyOn(CourtApi.prototype, 'createCourtContactDetail')
       .mockResolvedValue(HttpStatusCode.Created);
 
     const result = await new CourtContactService().submitContactDetailFlow({
@@ -131,7 +132,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
   test('returns save-error when save status is unsuccessful', async () => {
     const createCourtContactDetailSpy = jest
-      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .spyOn(CourtApi.prototype, 'createCourtContactDetail')
       .mockResolvedValue(HttpStatusCode.InternalServerError);
 
     const result = await new CourtContactService().submitContactDetailFlow({
@@ -161,10 +162,10 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
   test('returns validation-error when backend returns validation map', async () => {
     const createCourtContactDetailSpy = jest
-      .spyOn(DataApiRequests.prototype, 'createCourtContactDetail')
+      .spyOn(CourtApi.prototype, 'createCourtContactDetail')
       .mockResolvedValue(new Map([['email', 'Email already exists']]) as never);
     jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
 
     const result = await new CourtContactService().submitContactDetailFlow({
@@ -193,10 +194,10 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
   test('returns saved with resolved contact type name when save succeeds', async () => {
     const updateCourtContactDetailSpy = jest
-      .spyOn(DataApiRequests.prototype, 'updateCourtContactDetail')
+      .spyOn(CourtApi.prototype, 'updateCourtContactDetail')
       .mockResolvedValue(HttpStatusCode.Ok);
     const getContactDescriptionTypesSpy = jest
-      .spyOn(DataApiRequests.prototype, 'getContactDescriptionTypes')
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
       .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
 
     const result = await new CourtContactService().submitContactDetailFlow({

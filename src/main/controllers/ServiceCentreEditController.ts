@@ -2,7 +2,8 @@ import { GET, POST, route } from 'awilix-express';
 import { Request, Response } from 'express';
 
 import { isViewer } from '../modules/authentication/authenticationHelper';
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { OperationsApi } from '../requests/OperationsApi';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ApprovalService } from '../services/ApprovalService';
 import { LockService } from '../services/LockService';
@@ -11,8 +12,9 @@ import { parseNumber } from '../utils/valueParsers';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
-const dataApiRequests = new DataApiRequests();
-const lockService = new LockService(dataApiRequests);
+const operationsApi = new OperationsApi();
+const serviceCentreApi = new ServiceCentreApi();
+const lockService = new LockService(operationsApi);
 const locationApprovalController = new LocationApprovalController(
   {
     buildBreadcrumbs: buildEditBreadcrumbs,
@@ -27,7 +29,7 @@ const locationApprovalController = new LocationApprovalController(
         ? locks
         : { serviceCentreLocks: locks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
     },
-    getLocation: serviceCentreId => dataApiRequests.getServiceCentreById(serviceCentreId),
+    getLocation: serviceCentreId => serviceCentreApi.getServiceCentreById(serviceCentreId),
     locationIdViewKey: 'serviceCentreId',
     locationNameViewKey: 'serviceCentreName',
     notFoundView: 'service-centre-not-found',
@@ -35,7 +37,7 @@ const locationApprovalController = new LocationApprovalController(
     routeSegment: 'service-centres',
     subjectType: SubjectType.SERVICE_CENTRE,
   },
-  new ApprovalService(dataApiRequests)
+  new ApprovalService(operationsApi)
 );
 
 @route('/service-centres/:serviceCentreId/edit')

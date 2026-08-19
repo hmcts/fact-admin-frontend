@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 
@@ -13,11 +13,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('renders unchecked options when no translation services exist', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getTranslationServices').resolves(null);
+    stub(CourtApi.prototype, 'getTranslationServices').resolves(null);
 
     const response = await request(app).get(`/courts/${courtId}/edit/translation-and-interpretation`);
 
@@ -33,11 +33,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('renders checked options for non-empty translation service values', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getTranslationServices').resolves({
+    stub(CourtApi.prototype, 'getTranslationServices').resolves({
       courtId,
       email: 'translations@example.com',
       id: '22222222-2222-4222-8222-222222222222',
@@ -53,11 +53,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('treats empty or null translation service values as unchecked', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getTranslationServices').resolves({
+    stub(CourtApi.prototype, 'getTranslationServices').resolves({
       courtId,
       email: null,
       id: '22222222-2222-4222-8222-222222222222',
@@ -71,11 +71,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('posts empty strings for unselected contact methods', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveStub = stub(DataApiRequests.prototype, 'saveTranslationServices').resolves(HttpStatusCode.NoContent);
+    const saveStub = stub(CourtApi.prototype, 'saveTranslationServices').resolves(HttpStatusCode.NoContent);
 
     const response = await request(app).post(`/courts/${courtId}/edit/translation-and-interpretation/success`).send({});
 
@@ -90,11 +90,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('posts only selected contact method values', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveStub = stub(DataApiRequests.prototype, 'saveTranslationServices').resolves(HttpStatusCode.NoContent);
+    const saveStub = stub(CourtApi.prototype, 'saveTranslationServices').resolves(HttpStatusCode.NoContent);
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/translation-and-interpretation/success`)
@@ -111,11 +111,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('renders validation errors for invalid selected values', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveStub = stub(DataApiRequests.prototype, 'saveTranslationServices');
+    const saveStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/translation-and-interpretation/success`)
@@ -133,11 +133,11 @@ describe('Translation and interpretation page', () => {
   });
 
   test('renders validation errors for empty selected values', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveStub = stub(DataApiRequests.prototype, 'saveTranslationServices');
+    const saveStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/translation-and-interpretation/success`)
@@ -155,7 +155,7 @@ describe('Translation and interpretation page', () => {
   });
 
   test('renders court not found for invalid court id', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/translation-and-interpretation');
 
@@ -172,7 +172,7 @@ describe('Translation and interpretation page', () => {
   });
 
   test('does not save from the base page POST URL', async () => {
-    const saveStub = stub(DataApiRequests.prototype, 'saveTranslationServices');
+    const saveStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
     const response = await request(app).post(`/courts/${courtId}/edit/translation-and-interpretation`).send({});
 

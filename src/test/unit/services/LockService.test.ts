@@ -6,19 +6,19 @@ import { LockService } from '../../../main/services/LockService';
 
 describe('LockService', () => {
   test('returns status code when lock retrieval fails', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getLocks: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
-    const service = new LockService(dataApiRequests as never);
+    const service = new LockService(operationsApi as never);
 
     const response = await service.getLocks(SubjectType.COURT, '11111111-1111-4111-8111-111111111111');
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    expect(dataApiRequests.getLocks).toHaveBeenCalledWith(SubjectType.COURT, '11111111-1111-4111-8111-111111111111');
+    expect(operationsApi.getLocks).toHaveBeenCalledWith(SubjectType.COURT, '11111111-1111-4111-8111-111111111111');
   });
 
   test('maps lock pages to edit path keys', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getLocks: jest.fn().mockResolvedValue([
         {
           id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
@@ -46,7 +46,7 @@ describe('LockService', () => {
         },
       ]),
     };
-    const service = new LockService(dataApiRequests as never);
+    const service = new LockService(operationsApi as never);
 
     const response = await service.getLocks(SubjectType.COURT, '11111111-1111-4111-8111-111111111111');
 

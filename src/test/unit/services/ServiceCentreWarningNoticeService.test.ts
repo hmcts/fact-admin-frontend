@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import { restore, stub } from 'sinon';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import {
   ServiceCentreWarningNoticeService,
   maxServiceCentreWarningNoticeLength,
@@ -15,12 +15,12 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('returns validation error when warning notice exceeds 250 chars', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: null,
     } as never);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
     const result = await service.save(serviceCentreId, 'a'.repeat(maxServiceCentreWarningNoticeLength + 1), 'test');
@@ -32,7 +32,7 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('retrieves warning notice view model', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       warningNotice: 'Existing warning notice',
@@ -53,7 +53,7 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('returns status when retrieve service centre fails', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(HttpStatusCode.InternalServerError);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves(HttpStatusCode.InternalServerError);
 
     const service = new ServiceCentreWarningNoticeService();
     const result = await service.retrieve(serviceCentreId);
@@ -62,7 +62,7 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('trims warning notice before save', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -70,7 +70,7 @@ describe('ServiceCentreWarningNoticeService', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -97,7 +97,7 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('accepts Welsh warning notice diacritics', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -105,7 +105,7 @@ describe('ServiceCentreWarningNoticeService', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -128,8 +128,8 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('passes through lookup status responses', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves(HttpStatusCode.InternalServerError);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves(HttpStatusCode.InternalServerError);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
     const result = await service.save(serviceCentreId, 'Warning text', 'Testun rhybuddio');
@@ -139,7 +139,7 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('stores empty warning notice as null and returns saved result', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -147,7 +147,7 @@ describe('ServiceCentreWarningNoticeService', () => {
       slug: 'reading-service-centre',
       warningNotice: 'Old warning',
     } as never);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -175,7 +175,7 @@ describe('ServiceCentreWarningNoticeService', () => {
   });
 
   test('returns status when update fails with status', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -183,7 +183,7 @@ describe('ServiceCentreWarningNoticeService', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'updateServiceCentre').resolves(HttpStatusCode.BadGateway);
+    stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves(HttpStatusCode.BadGateway);
 
     const service = new ServiceCentreWarningNoticeService();
     const result = await service.save(serviceCentreId, 'Updated warning', "Rhybudd wedi'i ddiweddaru");

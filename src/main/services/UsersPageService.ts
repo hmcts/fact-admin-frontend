@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { UserApi } from '../requests/UserApi';
 import { PagedUsers } from '../schemas/userListSchema';
 
 import { UsersPageFiltersService } from './UsersPageFiltersService';
@@ -9,7 +9,7 @@ import { UsersPageFilters, UsersPageViewModel } from './types/UsersPage.types';
 
 export class UsersPageService {
   public constructor(
-    private readonly dataApiRequests = new DataApiRequests(),
+    private readonly userApi = new UserApi(),
     private readonly usersPageFiltersService = new UsersPageFiltersService(),
     private readonly usersPageViewService = new UsersPageViewService()
   ) {}
@@ -22,7 +22,7 @@ export class UsersPageService {
     const validationErrors = this.usersPageFiltersService.validateFilters(filters);
     const usersResponse =
       validationErrors.length === 0
-        ? await this.dataApiRequests.getUsers(this.usersPageFiltersService.toGetUsersParams(filters))
+        ? await this.userApi.getUsers(this.usersPageFiltersService.toGetUsersParams(filters))
         : HttpStatusCode.BadRequest;
     const usersPage = this.isPagedUsers(usersResponse) ? usersResponse : this.emptyUsersPage(filters);
 

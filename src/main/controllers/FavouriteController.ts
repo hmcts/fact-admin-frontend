@@ -2,7 +2,7 @@ import { POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { UserApi } from '../requests/UserApi';
 import { subjectTypeSchema } from '../schemas/subjectTypeSchema';
 import { isUuid } from '../utils/valueParsers';
 
@@ -24,7 +24,7 @@ const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 
 @route('/favourites/:subjectType/:subjectId')
 export default class FavouriteController {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly userApi = new UserApi()) {}
 
   @POST()
   public async add(req: Request, res: Response): Promise<void> {
@@ -47,8 +47,8 @@ export default class FavouriteController {
     }
 
     const status = remove
-      ? await this.dataApiRequests.removeFavourite({ subjectId, subjectType: subjectType.data })
-      : await this.dataApiRequests.addFavourite({ subjectId, subjectType: subjectType.data });
+      ? await this.userApi.removeFavourite({ subjectId, subjectType: subjectType.data })
+      : await this.userApi.addFavourite({ subjectId, subjectType: subjectType.data });
     const expectedStatus = remove ? HttpStatusCode.NoContent : HttpStatusCode.Created;
 
     if (status !== expectedStatus) {

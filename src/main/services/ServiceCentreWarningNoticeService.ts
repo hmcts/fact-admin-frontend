@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 
 export const maxServiceCentreWarningNoticeLength = 250;
 const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
@@ -30,10 +30,10 @@ export type SaveServiceCentreWarningNoticeResult =
     };
 
 export class ServiceCentreWarningNoticeService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly serviceCentreApi = new ServiceCentreApi()) {}
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreWarningNoticeViewModel | HttpStatusCode> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
     if (typeof serviceCentreResponse === 'number') {
       return serviceCentreResponse;
     }
@@ -51,7 +51,7 @@ export class ServiceCentreWarningNoticeService {
     warningNoticeInput: string | undefined,
     warningNoticeCyInput: string | undefined
   ): Promise<SaveServiceCentreWarningNoticeResult> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
     if (typeof serviceCentreResponse === 'number') {
       return { status: serviceCentreResponse, type: 'status' };
     }
@@ -72,7 +72,7 @@ export class ServiceCentreWarningNoticeService {
       };
     }
 
-    const updateResult = await this.dataApiRequests.updateServiceCentre({
+    const updateResult = await this.serviceCentreApi.updateServiceCentre({
       ...serviceCentreResponse,
       warningNotice: warningNotice.length > 0 ? warningNotice : null,
       warningNoticeCy: warningNoticeCy.length > 0 ? warningNoticeCy : null,
