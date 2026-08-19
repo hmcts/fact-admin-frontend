@@ -6,15 +6,6 @@
     "helpers:pinGitHubActionDigests",
     "docker:pinDigests"
   ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": ["/^infrastructure/.*\\.tf$/"],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>git-refs) packageName=(?<packageName>\\S+) currentValue=(?<currentValue>\\S+)\\s+source\\s*=\\s*\\\"git@github\\.com:[^?]+\\?ref=(?<currentDigest>[a-f0-9]{40})\\\""
-      ]
-    }
-  ],
   "packageRules": [
     {
       "description": "Deployment images are replaced by the release pipeline",
