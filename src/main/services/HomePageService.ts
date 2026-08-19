@@ -1,6 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
+import { UserApi } from '../requests/UserApi';
 import { PagedCourts } from '../schemas/courtListSchema';
 import { FavouriteStatus, PagedFavourites } from '../schemas/favouriteSchema';
 import { Region } from '../schemas/regionSchema';
@@ -15,7 +17,9 @@ import { HomePageFilters, HomePageViewModel } from './types/HomePage.types';
  */
 export class HomePageService {
   public constructor(
-    private readonly dataApiRequests = new DataApiRequests(),
+    private readonly courtApi = new CourtApi(),
+    private readonly userApi = new UserApi(),
+    private readonly referenceDataApi = new ReferenceDataApi(),
     private readonly homePageFiltersService = new HomePageFiltersService(),
     private readonly homePageViewService = new HomePageViewService()
   ) {}
@@ -26,20 +30,20 @@ export class HomePageService {
   public async getHomePageViewModel(filters: HomePageFilters, isReviewMode = false): Promise<HomePageViewModel> {
     const requestedFavouritesPage = filters.favouritesPageNumber ?? 0;
     const [regionsResponse, initialFavouritesResponse] = await Promise.all([
-      this.dataApiRequests.getRegions(),
-      this.dataApiRequests.getFavourites({ pageNumber: requestedFavouritesPage, pageSize: 25 }),
+      this.referenceDataApi.getRegions(),
+      this.userApi.getFavourites({ pageNumber: requestedFavouritesPage, pageSize: 25 }),
     ]);
     const regions = Array.isArray(regionsResponse) ? regionsResponse : [];
     const validationErrors = this.homePageFiltersService.validateFilters(filters, regions);
     const courtsResponse =
       validationErrors.length === 0
-        ? await this.dataApiRequests.getCourts(this.homePageFiltersService.toGetCourtsParams(filters))
+        ? await this.courtApi.getCourts(this.homePageFiltersService.toGetCourtsParams(filters))
         : HttpStatusCode.BadRequest;
 
     const courtsPage = this.isPagedCourts(courtsResponse) ? courtsResponse : this.emptyCourtsPage(filters);
     const favouriteStatusesResponse =
       this.isPagedCourts(courtsResponse) && courtsPage.content.length > 0
-        ? await this.dataApiRequests.getFavouriteStatuses(
+        ? await this.userApi.getFavouriteStatuses(
             courtsPage.content.map(location => ({
               subjectId: location.id,
               subjectType: location.locationType,
@@ -163,7 +167,7 @@ export class HomePageService {
       (filters.favouritesPageNumber ?? 0) >= response.page.totalPages
     ) {
       const lastPageNumber = response.page.totalPages - 1;
-      const lastPage = await this.dataApiRequests.getFavourites({ pageNumber: lastPageNumber, pageSize: 25 });
+      const lastPage = await this.userApi.getFavourites({ pageNumber: lastPageNumber, pageSize: 25 });
       return this.isPagedCourts(lastPage)
         ? { error: false, page: lastPage }
         : { error: true, page: this.emptyFavouritesPage(lastPageNumber) };

@@ -3,7 +3,8 @@ import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
 import CourtContactController from '../../../main/controllers/CourtContactController';
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtContactController', () => {
@@ -16,12 +17,12 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
 
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: '99999999-9999-4999-8999-999999999999',
         courtContactDescriptionId: 'desc-id',
@@ -32,7 +33,7 @@ describe('CourtContactController', () => {
         courtContactDescription: null,
       },
     ] as never);
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'desc-id',
         name: 'Enquiries',
@@ -93,8 +94,8 @@ describe('CourtContactController', () => {
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -121,8 +122,8 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -149,14 +150,14 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves(
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves(
       HttpStatusCode.InternalServerError
     );
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves(
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves(
       [] as never
     );
 
@@ -186,11 +187,11 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         name: 'General enquiries',
@@ -252,7 +253,7 @@ describe('CourtContactController', () => {
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -277,7 +278,7 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -302,9 +303,7 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -336,14 +335,14 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail').resolves(
+    const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail').resolves(
       HttpStatusCode.Created
     );
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         explanationCy: 'Desg ymholiadau cyffredinol',
@@ -408,11 +407,11 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail').resolves(
+    const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail').resolves(
       HttpStatusCode.InternalServerError
     );
 
@@ -445,17 +444,17 @@ describe('CourtContactController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         name: 'General enquiries',
       },
     ] as never);
-    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail');
+    const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
     responseMock
@@ -498,12 +497,12 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
 
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: '99999999-9999-4999-8999-999999999999',
         courtContactDescriptionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
@@ -517,7 +516,7 @@ describe('CourtContactController', () => {
         },
       },
     ] as never);
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         name: 'General enquiries',
@@ -586,8 +585,8 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -617,11 +616,11 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([] as never);
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([] as never);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -658,14 +657,14 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtContactDetailStub = stub(DataApiRequests.prototype, 'updateCourtContactDetail').resolves(
+    const updateCourtContactDetailStub = stub(CourtApi.prototype, 'updateCourtContactDetail').resolves(
       HttpStatusCode.Ok
     );
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         name: 'Listing enquiries',
@@ -737,11 +736,11 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtContactDetailStub = stub(DataApiRequests.prototype, 'updateCourtContactDetail').resolves(
+    const updateCourtContactDetailStub = stub(CourtApi.prototype, 'updateCourtContactDetail').resolves(
       HttpStatusCode.InternalServerError
     );
 
@@ -778,17 +777,17 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       {
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         name: 'Listing enquiries',
       },
     ] as never);
-    const updateCourtContactDetailStub = stub(DataApiRequests.prototype, 'updateCourtContactDetail');
+    const updateCourtContactDetailStub = stub(CourtApi.prototype, 'updateCourtContactDetail');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
     responseMock
@@ -830,12 +829,12 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
 
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: '99999999-9999-4999-8999-999999999999',
         courtContactDescriptionId: 'desc-id',
@@ -904,12 +903,12 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
 
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: '99999999-9999-4999-8999-999999999999',
         courtContactDescriptionId: 'desc-id',
@@ -920,7 +919,7 @@ describe('CourtContactController', () => {
         courtContactDescription: null,
       },
     ] as never);
-    const getContactDescriptionTypesStub = stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: 'desc-id', name: 'Enquiries', nameCy: 'Ymholiadau' },
     ] as never);
 
@@ -978,11 +977,11 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([] as never);
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([] as never);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -1012,11 +1011,11 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: '99999999-9999-4999-8999-999999999999',
         courtContactDescriptionId: 'desc-id',
@@ -1030,7 +1029,7 @@ describe('CourtContactController', () => {
         },
       },
     ] as never);
-    const deleteCourtContactDetailStub = stub(DataApiRequests.prototype, 'deleteCourtContactDetail').resolves(
+    const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail').resolves(
       HttpStatusCode.NoContent
     );
 
@@ -1080,11 +1079,11 @@ describe('CourtContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtContactDetailsStub = stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: '99999999-9999-4999-8999-999999999999',
         courtContactDescriptionId: 'desc-id',
@@ -1098,7 +1097,7 @@ describe('CourtContactController', () => {
         },
       },
     ] as never);
-    const deleteCourtContactDetailStub = stub(DataApiRequests.prototype, 'deleteCourtContactDetail').resolves(
+    const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail').resolves(
       HttpStatusCode.InternalServerError
     );
 

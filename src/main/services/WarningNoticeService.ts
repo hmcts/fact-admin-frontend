@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { isHttpStatusCode } from '../utils/valueParsers';
 
 const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
@@ -31,10 +31,10 @@ export type SaveWarningNoticeResult =
   | { type: 'status'; status: HttpStatusCode };
 
 export class WarningNoticeService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async getWarningNoticePage(courtId: string): Promise<WarningNoticeViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
@@ -54,7 +54,7 @@ export class WarningNoticeService {
   }
 
   public async save(courtId: string, form: WarningNoticeForm): Promise<SaveWarningNoticeResult> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (isHttpStatusCode(courtResponse)) {
       return { status: courtResponse, type: 'status' };
@@ -83,7 +83,7 @@ export class WarningNoticeService {
       warningNoticeCy: warningNoticeCy?.trim() || null,
     };
 
-    const updateResponse = await this.dataApiRequests.updateCourt(payload);
+    const updateResponse = await this.courtApi.updateCourt(payload);
 
     if (updateResponse instanceof Map) {
       const apiErrors: Record<string, string> = {};

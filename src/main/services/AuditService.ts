@@ -7,7 +7,7 @@ import { HttpStatusCode } from 'axios';
 import moment from 'moment';
 
 import { Logger } from '../modules/logging';
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { OperationsApi } from '../requests/OperationsApi';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 import { SubjectType } from '../schemas/subjectTypeSchema';
@@ -38,10 +38,10 @@ export type AuditCsvFile = {
 };
 
 export class AuditService {
-  constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  constructor(private readonly operationsApi = new OperationsApi()) {}
 
   public async retrieve(auditId: string): Promise<Audit | HttpStatusCode> {
-    const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
+    const auditSubjectResponse = await this.operationsApi.getAuditSubjectOptionsMap();
     if (this.isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
@@ -49,7 +49,7 @@ export class AuditService {
     // this is a little heavyweight for one audit, but we need the subject name for display
     // purposes and this is the only way to get it
     const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
-    const audit = await this.dataApiRequests.getAuditById(auditId);
+    const audit = await this.operationsApi.getAuditById(auditId);
     if (this.isHttpStatusCode(audit)) {
       return audit;
     }
@@ -61,7 +61,7 @@ export class AuditService {
     // first thing we do here is get the list of audit subject options, as the result of this
     // call is a view model that will be displayed to the user regardless of the success
     // of the query. In order to build a query, they'll need this data.
-    const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
+    const auditSubjectResponse = await this.operationsApi.getAuditSubjectOptionsMap();
     if (this.isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
@@ -74,7 +74,7 @@ export class AuditService {
       return this.buildErrorResponse(nestedSubjectMap, queryParams, errors);
     }
 
-    const audits = await this.dataApiRequests.getAudits(queryParams);
+    const audits = await this.operationsApi.getAudits(queryParams);
 
     if (this.isHttpStatusCode(audits)) {
       return audits;
@@ -102,7 +102,7 @@ export class AuditService {
    * @param filters
    */
   public async generateCsv(filters: GetAuditsParams): Promise<AuditCsvFile | HttpStatusCode> {
-    const auditSubjectResponse = await this.dataApiRequests.getAuditSubjectOptionsMap();
+    const auditSubjectResponse = await this.operationsApi.getAuditSubjectOptionsMap();
     if (this.isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
@@ -124,7 +124,7 @@ export class AuditService {
       // Pull at most MAX_CSV_PAGES pages from API in chunks of CSV_PAGE_SIZE and write to the file stream.
       // This is done in a loop until all pages are retrieved.
       while (true) {
-        const response = await this.dataApiRequests.getAudits({
+        const response = await this.operationsApi.getAudits({
           ...queryParams,
           pageNumber,
           pageSize: CSV_PAGE_SIZE,

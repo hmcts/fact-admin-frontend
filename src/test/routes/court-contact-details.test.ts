@@ -3,7 +3,8 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 const CONTACT_DETAIL_ID = '99999999-9999-4999-8999-999999999999';
@@ -15,11 +16,11 @@ describe('Court contact details routes', () => {
   });
 
   test('renders the contact details list page', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: CONTACT_DETAIL_ID,
         courtContactDescription: null,
@@ -30,7 +31,7 @@ describe('Court contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -51,7 +52,7 @@ describe('Court contact details routes', () => {
   });
 
   test('renders court not found for invalid court id on list page', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/contact-details');
 
@@ -61,11 +62,11 @@ describe('Court contact details routes', () => {
   });
 
   test('renders add contact details form', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -80,12 +81,12 @@ describe('Court contact details routes', () => {
   });
 
   test('re-renders add form when Welsh explanation is missing for an English explanation', async () => {
-    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail');
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail');
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -105,12 +106,12 @@ describe('Court contact details routes', () => {
   });
 
   test('re-renders add form when English explanation is missing for a Welsh explanation', async () => {
-    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail');
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail');
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -130,14 +131,14 @@ describe('Court contact details routes', () => {
   });
 
   test('creates contact detail and renders success page', async () => {
-    const createCourtContactDetailStub = stub(DataApiRequests.prototype, 'createCourtContactDetail').resolves(
+    const createCourtContactDetailStub = stub(CourtApi.prototype, 'createCourtContactDetail').resolves(
       HttpStatusCode.Created
     );
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -164,11 +165,11 @@ describe('Court contact details routes', () => {
   });
 
   test('renders edit contact details form', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: CONTACT_DETAIL_ID,
         courtContactDescription: null,
@@ -179,7 +180,7 @@ describe('Court contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -193,11 +194,11 @@ describe('Court contact details routes', () => {
   });
 
   test('deletes contact detail and renders success page', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtContactDetails').resolves([
+    stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
       {
         id: CONTACT_DETAIL_ID,
         courtContactDescription: null,
@@ -208,10 +209,10 @@ describe('Court contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
-    const deleteCourtContactDetailStub = stub(DataApiRequests.prototype, 'deleteCourtContactDetail').resolves(
+    const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail').resolves(
       HttpStatusCode.NoContent
     );
 

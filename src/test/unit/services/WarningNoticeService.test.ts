@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import { WarningNoticeForm, WarningNoticeService } from '../../../main/services/WarningNoticeService';
 
 describe('WarningNoticeService', () => {
@@ -12,18 +12,18 @@ describe('WarningNoticeService', () => {
     warningNoticeCy: 'Rhybudd presennol',
   };
 
-  function buildService(overrides: Partial<DataApiRequests> = {}) {
-    const dataApiRequests = {
+  function buildService(overrides: Partial<CourtApi> = {}) {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue(courtResponse),
       updateCourt: jest.fn().mockResolvedValue({}),
       ...overrides,
-    } as unknown as DataApiRequests;
+    } as unknown as CourtApi;
 
     return {
-      dataApiRequests,
-      getCourtById: dataApiRequests.getCourtById as jest.Mock,
-      updateCourt: dataApiRequests.updateCourt as jest.Mock,
-      service: new WarningNoticeService(dataApiRequests),
+      courtApi,
+      getCourtById: courtApi.getCourtById as jest.Mock,
+      updateCourt: courtApi.updateCourt as jest.Mock,
+      service: new WarningNoticeService(courtApi),
     };
   }
 

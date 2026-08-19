@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../schemas/courtAddressSchema';
 import { DpaAddress } from '../schemas/osDataSchema';
 import {
@@ -48,23 +49,24 @@ export type DeleteCourtAddressResponse =
 
 const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 
-const dataApiRequests = new DataApiRequests();
+const courtApi = new CourtApi();
+const referenceDataApi = new ReferenceDataApi();
 
 export class CourtAddressService {
   public async list(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {
-    return dataApiRequests.getCourtAddressDetails(courtId);
+    return courtApi.getCourtAddressDetails(courtId);
   }
 
   public async retrieve(courtId: string, addressId: string): Promise<CourtAddress | HttpStatusCode> {
-    return dataApiRequests.getCourtAddressDetailsById(courtId, addressId);
+    return courtApi.getCourtAddressDetailsById(courtId, addressId);
   }
 
   public async retrieveAll(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {
-    return dataApiRequests.getCourtAddressDetails(courtId);
+    return courtApi.getCourtAddressDetails(courtId);
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await dataApiRequests.getAddressesForPostcode(postcode);
+    const result = await referenceDataApi.getAddressesForPostcode(postcode);
     if (typeof result === 'number') {
       return result;
     }
@@ -98,7 +100,7 @@ export class CourtAddressService {
     }
 
     // retrieve the court as we'll need its name
-    const courtResponse = await dataApiRequests.getCourtById(courtId);
+    const courtResponse = await courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
@@ -106,8 +108,8 @@ export class CourtAddressService {
     // attempt to save the address. This may fail with validation errors, which we'll need to
     // decant into the response
     const result = addressId
-      ? await dataApiRequests.updateCourtAddress(address, courtId, addressId)
-      : await dataApiRequests.saveCourtAddress(address, courtId);
+      ? await courtApi.updateCourtAddress(address, courtId, addressId)
+      : await courtApi.saveCourtAddress(address, courtId);
 
     // if it's a number, it's an HttpResponseCode and likely not good
     if (typeof result === 'number') {
@@ -130,7 +132,7 @@ export class CourtAddressService {
 
     let courtOpened = false;
     if (!addressId && existingAddresses.length === 0 && !courtResponse.open) {
-      const openCourtResponse = await dataApiRequests.updateCourt({
+      const openCourtResponse = await courtApi.updateCourt({
         ...courtResponse,
         open: true,
       });
@@ -152,13 +154,13 @@ export class CourtAddressService {
 
   public async delete(courtId: string, addressId: string): Promise<DeleteCourtAddressResponse> {
     // retrieve the court as we'll need its name
-    const courtResponse = await dataApiRequests.getCourtById(courtId);
+    const courtResponse = await courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
     // retrieve the address as we'll need it
-    const courtAddressResponse = await dataApiRequests.getCourtAddressDetails(courtId);
+    const courtAddressResponse = await courtApi.getCourtAddressDetails(courtId);
     if (typeof courtAddressResponse === 'number') {
       return courtAddressResponse;
     }
@@ -180,7 +182,7 @@ export class CourtAddressService {
     }
 
     // delete the address
-    const response = await dataApiRequests.deleteCourtAddress(courtId, addressId);
+    const response = await courtApi.deleteCourtAddress(courtId, addressId);
     if (response !== HttpStatusCode.NoContent) {
       return response;
     }
@@ -188,7 +190,7 @@ export class CourtAddressService {
   }
 
   public async retrieveCourtName(courtId: string): Promise<string | HttpStatusCode> {
-    const courtResponse = await dataApiRequests.getCourtById(courtId);
+    const courtResponse = await courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }

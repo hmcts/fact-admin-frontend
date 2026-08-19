@@ -33,7 +33,7 @@ describe('ServiceCentreGeneralService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.retrieve(serviceCentre.id);
 
     expect(result).toEqual({
@@ -56,7 +56,7 @@ describe('ServiceCentreGeneralService', () => {
       getServiceCentreById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.retrieve(serviceCentre.id);
 
     expect(result).toBe(HttpStatusCode.NotFound);
@@ -71,7 +71,7 @@ describe('ServiceCentreGeneralService', () => {
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.retrieve(serviceCentre.id);
 
     expect(result).toBe(HttpStatusCode.InternalServerError);
@@ -86,7 +86,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn(),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Updated Service Centre',
@@ -115,7 +115,7 @@ describe('ServiceCentreGeneralService', () => {
       }),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: '  Updated Service Centre  ',
@@ -147,7 +147,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Updated Service Centre',
@@ -167,7 +167,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn(),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Updated Service Centre',
@@ -190,7 +190,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn(),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Updated Service Centre',
@@ -215,7 +215,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn(),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Existing Court',
@@ -244,7 +244,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn(),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Updated Service Centre',
@@ -270,7 +270,7 @@ describe('ServiceCentreGeneralService', () => {
       updateServiceCentre: jest.fn(),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Duplicate Service Centre',
@@ -305,7 +305,7 @@ describe('ServiceCentreGeneralService', () => {
       ),
     };
 
-    const service = new ServiceCentreGeneralService(requests as never);
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
     const result = await service.save({
       id: serviceCentre.id,
       name: 'Updated Service Centre',

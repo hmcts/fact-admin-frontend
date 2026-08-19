@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { UpdateAccessibilityRequest } from '../requests/types/UpdateAccessibilityRequest';
 import { Accessibility } from '../schemas/accessibilitySchema';
 import { validate } from '../utils/accessibilityValidationConfig';
@@ -9,22 +9,22 @@ import { mapHearingEnhancementEquipment } from '../utils/mapper';
 export type AccessibilityModel = Partial<Accessibility> & { errors?: Record<string, string[]> } & { name?: string };
 
 export class AccessibilityService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<Partial<AccessibilityModel> | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
-    const accessibleFacility = await this.dataApiRequests.getAccessibility(courtId);
+    const accessibleFacility = await this.courtApi.getAccessibility(courtId);
     if (typeof accessibleFacility === 'number') {
       return accessibleFacility;
     }
     return { ...accessibleFacility, name: courtResponse.name };
   }
   public async save(courtId: string, model: AccessibilityModel): Promise<AccessibilityModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
@@ -44,7 +44,7 @@ export class AccessibilityService {
       hearingEnhancementEquipment: mapHearingEnhancementEquipment(model.hearingEnhancementEquipment),
     };
 
-    const result = await this.dataApiRequests.updateAccessibility(courtId, payload);
+    const result = await this.courtApi.updateAccessibility(courtId, payload);
     if (typeof result === 'number') {
       return result;
     }
