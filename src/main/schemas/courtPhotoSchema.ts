@@ -21,5 +21,3 @@ function addCacheBuster(fileLink: string | null | undefined): string | undefined
   url.searchParams.set('cacheBust', crypto.randomUUID());
   return url.toString();
 }
-
-export type CourtPhoto = z.infer<typeof courtPhotoSchema>;
