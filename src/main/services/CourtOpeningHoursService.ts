@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../schemas/openingHoursSchema';
 
 type Day = {
@@ -91,7 +92,10 @@ const days: Day[] = [
 ];
 
 export class CourtOpeningHoursService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   public getSelectedDays(value: unknown): string[] {
     if (Array.isArray(value)) {
@@ -102,13 +106,13 @@ export class CourtOpeningHoursService {
   }
 
   public async getListPage(courtId: string): Promise<OpeningHoursListViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
-    const openingHoursResponse = await this.dataApiRequests.getCourtOpeningHours(courtId);
+    const openingHoursResponse = await this.courtApi.getCourtOpeningHours(courtId);
 
     if (this.isHttpStatusCode(openingHoursResponse)) {
       return this.isNoOpeningHoursResponse(openingHoursResponse)
@@ -159,7 +163,7 @@ export class CourtOpeningHoursService {
       return { status: baseModel, type: 'status' };
     }
 
-    const existingOpeningHoursResponse = await this.dataApiRequests.getCourtOpeningHours(courtId);
+    const existingOpeningHoursResponse = await this.courtApi.getCourtOpeningHours(courtId);
     if (
       this.isHttpStatusCode(existingOpeningHoursResponse) &&
       !this.isNoOpeningHoursResponse(existingOpeningHoursResponse)
@@ -188,7 +192,7 @@ export class CourtOpeningHoursService {
     const existingOpeningHoursRecord = openingHoursId
       ? existingOpeningHours.find(existing => existing.id === openingHoursId)
       : undefined;
-    const saveResponse = await this.dataApiRequests.saveCourtOpeningHours(courtId, {
+    const saveResponse = await this.courtApi.saveCourtOpeningHours(courtId, {
       courtId,
       id: openingHoursId,
       openingHourTypeId: form.openingHourTypeId ?? '',
@@ -228,12 +232,12 @@ export class CourtOpeningHoursService {
     courtId: string,
     openingHoursId: string
   ): Promise<OpeningHoursDeleteViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
-    const openingHoursResponse = await this.dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+    const openingHoursResponse = await this.courtApi.getCourtOpeningHoursById(courtId, openingHoursId);
     if (this.isHttpStatusCode(openingHoursResponse)) {
       return openingHoursResponse;
     }
@@ -256,7 +260,7 @@ export class CourtOpeningHoursService {
       return deleteViewModel;
     }
 
-    const deleteResponse = await this.dataApiRequests.deleteCourtOpeningHours(courtId, openingHoursId);
+    const deleteResponse = await this.courtApi.deleteCourtOpeningHours(courtId, openingHoursId);
     if (deleteResponse < HttpStatusCode.Ok || deleteResponse >= HttpStatusCode.MultipleChoices) {
       return deleteResponse;
     }
@@ -273,20 +277,20 @@ export class CourtOpeningHoursService {
     openingHoursId?: string,
     postedForm?: OpeningHoursForm
   ): Promise<OpeningHoursEditViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
 
     if (this.isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
-    const openingHourTypesResponse = await this.dataApiRequests.getOpeningHourTypes();
+    const openingHourTypesResponse = await this.referenceDataApi.getOpeningHourTypes();
     if (this.isHttpStatusCode(openingHourTypesResponse)) {
       return openingHourTypesResponse;
     }
 
     let openingHours: CourtOpeningHours | undefined;
     if (openingHoursId) {
-      const openingHoursResponse = await this.dataApiRequests.getCourtOpeningHoursById(courtId, openingHoursId);
+      const openingHoursResponse = await this.courtApi.getCourtOpeningHoursById(courtId, openingHoursId);
       if (this.isHttpStatusCode(openingHoursResponse)) {
         return openingHoursResponse;
       }
@@ -536,7 +540,7 @@ export class CourtOpeningHoursService {
   }
 
   private async getOpeningHourTypesById(): Promise<Map<string, string>> {
-    const openingHourTypesResponse = await this.dataApiRequests.getOpeningHourTypes();
+    const openingHourTypesResponse = await this.referenceDataApi.getOpeningHourTypes();
 
     if (this.isHttpStatusCode(openingHourTypesResponse)) {
       return new Map();

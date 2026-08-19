@@ -3,16 +3,17 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
+import { OperationsApi } from '../../main/requests/OperationsApi';
 
 describe('Court edit page', () => {
   beforeEach(() => {
     restore();
-    stub(DataApiRequests.prototype, 'getLocks').resolves([]);
+    stub(OperationsApi.prototype, 'getLocks').resolves([]);
   });
 
   test('renders the court edit page for a valid known court', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
@@ -36,11 +37,11 @@ describe('Court edit page', () => {
   });
 
   test('does not render approve data for admin users when the court is not approved', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getApprovalsStub = stub(DataApiRequests.prototype, 'getApprovals');
+    const getApprovalsStub = stub(OperationsApi.prototype, 'getApprovals');
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit');
 
@@ -50,11 +51,11 @@ describe('Court edit page', () => {
   });
 
   test('renders approve data for super admin users when the court is not approved', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -77,11 +78,11 @@ describe('Court edit page', () => {
   });
 
   test('renders the review page and approve data for viewer users when the court is not approved', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -104,11 +105,11 @@ describe('Court edit page', () => {
   });
 
   test('does not render approve data for super admin users when the court is approved', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -137,11 +138,11 @@ describe('Court edit page', () => {
   });
 
   test('renders approve data confirmation for super admin users', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -169,11 +170,11 @@ describe('Court edit page', () => {
   });
 
   test('approves court data and renders success page for super admin users', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -185,7 +186,7 @@ describe('Court edit page', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApprovalStub = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
 
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/approve')
@@ -206,11 +207,11 @@ describe('Court edit page', () => {
   });
 
   test('allows viewer users to confirm court approval', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getApprovals').resolves([
+    stub(OperationsApi.prototype, 'getApprovals').resolves([
       {
         subjectId: '11111111-1111-4111-8111-111111111111',
         subjectType: 'COURT',
@@ -222,7 +223,7 @@ describe('Court edit page', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApprovalStub = stub(DataApiRequests.prototype, 'createApproval').resolves(HttpStatusCode.Created);
+    const createApprovalStub = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
 
     const response = await request(app)
       .post('/courts/11111111-1111-4111-8111-111111111111/edit/approve')
@@ -234,7 +235,7 @@ describe('Court edit page', () => {
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).get('/courts/not-a-uuid/edit');
 
@@ -245,7 +246,7 @@ describe('Court edit page', () => {
   });
 
   test('renders the dedicated court not found page for a missing court', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit');
 
@@ -255,7 +256,7 @@ describe('Court edit page', () => {
   });
 
   test('renders the generic error page when the lookup fails', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get('/courts/11111111-1111-4111-8111-111111111111/edit');
 

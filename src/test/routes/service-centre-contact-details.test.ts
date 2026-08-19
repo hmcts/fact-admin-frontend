@@ -3,7 +3,8 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
 const CONTACT_DETAIL_ID = '99999999-9999-4999-8999-999999999999';
@@ -15,14 +16,14 @@ describe('Service centre contact details routes', () => {
   });
 
   test('renders the contact details list page', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreContactDetails').resolves([
+    stub(ServiceCentreApi.prototype, 'getServiceCentreContactDetails').resolves([
       {
         id: CONTACT_DETAIL_ID,
         serviceCentreContactDescription: null,
@@ -34,7 +35,7 @@ describe('Service centre contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -54,7 +55,7 @@ describe('Service centre contact details routes', () => {
   });
 
   test('renders not found for invalid service-centre id on list page', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById');
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById');
 
     const response = await request(app).get('/service-centres/not-a-uuid/edit/contact-details');
 
@@ -65,17 +66,17 @@ describe('Service centre contact details routes', () => {
 
   test('creates contact detail and renders success page', async () => {
     const createServiceCentreContactDetailStub = stub(
-      DataApiRequests.prototype,
+      ServiceCentreApi.prototype,
       'createServiceCentreContactDetail'
     ).resolves(HttpStatusCode.Created);
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
 
@@ -101,14 +102,14 @@ describe('Service centre contact details routes', () => {
   });
 
   test('deletes contact detail and renders success page', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreContactDetails').resolves([
+    stub(ServiceCentreApi.prototype, 'getServiceCentreContactDetails').resolves([
       {
         id: CONTACT_DETAIL_ID,
         serviceCentreContactDescription: null,
@@ -120,10 +121,10 @@ describe('Service centre contact details routes', () => {
         phoneNumber: '01234 567890',
       },
     ] as never);
-    stub(DataApiRequests.prototype, 'getContactDescriptionTypes').resolves([
+    stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes').resolves([
       { id: CONTACT_TYPE_ID, name: 'General enquiries' },
     ] as never);
-    const deleteStub = stub(DataApiRequests.prototype, 'deleteServiceCentreContactDetail').resolves(
+    const deleteStub = stub(ServiceCentreApi.prototype, 'deleteServiceCentreContactDetail').resolves(
       HttpStatusCode.NoContent
     );
 

@@ -3,7 +3,9 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre general page', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';
@@ -18,7 +20,7 @@ describe('Service centre general page', () => {
   });
 
   test('renders the general edit page for a valid known service centre', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -27,8 +29,8 @@ describe('Service centre general page', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
 
     const response = await request(app).get(`/service-centres/${serviceCentreId}/edit/general`);
 
@@ -47,7 +49,7 @@ describe('Service centre general page', () => {
   });
 
   test('renders not found for an invalid UUID on GET', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById');
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById');
 
     const response = await request(app).get('/service-centres/not-a-uuid/edit/general');
 
@@ -57,7 +59,7 @@ describe('Service centre general page', () => {
   });
 
   test('updates service centre details and renders success page', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -66,11 +68,11 @@ describe('Service centre general page', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
-    stub(DataApiRequests.prototype, 'getServiceCentreByName').resolves(HttpStatusCode.NotFound);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre').resolves({
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
+    stub(CourtApi.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(HttpStatusCode.NotFound);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves({
       id: serviceCentreId,
       name: 'Updated Service Centre',
       open: false,
@@ -102,7 +104,7 @@ describe('Service centre general page', () => {
   });
 
   test('renders validation errors when service areas are missing on POST', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
@@ -111,9 +113,9 @@ describe('Service centre general page', () => {
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas as never);
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    const updateServiceCentreStub = stub(DataApiRequests.prototype, 'updateServiceCentre');
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas as never);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/general/success`)

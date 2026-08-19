@@ -25,7 +25,7 @@ describe('GeneralService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     await expect(service.retrieve(courtEntity.id)).resolves.toEqual({ ...courtEntity, regions });
     expect(requests.getCourtById).toHaveBeenCalledWith(courtEntity.id);
@@ -38,7 +38,7 @@ describe('GeneralService', () => {
       getRegions: jest.fn(),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     await expect(service.retrieve(courtEntity.id)).resolves.toBe(HttpStatusCode.NotFound);
     expect(requests.getRegions).not.toHaveBeenCalled();
@@ -50,7 +50,7 @@ describe('GeneralService', () => {
       getRegions: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     await expect(service.retrieve(courtEntity.id)).resolves.toBe(HttpStatusCode.InternalServerError);
   });
@@ -62,7 +62,7 @@ describe('GeneralService', () => {
       updateCourt: jest.fn(),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     const result = await service.save({
       id: courtEntity.id,
@@ -94,7 +94,7 @@ describe('GeneralService', () => {
       updateCourt: jest.fn(),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     const result = await service.save({
       id: courtEntity.id,
@@ -122,7 +122,7 @@ describe('GeneralService', () => {
       updateCourt: jest.fn(),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     await expect(
       service.save({
@@ -148,7 +148,7 @@ describe('GeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     const result = await service.save({
       id: courtEntity.id,
@@ -184,7 +184,7 @@ describe('GeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     await service.save({
       id: courtEntity.id,
@@ -211,7 +211,7 @@ describe('GeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     await expect(
       service.save({
@@ -236,7 +236,7 @@ describe('GeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new GeneralService(requests as never);
+    const service = new GeneralService(requests as never, requests as never);
 
     const result = await service.save({
       id: courtEntity.id,

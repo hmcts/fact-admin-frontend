@@ -84,14 +84,14 @@ describe('Authentication', () => {
     const session: CallbackSession = {};
 
     await expect(afterCallback(ssoRequest(['Admin']), {}, session)).rejects.toThrow(
-      'Data API did not create or update the authenticated user'
+      'User API did not create or update the authenticated user'
     );
 
     expect(session.factUser).toBeUndefined();
     expect(logger.errorEvent).toHaveBeenCalledWith(
       'authentication.callback.failed',
       {
-        dataApiStatusCode: HttpStatusCode.ServiceUnavailable,
+        userApiStatusCode: HttpStatusCode.ServiceUnavailable,
         errorName: 'Error',
         stage: 'provision_user',
       },

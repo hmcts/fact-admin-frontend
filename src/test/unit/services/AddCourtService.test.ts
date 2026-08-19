@@ -30,7 +30,7 @@ describe('AddCourtService', () => {
     const requests = {
       getRegions: jest.fn().mockResolvedValue(regions),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.getViewModel()).resolves.toEqual({
       pagePath: '/add-court',
@@ -44,7 +44,7 @@ describe('AddCourtService', () => {
     const requests = {
       getRegions: jest.fn().mockResolvedValue(500),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.getViewModel()).resolves.toBe(500);
   });
@@ -88,7 +88,7 @@ describe('AddCourtService', () => {
       getCourtByName: jest.fn(),
       getRegions: jest.fn().mockResolvedValue(regions),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.create({ name: 'Test', regionId: '' })).resolves.toEqual({
       errors: {
@@ -112,7 +112,7 @@ describe('AddCourtService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreByName: jest.fn(),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.create({ name: createdCourt.name, regionId: regions[0].id })).resolves.toEqual({
       errors: {
@@ -136,7 +136,7 @@ describe('AddCourtService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreByName: jest.fn().mockResolvedValue(createdServiceCentre),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.create({ name: createdServiceCentre.name, regionId: regions[0].id })).resolves.toEqual({
       errors: {
@@ -160,7 +160,7 @@ describe('AddCourtService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.create({ name: createdCourt.name, regionId: regions[0].id })).resolves.toEqual({
       addressRedirectUrl: `/courts/${createdCourt.id}/edit/address`,
@@ -185,7 +185,7 @@ describe('AddCourtService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await service.create({ name: `  ${createdCourt.name}  `, regionId: regions[0].id });
 
@@ -210,7 +210,7 @@ describe('AddCourtService', () => {
       getRegions: jest.fn().mockResolvedValue(regions),
       getServiceCentreByName: jest.fn().mockResolvedValue(404),
     };
-    const service = new AddCourtService(requests as never);
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
 
     await expect(service.create({ name: createdCourt.name, regionId: regions[0].id })).resolves.toEqual({
       errors: {

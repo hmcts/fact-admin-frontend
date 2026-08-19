@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { Region } from '../schemas/regionSchema';
 
@@ -13,15 +14,18 @@ export type GeneralViewModel = Partial<CourtEntity> & {
 const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class GeneralService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   public async retrieve(courtId: string): Promise<GeneralViewModel | HttpStatusCode> {
-    const courtEntity = await this.dataApiRequests.getCourtById(courtId);
+    const courtEntity = await this.courtApi.getCourtById(courtId);
     if (typeof courtEntity === 'number') {
       return courtEntity;
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -54,7 +58,7 @@ export class GeneralService {
     }
 
     // ensure that if we already have a court with this exact name, that it's this court
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(courtEntity.name);
+    const duplicateCourt = await this.courtApi.getCourtByName(courtEntity.name);
     if (typeof duplicateCourt === 'number') {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;
@@ -69,7 +73,7 @@ export class GeneralService {
     }
 
     // persist to the API
-    const result = await this.dataApiRequests.updateCourt(courtEntity as CourtEntity);
+    const result = await this.courtApi.updateCourt(courtEntity as CourtEntity);
     if (typeof result === 'number') {
       return result;
     }

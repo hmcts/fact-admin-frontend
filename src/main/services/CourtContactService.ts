@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
@@ -91,11 +92,12 @@ const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
 const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
-const dataApiRequests = new DataApiRequests();
+const courtApi = new CourtApi();
+const referenceDataApi = new ReferenceDataApi();
 
 export class CourtContactService {
   public async getCourtById(courtId: string): Promise<CourtEntity | HttpStatusCode> {
-    return dataApiRequests.getCourtById(courtId);
+    return courtApi.getCourtById(courtId);
   }
 
   public async listContactDetails(courtId: string): Promise<
@@ -107,8 +109,8 @@ export class CourtContactService {
     | HttpStatusCode
   > {
     const [courtContactDetailsResponse, contactDescriptionTypesResponse] = await Promise.all([
-      dataApiRequests.getCourtContactDetails(courtId),
-      dataApiRequests.getContactDescriptionTypes(),
+      courtApi.getCourtContactDetails(courtId),
+      referenceDataApi.getContactDescriptionTypes(),
     ]);
     if (typeof courtContactDetailsResponse === 'number') {
       return courtContactDetailsResponse;
@@ -132,7 +134,7 @@ export class CourtContactService {
     courtId: string,
     contactDetailId: string
   ): Promise<CourtContactDetail | undefined | number> {
-    const courtContactDetailsResponse = await dataApiRequests.getCourtContactDetails(courtId);
+    const courtContactDetailsResponse = await courtApi.getCourtContactDetails(courtId);
     if (typeof courtContactDetailsResponse === 'number') {
       return courtContactDetailsResponse;
     }
@@ -143,7 +145,7 @@ export class CourtContactService {
   public async getContactDescriptionTypeItems(
     selectedId?: string
   ): Promise<CourtContactDescriptionTypeItem[] | HttpStatusCode> {
-    const contactDescriptionTypesResponse = await dataApiRequests.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return contactDescriptionTypesResponse;
     }
@@ -289,10 +291,10 @@ export class CourtContactService {
     contactDetailId?: string
   ): Promise<HttpStatusCode | Map<string, string>> {
     if (contactDetailId) {
-      return dataApiRequests.updateCourtContactDetail(courtId, contactDetailId, payload);
+      return courtApi.updateCourtContactDetail(courtId, contactDetailId, payload);
     }
 
-    return dataApiRequests.createCourtContactDetail(courtId, payload);
+    return courtApi.createCourtContactDetail(courtId, payload);
   }
 
   public async submitContactDetailFlow(options: CourtContactSubmitFlowOptions): Promise<CourtContactSubmitFlowOutcome> {
@@ -354,11 +356,11 @@ export class CourtContactService {
   }
 
   public async deleteContactDetail(courtId: string, contactDetailId: string): Promise<HttpStatusCode> {
-    return dataApiRequests.deleteCourtContactDetail(courtId, contactDetailId);
+    return courtApi.deleteCourtContactDetail(courtId, contactDetailId);
   }
 
   public async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await dataApiRequests.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return 'Contact details';
     }

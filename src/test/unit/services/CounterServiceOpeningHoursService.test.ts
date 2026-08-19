@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import {
   CounterServiceOpeningHoursForm,
   CounterServiceOpeningHoursService,
@@ -26,21 +26,21 @@ describe('CounterServiceOpeningHoursService', () => {
     openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00:00', closingTime: '17:00:00' }],
   };
 
-  function buildService(overrides: Partial<DataApiRequests> = {}) {
-    const dataApiRequests = {
+  function buildService(overrides: Partial<CourtApi> = {}) {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
       getCounterServiceOpeningHours: jest.fn().mockResolvedValue([existingRecord]),
       getCounterServiceOpeningHoursById: jest.fn().mockResolvedValue(existingRecord),
       saveCounterServiceOpeningHours: jest.fn(),
       deleteCounterServiceOpeningHours: jest.fn(),
       ...overrides,
-    } as unknown as DataApiRequests;
+    } as unknown as CourtApi;
 
     return {
-      dataApiRequests,
-      saveCounterServiceOpeningHours: dataApiRequests.saveCounterServiceOpeningHours as jest.Mock,
-      deleteCounterServiceOpeningHours: dataApiRequests.deleteCounterServiceOpeningHours as jest.Mock,
-      service: new CounterServiceOpeningHoursService(dataApiRequests),
+      courtApi,
+      saveCounterServiceOpeningHours: courtApi.saveCounterServiceOpeningHours as jest.Mock,
+      deleteCounterServiceOpeningHours: courtApi.deleteCounterServiceOpeningHours as jest.Mock,
+      service: new CounterServiceOpeningHoursService(courtApi),
     };
   }
 

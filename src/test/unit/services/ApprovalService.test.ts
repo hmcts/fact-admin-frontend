@@ -29,10 +29,10 @@ describe('ApprovalService', () => {
   ];
 
   test('maps approvals into tracker rows', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApprovalsTracker();
 
@@ -62,10 +62,10 @@ describe('ApprovalService', () => {
   });
 
   test('filters approvals by name', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApprovalsTracker({ name: 'birmingham' });
 
@@ -78,10 +78,10 @@ describe('ApprovalService', () => {
   });
 
   test('filters approvals by status', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApprovalsTracker({ status: 'approved' });
 
@@ -94,10 +94,10 @@ describe('ApprovalService', () => {
   });
 
   test('applies name and status filters together', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApprovalsTracker({ name: 'birmingham', status: 'approved' });
 
@@ -109,10 +109,10 @@ describe('ApprovalService', () => {
   });
 
   test('returns upstream status when approvals cannot be retrieved', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(HttpStatusCode.BadGateway),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApprovalsTracker();
 
@@ -120,10 +120,10 @@ describe('ApprovalService', () => {
   });
 
   test('returns undo approval view model for an approved approval', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getUndoApproval('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
 
@@ -135,10 +135,10 @@ describe('ApprovalService', () => {
   });
 
   test('does not return undo approval view model for a non-approved row', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getUndoApproval('22222222-2222-4222-8222-222222222222');
 
@@ -146,11 +146,11 @@ describe('ApprovalService', () => {
   });
 
   test('deletes an approval and returns success view model', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       deleteApproval: jest.fn().mockResolvedValue(HttpStatusCode.NoContent),
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.undoApproval('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
 
@@ -159,15 +159,15 @@ describe('ApprovalService', () => {
       name: 'Reading Crown Court',
       pageTitle: 'Undo approval - Reading Crown Court',
     });
-    expect(dataApiRequests.deleteApproval).toHaveBeenCalledWith('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+    expect(operationsApi.deleteApproval).toHaveBeenCalledWith('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
   });
 
   test('returns delete status when undo approval delete fails', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       deleteApproval: jest.fn().mockResolvedValue(HttpStatusCode.BadGateway),
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.undoApproval('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
 
@@ -175,10 +175,10 @@ describe('ApprovalService', () => {
   });
 
   test('does not fetch approvals for edit action when user is not super admin', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn(),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getEditApprovalAction(
       '22222222-2222-4222-8222-222222222222',
@@ -191,14 +191,14 @@ describe('ApprovalService', () => {
       approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
       showApproveData: false,
     });
-    expect(dataApiRequests.getApprovals).not.toHaveBeenCalled();
+    expect(operationsApi.getApprovals).not.toHaveBeenCalled();
   });
 
   test('shows edit approval action for super admin when subject is not approved', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getEditApprovalAction(
       '22222222-2222-4222-8222-222222222222',
@@ -214,10 +214,10 @@ describe('ApprovalService', () => {
   });
 
   test('hides edit approval action for super admin when subject is approved', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getEditApprovalAction(
       '11111111-1111-4111-8111-111111111111',
@@ -233,10 +233,10 @@ describe('ApprovalService', () => {
   });
 
   test('returns approve data view model for unapproved subject', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApproveData(
       '22222222-2222-4222-8222-222222222222',
@@ -255,10 +255,10 @@ describe('ApprovalService', () => {
   });
 
   test('does not return approve data view model for approved subject', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.getApproveData(
       '11111111-1111-4111-8111-111111111111',
@@ -271,11 +271,11 @@ describe('ApprovalService', () => {
   });
 
   test('creates approval and returns success view model', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       createApproval: jest.fn().mockResolvedValue(HttpStatusCode.Created),
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.approveData(
       '22222222-2222-4222-8222-222222222222',
@@ -292,7 +292,7 @@ describe('ApprovalService', () => {
       subjectId: '22222222-2222-4222-8222-222222222222',
       subjectType: 'SERVICE_CENTRE',
     });
-    expect(dataApiRequests.createApproval).toHaveBeenCalledWith({
+    expect(operationsApi.createApproval).toHaveBeenCalledWith({
       subjectId: '22222222-2222-4222-8222-222222222222',
       subjectType: 'SERVICE_CENTRE',
       userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
@@ -300,11 +300,11 @@ describe('ApprovalService', () => {
   });
 
   test('returns create approval status when approve data fails', async () => {
-    const dataApiRequests = {
+    const operationsApi = {
       createApproval: jest.fn().mockResolvedValue(HttpStatusCode.BadGateway),
       getApprovals: jest.fn().mockResolvedValue(approvals),
     };
-    const service = new ApprovalService(dataApiRequests as never);
+    const service = new ApprovalService(operationsApi as never);
 
     const response = await service.approveData(
       '22222222-2222-4222-8222-222222222222',
