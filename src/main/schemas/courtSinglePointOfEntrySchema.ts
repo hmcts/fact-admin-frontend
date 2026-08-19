@@ -9,5 +9,4 @@ export const courtSinglePointOfEntrySchema = z.object({
 
 export const courtSinglePointOfEntryListSchema = z.array(courtSinglePointOfEntrySchema);
 
-export type CourtSinglePointOfEntry = z.infer<typeof courtSinglePointOfEntrySchema>;
 export type CourtSinglePointOfEntryList = z.infer<typeof courtSinglePointOfEntryListSchema>;
