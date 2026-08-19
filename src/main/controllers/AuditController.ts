@@ -73,13 +73,27 @@ export default class AuditController {
       // Try to ensure temp file is removed after send completes or errors
       fs.unlink(csvResponse.filePath, unlinkErr => {
         if (unlinkErr) {
-          logger.error(`Failed to remove temp CSV file: ${csvResponse.filePath}`, unlinkErr);
+          logger.errorEvent('audit.export.cleanup_failed', { filename: csvResponse.filename }, unlinkErr);
         }
       });
 
-      if (err && !res.headersSent) {
-        res.status(HttpStatusCode.InternalServerError).render('error');
+      if (err) {
+        logger.errorEvent(
+          'audit.export.download_failed',
+          {
+            filename: csvResponse.filename,
+            headersSent: res.headersSent,
+          },
+          err
+        );
+
+        if (!res.headersSent) {
+          res.status(HttpStatusCode.InternalServerError).render('error');
+        }
+        return;
       }
+
+      logger.infoEvent('audit.export.completed', { filename: csvResponse.filename });
     });
   }
 

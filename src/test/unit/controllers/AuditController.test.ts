@@ -366,6 +366,10 @@ describe('AuditController', () => {
     await controller.downloadAudits(request, response);
 
     assert.calledOnce(auditService.generateCsv);
+    expect(mockAuditControllerLogger.error).toHaveBeenCalledWith(
+      'audit.export.download_failed: filename=audits-2026-06-26.csv, headersSent=false',
+      expect.any(Error)
+    );
     responseMock.verify();
   });
 
@@ -421,7 +425,7 @@ describe('AuditController', () => {
     await controller.downloadAudits(request, response);
 
     expect(mockAuditControllerLogger.error).toHaveBeenCalledWith(
-      'Failed to remove temp CSV file: /tmp/audit-controller-test.csv',
+      'audit.export.cleanup_failed: filename=audits-2026-06-26.csv',
       unlinkError
     );
     responseMock.verify();

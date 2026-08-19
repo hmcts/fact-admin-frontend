@@ -20,6 +20,11 @@ describe('LockingInterceptor', () => {
   const isSuperAdminMock = isSuperAdmin as jest.MockedFunction<typeof isSuperAdmin>;
 
   const subjectId = '11111111-1111-4111-8111-111111111111';
+  const logger = {
+    errorEvent: jest.fn(),
+    infoEvent: jest.fn(),
+    warnEvent: jest.fn(),
+  };
 
   const createResponse = (): express.Response => {
     const res = {
@@ -34,7 +39,7 @@ describe('LockingInterceptor', () => {
 
   const createMiddleware = (dataApi: { clearUserLocks: jest.Mock; acquireLock: jest.Mock; getLock: jest.Mock }) => {
     const app = { use: jest.fn() } as unknown as express.Express;
-    new LockingInterceptor(async () => dataApi as never).enableFor(app);
+    new LockingInterceptor(async () => dataApi as never, logger).enableFor(app);
     return (app.use as unknown as jest.Mock).mock.calls[0][0] as (
       req: express.Request,
       res: express.Response,
@@ -127,6 +132,10 @@ describe('LockingInterceptor', () => {
       subject: 'court',
       page: 'not a page',
     });
+    expect(logger.warnEvent).toHaveBeenCalledWith('locking.page_not_mapped', {
+      pageKey: 'not-a-page',
+      subjectType: SubjectType.COURT,
+    });
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -168,7 +177,30 @@ describe('LockingInterceptor', () => {
         page: 'address',
       })
     );
+    expect(logger.infoEvent).toHaveBeenCalledWith('locking.acquire_conflict', {
+      page: Page.ADDRESS,
+      subjectType: SubjectType.COURT,
+    });
     expect(next).not.toHaveBeenCalled();
+  });
+
+  test('logs server failures while acquiring a lock', async () => {
+    const dataApi = {
+      clearUserLocks: jest.fn(),
+      acquireLock: jest.fn().mockResolvedValue(HttpStatusCode.ServiceUnavailable),
+      getLock: jest.fn(),
+    };
+    const middleware = createMiddleware(dataApi);
+    const req = { path: `/courts/${subjectId}/edit/address` } as express.Request;
+    const res = createResponse();
+
+    await middleware(req, res, jest.fn());
+
+    expect(logger.errorEvent).toHaveBeenCalledWith('locking.acquire_failed', {
+      page: Page.ADDRESS,
+      statusCode: HttpStatusCode.ServiceUnavailable,
+      subjectType: SubjectType.COURT,
+    });
   });
 
   test('sets timeout dialog config and calls next when lock acquired', async () => {

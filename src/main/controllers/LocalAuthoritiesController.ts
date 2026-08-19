@@ -70,11 +70,9 @@ export default class LocalAuthoritiesController {
     // only really safe way to proceed here is to force the user into starting again. The error is
     // in the save result, but for now we'll just log it and show the general error screen.
     if (saveResult.status === 'invalid') {
-      if (saveResult.errors) {
-        Object.values(saveResult.errors)
-          .flat()
-          .forEach(error => logger.error(error));
-      }
+      logger.warnEvent('local_authorities.save.invalid_state', {
+        errorCount: Object.values(saveResult.errors ?? {}).flat().length,
+      });
       res.status(HttpStatusCode.BadRequest);
       return res.render('error');
     }

@@ -5,6 +5,7 @@ import { type RedisClientType, createClient } from 'redis';
 type Logger = {
   info: (message: string) => void;
   error: (message: string, error?: unknown) => void;
+  errorEvent: (eventName: string, properties?: Record<string, string>, error?: unknown) => void;
 };
 
 type SessionStoreCallback<T = unknown> = (error?: unknown, session?: T | null) => void;
@@ -18,13 +19,17 @@ type RedisSessionPayload = {
 class RedisSessionStore {
   private readonly prefix = 'sess:';
 
-  public constructor(private readonly client: RedisClientType) {}
+  public constructor(
+    private readonly client: RedisClientType,
+    private readonly logger: Logger
+  ) {}
 
   public async get(sessionId: string, callback: SessionStoreCallback): Promise<void> {
     try {
       const session = await this.client.get(this.getKey(sessionId));
       callback(undefined, session ? JSON.parse(session) : null);
     } catch (error) {
+      this.logFailure('get', error);
       callback(error);
     }
   }
@@ -48,6 +53,7 @@ class RedisSessionStore {
 
       callback?.();
     } catch (error) {
+      this.logFailure('set', error);
       callback?.(error);
     }
   }
@@ -57,6 +63,7 @@ class RedisSessionStore {
       await this.client.del(this.getKey(sessionId));
       callback?.();
     } catch (error) {
+      this.logFailure('destroy', error);
       callback?.(error);
     }
   }
@@ -72,6 +79,10 @@ class RedisSessionStore {
 
     const maxAge = (session as RedisSessionPayload).cookie?.maxAge;
     return typeof maxAge === 'number' ? maxAge : undefined;
+  }
+
+  private logFailure(operation: string, error: unknown): void {
+    this.logger.errorEvent('redis.session.operation_failed', { operation }, error);
   }
 }
 
@@ -125,6 +136,6 @@ export class RedisModule {
       });
 
     app.locals.redisClient = client;
-    app.locals.sessionStore = new RedisSessionStore(client);
+    app.locals.sessionStore = new RedisSessionStore(client, this.logger);
   }
 }
