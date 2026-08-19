@@ -1,7 +1,7 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
-import { buildTestAddress } from './court-address-test-support';
+import { buildTestAddress, setAddressCount } from './court-address-test-support';
 
 test.describe(
   'Court Address Edit Success Page Tests',
@@ -13,9 +13,12 @@ test.describe(
       courtAddressFindPage,
       courtAddressEditPage,
       courtAddressEditSuccessPage,
+      page,
       playwright,
     }) => {
       await withCreatedCourt(playwright, 'Court Address Edit Success Functional Test', {}, async ({ createdCourt }) => {
+        // ensure that only 2 addresses are present so that the add button is available
+        await setAddressCount(page, createdCourt.id, 2);
         await courtAddressFindPage.goto(createdCourt.id);
         await courtAddressFindPage.clickEnterAddressManually();
         await courtAddressEditPage.fillAddressForm(buildTestAddress('SaveSuccess1'));
