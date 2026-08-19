@@ -50,7 +50,7 @@ import {
   pagedFavouritesSchema,
 } from '../schemas/favouriteSchema';
 import { LocalAuthorityType, localAuthorityTypeListSchema } from '../schemas/localAuthorityTypeSchema';
-import { Lock, LockList, Page, lockListSchema, lockSchema } from '../schemas/lockSchema';
+import { Lock, LockList, lockListSchema, lockSchema } from '../schemas/lockSchema';
 import {
   CourtOpeningHours,
   OpeningHourType,
@@ -1423,7 +1423,7 @@ export class DataApiRequests {
   /**
    * Request to data API to retrieve a lock based on subject and page
    */
-  public async getLock(subject: Subject, subjectId: string, page: typeof Page): Promise<Lock | null | HttpStatusCode> {
+  public async getLock(subject: Subject, subjectId: string, page: Lock['page']): Promise<Lock | null | HttpStatusCode> {
     try {
       const response = await dataApi.get(`/locks/${subject}/${subjectId}/v1/${page}`);
       if (response.status === HttpStatusCode.NoContent) {
@@ -1464,7 +1464,7 @@ export class DataApiRequests {
   public async acquireLock(
     subject: Subject,
     subjectId: string,
-    page: typeof Page,
+    page: Lock['page'],
     userId: string
   ): Promise<Lock | HttpStatusCode> {
     try {
@@ -1475,11 +1475,18 @@ export class DataApiRequests {
       });
       return lockSchema.parse(response.data);
     } catch (error: unknown) {
-      logger.error(
-        `Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`,
-        toSafeErrorDetails(error)
-      );
-      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+      const statusCode =
+        isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+
+      // A conflict is expected when another editor already holds the lock. The interceptor
+      // records that outcome as an information trace, so it should not also appear as an error.
+      if (statusCode !== HttpStatusCode.Conflict) {
+        logger.error(
+          `Error acquiring court lock for subject: ${subject}, id ${subjectId} and page ${page}:`,
+          toSafeErrorDetails(error)
+        );
+      }
+      return statusCode;
     }
   }
 

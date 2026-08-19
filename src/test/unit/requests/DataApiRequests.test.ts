@@ -15,6 +15,8 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 import { DataApiRequests } from '../../../main/requests/DataApiRequests';
 import { dataApi } from '../../../main/requests/utils/axiosConfig';
 import { CounterServiceOpeningHours } from '../../../main/schemas/counterServiceOpeningHoursSchema';
+import { Page } from '../../../main/schemas/lockSchema';
+import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 
 const dataApiRequests = new DataApiRequests();
 
@@ -1432,6 +1434,20 @@ describe('DataApiRequests', () => {
     });
     const loggedError = JSON.stringify(mockDataApiLogger.error.mock.calls);
     expect(loggedError).not.toContain(bearerToken);
+  });
+
+  it('returns lock conflicts without logging an expected user-contention error', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+    const userId = '22222222-2222-4222-8222-222222222222';
+    postStub.rejects({
+      isAxiosError: true,
+      response: { status: HttpStatusCode.Conflict },
+    });
+
+    const response = await dataApiRequests.acquireLock(SubjectType.COURT, subjectId, Page.ADDRESS, userId);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+    expect(mockDataApiLogger.error).not.toHaveBeenCalled();
   });
 
   it('returns paged users when the users list response is valid', async () => {
