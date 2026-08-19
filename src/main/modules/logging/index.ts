@@ -2,6 +2,8 @@ import { Logger as HmctsLogger } from '@hmcts/nodejs-logging';
 
 type LogLevel = 'silly' | 'debug' | 'verbose' | 'info' | 'warn' | 'error';
 
+export type LogProperties = Record<string, string | number | boolean | undefined>;
+
 type LoggerDelegate = Record<LogLevel, (...args: unknown[]) => unknown>;
 
 type AppInsightsClient = {
@@ -54,6 +56,18 @@ class TelemetryLogger {
     this.write('error', args);
   }
 
+  public infoEvent(eventName: string, properties: LogProperties = {}): void {
+    this.writeEvent('info', eventName, properties);
+  }
+
+  public warnEvent(eventName: string, properties: LogProperties = {}): void {
+    this.writeEvent('warn', eventName, properties);
+  }
+
+  public errorEvent(eventName: string, properties: LogProperties = {}, error?: unknown): void {
+    this.writeEvent('error', eventName, properties, error);
+  }
+
   private write(level: LogLevel, args: unknown[]): void {
     this.delegate[level](...args);
 
@@ -62,6 +76,28 @@ class TelemetryLogger {
         message: formatLogMessage(args),
         severity: severityByLevel[level],
         properties: {
+          loggerName: this.name,
+        },
+      });
+    } catch {
+      // Telemetry must never prevent the application from writing its normal console log.
+    }
+  }
+
+  private writeEvent(level: LogLevel, eventName: string, properties: LogProperties, error?: unknown): void {
+    const telemetryProperties = formatProperties(properties);
+    const message = formatEventMessage(eventName, telemetryProperties);
+    const args = error === undefined ? [message] : [message, error];
+
+    this.delegate[level](...args);
+
+    try {
+      appInsightsClient?.trackTrace({
+        message: formatLogMessage(args),
+        severity: severityByLevel[level],
+        properties: {
+          ...telemetryProperties,
+          eventName,
           loggerName: this.name,
         },
       });
@@ -90,6 +126,22 @@ export class Logger {
 
 function formatLogMessage(args: unknown[]): string {
   return args.map(argument => formatValue(argument, new WeakSet<object>())).join(' ');
+}
+
+function formatProperties(properties: LogProperties): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(properties)
+      .filter((entry): entry is [string, string | number | boolean] => entry[1] !== undefined)
+      .map(([key, value]) => [key, String(value)])
+  );
+}
+
+function formatEventMessage(eventName: string, properties: Record<string, string>): string {
+  const details = Object.entries(properties)
+    .map(([key, value]) => `${key}=${value}`)
+    .join(', ');
+
+  return details ? `${eventName}: ${details}` : eventName;
 }
 
 function formatValue(value: unknown, seen: WeakSet<object>): string {

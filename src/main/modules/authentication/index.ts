@@ -4,12 +4,21 @@ import { auth } from 'express-openid-connect';
 
 import { FRONTEND_URL } from '../../envUrls';
 import type { UserApi as UserApiType } from '../../requests/UserApi';
+import { Logger } from '../logging';
 
 import { resolveFactUserRole } from './roleResolver';
 
 let userApiInstance: UserApiType | undefined;
 
+type DataApiProvider = () => Promise<UserApiType>;
+type AuthenticationLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent'>;
+
 export class Authentication {
+  public constructor(
+    private readonly getUserApi: DataApiProvider = getUserDataApi,
+    private readonly logger: AuthenticationLogger = Logger.getLogger('authentication')
+  ) {}
+
   public enableFor(app: express.Express): void {
     const clientId = process.env.SSO_APP_REG_ID ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_ID');
     const clientSecret = process.env.SSO_APP_REG_SECRET ?? config.get<string>('secrets.fact-kv.SSO_APP_REG_SECRET');
@@ -41,30 +50,54 @@ export class Authentication {
           postLogoutRedirect: '/',
         },
         afterCallback: async (_req, _res, session) => {
-          const user = _req.oidc.user;
+          let stage = 'resolve_sso_user';
+          let dataApiStatusCode: number | undefined;
 
-          if (!user) {
-            throw new Error('Unable to determine SSO user from request');
+          try {
+            const user = _req.oidc.user;
+
+            if (!user) {
+              throw new Error('Unable to determine SSO user from request');
+            }
+
+            stage = 'resolve_role';
+            const role = resolveFactUserRole(user.roles);
+
+          stage = 'provision_user';
+          const userApi = await this.getUserApi();
+            const factUser = await userApi.createUpdateUser({
+              email: user.preferred_username,
+              ssoId: user.oid,
+              role,
+            });
+
+            if (typeof factUser === 'number') {
+              dataApiStatusCode = factUser;
+              throw new Error('Data API did not create or update the authenticated user');
+            }
+
+            session.factUser = factUser;
+            this.logger.infoEvent('authentication.callback.succeeded', { role });
+            return session;
+          } catch (error) {
+            this.logger.errorEvent(
+              'authentication.callback.failed',
+              {
+                dataApiStatusCode,
+                errorName: error instanceof Error ? error.name : 'UnknownError',
+                stage,
+              },
+              error
+            );
+            throw error;
           }
-
-          const role = resolveFactUserRole(user.roles);
-
-          const userApi = await getUserApi();
-
-          session.factUser = await userApi.createUpdateUser({
-            email: user.preferred_username,
-            ssoId: user.oid,
-            role,
-          });
-
-          return session;
         },
       })
     );
   }
 }
 
-async function getUserApi(): Promise<UserApiType> {
+async function getUserDataApi(): Promise<UserApiType> {
   if (!userApiInstance) {
     const { UserApi } = await import('../../requests/UserApi');
     userApiInstance = new UserApi();
