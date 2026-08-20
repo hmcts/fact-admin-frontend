@@ -1,7 +1,7 @@
 services:
   redis:
     container_name: redis
-    image: hmctsprod.azurecr.io/imported/redis:8.2.1
+    image: hmctsprod.azurecr.io/imported/redis:8.2.1@sha256:5fa2edb1e408fa8235e6db8fab01d1afaaae96c9403ba67b70feceb8661e8621
     restart: unless-stopped
     volumes:
       - redis:/data
