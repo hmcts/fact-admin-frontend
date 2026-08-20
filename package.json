@@ -21,8 +21,7 @@
     "test:functional": "NODE_OPTIONS=--no-deprecation yarn playwright test --grep-invert='@smoke'",
     "test:performance": "yarn playwright test --grep='@performance'",
     "test:a11y": "echo 'a11y tests run as part of test:functional' && exit 0",
-    "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
-    "prepare": "husky install"
+    "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y"
   },
   "dependencies": {
     "@azure/identity": "4.13.1",
@@ -95,11 +94,9 @@
     "get-port": "^7.2.0",
     "globals": "17.11.0",
     "html-webpack-plugin": "5.6.8",
-    "husky": "9.1.7",
     "jest": "30.4.2",
     "jest-html-reporter": "4.4.0",
     "lighthouse": "13.4.1",
-    "lint-staged": "16.4.0",
     "mini-css-extract-plugin": "2.10.2",
     "odhin-reports-playwright": "1.1.8",
     "pa11y": "9.1.1",
@@ -135,15 +132,6 @@
     "js-yaml@npm:^4.3.0": "npm:4.3.1",
     "protobufjs": "7.6.5",
     "uuid": "14.0.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown",
-    "**/*.{js,ts}": "eslint --fix"
   },
   "packageManager": "yarn@4.18.0"
 }
