@@ -315,10 +315,9 @@ test.describe('Information for Professionals Page Tests', () => {
           'You are removing the court type of Family court.'
         );
         await expect(professionalInformationPage.page.getByRole('button', { name: 'Continue' })).toBeVisible();
-        await expect(professionalInformationPage.page.getByRole('link', { name: 'Cancel' })).toHaveAttribute(
-          'href',
-          `/courts/${createdCourt.id}/edit/information-for-professionals`
-        );
+        await expect(
+          professionalInformationPage.page.getByRole('link', { name: 'Cancel', exact: true })
+        ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit/information-for-professionals`);
         await expect(professionalInformationPage.page.locator('.govuk-back-link')).toHaveCount(0);
 
         await professionalInformationPage.page.getByRole('link', { name: 'Cancel' }).click();
