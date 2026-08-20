@@ -54,19 +54,19 @@ export class CourtOpeningHoursPage extends Base {
   }
 
   async clickFirstEditLink(): Promise<void> {
-    await this.page.getByRole('link', { name: 'Edit' }).first().click();
+    await this.page.getByRole('link', { name: 'Edit', exact: true }).first().click();
   }
 
   async clickEditLinkForType(typeName: string): Promise<void> {
-    await this.openingHoursRow(typeName).getByRole('link', { name: 'Edit' }).click();
+    await this.openingHoursRow(typeName).getByRole('link', { name: 'Edit', exact: true }).click();
   }
 
   async clickFirstDeleteLink(): Promise<void> {
-    await this.page.getByRole('link', { name: 'Delete' }).first().click();
+    await this.page.getByRole('link', { name: 'Delete', exact: true }).first().click();
   }
 
   async clickDeleteLinkForType(typeName: string): Promise<void> {
-    await this.openingHoursRow(typeName).getByRole('link', { name: 'Delete' }).click();
+    await this.openingHoursRow(typeName).getByRole('link', { name: 'Delete', exact: true }).click();
   }
 
   async clickDeleteOpeningHours(): Promise<void> {

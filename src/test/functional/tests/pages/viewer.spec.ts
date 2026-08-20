@@ -148,7 +148,7 @@ test.describe(
 
         await page.getByRole('button', { name: 'Approve data' }).click();
         await expect(page.getByRole('heading', { name: /Are you sure you want to approve/ })).toBeVisible();
-        await page.getByRole('link', { name: 'Cancel' }).click();
+        await page.getByRole('link', { name: 'Cancel', exact: true }).click();
         await expect.poll(() => new URL(page.url()).pathname).toBe(reviewPath);
         await expect(page.getByRole('button', { name: 'Approve data' })).toBeVisible();
 

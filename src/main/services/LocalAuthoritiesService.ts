@@ -63,7 +63,7 @@ export class LocalAuthoritiesService {
     const hasFamilyCourtCode =
       typeof professionalInformationResponse === 'number'
         ? false
-        : !!professionalInformationResponse?.codes?.familyCourtCode;
+        : typeof professionalInformationResponse?.codes?.familyCourtCode === 'number';
 
     // we need the cases heard in order to determine which areas of family law are handled
     const casesHeardResponse = await this.courtApi.getCourtAreasOfLaw(courtId);

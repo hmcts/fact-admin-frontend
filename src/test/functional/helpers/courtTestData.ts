@@ -47,6 +47,7 @@ export type TestingSupportRegion = {
 
 export type TestCourtParams = {
   addWarningNotice?: boolean;
+  addWarningNoticeCy?: boolean;
   courtName: string;
   open?: boolean;
   regionId?: string;
@@ -80,6 +81,9 @@ export async function createTestCourt(
   apiContext: APIRequestContext,
   {
     addWarningNotice = false,
+    // default need for welsh warning notice requirement to that of the
+    // English notice. Can still be overridden for negative testing
+    addWarningNoticeCy = addWarningNotice,
     courtName,
     open = true,
     regionId,
@@ -90,6 +94,7 @@ export async function createTestCourt(
 ): Promise<CreatedCourt> {
   const params = {
     addWarningNotice,
+    addWarningNoticeCy,
     courtName,
     open,
     withEnquiriesContact,
