@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { OperationsApi } from '../requests/OperationsApi';
 import { Lock, PATH_TO_PAGE_MAP } from '../schemas/lockSchema';
 import { Subject } from '../schemas/subjectTypeSchema';
 
@@ -15,10 +15,10 @@ export type LocksViewModel = Partial<Lock> &
   }[];
 
 export class LockService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly operationsApi = new OperationsApi()) {}
 
   public async getLocks(subject: Subject, subjectId: string): Promise<LocksViewModel | HttpStatusCode> {
-    const locks = await this.dataApiRequests.getLocks(subject, subjectId);
+    const locks = await this.operationsApi.getLocks(subject, subjectId);
     if (typeof locks === 'number') {
       return locks;
     }

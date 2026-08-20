@@ -1,6 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { Region } from '../schemas/regionSchema';
 import { ServiceArea } from '../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../schemas/serviceCentreSchema';
@@ -41,20 +43,24 @@ export type ServiceCentreGeneralSaveResult =
     };
 
 export class ServiceCentreGeneralService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(
+    private readonly courtApi = new CourtApi(),
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreGeneralViewModel | HttpStatusCode> {
-    const serviceCentreResponse = await this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
     if (typeof serviceCentreResponse === 'number') {
       return serviceCentreResponse;
     }
 
-    const serviceAreasResponse = await this.dataApiRequests.getServiceAreas();
+    const serviceAreasResponse = await this.referenceDataApi.getServiceAreas();
     if (typeof serviceAreasResponse === 'number') {
       return serviceAreasResponse;
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return regions;
     }
@@ -69,17 +75,17 @@ export class ServiceCentreGeneralService {
     serviceAreaIds?: string[];
     regionId?: string;
   }): Promise<ServiceCentreGeneralSaveResult> {
-    const existingServiceCentre = await this.dataApiRequests.getServiceCentreById(model.id);
+    const existingServiceCentre = await this.serviceCentreApi.getServiceCentreById(model.id);
     if (typeof existingServiceCentre === 'number') {
       return { status: existingServiceCentre, type: 'status' };
     }
 
-    const serviceAreasResponse = await this.dataApiRequests.getServiceAreas();
+    const serviceAreasResponse = await this.referenceDataApi.getServiceAreas();
     if (typeof serviceAreasResponse === 'number') {
       return { status: serviceAreasResponse, type: 'status' };
     }
 
-    const regions = await this.dataApiRequests.getRegions();
+    const regions = await this.referenceDataApi.getRegions();
     if (typeof regions === 'number') {
       return { status: regions, type: 'status' };
     }
@@ -126,7 +132,7 @@ export class ServiceCentreGeneralService {
       };
     }
 
-    const updateResponse = await this.dataApiRequests.updateServiceCentre(updatedServiceCentre);
+    const updateResponse = await this.serviceCentreApi.updateServiceCentre(updatedServiceCentre);
     if (typeof updateResponse === 'number') {
       return { status: updateResponse, type: 'status' };
     }
@@ -156,7 +162,7 @@ export class ServiceCentreGeneralService {
     name: string,
     serviceCentreId: string
   ): Promise<{ name: string; type: 'court' | 'service centre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.dataApiRequests.getCourtByName(name);
+    const duplicateCourt = await this.courtApi.getCourtByName(name);
     if (typeof duplicateCourt !== 'number') {
       return { name: duplicateCourt.name, type: 'court' };
     }
@@ -164,7 +170,7 @@ export class ServiceCentreGeneralService {
       return duplicateCourt;
     }
 
-    const duplicateServiceCentre = await this.dataApiRequests.getServiceCentreByName(name);
+    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
     if (typeof duplicateServiceCentre !== 'number') {
       if (duplicateServiceCentre.id !== serviceCentreId) {
         return { name: duplicateServiceCentre.name, type: 'service centre' };

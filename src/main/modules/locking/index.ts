@@ -1,14 +1,14 @@
 import { HttpStatusCode } from 'axios';
 import * as express from 'express';
 
-import type { DataApiRequests as DataApiRequestsType } from '../../requests/DataApiRequests';
+import { OperationsApi as OperationsApiType } from '../../requests/OperationsApi';
 import { type Lock, PATH_TO_PAGE_MAP } from '../../schemas/lockSchema';
 import { Subject, SubjectType } from '../../schemas/subjectTypeSchema';
 import { isUuid } from '../../utils/valueParsers';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenticationHelper';
 import { Logger } from '../logging';
 
-let dataApiRequests: DataApiRequestsType | undefined;
+let operationsApiInstance: OperationsApiType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
 const NON_LOCKABLE_EDIT_PAGES = new Set(['approve']);
@@ -21,12 +21,12 @@ type LockRequirements = {
   pageKey: string;
 };
 
-type DataApiProvider = () => Promise<DataApiRequestsType>;
+type OperationsApiProvider = () => Promise<OperationsApiType>;
 type LockingLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent' | 'warnEvent'>;
 
 export class LockingInterceptor {
   public constructor(
-    private readonly getDataApi: DataApiProvider = getDataApiRequests,
+    private readonly operationsApiProvider: OperationsApiProvider = getOperationsApi,
     private readonly logger: LockingLogger = Logger.getLogger('locking')
   ) {}
 
@@ -35,7 +35,7 @@ export class LockingInterceptor {
   }
 
   private async handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
-    const dataApi = await this.getDataApi();
+    const operationsApi = await this.operationsApiProvider();
     const userId = getFactUserId(req);
     res.locals.userId = undefined;
     res.locals.timeoutDialogConfig = undefined;
@@ -54,7 +54,7 @@ export class LockingInterceptor {
       // if they navigate away from a lockable resource, we will clear their locks. If they
       // are still editing (e.g. they have multiple tabs open) then the lock will need to be
       // re-acquired when they refresh or save.
-      const clearStatus = await dataApi.clearUserLocks(userId);
+      const clearStatus = await operationsApi.clearUserLocks(userId);
       if (clearStatus >= HttpStatusCode.BadRequest) {
         this.logger.warnEvent('locking.clear_failed', { statusCode: clearStatus });
       }
@@ -62,7 +62,7 @@ export class LockingInterceptor {
     }
 
     // attempt to acquire the lock, and if we can't, render the appropriate error page
-    const acquisitionResponse = await this.handleLockAcquisition(dataApi, userId, lockDetails, res);
+    const acquisitionResponse = await this.handleLockAcquisition(operationsApi, userId, lockDetails, res);
     if (typeof acquisitionResponse === 'number') {
       // likely a 404 on the subject, let the real page deal with that
       return next();
@@ -112,7 +112,7 @@ export class LockingInterceptor {
   }
 
   private async handleLockAcquisition(
-    dataApi: DataApiRequestsType,
+    operationsApi: OperationsApiType,
     userId: string,
     details: LockRequirements,
     res: express.Response
@@ -135,7 +135,7 @@ export class LockingInterceptor {
     }
 
     // just attempt the acquire the lock, we only need to do anything if we fail
-    const lock = await dataApi.acquireLock(details.subject, details.subjectId, page, userId);
+    const lock = await operationsApi.acquireLock(details.subject, details.subjectId, page, userId);
 
     if (typeof lock === 'number') {
       if (lock === HttpStatusCode.NotFound) {
@@ -145,7 +145,7 @@ export class LockingInterceptor {
         // other logic that the page might want to perform in that instance.
         return lock;
       } else {
-        await this.handleLockingFailure(dataApi, res, lock, page, details, subjectStr);
+        await this.handleLockingFailure(operationsApi, res, lock, page, details, subjectStr);
       }
       return true;
     }
@@ -154,7 +154,7 @@ export class LockingInterceptor {
   }
 
   private async handleLockingFailure(
-    dataApi: DataApiRequestsType,
+    operationsApi: OperationsApiType,
     res: express.Response,
     lock: HttpStatusCode,
     page: Lock['page'],
@@ -169,7 +169,7 @@ export class LockingInterceptor {
         page,
         subjectType: details.subject,
       });
-      const existingLock = await dataApi.getLock(details.subject, details.subjectId, page);
+      const existingLock = await operationsApi.getLock(details.subject, details.subjectId, page);
       res.render('lock-exists', {
         subject: subjectStr,
         page: pageStr,
@@ -195,10 +195,10 @@ export class LockingInterceptor {
   }
 }
 
-async function getDataApiRequests(): Promise<DataApiRequestsType> {
-  if (!dataApiRequests) {
-    const { DataApiRequests } = await import('../../requests/DataApiRequests');
-    dataApiRequests = new DataApiRequests();
+async function getOperationsApi(): Promise<OperationsApiType> {
+  if (!operationsApiInstance) {
+    const { OperationsApi } = await import('../../requests/OperationsApi');
+    operationsApiInstance = new OperationsApi();
   }
-  return dataApiRequests;
+  return operationsApiInstance;
 }

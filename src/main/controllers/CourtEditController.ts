@@ -2,7 +2,8 @@ import { GET, POST, route } from 'awilix-express';
 import { Request, Response } from 'express';
 
 import { isViewer } from '../modules/authentication/authenticationHelper';
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
+import { OperationsApi } from '../requests/OperationsApi';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ApprovalService } from '../services/ApprovalService';
 import { LockService } from '../services/LockService';
@@ -11,8 +12,9 @@ import { parseNumber } from '../utils/valueParsers';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
-const dataApiRequests = new DataApiRequests();
-const courtLockService = new LockService(dataApiRequests);
+const courtApi = new CourtApi();
+const operationsApi = new OperationsApi();
+const courtLockService = new LockService(operationsApi);
 const locationApprovalController = new LocationApprovalController(
   {
     buildBreadcrumbs: buildEditBreadcrumbs,
@@ -27,7 +29,7 @@ const locationApprovalController = new LocationApprovalController(
         ? courtLocks
         : { courtLocks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
     },
-    getLocation: courtId => dataApiRequests.getCourtById(courtId),
+    getLocation: courtId => courtApi.getCourtById(courtId),
     locationIdViewKey: 'courtId',
     locationNameViewKey: 'courtName',
     notFoundView: 'court-not-found',
@@ -35,7 +37,7 @@ const locationApprovalController = new LocationApprovalController(
     routeSegment: 'courts',
     subjectType: 'COURT',
   },
-  new ApprovalService(dataApiRequests)
+  new ApprovalService(operationsApi)
 );
 
 @route('/courts/:courtId/edit')

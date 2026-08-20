@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 
@@ -13,11 +13,11 @@ describe('Information for professionals page', () => {
   });
 
   test('renders the information for professionals form', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves({
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves({
       professionalInformation: {
         interviewRooms: true,
         interviewRoomCount: 3,
@@ -59,11 +59,11 @@ describe('Information for professionals page', () => {
   });
 
   test('renders an empty form when the professional information endpoint returns no content', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
 
     const response = await request(app).get(`/courts/${courtId}/edit/information-for-professionals`);
 
@@ -74,12 +74,12 @@ describe('Information for professionals page', () => {
   });
 
   test('saves professional information and renders the success page', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves({
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves({
       professionalInformation: {
         interviewRooms: true,
         interviewRoomCount: 2,
@@ -152,12 +152,12 @@ describe('Information for professionals page', () => {
   });
 
   test('renders validation errors when explanations are submitted without matching codes', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -178,12 +178,12 @@ describe('Information for professionals page', () => {
   });
 
   test('renders directional validation errors when DX/fax English and Welsh descriptions are not paired', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -216,11 +216,11 @@ describe('Information for professionals page', () => {
   });
 
   test('requires code fields for selected court types', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -234,12 +234,12 @@ describe('Information for professionals page', () => {
   });
 
   test('links interview room count range errors to the count field', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -256,12 +256,12 @@ describe('Information for professionals page', () => {
   });
 
   test('links API interview room count validation errors to the count field', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
         [
           'message',
@@ -284,12 +284,12 @@ describe('Information for professionals page', () => {
   });
 
   test('links fax number format errors to the fax number field', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -308,12 +308,12 @@ describe('Information for professionals page', () => {
   });
 
   test('maps API fax number regex errors to the fax number field', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
         ['message', "Phone Number must match the regex '^(|(\\+44|)[0-9 ]{10,20})$'"],
         ['timestamp', '2026-06-12T10:24:23.354464'],
@@ -336,12 +336,12 @@ describe('Information for professionals page', () => {
   });
 
   test('maps API length errors to the matching GBS and DX code fields', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
         ['codes.gbs', 'GBS code must be 10 characters or fewer'],
         ['message', 'DX code must be 200 characters or fewer'],
@@ -364,12 +364,12 @@ describe('Information for professionals page', () => {
   });
 
   test('maps indexed API DX code errors to the matching DX code field', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves(null);
-    stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves(
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
+    stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
         ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
       ])
@@ -391,11 +391,11 @@ describe('Information for professionals page', () => {
   });
 
   test('renders confirmation page before removing family court type with local authority config', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    stub(DataApiRequests.prototype, 'getCourtProfessionalInformation').resolves({
+    stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves({
       professionalInformation: {
         interviewRooms: false,
         interviewRoomCount: 0,
@@ -415,14 +415,14 @@ describe('Information for professionals page', () => {
       dxCodes: [],
       faxNumbers: [],
     });
-    stub(DataApiRequests.prototype, 'getCourtLocalAuthorities').resolves([
+    stub(CourtApi.prototype, 'getCourtLocalAuthorities').resolves([
       {
         areaOfLawId: '22222222-2222-4222-8222-222222222222',
         areaOfLawName: 'Children',
         localAuthorities: [{ id: '33333333-3333-4333-8333-333333333333', selected: true }],
       },
     ]);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation');
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/information-for-professionals/success`)
@@ -447,11 +447,11 @@ describe('Information for professionals page', () => {
   });
 
   test('saves family court type removal after confirmation', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveStub = stub(DataApiRequests.prototype, 'saveCourtProfessionalInformation').resolves({
+    const saveStub = stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves({
       professionalInformation: {
         interviewRooms: false,
         interviewRoomCount: 0,
@@ -487,7 +487,7 @@ describe('Information for professionals page', () => {
   });
 
   test('renders court not found for invalid court id', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/information-for-professionals');
 

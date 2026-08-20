@@ -3,7 +3,7 @@ import { assert, match, mock, stub } from 'sinon';
 import type { SinonStub } from 'sinon';
 
 import InfoController from '../../../main/controllers/InfoController';
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { OperationsApi } from '../../../main/requests/OperationsApi';
 
 jest.mock('@hmcts/info-provider', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -30,7 +30,7 @@ describe('InfoController', () => {
     } as unknown as Response;
     const responseMock = mock(response);
     const next = stub();
-    const checkHealthStub = stub(DataApiRequests.prototype, 'checkHealth').resolves(true);
+    const checkHealthStub = stub(OperationsApi.prototype, 'checkHealth').resolves(true);
 
     responseMock.expects('end').never();
     await controller.get(request, response, next);

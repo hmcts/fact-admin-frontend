@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { CourtApi } from '../requests/CourtApi';
 import { CourtSinglePointOfEntryList } from '../schemas/courtSinglePointOfEntrySchema';
 
 const supportedSinglePointOfEntryServices = [
@@ -30,15 +30,15 @@ export type SinglePointOfEntrySaveModel = {
 };
 
 export class SinglePointOfEntryService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(private readonly courtApi = new CourtApi()) {}
 
   public async retrieve(courtId: string): Promise<SinglePointOfEntryViewModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
-    const singlePointOfEntryResponse = await this.dataApiRequests.getCourtSinglePointOfEntry(courtId);
+    const singlePointOfEntryResponse = await this.courtApi.getCourtSinglePointOfEntry(courtId);
     if (typeof singlePointOfEntryResponse === 'number') {
       return singlePointOfEntryResponse;
     }
@@ -55,12 +55,12 @@ export class SinglePointOfEntryService {
     courtId: string,
     serviceSelections: Record<string, boolean>
   ): Promise<SinglePointOfEntrySaveModel | HttpStatusCode> {
-    const courtResponse = await this.dataApiRequests.getCourtById(courtId);
+    const courtResponse = await this.courtApi.getCourtById(courtId);
     if (typeof courtResponse === 'number') {
       return courtResponse;
     }
 
-    const existingSinglePointOfEntryResponse = await this.dataApiRequests.getCourtSinglePointOfEntry(courtId);
+    const existingSinglePointOfEntryResponse = await this.courtApi.getCourtSinglePointOfEntry(courtId);
     if (typeof existingSinglePointOfEntryResponse === 'number') {
       return existingSinglePointOfEntryResponse;
     }
@@ -69,7 +69,7 @@ export class SinglePointOfEntryService {
       return HttpStatusCode.BadRequest;
     }
 
-    const updateResponse = await this.dataApiRequests.updateCourtSinglePointOfEntry(
+    const updateResponse = await this.courtApi.updateCourtSinglePointOfEntry(
       courtId,
       this.applySelections(existingSinglePointOfEntryResponse, serviceSelections)
     );

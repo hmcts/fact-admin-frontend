@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 import { dataApiRequestContext } from '../../main/requests/utils/dataApiRequestContext';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
@@ -20,8 +20,8 @@ describe('Court photo routes', () => {
   });
 
   function stubCourtPhoto(fileLink: string | HttpStatusCode = FILE_LINK) {
-    const getCourtById = stub(DataApiRequests.prototype, 'getCourtById').resolves(COURT as never);
-    const getCourtPhotoFileLink = stub(DataApiRequests.prototype, 'getCourtPhotoFileLink').resolves(fileLink);
+    const getCourtById = stub(CourtApi.prototype, 'getCourtById').resolves(COURT as never);
+    const getCourtPhotoFileLink = stub(CourtApi.prototype, 'getCourtPhotoFileLink').resolves(fileLink);
     return { getCourtById, getCourtPhotoFileLink };
   }
 
@@ -66,8 +66,8 @@ describe('Court photo routes', () => {
   });
 
   test('renders court not found for an invalid court id without calling the API', async () => {
-    const getCourtById = stub(DataApiRequests.prototype, 'getCourtById');
-    const getCourtPhotoFileLink = stub(DataApiRequests.prototype, 'getCourtPhotoFileLink');
+    const getCourtById = stub(CourtApi.prototype, 'getCourtById');
+    const getCourtPhotoFileLink = stub(CourtApi.prototype, 'getCourtPhotoFileLink');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/photo');
 
@@ -81,7 +81,7 @@ describe('Court photo routes', () => {
     [HttpStatusCode.NotFound, 'Court not found'],
     [HttpStatusCode.InternalServerError, 'Something went wrong'],
   ])('renders the expected error when the court lookup returns %s', async (status, content) => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(status);
+    stub(CourtApi.prototype, 'getCourtById').resolves(status);
 
     const response = await request(app).get(`/courts/${COURT_ID}/edit/photo`);
 
@@ -96,7 +96,7 @@ describe('Court photo routes', () => {
     stubCourtPhoto();
     const file = Buffer.from(`content-for-${mimeType}`);
     let observedUserId: string | undefined;
-    const updateCourtPhoto = stub(DataApiRequests.prototype, 'updateCourtPhoto').callsFake(
+    const updateCourtPhoto = stub(CourtApi.prototype, 'updateCourtPhoto').callsFake(
       async (id, uploadedFile, uploadedMimeType) => {
         expect(id).toBe(COURT_ID);
         expect(uploadedFile.equals(file)).toBe(true);
@@ -118,7 +118,7 @@ describe('Court photo routes', () => {
 
   test('renders a validation error when no file is selected', async () => {
     stubCourtPhoto();
-    const updateCourtPhoto = stub(DataApiRequests.prototype, 'updateCourtPhoto');
+    const updateCourtPhoto = stub(CourtApi.prototype, 'updateCourtPhoto');
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/photo/upload`);
 
@@ -130,7 +130,7 @@ describe('Court photo routes', () => {
 
   test('renders a validation error for an unsupported file type', async () => {
     stubCourtPhoto();
-    const updateCourtPhoto = stub(DataApiRequests.prototype, 'updateCourtPhoto');
+    const updateCourtPhoto = stub(CourtApi.prototype, 'updateCourtPhoto');
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
@@ -143,7 +143,7 @@ describe('Court photo routes', () => {
 
   test('renders the 4MB validation error for an oversized file', async () => {
     stubCourtPhoto();
-    const updateCourtPhoto = stub(DataApiRequests.prototype, 'updateCourtPhoto');
+    const updateCourtPhoto = stub(CourtApi.prototype, 'updateCourtPhoto');
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
@@ -156,7 +156,7 @@ describe('Court photo routes', () => {
 
   test('renders API validation errors and retains the existing photo', async () => {
     stubCourtPhoto();
-    stub(DataApiRequests.prototype, 'updateCourtPhoto').resolves(
+    stub(CourtApi.prototype, 'updateCourtPhoto').resolves(
       new Map([
         ['photo', 'The image dimensions are invalid'],
         ['timestamp', '2026-07-22T10:00:00Z'],
@@ -178,7 +178,7 @@ describe('Court photo routes', () => {
     [HttpStatusCode.InternalServerError, 'Something went wrong'],
   ])('renders the expected error when upload returns %s', async (status, content) => {
     stubCourtPhoto();
-    stub(DataApiRequests.prototype, 'updateCourtPhoto').resolves(status);
+    stub(CourtApi.prototype, 'updateCourtPhoto').resolves(status);
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
@@ -189,7 +189,7 @@ describe('Court photo routes', () => {
   });
 
   test('renders the delete confirmation page', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(COURT as never);
+    stub(CourtApi.prototype, 'getCourtById').resolves(COURT as never);
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/photo/delete`);
 
@@ -200,8 +200,8 @@ describe('Court photo routes', () => {
   });
 
   test('deletes a court photo and renders success', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(COURT as never);
-    const deleteCourtPhoto = stub(DataApiRequests.prototype, 'deleteCourtPhoto').resolves(HttpStatusCode.NoContent);
+    stub(CourtApi.prototype, 'getCourtById').resolves(COURT as never);
+    const deleteCourtPhoto = stub(CourtApi.prototype, 'deleteCourtPhoto').resolves(HttpStatusCode.NoContent);
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/photo/delete/success`);
 
@@ -214,8 +214,8 @@ describe('Court photo routes', () => {
     [HttpStatusCode.NotFound, 'Court not found'],
     [HttpStatusCode.InternalServerError, 'Something went wrong'],
   ])('renders the expected error when deletion returns %s', async (status, content) => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(COURT as never);
-    stub(DataApiRequests.prototype, 'deleteCourtPhoto').resolves(status);
+    stub(CourtApi.prototype, 'getCourtById').resolves(COURT as never);
+    stub(CourtApi.prototype, 'deleteCourtPhoto').resolves(status);
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/photo/delete/success`);
 
@@ -226,7 +226,7 @@ describe('Court photo routes', () => {
   test.each(['/upload', '/delete', '/delete/success'])(
     'renders court not found when %s receives an invalid court id',
     async suffix => {
-      const getCourtById = stub(DataApiRequests.prototype, 'getCourtById');
+      const getCourtById = stub(CourtApi.prototype, 'getCourtById');
 
       const response = await request(app).post(`/courts/not-a-uuid/edit/photo${suffix}`);
 
@@ -237,7 +237,7 @@ describe('Court photo routes', () => {
   );
 
   test.each(['/upload', '/delete', '/delete/success'])('denies viewers access to the %s route', async suffix => {
-    const getCourtById = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtById = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/photo${suffix}`).set('x-test-role', 'Viewer');
 

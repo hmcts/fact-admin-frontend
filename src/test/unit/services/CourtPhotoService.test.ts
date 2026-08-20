@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../../../main/requests/DataApiRequests';
+import { CourtApi } from '../../../main/requests/CourtApi';
 import { CourtPhotoService } from '../../../main/services/CourtPhotoService';
 
 describe('CourtPhotoService', () => {
@@ -10,22 +10,22 @@ describe('CourtPhotoService', () => {
     name: 'Reading Crown Court',
   };
 
-  function buildService(overrides: Partial<DataApiRequests> = {}) {
-    const dataApiRequests = {
+  function buildService(overrides: Partial<CourtApi> = {}) {
+    const courtApi = {
       deleteCourtPhoto: jest.fn().mockResolvedValue(HttpStatusCode.NoContent),
       getCourtById: jest.fn().mockResolvedValue(court),
       getCourtPhotoFileLink: jest.fn().mockResolvedValue('https://example.com/existing.jpg'),
       updateCourtPhoto: jest.fn().mockResolvedValue('https://example.com/updated.jpg'),
       ...overrides,
-    } as unknown as DataApiRequests;
+    } as unknown as CourtApi;
 
     return {
-      dataApiRequests,
-      deleteCourtPhoto: dataApiRequests.deleteCourtPhoto as jest.Mock,
-      getCourtById: dataApiRequests.getCourtById as jest.Mock,
-      getCourtPhotoFileLink: dataApiRequests.getCourtPhotoFileLink as jest.Mock,
-      service: new CourtPhotoService(dataApiRequests),
-      updateCourtPhoto: dataApiRequests.updateCourtPhoto as jest.Mock,
+      courtApi,
+      deleteCourtPhoto: courtApi.deleteCourtPhoto as jest.Mock,
+      getCourtById: courtApi.getCourtById as jest.Mock,
+      getCourtPhotoFileLink: courtApi.getCourtPhotoFileLink as jest.Mock,
+      service: new CourtPhotoService(courtApi),
+      updateCourtPhoto: courtApi.updateCourtPhoto as jest.Mock,
     };
   }
 

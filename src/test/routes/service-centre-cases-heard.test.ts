@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Service centre cases heard page', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';
@@ -13,14 +13,14 @@ describe('Service centre cases heard page', () => {
   });
 
   test('renders the cases heard page for a valid known service centre', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAreasOfLaw').resolves([
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAreasOfLaw').resolves([
       {
         areaOfLawType: {
           id: '22222222-2222-4222-8222-222222222222',
@@ -49,7 +49,7 @@ describe('Service centre cases heard page', () => {
   });
 
   test('renders not found for an invalid UUID', async () => {
-    const getServiceCentreByIdStub = stub(DataApiRequests.prototype, 'getServiceCentreById');
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById');
 
     const response = await request(app).get('/service-centres/not-a-uuid/edit/cases-heard');
 
@@ -59,14 +59,14 @@ describe('Service centre cases heard page', () => {
   });
 
   test('updates selected areas of law and renders success page', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    const updateStub = stub(DataApiRequests.prototype, 'updateServiceCentreAreasOfLaw').resolves(HttpStatusCode.Ok);
+    const updateStub = stub(ServiceCentreApi.prototype, 'updateServiceCentreAreasOfLaw').resolves(HttpStatusCode.Ok);
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/cases-heard/success`)
@@ -84,14 +84,14 @@ describe('Service centre cases heard page', () => {
   });
 
   test('renders validation error when no areas of law are selected', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
       open: true,
       slug: 'reading-service-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAreasOfLaw').resolves([
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAreasOfLaw').resolves([
       {
         areaOfLawType: {
           id: '22222222-2222-4222-8222-222222222222',
@@ -101,7 +101,7 @@ describe('Service centre cases heard page', () => {
         selected: true,
       },
     ] as never);
-    const updateStub = stub(DataApiRequests.prototype, 'updateServiceCentreAreasOfLaw');
+    const updateStub = stub(ServiceCentreApi.prototype, 'updateServiceCentreAreasOfLaw');
 
     const response = await request(app)
       .post(`/service-centres/${serviceCentreId}/edit/cases-heard/success`)

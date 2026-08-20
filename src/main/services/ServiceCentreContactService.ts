@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import { DataApiRequests } from '../requests/DataApiRequests';
+import { ReferenceDataApi } from '../requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../schemas/serviceCentreSchema';
@@ -87,10 +88,13 @@ const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
-  public constructor(private readonly dataApiRequests = new DataApiRequests()) {}
+  public constructor(
+    private readonly serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi()
+  ) {}
 
   public async getServiceCentreById(serviceCentreId: string): Promise<ServiceCentre | HttpStatusCode> {
-    return this.dataApiRequests.getServiceCentreById(serviceCentreId);
+    return this.serviceCentreApi.getServiceCentreById(serviceCentreId);
   }
 
   public async listContactDetails(serviceCentreId: string): Promise<
@@ -102,8 +106,8 @@ export class ServiceCentreContactService {
     | HttpStatusCode
   > {
     const [contactDetailsResponse, contactDescriptionTypesResponse] = await Promise.all([
-      this.dataApiRequests.getServiceCentreContactDetails(serviceCentreId),
-      this.dataApiRequests.getContactDescriptionTypes(),
+      this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId),
+      this.referenceDataApi.getContactDescriptionTypes(),
     ]);
 
     if (typeof contactDetailsResponse === 'number') {
@@ -133,7 +137,7 @@ export class ServiceCentreContactService {
     serviceCentreId: string,
     contactDetailId: string
   ): Promise<ServiceCentreContactDetail | undefined | HttpStatusCode> {
-    const contactDetailsResponse = await this.dataApiRequests.getServiceCentreContactDetails(serviceCentreId);
+    const contactDetailsResponse = await this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
     if (typeof contactDetailsResponse === 'number') {
       return contactDetailsResponse;
     }
@@ -144,7 +148,7 @@ export class ServiceCentreContactService {
   public async getContactDescriptionTypeItems(
     selectedId?: string
   ): Promise<ServiceCentreContactDescriptionTypeItem[] | HttpStatusCode> {
-    const contactDescriptionTypesResponse = await this.dataApiRequests.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return contactDescriptionTypesResponse;
     }
@@ -241,7 +245,7 @@ export class ServiceCentreContactService {
   }
 
   public async deleteContactDetail(serviceCentreId: string, contactDetailId: string): Promise<HttpStatusCode> {
-    return this.dataApiRequests.deleteServiceCentreContactDetail(serviceCentreId, contactDetailId);
+    return this.serviceCentreApi.deleteServiceCentreContactDetail(serviceCentreId, contactDetailId);
   }
 
   public async resolveContactDetailDescription(contactDetail: ServiceCentreContactDetail): Promise<string> {
@@ -256,7 +260,7 @@ export class ServiceCentreContactService {
   }
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await this.dataApiRequests.getContactDescriptionTypes();
+    const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
     if (typeof contactDescriptionTypesResponse === 'number') {
       return 'Contact details';
     }
@@ -377,10 +381,10 @@ export class ServiceCentreContactService {
     contactDetailId?: string
   ): Promise<HttpStatusCode | Map<string, string>> {
     if (contactDetailId) {
-      return this.dataApiRequests.updateServiceCentreContactDetail(serviceCentreId, contactDetailId, payload);
+      return this.serviceCentreApi.updateServiceCentreContactDetail(serviceCentreId, contactDetailId, payload);
     }
 
-    return this.dataApiRequests.createServiceCentreContactDetail(serviceCentreId, payload);
+    return this.serviceCentreApi.createServiceCentreContactDetail(serviceCentreId, payload);
   }
 
   private buildValidationFormViewModel(

@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -13,7 +13,7 @@ describe('Warning notice page', () => {
   });
 
   test('renders the warning notice page for a valid known court with breadcrumbs', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
       warningNotice: null,
@@ -35,7 +35,7 @@ describe('Warning notice page', () => {
   });
 
   test('renders court not found for invalid court id on GET', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/warning-notice');
 
@@ -45,7 +45,7 @@ describe('Warning notice page', () => {
   });
 
   test('renders court not found when the court does not exist on GET', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     const response = await request(app).get(`/courts/${COURT_ID}/edit/warning-notice`);
 
@@ -54,7 +54,7 @@ describe('Warning notice page', () => {
   });
 
   test('saves warning notices and renders success page on valid POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       createdAt: '2026-04-29T09:00:00Z',
       id: COURT_ID,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
@@ -67,7 +67,7 @@ describe('Warning notice page', () => {
       warningNotice: null,
       warningNoticeCy: null,
     } as never);
-    const updateCourtStub = stub(DataApiRequests.prototype, 'updateCourt').resolves({ id: COURT_ID } as never);
+    const updateCourtStub = stub(CourtApi.prototype, 'updateCourt').resolves({ id: COURT_ID } as never);
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/warning-notice/success`).type('form').send({
       warningNotice: 'Temporary service disruption due to maintenance.',
@@ -89,13 +89,13 @@ describe('Warning notice page', () => {
   });
 
   test('renders validation errors when Welsh translation is missing on POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       id: COURT_ID,
       name: 'Reading Crown Court',
       warningNotice: null,
       warningNoticeCy: null,
     } as never);
-    const updateCourtStub = stub(DataApiRequests.prototype, 'updateCourt');
+    const updateCourtStub = stub(CourtApi.prototype, 'updateCourt');
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/warning-notice/success`).type('form').send({
       warningNotice: 'Temporary service disruption due to maintenance.',
@@ -111,8 +111,8 @@ describe('Warning notice page', () => {
   });
 
   test('renders court not found for invalid court id on POST', async () => {
-    const getCourtByIdStub = stub(DataApiRequests.prototype, 'getCourtById');
-    const updateCourtStub = stub(DataApiRequests.prototype, 'updateCourt');
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const updateCourtStub = stub(CourtApi.prototype, 'updateCourt');
 
     const response = await request(app).post('/courts/not-a-uuid/edit/warning-notice/success').type('form').send({});
 
@@ -123,8 +123,8 @@ describe('Warning notice page', () => {
   });
 
   test('renders court not found when save cannot find the court on POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
-    const updateCourtStub = stub(DataApiRequests.prototype, 'updateCourt');
+    stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const updateCourtStub = stub(CourtApi.prototype, 'updateCourt');
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/warning-notice/success`).type('form').send({
       warningNotice: 'Temporary service disruption due to maintenance.',
@@ -137,7 +137,7 @@ describe('Warning notice page', () => {
   });
 
   test('renders generic error page when save fails on POST', async () => {
-    stub(DataApiRequests.prototype, 'getCourtById').resolves({
+    stub(CourtApi.prototype, 'getCourtById').resolves({
       createdAt: '2026-04-29T09:00:00Z',
       id: COURT_ID,
       lastUpdatedAt: '2026-04-29T10:00:00Z',
@@ -150,7 +150,7 @@ describe('Warning notice page', () => {
       warningNotice: null,
       warningNoticeCy: null,
     } as never);
-    stub(DataApiRequests.prototype, 'updateCourt').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtApi.prototype, 'updateCourt').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).post(`/courts/${COURT_ID}/edit/warning-notice/success`).type('form').send({
       warningNotice: 'Temporary service disruption due to maintenance.',

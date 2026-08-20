@@ -2,7 +2,9 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { DataApiRequests } from '../../main/requests/DataApiRequests';
+import { CourtApi } from '../../main/requests/CourtApi';
+import { ReferenceDataApi } from '../../main/requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 
 describe('Add service centre page', () => {
   const regions = [{ country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' }];
@@ -13,8 +15,8 @@ describe('Add service centre page', () => {
   });
 
   test('renders the add service centre page for admin users', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas);
 
     const response = await request(app).get('/add-service-centre');
 
@@ -25,8 +27,8 @@ describe('Add service centre page', () => {
   });
 
   test('renders the add service centre page for super admin users', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas);
 
     const response = await request(app).get('/add-service-centre').set('x-test-role', 'SuperAdmin');
 
@@ -42,9 +44,9 @@ describe('Add service centre page', () => {
   });
 
   test('re-renders the add service centre page with validation errors', async () => {
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
-    const createServiceCentreStub = stub(DataApiRequests.prototype, 'createServiceCentre');
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas);
+    const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre');
 
     const response = await request(app).post('/add-service-centre').send({ name: 'Te', regionId: '' });
 
@@ -68,11 +70,11 @@ describe('Add service centre page', () => {
       slug: 'national-business-centre',
       warningNotice: null,
     };
-    stub(DataApiRequests.prototype, 'getRegions').resolves(regions);
-    stub(DataApiRequests.prototype, 'getServiceAreas').resolves(serviceAreas);
-    stub(DataApiRequests.prototype, 'getCourtByName').resolves(404);
-    stub(DataApiRequests.prototype, 'getServiceCentreByName').resolves(404);
-    const createServiceCentreStub = stub(DataApiRequests.prototype, 'createServiceCentre').resolves(serviceCentre);
+    stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
+    stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas);
+    stub(CourtApi.prototype, 'getCourtByName').resolves(404);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(404);
+    const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre').resolves(serviceCentre);
 
     const response = await request(app).post('/add-service-centre').send({
       name: serviceCentre.name,
@@ -95,14 +97,14 @@ describe('Add service centre page', () => {
   });
 
   test('renders the service centre address page after create flow', async () => {
-    stub(DataApiRequests.prototype, 'getServiceCentreById').resolves({
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'National Business Centre',
       open: false,
       slug: 'national-business-centre',
       warningNotice: null,
     } as never);
-    stub(DataApiRequests.prototype, 'getServiceCentreAddressDetails').resolves([]);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreAddressDetails').resolves([]);
 
     const response = await request(app).get(
       '/service-centres/11111111-1111-4111-8111-111111111111/edit/address?isNewSC=true'

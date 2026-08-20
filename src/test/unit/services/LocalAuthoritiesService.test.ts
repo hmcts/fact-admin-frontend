@@ -5,7 +5,7 @@ import { LocalAuthoritiesService } from '../../../main/services/LocalAuthorities
 describe('LocalAuthoritiesService', () => {
   test('builds local authorities view model from upstream responses', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
-    const dataApiRequests = {
+    const courtApi = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({
         codes: { familyCourtCode: 123 },
       }),
@@ -37,7 +37,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -64,13 +64,13 @@ describe('LocalAuthoritiesService', () => {
       },
       pageTitle: 'Local authorities - Reading Crown Court',
     });
-    expect(dataApiRequests.getCourtProfessionalInformation).toHaveBeenCalledWith(courtId);
-    expect(dataApiRequests.getCourtAreasOfLaw).toHaveBeenCalledWith(courtId);
-    expect(dataApiRequests.getCourtLocalAuthorities).toHaveBeenCalledWith(courtId);
+    expect(courtApi.getCourtProfessionalInformation).toHaveBeenCalledWith(courtId);
+    expect(courtApi.getCourtAreasOfLaw).toHaveBeenCalledWith(courtId);
+    expect(courtApi.getCourtLocalAuthorities).toHaveBeenCalledWith(courtId);
   });
 
   test('returns status code from court local authorities lookup', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({ codes: {} }),
       getCourtAreasOfLaw: jest.fn().mockResolvedValue([]),
       getCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
@@ -80,7 +80,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -88,7 +88,7 @@ describe('LocalAuthoritiesService', () => {
   });
 
   test('returns status code when cases heard lookup fails', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({ codes: {} }),
       getCourtAreasOfLaw: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getCourtLocalAuthorities: jest.fn(),
@@ -98,16 +98,16 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
     expect(result).toBe(HttpStatusCode.NotFound);
-    expect(dataApiRequests.getCourtLocalAuthorities).not.toHaveBeenCalled();
+    expect(courtApi.getCourtLocalAuthorities).not.toHaveBeenCalled();
   });
 
   test('sets family court type to false when family court code is not present', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({ codes: {} }),
       getCourtAreasOfLaw: jest.fn().mockResolvedValue([]),
       getCourtLocalAuthorities: jest.fn().mockResolvedValue([]),
@@ -117,7 +117,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -132,7 +132,7 @@ describe('LocalAuthoritiesService', () => {
   });
 
   test('sets family court type to false when professional information is not found', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getCourtAreasOfLaw: jest.fn().mockResolvedValue([]),
       getCourtLocalAuthorities: jest.fn().mockResolvedValue([]),
@@ -142,15 +142,15 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
     expect(result).toMatchObject({
       courtTypes: { family: false },
     });
-    expect(dataApiRequests.getCourtAreasOfLaw).toHaveBeenCalled();
-    expect(dataApiRequests.getCourtLocalAuthorities).toHaveBeenCalled();
+    expect(courtApi.getCourtAreasOfLaw).toHaveBeenCalled();
+    expect(courtApi.getCourtLocalAuthorities).toHaveBeenCalled();
   });
 
   test('saves selected local authorities and returns saved result with court name', async () => {
@@ -166,12 +166,12 @@ describe('LocalAuthoritiesService', () => {
       },
     };
 
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue({}),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.update(courtId, selections);
 
@@ -179,8 +179,8 @@ describe('LocalAuthoritiesService', () => {
       status: 'saved',
       courtName: 'Reading Crown Court',
     });
-    expect(dataApiRequests.getCourtById).toHaveBeenCalledWith(courtId);
-    expect(dataApiRequests.updateCourtLocalAuthorities).toHaveBeenCalledWith(courtId, [
+    expect(courtApi.getCourtById).toHaveBeenCalledWith(courtId);
+    expect(courtApi.updateCourtLocalAuthorities).toHaveBeenCalledWith(courtId, [
       {
         areaOfLawId: '22222222-2222-4222-8222-222222222222',
         localAuthorities: [{ id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', selected: true }],
@@ -193,26 +193,26 @@ describe('LocalAuthoritiesService', () => {
   });
 
   test('returns status code when court lookup fails during update', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       updateCourtLocalAuthorities: jest.fn(),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
     expect(result).toBe(HttpStatusCode.NotFound);
-    expect(dataApiRequests.updateCourtLocalAuthorities).not.toHaveBeenCalled();
+    expect(courtApi.updateCourtLocalAuthorities).not.toHaveBeenCalled();
   });
 
   test('returns status code when update call fails', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
@@ -225,12 +225,12 @@ describe('LocalAuthoritiesService', () => {
       ['Children', 'Invalid local authority id'],
     ]);
 
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue(validationErrors),
     };
 
-    const service = new LocalAuthoritiesService(dataApiRequests as never);
+    const service = new LocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 

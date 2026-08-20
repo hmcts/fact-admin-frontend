@@ -29,7 +29,7 @@ const professionalInformationResponse = {
   faxNumbers: [{ faxNumber: '01273 800 900', description: 'Main fax' }],
 };
 
-const buildDataApiRequests = (overrides: Partial<Record<string, jest.Mock>> = {}) =>
+const buildCourtApi = (overrides: Partial<Record<string, jest.Mock>> = {}) =>
   ({
     getCourtById: jest.fn().mockResolvedValue(court),
     getCourtLocalAuthorities: jest.fn().mockResolvedValue([]),
@@ -40,9 +40,9 @@ const buildDataApiRequests = (overrides: Partial<Record<string, jest.Mock>> = {}
 
 describe('ProfessionalInformationService', () => {
   test('builds a populated view model from professional information', async () => {
-    const dataApiRequests = buildDataApiRequests();
+    const courtApi = buildCourtApi();
 
-    const result = await new ProfessionalInformationService(dataApiRequests).getViewModel(courtId);
+    const result = await new ProfessionalInformationService(courtApi).getViewModel(courtId);
 
     expect(result).toMatchObject({
       accessScheme: false,
@@ -69,11 +69,11 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('builds an empty view model when professional information is not present', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
     });
 
-    const result = await new ProfessionalInformationService(dataApiRequests).getViewModel(courtId);
+    const result = await new ProfessionalInformationService(courtApi).getViewModel(courtId);
 
     expect(result).toMatchObject({
       dxCodes: [{ code: '', description: '' }],
@@ -88,7 +88,7 @@ describe('ProfessionalInformationService', () => {
   test('returns upstream status codes while building the view model', async () => {
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
         })
       ).getViewModel(courtId)
@@ -96,7 +96,7 @@ describe('ProfessionalInformationService', () => {
 
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
         })
       ).getViewModel(courtId)
@@ -104,12 +104,12 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('saves valid submitted professional information', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
     }) as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
-    const service = new ProfessionalInformationService(dataApiRequests as never);
+    const service = new ProfessionalInformationService(courtApi as never);
 
     const result = await service.save(courtId, {
       accessScheme: 'false',
@@ -138,7 +138,7 @@ describe('ProfessionalInformationService', () => {
         courtName: 'Reading Crown Court',
       },
     });
-    expect(dataApiRequests.saveCourtProfessionalInformation).toHaveBeenCalledWith(courtId, {
+    expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalledWith(courtId, {
       codes: {
         countyCourtCode: null,
         crownCourtCode: 456,
@@ -161,14 +161,14 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('saves optional empty fields as nulls, empty arrays and false booleans', async () => {
-    const dataApiRequests = buildDataApiRequests() as never as {
+    const courtApi = buildCourtApi() as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {});
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {});
 
     expect(result).toMatchObject({ status: 'saved' });
-    expect(dataApiRequests.saveCourtProfessionalInformation).toHaveBeenCalledWith(courtId, {
+    expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalledWith(courtId, {
       codes: null,
       dxCodes: [],
       faxNumbers: [],
@@ -184,11 +184,11 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('returns validation errors without saving invalid submitted values', async () => {
-    const dataApiRequests = buildDataApiRequests() as never as {
+    const courtApi = buildCourtApi() as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
       courtTypes: ['family', 'crown'],
       crownCourtCode: 'ABC',
       'dxCodeDescription-0': 'Documents',
@@ -217,15 +217,15 @@ describe('ProfessionalInformationService', () => {
         },
       },
     });
-    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
   test('returns all repeatable frontend validation errors before saving', async () => {
-    const dataApiRequests = buildDataApiRequests() as never as {
+    const courtApi = buildCourtApi() as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCode-0': '@£@$&()@$)(@()$',
       'dxCodeDescription-0': '@£@$&()@$)(@()$',
       'dxCodeDescriptionCy-0': '@£@$&()@$)(@()$',
@@ -265,15 +265,15 @@ describe('ProfessionalInformationService', () => {
         ],
       },
     });
-    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
   test('returns directional errors when either English or Welsh descriptions are missing', async () => {
-    const dataApiRequests = buildDataApiRequests() as never as {
+    const courtApi = buildCourtApi() as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCode-0': 'DX 12345',
       'dxCodeDescription-0': 'Documents',
       'dxCode-1': 'DX 54321',
@@ -299,14 +299,14 @@ describe('ProfessionalInformationService', () => {
         },
       },
     });
-    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
   test('validates missing and non-numeric interview room counts', async () => {
-    const missingCount = await new ProfessionalInformationService(buildDataApiRequests()).save(courtId, {
+    const missingCount = await new ProfessionalInformationService(buildCourtApi()).save(courtId, {
       interviewRooms: 'true',
     });
-    const nonNumericCount = await new ProfessionalInformationService(buildDataApiRequests()).save(courtId, {
+    const nonNumericCount = await new ProfessionalInformationService(buildCourtApi()).save(courtId, {
       interviewRoomCount: 'abc',
       interviewRooms: 'true',
     });
@@ -322,7 +322,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('maps API validation errors back to form fields', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
           [
@@ -335,7 +335,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi).save(courtId, {
       interviewRoomCount: '150',
       interviewRooms: 'true',
     });
@@ -355,7 +355,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('maps API validation errors for every professional information field to form anchors', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
           ['codes.countyCourtCode', 'County court code must be 10 characters or fewer'],
@@ -372,7 +372,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {});
+    const result = await new ProfessionalInformationService(courtApi).save(courtId, {});
 
     expect(result).toMatchObject({
       status: 'validationError',
@@ -409,7 +409,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('maps indexed API validation errors to the matching repeatable field anchors', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
           ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
@@ -423,7 +423,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi).save(courtId, {
       'dxCode-0': 'DX 123',
       'dxCode-1': 'Invalid DX',
       'dxCodeDescription-1': 'Invalid DX explanation',
@@ -469,7 +469,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('keeps repeated API validation errors linked and labelled by repeatable field index', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
           ['dxCodes[0].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
@@ -480,7 +480,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(dataApiRequests).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi).save(courtId, {
       'dxCode-0': 'Invalid DX 1',
       'dxCode-1': 'DX 2',
       'dxCode-2': 'DX 3',
@@ -519,7 +519,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('maps repeatable API validation errors back to the original visible field indexes after blank rows are omitted from the payload', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
           ['dxCodes[0].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
@@ -530,12 +530,12 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCode-3': 'Invalid DX 4',
       'faxNumber-4': '020 0000 0004',
     });
 
-    expect(dataApiRequests.saveCourtProfessionalInformation).toHaveBeenCalledWith(
+    expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalledWith(
       courtId,
       expect.objectContaining({
         dxCodes: [{ dxCode: 'Invalid DX 4', explanation: null, explanationCy: null }],
@@ -560,11 +560,11 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('links repeatable frontend validation errors to the original visible field indexes after blank rows', async () => {
-    const dataApiRequests = buildDataApiRequests() as never as {
+    const courtApi = buildCourtApi() as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(dataApiRequests as never).save(courtId, {
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCodeDescription-3': 'Documents',
       'faxNumberDescription-4': 'Secondary fax',
     });
@@ -592,13 +592,13 @@ describe('ProfessionalInformationService', () => {
         ],
       },
     });
-    expect(dataApiRequests.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
   test('returns status codes from save dependencies', async () => {
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
         })
       ).save(courtId, {})
@@ -606,7 +606,7 @@ describe('ProfessionalInformationService', () => {
 
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           saveCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.Forbidden),
         })
       ).save(courtId, {})
@@ -614,7 +614,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('requires family court removal confirmation when selected local authority config exists', async () => {
-    const dataApiRequests = buildDataApiRequests({
+    const courtApi = buildCourtApi({
       getCourtLocalAuthorities: jest.fn().mockResolvedValue([
         {
           areaOfLawName: 'Children',
@@ -625,23 +625,24 @@ describe('ProfessionalInformationService', () => {
       getCourtLocalAuthorities: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(
-      dataApiRequests as never
-    ).requiresFamilyCourtRemovalConfirmation(courtId, {
-      courtTypes: ['crown'],
-      crownCourtCode: '456',
-    });
+    const result = await new ProfessionalInformationService(courtApi as never).requiresFamilyCourtRemovalConfirmation(
+      courtId,
+      {
+        courtTypes: ['crown'],
+        crownCourtCode: '456',
+      }
+    );
 
     expect(result).toEqual({
       courtName: 'Reading Crown Court',
       required: true,
     });
-    expect(dataApiRequests.getCourtLocalAuthorities).toHaveBeenCalledWith(courtId);
+    expect(courtApi.getCourtLocalAuthorities).toHaveBeenCalledWith(courtId);
   });
 
   test('does not require family court removal confirmation when family remains selected or nothing is selected', async () => {
     await expect(
-      new ProfessionalInformationService(buildDataApiRequests()).requiresFamilyCourtRemovalConfirmation(courtId, {
+      new ProfessionalInformationService(buildCourtApi()).requiresFamilyCourtRemovalConfirmation(courtId, {
         courtTypes: ['family'],
       })
     ).resolves.toEqual({
@@ -651,7 +652,7 @@ describe('ProfessionalInformationService', () => {
 
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
         })
       ).requiresFamilyCourtRemovalConfirmation(courtId, {})
@@ -664,7 +665,7 @@ describe('ProfessionalInformationService', () => {
   test('returns status codes from family court removal confirmation dependencies', async () => {
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
         })
       ).requiresFamilyCourtRemovalConfirmation(courtId, {})
@@ -672,7 +673,7 @@ describe('ProfessionalInformationService', () => {
 
     await expect(
       new ProfessionalInformationService(
-        buildDataApiRequests({
+        buildCourtApi({
           getCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
         })
       ).requiresFamilyCourtRemovalConfirmation(courtId, { courtTypes: [] })

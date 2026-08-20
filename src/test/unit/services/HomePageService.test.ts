@@ -4,7 +4,7 @@ import { HomePageService } from '../../../main/services/HomePageService';
 
 describe('HomePageService', () => {
   test('parses homepage filters from query values', () => {
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts: jest.fn(),
         getRegions: jest.fn(),
@@ -44,7 +44,7 @@ describe('HomePageService', () => {
   });
 
   test('caps pageNumber and pageSize at 1000 when query values exceed the backend integer limit', () => {
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts: jest.fn(),
         getRegions: jest.fn(),
@@ -78,7 +78,7 @@ describe('HomePageService', () => {
   });
 
   test('defaults sortOrder to ascending when sortBy is provided without sortOrder', () => {
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts: jest.fn(),
         getRegions: jest.fn(),
@@ -103,10 +103,16 @@ describe('HomePageService', () => {
         totalPages: 0,
       },
     });
-    const service = new HomePageService(
+    const getFavourites = jest.fn().mockResolvedValue({
+      content: [],
+      page: { number: 0, size: 25, totalElements: 0, totalPages: 0 },
+    });
+    const getRegions = jest.fn().mockResolvedValue([]);
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
-        getRegions: jest.fn().mockResolvedValue([]),
+        getFavourites,
+        getRegions,
       })
     );
 
@@ -121,10 +127,12 @@ describe('HomePageService', () => {
       pageNumber: 0,
       pageSize: 25,
     });
+    expect(getFavourites).toHaveBeenCalledWith({ pageNumber: 0, pageSize: 25 });
+    expect(getRegions).toHaveBeenCalledTimes(1);
   });
 
   test('builds the homepage view model from API responses', async () => {
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts: jest.fn().mockResolvedValue({
           content: [
@@ -209,6 +217,7 @@ describe('HomePageService', () => {
     expect(viewModel.errorMessage).toBeUndefined();
     expect(viewModel.errorSummary).toEqual([]);
     expect(viewModel.includeStatusColumn).toBe(false);
+    expect(viewModel.courtFavouriteStatusErrorMessage).toBe('There was a problem loading favourite status.');
     expect(viewModel.pageTitle).toBe('Courts, tribunals and service centres');
     expect(viewModel.partialCourtNameError).toBeUndefined();
     expect(viewModel.resultsMessage).toBe('Showing 1 to 2 of 2 courts, tribunals and service centres');
@@ -252,7 +261,7 @@ describe('HomePageService', () => {
         totalPages: 3,
       },
     });
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -298,7 +307,7 @@ describe('HomePageService', () => {
   });
 
   test('returns an error message and empty data when requests fail', async () => {
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
         getRegions: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
@@ -331,7 +340,7 @@ describe('HomePageService', () => {
   });
 
   test('builds condensed pagination and page title for later pages', async () => {
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts: jest.fn().mockResolvedValue({
           content: [
@@ -399,7 +408,7 @@ describe('HomePageService', () => {
 
   test('returns GOV.UK validation errors for an invalid partial court name and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -434,7 +443,7 @@ describe('HomePageService', () => {
 
   test('returns a GOV.UK error summary for invalid pageSize and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -469,7 +478,7 @@ describe('HomePageService', () => {
 
   test('returns a GOV.UK error summary for pageSize values above 1000 and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -504,7 +513,7 @@ describe('HomePageService', () => {
 
   test('returns a GOV.UK error summary for invalid pageNumber and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -539,7 +548,7 @@ describe('HomePageService', () => {
 
   test('returns a GOV.UK error summary for pageNumber values above 1000 and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -582,7 +591,7 @@ describe('HomePageService', () => {
         totalPages: 0,
       },
     });
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -612,7 +621,7 @@ describe('HomePageService', () => {
 
   test('returns a GOV.UK error summary for invalid includeClosed and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -647,7 +656,7 @@ describe('HomePageService', () => {
 
   test('returns a field error for invalid regionId format and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -682,7 +691,7 @@ describe('HomePageService', () => {
 
   test('returns a field error for unknown regionId and skips the courts call', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([
@@ -723,7 +732,7 @@ describe('HomePageService', () => {
 
   test('returns a validation error when sortOrder is provided without sortBy', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -758,7 +767,7 @@ describe('HomePageService', () => {
 
   test('returns a validation error for invalid sortBy', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -793,7 +802,7 @@ describe('HomePageService', () => {
 
   test('returns a validation error for invalid sortOrder', async () => {
     const getCourts = jest.fn();
-    const service = new HomePageService(
+    const service = buildHomePageService(
       homePageRequests({
         getCourts,
         getRegions: jest.fn().mockResolvedValue([]),
@@ -827,7 +836,29 @@ describe('HomePageService', () => {
   });
 });
 
-function homePageRequests(overrides: Record<string, jest.Mock>): never {
+type HomePageApiRequests = {
+  getCourts: jest.Mock;
+  getFavouriteStatuses: jest.Mock;
+  getFavourites: jest.Mock;
+  getRegions: jest.Mock;
+};
+
+function buildHomePageService(requests: HomePageApiRequests): HomePageService {
+  const courtApi = {
+    getCourts: requests.getCourts,
+  };
+  const userApi = {
+    getFavourites: requests.getFavourites,
+    getFavouriteStatuses: requests.getFavouriteStatuses,
+  };
+  const referenceDataApi = {
+    getRegions: requests.getRegions,
+  };
+
+  return new HomePageService(courtApi as never, userApi as never, referenceDataApi as never);
+}
+
+function homePageRequests(overrides: Partial<HomePageApiRequests> = {}): HomePageApiRequests {
   return {
     getCourts: jest.fn(),
     getFavouriteStatuses: jest.fn().mockResolvedValue(HttpStatusCode.ServiceUnavailable),
@@ -837,5 +868,5 @@ function homePageRequests(overrides: Record<string, jest.Mock>): never {
     }),
     getRegions: jest.fn().mockResolvedValue([]),
     ...overrides,
-  } as never;
+  };
 }

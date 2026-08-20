@@ -7,7 +7,7 @@ describe('SinglePointOfEntryService', () => {
   const childrenAreaOfLawId = '22222222-2222-4222-8222-222222222222';
 
   test('builds view model from upstream responses', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -19,7 +19,7 @@ describe('SinglePointOfEntryService', () => {
       ]),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -38,12 +38,12 @@ describe('SinglePointOfEntryService', () => {
   });
 
   test('does not render unsupported services when no children entry exists', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([]),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -53,26 +53,26 @@ describe('SinglePointOfEntryService', () => {
   });
 
   test('returns status code when court lookup fails', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
     expect(result).toBe(HttpStatusCode.NotFound);
-    expect(dataApiRequests.getCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.getCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 
   test('returns status code when single points of entry lookup fails during retrieve', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -80,7 +80,7 @@ describe('SinglePointOfEntryService', () => {
   });
 
   test('saves childcare arrangements single point of entry and returns saved result', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -99,7 +99,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.Ok),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
@@ -107,7 +107,7 @@ describe('SinglePointOfEntryService', () => {
       status: 'saved',
       courtName: 'Reading Crown Court',
     });
-    expect(dataApiRequests.updateCourtSinglePointOfEntry).toHaveBeenCalledWith(courtId, [
+    expect(courtApi.updateCourtSinglePointOfEntry).toHaveBeenCalledWith(courtId, [
       {
         id: '33333333-3333-4333-8333-333333333333',
         name: 'Adoption',
@@ -124,7 +124,7 @@ describe('SinglePointOfEntryService', () => {
   });
 
   test('returns status code when update call fails', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -136,7 +136,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: false });
 
@@ -144,38 +144,38 @@ describe('SinglePointOfEntryService', () => {
   });
 
   test('returns status code when court lookup fails during update', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       getCourtSinglePointOfEntry: jest.fn(),
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
     expect(result).toBe(HttpStatusCode.NotFound);
-    expect(dataApiRequests.getCourtSinglePointOfEntry).not.toHaveBeenCalled();
-    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.getCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 
   test('returns status code when single points of entry lookup fails during update', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
     expect(result).toBe(HttpStatusCode.InternalServerError);
-    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 
   test('does not call update endpoint when an editable service selection is missing', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -187,16 +187,16 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, {});
 
     expect(result).toBe(HttpStatusCode.BadRequest);
-    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 
   test('returns invalid result with mapped errors when update call returns validation map', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -213,7 +213,7 @@ describe('SinglePointOfEntryService', () => {
       ),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: false });
 
@@ -227,7 +227,7 @@ describe('SinglePointOfEntryService', () => {
   });
 
   test('does not call update endpoint when children area of law is missing', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -239,16 +239,16 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
     expect(result).toBe(HttpStatusCode.BadRequest);
-    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 
   test('does not call update endpoint when posted service id is not editable', async () => {
-    const dataApiRequests = {
+    const courtApi = {
       getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([
         {
@@ -260,7 +260,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(dataApiRequests as never);
+    const service = new SinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, {
       [childrenAreaOfLawId]: true,
@@ -268,6 +268,6 @@ describe('SinglePointOfEntryService', () => {
     });
 
     expect(result).toBe(HttpStatusCode.BadRequest);
-    expect(dataApiRequests.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
+    expect(courtApi.updateCourtSinglePointOfEntry).not.toHaveBeenCalled();
   });
 });
