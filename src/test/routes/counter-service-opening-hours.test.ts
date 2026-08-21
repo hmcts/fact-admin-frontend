@@ -183,4 +183,36 @@ describe('Counter service opening hours routes', () => {
     expect(response.text).toContain('You have removed this counter service opening hour for Newcastle Crown Court.');
     expect(response.text).toContain('Back to Counter service opening hours');
   });
+
+  test('renders court not found for invalid court UUID', async () => {
+    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage');
+
+    const response = await request(app).get('/courts/not-a-uuid/edit/counter-service-opening-hours');
+
+    expect(response.status).toBe(HttpStatusCode.NotFound);
+    expect(response.text).toContain('Court not found');
+    expect(getListPage.notCalled).toBe(true);
+  });
+
+  test('renders generic not found for invalid counter service UUID on edit GET', async () => {
+    const getEditPage = stub(CounterServiceOpeningHoursService.prototype, 'getEditPage');
+
+    const response = await request(app).get(`/courts/${courtId}/edit/counter-service-opening-hours/edit/not-a-uuid`);
+
+    expect(response.status).toBe(HttpStatusCode.NotFound);
+    expect(response.text).toContain('Page Not Found');
+    expect(getEditPage.notCalled).toBe(true);
+  });
+
+  test('renders generic not found for invalid counter service UUID on edit POST', async () => {
+    const save = stub(CounterServiceOpeningHoursService.prototype, 'save');
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/counter-service-opening-hours/save/not-a-uuid`)
+      .send({});
+
+    expect(response.status).toBe(HttpStatusCode.NotFound);
+    expect(response.text).toContain('Page Not Found');
+    expect(save.notCalled).toBe(true);
+  });
 });
