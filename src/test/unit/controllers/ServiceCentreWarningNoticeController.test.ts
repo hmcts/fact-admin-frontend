@@ -85,6 +85,32 @@ describe('ServiceCentreWarningNoticeController', () => {
     }
   });
 
+  test('renders error when retrieve returns a non-404 status', async () => {
+    const controller = new ServiceCentreWarningNoticeController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreWarningNoticeService.prototype, 'retrieve').resolves(
+      HttpStatusCode.InternalServerError
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(request, response);
+      assert.calledOnce(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
   test('renders validation model on save validation-error', async () => {
     const controller = new ServiceCentreWarningNoticeController();
     const response = {
@@ -210,6 +236,31 @@ describe('ServiceCentreWarningNoticeController', () => {
     try {
       await controller.save(request, response);
       assert.calledOnce(saveStub);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('renders not-found when serviceCentreId is invalid on save', async () => {
+    const controller = new ServiceCentreWarningNoticeController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'bad-id' };
+    request.body = { warningNotice: 'Updated warning' };
+    const responseMock = mock(response);
+
+    const saveStub = stub(ServiceCentreWarningNoticeService.prototype, 'save');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.save(request, response);
+      assert.notCalled(saveStub);
       responseMock.verify();
     } finally {
       saveStub.restore();
