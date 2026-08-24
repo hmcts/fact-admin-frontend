@@ -316,4 +316,52 @@ describe('ApprovalService', () => {
 
     expect(response).toBe(HttpStatusCode.BadGateway);
   });
+
+  test('returns not found from undoApproval when approved approval cannot be found', async () => {
+    const operationsApi = {
+      deleteApproval: jest.fn(),
+      getApprovals: jest.fn().mockResolvedValue(approvals),
+    };
+    const service = new ApprovalService(operationsApi as never);
+
+    const response = await service.undoApproval('dddddddd-dddd-4ddd-8ddd-dddddddddddd');
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(operationsApi.deleteApproval).not.toHaveBeenCalled();
+  });
+
+  test('returns not found for edit approval action when matching approval is missing', async () => {
+    const operationsApi = {
+      getApprovals: jest.fn().mockResolvedValue(approvals),
+    };
+    const service = new ApprovalService(operationsApi as never);
+
+    const response = await service.getEditApprovalAction(
+      '33333333-3333-4333-8333-333333333333',
+      'SERVICE_CENTRE',
+      '/service-centres/33333333-3333-4333-8333-333333333333/edit/approve',
+      true
+    );
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  test('returns status from approveData when approve data pre-check returns status', async () => {
+    const operationsApi = {
+      createApproval: jest.fn(),
+      getApprovals: jest.fn().mockResolvedValue(HttpStatusCode.BadGateway),
+    };
+    const service = new ApprovalService(operationsApi as never);
+
+    const response = await service.approveData(
+      '22222222-2222-4222-8222-222222222222',
+      'SERVICE_CENTRE',
+      'Birmingham Service Centre',
+      '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+      'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    );
+
+    expect(response).toBe(HttpStatusCode.BadGateway);
+    expect(operationsApi.createApproval).not.toHaveBeenCalled();
+  });
 });

@@ -75,6 +75,20 @@ describe('AddServiceCentreService', () => {
     });
   });
 
+  test('validates long service centre names over 200 characters', () => {
+    const service = new AddServiceCentreService();
+
+    expect(
+      service.validate({
+        name: 'A'.repeat(201),
+        regionId: regions[0].id,
+        serviceAreaIds: [serviceAreas[0].id],
+      })
+    ).toEqual({
+      name: ['Service centre name should be between 5 and 200 characters'],
+    });
+  });
+
   test('create returns validation errors and does not call create API when fields are invalid', async () => {
     const requests = {
       createServiceCentre: jest.fn(),
@@ -218,5 +232,65 @@ describe('AddServiceCentreService', () => {
       serviceAreaIds: [serviceAreas[0].id],
       serviceAreas,
     });
+  });
+
+  test('returns status from getViewModel when model data cannot be loaded', async () => {
+    const requests = {
+      getRegions: jest.fn().mockResolvedValue(500),
+      getServiceAreas: jest.fn(),
+    };
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
+
+    await expect(service.getViewModel()).resolves.toBe(500);
+    expect(requests.getServiceAreas).not.toHaveBeenCalled();
+  });
+
+  test('returns status from create when model data cannot be loaded after validation passes', async () => {
+    const requests = {
+      createServiceCentre: jest.fn(),
+      getCourtByName: jest.fn(),
+      getRegions: jest.fn().mockResolvedValue(500),
+      getServiceAreas: jest.fn(),
+      getServiceCentreByName: jest.fn(),
+    };
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
+
+    await expect(
+      service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
+    ).resolves.toBe(500);
+    expect(requests.getCourtByName).not.toHaveBeenCalled();
+    expect(requests.createServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('returns duplicate lookup status when checking court name fails with non-404 status', async () => {
+    const requests = {
+      createServiceCentre: jest.fn(),
+      getCourtByName: jest.fn().mockResolvedValue(502),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getServiceCentreByName: jest.fn(),
+    };
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
+
+    await expect(
+      service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
+    ).resolves.toBe(502);
+    expect(requests.getServiceCentreByName).not.toHaveBeenCalled();
+    expect(requests.createServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('returns create status when createServiceCentre returns a numeric status', async () => {
+    const requests = {
+      createServiceCentre: jest.fn().mockResolvedValue(500),
+      getCourtByName: jest.fn().mockResolvedValue(404),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getServiceCentreByName: jest.fn().mockResolvedValue(404),
+    };
+    const service = new AddServiceCentreService(requests as never, requests as never, requests as never);
+
+    await expect(
+      service.create({ name: createdServiceCentre.name, regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })
+    ).resolves.toBe(500);
   });
 });

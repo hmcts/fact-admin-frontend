@@ -167,4 +167,62 @@ describe('AddCourtController', () => {
       createStub.restore();
     }
   });
+
+  test('renders error when create returns an unexpected object without courtId', async () => {
+    const controller = new AddCourtController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = { name: 'Reading Crown Court', regionId: '22222222-2222-4222-8222-222222222222' };
+    const responseMock = mock(response);
+    const createStub = stub(AddCourtService.prototype, 'create').resolves({
+      pagePath: '/add-court/success',
+      pageTitle: 'New court created - Reading Crown Court',
+    } as never);
+
+    responseMock.expects('status').once().withArgs(500).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.createCourt(request, response);
+
+      assert.calledOnce(createStub);
+      responseMock.verify();
+    } finally {
+      createStub.restore();
+    }
+  });
+
+  test('passes undefined name and regionId when request body is missing', async () => {
+    const controller = new AddCourtController();
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = undefined;
+    const responseMock = mock(response);
+    const createStub = stub(AddCourtService.prototype, 'create').resolves({
+      errors: {
+        name: ['Enter a name for the court'],
+        regionId: ['Select a region for the court'],
+      },
+      pagePath: '/add-court',
+      pageTitle: 'Error: Add new court',
+      regions: [],
+    } as never);
+
+    responseMock.expects('render').once().withArgs('add-court');
+
+    try {
+      await controller.createCourt(request, response);
+
+      assert.calledOnce(createStub);
+      assert.calledWith(createStub, { name: undefined, regionId: undefined });
+      responseMock.verify();
+    } finally {
+      createStub.restore();
+    }
+  });
 });

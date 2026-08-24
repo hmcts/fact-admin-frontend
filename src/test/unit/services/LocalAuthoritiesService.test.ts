@@ -87,6 +87,44 @@ describe('LocalAuthoritiesService', () => {
     expect(result).toBe(HttpStatusCode.InternalServerError);
   });
 
+  test('returns status code when court lookup fails during retrieve', async () => {
+    const courtApi = {
+      getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+      getCourtProfessionalInformation: jest.fn(),
+      getCourtAreasOfLaw: jest.fn(),
+      getCourtLocalAuthorities: jest.fn(),
+    };
+
+    const service = new LocalAuthoritiesService(courtApi as never);
+
+    const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
+
+    expect(result).toBe(HttpStatusCode.NotFound);
+    expect(courtApi.getCourtProfessionalInformation).not.toHaveBeenCalled();
+    expect(courtApi.getCourtAreasOfLaw).not.toHaveBeenCalled();
+    expect(courtApi.getCourtLocalAuthorities).not.toHaveBeenCalled();
+  });
+
+  test('returns status code when professional information lookup fails with non-404 status', async () => {
+    const courtApi = {
+      getCourtById: jest.fn().mockResolvedValue({
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Reading Crown Court',
+      } as never),
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      getCourtAreasOfLaw: jest.fn(),
+      getCourtLocalAuthorities: jest.fn(),
+    };
+
+    const service = new LocalAuthoritiesService(courtApi as never);
+
+    const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+    expect(courtApi.getCourtAreasOfLaw).not.toHaveBeenCalled();
+    expect(courtApi.getCourtLocalAuthorities).not.toHaveBeenCalled();
+  });
+
   test('returns status code when cases heard lookup fails', async () => {
     const courtApi = {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue({ codes: {} }),
@@ -241,6 +279,75 @@ describe('LocalAuthoritiesService', () => {
         Adoption: ['Select at least one local authority'],
         Children: ['Invalid local authority id'],
       },
+    });
+  });
+
+  test('treats numeric 200 update response as saved', async () => {
+    const courtApi = {
+      getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
+      updateCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.Ok),
+    };
+
+    const service = new LocalAuthoritiesService(courtApi as never);
+
+    const result = await service.update('11111111-1111-4111-8111-111111111111', {});
+
+    expect(result).toEqual({
+      status: 'saved',
+      courtName: 'Reading Crown Court',
+    });
+  });
+
+  test('ignores timestamp entry when mapping update validation errors', async () => {
+    const validationErrors = new Map<string, string>([
+      ['timestamp', '2026-01-01T12:00:00.000Z'],
+      ['Adoption', 'Select at least one local authority'],
+    ]);
+
+    const courtApi = {
+      getCourtById: jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),
+      updateCourtLocalAuthorities: jest.fn().mockResolvedValue(validationErrors),
+    };
+
+    const service = new LocalAuthoritiesService(courtApi as never);
+
+    const result = await service.update('11111111-1111-4111-8111-111111111111', {});
+
+    expect(result).toEqual({
+      status: 'invalid',
+      courtName: 'Reading Crown Court',
+      errors: {
+        Adoption: ['Select at least one local authority'],
+      },
+    });
+  });
+
+  test('extracts cases heard booleans from local authority selections object', () => {
+    const service = new LocalAuthoritiesService({} as never);
+    const serviceWithExtractor = service as unknown as {
+      extractCasesHeard: (input: unknown) => {
+        Adoption: boolean;
+        Children: boolean;
+        Divorce: boolean;
+      };
+    };
+
+    const extracted = serviceWithExtractor.extractCasesHeard({
+      Adoption: {
+        areaOfLawId: '11111111-1111-4111-8111-111111111111',
+        localAuthorities: [],
+      },
+      Children: undefined,
+      Divorce: {
+        areaOfLawId: '22222222-2222-4222-8222-222222222222',
+        localAuthorities: [],
+      },
+    });
+
+    expect(extracted).toEqual({
+      Adoption: true,
+      Children: false,
+      Divorce: true,
     });
   });
 });
