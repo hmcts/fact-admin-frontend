@@ -2,11 +2,11 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { restore, stub } from 'sinon';
 
-import WarningNoticeController from '../../../main/controllers/WarningNoticeController';
+import CourtWarningNoticeController from '../../../main/controllers/CourtWarningNoticeController';
 import { WarningNoticeService } from '../../../main/services/WarningNoticeService';
 import { mockRequest } from '../mocks/mockRequest';
 
-describe('WarningNoticeController', () => {
+describe('CourtWarningNoticeController', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
 
   afterEach(() => {
@@ -23,7 +23,7 @@ describe('WarningNoticeController', () => {
   }
 
   test('renders warning notice page when the service returns a view model', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -56,7 +56,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when the get route has an invalid court id', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
@@ -70,7 +70,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when get returns 404 status', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -83,7 +83,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when save route has an invalid court id', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
@@ -98,7 +98,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders validation errors when save returns validation_error', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -150,7 +150,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('normalises array body values and renders save success', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -193,7 +193,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when save returns 404 status', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -210,7 +210,7 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders error when save returns non-404 status', async () => {
-    const controller = new WarningNoticeController();
+    const controller = new CourtWarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };

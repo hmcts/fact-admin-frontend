@@ -12,7 +12,7 @@ import { ensureValidCourtId } from './helpers/routeParams';
 const warningNoticeService = new WarningNoticeService();
 
 @route('/courts/:courtId/edit/warning-notice')
-export default class WarningNoticeController {
+export default class CourtWarningNoticeController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const courtId: string = parseString(req.params.courtId);
