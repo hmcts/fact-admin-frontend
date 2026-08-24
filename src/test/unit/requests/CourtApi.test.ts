@@ -1388,6 +1388,27 @@ describe('CourtApi', () => {
     expect(response).toBe(HttpStatusCode.NoContent);
   });
 
+  it('returns conflict when saving translation services fails with an axios status', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      email: 'translations@example.com',
+      phoneNumber: '+443465456784',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/translation-services`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await courtApi.saveTranslationServices(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
   it('returns parsed court local authorities when response is valid', async () => {
     const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     const localAuthorities = [
@@ -1686,6 +1707,97 @@ describe('CourtApi', () => {
     const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
 
     expect(response).toEqual(professionalInformation);
+  });
+
+  it('returns validation errors map when save court professional information endpoint returns a 400', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+    const professionalInformation = {
+      professionalInformation: {
+        interviewRooms: true,
+        videoHearings: true,
+        commonPlatform: false,
+        accessScheme: true,
+        interviewRoomCount: 3,
+        interviewPhoneNumber: '01234567891',
+      },
+      codes: {
+        countyCourtCode: 101,
+        crownCourtCode: null,
+        familyCourtCode: 202,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [
+        {
+          dxCode: 'DX 999',
+          explanation: null,
+        },
+      ],
+      faxNumbers: [
+        {
+          faxNumber: '02000000000',
+          description: 'Main fax',
+        },
+      ],
+    };
+    const apiErrors = {
+      professionalInformation: 'Invalid professional information',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/professional-information`, professionalInformation).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when save court professional information throws a non-axios error', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+    const professionalInformation = {
+      professionalInformation: {
+        interviewRooms: true,
+        videoHearings: true,
+        commonPlatform: false,
+        accessScheme: true,
+        interviewRoomCount: 3,
+        interviewPhoneNumber: '01234 567890',
+      },
+      codes: {
+        countyCourtCode: 101,
+        crownCourtCode: null,
+        familyCourtCode: 202,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [
+        {
+          dxCode: 'DX 999',
+          explanation: null,
+        },
+      ],
+      faxNumbers: [
+        {
+          faxNumber: '020 0000 0000',
+          description: 'Main fax',
+        },
+      ],
+    };
+
+    postStub
+      .withArgs(`/courts/${courtId}/v1/professional-information`, professionalInformation)
+      .rejects(new Error('Unexpected error'));
+
+    const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
   it('returns forbidden when court professional information endpoint returns a 403', async () => {
@@ -2500,23 +2612,92 @@ describe('CourtApi', () => {
     expect(response).toEqual(new Map([['file', 'File type is not supported']]));
   });
 
-  it('returns delete status when deleting court photo succeeds', async () => {
+  it('returns conflict when updating court photo fails with a non-400 axios status', async () => {
     const courtId = '55555555-5555-4555-8555-555555555555';
 
-    deleteStub.withArgs(`/courts/${courtId}/v1/photo`).resolves({ status: HttpStatusCode.NoContent });
+    postStub.withArgs(`/courts/${courtId}/v1/photo`).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
 
-    const response = await courtApi.deleteCourtPhoto(courtId);
+    const response = await courtApi.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
+  it('returns parsed court contact details when the contact details response is valid', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetails = [
+      {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+        email: 'contact@example.com',
+        explanation: 'General enquiries',
+        explanationCy: null,
+        phoneNumber: '020 1234 5678',
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/contact-details`).resolves({ data: contactDetails });
+
+    const response = await courtApi.getCourtContactDetails(courtId);
+
+    expect(response).toEqual(contactDetails);
+  });
+
+  it('returns not found when fetching court contact details fails with an axios status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+
+    getStub.withArgs(`/courts/${courtId}/v1/contact-details`).rejects(errorResponse);
+
+    const response = await courtApi.getCourtContactDetails(courtId);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns no content when deleting court contact detail succeeds', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await courtApi.deleteCourtContactDetail(courtId, contactDetailId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
 
-  it('returns not found when deleting court photo fails with a 404', async () => {
-    const courtId = '55555555-5555-4555-8555-555555555555';
+  it('returns internal server error when deleting court contact detail gets an unexpected status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
 
-    deleteStub.withArgs(`/courts/${courtId}/v1/photo`).rejects(errorResponse);
+    deleteStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`).resolves({
+      status: HttpStatusCode.Ok,
+    });
 
-    const response = await courtApi.deleteCourtPhoto(courtId);
+    const response = await courtApi.deleteCourtContactDetail(courtId, contactDetailId);
 
-    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns bad gateway when deleting court contact detail fails with an axios status', async () => {
+    const courtId = '77777777-7777-4777-8777-777777777777';
+    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+
+    deleteStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'bad gateway',
+        status: HttpStatusCode.BadGateway,
+      },
+    });
+
+    const response = await courtApi.deleteCourtContactDetail(courtId, contactDetailId);
+
+    expect(response).toBe(HttpStatusCode.BadGateway);
   });
 });
