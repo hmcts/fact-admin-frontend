@@ -43,7 +43,7 @@ export class ServiceCentreAddressListPage extends Base {
     return this.page
       .getByRole('row')
       .filter({ has: this.page.getByRole('cell', { name: postcode }) })
-      .getByRole('link', { name: 'Edit' })
+      .getByRole('link', { name: 'Edit', exact: true })
       .first()
       .getAttribute('href');
   }

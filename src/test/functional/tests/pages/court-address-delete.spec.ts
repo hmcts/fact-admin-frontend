@@ -1,7 +1,7 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
-import { buildTestAddress, createAddressViaManualEntry, getFirstDeleteAddressId } from './court-address-test-support';
+import { getFirstDeleteAddressId, setAddressCount } from './court-address-test-support';
 
 test.describe(
   'Court Address Delete Page Tests',
@@ -11,8 +11,8 @@ test.describe(
   () => {
     test('visibility test', async ({ courtAddressDeletePage, playwright, page }) => {
       await withCreatedCourt(playwright, 'Court Address Delete Functional Test', {}, async ({ createdCourt }) => {
-        await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('DeleteOne'));
-        await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('DeleteTwo'));
+        // ensure there are exactly two addresses before starting the tests proper
+        await setAddressCount(page, createdCourt.id, 2);
         const addressId = await getFirstDeleteAddressId(page, createdCourt.id);
 
         await courtAddressDeletePage.goto(createdCourt.id, addressId);

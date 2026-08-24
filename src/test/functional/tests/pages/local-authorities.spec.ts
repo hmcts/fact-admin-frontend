@@ -84,14 +84,7 @@ test.describe('Local Authorities Page Tests', () => {
         await expect(casesHeardPage.successPanel).toContainText('Cases heard saved');
 
         await localAuthoritiesPage.goto(createdCourt.id);
-
-        if (await localAuthoritiesPage.isConfigurationUnavailable()) {
-          await expect(localAuthoritiesPage.availabilityWarningText).toContainText(
-            "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court"
-          );
-          await expect(localAuthoritiesPage.saveButton).toHaveCount(0);
-          return;
-        }
+        await expect(localAuthoritiesPage.availabilityWarningText).toHaveCount(0);
 
         await expect(localAuthoritiesPage.heading).toContainText('Local Authorities');
 
