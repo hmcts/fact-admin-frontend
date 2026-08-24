@@ -142,6 +142,9 @@ class MockElement {
     if (selector === 'input') {
       return this.tagName === 'input';
     }
+    if (selector === 'label') {
+      return this.tagName === 'label';
+    }
     if (selector === 'input[type="radio"][aria-expanded]') {
       return this.tagName === 'input' && this.type === 'radio' && this.attributes['aria-expanded'] !== undefined;
     }
@@ -336,5 +339,165 @@ describe('professionalInformation repeatable fields', () => {
     );
 
     expect(radio.attributes['aria-expanded']).toBeUndefined();
+  });
+
+  test('ignores repeatable lists with unsupported type', () => {
+    const document = new MockElement('document');
+    const list = new MockElement('div');
+    list.dataset.professionalInformationList = 'unknown';
+    list.append(buildRepeatableItem('dxCode', 0));
+    const addButton = new MockElement('button');
+    addButton.dataset.professionalInformationAdd = 'unknown';
+    document.append(list, addButton);
+    document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = document as never;
+
+    expect(() => initProfessionalInformationRepeatableFields()).not.toThrow();
+    addButton.click();
+    expect(list.querySelectorAll('[data-professional-information-item]')).toHaveLength(1);
+  });
+
+  test('ignores remove clicks that target a different repeatable list', () => {
+    const document = new MockElement('document');
+    const firstList = new MockElement('div');
+    const secondList = new MockElement('div');
+    const firstAddButton = new MockElement('button');
+    const secondAddButton = new MockElement('button');
+
+    firstList.dataset.professionalInformationList = 'dxCode';
+    secondList.dataset.professionalInformationList = 'dxCode';
+    firstList.append(buildRepeatableItem('dxCode', 0));
+    secondList.append(buildRepeatableItem('dxCode', 0));
+    firstAddButton.dataset.professionalInformationAdd = 'dxCode';
+    secondAddButton.dataset.professionalInformationAdd = 'dxCode';
+    document.append(firstList, firstAddButton, secondList, secondAddButton);
+    document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = document as never;
+
+    initProfessionalInformationRepeatableFields();
+    secondAddButton.click();
+
+    const removeButtonFromSecondList = secondList.querySelectorAll('[data-professional-information-remove]')[0];
+    firstList.listeners.click?.({ currentTarget: firstList, target: removeButtonFromSecondList });
+
+    expect(firstList.querySelectorAll('[data-professional-information-item]')).toHaveLength(1);
+    expect(secondList.querySelectorAll('[data-professional-information-item]')).toHaveLength(2);
+  });
+
+  test('ignores remove clicks for buttons that are not inside repeatable items', () => {
+    const mockDom = buildDocument();
+    mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = mockDom.document as never;
+
+    initProfessionalInformationRepeatableFields();
+
+    const strayRemoveButton = new MockElement('button');
+    strayRemoveButton.dataset.professionalInformationRemove = '';
+    mockDom.list.append(strayRemoveButton);
+    strayRemoveButton.click();
+
+    expect(mockDom.list.querySelectorAll('[data-professional-information-item]')).toHaveLength(1);
+  });
+
+  test('finds sibling add button even when another add button has a different parent', () => {
+    const document = new MockElement('document');
+    const wrapper = new MockElement('div');
+    const list = new MockElement('div');
+    const nestedContainer = new MockElement('div');
+    const nestedAddButton = new MockElement('button');
+    const siblingAddButton = new MockElement('button');
+
+    list.dataset.professionalInformationList = 'faxNumber';
+    list.append(buildRepeatableItem('faxNumber', 0));
+    nestedAddButton.dataset.professionalInformationAdd = 'faxNumber';
+    siblingAddButton.dataset.professionalInformationAdd = 'faxNumber';
+    nestedContainer.append(nestedAddButton);
+    wrapper.append(list, nestedContainer, siblingAddButton);
+    document.append(wrapper);
+    document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = document as never;
+
+    initProfessionalInformationRepeatableFields();
+
+    siblingAddButton.click();
+
+    expect(list.querySelectorAll('[data-professional-information-item]')).toHaveLength(2);
+  });
+
+  test('does not remove aria-expanded when mutation does not target that attribute', () => {
+    const mockDom = buildDocument();
+    let mutationCallback: MutationCallback | undefined;
+    const radio = new MockElement('input');
+    radio.type = 'radio';
+    mockDom.document.append(radio);
+    mockDom.document.body = new MockElement('body');
+    mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = mockDom.document as never;
+    (globalThis as { MutationObserver: typeof MutationObserver }).MutationObserver = class {
+      public constructor(callback: MutationCallback) {
+        mutationCallback = callback;
+      }
+
+      public observe = jest.fn();
+    } as never;
+
+    initProfessionalInformationRepeatableFields();
+
+    radio.setAttribute('aria-expanded', 'true');
+    mutationCallback?.(
+      [
+        {
+          attributeName: 'class',
+          type: 'attributes',
+        } as MutationRecord,
+      ],
+      {} as MutationObserver
+    );
+
+    expect(radio.attributes['aria-expanded']).toBe('true');
+  });
+
+  test('does not register duplicate listeners when initialised more than once', () => {
+    const mockDom = buildDocument();
+    mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = mockDom.document as never;
+
+    initProfessionalInformationRepeatableFields();
+    initProfessionalInformationRepeatableFields();
+
+    mockDom.addButton.click();
+
+    expect(mockDom.list.querySelectorAll('[data-professional-information-item]')).toHaveLength(2);
+  });
+
+  test('looks up add buttons from the document when list parent is missing', () => {
+    const document = new MockElement('document');
+    const list = new MockElement('div');
+    const addButton = new MockElement('button');
+    list.dataset.professionalInformationList = 'dxCode';
+    list.append(buildRepeatableItem('dxCode', 0));
+    addButton.dataset.professionalInformationAdd = 'dxCode';
+    document.append(list, addButton);
+    list.parentElement = null;
+    document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = document as never;
+
+    initProfessionalInformationRepeatableFields();
+
+    addButton.click();
+    expect(list.querySelectorAll('[data-professional-information-item]')).toHaveLength(2);
+  });
+
+  test('does not add repeatable items when the list is already at max', () => {
+    const mockDom = buildDocument();
+    mockDom.list.dataset.professionalInformationMax = '1';
+    mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+    (globalThis as { document: Document }).document = mockDom.document as never;
+
+    initProfessionalInformationRepeatableFields();
+    mockDom.addButton.click();
+
+    expect(mockDom.list.querySelectorAll('[data-professional-information-item]')).toHaveLength(1);
+    expect(mockDom.addButton.hidden).toBe(true);
   });
 });
