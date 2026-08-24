@@ -1,7 +1,12 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
-import { buildTestAddress, createAddressViaManualEntry, getSpecificAddressId } from './court-address-test-support';
+import {
+  buildTestAddress,
+  createAddressViaManualEntry,
+  getSpecificAddressId,
+  setAddressCount,
+} from './court-address-test-support';
 
 test.describe(
   'Court Address Find Page Tests',
@@ -37,6 +42,8 @@ test.describe(
       page,
     }) => {
       await withCreatedCourt(playwright, 'Court Address Find Functional Test', {}, async ({ createdCourt }) => {
+        // reduce address count to 1 so that we know we can add another
+        await setAddressCount(page, createdCourt.id, 1);
         await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('FindPage1'));
         const addressId = await getSpecificAddressId(page, createdCourt.id, 'SW1A 1AA');
 

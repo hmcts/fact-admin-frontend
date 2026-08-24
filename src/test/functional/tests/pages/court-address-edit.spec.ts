@@ -1,12 +1,7 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
-import {
-  buildTestAddress,
-  createAddressViaManualEntry,
-  getFirstAddressId,
-  reduceAddressesCount,
-} from './court-address-test-support';
+import { buildTestAddress, getFirstAddressId, setAddressCount } from './court-address-test-support';
 
 test.describe(
   'Court Address Edit Page Tests',
@@ -114,7 +109,6 @@ test.describe(
       page,
     }) => {
       await withCreatedCourt(playwright, 'Court Address Edit Functional Test', {}, async ({ createdCourt }) => {
-        await createAddressViaManualEntry(page, createdCourt.id, buildTestAddress('EditBase1'));
         const addressId = await getFirstAddressId(page, createdCourt.id);
 
         await courtAddressFindPage.goto(createdCourt.id, addressId);
@@ -133,20 +127,11 @@ test.describe(
       courtAddressEditPage,
       courtAddressEditSuccessPage,
       courtAddressListPage,
-      courtAddressDeletePage,
-      courtAddressDeleteSuccessPage,
       playwright,
     }) => {
       await withCreatedCourt(playwright, 'Court Address Edit Success Functional Test', {}, async ({ createdCourt }) => {
-        // reduce the addresses down to 1
-        await reduceAddressesCount(
-          page,
-          courtAddressListPage,
-          courtAddressDeletePage,
-          courtAddressDeleteSuccessPage,
-          createdCourt.id,
-          1
-        );
+        // Ensure only a single address exists
+        await setAddressCount(page, createdCourt.id, 1);
 
         // edit it and make it a visit us address
         await courtAddressListPage.goto(createdCourt.id);

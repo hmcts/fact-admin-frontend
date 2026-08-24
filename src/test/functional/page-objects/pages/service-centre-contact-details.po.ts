@@ -56,12 +56,12 @@ export class ServiceCentreContactDetailsPage extends Base {
 
   async clickEditForRowText(rowText: string): Promise<void> {
     const row = this.page.locator('tbody tr', { hasText: rowText }).first();
-    await row.getByRole('link', { name: 'Edit' }).click();
+    await row.getByRole('link', { name: 'Edit', exact: true }).click();
   }
 
   async clickDeleteForRowText(rowText: string): Promise<void> {
     const row = this.page.locator('tbody tr', { hasText: rowText }).first();
-    await row.getByRole('link', { name: 'Delete' }).click();
+    await row.getByRole('link', { name: 'Delete', exact: true }).click();
   }
 
   async confirmDelete(): Promise<void> {

@@ -20,7 +20,7 @@ export class AuditListPage extends Base {
   }
 
   async filterByCourt(courtId: string): Promise<void> {
-    await this.page.getByRole('radio', { name: 'Court' }).check();
+    await this.page.getByRole('radio', { name: 'Court', exact: true }).check();
     await this.page.locator('#courtId').selectOption(courtId);
     await this.searchButton.click();
   }
@@ -29,7 +29,7 @@ export class AuditListPage extends Base {
     return this.auditTable
       .locator('tr')
       .filter({ hasText: actionType })
-      .getByRole('link', { name: 'Details' })
+      .getByRole('link', { name: 'Details', exact: true })
       .first()
       .getAttribute('href');
   }

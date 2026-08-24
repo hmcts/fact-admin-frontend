@@ -90,24 +90,27 @@ export async function getFirstDeleteAddressId(page: Page, courtId: string): Prom
   return matches[1];
 }
 
-export async function reduceAddressesCount(
-  page: Page,
-  courtAddressListPage: CourtAddressListPage,
-  courtAddressDeletePage: CourtAddressDeletePage,
-  courtAddressDeleteSuccessPage: CourtAddressDeleteSuccessPage,
-  courtId: string,
-  reduceTo: number
-): Promise<void> {
-  // test court generator will add up to three addresses, which
-  // has the downside of causing the pages to sometimes render with unwanted
-  // side effects (missing add button / no delete action). this just lets
-  // us reduce the number of addresses so that we can perform empirical tests
+export async function setAddressCount(page: Page, courtId: string, targetCount: number): Promise<void> {
+  if (!Number.isInteger(targetCount) || targetCount < 1 || targetCount > 3) {
+    throw new Error(`Expected a court address target between 1 and 3, received ${targetCount}.`);
+  }
+
+  const courtAddressListPage = new CourtAddressListPage(page);
+  const courtAddressDeletePage = new CourtAddressDeletePage(page);
+  const courtAddressDeleteSuccessPage = new CourtAddressDeleteSuccessPage(page);
+
   await courtAddressListPage.goto(courtId);
-  while ((await courtAddressListPage.getAddressCount()) > reduceTo) {
+  while ((await courtAddressListPage.getAddressCount()) > targetCount) {
     const addressId = await getFirstDeleteAddressId(page, courtId);
     await courtAddressDeletePage.goto(courtId, addressId);
     await courtAddressDeletePage.clickDeleteAddress();
     await expect(courtAddressDeleteSuccessPage.successPanelTitle).toContainText('Address deleted:');
+    await courtAddressListPage.goto(courtId);
+  }
+
+  while ((await courtAddressListPage.getAddressCount()) < targetCount) {
+    const nextAddressNumber = (await courtAddressListPage.getAddressCount()) + 1;
+    await createAddressViaManualEntry(page, courtId, buildTestAddress(`NormalisedAddress${nextAddressNumber}`));
     await courtAddressListPage.goto(courtId);
   }
 }

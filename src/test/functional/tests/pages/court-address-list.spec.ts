@@ -1,7 +1,7 @@
 import { expect, test } from '../../fixtures';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
-import { reduceAddressesCount } from './court-address-test-support';
+import { setAddressCount } from './court-address-test-support';
 
 test.describe(
   'Court Address List Page Tests',
@@ -30,22 +30,10 @@ test.describe(
       }
     );
 
-    test('visibility test', async ({
-      courtAddressListPage,
-      courtAddressDeletePage,
-      courtAddressDeleteSuccessPage,
-      playwright,
-      page,
-    }) => {
+    test('visibility test', async ({ courtAddressListPage, playwright, page }) => {
       await withCreatedCourt(playwright, 'Court Address List Functional Test', {}, async ({ createdCourt }) => {
-        await reduceAddressesCount(
-          page,
-          courtAddressListPage,
-          courtAddressDeletePage,
-          courtAddressDeleteSuccessPage,
-          createdCourt.id,
-          2
-        );
+        // ensure there are two addresses, so that the add button is guaranteed to show up
+        await setAddressCount(page, createdCourt.id, 2);
 
         await courtAddressListPage.expectVisibleElements();
         await expect(courtAddressListPage.mainContent.content).toContainText(
@@ -58,20 +46,12 @@ test.describe(
     test('add address action opens the find address page for the selected court', async ({
       page,
       courtAddressListPage,
-      courtAddressDeletePage,
-      courtAddressDeleteSuccessPage,
       courtAddressFindPage,
       playwright,
     }) => {
       await withCreatedCourt(playwright, 'Court Address List Functional Test', {}, async ({ createdCourt }) => {
-        await reduceAddressesCount(
-          page,
-          courtAddressListPage,
-          courtAddressDeletePage,
-          courtAddressDeleteSuccessPage,
-          createdCourt.id,
-          2
-        );
+        // ensure there are two addresses, so that the add button is guaranteed to show up
+        await setAddressCount(page, createdCourt.id, 2);
 
         await courtAddressListPage.goto(createdCourt.id);
         await courtAddressListPage.clickAddAddress();
