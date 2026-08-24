@@ -10,10 +10,7 @@ type TestOptionsOverrides = {
     locationName: string,
     subjectType: 'COURT' | 'SERVICE_CENTRE'
   ) => { href: string; text: string }[];
-  getAdditionalEditViewModel?: (
-    req: Request,
-    locationId: string
-  ) => Promise<Record<string, unknown> | HttpStatusCode>;
+  getAdditionalEditViewModel?: (req: Request, locationId: string) => Promise<Record<string, unknown> | HttpStatusCode>;
   getLocation?: (locationId: string) => Promise<{ name: string } | HttpStatusCode>;
 };
 
