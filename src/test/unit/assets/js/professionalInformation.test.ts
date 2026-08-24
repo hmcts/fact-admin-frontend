@@ -149,27 +149,27 @@ class MockElement {
       return this.tagName === 'input' && this.type === 'radio' && this.attributes['aria-expanded'] !== undefined;
     }
 
-    const listMatch = selector.match(/^\[data-professional-information-list="(.+)"\]$/);
+    const listMatch = selector.match(/^\[data-professional-information-list="(.+)"]$/);
     if (listMatch) {
       return this.dataset.professionalInformationList === listMatch[1];
     }
 
-    const inputNamePrefixMatch = selector.match(/^input\[name\^="(.+)"\]$/);
+    const inputNamePrefixMatch = selector.match(/^input\[name\^="(.+)"]$/);
     if (inputNamePrefixMatch) {
       return this.tagName === 'input' && this.name.startsWith(inputNamePrefixMatch[1]);
     }
 
-    const inputFieldMatch = selector.match(/^input\[data-professional-information-field="(.+)"\]$/);
+    const inputFieldMatch = selector.match(/^input\[data-professional-information-field="(.+)"]$/);
     if (inputFieldMatch) {
       return this.tagName === 'input' && this.dataset.professionalInformationField === inputFieldMatch[1];
     }
 
-    const labelForPrefixMatch = selector.match(/^label\[for\^="(.+)"\]$/);
+    const labelForPrefixMatch = selector.match(/^label\[for\^="(.+)"]$/);
     if (labelForPrefixMatch) {
       return this.tagName === 'label' && this.htmlFor.startsWith(labelForPrefixMatch[1]);
     }
 
-    const addButtonMatch = selector.match(/^\[data-professional-information-add="(.+)"\]$/);
+    const addButtonMatch = selector.match(/^\[data-professional-information-add="(.+)"]$/);
     if (addButtonMatch) {
       return this.dataset.professionalInformationAdd === addButtonMatch[1];
     }

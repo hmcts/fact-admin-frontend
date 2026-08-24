@@ -701,6 +701,45 @@ describe('CourtContactController', () => {
     }
   });
 
+  test('renders error on edit contact details page when contact detail lookup fails', async () => {
+    const controller = new CourtContactController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      contactDetailId: '99999999-9999-4999-8999-999999999999',
+    };
+    const responseMock = mock(response);
+
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves(
+      HttpStatusCode.InternalServerError
+    );
+    const getContactDescriptionTypesStub = stub(ReferenceDataApi.prototype, 'getContactDescriptionTypes');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.renderEdit(request, response);
+
+      assert.calledOnce(getCourtByIdStub);
+      assert.calledOnce(getCourtContactDetailsStub);
+      assert.notCalled(getContactDescriptionTypesStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      getCourtContactDetailsStub.restore();
+      getContactDescriptionTypesStub.restore();
+    }
+  });
+
   test('renders error on edit contact details page when description type lookup fails', async () => {
     const controller = new CourtContactController();
     const response = {
@@ -1224,6 +1263,37 @@ describe('CourtContactController', () => {
     }
   });
 
+  test('renders court not found on delete contact details page when ids are invalid', async () => {
+    const controller = new CourtContactController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      contactDetailId: 'not-a-uuid',
+    };
+    const responseMock = mock(response);
+
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.renderDelete(request, response);
+
+      assert.notCalled(getCourtByIdStub);
+      assert.notCalled(getCourtContactDetailsStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      getCourtContactDetailsStub.restore();
+    }
+  });
+
   test('renders error on delete contact details page when court lookup fails', async () => {
     const controller = new CourtContactController();
     const response = {
@@ -1418,6 +1488,65 @@ describe('CourtContactController', () => {
     }
   });
 
+  test('deletes contact details and renders success screen when only phone exists', async () => {
+    const controller = new CourtContactController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      contactDetailId: '99999999-9999-4999-8999-999999999999',
+    };
+    const responseMock = mock(response);
+
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([
+      {
+        id: '99999999-9999-4999-8999-999999999999',
+        courtContactDescriptionId: 'desc-id',
+        explanation: 'General enquiries',
+        explanationCy: null,
+        email: undefined,
+        phoneNumber: '01234 567890',
+        courtContactDescription: {
+          name: 'Enquiries',
+          nameCy: 'Ymholiadau',
+        },
+      },
+    ] as never);
+    const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail').resolves(
+      HttpStatusCode.NoContent
+    );
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'common-edit-success',
+        match({
+          successPanelTitle: 'Contact details deleted: 01234 567890',
+        })
+      );
+
+    try {
+      await controller.deleteContactDetail(request, response);
+
+      assert.calledOnce(getCourtByIdStub);
+      assert.calledOnce(getCourtContactDetailsStub);
+      assert.calledOnce(deleteCourtContactDetailStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      getCourtContactDetailsStub.restore();
+      deleteCourtContactDetailStub.restore();
+    }
+  });
+
   test('renders error when deleting contact details fails', async () => {
     const controller = new CourtContactController();
     const response = {
@@ -1501,6 +1630,74 @@ describe('CourtContactController', () => {
     }
   });
 
+  test('renders error when deleting contact details and court lookup fails', async () => {
+    const controller = new CourtContactController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      contactDetailId: '99999999-9999-4999-8999-999999999999',
+    };
+    const responseMock = mock(response);
+
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
+    const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.deleteContactDetail(request, response);
+
+      assert.calledOnce(getCourtByIdStub);
+      assert.notCalled(deleteCourtContactDetailStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      deleteCourtContactDetailStub.restore();
+    }
+  });
+
+  test('renders court not found when deleting contact details and contact detail is missing', async () => {
+    const controller = new CourtContactController();
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = {
+      courtId: '11111111-1111-4111-8111-111111111111',
+      contactDetailId: '99999999-9999-4999-8999-999999999999',
+    };
+    const responseMock = mock(response);
+
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    const getCourtContactDetailsStub = stub(CourtApi.prototype, 'getCourtContactDetails').resolves([] as never);
+    const deleteCourtContactDetailStub = stub(CourtApi.prototype, 'deleteCourtContactDetail');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.deleteContactDetail(request, response);
+
+      assert.calledOnce(getCourtByIdStub);
+      assert.calledOnce(getCourtContactDetailsStub);
+      assert.notCalled(deleteCourtContactDetailStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      getCourtContactDetailsStub.restore();
+      deleteCourtContactDetailStub.restore();
+    }
+  });
+
   test('renders error when deleting contact details and contact detail lookup fails', async () => {
     const controller = new CourtContactController();
     const response = {
@@ -1538,5 +1735,15 @@ describe('CourtContactController', () => {
       getCourtContactDetailsStub.restore();
       deleteCourtContactDetailStub.restore();
     }
+  });
+
+  test('returns email text from details generator when only email exists', () => {
+    const controller = new CourtContactController() as unknown as {
+      detailsGenerator: (contactDetail: Record<string, string | undefined>, email: string, phoneNumber: string) => string;
+    };
+
+    expect(controller.detailsGenerator({ email: 'enquiries@example.test', phoneNumber: undefined }, 'email', 'phoneNumber')).toBe(
+      'enquiries@example.test'
+    );
   });
 });
