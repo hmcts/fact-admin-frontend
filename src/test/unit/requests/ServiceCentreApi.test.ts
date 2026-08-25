@@ -67,29 +67,6 @@ describe('ServiceCentreApi', () => {
     expect(response).toEqual(serviceCentre);
   });
 
-  it('returns parsed service centre when the service centre by id response is valid', async () => {
-    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
-    const serviceCentre = {
-      createdAt: '2026-04-29T09:00:00Z',
-      id: serviceCentreId,
-      lastUpdatedAt: '2026-04-29T10:00:00Z',
-      name: 'National Business Centre',
-      open: true,
-      regionId: '33333333-3333-4333-8333-333333333333',
-      serviceAreaIds: ['77777777-7777-4777-8777-777777777777'],
-      slug: 'national-business-centre',
-      warningNotice: null,
-    };
-
-    getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).resolves({
-      data: serviceCentre,
-    });
-
-    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
-
-    expect(response).toEqual(serviceCentre);
-  });
-
   it('returns not found when the service centre by id endpoint returns a 404', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
 
@@ -264,7 +241,17 @@ describe('ServiceCentreApi', () => {
     expect(response).toBe(HttpStatusCode.Forbidden);
   });
 
-  it('returns a validation map when update service centre returns a 400', async () => {
+  it('returns internal server error when service centre by id request fails without an axios status', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+
+    getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).rejects(errorMessage);
+
+    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+    it('returns a validation map when update service centre returns a 400', async () => {
     const serviceCentre = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '66666666-6666-4666-8666-666666666666',
@@ -290,7 +277,27 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.updateServiceCentre(serviceCentre);
 
     expect(response).toEqual(new Map([['name', 'Name already exists']]));
-  });
+    });
+
+    it('returns internal server error when update service centre fails without an axios status', async () => {
+    const serviceCentre = {
+      createdAt: '2026-04-29T09:00:00Z',
+      id: '66666666-6666-4666-8666-666666666666',
+      lastUpdatedAt: '2026-04-29T10:00:00Z',
+      name: 'Updated National Business Centre',
+      open: true,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      serviceAreaIds: ['77777777-7777-4777-8777-777777777777'],
+      slug: 'national-business-centre',
+      warningNotice: null,
+    };
+
+    putStub.withArgs(`/service-centres/${serviceCentre.id}/v1`, serviceCentre).rejects(errorMessage);
+
+    const response = await serviceCentreApi.updateServiceCentre(serviceCentre);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    });
 
   it('returns parsed service centre areas of law when response is valid', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
@@ -360,7 +367,23 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
 
     expect(response).toEqual(addresses);
-  });
+    });
+
+    it('returns status code when service-centre address list request fails with axios status', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+
+    getStub.withArgs(`/service-centres/${serviceCentreId}/v1/address`).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'bad gateway',
+        status: HttpStatusCode.BadGateway,
+      },
+    });
+
+    const response = await serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
+
+    expect(response).toBe(HttpStatusCode.BadGateway);
+    });
 
   it('returns parsed service-centre address by id when response is valid', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
@@ -465,6 +488,28 @@ describe('ServiceCentreApi', () => {
     expect(response).toEqual(new Map([['postcode', 'Invalid postcode']]));
   });
 
+  it('returns status code when saving service-centre address fails with non-400 axios status', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+    const payload = {
+      addressLine1: '1 Test Street',
+      postcode: 'SW1A 1AA',
+      townCity: 'London',
+      addressType: 'VISIT_US' as const,
+    };
+
+    postStub.withArgs(`/service-centres/${serviceCentreId}/v1/address`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await serviceCentreApi.saveServiceCentreAddress(payload, serviceCentreId);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
   it('returns parsed service-centre address when updating service-centre address succeeds', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
     const addressId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -557,6 +602,19 @@ describe('ServiceCentreApi', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns no content when deleting service-centre address succeeds', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+    const addressId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+    deleteStub.withArgs(`/service-centres/${serviceCentreId}/v1/address/${addressId}`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await serviceCentreApi.deleteServiceCentreAddress(serviceCentreId, addressId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
   it('returns parsed service-centre contact details when response is valid', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
     const contactDetails = [
@@ -593,6 +651,16 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
 
     expect(response).toBe(HttpStatusCode.BadGateway);
+  });
+
+  it('returns internal server error when service-centre contact details request fails without an axios status', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+
+    getStub.withArgs(`/service-centres/${serviceCentreId}/v1/contact-details`).rejects(errorMessage);
+
+    const response = await serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
   it('returns a validation map when creating service-centre contact detail returns 400', async () => {

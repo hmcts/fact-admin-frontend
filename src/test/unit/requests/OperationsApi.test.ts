@@ -31,6 +31,22 @@ const errorMessage = {
   message: 'test',
 };
 
+const lockResponse = {
+  id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+  subjectType: 'COURT',
+  subjectId: '11111111-1111-4111-8111-111111111111',
+  userId: '22222222-2222-4222-8222-222222222222',
+  user: {
+    email: 'editor@justice.gov.uk',
+    id: '22222222-2222-4222-8222-222222222222',
+    lastLogin: '2026-06-26T09:10:11.123Z',
+    role: 'SUPER_ADMIN',
+    ssoId: '33333333-3333-4333-8333-333333333333',
+  },
+  page: 'ADDRESS',
+  lockAcquired: '2026-06-26T09:10:11.123Z',
+};
+
 function expectedAxiosError(status: HttpStatusCode) {
   return {
     name: 'AxiosError',
@@ -482,6 +498,25 @@ describe('OperationsApi', () => {
     );
   });
 
+  it('returns internal server error and logs when create approval endpoint throws non-axios error', async () => {
+    const approval = {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectType: 'COURT' as const,
+      userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    };
+    const nonAxiosError = new Error('Unexpected create approval error');
+
+    postStub.withArgs('/approvals/v1', approval).rejects(nonAxiosError);
+
+    const response = await operationsApi.createApproval(approval);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error creating approval:', {
+      name: 'Error',
+      message: 'Unexpected create approval error',
+    });
+  });
+
   it('returns delete status when delete approval succeeds', async () => {
     const approvalId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
@@ -513,9 +548,106 @@ describe('OperationsApi', () => {
     );
   });
 
+  it('returns parsed lock when getLock receives lock data', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/locks/${SubjectType.COURT}/${subjectId}/v1/${Page.ADDRESS}`).resolves({
+      status: HttpStatusCode.Ok,
+      data: lockResponse,
+    });
+
+    const response = await operationsApi.getLock(SubjectType.COURT, subjectId, Page.ADDRESS);
+
+    expect(response).toEqual(lockResponse);
+  });
+
+  it('returns axios status and logs when getLock endpoint errors', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/locks/${SubjectType.COURT}/${subjectId}/v1/${Page.ADDRESS}`).rejects({
+      isAxiosError: true,
+      response: {
+        status: HttpStatusCode.Locked,
+      },
+    });
+
+    const response = await operationsApi.getLock(SubjectType.COURT, subjectId, Page.ADDRESS);
+
+    expect(response).toBe(HttpStatusCode.Locked);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching lock information for subject ${SubjectType.COURT}, id ${subjectId} and page ${Page.ADDRESS}:`,
+      expectedAxiosError(HttpStatusCode.Locked)
+    );
+  });
+
+  it('returns empty list when getLocks receives no-content status', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/locks/${SubjectType.COURT}/${subjectId}/v1`).resolves({
+      status: HttpStatusCode.NoContent,
+    });
+
+    const response = await operationsApi.getLocks(SubjectType.COURT, subjectId);
+
+    expect(response).toEqual([]);
+  });
+
+  it('returns axios status and logs when getLocks endpoint errors', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+
+    getStub.withArgs(`/locks/${SubjectType.COURT}/${subjectId}/v1`).rejects({
+      isAxiosError: true,
+      response: {
+        status: HttpStatusCode.Locked,
+      },
+    });
+
+    const response = await operationsApi.getLocks(SubjectType.COURT, subjectId);
+
+    expect(response).toBe(HttpStatusCode.Locked);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching lock information for subject: ${SubjectType.COURT}, with id: ${subjectId}`,
+      expectedAxiosError(HttpStatusCode.Locked)
+    );
+  });
+
+  it('returns internal server error and logs when getLocks throws non-axios error', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+    const nonAxiosError = new Error('Unexpected getLocks error');
+
+    getStub.withArgs(`/locks/${SubjectType.COURT}/${subjectId}/v1`).rejects(nonAxiosError);
+
+    const response = await operationsApi.getLocks(SubjectType.COURT, subjectId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error fetching lock information for subject: ${SubjectType.COURT}, with id: ${subjectId}`,
+      {
+        name: 'Error',
+        message: 'Unexpected getLocks error',
+      }
+    );
+  });
+
+  it('returns parsed lock when acquire lock succeeds', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+    const userId = '22222222-2222-4222-8222-222222222222';
+
+    postStub.withArgs(`/locks/${SubjectType.COURT}/${subjectId}/v1/${Page.ADDRESS}`, userId, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).resolves({ data: lockResponse });
+
+    const response = await operationsApi.acquireLock(SubjectType.COURT, subjectId, Page.ADDRESS, userId);
+
+    expect(response).toEqual(lockResponse);
+  });
+
   it('returns lock conflicts without logging an expected user-contention error', async () => {
     const subjectId = '11111111-1111-4111-8111-111111111111';
     const userId = '22222222-2222-4222-8222-222222222222';
+
     postStub.rejects({
       isAxiosError: true,
       response: { status: HttpStatusCode.Conflict },
@@ -525,5 +657,66 @@ describe('OperationsApi', () => {
 
     expect(response).toBe(HttpStatusCode.Conflict);
     expect(mockDataApiLogger.error).not.toHaveBeenCalled();
+  });
+
+  it('returns non-conflict status and logs when acquire lock endpoint errors', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+    const userId = '22222222-2222-4222-8222-222222222222';
+
+    postStub.rejects({
+      isAxiosError: true,
+      response: { status: HttpStatusCode.Locked },
+    });
+
+    const response = await operationsApi.acquireLock(SubjectType.COURT, subjectId, Page.ADDRESS, userId);
+
+    expect(response).toBe(HttpStatusCode.Locked);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error acquiring court lock for subject: ${SubjectType.COURT}, id ${subjectId} and page ${Page.ADDRESS}:`,
+      expectedAxiosError(HttpStatusCode.Locked)
+    );
+  });
+
+  it('returns internal server error and logs when acquire lock throws non-axios error', async () => {
+    const subjectId = '11111111-1111-4111-8111-111111111111';
+    const userId = '22222222-2222-4222-8222-222222222222';
+    const nonAxiosError = new Error('Unexpected acquireLock error');
+
+    postStub.rejects(nonAxiosError);
+
+    const response = await operationsApi.acquireLock(SubjectType.COURT, subjectId, Page.ADDRESS, userId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      `Error acquiring court lock for subject: ${SubjectType.COURT}, id ${subjectId} and page ${Page.ADDRESS}:`,
+      {
+        name: 'Error',
+        message: 'Unexpected acquireLock error',
+      }
+    );
+  });
+
+  it('returns no-content when clearUserLocks succeeds', async () => {
+    const userId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    deleteStub.withArgs(`/user/v1/${userId}/locks`).resolves({ status: HttpStatusCode.NoContent });
+
+    const response = await operationsApi.clearUserLocks(userId);
+
+    expect(response).toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns internal server error and logs when clearUserLocks throws non-axios error', async () => {
+    const userId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    const nonAxiosError = new Error('Unexpected clear locks error');
+
+    deleteStub.withArgs(`/user/v1/${userId}/locks`).rejects(nonAxiosError);
+
+    const response = await operationsApi.clearUserLocks(userId);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error removing locks for user:', {
+      name: 'Error',
+      message: 'Unexpected clear locks error',
+    });
   });
 });
