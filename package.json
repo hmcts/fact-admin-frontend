@@ -25,7 +25,7 @@
     "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y"
   },
   "dependencies": {
-    "@azure/identity": "4.13.1",
+    "@azure/identity": "4.13.2",
     "@hmcts/info-provider": "^1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/nodejs-logging": "^4.0.4",
