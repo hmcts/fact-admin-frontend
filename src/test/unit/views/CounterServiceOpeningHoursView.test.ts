@@ -128,5 +128,3 @@ describe('Counter Service Opening Hours View', () => {
     expect(html).toContain('Select yes if the same opening hours apply Monday to Friday');
   });
 });
-
-
