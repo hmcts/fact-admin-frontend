@@ -64,4 +64,3 @@ describe('responseRenderers', () => {
     expect(response.render).toHaveBeenCalledWith('error');
   });
 });
-

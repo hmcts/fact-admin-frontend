@@ -1739,11 +1739,15 @@ describe('CourtContactController', () => {
 
   test('returns email text from details generator when only email exists', () => {
     const controller = new CourtContactController() as unknown as {
-      detailsGenerator: (contactDetail: Record<string, string | undefined>, email: string, phoneNumber: string) => string;
+      detailsGenerator: (
+        contactDetail: Record<string, string | undefined>,
+        email: string,
+        phoneNumber: string
+      ) => string;
     };
 
-    expect(controller.detailsGenerator({ email: 'enquiries@example.test', phoneNumber: undefined }, 'email', 'phoneNumber')).toBe(
-      'enquiries@example.test'
-    );
+    expect(
+      controller.detailsGenerator({ email: 'enquiries@example.test', phoneNumber: undefined }, 'email', 'phoneNumber')
+    ).toBe('enquiries@example.test');
   });
 });
