@@ -615,8 +615,13 @@ test.describe(
 
     test('Court Opening Hours Success Page Accessibility', async ({ axeUtils, courtOpeningHoursPage, playwright }) => {
       await withCreatedCourt(playwright, 'Opening Hours Accessibility Test', {}, async ({ createdCourt }) => {
-        await courtOpeningHoursPage.gotoAdd(createdCourt.id);
-        await courtOpeningHoursPage.selectOpeningHoursType('Court open');
+        // As RNG during test creation can potentially leave no options
+        // for addition, if we can't add one, we need to edit one.
+        await courtOpeningHoursPage.goto(createdCourt.id);
+        const openingHoursType = await courtOpeningHoursPage.clickFirstAddableOpeningHoursType();
+        if (!openingHoursType) {
+          await courtOpeningHoursPage.clickFirstEditLink();
+        }
         await courtOpeningHoursPage.selectSameTime();
         await courtOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
         await courtOpeningHoursPage.save();

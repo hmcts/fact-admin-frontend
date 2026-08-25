@@ -4,11 +4,7 @@ import { expect } from '../fixtures';
 import { AddCourtPage } from '../page-objects/pages/add-court.po';
 import { CourtAddressDeletePage } from '../page-objects/pages/court-address-delete.po';
 import { GeneralPage } from '../page-objects/pages/general.po';
-import {
-  buildTestAddress,
-  createAddressViaManualEntry,
-  getFirstDeleteAddressId,
-} from '../tests/pages/court-address-test-support';
+import { getFirstDeleteAddressId, setAddressCount } from '../tests/pages/court-address-test-support';
 import { config } from '../utils';
 
 import { withTestCourtPrefix } from './testSupport';
@@ -71,8 +67,7 @@ export async function seedAuditTrailViaUi({
 
     if (includeDelete) {
       // Create addresses to guarantee there is a deletable record and then delete one.
-      await createAddressViaManualEntry(page, courtId, buildTestAddress(`AuditDeleteOne${Date.now()}`));
-      await createAddressViaManualEntry(page, courtId, buildTestAddress(`AuditDeleteTwo${Date.now()}`));
+      await setAddressCount(page, courtId, 2);
 
       const deleteAddressId = await getFirstDeleteAddressId(page, courtId);
       await courtAddressDeletePage.goto(courtId, deleteAddressId);

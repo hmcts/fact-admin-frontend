@@ -136,6 +136,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@azure/core-process@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@azure/core-process@npm:1.0.0"
+  checksum: 10/760913c11b3be7b80dadd9bfbbc2c4aef32d8ba3a5b13e614241ebc6573c6b0a3ccb967cc880022451fe898682ccdbc51200255d2297034e1d2bd17969ced868
+  languageName: node
+  linkType: hard
+
 "@azure/core-rest-pipeline@npm:^1.17.0, @azure/core-rest-pipeline@npm:^1.19.0, @azure/core-rest-pipeline@npm:^1.22.0, @azure/core-rest-pipeline@npm:^1.22.2, @azure/core-rest-pipeline@npm:^1.8.0":
   version: 1.23.0
   resolution: "@azure/core-rest-pipeline@npm:1.23.0"
@@ -188,7 +195,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/identity@npm:4.13.1, @azure/identity@npm:^4.13.0, @azure/identity@npm:^4.13.1":
+"@azure/identity@npm:4.13.2":
+  version: 4.13.2
+  resolution: "@azure/identity@npm:4.13.2"
+  dependencies:
+    "@azure/abort-controller": "npm:^2.0.0"
+    "@azure/core-auth": "npm:^1.9.0"
+    "@azure/core-client": "npm:^1.9.2"
+    "@azure/core-process": "npm:^1.0.0"
+    "@azure/core-rest-pipeline": "npm:^1.17.0"
+    "@azure/core-tracing": "npm:^1.0.0"
+    "@azure/core-util": "npm:^1.11.0"
+    "@azure/logger": "npm:^1.0.0"
+    "@azure/msal-browser": "npm:^5.5.0"
+    "@azure/msal-node": "npm:^5.1.5"
+    open: "npm:^10.1.0"
+    tslib: "npm:^2.2.0"
+  checksum: 10/b6ec2bde20a8f95e6415c13eecdd8eaa39d9048e637f607067691953ceb825104b018862a2e62df5e23e43e63f78efc016cbdce0bc52cddc1a4467fe7ca33334
+  languageName: node
+  linkType: hard
+
+"@azure/identity@npm:^4.13.0, @azure/identity@npm:^4.13.1":
   version: 4.13.1
   resolution: "@azure/identity@npm:4.13.1"
   dependencies:
@@ -344,6 +371,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@azure/msal-common@npm:16.13.0":
+  version: 16.13.0
+  resolution: "@azure/msal-common@npm:16.13.0"
+  checksum: 10/b9280efa0cd160bf755819bca171e13586daa624cf6afdee2e60325d146e869d9ad0df8d6fda630ff37645fdcc8fa323df91bf6c2212defb593c9366a8de16dc
+  languageName: node
+  linkType: hard
+
 "@azure/msal-common@npm:16.6.2":
   version: 16.6.2
   resolution: "@azure/msal-common@npm:16.6.2"
@@ -358,6 +392,16 @@ __metadata:
     "@azure/msal-common": "npm:16.6.2"
     jsonwebtoken: "npm:^9.0.0"
   checksum: 10/29cf3d594207a59d01f4f04ca48203391eca3bf7c389a6a51d4a531b30b83cb990c223deee26c99ceaee8f48f3846d3b006b33c4eefc765f37646e442a79572f
+  languageName: node
+  linkType: hard
+
+"@azure/msal-node@npm:^5.1.5":
+  version: 5.6.0
+  resolution: "@azure/msal-node@npm:5.6.0"
+  dependencies:
+    "@azure/msal-common": "npm:16.13.0"
+    jsonwebtoken: "npm:^9.0.0"
+  checksum: 10/6874002465666f415076a9a7326c4c0543f954082e84454c8dcc84812efe5ea5b9544340b844ec94b0010b2c2181bc68e7cfc4560af721c770ec05b0e2815c9b
   languageName: node
   linkType: hard
 
@@ -10255,7 +10299,7 @@ __metadata:
   resolution: "fact-admin-frontend@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:4.13.0"
-    "@azure/identity": "npm:4.13.1"
+    "@azure/identity": "npm:4.13.2"
     "@babel/core": "npm:7.29.7"
     "@babel/plugin-proposal-decorators": "npm:7.29.7"
     "@babel/preset-env": "npm:7.29.7"
@@ -12984,9 +13028,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:18.2.3":
-  version: 18.2.3
-  resolution: "joi@npm:18.2.3"
+"joi@npm:18.2.5":
+  version: 18.2.5
+  resolution: "joi@npm:18.2.5"
   dependencies:
     "@hapi/address": "npm:^5.1.1"
     "@hapi/formula": "npm:^3.0.2"
@@ -12995,7 +13039,7 @@ __metadata:
     "@hapi/tlds": "npm:^1.1.1"
     "@hapi/topo": "npm:^6.0.2"
     "@standard-schema/spec": "npm:^1.1.0"
-  checksum: 10/95beb88e78c884e1b2650837b31f1fecc52b035f1b48f771f5a4c07b2202a1fcce87819b4706734d708f277875f19c813b4c695246bdf9c65659f210b681a613
+  checksum: 10/f12ed810c5ab3b03a05ca153a24da8dd6cddf2d54b454e8e8b2686e64d03939080eed2a142536ea5505ca551ba6ebb438f2e99bbd9d71e5825c992f8b540a3e1
   languageName: node
   linkType: hard
 
