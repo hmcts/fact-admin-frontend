@@ -5,7 +5,9 @@ import { Base } from '../base';
 
 export class CourtContactDetailsPage extends Base {
   public readonly addContactDetailLink: Locator;
+  public readonly contactTypeAutocompleteInput: Locator;
   public readonly contactTypeSelect: Locator;
+  public readonly contactTypeFallbackSelect: Locator;
   public readonly emailCheckbox: Locator;
   public readonly phoneCheckbox: Locator;
   public readonly emailInput: Locator;
@@ -20,7 +22,9 @@ export class CourtContactDetailsPage extends Base {
   constructor(page: Page) {
     super(page);
     this.addContactDetailLink = this.page.getByRole('button', { name: 'Add contact detail' });
-    this.contactTypeSelect = this.page.locator('#contact-type');
+    this.contactTypeAutocompleteInput = this.page.locator('input#contact-type[role="combobox"]');
+    this.contactTypeSelect = this.page.locator('select#contact-type-select');
+    this.contactTypeFallbackSelect = this.page.locator('select#contact-type');
     this.emailCheckbox = this.page.getByRole('checkbox', { name: 'Email address' });
     this.phoneCheckbox = this.page.getByRole('checkbox', { name: 'Phone number' });
     this.emailInput = this.page.locator('#contact-email');
@@ -42,6 +46,30 @@ export class CourtContactDetailsPage extends Base {
   }
 
   async selectFirstAvailableContactType(): Promise<string> {
+    const hasAutocomplete = (await this.contactTypeAutocompleteInput.count()) > 0;
+    if (hasAutocomplete) {
+      await this.contactTypeAutocompleteInput.click();
+      const listboxId = await this.contactTypeAutocompleteInput.getAttribute('aria-controls');
+      const firstAutocompleteOption = (
+        listboxId
+          ? this.page.locator(`#${listboxId} .autocomplete__option:not(.autocomplete__option--no-results)`)
+          : this.page.locator('.autocomplete__menu .autocomplete__option:not(.autocomplete__option--no-results)')
+      ).first();
+      await firstAutocompleteOption.waitFor({ state: 'visible' });
+      const selectedLabel = (await firstAutocompleteOption.textContent())?.trim() ?? '';
+      if (!selectedLabel) {
+        throw new Error('No contact type option is available for selection');
+      }
+
+      await firstAutocompleteOption.click();
+      const selectedValue = await this.page.locator('#contact-type-select').inputValue();
+      if (!selectedValue) {
+        throw new Error('No contact type option was selected');
+      }
+
+      return selectedLabel;
+    }
+
     const firstOption = this.page.locator('#contact-type option:not([value=""])').first();
     const selectedValue = await firstOption.getAttribute('value');
     const selectedLabel = (await firstOption.textContent())?.trim() ?? '';
@@ -50,8 +78,25 @@ export class CourtContactDetailsPage extends Base {
       throw new Error('No contact type option is available for selection');
     }
 
-    await this.contactTypeSelect.selectOption(selectedValue);
+    await this.contactTypeFallbackSelect.selectOption(selectedValue);
     return selectedLabel;
+  }
+
+  async openContactTypeAndBlur(): Promise<void> {
+    if ((await this.contactTypeAutocompleteInput.count()) === 0) {
+      return;
+    }
+
+    await this.contactTypeAutocompleteInput.click();
+    await this.explanationInput.click();
+  }
+
+  async selectedContactTypeValue(): Promise<string> {
+    if ((await this.contactTypeSelect.count()) > 0) {
+      return this.contactTypeSelect.inputValue();
+    }
+
+    return this.contactTypeFallbackSelect.inputValue();
   }
 
   async clickEditForDescription(description: string): Promise<void> {

@@ -51,9 +51,12 @@ describe('Service Centre Contact Views', () => {
 
     expect(html).toContain('Add contact details');
     expect(html).toContain('Contact type');
+    expect(html).toContain('Please type to view matching contact types');
     expect(html).toContain('Explanation (optional)');
     expect(html).toContain('Explanation in Welsh (optional)');
     expect(html).toContain('Select all that apply');
     expect(html).toContain(`/service-centres/${serviceCentreId}/edit/contact-details/add/success`);
+    expect(html).toContain('/assets/js/accessible-autocomplete.min.js');
+    expect(html).toContain('/assets/js/contact-type-autocomplete.js');
   });
 });
