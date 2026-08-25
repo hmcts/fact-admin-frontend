@@ -251,7 +251,7 @@ describe('ServiceCentreApi', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
-    it('returns a validation map when update service centre returns a 400', async () => {
+  it('returns a validation map when update service centre returns a 400', async () => {
     const serviceCentre = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '66666666-6666-4666-8666-666666666666',
@@ -277,9 +277,9 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.updateServiceCentre(serviceCentre);
 
     expect(response).toEqual(new Map([['name', 'Name already exists']]));
-    });
+  });
 
-    it('returns internal server error when update service centre fails without an axios status', async () => {
+  it('returns internal server error when update service centre fails without an axios status', async () => {
     const serviceCentre = {
       createdAt: '2026-04-29T09:00:00Z',
       id: '66666666-6666-4666-8666-666666666666',
@@ -297,7 +297,7 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.updateServiceCentre(serviceCentre);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
-    });
+  });
 
   it('returns parsed service centre areas of law when response is valid', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
@@ -367,9 +367,9 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
 
     expect(response).toEqual(addresses);
-    });
+  });
 
-    it('returns status code when service-centre address list request fails with axios status', async () => {
+  it('returns status code when service-centre address list request fails with axios status', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
 
     getStub.withArgs(`/service-centres/${serviceCentreId}/v1/address`).rejects({
@@ -383,7 +383,7 @@ describe('ServiceCentreApi', () => {
     const response = await serviceCentreApi.getServiceCentreAddressDetails(serviceCentreId);
 
     expect(response).toBe(HttpStatusCode.BadGateway);
-    });
+  });
 
   it('returns parsed service-centre address by id when response is valid', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
