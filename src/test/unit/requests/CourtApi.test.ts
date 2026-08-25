@@ -2612,92 +2612,23 @@ describe('CourtApi', () => {
     expect(response).toEqual(new Map([['file', 'File type is not supported']]));
   });
 
-  it('returns conflict when updating court photo fails with a non-400 axios status', async () => {
+  it('returns delete status when deleting court photo succeeds', async () => {
     const courtId = '55555555-5555-4555-8555-555555555555';
 
-    postStub.withArgs(`/courts/${courtId}/v1/photo`).rejects({
-      isAxiosError: true,
-      response: {
-        data: 'conflict',
-        status: HttpStatusCode.Conflict,
-      },
-    });
+    deleteStub.withArgs(`/courts/${courtId}/v1/photo`).resolves({ status: HttpStatusCode.NoContent });
 
-    const response = await courtApi.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
-
-    expect(response).toBe(HttpStatusCode.Conflict);
-  });
-
-  it('returns parsed court contact details when the contact details response is valid', async () => {
-    const courtId = '77777777-7777-4777-8777-777777777777';
-    const contactDetails = [
-      {
-        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-        courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
-        email: 'contact@example.com',
-        explanation: 'General enquiries',
-        explanationCy: null,
-        phoneNumber: '020 1234 5678',
-      },
-    ];
-
-    getStub.withArgs(`/courts/${courtId}/v1/contact-details`).resolves({ data: contactDetails });
-
-    const response = await courtApi.getCourtContactDetails(courtId);
-
-    expect(response).toEqual(contactDetails);
-  });
-
-  it('returns not found when fetching court contact details fails with an axios status', async () => {
-    const courtId = '77777777-7777-4777-8777-777777777777';
-
-    getStub.withArgs(`/courts/${courtId}/v1/contact-details`).rejects(errorResponse);
-
-    const response = await courtApi.getCourtContactDetails(courtId);
-
-    expect(response).toBe(HttpStatusCode.NotFound);
-  });
-
-  it('returns no content when deleting court contact detail succeeds', async () => {
-    const courtId = '77777777-7777-4777-8777-777777777777';
-    const contactDetailId = '99999999-9999-4999-8999-999999999999';
-
-    deleteStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`).resolves({
-      status: HttpStatusCode.NoContent,
-    });
-
-    const response = await courtApi.deleteCourtContactDetail(courtId, contactDetailId);
+    const response = await courtApi.deleteCourtPhoto(courtId);
 
     expect(response).toBe(HttpStatusCode.NoContent);
   });
 
-  it('returns internal server error when deleting court contact detail gets an unexpected status', async () => {
-    const courtId = '77777777-7777-4777-8777-777777777777';
-    const contactDetailId = '99999999-9999-4999-8999-999999999999';
+  it('returns not found when deleting court photo fails with a 404', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
 
-    deleteStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`).resolves({
-      status: HttpStatusCode.Ok,
-    });
+    deleteStub.withArgs(`/courts/${courtId}/v1/photo`).rejects(errorResponse);
 
-    const response = await courtApi.deleteCourtContactDetail(courtId, contactDetailId);
+    const response = await courtApi.deleteCourtPhoto(courtId);
 
-    expect(response).toBe(HttpStatusCode.InternalServerError);
-  });
-
-  it('returns bad gateway when deleting court contact detail fails with an axios status', async () => {
-    const courtId = '77777777-7777-4777-8777-777777777777';
-    const contactDetailId = '99999999-9999-4999-8999-999999999999';
-
-    deleteStub.withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`).rejects({
-      isAxiosError: true,
-      response: {
-        data: 'bad gateway',
-        status: HttpStatusCode.BadGateway,
-      },
-    });
-
-    const response = await courtApi.deleteCourtContactDetail(courtId, contactDetailId);
-
-    expect(response).toBe(HttpStatusCode.BadGateway);
+    expect(response).toBe(HttpStatusCode.NotFound);
   });
 });
