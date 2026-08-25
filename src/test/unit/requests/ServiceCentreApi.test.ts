@@ -227,6 +227,27 @@ describe('ServiceCentreApi', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns parsed service centre details when service centre by id response is valid', async () => {
+    const serviceCentreId = '66666666-6666-4666-8666-666666666666';
+    const serviceCentre = {
+      createdAt: '2026-04-29T09:00:00Z',
+      id: serviceCentreId,
+      lastUpdatedAt: '2026-04-29T10:00:00Z',
+      name: 'National Business Centre',
+      open: true,
+      regionId: '33333333-3333-4333-8333-333333333333',
+      serviceAreaIds: ['77777777-7777-4777-8777-777777777777'],
+      slug: 'national-business-centre',
+      warningNotice: null,
+    };
+
+    getStub.withArgs(`/service-centres/${serviceCentreId}/entity/v1`).resolves({ data: serviceCentre });
+
+    const response = await serviceCentreApi.getServiceCentreById(serviceCentreId);
+
+    expect(response).toEqual(serviceCentre);
+  });
+
   it('returns status code when service centre by id request fails', async () => {
     const serviceCentreId = '66666666-6666-4666-8666-666666666666';
 
