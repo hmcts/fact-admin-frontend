@@ -3,6 +3,7 @@ src/main/public/main-dev.css
 src/main/public/main*.css
 src/main/public/main*.js
 src/main/assets/js/accessible-autocomplete.min.js
+src/main/assets/scss/accessible-autocomplete.min.scss
 .pnp.*
 src/main/views/govuk
 .yarn/
