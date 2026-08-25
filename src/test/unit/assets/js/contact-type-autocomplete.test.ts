@@ -87,5 +87,6 @@ describe('contact-type-autocomplete', () => {
     expect(options.dropdownArrow({ className: 'autocomplete__dropdown-arrow-down' })).toContain(
       'class="autocomplete__dropdown-arrow-down"'
     );
+    expect(options.dropdownArrow({ className: 'autocomplete__dropdown-arrow-down' })).not.toContain('style=');
   });
 });
