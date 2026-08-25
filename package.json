@@ -124,7 +124,7 @@
     "body-parser@npm:~1.20.5": "npm:1.20.6",
     "form-data": "4.0.6",
     "ip-address": "10.5.0",
-    "joi": "18.2.3",
+    "joi": "18.2.5",
     "js-yaml@npm:^3.13.1": "npm:js-yaml@3.15.1",
     "js-yaml@npm:^4.0.0": "npm:4.3.1",
     "js-yaml@npm:^4.1.0": "npm:4.3.1",
