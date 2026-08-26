@@ -5,8 +5,8 @@ import { canApprove, getFactUserId, isViewer } from '../modules/authentication/a
 import { ApprovalSubjectType } from '../schemas/approvalSchema';
 import { Subject } from '../schemas/subjectTypeSchema';
 import { ApprovalService, ApproveDataViewModel } from '../services/ApprovalService';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController, { type NotFoundTemplate } from './BaseController';
 import { BreadcrumbItem } from './helpers/breadcrumbs';
 
 type Location = {
@@ -22,17 +22,19 @@ type LocationApprovalControllerOptions = {
   getLocation: (locationId: string) => Promise<Location | HttpStatusCode>;
   locationIdViewKey: string;
   locationNameViewKey: string;
-  notFoundView: string;
+  notFoundView: NotFoundTemplate;
   paramName: string;
   routeSegment: string;
   subjectType: ApprovalSubjectType;
 };
 
-export class LocationApprovalController {
+export class LocationApprovalController extends BaseController {
   public constructor(
     private readonly options: LocationApprovalControllerOptions,
     private readonly approvalService: ApprovalService
-  ) {}
+  ) {
+    super();
+  }
 
   public async get(req: Request, res: Response): Promise<void> {
     const locationId = this.resolveLocationId(req, res);
@@ -51,7 +53,7 @@ export class LocationApprovalController {
       ? await this.options.getAdditionalEditViewModel(req, locationId)
       : {};
 
-    if (this.renderStatusResponse(additionalViewModel, res)) {
+    if (this.renderStatusResponse(res, additionalViewModel, 'not-found')) {
       return;
     }
 
@@ -63,7 +65,7 @@ export class LocationApprovalController {
       canApprove(req)
     );
 
-    if (this.renderStatusResponse(approvalAction, res)) {
+    if (this.renderStatusResponse(res, approvalAction, 'not-found')) {
       return;
     }
 
@@ -87,7 +89,7 @@ export class LocationApprovalController {
 
     const approveData = await this.getApproveData(req, res);
 
-    if (!approveData || this.renderStatusResponse(approveData, res)) {
+    if (!approveData || this.renderStatusResponse(res, approveData, 'not-found')) {
       return;
     }
 
@@ -117,7 +119,7 @@ export class LocationApprovalController {
     }
 
     if (!userId) {
-      return res.status(HttpStatusCode.InternalServerError).render('error');
+      return this.renderError(res, HttpStatusCode.InternalServerError);
     }
 
     const location = await this.options.getLocation(locationId);
@@ -134,7 +136,7 @@ export class LocationApprovalController {
       userId
     );
 
-    if (this.renderStatusResponse(approveData, res)) {
+    if (this.renderStatusResponse(res, approveData, 'not-found')) {
       return;
     }
 
@@ -193,16 +195,7 @@ export class LocationApprovalController {
       return false;
     }
 
-    res.status(location).render(location === HttpStatusCode.NotFound ? this.options.notFoundView : 'error');
-    return true;
-  }
-
-  private renderStatusResponse<T>(response: T | HttpStatusCode, res: Response): response is HttpStatusCode {
-    if (typeof response !== 'number') {
-      return false;
-    }
-
-    res.status(response).render(response === HttpStatusCode.NotFound ? 'not-found' : 'error');
+    this.renderStatus(res, location, this.options.notFoundView);
     return true;
   }
 
@@ -216,11 +209,10 @@ export class LocationApprovalController {
   }
 
   private resolveLocationId(req: Request, res: Response): string | undefined {
-    const locationIdParam = req.params[this.options.paramName];
-    const locationId = Array.isArray(locationIdParam) ? locationIdParam[0] : locationIdParam;
+    const locationId = this.getUuidRouteParam(req, this.options.paramName);
 
-    if (!locationId || !isUuid(locationId)) {
-      res.status(HttpStatusCode.NotFound).render(this.options.notFoundView);
+    if (!locationId) {
+      this.renderNotFound(res, this.options.notFoundView);
       return undefined;
     }
 

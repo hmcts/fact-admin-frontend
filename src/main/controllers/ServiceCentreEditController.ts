@@ -9,6 +9,7 @@ import { ApprovalService } from '../services/ApprovalService';
 import { LockService } from '../services/LockService';
 import { parseNumber } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
@@ -41,7 +42,7 @@ const locationApprovalController = new LocationApprovalController(
 );
 
 @route('/service-centres/:serviceCentreId/edit')
-export default class ServiceCentreEditController {
+export default class ServiceCentreEditController extends BaseController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     await locationApprovalController.get(req, res);

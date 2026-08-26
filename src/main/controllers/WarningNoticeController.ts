@@ -3,35 +3,41 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { WarningNoticeForm, WarningNoticeService } from '../services/WarningNoticeService';
-import { renderResponse, renderStatus } from '../utils/responseRendering';
-import { parseOptionalString, parseString } from '../utils/valueParsers';
+import { parseOptionalString } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
-import { ensureValidCourtId } from './helpers/routeParams';
 
 const warningNoticeService = new WarningNoticeService();
 
 @route('/courts/:courtId/edit/warning-notice')
-export default class WarningNoticeController {
+export default class WarningNoticeController extends BaseController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const courtId: string = parseString(req.params.courtId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
 
-    if (!ensureValidCourtId(courtId, res)) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
     const viewModel = await warningNoticeService.getWarningNoticePage(courtId);
 
-    return renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-warning-notice-edit');
+    return this.renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel),
+      'court-warning-notice-edit',
+      'court-not-found'
+    );
   }
 
   @route('/success')
   @POST()
   public async post(req: Request, res: Response): Promise<void> {
-    const courtId: string = parseString(req.params.courtId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
 
-    if (!ensureValidCourtId(courtId, res)) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
@@ -51,7 +57,7 @@ export default class WarningNoticeController {
     }
 
     if (saveResult.type === 'status') {
-      return renderStatus(res, saveResult.status, 'court-not-found');
+      return this.renderStatus(res, saveResult.status, 'court-not-found');
     }
 
     return res.render('common-edit-success.njk', {

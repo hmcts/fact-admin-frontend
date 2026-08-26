@@ -8,8 +8,8 @@ import { dpaAddressSchema } from '../schemas/osDataSchema';
 import { CourtAddressService } from '../services/CourtAddressService';
 import { TypesService } from '../services/TypesService';
 import { isValidPostcode, validatePostcodeField } from '../utils/addressValidation';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController, { type NotFoundTemplate } from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 const logger = Logger.getLogger('app');
@@ -17,11 +17,12 @@ const courtAddressService = new CourtAddressService();
 const typesService = new TypesService();
 
 @route('/courts/:courtId/edit/address')
-export class CourtAddressController {
+export class CourtAddressController extends BaseController {
   @GET()
   public async renderAddressList(req: Request, res: Response): Promise<void> {
     const { courtId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
@@ -55,7 +56,8 @@ export class CourtAddressController {
   @GET()
   public async renderFindNew(req: Request, res: Response): Promise<void> {
     const { courtId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
@@ -75,10 +77,12 @@ export class CourtAddressController {
   @GET()
   public async renderFindForUpdate(req: Request, res: Response): Promise<void> {
     const { courtId, addressId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
-    if (!this.validateUuid(addressId, res, 'not-found')) {
+    if (!addressId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -105,7 +109,8 @@ export class CourtAddressController {
   @GET()
   public async renderSelectNew(req: Request, res: Response): Promise<void> {
     const { courtId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
@@ -153,10 +158,12 @@ export class CourtAddressController {
   @GET()
   public async renderSelectForUpdate(req: Request, res: Response): Promise<void> {
     const { courtId, addressId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
-    if (!this.validateUuid(addressId, res, 'not-found')) {
+    if (!addressId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -206,7 +213,8 @@ export class CourtAddressController {
   @POST()
   public async addAddress(req: Request, res: Response): Promise<void> {
     const { courtId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
     const courtName = await this.resolveCourtName(courtId);
@@ -220,7 +228,8 @@ export class CourtAddressController {
   @POST()
   public async saveNewAddress(req: Request, res: Response): Promise<void> {
     const { courtId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
@@ -299,10 +308,12 @@ export class CourtAddressController {
   @POST()
   public async editAddress(req: Request, res: Response): Promise<void> {
     const { courtId, addressId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
-    if (!this.validateUuid(addressId, res, 'not-found')) {
+    if (!addressId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -335,10 +346,12 @@ export class CourtAddressController {
   @POST()
   public async updateExistingAddress(req: Request, res: Response): Promise<void> {
     const { courtId, addressId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
-    if (!this.validateUuid(addressId, res, 'not-found')) {
+    if (!addressId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -420,10 +433,12 @@ export class CourtAddressController {
   @GET()
   public async renderDeleteAddress(req: Request, res: Response): Promise<void> {
     const { courtId, addressId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
-    if (!this.validateUuid(addressId, res, 'not-found')) {
+    if (!addressId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -451,10 +466,12 @@ export class CourtAddressController {
   @POST()
   public async deleteAddress(req: Request, res: Response): Promise<void> {
     const { courtId, addressId } = this.resolvePathParams(req);
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
-    if (!this.validateUuid(addressId, res, 'not-found')) {
+    if (!addressId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -489,45 +506,19 @@ export class CourtAddressController {
   // --------------------------------------------------------------------------
   // util methods
 
-  private resolvePathParams(req: Request): { courtId: string; addressId: string } {
-    const courtId = Array.isArray(req.params?.courtId) ? req.params.courtId[0] : req.params.courtId;
-    if (req.params?.addressId) {
-      const addressId = Array.isArray(req.params?.addressId) ? req.params.addressId[0] : req.params.addressId;
-      return { courtId, addressId };
-    }
-    return { courtId, addressId: '' };
+  private resolvePathParams(req: Request): { courtId?: string; addressId?: string } {
+    return {
+      courtId: this.getUuidRouteParam(req, 'courtId'),
+      addressId: this.getUuidRouteParam(req, 'addressId'),
+    };
   }
 
-  private validateUuid(param: string, res: Response, notFoundView: string): boolean {
-    if (!param || !isUuid(param)) {
-      res.status(HttpStatusCode.NotFound);
-      res.render(notFoundView);
+  private validateServiceResponse(response: unknown, res: Response, notFoundView?: NotFoundTemplate): boolean {
+    if (typeof response === 'number') {
+      this.renderStatus(res, response as HttpStatusCode, notFoundView);
       return false;
     }
     return true;
-  }
-
-  private validateServiceResponse(response: unknown, res: Response, notFoundView?: string): boolean {
-    if (this.isHttpStatus(response)) {
-      this.renderServiceError(res, response, notFoundView);
-      return false;
-    }
-    return true;
-  }
-
-  private isHttpStatus(result: unknown): result is number {
-    return typeof result === 'number';
-  }
-
-  private renderServiceError(res: Response, status: number, notFoundView?: string): void {
-    if (status === HttpStatusCode.NotFound && notFoundView) {
-      res.status(HttpStatusCode.NotFound);
-      res.render(notFoundView);
-      return;
-    }
-
-    res.status(status);
-    res.render('error');
   }
 
   private async resolveCourtName(courtId: string): Promise<string | HttpStatusCode> {

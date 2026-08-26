@@ -3,8 +3,8 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { CasesHeardService } from '../services/CasesHeardService';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 const casesHeardService = new CasesHeardService();
@@ -16,24 +16,19 @@ type Confirmations = {
 };
 
 @route('/courts/:courtId/edit/cases-heard')
-export default class CasesHeardController {
+export default class CasesHeardController extends BaseController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
 
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      return res.status(HttpStatusCode.NotFound).render('court-not-found');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
     const viewModel = await casesHeardService.getCasesHeardPage(resolvedCourtId);
 
-    if (viewModel === HttpStatusCode.NotFound) {
-      return res.status(HttpStatusCode.NotFound).render('court-not-found');
-    }
-
-    if (typeof viewModel === 'number') {
-      return res.status(viewModel).render('error');
+    if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
+      return;
     }
 
     return res.render('cases-heard', {
@@ -45,11 +40,10 @@ export default class CasesHeardController {
   @route('/success')
   @POST()
   public async postSuccess(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
 
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      return res.status(HttpStatusCode.NotFound).render('court-not-found');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
     const selectedAreasOfLaw = casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
@@ -76,12 +70,8 @@ export default class CasesHeardController {
       });
     }
 
-    if (saveResult.type === 'status' && saveResult.status === HttpStatusCode.NotFound) {
-      return res.status(HttpStatusCode.NotFound).render('court-not-found');
-    }
-
     if (saveResult.type === 'status') {
-      return res.status(saveResult.status).render('error');
+      return this.renderStatus(res, saveResult.status, 'court-not-found');
     }
 
     return res.render('common-edit-success', {

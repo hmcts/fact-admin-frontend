@@ -7,10 +7,12 @@ import { NextFunction, Request, Response } from 'express';
 import { OperationsApi } from '../requests/OperationsApi';
 import { dataApiUrl } from '../requests/utils/axiosConfig';
 
+import BaseController from './BaseController';
+
 const operationsApi = new OperationsApi();
 
 @route('/info')
-export default class InfoController {
+export default class InfoController extends BaseController {
   @GET()
   public async get(req: Request, res: Response, next: NextFunction): Promise<void> {
     infoRequestHandler({

@@ -4,10 +4,12 @@ import { Request, Response } from 'express';
 import { isViewer } from '../modules/authentication/authenticationHelper';
 import { HomePageService } from '../services/HomePageService';
 
+import BaseController from './BaseController';
+
 const homePageService = new HomePageService();
 
 @route('/')
-export default class HomeController {
+export default class HomeController extends BaseController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const filters = homePageService.getFilters(req.query as Record<string, unknown>);

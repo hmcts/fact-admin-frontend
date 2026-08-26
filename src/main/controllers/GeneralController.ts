@@ -1,35 +1,26 @@
 import { GET, POST, route } from 'awilix-express';
-import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { GeneralService, GeneralViewModel } from '../services/GeneralService';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 const generalService = new GeneralService();
 
 @route('/courts/:courtId/edit/general')
-export default class GeneralController {
+export default class GeneralController extends BaseController {
   @GET()
   public async renderEditView(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
     const model = await generalService.retrieve(resolvedCourtId);
 
-    if (model === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof model === 'number') {
-      res.status(model);
-      return res.render('error');
+    if (this.renderStatusResponse(res, model, 'court-not-found')) {
+      return;
     }
 
     res.render('general-edit', {
@@ -42,11 +33,9 @@ export default class GeneralController {
   @route('/success')
   @POST()
   public async updateCourt(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
     // parse the open field. The body contains a string, which we need to
@@ -72,14 +61,8 @@ export default class GeneralController {
     };
 
     const updateResponse = await generalService.save(model);
-    if (updateResponse === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof updateResponse === 'number') {
-      res.status(updateResponse);
-      return res.render('error');
+    if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
+      return;
     }
 
     if (updateResponse.errors) {

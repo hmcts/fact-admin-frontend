@@ -3,19 +3,19 @@ import { Request, Response } from 'express';
 
 import { AddServiceCentreService } from '../services/AddServiceCentreService';
 
+import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 const addServiceCentreService = new AddServiceCentreService();
 
 @route('/add-service-centre')
-export default class AddServiceCentreController {
+export default class AddServiceCentreController extends BaseController {
   @GET()
   public async get(_req: Request, res: Response): Promise<void> {
     const viewModel = await addServiceCentreService.getViewModel();
 
     if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      res.render('error');
+      this.renderError(res, viewModel);
       return;
     }
 
@@ -34,8 +34,7 @@ export default class AddServiceCentreController {
     });
 
     if (typeof createResult === 'number') {
-      res.status(createResult);
-      res.render('error');
+      this.renderError(res, createResult);
       return;
     }
 

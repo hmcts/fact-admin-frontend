@@ -5,11 +5,9 @@ import { Request, Response } from 'express';
 import {
   FamilyCourtRemovalConfirmation,
   ProfessionalInformationService,
-  ProfessionalInformationViewModel,
-  SaveProfessionalInformationResult,
 } from '../services/ProfessionalInformationService';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 type HiddenInput = {
@@ -20,13 +18,14 @@ type HiddenInput = {
 type ProfessionalInformationServiceFactory = () => Promise<ProfessionalInformationService>;
 
 @route('/courts/:courtId/edit/information-for-professionals')
-export default class ProfessionalInformationController {
+export default class ProfessionalInformationController extends BaseController {
   private professionalInformationService?: ProfessionalInformationService;
   private readonly professionalInformationServiceFactory?: ProfessionalInformationServiceFactory;
 
   public constructor(
     professionalInformationServiceFactory?: ProfessionalInformationService | ProfessionalInformationServiceFactory
   ) {
+    super();
     if (typeof professionalInformationServiceFactory === 'function') {
       this.professionalInformationServiceFactory = professionalInformationServiceFactory;
     } else {
@@ -37,14 +36,14 @@ export default class ProfessionalInformationController {
 
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveCourtId(req);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
     if (!courtId) {
       return this.renderCourtNotFound(res);
     }
 
     const professionalInformationService = await this.getProfessionalInformationService();
     const viewModel = await professionalInformationService.getViewModel(courtId);
-    if (this.renderStatusResponse(res, viewModel)) {
+    if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
       return;
     }
 
@@ -57,7 +56,7 @@ export default class ProfessionalInformationController {
   @route('/success')
   @POST()
   public async postSuccess(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveCourtId(req);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
     if (!courtId) {
       return this.renderCourtNotFound(res);
     }
@@ -68,7 +67,7 @@ export default class ProfessionalInformationController {
         courtId,
         req.body
       );
-      if (this.renderStatusResponse(res, confirmation)) {
+      if (this.renderStatusResponse(res, confirmation, 'court-not-found')) {
         return;
       }
 
@@ -79,7 +78,7 @@ export default class ProfessionalInformationController {
 
     const professionalInformationService = await this.getProfessionalInformationService();
     const saveResponse = await professionalInformationService.save(courtId, req.body);
-    if (this.renderStatusResponse(res, saveResponse)) {
+    if (this.renderStatusResponse(res, saveResponse, 'court-not-found')) {
       return;
     }
 
@@ -100,40 +99,6 @@ export default class ProfessionalInformationController {
       courtId,
       courtName: saveResponse.viewModel.courtName,
     });
-  }
-
-  private resolveCourtId(req: Request): string | null {
-    const courtId = req.params?.courtId as string | string[] | undefined;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-
-    return typeof resolvedCourtId === 'string' && isUuid(resolvedCourtId) ? resolvedCourtId : null;
-  }
-
-  private renderStatusResponse(
-    res: Response,
-    response:
-      | FamilyCourtRemovalConfirmation
-      | HttpStatusCode
-      | ProfessionalInformationViewModel
-      | SaveProfessionalInformationResult
-  ): response is HttpStatusCode {
-    if (typeof response !== 'number') {
-      return false;
-    }
-
-    if (response === HttpStatusCode.NotFound) {
-      this.renderCourtNotFound(res);
-      return true;
-    }
-
-    res.status(response);
-    res.render('error');
-    return true;
-  }
-
-  private renderCourtNotFound(res: Response): void {
-    res.status(HttpStatusCode.NotFound);
-    res.render('court-not-found');
   }
 
   private renderConfirmation(

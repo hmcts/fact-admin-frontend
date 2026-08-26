@@ -9,30 +9,24 @@ import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../services/ServiceCentreAddressService';
 import { isValidPostcode, validatePostcodeField } from '../utils/addressValidation';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
-import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
-import { getUuidRouteParam } from './helpers/routeParams';
 
 const logger = Logger.getLogger('app');
 const serviceCentreAddressService = new ServiceCentreAddressService();
 
 @route('/service-centres/:serviceCentreId/edit/address')
-export default class ServiceCentreAddressController {
+export default class ServiceCentreAddressController extends BaseController {
   @GET()
   public async renderAddressList(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
     const addressesResponse = await serviceCentreAddressService.list(serviceCentreId);
-    if (addressesResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof addressesResponse === 'number') {
-      renderError(res, addressesResponse);
+    if (this.renderStatusResponse(res, addressesResponse, 'service-centre-not-found')) {
       return;
     }
 
@@ -56,9 +50,9 @@ export default class ServiceCentreAddressController {
   @route('/find')
   @GET()
   public async renderFindNew(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -86,20 +80,15 @@ export default class ServiceCentreAddressController {
   @route('/find/:addressId')
   @GET()
   public async renderFindForUpdate(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const addressId = getUuidRouteParam(req, 'addressId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const addressId = this.getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
     const addressResponse = await serviceCentreAddressService.retrieve(serviceCentreId, addressId);
-    if (addressResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof addressResponse === 'number') {
-      renderError(res, addressResponse);
+    if (this.renderStatusResponse(res, addressResponse, 'service-centre-not-found')) {
       return;
     }
 
@@ -121,9 +110,9 @@ export default class ServiceCentreAddressController {
   @route('/select')
   @GET()
   public async renderSelectNew(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -154,12 +143,7 @@ export default class ServiceCentreAddressController {
     }
 
     const searchResponse = await serviceCentreAddressService.retrieveAddressOptions(postcode);
-    if (searchResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof searchResponse === 'number') {
-      renderError(res, searchResponse);
+    if (this.renderStatusResponse(res, searchResponse, 'service-centre-not-found')) {
       return;
     }
 
@@ -200,10 +184,10 @@ export default class ServiceCentreAddressController {
   @route('/select/:addressId')
   @GET()
   public async renderSelectForUpdate(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const addressId = getUuidRouteParam(req, 'addressId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const addressId = this.getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -227,12 +211,7 @@ export default class ServiceCentreAddressController {
     }
 
     const searchResponse = await serviceCentreAddressService.retrieveAddressOptions(postcode);
-    if (searchResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof searchResponse === 'number') {
-      renderError(res, searchResponse);
+    if (this.renderStatusResponse(res, searchResponse, 'service-centre-not-found')) {
       return;
     }
 
@@ -263,9 +242,9 @@ export default class ServiceCentreAddressController {
   @route('/details')
   @POST()
   public async addAddress(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -288,9 +267,9 @@ export default class ServiceCentreAddressController {
   @route('/details/success')
   @POST()
   public async saveNewAddress(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -308,12 +287,7 @@ export default class ServiceCentreAddressController {
       isNewSC
     );
 
-    if (saveResult === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof saveResult === 'number') {
-      renderError(res, saveResult);
+    if (this.renderStatusResponse(res, saveResult, 'service-centre-not-found')) {
       return;
     }
 
@@ -343,20 +317,15 @@ export default class ServiceCentreAddressController {
   @route('/details/:addressId')
   @POST()
   public async editAddress(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const addressId = getUuidRouteParam(req, 'addressId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const addressId = this.getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
     const addressResponse = await serviceCentreAddressService.retrieve(serviceCentreId, addressId);
-    if (addressResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof addressResponse === 'number') {
-      renderError(res, addressResponse);
+    if (this.renderStatusResponse(res, addressResponse, 'service-centre-not-found')) {
       return;
     }
 
@@ -378,10 +347,10 @@ export default class ServiceCentreAddressController {
   @route('/details/success/:addressId')
   @POST()
   public async updateAddress(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const addressId = getUuidRouteParam(req, 'addressId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const addressId = this.getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -396,12 +365,7 @@ export default class ServiceCentreAddressController {
       addressId
     );
 
-    if (saveResult === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof saveResult === 'number') {
-      renderError(res, saveResult);
+    if (this.renderStatusResponse(res, saveResult, 'service-centre-not-found')) {
       return;
     }
 
@@ -422,10 +386,10 @@ export default class ServiceCentreAddressController {
   @route('/delete/:addressId')
   @GET()
   public async renderDeleteAddress(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const addressId = getUuidRouteParam(req, 'addressId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const addressId = this.getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -435,12 +399,7 @@ export default class ServiceCentreAddressController {
     }
 
     const addressResponse = await serviceCentreAddressService.retrieve(serviceCentreId, addressId);
-    if (addressResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof addressResponse === 'number') {
-      renderError(res, addressResponse);
+    if (this.renderStatusResponse(res, addressResponse, 'service-centre-not-found')) {
       return;
     }
 
@@ -456,20 +415,15 @@ export default class ServiceCentreAddressController {
   @route('/delete/success/:addressId')
   @POST()
   public async deleteAddress(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const addressId = getUuidRouteParam(req, 'addressId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const addressId = this.getUuidRouteParam(req, 'addressId');
     if (!serviceCentreId || !addressId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
     const deleteResult = await serviceCentreAddressService.delete(serviceCentreId, addressId);
-    if (deleteResult === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof deleteResult === 'number') {
-      renderError(res, deleteResult);
+    if (this.renderStatusResponse(res, deleteResult, 'service-centre-not-found')) {
       return;
     }
 
@@ -566,11 +520,7 @@ export default class ServiceCentreAddressController {
       logger.warn('Unable to resolve service-centre name for breadcrumbs:', error);
     }
     if (typeof response === 'number') {
-      if (response === HttpStatusCode.NotFound) {
-        renderServiceCentreNotFound(res);
-      } else {
-        renderError(res, response);
-      }
+      this.renderStatus(res, response, 'service-centre-not-found');
       return undefined;
     }
     return response;

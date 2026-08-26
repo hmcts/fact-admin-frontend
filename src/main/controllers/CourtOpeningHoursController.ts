@@ -3,59 +3,68 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { CourtOpeningHoursService, OpeningHoursForm } from '../services/CourtOpeningHoursService';
-import { renderResponse, renderStatus } from '../utils/responseRendering';
-import { isUuid, parseOptionalString, parseString } from '../utils/valueParsers';
+import { parseOptionalString } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 const courtOpeningHoursService = new CourtOpeningHoursService();
 
 @route('/courts/:courtId/edit/court-opening-hours')
-export default class CourtOpeningHoursController {
+export default class CourtOpeningHoursController extends BaseController {
   @GET()
   public async getList(req: Request, res: Response): Promise<void> {
-    const courtId = parseString(req.params.courtId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
     const viewModel = await courtOpeningHoursService.getListPage(courtId);
 
-    renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-opening-hours');
+    this.renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-opening-hours', 'court-not-found');
   }
 
   @route('/add')
   @GET()
   public async getAdd(req: Request, res: Response): Promise<void> {
-    const courtId = parseString(req.params.courtId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId);
 
-    renderResponse(res, this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'), 'court-opening-hours-edit');
+    this.renderResponse(
+      res,
+      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
+      'court-opening-hours-edit',
+      'court-not-found'
+    );
   }
 
   @route('/edit/:openingHoursId')
   @GET()
   public async getEdit(req: Request, res: Response): Promise<void> {
-    const courtId = parseString(req.params.courtId);
-    const openingHoursId = parseString(req.params.openingHoursId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
+    const openingHoursId = this.getUuidRouteParam(req, 'openingHoursId');
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
-    if (!this.validateUuid(openingHoursId, res, 'not-found')) {
+    if (!openingHoursId) {
+      this.renderNotFound(res);
       return;
     }
 
     const viewModel = await courtOpeningHoursService.getEditPage(courtId, openingHoursId);
 
-    renderResponse(
+    this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
       'court-opening-hours-edit',
@@ -72,20 +81,22 @@ export default class CourtOpeningHoursController {
   @route('/save/:openingHoursId')
   @POST()
   public async postEdit(req: Request, res: Response): Promise<void> {
-    await this.save(req, res, parseString(req.params.openingHoursId));
+    await this.save(req, res, true);
   }
 
   @route('/delete/:openingHoursId')
   @GET()
   public async getDelete(req: Request, res: Response): Promise<void> {
-    const courtId = parseString(req.params.courtId);
-    const openingHoursId = parseString(req.params.openingHoursId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
+    const openingHoursId = this.getUuidRouteParam(req, 'openingHoursId');
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
-    if (!this.validateUuid(openingHoursId, res, 'not-found')) {
+    if (!openingHoursId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -98,7 +109,7 @@ export default class CourtOpeningHoursController {
             cancelHref: `/courts/${courtId}/edit/court-opening-hours`,
           };
 
-    renderResponse(
+    this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, deleteViewModel, 'Delete opening hours'),
       'court-opening-hours-delete',
@@ -109,20 +120,22 @@ export default class CourtOpeningHoursController {
   @route('/delete/success/:openingHoursId')
   @POST()
   public async postDelete(req: Request, res: Response): Promise<void> {
-    const courtId = parseString(req.params.courtId);
-    const openingHoursId = parseString(req.params.openingHoursId);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
+    const openingHoursId = this.getUuidRouteParam(req, 'openingHoursId');
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
-    if (!this.validateUuid(openingHoursId, res, 'not-found')) {
+    if (!openingHoursId) {
+      this.renderNotFound(res);
       return;
     }
 
     const viewModel = await courtOpeningHoursService.delete(courtId, openingHoursId);
 
-    renderResponse(
+    this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted'),
       'court-opening-hours-delete-success',
@@ -130,14 +143,17 @@ export default class CourtOpeningHoursController {
     );
   }
 
-  private async save(req: Request, res: Response, openingHoursId?: string): Promise<void> {
-    const courtId = parseString(req.params.courtId);
+  private async save(req: Request, res: Response, isEdit = false): Promise<void> {
+    const courtId = this.getUuidRouteParam(req, 'courtId');
+    const openingHoursId = isEdit ? this.getUuidRouteParam(req, 'openingHoursId') : undefined;
 
-    if (!this.validateUuid(courtId, res, 'court-not-found')) {
+    if (!courtId) {
+      this.renderCourtNotFound(res);
       return;
     }
 
-    if (openingHoursId && !this.validateUuid(openingHoursId, res, 'not-found')) {
+    if (isEdit && !openingHoursId) {
+      this.renderNotFound(res);
       return;
     }
 
@@ -152,7 +168,7 @@ export default class CourtOpeningHoursController {
     }
 
     if (saveResult.type === 'status') {
-      return renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
+      return this.renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
     }
 
     return res.render('court-opening-hours-save-success', {
@@ -168,16 +184,6 @@ export default class CourtOpeningHoursController {
       sameTime: parseOptionalString(body.sameTime),
       selectedDays: courtOpeningHoursService.getSelectedDays(body.selectedDays),
     } as OpeningHoursForm;
-  }
-
-  private validateUuid(value: string, res: Response, template: string): boolean {
-    if (!value || !isUuid(value)) {
-      res.status(HttpStatusCode.NotFound);
-      res.render(template);
-      return false;
-    }
-
-    return true;
   }
 
   private buildOpeningHoursBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {

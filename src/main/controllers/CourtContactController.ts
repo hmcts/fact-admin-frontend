@@ -6,14 +6,13 @@ import { CourtContactDetail } from '../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../schemas/courtEntitySchema';
 import { CourtContactFormHeading, CourtContactService } from '../services/CourtContactService';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
-import { renderCourtNotFound, renderError } from './helpers/responseRenderers';
-import { getUuidRouteParam } from './helpers/routeParams';
 
 const courtContactService = new CourtContactService();
 
 @route('/courts/:courtId/edit/contact-details')
-export default class CourtContactController {
+export default class CourtContactController extends BaseController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const resolvedCourtId = this.resolveRequiredCourtId(req, res);
@@ -28,7 +27,7 @@ export default class CourtContactController {
 
     const courtContactDetailsResponse = await courtContactService.listContactDetails(resolvedCourtId);
     if (typeof courtContactDetailsResponse === 'number') {
-      return renderError(res, courtContactDetailsResponse);
+      return this.renderError(res, courtContactDetailsResponse);
     }
 
     return res.render('court-contact-list', {
@@ -55,7 +54,7 @@ export default class CourtContactController {
 
     const contactDescriptionTypesResponse = await courtContactService.getContactDescriptionTypeItems();
     if (typeof contactDescriptionTypesResponse === 'number') {
-      return renderError(res, contactDescriptionTypesResponse);
+      return this.renderError(res, contactDescriptionTypesResponse);
     }
 
     return res.render('court-contact-form', {
@@ -89,18 +88,18 @@ export default class CourtContactController {
       resolvedContactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      return renderError(res, contactDetailResponse);
+      return this.renderError(res, contactDetailResponse);
     }
 
     if (!contactDetailResponse) {
-      return renderCourtNotFound(res);
+      return this.renderCourtNotFound(res);
     }
 
     const contactDescriptionTypesResponse = await courtContactService.getContactDescriptionTypeItems(
       contactDetailResponse.courtContactDescriptionId
     );
     if (typeof contactDescriptionTypesResponse === 'number') {
-      return renderError(res, contactDescriptionTypesResponse);
+      return this.renderError(res, contactDescriptionTypesResponse);
     }
 
     return res.render('court-contact-form', {
@@ -179,11 +178,11 @@ export default class CourtContactController {
       resolvedContactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      return renderError(res, contactDetailResponse);
+      return this.renderError(res, contactDetailResponse);
     }
 
     if (!contactDetailResponse) {
-      return renderCourtNotFound(res);
+      return this.renderCourtNotFound(res);
     }
 
     const contactDescription = await courtContactService.resolveContactDetailDescription(contactDetailResponse);
@@ -221,18 +220,18 @@ export default class CourtContactController {
       resolvedContactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      return renderError(res, contactDetailResponse);
+      return this.renderError(res, contactDetailResponse);
     }
 
     if (!contactDetailResponse) {
-      return renderCourtNotFound(res);
+      return this.renderCourtNotFound(res);
     }
 
     const contactDescription = await courtContactService.resolveContactDetailDescription(contactDetailResponse);
 
     const deleteStatus = await courtContactService.deleteContactDetail(resolvedCourtId, resolvedContactDetailId);
     if (deleteStatus !== HttpStatusCode.NoContent) {
-      return renderError(res, deleteStatus);
+      return this.renderError(res, deleteStatus);
     }
     const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
     return res.render('common-edit-success', {
@@ -260,9 +259,9 @@ export default class CourtContactController {
   }
 
   private resolveRequiredCourtId(req: Request, res: Response): string | void {
-    const courtId = getUuidRouteParam(req, 'courtId');
+    const courtId = this.getUuidRouteParam(req, 'courtId');
     if (!courtId) {
-      return renderCourtNotFound(res);
+      return this.renderCourtNotFound(res);
     }
 
     return courtId;
@@ -272,11 +271,11 @@ export default class CourtContactController {
     req: Request,
     res: Response
   ): { courtId: string; contactDetailId: string } | undefined {
-    const courtId = getUuidRouteParam(req, 'courtId');
-    const contactDetailId = getUuidRouteParam(req, 'contactDetailId');
+    const courtId = this.getUuidRouteParam(req, 'courtId');
+    const contactDetailId = this.getUuidRouteParam(req, 'contactDetailId');
 
     if (!courtId || !contactDetailId) {
-      renderCourtNotFound(res);
+      this.renderCourtNotFound(res);
       return;
     }
 
@@ -316,7 +315,7 @@ export default class CourtContactController {
     }
 
     if (submitFlowOutcome.type === 'save-error') {
-      return renderError(res, submitFlowOutcome.status);
+      return this.renderError(res, submitFlowOutcome.status);
     }
 
     const contactDescription = submitFlowOutcome.successPanelBody;
@@ -340,12 +339,8 @@ export default class CourtContactController {
   private async resolveCourtForView(courtId: string, res: Response): Promise<CourtEntity | void> {
     const courtResponse = await courtContactService.getCourtById(courtId);
 
-    if (courtResponse === HttpStatusCode.NotFound) {
-      return renderCourtNotFound(res);
-    }
-
     if (typeof courtResponse === 'number') {
-      return renderError(res, courtResponse);
+      return this.renderStatus(res, courtResponse, 'court-not-found');
     }
 
     return courtResponse;

@@ -3,33 +3,26 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { TranslationAndInterpretationService } from '../services/TranslationAndInterpretationService';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 const translationAndInterpretationService = new TranslationAndInterpretationService();
 
 @route('/courts/:courtId/edit/translation-and-interpretation')
-export default class TranslationAndInterpretationController {
+export default class TranslationAndInterpretationController extends BaseController {
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveCourtId(req);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
 
     if (!courtId) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return this.renderCourtNotFound(res);
     }
 
     const viewModel = await translationAndInterpretationService.getViewModel(courtId);
 
-    if (viewModel === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      return res.render('error');
+    if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
+      return;
     }
 
     return res.render('translation-and-interpretation', {
@@ -41,23 +34,16 @@ export default class TranslationAndInterpretationController {
   @route('/success')
   @POST()
   public async postSuccess(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveCourtId(req);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
 
     if (!courtId) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return this.renderCourtNotFound(res);
     }
 
     const saveResponse = await translationAndInterpretationService.save(courtId, req.body);
 
-    if (saveResponse === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof saveResponse === 'number') {
-      res.status(saveResponse);
-      return res.render('error');
+    if (this.renderStatusResponse(res, saveResponse, 'court-not-found')) {
+      return;
     }
 
     if (saveResponse.status === 'validationError') {
@@ -77,13 +63,6 @@ export default class TranslationAndInterpretationController {
       courtId,
       courtName: saveResponse.viewModel.courtName,
     });
-  }
-
-  private resolveCourtId(req: Request): string | null {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-
-    return resolvedCourtId && isUuid(resolvedCourtId) ? resolvedCourtId : null;
   }
 
   private buildTranslationBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {

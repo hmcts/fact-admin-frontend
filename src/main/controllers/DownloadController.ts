@@ -3,17 +3,18 @@ import { Request, Response } from 'express';
 
 import { DownloadCsvService } from '../services/DownloadCsvService';
 
+import BaseController from './BaseController';
+
 const downloadCsvService = new DownloadCsvService();
 
 @route('/download')
-export default class DownloadController {
+export default class DownloadController extends BaseController {
   @GET()
   public async get(_req: Request, res: Response): Promise<void> {
     const csvResponse = await downloadCsvService.getDownloadCsv();
 
     if (typeof csvResponse === 'number') {
-      res.status(csvResponse);
-      res.render('error');
+      this.renderError(res, csvResponse);
       return;
     }
 
