@@ -14,14 +14,27 @@ import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/service-centres/:serviceCentreId/edit')
-export default class ServiceCentreEditController extends BaseController {
+export class ServiceCentreEditController extends BaseController {
   private readonly locationApprovalController: LocationApprovalController;
 
-  constructor(serviceCentreApi = new ServiceCentreApi(), operationsApi = new OperationsApi()) {
+  constructor(
+    serviceCentreApi = new ServiceCentreApi(),
+    operationsApi = new OperationsApi(),
+    locationApprovalController = ServiceCentreEditController.createServiceCentreLocationApprovalController(
+      serviceCentreApi,
+      operationsApi
+    )
+  ) {
     super();
+    this.locationApprovalController = locationApprovalController;
+  }
 
+  private static createServiceCentreLocationApprovalController(
+    serviceCentreApi: ServiceCentreApi,
+    operationsApi: OperationsApi
+  ): LocationApprovalController {
     const lockService = new LockService(operationsApi);
-    this.locationApprovalController = new LocationApprovalController(
+    return new LocationApprovalController(
       {
         buildBreadcrumbs: buildEditBreadcrumbs,
         editView: 'service-centre-edit',

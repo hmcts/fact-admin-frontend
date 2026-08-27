@@ -14,14 +14,25 @@ import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit')
-export default class CourtEditController extends BaseController {
+export class CourtEditController extends BaseController {
   private readonly locationApprovalController: LocationApprovalController;
 
-  constructor(courtApi = new CourtApi(), operationsApi = new OperationsApi()) {
+  constructor(
+    courtApi = new CourtApi(),
+    operationsApi = new OperationsApi(),
+    locationApprovalController = CourtEditController.createCourtLocationApprovalController(courtApi, operationsApi)
+  ) {
     super();
+    this.locationApprovalController = locationApprovalController;
+  }
 
+  private static createCourtLocationApprovalController(
+    courtApi: CourtApi,
+    operationsApi: OperationsApi
+  ): LocationApprovalController {
     const courtLockService = new LockService(operationsApi);
-    this.locationApprovalController = new LocationApprovalController(
+
+    return new LocationApprovalController(
       {
         buildBreadcrumbs: buildEditBreadcrumbs,
         editView: 'court-edit',
@@ -41,7 +52,7 @@ export default class CourtEditController extends BaseController {
         notFoundView: 'court-not-found',
         paramName: 'courtId',
         routeSegment: 'courts',
-        subjectType: 'COURT',
+        subjectType: SubjectType.COURT,
       },
       new ApprovalService(operationsApi)
     );

@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 import type { Request, Response } from 'express';
 import { assert, match, mock, restore, stub } from 'sinon';
 
-import CourtEditController from '../../../main/controllers/CourtEditController';
+import { CourtEditController } from '../../../main/controllers/CourtEditController';
 import { CourtApi } from '../../../main/requests/CourtApi';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
