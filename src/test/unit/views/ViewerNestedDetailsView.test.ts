@@ -37,8 +37,11 @@ describe('Viewer nested details views', () => {
     expect(listHtml).not.toContain('Delete');
     expect(listHtml).not.toContain('Add contact detail');
     expect(formHtml).toContain('View contact details');
+    expect(formHtml).toContain('Please type to view matching contact types');
     expect(formHtml).toContain('<fieldset class="govuk-fieldset" disabled>');
     expect(formHtml).not.toContain('>Save<');
+    expect(formHtml).toContain('/assets/js/accessible-autocomplete.min.js');
+    expect(formHtml).toContain('/assets/js/contact-type-autocomplete.js');
   });
 
   test('shows opening hours as view-only without add, delete, or save controls', () => {

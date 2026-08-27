@@ -26,6 +26,7 @@ const globalIgnores = [
   '**/*.d.ts',
   'src/main/views/govuk/**',
   'src/main/public/**',
+  'src/main/assets/js/accessible-autocomplete.min.js',
   'src/main/types/**',
   'src/test/config.ts',
   'jest.*config.js',
@@ -184,6 +185,16 @@ module.exports = [
       sourceType: 'script',
       globals: {
         ...globals.node,
+      },
+    },
+  },
+  {
+    files: ['src/main/assets/js/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2026,
+      sourceType: 'script',
+      globals: {
+        ...globals.browser,
       },
     },
   },

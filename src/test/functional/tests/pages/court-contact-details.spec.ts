@@ -50,6 +50,26 @@ test.describe('Court Contact Details Journey', () => {
     });
   });
 
+  test('does not auto-select a contact type when autocomplete loses focus', async ({
+    courtContactDetailsPage,
+    playwright,
+  }) => {
+    await withCreatedCourt(playwright, 'Court Contact Autocomplete Blur', {}, async ({ createdCourt }) => {
+      const uniqueSuffix = Date.now();
+      const contactEmail = `contact-autocomplete-${uniqueSuffix}@example.test`;
+
+      await courtContactDetailsPage.gotoAdd(createdCourt.id);
+      await courtContactDetailsPage.openContactTypeAndBlur();
+      await expect.poll(() => courtContactDetailsPage.selectedContactTypeValue()).toBe('');
+
+      await courtContactDetailsPage.emailCheckbox.check();
+      await courtContactDetailsPage.emailInput.fill(contactEmail);
+      await courtContactDetailsPage.save();
+
+      await expect(courtContactDetailsPage.errorSummary).toContainText('Select a contact type');
+    });
+  });
+
   test('adds, edits and deletes contact details', async ({ courtContactDetailsPage, playwright }) => {
     await withCreatedCourt(playwright, 'Court Contact Details Journey', {}, async ({ createdCourt }) => {
       const uniqueSuffix = Date.now();

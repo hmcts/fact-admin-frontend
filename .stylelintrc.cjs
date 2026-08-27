@@ -7,7 +7,7 @@
  */
 module.exports = {
   extends: 'stylelint-config-standard-scss',
-  ignoreFiles: ['**/node_modules/**', '.yarn/**'],
+  ignoreFiles: ['**/node_modules/**', '.yarn/**', 'src/main/assets/scss/accessible-autocomplete.min.scss'],
   rules: {
     'string-quotes': null,
     'selector-class-pattern': null,
