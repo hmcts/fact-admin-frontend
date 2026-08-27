@@ -2,6 +2,24 @@
 
 @use '@ministryofjustice/frontend/moj/all' as *;
 @use 'govuk-frontend';
+@use 'accessible-autocomplete.min';
+
+// Ensure the autocomplete widget uses GOV.UK typography.
+.autocomplete__wrapper {
+  @include govuk-frontend.govuk-font($size: 19);
+}
+
+.autocomplete__hint,
+.autocomplete__input,
+.autocomplete__option {
+  font: inherit;
+}
+
+.autocomplete__dropdown-arrow-down {
+  top: 8px;
+  z-index: 1;
+  pointer-events: none;
+}
 
 // Align the service navigation with page content on the left, while letting it use extra space on the right.
 .app-service-navigation .govuk-width-container {

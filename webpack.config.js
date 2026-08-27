@@ -5,13 +5,20 @@ const govukFrontend = require(path.resolve(__dirname, 'webpack/govukFrontend'));
 const mojFrontend = require(path.resolve(__dirname, 'webpack/mojFrontend'));
 const scss = require(path.resolve(__dirname, 'webpack/scss'));
 const HtmlWebpack = require(path.resolve(__dirname, 'webpack/htmlWebpack'));
+const accessibleAutocomplete = require(path.resolve(__dirname, 'webpack/accessibleAutocomplete'));
 
 const devMode = process.env.NODE_ENV !== 'production';
 const fileNameSuffix = devMode ? '-dev' : '.[contenthash]';
 const filename = `[name]${fileNameSuffix}.js`;
 
 module.exports = {
-  plugins: [...govukFrontend.plugins, ...mojFrontend.plugins, ...scss.plugins, ...HtmlWebpack.plugins],
+  plugins: [
+    ...govukFrontend.plugins,
+    ...mojFrontend.plugins,
+    ...scss.plugins,
+    ...HtmlWebpack.plugins,
+    ...accessibleAutocomplete.plugins,
+  ],
   entry: path.resolve(sourcePath, 'index.ts'),
   mode: devMode ? 'development' : 'production',
   module: {
