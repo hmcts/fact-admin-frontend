@@ -7,6 +7,14 @@ import { CounterServiceOpeningHoursService } from '../../../main/services/Counte
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CounterServiceOpeningHoursController', () => {
+  let counterServiceOpeningHoursService = new CounterServiceOpeningHoursService();
+  let controller = new CounterServiceOpeningHoursController(counterServiceOpeningHoursService);
+
+  beforeEach(() => {
+    counterServiceOpeningHoursService = new CounterServiceOpeningHoursService();
+    controller = new CounterServiceOpeningHoursController(counterServiceOpeningHoursService);
+  });
+
   const courtId = '11111111-1111-4111-8111-111111111111';
   const counterServiceId = '22222222-2222-4222-8222-222222222222';
 
@@ -24,7 +32,6 @@ describe('CounterServiceOpeningHoursController', () => {
   }
 
   test('renders the list page when the service returns a view model', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -34,7 +41,7 @@ describe('CounterServiceOpeningHoursController', () => {
       openingHours: [],
       pageTitle: 'Counter service opening hours - Reading Crown Court',
     };
-    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage').resolves(viewModel);
+    const getListPage = stub(counterServiceOpeningHoursService, 'getListPage').resolves(viewModel);
 
     await controller.getList(request, response);
 
@@ -52,11 +59,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders court not found when the list court id is invalid', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
-    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage');
+    const getListPage = stub(counterServiceOpeningHoursService, 'getListPage');
 
     await controller.getList(request, response);
 
@@ -66,11 +72,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders court not found when the list court id is missing', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = {};
-    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage');
+    const getListPage = stub(counterServiceOpeningHoursService, 'getListPage');
 
     await controller.getList(request, response);
 
@@ -80,7 +85,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('uses the first court id when the list route parameter is an array', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: [courtId] } as unknown as typeof request.params;
@@ -90,7 +94,7 @@ describe('CounterServiceOpeningHoursController', () => {
       openingHours: [],
       pageTitle: 'Counter service opening hours - Reading Crown Court',
     };
-    const getListPage = stub(CounterServiceOpeningHoursService.prototype, 'getListPage').resolves(viewModel);
+    const getListPage = stub(counterServiceOpeningHoursService, 'getListPage').resolves(viewModel);
 
     await controller.getList(request, response);
 
@@ -99,7 +103,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders the add page when the service returns a view model', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -112,7 +115,7 @@ describe('CounterServiceOpeningHoursController', () => {
       form: { assistWith: [], selectedDays: [] },
       pageTitle: 'Edit counter service opening hours - Reading Crown Court',
     };
-    const getEditPage = stub(CounterServiceOpeningHoursService.prototype, 'getEditPage').resolves(viewModel);
+    const getEditPage = stub(counterServiceOpeningHoursService, 'getEditPage').resolves(viewModel);
 
     await controller.getAdd(request, response);
 
@@ -131,11 +134,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders court not found when the add court id is invalid', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
-    const getEditPage = stub(CounterServiceOpeningHoursService.prototype, 'getEditPage');
+    const getEditPage = stub(counterServiceOpeningHoursService, 'getEditPage');
 
     await controller.getAdd(request, response);
 
@@ -145,11 +147,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders court not found when the edit court id is invalid', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid', counterServiceId };
-    const getEditPage = stub(CounterServiceOpeningHoursService.prototype, 'getEditPage');
+    const getEditPage = stub(counterServiceOpeningHoursService, 'getEditPage');
 
     await controller.getEdit(request, response);
 
@@ -159,11 +160,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders generic not found when the edit counter service id is invalid', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, counterServiceId: 'not-a-uuid' };
-    const getEditPage = stub(CounterServiceOpeningHoursService.prototype, 'getEditPage');
+    const getEditPage = stub(counterServiceOpeningHoursService, 'getEditPage');
 
     await controller.getEdit(request, response);
 
@@ -173,11 +173,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders generic not found when an edit counter service id no longer exists', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, counterServiceId };
-    stub(CounterServiceOpeningHoursService.prototype, 'getEditPage').resolves(HttpStatusCode.NotFound);
+    stub(counterServiceOpeningHoursService, 'getEditPage').resolves(HttpStatusCode.NotFound);
 
     await controller.getEdit(request, response);
 
@@ -186,12 +185,11 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders court not found when saving add has an invalid court id', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     request.body = {};
-    const save = stub(CounterServiceOpeningHoursService.prototype, 'save');
+    const save = stub(counterServiceOpeningHoursService, 'save');
 
     await controller.postAdd(request, response);
 
@@ -201,12 +199,11 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders generic not found when saving edit has an invalid counter service id', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, counterServiceId: 'not-a-uuid' };
     request.body = {};
-    const save = stub(CounterServiceOpeningHoursService.prototype, 'save');
+    const save = stub(counterServiceOpeningHoursService, 'save');
 
     await controller.postEdit(request, response);
 
@@ -216,7 +213,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders validation errors when saving add returns a validation result', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -235,7 +231,7 @@ describe('CounterServiceOpeningHoursController', () => {
       form: { assistWit: ['forms'], selectedDays: ['MONDAY'], sameTime: 'no' },
       pageTitle: 'Error: Edit counter service opening hours - Reading Crown Court',
     };
-    const save = stub(CounterServiceOpeningHoursService.prototype, 'save').resolves({
+    const save = stub(counterServiceOpeningHoursService, 'save').resolves({
       type: 'validation_error',
       viewModel,
     });
@@ -265,7 +261,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders save success when saving add succeeds', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -283,7 +278,7 @@ describe('CounterServiceOpeningHoursController', () => {
       courtName: 'Reading Crown Court',
       assistanceAvailable: 'Forms',
     };
-    const save = stub(CounterServiceOpeningHoursService.prototype, 'save').resolves({
+    const save = stub(counterServiceOpeningHoursService, 'save').resolves({
       type: 'success',
       viewModel,
     });
@@ -306,7 +301,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders save success when saving edit succeeds', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, counterServiceId };
@@ -324,7 +318,7 @@ describe('CounterServiceOpeningHoursController', () => {
       courtName: 'Reading Crown Court',
       assistanceAvailable: 'Forms',
     };
-    const save = stub(CounterServiceOpeningHoursService.prototype, 'save').resolves({
+    const save = stub(counterServiceOpeningHoursService, 'save').resolves({
       type: 'success',
       viewModel,
     });
@@ -347,12 +341,11 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders generic not found when saving edit returns 404', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, counterServiceId };
     request.body = {};
-    stub(CounterServiceOpeningHoursService.prototype, 'save').resolves({
+    stub(counterServiceOpeningHoursService, 'save').resolves({
       status: HttpStatusCode.NotFound,
       type: 'status',
     });
@@ -364,12 +357,11 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders error when saving add returns a non-404 status', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
     request.body = {};
-    stub(CounterServiceOpeningHoursService.prototype, 'save').resolves({
+    stub(counterServiceOpeningHoursService, 'save').resolves({
       status: HttpStatusCode.InternalServerError,
       type: 'status',
     });
@@ -381,7 +373,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders delete confirmation and delete success pages', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const deleteResponse = responseMock();
     const successResponse = responseMock();
     const deleteRequest = mockRequest({});
@@ -401,8 +392,8 @@ describe('CounterServiceOpeningHoursController', () => {
       courtName: 'Reading Crown Court',
       assistanceAvailable: 'Forms',
     };
-    stub(CounterServiceOpeningHoursService.prototype, 'getDeletePage').resolves(deleteViewModel);
-    stub(CounterServiceOpeningHoursService.prototype, 'delete').resolves(successViewModel);
+    stub(counterServiceOpeningHoursService, 'getDeletePage').resolves(deleteViewModel);
+    stub(counterServiceOpeningHoursService, 'delete').resolves(successViewModel);
 
     await controller.getDelete(deleteRequest, deleteResponse);
     await controller.postDelete(successRequest, successResponse);
@@ -436,11 +427,10 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders generic not found when a counter service to delete no longer exists', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, counterServiceId };
-    stub(CounterServiceOpeningHoursService.prototype, 'getDeletePage').resolves(HttpStatusCode.NotFound);
+    stub(counterServiceOpeningHoursService, 'getDeletePage').resolves(HttpStatusCode.NotFound);
 
     await controller.getDelete(request, response);
 
@@ -449,7 +439,6 @@ describe('CounterServiceOpeningHoursController', () => {
   });
 
   test('renders not found pages for invalid delete route parameters', async () => {
-    const controller = new CounterServiceOpeningHoursController();
     const invalidCourtResponse = responseMock();
     const invalidCounterServiceResponse = responseMock();
     const invalidPostCourtResponse = responseMock();
@@ -463,8 +452,8 @@ describe('CounterServiceOpeningHoursController', () => {
     invalidCounterServiceRequest.params = { courtId, counterServiceId: 'not-a-uuid' };
     invalidPostCourtRequest.params = { courtId: 'not-a-uuid', counterServiceId };
     invalidPostCounterServiceRequest.params = { courtId, counterServiceId: 'not-a-uuid' };
-    const getDeletePage = stub(CounterServiceOpeningHoursService.prototype, 'getDeletePage');
-    const deleteCounterService = stub(CounterServiceOpeningHoursService.prototype, 'delete');
+    const getDeletePage = stub(counterServiceOpeningHoursService, 'getDeletePage');
+    const deleteCounterService = stub(counterServiceOpeningHoursService, 'delete');
 
     await controller.getDelete(invalidCourtRequest, invalidCourtResponse);
     await controller.getDelete(invalidCounterServiceRequest, invalidCounterServiceResponse);

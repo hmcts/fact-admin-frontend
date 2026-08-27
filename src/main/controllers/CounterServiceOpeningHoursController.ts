@@ -11,10 +11,12 @@ import { parseOptionalString } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const counterServiceOpeningHoursService = new CounterServiceOpeningHoursService();
-
 @route('/courts/:courtId/edit/counter-service-opening-hours')
 export default class CounterServiceOpeningHoursController extends BaseController {
+  constructor(private readonly counterServiceOpeningHoursService = new CounterServiceOpeningHoursService()) {
+    super();
+  }
+
   @GET()
   public async getList(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
@@ -24,7 +26,7 @@ export default class CounterServiceOpeningHoursController extends BaseController
       return;
     }
 
-    const viewModel = await counterServiceOpeningHoursService.getListPage(courtId);
+    const viewModel = await this.counterServiceOpeningHoursService.getListPage(courtId);
 
     this.renderResponse(
       res,
@@ -44,7 +46,7 @@ export default class CounterServiceOpeningHoursController extends BaseController
       return;
     }
 
-    const viewModel = await counterServiceOpeningHoursService.getEditPage(courtId);
+    const viewModel = await this.counterServiceOpeningHoursService.getEditPage(courtId);
 
     this.renderResponse(
       res,
@@ -70,7 +72,7 @@ export default class CounterServiceOpeningHoursController extends BaseController
       return;
     }
 
-    const viewModel = await counterServiceOpeningHoursService.getEditPage(courtId, counterServiceId);
+    const viewModel = await this.counterServiceOpeningHoursService.getEditPage(courtId, counterServiceId);
 
     this.renderResponse(
       res,
@@ -108,7 +110,7 @@ export default class CounterServiceOpeningHoursController extends BaseController
       return;
     }
 
-    const viewModel = await counterServiceOpeningHoursService.getDeletePage(courtId, counterServiceId);
+    const viewModel = await this.counterServiceOpeningHoursService.getDeletePage(courtId, counterServiceId);
     const deleteViewModel =
       typeof viewModel === 'number'
         ? viewModel
@@ -141,7 +143,7 @@ export default class CounterServiceOpeningHoursController extends BaseController
       return;
     }
 
-    const viewModel = await counterServiceOpeningHoursService.delete(courtId, counterServiceId);
+    const viewModel = await this.counterServiceOpeningHoursService.delete(courtId, counterServiceId);
 
     this.renderResponse(
       res,
@@ -166,7 +168,7 @@ export default class CounterServiceOpeningHoursController extends BaseController
     }
 
     const form = this.toForm(req.body);
-    const saveResult = await counterServiceOpeningHoursService.save(courtId, counterServiceId, form);
+    const saveResult = await this.counterServiceOpeningHoursService.save(courtId, counterServiceId, form);
 
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('counter-service-opening-hours-edit', {
@@ -193,11 +195,11 @@ export default class CounterServiceOpeningHoursController extends BaseController
   private toForm(body: Record<string, unknown>): CounterServiceOpeningHoursForm {
     return {
       ...body,
-      assistWith: counterServiceOpeningHoursService.getSelectedDays(body.assistWith),
+      assistWith: this.counterServiceOpeningHoursService.getSelectedDays(body.assistWith),
       appointmentNeeded: parseOptionalString(body.appointmentNeeded),
       appointmentContact: parseOptionalString(body.appointmentContact),
       sameTime: parseOptionalString(body.sameTime),
-      selectedDays: counterServiceOpeningHoursService.getSelectedDays(body.selectedDays),
+      selectedDays: this.counterServiceOpeningHoursService.getSelectedDays(body.selectedDays),
     } as CounterServiceOpeningHoursForm;
   }
 

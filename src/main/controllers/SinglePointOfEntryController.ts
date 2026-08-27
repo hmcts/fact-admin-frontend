@@ -9,12 +9,15 @@ import { isUuid, parseBoolean } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const singlePointOfEntryService = new SinglePointOfEntryService();
 const logger = Logger.getLogger('app');
 const singlePointOfEntryFieldPrefix = 'singlePointOfEntry.';
 
 @route('/courts/:courtId/edit/single-point-of-entry')
 export default class SinglePointOfEntryController extends BaseController {
+  constructor(private readonly singlePointOfEntryService = new SinglePointOfEntryService()) {
+    super();
+  }
+
   @GET()
   public async renderSinglePointOfEntryView(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
@@ -22,7 +25,7 @@ export default class SinglePointOfEntryController extends BaseController {
       return this.renderStatus(res, HttpStatusCode.NotFound, 'court-not-found');
     }
 
-    const viewModel = await singlePointOfEntryService.retrieve(courtId);
+    const viewModel = await this.singlePointOfEntryService.retrieve(courtId);
     if (typeof viewModel === 'number') {
       return this.renderStatus(res, viewModel, 'court-not-found');
     }
@@ -51,7 +54,7 @@ export default class SinglePointOfEntryController extends BaseController {
       return this.renderStatus(res, HttpStatusCode.BadRequest, 'court-not-found');
     }
 
-    const saveResult = await singlePointOfEntryService.update(courtId, serviceSelections);
+    const saveResult = await this.singlePointOfEntryService.update(courtId, serviceSelections);
     if (typeof saveResult === 'number') {
       return this.renderStatus(res, saveResult, 'court-not-found');
     }

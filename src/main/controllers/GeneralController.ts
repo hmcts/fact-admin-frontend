@@ -6,10 +6,12 @@ import { GeneralService, GeneralViewModel } from '../services/GeneralService';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const generalService = new GeneralService();
-
 @route('/courts/:courtId/edit/general')
 export default class GeneralController extends BaseController {
+  constructor(private readonly generalService = new GeneralService()) {
+    super();
+  }
+
   @GET()
   public async renderEditView(req: Request, res: Response): Promise<void> {
     const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
@@ -17,7 +19,7 @@ export default class GeneralController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const model = await generalService.retrieve(resolvedCourtId);
+    const model = await this.generalService.retrieve(resolvedCourtId);
 
     if (this.renderStatusResponse(res, model, 'court-not-found')) {
       return;
@@ -60,7 +62,7 @@ export default class GeneralController extends BaseController {
       regionId: req.body?.regionId ?? undefined,
     };
 
-    const updateResponse = await generalService.save(model);
+    const updateResponse = await this.generalService.save(model);
     if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
       return;
     }

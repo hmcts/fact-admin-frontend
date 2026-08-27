@@ -8,10 +8,12 @@ import { parseOptionalString } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const warningNoticeService = new WarningNoticeService();
-
 @route('/courts/:courtId/edit/warning-notice')
 export default class WarningNoticeController extends BaseController {
+  constructor(private readonly warningNoticeService = new WarningNoticeService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
@@ -21,7 +23,7 @@ export default class WarningNoticeController extends BaseController {
       return;
     }
 
-    const viewModel = await warningNoticeService.getWarningNoticePage(courtId);
+    const viewModel = await this.warningNoticeService.getWarningNoticePage(courtId);
 
     return this.renderResponse(
       res,
@@ -47,7 +49,7 @@ export default class WarningNoticeController extends BaseController {
       warningNoticeCy: parseOptionalString(warningNoticeCy),
     };
 
-    const saveResult = await warningNoticeService.save(courtId, form);
+    const saveResult = await this.warningNoticeService.save(courtId, form);
 
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('court-warning-notice-edit', {

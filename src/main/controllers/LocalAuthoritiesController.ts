@@ -13,11 +13,14 @@ import { isUuid } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const localAuthoritiesService = new LocalAuthoritiesService();
 const logger = Logger.getLogger('app');
 
 @route('/courts/:courtId/edit/local-authorities')
 export default class LocalAuthoritiesController extends BaseController {
+  constructor(private readonly localAuthoritiesService = new LocalAuthoritiesService()) {
+    super();
+  }
+
   @GET()
   public async renderLocalAuthoritiesView(req: Request, res: Response): Promise<void> {
     const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
@@ -25,7 +28,7 @@ export default class LocalAuthoritiesController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const viewModel = await localAuthoritiesService.retrieve(resolvedCourtId);
+    const viewModel = await this.localAuthoritiesService.retrieve(resolvedCourtId);
 
     if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
       return;
@@ -47,7 +50,7 @@ export default class LocalAuthoritiesController extends BaseController {
 
     const updatePayload = this.parseSelectionsFromBody(req.body);
 
-    const saveResult = await localAuthoritiesService.update(resolvedCourtId, updatePayload);
+    const saveResult = await this.localAuthoritiesService.update(resolvedCourtId, updatePayload);
 
     if (this.renderStatusResponse(res, saveResult, 'court-not-found')) {
       return;

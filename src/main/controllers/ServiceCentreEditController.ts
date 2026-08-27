@@ -13,51 +13,55 @@ import BaseController from './BaseController';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
-const operationsApi = new OperationsApi();
-const serviceCentreApi = new ServiceCentreApi();
-const lockService = new LockService(operationsApi);
-const locationApprovalController = new LocationApprovalController(
-  {
-    buildBreadcrumbs: buildEditBreadcrumbs,
-    editView: 'service-centre-edit',
-    getAdditionalEditViewModel: async (req, serviceCentreId) => {
-      if (isViewer(req)) {
-        return { serviceCentreLocks: [], timeoutMins: undefined };
-      }
-
-      const locks = await lockService.getLocks(SubjectType.SERVICE_CENTRE, serviceCentreId);
-      return typeof locks === 'number'
-        ? locks
-        : { serviceCentreLocks: locks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
-    },
-    getLocation: serviceCentreId => serviceCentreApi.getServiceCentreById(serviceCentreId),
-    locationIdViewKey: 'serviceCentreId',
-    locationNameViewKey: 'serviceCentreName',
-    notFoundView: 'service-centre-not-found',
-    paramName: 'serviceCentreId',
-    routeSegment: 'service-centres',
-    subjectType: SubjectType.SERVICE_CENTRE,
-  },
-  new ApprovalService(operationsApi)
-);
-
 @route('/service-centres/:serviceCentreId/edit')
 export default class ServiceCentreEditController extends BaseController {
+  private readonly locationApprovalController: LocationApprovalController;
+
+  constructor(serviceCentreApi = new ServiceCentreApi(), operationsApi = new OperationsApi()) {
+    super();
+
+    const lockService = new LockService(operationsApi);
+    this.locationApprovalController = new LocationApprovalController(
+      {
+        buildBreadcrumbs: buildEditBreadcrumbs,
+        editView: 'service-centre-edit',
+        getAdditionalEditViewModel: async (req, serviceCentreId) => {
+          if (isViewer(req)) {
+            return { serviceCentreLocks: [], timeoutMins: undefined };
+          }
+
+          const locks = await lockService.getLocks(SubjectType.SERVICE_CENTRE, serviceCentreId);
+          return typeof locks === 'number'
+            ? locks
+            : { serviceCentreLocks: locks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
+        },
+        getLocation: serviceCentreId => serviceCentreApi.getServiceCentreById(serviceCentreId),
+        locationIdViewKey: 'serviceCentreId',
+        locationNameViewKey: 'serviceCentreName',
+        notFoundView: 'service-centre-not-found',
+        paramName: 'serviceCentreId',
+        routeSegment: 'service-centres',
+        subjectType: SubjectType.SERVICE_CENTRE,
+      },
+      new ApprovalService(operationsApi)
+    );
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    await locationApprovalController.get(req, res);
+    await this.locationApprovalController.get(req, res);
   }
 
   @GET()
   @route('/approve')
   public async getApprove(req: Request, res: Response): Promise<void> {
-    await locationApprovalController.getApprove(req, res);
+    await this.locationApprovalController.getApprove(req, res);
   }
 
   @POST()
   @route('/approve')
   public async postApprove(req: Request, res: Response): Promise<void> {
-    await locationApprovalController.postApprove(req, res);
+    await this.locationApprovalController.postApprove(req, res);
   }
 }
 

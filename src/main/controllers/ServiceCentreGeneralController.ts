@@ -8,10 +8,12 @@ import { ServiceCentreGeneralService } from '../services/ServiceCentreGeneralSer
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const serviceCentreGeneralService = new ServiceCentreGeneralService();
-
 @route('/service-centres/:serviceCentreId/edit/general')
 export default class ServiceCentreGeneralController extends BaseController {
+  constructor(private readonly serviceCentreGeneralService = new ServiceCentreGeneralService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
@@ -20,7 +22,7 @@ export default class ServiceCentreGeneralController extends BaseController {
       return;
     }
 
-    const viewModel = await serviceCentreGeneralService.retrieve(serviceCentreId);
+    const viewModel = await this.serviceCentreGeneralService.retrieve(serviceCentreId);
     if (this.renderStatusResponse(res, viewModel, 'service-centre-not-found')) {
       return;
     }
@@ -41,7 +43,7 @@ export default class ServiceCentreGeneralController extends BaseController {
       return;
     }
 
-    const saveResult = await serviceCentreGeneralService.save({
+    const saveResult = await this.serviceCentreGeneralService.save({
       id: serviceCentreId,
       name: req.body?.name,
       open: this.parseOpen(req.body?.open),

@@ -8,10 +8,12 @@ import { ServiceCentreWarningNoticeService } from '../services/ServiceCentreWarn
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const serviceCentreWarningNoticeService = new ServiceCentreWarningNoticeService();
-
 @route('/service-centres/:serviceCentreId/edit/warning-notice')
 export default class ServiceCentreWarningNoticeController extends BaseController {
+  constructor(private readonly serviceCentreWarningNoticeService = new ServiceCentreWarningNoticeService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
@@ -20,7 +22,7 @@ export default class ServiceCentreWarningNoticeController extends BaseController
       return;
     }
 
-    const viewModel = await serviceCentreWarningNoticeService.retrieve(serviceCentreId);
+    const viewModel = await this.serviceCentreWarningNoticeService.retrieve(serviceCentreId);
     if (this.renderStatusResponse(res, viewModel, 'service-centre-not-found')) {
       return;
     }
@@ -41,7 +43,7 @@ export default class ServiceCentreWarningNoticeController extends BaseController
       return;
     }
 
-    const saveResult = await serviceCentreWarningNoticeService.save(
+    const saveResult = await this.serviceCentreWarningNoticeService.save(
       serviceCentreId,
       req.body?.warningNotice,
       req.body?.warningNoticeCy

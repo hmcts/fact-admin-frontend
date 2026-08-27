@@ -7,8 +7,6 @@ import { CasesHeardService } from '../services/CasesHeardService';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const casesHeardService = new CasesHeardService();
-
 type Confirmations = {
   Adoption: boolean;
   Children: boolean;
@@ -17,6 +15,10 @@ type Confirmations = {
 
 @route('/courts/:courtId/edit/cases-heard')
 export default class CasesHeardController extends BaseController {
+  constructor(private readonly casesHeardService = new CasesHeardService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
@@ -25,7 +27,7 @@ export default class CasesHeardController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const viewModel = await casesHeardService.getCasesHeardPage(resolvedCourtId);
+    const viewModel = await this.casesHeardService.getCasesHeardPage(resolvedCourtId);
 
     if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
       return;
@@ -46,7 +48,7 @@ export default class CasesHeardController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const selectedAreasOfLaw = casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
+    const selectedAreasOfLaw = this.casesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
 
     const confirmations: Confirmations = {
       Adoption: req.body?.adoption && !selectedAreasOfLaw.includes(req.body?.adoption),
@@ -61,7 +63,7 @@ export default class CasesHeardController extends BaseController {
       return this.renderConfirmationPage(res, confirmations, resolvedCourtId, req.body.courtName, selectedAreasOfLaw);
     }
 
-    const saveResult = await casesHeardService.saveCasesHeard(resolvedCourtId, selectedAreasOfLaw);
+    const saveResult = await this.casesHeardService.saveCasesHeard(resolvedCourtId, selectedAreasOfLaw);
 
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('cases-heard', {

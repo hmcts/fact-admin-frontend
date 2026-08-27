@@ -11,10 +11,6 @@ export class Container {
       injectionMode: InjectionMode.CLASSIC,
     }).register({
       logger: asValue(logger),
-      professionalInformationServiceFactory: asValue(async () => {
-        const { ProfessionalInformationService } = await import('../../services/ProfessionalInformationService');
-        return new ProfessionalInformationService();
-      }),
     });
   }
 }

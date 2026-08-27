@@ -8,9 +8,12 @@ import { parseBoolean } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const buildingFacilitiesService = new BuildingFacilitiesService();
 @route('/courts/:courtId/edit/building-facilities')
 export default class BuildingFacilitiesController extends BaseController {
+  constructor(private readonly buildingFacilitiesService = new BuildingFacilitiesService()) {
+    super();
+  }
+
   @GET()
   public async renderEditView(req: Request, res: Response): Promise<void> {
     const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
@@ -18,7 +21,7 @@ export default class BuildingFacilitiesController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const model = await buildingFacilitiesService.retrieve(resolvedCourtId);
+    const model = await this.buildingFacilitiesService.retrieve(resolvedCourtId);
 
     if (this.renderStatusResponse(res, model, 'court-not-found')) {
       return;
@@ -57,7 +60,7 @@ export default class BuildingFacilitiesController extends BaseController {
       babyChanging: parseBoolean(babyChanging),
       wifi: parseBoolean(wifi),
     };
-    const updateResponse = await buildingFacilitiesService.save(resolvedCourtId, model);
+    const updateResponse = await this.buildingFacilitiesService.save(resolvedCourtId, model);
     if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
       return;
     }

@@ -7,6 +7,14 @@ import { CourtOpeningHoursService } from '../../../main/services/CourtOpeningHou
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtOpeningHoursController', () => {
+  let courtOpeningHoursService = new CourtOpeningHoursService();
+  let controller = new CourtOpeningHoursController(courtOpeningHoursService);
+
+  beforeEach(() => {
+    courtOpeningHoursService = new CourtOpeningHoursService();
+    controller = new CourtOpeningHoursController(courtOpeningHoursService);
+  });
+
   const courtId = '11111111-1111-4111-8111-111111111111';
   const openingHoursId = '22222222-2222-4222-8222-222222222222';
 
@@ -24,7 +32,6 @@ describe('CourtOpeningHoursController', () => {
   }
 
   test('renders the list page when the service returns a view model', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -34,7 +41,7 @@ describe('CourtOpeningHoursController', () => {
       openingHours: [],
       pageTitle: 'Court opening hours - Reading Crown Court',
     };
-    const getListPage = stub(CourtOpeningHoursService.prototype, 'getListPage').resolves(viewModel);
+    const getListPage = stub(courtOpeningHoursService, 'getListPage').resolves(viewModel);
 
     await controller.getList(request, response);
 
@@ -52,11 +59,10 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders court not found when the list court id is invalid', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
-    const getListPage = stub(CourtOpeningHoursService.prototype, 'getListPage');
+    const getListPage = stub(courtOpeningHoursService, 'getListPage');
 
     await controller.getList(request, response);
 
@@ -66,7 +72,6 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders the add page when the service returns a view model', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -80,7 +85,7 @@ describe('CourtOpeningHoursController', () => {
       openingHourTypes: [],
       pageTitle: 'Edit opening hours - Reading Crown Court',
     };
-    const getEditPage = stub(CourtOpeningHoursService.prototype, 'getEditPage').resolves(viewModel);
+    const getEditPage = stub(courtOpeningHoursService, 'getEditPage').resolves(viewModel);
 
     await controller.getAdd(request, response);
 
@@ -99,11 +104,10 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders court not found when the add court id is invalid', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
-    const getEditPage = stub(CourtOpeningHoursService.prototype, 'getEditPage');
+    const getEditPage = stub(courtOpeningHoursService, 'getEditPage');
 
     await controller.getAdd(request, response);
 
@@ -113,11 +117,10 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders court not found when the edit court id is invalid', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid', openingHoursId };
-    const getEditPage = stub(CourtOpeningHoursService.prototype, 'getEditPage');
+    const getEditPage = stub(courtOpeningHoursService, 'getEditPage');
 
     await controller.getEdit(request, response);
 
@@ -127,11 +130,10 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders generic not found when an edit opening-hours id no longer exists', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, openingHoursId };
-    stub(CourtOpeningHoursService.prototype, 'getEditPage').resolves(HttpStatusCode.NotFound);
+    stub(courtOpeningHoursService, 'getEditPage').resolves(HttpStatusCode.NotFound);
 
     await controller.getEdit(request, response);
 
@@ -140,11 +142,10 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders generic not found when the edit opening-hours id is invalid', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, openingHoursId: 'not-a-uuid' };
-    const getEditPage = stub(CourtOpeningHoursService.prototype, 'getEditPage');
+    const getEditPage = stub(courtOpeningHoursService, 'getEditPage');
 
     await controller.getEdit(request, response);
 
@@ -154,12 +155,11 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders court not found when saving add has an invalid court id', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     request.body = {};
-    const save = stub(CourtOpeningHoursService.prototype, 'save');
+    const save = stub(courtOpeningHoursService, 'save');
 
     await controller.postAdd(request, response);
 
@@ -169,12 +169,11 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders generic not found when saving edit has an invalid opening-hours id', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, openingHoursId: 'not-a-uuid' };
     request.body = {};
-    const save = stub(CourtOpeningHoursService.prototype, 'save');
+    const save = stub(courtOpeningHoursService, 'save');
 
     await controller.postEdit(request, response);
 
@@ -184,7 +183,6 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders validation errors when saving add returns a validation result', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -203,7 +201,7 @@ describe('CourtOpeningHoursController', () => {
       openingHourTypes: [],
       pageTitle: 'Error: Edit opening hours - Reading Crown Court',
     };
-    const save = stub(CourtOpeningHoursService.prototype, 'save').resolves({
+    const save = stub(courtOpeningHoursService, 'save').resolves({
       type: 'validation_error',
       viewModel,
     });
@@ -232,7 +230,6 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('normalises array body values when saving add', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -249,7 +246,7 @@ describe('CourtOpeningHoursController', () => {
       courtName: 'Reading Crown Court',
       openingHourType: 'Court open',
     };
-    const save = stub(CourtOpeningHoursService.prototype, 'save').resolves({
+    const save = stub(courtOpeningHoursService, 'save').resolves({
       type: 'success',
       viewModel,
     });
@@ -274,7 +271,6 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders save success when saving edit succeeds', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, openingHoursId };
@@ -288,7 +284,7 @@ describe('CourtOpeningHoursController', () => {
       courtName: 'Reading Crown Court',
       openingHourType: 'Court open',
     };
-    const save = stub(CourtOpeningHoursService.prototype, 'save').resolves({
+    const save = stub(courtOpeningHoursService, 'save').resolves({
       type: 'success',
       viewModel,
     });
@@ -311,12 +307,11 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders generic not found when saving edit returns 404', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, openingHoursId };
     request.body = {};
-    stub(CourtOpeningHoursService.prototype, 'save').resolves({
+    stub(courtOpeningHoursService, 'save').resolves({
       status: HttpStatusCode.NotFound,
       type: 'status',
     });
@@ -328,12 +323,11 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders error when saving add returns a non-404 status', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
     request.body = {};
-    stub(CourtOpeningHoursService.prototype, 'save').resolves({
+    stub(courtOpeningHoursService, 'save').resolves({
       status: HttpStatusCode.InternalServerError,
       type: 'status',
     });
@@ -345,7 +339,6 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders delete confirmation and delete success pages', async () => {
-    const controller = new CourtOpeningHoursController();
     const deleteResponse = responseMock();
     const successResponse = responseMock();
     const deleteRequest = mockRequest({});
@@ -365,8 +358,8 @@ describe('CourtOpeningHoursController', () => {
       courtName: 'Reading Crown Court',
       openingHourType: 'Court open',
     };
-    stub(CourtOpeningHoursService.prototype, 'getDeletePage').resolves(deleteViewModel);
-    stub(CourtOpeningHoursService.prototype, 'delete').resolves(successViewModel);
+    stub(courtOpeningHoursService, 'getDeletePage').resolves(deleteViewModel);
+    stub(courtOpeningHoursService, 'delete').resolves(successViewModel);
 
     await controller.getDelete(deleteRequest, deleteResponse);
     await controller.postDelete(successRequest, successResponse);
@@ -397,11 +390,10 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders generic not found when opening hours to delete no longer exist', async () => {
-    const controller = new CourtOpeningHoursController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId, openingHoursId };
-    stub(CourtOpeningHoursService.prototype, 'getDeletePage').resolves(HttpStatusCode.NotFound);
+    stub(courtOpeningHoursService, 'getDeletePage').resolves(HttpStatusCode.NotFound);
 
     await controller.getDelete(request, response);
 
@@ -410,7 +402,6 @@ describe('CourtOpeningHoursController', () => {
   });
 
   test('renders not found pages for invalid delete route parameters', async () => {
-    const controller = new CourtOpeningHoursController();
     const invalidCourtResponse = responseMock();
     const invalidOpeningHoursResponse = responseMock();
     const invalidPostDeleteCourtResponse = responseMock();
@@ -423,8 +414,8 @@ describe('CourtOpeningHoursController', () => {
     invalidOpeningHoursRequest.params = { courtId, openingHoursId: 'not-a-uuid' };
     invalidPostDeleteCourtRequest.params = { courtId: 'not-a-uuid', openingHoursId };
     invalidPostDeleteOpeningHoursRequest.params = { courtId, openingHoursId: 'not-a-uuid' };
-    const getDeletePage = stub(CourtOpeningHoursService.prototype, 'getDeletePage');
-    const deleteOpeningHours = stub(CourtOpeningHoursService.prototype, 'delete');
+    const getDeletePage = stub(courtOpeningHoursService, 'getDeletePage');
+    const deleteOpeningHours = stub(courtOpeningHoursService, 'delete');
 
     await controller.getDelete(invalidCourtRequest, invalidCourtResponse);
     await controller.getDelete(invalidOpeningHoursRequest, invalidOpeningHoursResponse);

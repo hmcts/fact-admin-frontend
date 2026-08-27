@@ -5,13 +5,15 @@ import { AddCourtService } from '../services/AddCourtService';
 
 import BaseController from './BaseController';
 
-const addCourtService = new AddCourtService();
-
 @route('/add-court')
 export default class AddCourtController extends BaseController {
+  constructor(private readonly addCourtService = new AddCourtService()) {
+    super();
+  }
+
   @GET()
   public async get(_req: Request, res: Response): Promise<void> {
-    const viewModel = await addCourtService.getViewModel();
+    const viewModel = await this.addCourtService.getViewModel();
 
     if (typeof viewModel === 'number') {
       return this.renderError(res, viewModel);
@@ -28,7 +30,7 @@ export default class AddCourtController extends BaseController {
 
   @POST()
   public async createCourt(req: Request, res: Response): Promise<void> {
-    const createResult = await addCourtService.create({
+    const createResult = await this.addCourtService.create({
       name: req.body?.name ?? undefined,
       regionId: req.body?.regionId ?? undefined,
     });

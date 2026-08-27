@@ -15,8 +15,15 @@ const LA_ID_2 = '66666666-6666-4666-8666-666666666666';
 const LA_ID_3 = '77777777-7777-4777-8777-777777777777';
 
 describe('LocalAuthoritiesController', () => {
+  let localAuthoritiesService = new LocalAuthoritiesService();
+  let controller = new LocalAuthoritiesController(localAuthoritiesService);
+
+  beforeEach(() => {
+    localAuthoritiesService = new LocalAuthoritiesService();
+    controller = new LocalAuthoritiesController(localAuthoritiesService);
+  });
+
   test('renders local authorities page when retrieve succeeds', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -37,7 +44,7 @@ describe('LocalAuthoritiesController', () => {
       },
     };
 
-    const retrieveStub = stub(LocalAuthoritiesService.prototype, 'retrieve').resolves(viewModel as never);
+    const retrieveStub = stub(localAuthoritiesService, 'retrieve').resolves(viewModel as never);
 
     responseMock
       .expects('render')
@@ -62,7 +69,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('renders court-not-found when local authorities page receives an invalid courtId', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
       status: () => response,
@@ -71,7 +77,7 @@ describe('LocalAuthoritiesController', () => {
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
 
-    const retrieveStub = stub(LocalAuthoritiesService.prototype, 'retrieve');
+    const retrieveStub = stub(localAuthoritiesService, 'retrieve');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -86,7 +92,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('renders court-not-found when retrieve returns not found', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
       status: () => response,
@@ -95,7 +100,7 @@ describe('LocalAuthoritiesController', () => {
     request.params = { courtId: COURT_ID };
     const responseMock = mock(response);
 
-    const retrieveStub = stub(LocalAuthoritiesService.prototype, 'retrieve').resolves(HttpStatusCode.NotFound);
+    const retrieveStub = stub(localAuthoritiesService, 'retrieve').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -110,7 +115,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('renders error when retrieve returns a non-not-found status code', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
       status: () => response,
@@ -119,9 +123,7 @@ describe('LocalAuthoritiesController', () => {
     request.params = { courtId: COURT_ID };
     const responseMock = mock(response);
 
-    const retrieveStub = stub(LocalAuthoritiesService.prototype, 'retrieve').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const retrieveStub = stub(localAuthoritiesService, 'retrieve').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -136,7 +138,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('updates selected local authorities and renders success page when save succeeds', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -150,7 +151,7 @@ describe('LocalAuthoritiesController', () => {
     };
     const responseMock = mock(response);
 
-    const updateStub = stub(LocalAuthoritiesService.prototype, 'update').resolves({
+    const updateStub = stub(localAuthoritiesService, 'update').resolves({
       status: 'saved',
       courtName: 'Reading Crown Court',
     });
@@ -196,7 +197,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('renders court-not-found when update route receives invalid courtId', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
       status: () => response,
@@ -206,7 +206,7 @@ describe('LocalAuthoritiesController', () => {
     request.body = {};
     const responseMock = mock(response);
 
-    const updateStub = stub(LocalAuthoritiesService.prototype, 'update');
+    const updateStub = stub(localAuthoritiesService, 'update');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -221,7 +221,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('renders error when update returns an http status code', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
       status: () => response,
@@ -231,7 +230,7 @@ describe('LocalAuthoritiesController', () => {
     request.body = {};
     const responseMock = mock(response);
 
-    const updateStub = stub(LocalAuthoritiesService.prototype, 'update').resolves(HttpStatusCode.InternalServerError);
+    const updateStub = stub(localAuthoritiesService, 'update').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -246,7 +245,6 @@ describe('LocalAuthoritiesController', () => {
   });
 
   test('renders error with bad request when update returns invalid save response', async () => {
-    const controller = new LocalAuthoritiesController();
     const response = {
       render: () => '',
       status: () => response,
@@ -256,7 +254,7 @@ describe('LocalAuthoritiesController', () => {
     request.body = {};
     const responseMock = mock(response);
 
-    const updateStub = stub(LocalAuthoritiesService.prototype, 'update').resolves({
+    const updateStub = stub(localAuthoritiesService, 'update').resolves({
       status: 'invalid',
       courtName: 'Reading Crown Court',
       errors: {

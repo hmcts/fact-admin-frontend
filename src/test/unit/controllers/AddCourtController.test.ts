@@ -6,8 +6,15 @@ import { AddCourtService } from '../../../main/services/AddCourtService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('AddCourtController', () => {
+  let addCourtService = new AddCourtService();
+  let controller = new AddCourtController(addCourtService);
+
+  beforeEach(() => {
+    addCourtService = new AddCourtService();
+    controller = new AddCourtController(addCourtService);
+  });
+
   test('renders the add court view', async () => {
-    const controller = new AddCourtController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -17,7 +24,7 @@ describe('AddCourtController', () => {
       pageTitle: 'Add new court',
       regions: [{ country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' }],
     };
-    const getViewModelStub = stub(AddCourtService.prototype, 'getViewModel').resolves(viewModel);
+    const getViewModelStub = stub(addCourtService, 'getViewModel').resolves(viewModel);
 
     responseMock
       .expects('render')
@@ -41,13 +48,12 @@ describe('AddCourtController', () => {
   });
 
   test('renders error when the view model cannot be loaded', async () => {
-    const controller = new AddCourtController();
     const response = {
       render: () => '',
       status: () => response,
     } as unknown as Response;
     const responseMock = mock(response);
-    const getViewModelStub = stub(AddCourtService.prototype, 'getViewModel').resolves(500);
+    const getViewModelStub = stub(addCourtService, 'getViewModel').resolves(500);
 
     responseMock.expects('status').once().withArgs(500).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -63,7 +69,6 @@ describe('AddCourtController', () => {
   });
 
   test('re-renders the add court page when create returns validation errors', async () => {
-    const controller = new AddCourtController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -81,7 +86,7 @@ describe('AddCourtController', () => {
       regionId: '',
       regions: [],
     };
-    const createStub = stub(AddCourtService.prototype, 'create').resolves(viewModel);
+    const createStub = stub(addCourtService, 'create').resolves(viewModel);
 
     responseMock
       .expects('render')
@@ -106,7 +111,6 @@ describe('AddCourtController', () => {
   });
 
   test('renders the add court success page when create succeeds', async () => {
-    const controller = new AddCourtController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -120,7 +124,7 @@ describe('AddCourtController', () => {
       pagePath: '/add-court/success',
       pageTitle: 'New court created - Reading Crown Court',
     };
-    const createStub = stub(AddCourtService.prototype, 'create').resolves(viewModel);
+    const createStub = stub(addCourtService, 'create').resolves(viewModel);
 
     responseMock
       .expects('render')
@@ -145,7 +149,6 @@ describe('AddCourtController', () => {
   });
 
   test('renders error when create returns a status code', async () => {
-    const controller = new AddCourtController();
     const response = {
       render: () => '',
       status: () => response,
@@ -153,7 +156,7 @@ describe('AddCourtController', () => {
     const request = mockRequest({});
     request.body = { name: 'Reading Crown Court', regionId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
-    const createStub = stub(AddCourtService.prototype, 'create').resolves(500);
+    const createStub = stub(addCourtService, 'create').resolves(500);
 
     responseMock.expects('status').once().withArgs(500).returns(response);
     responseMock.expects('render').once().withArgs('error');

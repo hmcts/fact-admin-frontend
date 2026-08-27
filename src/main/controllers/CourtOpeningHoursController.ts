@@ -8,10 +8,12 @@ import { parseOptionalString } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const courtOpeningHoursService = new CourtOpeningHoursService();
-
 @route('/courts/:courtId/edit/court-opening-hours')
 export default class CourtOpeningHoursController extends BaseController {
+  constructor(private readonly courtOpeningHoursService = new CourtOpeningHoursService()) {
+    super();
+  }
+
   @GET()
   public async getList(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
@@ -21,7 +23,7 @@ export default class CourtOpeningHoursController extends BaseController {
       return;
     }
 
-    const viewModel = await courtOpeningHoursService.getListPage(courtId);
+    const viewModel = await this.courtOpeningHoursService.getListPage(courtId);
 
     this.renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-opening-hours', 'court-not-found');
   }
@@ -36,7 +38,7 @@ export default class CourtOpeningHoursController extends BaseController {
       return;
     }
 
-    const viewModel = await courtOpeningHoursService.getEditPage(courtId);
+    const viewModel = await this.courtOpeningHoursService.getEditPage(courtId);
 
     this.renderResponse(
       res,
@@ -62,7 +64,7 @@ export default class CourtOpeningHoursController extends BaseController {
       return;
     }
 
-    const viewModel = await courtOpeningHoursService.getEditPage(courtId, openingHoursId);
+    const viewModel = await this.courtOpeningHoursService.getEditPage(courtId, openingHoursId);
 
     this.renderResponse(
       res,
@@ -100,7 +102,7 @@ export default class CourtOpeningHoursController extends BaseController {
       return;
     }
 
-    const viewModel = await courtOpeningHoursService.getDeletePage(courtId, openingHoursId);
+    const viewModel = await this.courtOpeningHoursService.getDeletePage(courtId, openingHoursId);
     const deleteViewModel =
       typeof viewModel === 'number'
         ? viewModel
@@ -133,7 +135,7 @@ export default class CourtOpeningHoursController extends BaseController {
       return;
     }
 
-    const viewModel = await courtOpeningHoursService.delete(courtId, openingHoursId);
+    const viewModel = await this.courtOpeningHoursService.delete(courtId, openingHoursId);
 
     this.renderResponse(
       res,
@@ -158,7 +160,7 @@ export default class CourtOpeningHoursController extends BaseController {
     }
 
     const form = this.toForm(req.body);
-    const saveResult = await courtOpeningHoursService.save(courtId, openingHoursId, form);
+    const saveResult = await this.courtOpeningHoursService.save(courtId, openingHoursId, form);
 
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('court-opening-hours-edit', {
@@ -182,7 +184,7 @@ export default class CourtOpeningHoursController extends BaseController {
       ...body,
       openingHourTypeId: parseOptionalString(body.openingHourTypeId),
       sameTime: parseOptionalString(body.sameTime),
-      selectedDays: courtOpeningHoursService.getSelectedDays(body.selectedDays),
+      selectedDays: this.courtOpeningHoursService.getSelectedDays(body.selectedDays),
     } as OpeningHoursForm;
   }
 

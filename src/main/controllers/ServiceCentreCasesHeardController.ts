@@ -8,10 +8,12 @@ import { ServiceCentreCasesHeardService } from '../services/ServiceCentreCasesHe
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const serviceCentreCasesHeardService = new ServiceCentreCasesHeardService();
-
 @route('/service-centres/:serviceCentreId/edit/cases-heard')
 export default class ServiceCentreCasesHeardController extends BaseController {
+  constructor(private readonly serviceCentreCasesHeardService = new ServiceCentreCasesHeardService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
@@ -20,7 +22,7 @@ export default class ServiceCentreCasesHeardController extends BaseController {
       return;
     }
 
-    const viewModel = await serviceCentreCasesHeardService.getCasesHeardPage(serviceCentreId);
+    const viewModel = await this.serviceCentreCasesHeardService.getCasesHeardPage(serviceCentreId);
 
     if (this.renderStatusResponse(res, viewModel, 'service-centre-not-found')) {
       return;
@@ -41,8 +43,8 @@ export default class ServiceCentreCasesHeardController extends BaseController {
       return;
     }
 
-    const selectedAreasOfLaw = serviceCentreCasesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
-    const saveResult = await serviceCentreCasesHeardService.saveCasesHeard(serviceCentreId, selectedAreasOfLaw);
+    const selectedAreasOfLaw = this.serviceCentreCasesHeardService.getSelectedAreasOfLaw(req.body?.areasOfLaw);
+    const saveResult = await this.serviceCentreCasesHeardService.saveCasesHeard(serviceCentreId, selectedAreasOfLaw);
 
     if (saveResult.type === 'validation_error') {
       res.status(HttpStatusCode.BadRequest);

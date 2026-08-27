@@ -15,6 +15,14 @@ jest.mock('@hmcts/info-provider', () => {
 });
 
 describe('InfoController', () => {
+  let operationsApi = new OperationsApi();
+  let controller = new InfoController(operationsApi);
+
+  beforeEach(() => {
+    operationsApi = new OperationsApi();
+    controller = new InfoController(operationsApi);
+  });
+
   test('delegates to infoRequestHandler', async () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const infoProvider = require('@hmcts/info-provider');
@@ -23,14 +31,13 @@ describe('InfoController', () => {
     const handler = stub();
     infoRequestHandlerStub.returns(handler);
 
-    const controller = new InfoController();
     const request = {} as never;
     const response = {
       end: () => '',
     } as unknown as Response;
     const responseMock = mock(response);
     const next = stub();
-    const checkHealthStub = stub(OperationsApi.prototype, 'checkHealth').resolves(true);
+    const checkHealthStub = stub(operationsApi, 'checkHealth').resolves(true);
 
     responseMock.expects('end').never();
     await controller.get(request, response, next);

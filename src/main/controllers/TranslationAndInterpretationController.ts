@@ -7,10 +7,12 @@ import { TranslationAndInterpretationService } from '../services/TranslationAndI
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const translationAndInterpretationService = new TranslationAndInterpretationService();
-
 @route('/courts/:courtId/edit/translation-and-interpretation')
 export default class TranslationAndInterpretationController extends BaseController {
+  constructor(private readonly translationAndInterpretationService = new TranslationAndInterpretationService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
@@ -19,7 +21,7 @@ export default class TranslationAndInterpretationController extends BaseControll
       return this.renderCourtNotFound(res);
     }
 
-    const viewModel = await translationAndInterpretationService.getViewModel(courtId);
+    const viewModel = await this.translationAndInterpretationService.getViewModel(courtId);
 
     if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
       return;
@@ -40,7 +42,7 @@ export default class TranslationAndInterpretationController extends BaseControll
       return this.renderCourtNotFound(res);
     }
 
-    const saveResponse = await translationAndInterpretationService.save(courtId, req.body);
+    const saveResponse = await this.translationAndInterpretationService.save(courtId, req.body);
 
     if (this.renderStatusResponse(res, saveResponse, 'court-not-found')) {
       return;

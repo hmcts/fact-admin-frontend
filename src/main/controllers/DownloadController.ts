@@ -5,13 +5,15 @@ import { DownloadCsvService } from '../services/DownloadCsvService';
 
 import BaseController from './BaseController';
 
-const downloadCsvService = new DownloadCsvService();
-
 @route('/download')
 export default class DownloadController extends BaseController {
+  constructor(private readonly downloadCsvService = new DownloadCsvService()) {
+    super();
+  }
+
   @GET()
   public async get(_req: Request, res: Response): Promise<void> {
-    const csvResponse = await downloadCsvService.getDownloadCsv();
+    const csvResponse = await this.downloadCsvService.getDownloadCsv();
 
     if (typeof csvResponse === 'number') {
       this.renderError(res, csvResponse);

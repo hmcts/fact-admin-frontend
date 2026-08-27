@@ -10,10 +10,12 @@ import { ServiceCentreContactService } from '../services/ServiceCentreContactSer
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const serviceCentreContactService = new ServiceCentreContactService();
-
 @route('/service-centres/:serviceCentreId/edit/contact-details')
 export default class ServiceCentreContactController extends BaseController {
+  constructor(private readonly serviceCentreContactService = new ServiceCentreContactService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const serviceCentreId = this.resolveRequiredServiceCentreId(req, res);
@@ -26,7 +28,8 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const serviceCentreContactDetailsResponse = await serviceCentreContactService.listContactDetails(serviceCentreId);
+    const serviceCentreContactDetailsResponse =
+      await this.serviceCentreContactService.listContactDetails(serviceCentreId);
     if (typeof serviceCentreContactDetailsResponse === 'number') {
       this.renderError(res, serviceCentreContactDetailsResponse);
       return;
@@ -54,7 +57,7 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const contactDescriptionTypesResponse = await serviceCentreContactService.getContactDescriptionTypeItems();
+    const contactDescriptionTypesResponse = await this.serviceCentreContactService.getContactDescriptionTypeItems();
     if (typeof contactDescriptionTypesResponse === 'number') {
       this.renderError(res, contactDescriptionTypesResponse);
       return;
@@ -69,7 +72,7 @@ export default class ServiceCentreContactController extends BaseController {
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
       formHeading: 'Add contact details',
-      formValues: serviceCentreContactService.getEmptyFormValues(),
+      formValues: this.serviceCentreContactService.getEmptyFormValues(),
       pageTitle: `Add contact details - ${serviceCentreResponse.name}`,
       serviceCentreId,
       serviceCentreName: serviceCentreResponse.name,
@@ -90,7 +93,7 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const contactDetailResponse = await serviceCentreContactService.getContactDetailById(
+    const contactDetailResponse = await this.serviceCentreContactService.getContactDetailById(
       serviceCentreId,
       contactDetailId
     );
@@ -108,7 +111,7 @@ export default class ServiceCentreContactController extends BaseController {
       contactDetailResponse.serviceCentreContactDescription?.id ??
       contactDetailResponse.serviceCentreContactDescriptionId;
     const contactDescriptionTypesResponse =
-      await serviceCentreContactService.getContactDescriptionTypeItems(selectedTypeId);
+      await this.serviceCentreContactService.getContactDescriptionTypeItems(selectedTypeId);
     if (typeof contactDescriptionTypesResponse === 'number') {
       this.renderError(res, contactDescriptionTypesResponse);
       return;
@@ -124,7 +127,7 @@ export default class ServiceCentreContactController extends BaseController {
       contactDetailId,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/edit/${contactDetailId}/success`,
       formHeading: 'Edit contact details',
-      formValues: serviceCentreContactService.buildFormValues(contactDetailResponse),
+      formValues: this.serviceCentreContactService.buildFormValues(contactDetailResponse),
       pageTitle: `Edit contact details - ${serviceCentreResponse.name}`,
       serviceCentreId,
       serviceCentreName: serviceCentreResponse.name,
@@ -189,7 +192,7 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const contactDetailResponse = await serviceCentreContactService.getContactDetailById(
+    const contactDetailResponse = await this.serviceCentreContactService.getContactDetailById(
       serviceCentreId,
       contactDetailId
     );
@@ -203,7 +206,8 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const contactDescription = await serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
+    const contactDescription =
+      await this.serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
 
     res.render('service-centre-contact-delete', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(
@@ -237,7 +241,7 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const contactDetailResponse = await serviceCentreContactService.getContactDetailById(
+    const contactDetailResponse = await this.serviceCentreContactService.getContactDetailById(
       serviceCentreId,
       contactDetailId
     );
@@ -251,9 +255,10 @@ export default class ServiceCentreContactController extends BaseController {
       return;
     }
 
-    const contactDescription = await serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
+    const contactDescription =
+      await this.serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
 
-    const deleteStatus = await serviceCentreContactService.deleteContactDetail(serviceCentreId, contactDetailId);
+    const deleteStatus = await this.serviceCentreContactService.deleteContactDetail(serviceCentreId, contactDetailId);
     if (deleteStatus !== HttpStatusCode.NoContent) {
       this.renderError(res, deleteStatus);
       return;
@@ -287,7 +292,7 @@ export default class ServiceCentreContactController extends BaseController {
       contactDetailId?: string;
     }
   ): Promise<void> {
-    const submitFlowOutcome = await serviceCentreContactService.submitContactDetailFlow({
+    const submitFlowOutcome = await this.serviceCentreContactService.submitContactDetailFlow({
       body: req.body as Record<string, unknown>,
       contactDetailId: options.contactDetailId,
       formAction: options.formAction,
@@ -370,7 +375,7 @@ export default class ServiceCentreContactController extends BaseController {
     serviceCentreId: string,
     res: Response
   ): Promise<ServiceCentre | undefined> {
-    const serviceCentreResponse = await serviceCentreContactService.getServiceCentreById(serviceCentreId);
+    const serviceCentreResponse = await this.serviceCentreContactService.getServiceCentreById(serviceCentreId);
 
     if (typeof serviceCentreResponse === 'number') {
       this.renderStatus(res, serviceCentreResponse, 'service-centre-not-found');

@@ -8,10 +8,12 @@ import { parseBoolean, parseLiftMetric } from '../utils/valueParsers';
 import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const accessibilityService = new AccessibilityService();
-
 @route('/courts/:courtId/edit/accessibility')
 export default class AccessibilityController extends BaseController {
+  constructor(private readonly accessibilityService = new AccessibilityService()) {
+    super();
+  }
+
   @GET()
   public async renderEditView(req: Request, res: Response): Promise<void> {
     const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
@@ -19,7 +21,7 @@ export default class AccessibilityController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const model = await accessibilityService.retrieve(resolvedCourtId);
+    const model = await this.accessibilityService.retrieve(resolvedCourtId);
 
     if (this.renderStatusResponse(res, model, 'court-not-found')) {
       return;
@@ -84,7 +86,7 @@ export default class AccessibilityController extends BaseController {
       quietRoom: parseBoolean(quietRoom),
     };
 
-    const updateResponse = await accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
+    const updateResponse = await this.accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
     if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
       return;
     }

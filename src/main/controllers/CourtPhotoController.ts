@@ -10,10 +10,13 @@ import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 import { photoUploadMiddleware } from './helpers/multerUpload';
 
 const logger = Logger.getLogger('app');
-const courtPhotoService = new CourtPhotoService();
 
 @route('/courts/:courtId/edit/photo')
 export default class CourtPhotoController extends BaseController {
+  constructor(private readonly courtPhotoService = new CourtPhotoService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
@@ -21,7 +24,7 @@ export default class CourtPhotoController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const model = await courtPhotoService.retrieve(courtId);
+    const model = await this.courtPhotoService.retrieve(courtId);
     if (typeof model === 'number') {
       return this.renderStatus(res, model, 'court-not-found');
     }
@@ -42,7 +45,7 @@ export default class CourtPhotoController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const model = await courtPhotoService.retrieve(courtId);
+    const model = await this.courtPhotoService.retrieve(courtId);
     if (typeof model === 'number') {
       return this.renderStatus(res, model, 'court-not-found');
     }
@@ -83,7 +86,7 @@ export default class CourtPhotoController extends BaseController {
     }
 
     // Continue normal upload
-    const updatedModel = await courtPhotoService.upload(courtId, file.buffer, file.mimetype);
+    const updatedModel = await this.courtPhotoService.upload(courtId, file.buffer, file.mimetype);
     if (typeof updatedModel === 'number') {
       return this.renderStatus(res, updatedModel, 'court-not-found');
     }
@@ -144,7 +147,7 @@ export default class CourtPhotoController extends BaseController {
       return this.renderStatus(res, courtName, 'court-not-found');
     }
 
-    const response = await courtPhotoService.delete(courtId);
+    const response = await this.courtPhotoService.delete(courtId);
     if (typeof response === 'number' && response !== HttpStatusCode.NoContent) {
       return this.renderStatus(res, response, 'court-not-found');
     }
@@ -158,7 +161,7 @@ export default class CourtPhotoController extends BaseController {
 
   private async resolveCourtName(courtId: string): Promise<string | HttpStatusCode> {
     try {
-      return await courtPhotoService.retrieveCourtName(courtId);
+      return await this.courtPhotoService.retrieveCourtName(courtId);
     } catch (error) {
       logger.warn('Unable to resolve court name for breadcrumbs:', error);
       return HttpStatusCode.NotFound;

@@ -9,10 +9,12 @@ import { dataApiUrl } from '../requests/utils/axiosConfig';
 
 import BaseController from './BaseController';
 
-const operationsApi = new OperationsApi();
-
 @route('/info')
 export default class InfoController extends BaseController {
+  constructor(private readonly operationsApi = new OperationsApi()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response, next: NextFunction): Promise<void> {
     infoRequestHandler({
@@ -20,7 +22,7 @@ export default class InfoController extends BaseController {
         host: os.hostname(),
         name: 'FaCT Admin Frontend',
         uptime: process.uptime(),
-        dataApiUp: await operationsApi.checkHealth(),
+        dataApiUp: await this.operationsApi.checkHealth(),
       },
       info: {
         DataApi: new InfoContributor(dataApiUrl + '/info'),
