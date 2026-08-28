@@ -1,34 +1,30 @@
 import { GET, POST, route } from 'awilix-express';
-import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { BuildingFacilitiesService, FacilityModel } from '../services/BuildingFacilitiesService';
 import { addFoodAndDrink, mapFoodAndDrink } from '../utils/mapper';
-import { isUuid, parseBoolean } from '../utils/valueParsers';
+import { parseBoolean } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const buildingFacilitiesService = new BuildingFacilitiesService();
 @route('/courts/:courtId/edit/building-facilities')
-export default class BuildingFacilitiesController {
+export default class BuildingFacilitiesController extends BaseController {
+  constructor(private readonly buildingFacilitiesService = new BuildingFacilitiesService()) {
+    super();
+  }
+
   @GET()
   public async renderEditView(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
-    const model = await buildingFacilitiesService.retrieve(resolvedCourtId);
+    const model = await this.buildingFacilitiesService.retrieve(resolvedCourtId);
 
-    if (model === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-    if (typeof model === 'number') {
-      res.status(model);
-      return res.render('error');
+    if (this.renderStatusResponse(res, model, 'court-not-found')) {
+      return;
     }
     const result = addFoodAndDrink(model);
     res.render('building-facilities-edit', {
@@ -42,11 +38,9 @@ export default class BuildingFacilitiesController {
   @route('/success')
   @POST()
   public async updateCourt(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
     const { parking, foodAndDrink, waitingArea, quietRoom, babyChanging, wifi, waitingAreaChildren } =
@@ -66,15 +60,9 @@ export default class BuildingFacilitiesController {
       babyChanging: parseBoolean(babyChanging),
       wifi: parseBoolean(wifi),
     };
-    const updateResponse = await buildingFacilitiesService.save(resolvedCourtId, model);
-    if (updateResponse === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof updateResponse === 'number') {
-      res.status(updateResponse);
-      return res.render('error');
+    const updateResponse = await this.buildingFacilitiesService.save(resolvedCourtId, model);
+    if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
+      return;
     }
 
     if (updateResponse.errors) {

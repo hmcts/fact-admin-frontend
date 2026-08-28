@@ -4,24 +4,34 @@ import { assert, mock, stub } from 'sinon';
 
 import TranslationAndInterpretationController from '../../../main/controllers/TranslationAndInterpretationController';
 import { CourtApi } from '../../../main/requests/CourtApi';
+import { TranslationAndInterpretationService } from '../../../main/services/TranslationAndInterpretationService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 
 describe('TranslationAndInterpretationController', () => {
+  let courtApi = new CourtApi();
+  let translationAndInterpretationService = new TranslationAndInterpretationService(courtApi);
+  let controller = new TranslationAndInterpretationController(translationAndInterpretationService);
+
+  beforeEach(() => {
+    courtApi = new CourtApi();
+    translationAndInterpretationService = new TranslationAndInterpretationService(courtApi);
+    controller = new TranslationAndInterpretationController(translationAndInterpretationService);
+  });
+
   test('renders translation and interpretation view with translation services', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     request.params = { courtId };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const getTranslationServicesStub = stub(CourtApi.prototype, 'getTranslationServices').resolves({
+    const getTranslationServicesStub = stub(courtApi, 'getTranslationServices').resolves({
       courtId,
       email: 'translations@example.com',
       id: '22222222-2222-4222-8222-222222222222',
@@ -58,18 +68,17 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders translation and interpretation view when court id param is an array', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     request.params = { courtId: [courtId] };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const getTranslationServicesStub = stub(CourtApi.prototype, 'getTranslationServices').resolves(null);
+    const getTranslationServicesStub = stub(courtApi, 'getTranslationServices').resolves(null);
 
     responseMock.expects('render').once().withArgs('translation-and-interpretation');
 
@@ -85,7 +94,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders court not found when loading with an invalid court id', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -93,7 +101,7 @@ describe('TranslationAndInterpretationController', () => {
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const getCourtByIdStub = stub(courtApi, 'getCourtById');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -108,7 +116,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders court not found when the court lookup returns not found', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -116,7 +123,7 @@ describe('TranslationAndInterpretationController', () => {
     const request = mockRequest({});
     request.params = { courtId };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -130,7 +137,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders the error page when loading fails', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -138,7 +144,7 @@ describe('TranslationAndInterpretationController', () => {
     const request = mockRequest({});
     request.params = { courtId };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -152,7 +158,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('saves empty strings when no contact methods are selected', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -161,13 +166,11 @@ describe('TranslationAndInterpretationController', () => {
     request.params = { courtId };
     request.body = {};
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices').resolves(
-      HttpStatusCode.NoContent
-    );
+    const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices').resolves(HttpStatusCode.NoContent);
 
     responseMock
       .expects('render')
@@ -195,7 +198,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders validation errors without saving invalid values', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -208,11 +210,11 @@ describe('TranslationAndInterpretationController', () => {
       phoneNumber: 'abc',
     };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices');
+    const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
     responseMock.expects('render').once().withArgs('translation-and-interpretation');
@@ -228,7 +230,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders court not found when saving with an invalid court id', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -237,8 +238,8 @@ describe('TranslationAndInterpretationController', () => {
     request.params = { courtId: 'not-a-uuid' };
     request.body = {};
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
-    const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices');
+    const getCourtByIdStub = stub(courtApi, 'getCourtById');
+    const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -255,7 +256,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders court not found when saving returns not found', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -264,7 +264,7 @@ describe('TranslationAndInterpretationController', () => {
     request.params = { courtId };
     request.body = {};
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -278,7 +278,6 @@ describe('TranslationAndInterpretationController', () => {
   });
 
   test('renders the error page when saving fails', async () => {
-    const controller = new TranslationAndInterpretationController();
     const response = {
       render: () => '',
       status: () => response,
@@ -287,11 +286,11 @@ describe('TranslationAndInterpretationController', () => {
     request.params = { courtId };
     request.body = {};
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: courtId,
       name: 'Reading Crown Court',
     } as never);
-    const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices').resolves(
+    const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices').resolves(
       HttpStatusCode.InternalServerError
     );
 

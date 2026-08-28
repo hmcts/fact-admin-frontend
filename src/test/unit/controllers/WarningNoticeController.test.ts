@@ -7,6 +7,14 @@ import { WarningNoticeService } from '../../../main/services/WarningNoticeServic
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('WarningNoticeController', () => {
+  let warningNoticeService = new WarningNoticeService();
+  let controller = new WarningNoticeController(warningNoticeService);
+
+  beforeEach(() => {
+    warningNoticeService = new WarningNoticeService();
+    controller = new WarningNoticeController(warningNoticeService);
+  });
+
   const courtId = '11111111-1111-4111-8111-111111111111';
 
   afterEach(() => {
@@ -23,7 +31,6 @@ describe('WarningNoticeController', () => {
   }
 
   test('renders warning notice page when the service returns a view model', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -38,7 +45,7 @@ describe('WarningNoticeController', () => {
       errorSummary: [],
       pageTitle: 'Warning notice - Reading Crown Court',
     };
-    const getPage = stub(WarningNoticeService.prototype, 'getWarningNoticePage').resolves(viewModel);
+    const getPage = stub(warningNoticeService, 'getWarningNoticePage').resolves(viewModel);
 
     await controller.get(request, response);
 
@@ -56,11 +63,10 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when the get route has an invalid court id', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
-    const getPage = stub(WarningNoticeService.prototype, 'getWarningNoticePage');
+    const getPage = stub(warningNoticeService, 'getWarningNoticePage');
 
     await controller.get(request, response);
 
@@ -70,11 +76,10 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when get returns 404 status', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
-    stub(WarningNoticeService.prototype, 'getWarningNoticePage').resolves(HttpStatusCode.NotFound);
+    stub(warningNoticeService, 'getWarningNoticePage').resolves(HttpStatusCode.NotFound);
 
     await controller.get(request, response);
 
@@ -83,12 +88,11 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when save route has an invalid court id', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     request.body = {};
-    const save = stub(WarningNoticeService.prototype, 'save');
+    const save = stub(warningNoticeService, 'save');
 
     await controller.post(request, response);
 
@@ -98,7 +102,6 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders validation errors when save returns validation_error', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -124,7 +127,7 @@ describe('WarningNoticeController', () => {
       ],
       pageTitle: 'Error: Warning notice - Reading Crown Court',
     };
-    const save = stub(WarningNoticeService.prototype, 'save').resolves({
+    const save = stub(warningNoticeService, 'save').resolves({
       type: 'validation_error',
       viewModel,
     });
@@ -150,7 +153,6 @@ describe('WarningNoticeController', () => {
   });
 
   test('normalises array body values and renders save success', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
@@ -162,7 +164,7 @@ describe('WarningNoticeController', () => {
       courtId,
       courtName: 'Reading Crown Court',
     };
-    const save = stub(WarningNoticeService.prototype, 'save').resolves({
+    const save = stub(warningNoticeService, 'save').resolves({
       type: 'success',
       viewModel,
     });
@@ -193,12 +195,11 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders court not found when save returns 404 status', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
     request.body = {};
-    stub(WarningNoticeService.prototype, 'save').resolves({
+    stub(warningNoticeService, 'save').resolves({
       status: HttpStatusCode.NotFound,
       type: 'status',
     });
@@ -210,12 +211,11 @@ describe('WarningNoticeController', () => {
   });
 
   test('renders error when save returns non-404 status', async () => {
-    const controller = new WarningNoticeController();
     const response = responseMock();
     const request = mockRequest({});
     request.params = { courtId };
     request.body = {};
-    stub(WarningNoticeService.prototype, 'save').resolves({
+    stub(warningNoticeService, 'save').resolves({
       status: HttpStatusCode.InternalServerError,
       type: 'status',
     });

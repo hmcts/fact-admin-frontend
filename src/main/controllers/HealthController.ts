@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 
 import { app as myApp } from '../app';
 
+import BaseController from './BaseController';
+
 /* eslint-disable @typescript-eslint/no-require-imports */
 const healthcheck = require('@hmcts/nodejs-healthcheck');
 const outputs = require('@hmcts/nodejs-healthcheck/healthcheck/outputs');
@@ -10,7 +12,7 @@ const healthRoutes = require('@hmcts/nodejs-healthcheck/healthcheck/routes');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 @route('/health')
-export default class HealthController {
+export default class HealthController extends BaseController {
   private readonly redisHealthCheckTimeoutMs = 2000;
 
   private readonly healthCheckConfig = {

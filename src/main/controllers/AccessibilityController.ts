@@ -1,35 +1,30 @@
 import { GET, POST, route } from 'awilix-express';
-import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { AccessibilityModel, AccessibilityService } from '../services/AccessibilityService';
 import { isHearingEnhancementEquipment } from '../utils/mapper';
-import { isUuid, parseBoolean, parseLiftMetric } from '../utils/valueParsers';
+import { parseBoolean, parseLiftMetric } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const accessibilityService = new AccessibilityService();
-
 @route('/courts/:courtId/edit/accessibility')
-export default class AccessibilityController {
+export default class AccessibilityController extends BaseController {
+  constructor(private readonly accessibilityService = new AccessibilityService()) {
+    super();
+  }
+
   @GET()
   public async renderEditView(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
-    const model = await accessibilityService.retrieve(resolvedCourtId);
+    const model = await this.accessibilityService.retrieve(resolvedCourtId);
 
-    if (model === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-    if (typeof model === 'number') {
-      res.status(model);
-      return res.render('error');
+    if (this.renderStatusResponse(res, model, 'court-not-found')) {
+      return;
     }
 
     return res.render('accessibility-edit', {
@@ -43,10 +38,9 @@ export default class AccessibilityController {
   @route('/success')
   @POST()
   public async updateCourt(req: Request, res: Response): Promise<void> {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-    if (!resolvedCourtId || !isUuid(resolvedCourtId)) {
-      return res.status(HttpStatusCode.NotFound).render('court-not-found');
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
     }
 
     const {
@@ -92,13 +86,9 @@ export default class AccessibilityController {
       quietRoom: parseBoolean(quietRoom),
     };
 
-    const updateResponse = await accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
-    if (updateResponse === HttpStatusCode.NotFound) {
-      return res.status(HttpStatusCode.NotFound).render('court-not-found');
-    }
-
-    if (typeof updateResponse === 'number') {
-      return res.status(updateResponse).render('error');
+    const updateResponse = await this.accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
+    if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
+      return;
     }
 
     if (updateResponse.errors) {

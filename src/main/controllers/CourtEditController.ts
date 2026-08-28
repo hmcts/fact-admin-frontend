@@ -9,54 +9,70 @@ import { ApprovalService } from '../services/ApprovalService';
 import { LockService } from '../services/LockService';
 import { parseNumber } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { LocationApprovalController } from './LocationApprovalController';
 import { buildEditBreadcrumbs } from './helpers/breadcrumbs';
 
-const courtApi = new CourtApi();
-const operationsApi = new OperationsApi();
-const courtLockService = new LockService(operationsApi);
-const locationApprovalController = new LocationApprovalController(
-  {
-    buildBreadcrumbs: buildEditBreadcrumbs,
-    editView: 'court-edit',
-    getAdditionalEditViewModel: async (req, courtId) => {
-      if (isViewer(req)) {
-        return { courtLocks: [], timeoutMins: undefined };
-      }
-
-      const courtLocks = await courtLockService.getLocks(SubjectType.COURT, courtId);
-      return typeof courtLocks === 'number'
-        ? courtLocks
-        : { courtLocks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
-    },
-    getLocation: courtId => courtApi.getCourtById(courtId),
-    locationIdViewKey: 'courtId',
-    locationNameViewKey: 'courtName',
-    notFoundView: 'court-not-found',
-    paramName: 'courtId',
-    routeSegment: 'courts',
-    subjectType: 'COURT',
-  },
-  new ApprovalService(operationsApi)
-);
-
 @route('/courts/:courtId/edit')
-export default class CourtEditController {
+export class CourtEditController extends BaseController {
+  private readonly locationApprovalController: LocationApprovalController;
+
+  constructor(
+    courtApi = new CourtApi(),
+    operationsApi = new OperationsApi(),
+    locationApprovalController = CourtEditController.createCourtLocationApprovalController(courtApi, operationsApi)
+  ) {
+    super();
+    this.locationApprovalController = locationApprovalController;
+  }
+
+  private static createCourtLocationApprovalController(
+    courtApi: CourtApi,
+    operationsApi: OperationsApi
+  ): LocationApprovalController {
+    const courtLockService = new LockService(operationsApi);
+
+    return new LocationApprovalController(
+      {
+        buildBreadcrumbs: buildEditBreadcrumbs,
+        editView: 'court-edit',
+        getAdditionalEditViewModel: async (req, courtId) => {
+          if (isViewer(req)) {
+            return { courtLocks: [], timeoutMins: undefined };
+          }
+
+          const courtLocks = await courtLockService.getLocks(SubjectType.COURT, courtId);
+          return typeof courtLocks === 'number'
+            ? courtLocks
+            : { courtLocks, timeoutMins: getTimeoutMinsFromQuery(req.query) };
+        },
+        getLocation: courtId => courtApi.getCourtById(courtId),
+        locationIdViewKey: 'courtId',
+        locationNameViewKey: 'courtName',
+        notFoundView: 'court-not-found',
+        paramName: 'courtId',
+        routeSegment: 'courts',
+        subjectType: SubjectType.COURT,
+      },
+      new ApprovalService(operationsApi)
+    );
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    await locationApprovalController.get(req, res);
+    await this.locationApprovalController.get(req, res);
   }
 
   @GET()
   @route('/approve')
   public async getApprove(req: Request, res: Response): Promise<void> {
-    await locationApprovalController.getApprove(req, res);
+    await this.locationApprovalController.getApprove(req, res);
   }
 
   @POST()
   @route('/approve')
   public async postApprove(req: Request, res: Response): Promise<void> {
-    await locationApprovalController.postApprove(req, res);
+    await this.locationApprovalController.postApprove(req, res);
   }
 }
 

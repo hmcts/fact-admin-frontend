@@ -44,11 +44,12 @@ async function withStubbedRetrieve(
   }) => Promise<void>,
   params: Request['params'] = { courtId: COURT_ID }
 ): Promise<void> {
-  const retrieveStub = stub(SinglePointOfEntryService.prototype, 'retrieve').resolves(retrieveResult);
+  const service = new SinglePointOfEntryService();
+  const retrieveStub = stub(service, 'retrieve').resolves(retrieveResult);
 
   try {
     await run({
-      controller: new SinglePointOfEntryController(),
+      controller: new SinglePointOfEntryController(service),
       request: buildRequest(params),
       response: buildResponse(),
       stub: retrieveStub,
@@ -68,11 +69,12 @@ async function withStubbedUpdate(
   }) => Promise<void>,
   request = buildRequest()
 ): Promise<void> {
-  const updateStub = stub(SinglePointOfEntryService.prototype, 'update').resolves(updateResult);
+  const service = new SinglePointOfEntryService();
+  const updateStub = stub(service, 'update').resolves(updateResult);
 
   try {
     await run({
-      controller: new SinglePointOfEntryController(),
+      controller: new SinglePointOfEntryController(service),
       request,
       response: buildResponse(),
       stub: updateStub,
@@ -83,6 +85,14 @@ async function withStubbedUpdate(
 }
 
 describe('SinglePointOfEntryController', () => {
+  let singlePointOfEntryService = new SinglePointOfEntryService();
+  let controllerUnderTest = new SinglePointOfEntryController(singlePointOfEntryService);
+
+  beforeEach(() => {
+    singlePointOfEntryService = new SinglePointOfEntryService();
+    controllerUnderTest = new SinglePointOfEntryController(singlePointOfEntryService);
+  });
+
   test('renders single points of entry page when retrieve succeeds', async () => {
     const viewModel = {
       courtId: COURT_ID,
@@ -115,8 +125,7 @@ describe('SinglePointOfEntryController', () => {
   });
 
   test('renders court-not-found when single points page receives an invalid courtId', async () => {
-    const retrieveStub = stub(SinglePointOfEntryService.prototype, 'retrieve');
-    const controller = new SinglePointOfEntryController();
+    const retrieveStub = stub(singlePointOfEntryService, 'retrieve');
     const request = buildRequest({ courtId: 'not-a-uuid' });
     const response = buildResponse();
     const responseMock = mock(response);
@@ -124,7 +133,7 @@ describe('SinglePointOfEntryController', () => {
     responseMock.expects('render').once().withArgs('court-not-found');
 
     try {
-      await controller.renderSinglePointOfEntryView(request, response);
+      await controllerUnderTest.renderSinglePointOfEntryView(request, response);
       assert.notCalled(retrieveStub);
       responseMock.verify();
     } finally {
@@ -200,8 +209,7 @@ describe('SinglePointOfEntryController', () => {
   });
 
   test('renders court-not-found when update route receives invalid courtId', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
-    const controller = new SinglePointOfEntryController();
+    const updateStub = stub(singlePointOfEntryService, 'update');
     const request = buildRequest({ courtId: 'not-a-uuid' }, {});
     const response = buildResponse();
     const responseMock = mock(response);
@@ -209,7 +217,7 @@ describe('SinglePointOfEntryController', () => {
     responseMock.expects('render').once().withArgs('court-not-found');
 
     try {
-      await controller.updateSinglePointOfEntry(request, response);
+      await controllerUnderTest.updateSinglePointOfEntry(request, response);
       assert.notCalled(updateStub);
       responseMock.verify();
     } finally {
@@ -224,8 +232,7 @@ describe('SinglePointOfEntryController', () => {
     ['ignored fields only', { ignoredField: 'ignored' }],
     ['invalid scalar value', { [`singlePointOfEntry.${CHILDREN_AREA_ID}`]: 'invalid' }],
   ])('renders error when posted services are invalid: %s', async (_description, body) => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
-    const controller = new SinglePointOfEntryController();
+    const updateStub = stub(singlePointOfEntryService, 'update');
     const request = buildRequest({ courtId: COURT_ID }, body);
     const response = buildResponse();
     const responseMock = mock(response);
@@ -233,7 +240,7 @@ describe('SinglePointOfEntryController', () => {
     responseMock.expects('render').once().withArgs('error');
 
     try {
-      await controller.updateSinglePointOfEntry(request, response);
+      await controllerUnderTest.updateSinglePointOfEntry(request, response);
       assert.notCalled(updateStub);
       responseMock.verify();
     } finally {

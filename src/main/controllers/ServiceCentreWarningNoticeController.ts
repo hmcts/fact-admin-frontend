@@ -5,30 +5,25 @@ import { Request, Response } from 'express';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreWarningNoticeService } from '../services/ServiceCentreWarningNoticeService';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
-import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
-import { getUuidRouteParam } from './helpers/routeParams';
-
-const serviceCentreWarningNoticeService = new ServiceCentreWarningNoticeService();
 
 @route('/service-centres/:serviceCentreId/edit/warning-notice')
-export default class ServiceCentreWarningNoticeController {
+export default class ServiceCentreWarningNoticeController extends BaseController {
+  constructor(private readonly serviceCentreWarningNoticeService = new ServiceCentreWarningNoticeService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
-    const viewModel = await serviceCentreWarningNoticeService.retrieve(serviceCentreId);
-    if (viewModel === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-
-    if (typeof viewModel === 'number') {
-      renderError(res, viewModel);
+    const viewModel = await this.serviceCentreWarningNoticeService.retrieve(serviceCentreId);
+    if (this.renderStatusResponse(res, viewModel, 'service-centre-not-found')) {
       return;
     }
 
@@ -42,13 +37,13 @@ export default class ServiceCentreWarningNoticeController {
   @route('/success')
   @POST()
   public async save(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
-    const saveResult = await serviceCentreWarningNoticeService.save(
+    const saveResult = await this.serviceCentreWarningNoticeService.save(
       serviceCentreId,
       req.body?.warningNotice,
       req.body?.warningNoticeCy
@@ -65,11 +60,7 @@ export default class ServiceCentreWarningNoticeController {
     }
 
     if (saveResult.type === 'status') {
-      if (saveResult.status === HttpStatusCode.NotFound) {
-        renderServiceCentreNotFound(res);
-        return;
-      }
-      renderError(res, saveResult.status);
+      this.renderStatus(res, saveResult.status, 'service-centre-not-found');
       return;
     }
 

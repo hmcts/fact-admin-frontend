@@ -3,14 +3,17 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { isSuperAdmin } from '../modules/authentication/authenticationHelper';
-import { ApprovalService, ApprovalTrackerViewModel, UndoApprovalViewModel } from '../services/ApprovalService';
-import { isUuid, parseString } from '../utils/valueParsers';
+import { ApprovalService } from '../services/ApprovalService';
+import { parseString } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/approvals')
-export default class ApprovalsController {
-  constructor(private readonly approvalService = new ApprovalService()) {}
+export default class ApprovalsController extends BaseController {
+  constructor(private readonly approvalService = new ApprovalService()) {
+    super();
+  }
 
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
@@ -90,18 +93,6 @@ export default class ApprovalsController {
     });
   }
 
-  private renderStatusResponse(
-    res: Response,
-    result: ApprovalTrackerViewModel | UndoApprovalViewModel | HttpStatusCode
-  ): result is HttpStatusCode {
-    if (typeof result !== 'number') {
-      return false;
-    }
-
-    res.status(result).render('error');
-    return true;
-  }
-
   private requireSuperAdmin(req: Request, res: Response): boolean {
     if (isSuperAdmin(req)) {
       return true;
@@ -112,13 +103,13 @@ export default class ApprovalsController {
   }
 
   private resolveApprovalId(req: Request, res: Response): string | undefined {
-    const approvalId = parseString(req.params?.approvalId);
+    const approvalId = this.getUuidRouteParam(req, 'approvalId');
 
-    if (isUuid(approvalId)) {
+    if (approvalId) {
       return approvalId;
     }
 
-    res.status(HttpStatusCode.NotFound).render('not-found');
+    this.renderNotFound(res);
     return undefined;
   }
 }

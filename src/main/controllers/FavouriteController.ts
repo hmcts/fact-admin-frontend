@@ -6,6 +6,8 @@ import { UserApi } from '../requests/UserApi';
 import { subjectTypeSchema } from '../schemas/subjectTypeSchema';
 import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
+
 const SAFE_ORIGIN = 'https://fact-admin.local';
 const SAFE_RETURN_KEYS = new Set([
   'favouritesPageNumber',
@@ -23,8 +25,10 @@ const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
 const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 
 @route('/favourites/:subjectType/:subjectId')
-export default class FavouriteController {
-  public constructor(private readonly userApi = new UserApi()) {}
+export default class FavouriteController extends BaseController {
+  public constructor(private readonly userApi = new UserApi()) {
+    super();
+  }
 
   @POST()
   public async add(req: Request, res: Response): Promise<void> {
@@ -38,11 +42,11 @@ export default class FavouriteController {
   }
 
   private async mutate(req: Request, res: Response, remove: boolean): Promise<void> {
-    const subjectType = subjectTypeSchema.safeParse(req.params.subjectType);
-    const subjectId = req.params.subjectId;
+    const subjectType = subjectTypeSchema.safeParse(this.getRouteParam(req, 'subjectType'));
+    const subjectId = this.getUuidRouteParam(req, 'subjectId');
 
-    if (!subjectType.success || typeof subjectId !== 'string' || !isUuid(subjectId)) {
-      res.status(HttpStatusCode.BadRequest).render('error');
+    if (!subjectType.success || !subjectId) {
+      this.renderError(res, HttpStatusCode.BadRequest);
       return;
     }
 
@@ -52,7 +56,7 @@ export default class FavouriteController {
     const expectedStatus = remove ? HttpStatusCode.NoContent : HttpStatusCode.Created;
 
     if (status !== expectedStatus) {
-      res.status(status).render('error');
+      this.renderError(res, status);
       return;
     }
 

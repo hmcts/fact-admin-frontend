@@ -5,29 +5,25 @@ import { Request, Response } from 'express';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreGeneralService } from '../services/ServiceCentreGeneralService';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
-import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
-import { getUuidRouteParam } from './helpers/routeParams';
-
-const serviceCentreGeneralService = new ServiceCentreGeneralService();
 
 @route('/service-centres/:serviceCentreId/edit/general')
-export default class ServiceCentreGeneralController {
+export default class ServiceCentreGeneralController extends BaseController {
+  constructor(private readonly serviceCentreGeneralService = new ServiceCentreGeneralService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
-    const viewModel = await serviceCentreGeneralService.retrieve(serviceCentreId);
-    if (viewModel === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
-    if (typeof viewModel === 'number') {
-      renderError(res, viewModel);
+    const viewModel = await this.serviceCentreGeneralService.retrieve(serviceCentreId);
+    if (this.renderStatusResponse(res, viewModel, 'service-centre-not-found')) {
       return;
     }
 
@@ -41,13 +37,13 @@ export default class ServiceCentreGeneralController {
   @route('/success')
   @POST()
   public async save(req: Request, res: Response): Promise<void> {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
-    const saveResult = await serviceCentreGeneralService.save({
+    const saveResult = await this.serviceCentreGeneralService.save({
       id: serviceCentreId,
       name: req.body?.name,
       open: this.parseOpen(req.body?.open),
@@ -66,11 +62,7 @@ export default class ServiceCentreGeneralController {
     }
 
     if (saveResult.type === 'status') {
-      if (saveResult.status === HttpStatusCode.NotFound) {
-        renderServiceCentreNotFound(res);
-        return;
-      }
-      renderError(res, saveResult.status);
+      this.renderStatus(res, saveResult.status, 'service-centre-not-found');
       return;
     }
 
