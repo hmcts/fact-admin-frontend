@@ -4,8 +4,8 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   testEnvironment: 'node',
   transform: {
-    '^.+\\.ts?$': 'ts-jest',
-    '^.+\\.js$': 'babel-jest',
+    '^.+\\.ts?$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
+    '^.+\\.(js|mjs)$': 'babel-jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!chai|uuid)'],
 };

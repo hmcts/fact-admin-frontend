@@ -5,7 +5,7 @@ module.exports = {
   testEnvironment: 'node',
   setupFiles: ['<rootDir>/src/test/setup/routes.setup.ts'],
   transform: {
-    '^.+\\.ts?$': 'ts-jest',
+    '^.+\\.ts?$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
     '^.+\\.(js|mjs)$': 'babel-jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!chai|uuid|config)'],
