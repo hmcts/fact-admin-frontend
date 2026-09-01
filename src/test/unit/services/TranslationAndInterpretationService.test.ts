@@ -2,11 +2,11 @@ import { HttpStatusCode } from 'axios';
 import { restore, stub } from 'sinon';
 
 import { CourtApi } from '../../../main/requests/CourtApi';
-import { TranslationAndInterpretationService } from '../../../main/services/TranslationAndInterpretationService';
+import { CourtTranslationAndInterpretationService } from '../../../main/services/courts/CourtTranslationAndInterpretationService';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 
-describe('TranslationAndInterpretationService', () => {
+describe('CourtTranslationAndInterpretationService', () => {
   beforeEach(() => {
     restore();
   });
@@ -23,7 +23,7 @@ describe('TranslationAndInterpretationService', () => {
       phoneNumber: '+441234 567890',
     });
 
-    const viewModel = await new TranslationAndInterpretationService().getViewModel(courtId);
+    const viewModel = await new CourtTranslationAndInterpretationService().getViewModel(courtId);
 
     expect(viewModel).toEqual({
       courtId,
@@ -47,7 +47,7 @@ describe('TranslationAndInterpretationService', () => {
       phoneNumber: '',
     });
 
-    const viewModel = await new TranslationAndInterpretationService().getViewModel(courtId);
+    const viewModel = await new CourtTranslationAndInterpretationService().getViewModel(courtId);
 
     expect(viewModel).toMatchObject({
       email: '',
@@ -66,7 +66,7 @@ describe('TranslationAndInterpretationService', () => {
       HttpStatusCode.NoContent
     );
 
-    const result = await new TranslationAndInterpretationService().save(courtId, {});
+    const result = await new CourtTranslationAndInterpretationService().save(courtId, {});
 
     expect(result).toMatchObject({
       status: 'saved',
@@ -87,7 +87,7 @@ describe('TranslationAndInterpretationService', () => {
       HttpStatusCode.NoContent
     );
 
-    const result = await new TranslationAndInterpretationService().save(courtId, {
+    const result = await new CourtTranslationAndInterpretationService().save(courtId, {
       contactMethods: ['email'],
       email: ' translations@example.com ',
       phoneNumber: '+441234 567890',
@@ -116,7 +116,7 @@ describe('TranslationAndInterpretationService', () => {
     } as never);
     const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
-    const result = await new TranslationAndInterpretationService().save(courtId, {
+    const result = await new CourtTranslationAndInterpretationService().save(courtId, {
       contactMethods: ['email', 'phoneNumber'],
       email: ' ',
       phoneNumber: '',
@@ -145,7 +145,7 @@ describe('TranslationAndInterpretationService', () => {
     } as never);
     const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
-    const result = await new TranslationAndInterpretationService().save(courtId, {
+    const result = await new CourtTranslationAndInterpretationService().save(courtId, {
       contactMethods: ['email', 'phoneNumber'],
       email: 'invalid',
       phoneNumber: 'abc',
@@ -170,7 +170,7 @@ describe('TranslationAndInterpretationService', () => {
     } as never);
     const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
-    const result = await new TranslationAndInterpretationService().save(courtId, {
+    const result = await new CourtTranslationAndInterpretationService().save(courtId, {
       contactMethods: ['email'],
       email: 'test.user@email..com',
     });
@@ -191,7 +191,7 @@ describe('TranslationAndInterpretationService', () => {
     } as never);
     const saveTranslationServicesStub = stub(CourtApi.prototype, 'saveTranslationServices');
 
-    const result = await new TranslationAndInterpretationService().save(courtId, {
+    const result = await new CourtTranslationAndInterpretationService().save(courtId, {
       contactMethods: ['email'],
       email: 'test.user@.email.com',
     });

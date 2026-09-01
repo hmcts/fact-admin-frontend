@@ -1,8 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import BuildingFacilitiesController from '../../../main/controllers/BuildingFacilitiesController';
-import type { BuildingFacilitiesService } from '../../../main/services/BuildingFacilitiesService';
+import CourtBuildingFacilitiesController from '../../../main/controllers/courts/CourtBuildingFacilitiesController';
+import type { CourtBuildingFacilitiesService } from '../../../main/services/courts/CourtBuildingFacilitiesService';
 
 jest.mock('../../../main/utils/valueParsers', () => ({
   isUuid: jest.fn(() => true),
@@ -23,10 +23,10 @@ const saveMock = jest.fn();
 const buildingFacilitiesService = {
   retrieve: retrieveMock,
   save: saveMock,
-} as unknown as BuildingFacilitiesService;
+} as unknown as CourtBuildingFacilitiesService;
 
-describe('BuildingFacilitiesController', () => {
-  const controller = new BuildingFacilitiesController(buildingFacilitiesService);
+describe('CourtBuildingFacilitiesController', () => {
+  const controller = new CourtBuildingFacilitiesController(buildingFacilitiesService);
 
   type MockResponse = Response & {
     status: jest.Mock;

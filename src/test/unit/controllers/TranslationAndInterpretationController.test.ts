@@ -2,22 +2,22 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 
-import TranslationAndInterpretationController from '../../../main/controllers/TranslationAndInterpretationController';
+import CourtTranslationAndInterpretationController from '../../../main/controllers/courts/CourtTranslationAndInterpretationController';
 import { CourtApi } from '../../../main/requests/CourtApi';
-import { TranslationAndInterpretationService } from '../../../main/services/TranslationAndInterpretationService';
+import { CourtTranslationAndInterpretationService } from '../../../main/services/courts/CourtTranslationAndInterpretationService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 
-describe('TranslationAndInterpretationController', () => {
+describe('CourtTranslationAndInterpretationController', () => {
   let courtApi = new CourtApi();
-  let translationAndInterpretationService = new TranslationAndInterpretationService(courtApi);
-  let controller = new TranslationAndInterpretationController(translationAndInterpretationService);
+  let translationAndInterpretationService = new CourtTranslationAndInterpretationService(courtApi);
+  let controller = new CourtTranslationAndInterpretationController(translationAndInterpretationService);
 
   beforeEach(() => {
     courtApi = new CourtApi();
-    translationAndInterpretationService = new TranslationAndInterpretationService(courtApi);
-    controller = new TranslationAndInterpretationController(translationAndInterpretationService);
+    translationAndInterpretationService = new CourtTranslationAndInterpretationService(courtApi);
+    controller = new CourtTranslationAndInterpretationController(translationAndInterpretationService);
   });
 
   test('renders translation and interpretation view with translation services', async () => {

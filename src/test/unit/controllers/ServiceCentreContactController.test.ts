@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import ServiceCentreContactController from '../../../main/controllers/ServiceCentreContactController';
-import { ServiceCentreContactService } from '../../../main/services/ServiceCentreContactService';
+import ServiceCentreContactController from '../../../main/controllers/service-centres/ServiceCentreContactController';
+import { ServiceCentreContactService } from '../../../main/services/service-centres/ServiceCentreContactService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';

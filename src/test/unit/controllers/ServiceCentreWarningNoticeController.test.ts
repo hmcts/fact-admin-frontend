@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import ServiceCentreWarningNoticeController from '../../../main/controllers/ServiceCentreWarningNoticeController';
-import { ServiceCentreWarningNoticeService } from '../../../main/services/ServiceCentreWarningNoticeService';
+import ServiceCentreWarningNoticeController from '../../../main/controllers/service-centres/ServiceCentreWarningNoticeController';
+import { ServiceCentreWarningNoticeService } from '../../../main/services/service-centres/ServiceCentreWarningNoticeService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';

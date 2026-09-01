@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { restore, stub } from 'sinon';
 
-import CourtPhotoController from '../../../main/controllers/CourtPhotoController';
-import { CourtPhotoService } from '../../../main/services/CourtPhotoService';
+import CourtPhotoController from '../../../main/controllers/courts/CourtPhotoController';
+import { CourtPhotoService } from '../../../main/services/courts/CourtPhotoService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtPhotoController', () => {

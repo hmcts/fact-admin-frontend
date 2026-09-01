@@ -3,8 +3,8 @@ import type { Request, Response } from 'express';
 import { assert, mock, match as sinonMatch, stub } from 'sinon';
 import type { SinonStub } from 'sinon';
 
-import ProfessionalInformationController from '../../../main/controllers/ProfessionalInformationController';
-import { ProfessionalInformationService } from '../../../main/services/ProfessionalInformationService';
+import CourtProfessionalInformationController from '../../../main/controllers/courts/CourtProfessionalInformationController';
+import { CourtProfessionalInformationService } from '../../../main/services/courts/CourtProfessionalInformationService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
@@ -25,7 +25,7 @@ const buildProfessionalInformationBreadcrumbs = (resolvedCourtName: string, curr
 };
 
 type MockProfessionalInformationService = Pick<
-  ProfessionalInformationService,
+  CourtProfessionalInformationService,
   'getViewModel' | 'requiresFamilyCourtRemovalConfirmation' | 'save'
 >;
 
@@ -39,8 +39,8 @@ function buildService(
   } as unknown as MockProfessionalInformationService;
 }
 
-function buildController(service = buildService()): ProfessionalInformationController {
-  return new ProfessionalInformationController(service as ProfessionalInformationService);
+function buildController(service = buildService()): CourtProfessionalInformationController {
+  return new CourtProfessionalInformationController(service as CourtProfessionalInformationService);
 }
 
 function buildResponse(): Response {
@@ -58,7 +58,7 @@ function buildRequest(params: Request['params'], body: Request['body'] = {}): Re
   return request;
 }
 
-describe('ProfessionalInformationController', () => {
+describe('CourtProfessionalInformationController', () => {
   test('renders the professional information page', async () => {
     const viewModel = {
       courtId,

@@ -1,8 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
-import { LocalAuthoritiesService } from '../../../main/services/LocalAuthoritiesService';
+import { CourtLocalAuthoritiesService } from '../../../main/services/courts/CourtLocalAuthoritiesService';
 
-describe('LocalAuthoritiesService', () => {
+describe('CourtLocalAuthoritiesService', () => {
   test('builds local authorities view model from upstream responses', async () => {
     const courtId = '11111111-1111-4111-8111-111111111111';
     const courtApi = {
@@ -37,7 +37,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -80,7 +80,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -95,7 +95,7 @@ describe('LocalAuthoritiesService', () => {
       getCourtLocalAuthorities: jest.fn(),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -116,7 +116,7 @@ describe('LocalAuthoritiesService', () => {
       getCourtLocalAuthorities: jest.fn(),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -136,7 +136,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -155,7 +155,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -180,7 +180,7 @@ describe('LocalAuthoritiesService', () => {
       } as never),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.retrieve('11111111-1111-4111-8111-111111111111');
 
@@ -209,7 +209,7 @@ describe('LocalAuthoritiesService', () => {
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue({}),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.update(courtId, selections);
 
@@ -236,7 +236,7 @@ describe('LocalAuthoritiesService', () => {
       updateCourtLocalAuthorities: jest.fn(),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
@@ -250,7 +250,7 @@ describe('LocalAuthoritiesService', () => {
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
@@ -268,7 +268,7 @@ describe('LocalAuthoritiesService', () => {
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue(validationErrors),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
@@ -288,7 +288,7 @@ describe('LocalAuthoritiesService', () => {
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.Ok),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
@@ -309,7 +309,7 @@ describe('LocalAuthoritiesService', () => {
       updateCourtLocalAuthorities: jest.fn().mockResolvedValue(validationErrors),
     };
 
-    const service = new LocalAuthoritiesService(courtApi as never);
+    const service = new CourtLocalAuthoritiesService(courtApi as never);
 
     const result = await service.update('11111111-1111-4111-8111-111111111111', {});
 
@@ -323,7 +323,7 @@ describe('LocalAuthoritiesService', () => {
   });
 
   test('extracts cases heard booleans from local authority selections object', () => {
-    const service = new LocalAuthoritiesService({} as never);
+    const service = new CourtLocalAuthoritiesService({} as never);
     const serviceWithExtractor = service as unknown as {
       extractCasesHeard: (input: unknown) => {
         Adoption: boolean;

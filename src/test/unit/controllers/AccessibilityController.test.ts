@@ -1,8 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
-import AccessibilityController from '../../../main/controllers/AccessibilityController';
-import type { AccessibilityService } from '../../../main/services/AccessibilityService';
+import CourtAccessibilityController from '../../../main/controllers/courts/CourtAccessibilityController';
+import type { CourtAccessibilityService } from '../../../main/services/courts/CourtAccessibilityService';
 
 jest.mock('../../../main/utils/mapper', () => ({
   isHearingEnhancementEquipment: jest.fn((value: unknown) =>
@@ -42,10 +42,10 @@ const saveMock = jest.fn();
 const accessibilityService = {
   retrieve: retrieveMock,
   save: saveMock,
-} as unknown as AccessibilityService;
+} as unknown as CourtAccessibilityService;
 
-describe('AccessibilityController', () => {
-  const controller = new AccessibilityController(accessibilityService);
+describe('CourtAccessibilityController', () => {
+  const controller = new CourtAccessibilityController(accessibilityService);
 
   type MockResponse = Response & {
     status: jest.Mock;

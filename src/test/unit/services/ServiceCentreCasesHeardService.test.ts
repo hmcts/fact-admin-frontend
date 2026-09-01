@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import {
   ServiceCentreCasesHeardService,
   serviceCentreAreasOfLawValidationMessage,
-} from '../../../main/services/ServiceCentreCasesHeardService';
+} from '../../../main/services/service-centres/ServiceCentreCasesHeardService';
 
 describe('ServiceCentreCasesHeardService', () => {
   test('normalises checkbox values from a single string or an array', () => {

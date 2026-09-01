@@ -1,9 +1,9 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../../main/requests/CourtApi';
-import { WarningNoticeForm, WarningNoticeService } from '../../../main/services/WarningNoticeService';
+import { CourtWarningNoticeService, WarningNoticeForm } from '../../../main/services/courts/CourtWarningNoticeService';
 
-describe('WarningNoticeService', () => {
+describe('CourtWarningNoticeService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
   const courtResponse = {
     id: courtId,
@@ -23,7 +23,7 @@ describe('WarningNoticeService', () => {
       courtApi,
       getCourtById: courtApi.getCourtById as jest.Mock,
       updateCourt: courtApi.updateCourt as jest.Mock,
-      service: new WarningNoticeService(courtApi),
+      service: new CourtWarningNoticeService(courtApi),
     };
   }
 

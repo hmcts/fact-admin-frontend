@@ -1,4 +1,4 @@
-import { AddServiceCentreService } from '../../../main/services/AddServiceCentreService';
+import { AddServiceCentreService } from '../../../main/services/service-centres/AddServiceCentreService';
 
 describe('AddServiceCentreService', () => {
   const regions = [{ country: 'england', id: '22222222-2222-4222-8222-222222222222', name: 'South East' }];

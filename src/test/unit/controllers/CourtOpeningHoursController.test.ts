@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { restore, stub } from 'sinon';
 
-import CourtOpeningHoursController from '../../../main/controllers/CourtOpeningHoursController';
-import { CourtOpeningHoursService } from '../../../main/services/CourtOpeningHoursService';
+import CourtOpeningHoursController from '../../../main/controllers/courts/CourtOpeningHoursController';
+import { CourtOpeningHoursService } from '../../../main/services/courts/CourtOpeningHoursService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtOpeningHoursController', () => {

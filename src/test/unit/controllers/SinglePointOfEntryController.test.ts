@@ -3,8 +3,8 @@ import type { Request, Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 import type { SinonStub } from 'sinon';
 
-import SinglePointOfEntryController from '../../../main/controllers/SinglePointOfEntryController';
-import { SinglePointOfEntryService } from '../../../main/services/SinglePointOfEntryService';
+import CourtSinglePointOfEntryController from '../../../main/controllers/courts/CourtSinglePointOfEntryController';
+import { CourtSinglePointOfEntryService } from '../../../main/services/courts/CourtSinglePointOfEntryService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
@@ -35,21 +35,21 @@ function buildResponse(): Response {
 }
 
 async function withStubbedRetrieve(
-  retrieveResult: Awaited<ReturnType<SinglePointOfEntryService['retrieve']>>,
+  retrieveResult: Awaited<ReturnType<CourtSinglePointOfEntryService['retrieve']>>,
   run: (context: {
-    controller: SinglePointOfEntryController;
+    controller: CourtSinglePointOfEntryController;
     request: Request;
     response: Response;
     stub: SinonStub;
   }) => Promise<void>,
   params: Request['params'] = { courtId: COURT_ID }
 ): Promise<void> {
-  const service = new SinglePointOfEntryService();
+  const service = new CourtSinglePointOfEntryService();
   const retrieveStub = stub(service, 'retrieve').resolves(retrieveResult);
 
   try {
     await run({
-      controller: new SinglePointOfEntryController(service),
+      controller: new CourtSinglePointOfEntryController(service),
       request: buildRequest(params),
       response: buildResponse(),
       stub: retrieveStub,
@@ -60,21 +60,21 @@ async function withStubbedRetrieve(
 }
 
 async function withStubbedUpdate(
-  updateResult: Awaited<ReturnType<SinglePointOfEntryService['update']>>,
+  updateResult: Awaited<ReturnType<CourtSinglePointOfEntryService['update']>>,
   run: (context: {
-    controller: SinglePointOfEntryController;
+    controller: CourtSinglePointOfEntryController;
     request: Request;
     response: Response;
     stub: SinonStub;
   }) => Promise<void>,
   request = buildRequest()
 ): Promise<void> {
-  const service = new SinglePointOfEntryService();
+  const service = new CourtSinglePointOfEntryService();
   const updateStub = stub(service, 'update').resolves(updateResult);
 
   try {
     await run({
-      controller: new SinglePointOfEntryController(service),
+      controller: new CourtSinglePointOfEntryController(service),
       request,
       response: buildResponse(),
       stub: updateStub,
@@ -84,13 +84,13 @@ async function withStubbedUpdate(
   }
 }
 
-describe('SinglePointOfEntryController', () => {
-  let singlePointOfEntryService = new SinglePointOfEntryService();
-  let controllerUnderTest = new SinglePointOfEntryController(singlePointOfEntryService);
+describe('CourtSinglePointOfEntryController', () => {
+  let singlePointOfEntryService = new CourtSinglePointOfEntryService();
+  let controllerUnderTest = new CourtSinglePointOfEntryController(singlePointOfEntryService);
 
   beforeEach(() => {
-    singlePointOfEntryService = new SinglePointOfEntryService();
-    controllerUnderTest = new SinglePointOfEntryController(singlePointOfEntryService);
+    singlePointOfEntryService = new CourtSinglePointOfEntryService();
+    controllerUnderTest = new CourtSinglePointOfEntryController(singlePointOfEntryService);
   });
 
   test('renders single points of entry page when retrieve succeeds', async () => {

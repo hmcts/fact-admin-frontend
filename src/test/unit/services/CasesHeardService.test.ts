@@ -1,10 +1,10 @@
 import { HttpStatusCode } from 'axios';
 
-import { CasesHeardService } from '../../../main/services/CasesHeardService';
+import { CourtCasesHeardService } from '../../../main/services/courts/CourtCasesHeardService';
 
-describe('CasesHeardService', () => {
+describe('CourtCasesHeardService', () => {
   test('normalises checkbox values from a single string or an array', () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtAreasOfLaw: jest.fn(),
     } as never);
 
@@ -14,7 +14,7 @@ describe('CasesHeardService', () => {
   });
 
   test('returns a validation error when no areas of law are selected', () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtAreasOfLaw: jest.fn(),
     } as never);
 
@@ -23,7 +23,7 @@ describe('CasesHeardService', () => {
   });
 
   test('loads the cases heard page view model from the API responses', async () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtById: jest.fn().mockResolvedValue({
         id: '11111111-1111-4111-8111-111111111111',
         name: 'Reading Crown Court',
@@ -79,7 +79,7 @@ describe('CasesHeardService', () => {
   });
 
   test('returns a validation error result with the submitted selection state preserved', async () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtById: jest.fn().mockResolvedValue({
         id: '11111111-1111-4111-8111-111111111111',
         name: 'Reading Crown Court',
@@ -125,7 +125,7 @@ describe('CasesHeardService', () => {
   });
 
   test('returns success when the selected areas of law are saved', async () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtById: jest.fn().mockResolvedValue({
         id: '11111111-1111-4111-8111-111111111111',
         name: 'Reading Crown Court',
@@ -147,7 +147,7 @@ describe('CasesHeardService', () => {
   });
 
   test('returns the upstream status code when saving fails', async () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtById: jest.fn().mockResolvedValue({
         id: '11111111-1111-4111-8111-111111111111',
         name: 'Reading Crown Court',
@@ -163,7 +163,7 @@ describe('CasesHeardService', () => {
   });
 
   test('returns the upstream status code when the court lookup fails while loading the page', async () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
       getCourtAreasOfLaw: jest.fn(),
     } as never);
@@ -174,7 +174,7 @@ describe('CasesHeardService', () => {
   });
 
   test('returns the upstream status code when areas of law loading fails', async () => {
-    const service = new CasesHeardService({
+    const service = new CourtCasesHeardService({
       getCourtById: jest.fn().mockResolvedValue({
         id: '11111111-1111-4111-8111-111111111111',
         name: 'Reading Crown Court',

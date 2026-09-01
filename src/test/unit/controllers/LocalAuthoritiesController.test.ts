@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 
-import LocalAuthoritiesController from '../../../main/controllers/LocalAuthoritiesController';
-import { LocalAuthoritiesService } from '../../../main/services/LocalAuthoritiesService';
+import CourtLocalAuthoritiesController from '../../../main/controllers/courts/CourtLocalAuthoritiesController';
+import { CourtLocalAuthoritiesService } from '../../../main/services/courts/CourtLocalAuthoritiesService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
@@ -14,13 +14,13 @@ const LA_ID_1 = '55555555-5555-4555-8555-555555555555';
 const LA_ID_2 = '66666666-6666-4666-8666-666666666666';
 const LA_ID_3 = '77777777-7777-4777-8777-777777777777';
 
-describe('LocalAuthoritiesController', () => {
-  let localAuthoritiesService = new LocalAuthoritiesService();
-  let controller = new LocalAuthoritiesController(localAuthoritiesService);
+describe('CourtLocalAuthoritiesController', () => {
+  let localAuthoritiesService = new CourtLocalAuthoritiesService();
+  let controller = new CourtLocalAuthoritiesController(localAuthoritiesService);
 
   beforeEach(() => {
-    localAuthoritiesService = new LocalAuthoritiesService();
-    controller = new LocalAuthoritiesController(localAuthoritiesService);
+    localAuthoritiesService = new CourtLocalAuthoritiesService();
+    controller = new CourtLocalAuthoritiesController(localAuthoritiesService);
   });
 
   test('renders local authorities page when retrieve succeeds', async () => {

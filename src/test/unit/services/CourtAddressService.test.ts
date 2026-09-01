@@ -4,7 +4,7 @@ import { CourtApi } from '../../../main/requests/CourtApi';
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
 import { CourtEntity } from '../../../main/schemas/courtEntitySchema';
-import { CourtAddressService } from '../../../main/services/CourtAddressService';
+import { CourtAddressService } from '../../../main/services/courts/CourtAddressService';
 
 describe('CourtAddressService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';

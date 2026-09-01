@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../../main/requests/CourtApi';
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
-import { CourtContactService } from '../../../main/services/CourtContactService';
+import { CourtContactService } from '../../../main/services/courts/CourtContactService';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 const contactTypeId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';

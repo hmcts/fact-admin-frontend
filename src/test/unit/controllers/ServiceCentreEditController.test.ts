@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 import type { Request, Response } from 'express';
 import { assert, match, mock, restore, stub } from 'sinon';
 
-import { ServiceCentreEditController } from '../../../main/controllers/ServiceCentreEditController';
+import { ServiceCentreEditController } from '../../../main/controllers/service-centres/ServiceCentreEditController';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';

@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import ServiceCentreAddressController from '../../../main/controllers/ServiceCentreAddressController';
-import { ServiceCentreAddressService } from '../../../main/services/ServiceCentreAddressService';
+import ServiceCentreAddressController from '../../../main/controllers/service-centres/ServiceCentreAddressController';
+import { ServiceCentreAddressService } from '../../../main/services/service-centres/ServiceCentreAddressService';
 import * as addressValidation from '../../../main/utils/addressValidation';
 import { mockRequest } from '../mocks/mockRequest';
 

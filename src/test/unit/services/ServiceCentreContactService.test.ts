@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
-import { ServiceCentreContactService } from '../../../main/services/ServiceCentreContactService';
+import { ServiceCentreContactService } from '../../../main/services/service-centres/ServiceCentreContactService';
 
 describe('ServiceCentreContactService', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';

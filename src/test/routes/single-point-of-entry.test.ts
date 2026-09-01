@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { SinglePointOfEntryService } from '../../main/services/SinglePointOfEntryService';
+import { CourtSinglePointOfEntryService } from '../../main/services/courts/CourtSinglePointOfEntryService';
 
 describe('Single point of entry routes', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -13,7 +13,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('renders single point of entry page for a valid known court', async () => {
-    stub(SinglePointOfEntryService.prototype, 'retrieve').resolves({
+    stub(CourtSinglePointOfEntryService.prototype, 'retrieve').resolves({
       courtId,
       courtName: 'Reading Crown Court',
       singlePointOfEntryServices: [
@@ -48,7 +48,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {
-    const retrieveStub = stub(SinglePointOfEntryService.prototype, 'retrieve');
+    const retrieveStub = stub(CourtSinglePointOfEntryService.prototype, 'retrieve');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/single-point-of-entry');
 
@@ -58,7 +58,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('renders the generic error page when retrieval fails', async () => {
-    stub(SinglePointOfEntryService.prototype, 'retrieve').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtSinglePointOfEntryService.prototype, 'retrieve').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get(`/courts/${courtId}/edit/single-point-of-entry`);
 
@@ -67,7 +67,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('updates single point of entry and renders success page', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update').resolves({
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update').resolves({
       status: 'saved',
       courtName: 'Reading Crown Court',
     });
@@ -92,7 +92,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('updates service to false when no was selected', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update').resolves({
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update').resolves({
       status: 'saved',
       courtName: 'Reading Crown Court',
     });
@@ -110,7 +110,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('rejects invalid radio values before calling the service', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
@@ -125,7 +125,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('rejects unexpected checkbox value order before calling the service', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
@@ -140,7 +140,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('rejects repeated checkbox values before calling the service', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
@@ -155,7 +155,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('rejects invalid area of law ids before calling the service', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
@@ -175,7 +175,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('renders the dedicated court not found page for invalid UUID on update route', async () => {
-    const updateStub = stub(SinglePointOfEntryService.prototype, 'update');
+    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
 
     const response = await request(app)
       .post('/courts/not-a-uuid/edit/single-point-of-entry/success')
@@ -190,7 +190,7 @@ describe('Single point of entry routes', () => {
   });
 
   test('renders the generic error page when update fails', async () => {
-    stub(SinglePointOfEntryService.prototype, 'update').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtSinglePointOfEntryService.prototype, 'update').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/single-point-of-entry/success`)

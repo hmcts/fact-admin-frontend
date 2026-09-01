@@ -2,10 +2,10 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import { CourtAddressController } from '../../../main/controllers/CourtAddressController';
+import { CourtAddressController } from '../../../main/controllers/courts/CourtAddressController';
 import { CourtAddress, CourtAddressType } from '../../../main/schemas/courtAddressSchema';
-import { CourtAddressService } from '../../../main/services/CourtAddressService';
 import { TypesService } from '../../../main/services/TypesService';
+import { CourtAddressService } from '../../../main/services/courts/CourtAddressService';
 import * as addressValidation from '../../../main/utils/addressValidation';
 import { mockRequest } from '../mocks/mockRequest';
 

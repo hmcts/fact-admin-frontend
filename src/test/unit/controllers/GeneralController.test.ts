@@ -2,17 +2,17 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 
-import GeneralController from '../../../main/controllers/GeneralController';
-import { GeneralService } from '../../../main/services/GeneralService';
+import CourtGeneralController from '../../../main/controllers/courts/CourtGeneralController';
+import { CourtGeneralService } from '../../../main/services/courts/CourtGeneralService';
 import { mockRequest } from '../mocks/mockRequest';
 
-describe('GeneralController', () => {
-  let generalService = new GeneralService();
-  let controller = new GeneralController(generalService);
+describe('CourtGeneralController', () => {
+  let generalService = new CourtGeneralService();
+  let controller = new CourtGeneralController(generalService);
 
   beforeEach(() => {
-    generalService = new GeneralService();
-    controller = new GeneralController(generalService);
+    generalService = new CourtGeneralService();
+    controller = new CourtGeneralController(generalService);
   });
 
   test('renders the general edit view when retrieval succeeds', async () => {

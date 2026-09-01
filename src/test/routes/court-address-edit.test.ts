@@ -3,8 +3,8 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { CourtAddressService } from '../../main/services/CourtAddressService';
 import { TypesService } from '../../main/services/TypesService';
+import { CourtAddressService } from '../../main/services/courts/CourtAddressService';
 
 describe('Court address edit routes', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';

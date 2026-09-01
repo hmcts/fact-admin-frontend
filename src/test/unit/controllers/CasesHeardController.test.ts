@@ -2,9 +2,9 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 
-import CasesHeardController from '../../../main/controllers/CasesHeardController';
+import CourtCasesHeardController from '../../../main/controllers/courts/CourtCasesHeardController';
 import { CourtApi } from '../../../main/requests/CourtApi';
-import { CasesHeardService } from '../../../main/services/CasesHeardService';
+import { CourtCasesHeardService } from '../../../main/services/courts/CourtCasesHeardService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const buildCasesHeardBreadcrumbs = (courtId: string, courtName: string, currentPage?: string) => {
@@ -21,15 +21,15 @@ const buildCasesHeardBreadcrumbs = (courtId: string, courtName: string, currentP
   return breadcrumbs;
 };
 
-describe('CasesHeardController', () => {
+describe('CourtCasesHeardController', () => {
   let courtApi = new CourtApi();
-  let casesHeardService = new CasesHeardService(courtApi);
-  let controller = new CasesHeardController(casesHeardService);
+  let casesHeardService = new CourtCasesHeardService(courtApi);
+  let controller = new CourtCasesHeardController(casesHeardService);
 
   beforeEach(() => {
     courtApi = new CourtApi();
-    casesHeardService = new CasesHeardService(courtApi);
-    controller = new CasesHeardController(casesHeardService);
+    casesHeardService = new CourtCasesHeardService(courtApi);
+    controller = new CourtCasesHeardController(casesHeardService);
   });
 
   test('renders the cases heard view when the court exists', async () => {

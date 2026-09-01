@@ -1,4 +1,4 @@
-import { courtTypeOptions } from '../../../main/services/ProfessionalInformationService';
+import { courtTypeOptions } from '../../../main/services/courts/CourtProfessionalInformationService';
 import { env } from '../../../testUtils/nunjucksHelper';
 
 describe('Professional Information View', () => {

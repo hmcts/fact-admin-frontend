@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { LocalAuthoritiesService } from '../../main/services/LocalAuthoritiesService';
+import { CourtLocalAuthoritiesService } from '../../main/services/courts/CourtLocalAuthoritiesService';
 
 describe('Local authorities routes', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -19,7 +19,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders local authorities page for a valid known court', async () => {
-    stub(LocalAuthoritiesService.prototype, 'retrieve').resolves({
+    stub(CourtLocalAuthoritiesService.prototype, 'retrieve').resolves({
       courtId,
       courtTypes: {
         family: true,
@@ -67,7 +67,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders the dedicated court not found page for an invalid UUID', async () => {
-    const retrieveStub = stub(LocalAuthoritiesService.prototype, 'retrieve');
+    const retrieveStub = stub(CourtLocalAuthoritiesService.prototype, 'retrieve');
 
     const response = await request(app).get('/courts/not-a-uuid/edit/local-authorities');
 
@@ -78,7 +78,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders the dedicated court not found page when the court is missing', async () => {
-    stub(LocalAuthoritiesService.prototype, 'retrieve').resolves(HttpStatusCode.NotFound);
+    stub(CourtLocalAuthoritiesService.prototype, 'retrieve').resolves(HttpStatusCode.NotFound);
 
     const response = await request(app).get(`/courts/${courtId}/edit/local-authorities`);
 
@@ -88,7 +88,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders the generic error page when retrieval fails', async () => {
-    stub(LocalAuthoritiesService.prototype, 'retrieve').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtLocalAuthoritiesService.prototype, 'retrieve').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app).get(`/courts/${courtId}/edit/local-authorities`);
 
@@ -97,7 +97,7 @@ describe('Local authorities routes', () => {
   });
 
   test('updates selected local authorities and renders success page', async () => {
-    const updateStub = stub(LocalAuthoritiesService.prototype, 'update').resolves({
+    const updateStub = stub(CourtLocalAuthoritiesService.prototype, 'update').resolves({
       status: 'saved',
       courtName: 'Reading Crown Court',
     } as never);
@@ -143,7 +143,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders the dedicated court not found page for invalid UUID on update route', async () => {
-    const updateStub = stub(LocalAuthoritiesService.prototype, 'update');
+    const updateStub = stub(CourtLocalAuthoritiesService.prototype, 'update');
 
     const response = await request(app)
       .post('/courts/not-a-uuid/edit/local-authorities/success')
@@ -156,7 +156,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders the generic error page when update fails', async () => {
-    stub(LocalAuthoritiesService.prototype, 'update').resolves(HttpStatusCode.InternalServerError);
+    stub(CourtLocalAuthoritiesService.prototype, 'update').resolves(HttpStatusCode.InternalServerError);
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/local-authorities/success`)
@@ -168,7 +168,7 @@ describe('Local authorities routes', () => {
   });
 
   test('renders the generic error page when update returns validation errors', async () => {
-    stub(LocalAuthoritiesService.prototype, 'update').resolves({
+    stub(CourtLocalAuthoritiesService.prototype, 'update').resolves({
       status: 'invalid',
       courtName: 'Reading Crown Court',
       errors: {

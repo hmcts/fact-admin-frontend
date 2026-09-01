@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../../main/requests/CourtApi';
-import { ProfessionalInformationService } from '../../../main/services/ProfessionalInformationService';
+import { CourtProfessionalInformationService } from '../../../main/services/courts/CourtProfessionalInformationService';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 const court = {
@@ -39,11 +39,11 @@ const buildCourtApi = (overrides: Partial<Record<string, jest.Mock>> = {}) =>
     ...overrides,
   }) as never;
 
-describe('ProfessionalInformationService', () => {
+describe('CourtProfessionalInformationService', () => {
   test('builds a populated view model from professional information', async () => {
     const courtApi = buildCourtApi();
 
-    const result = await new ProfessionalInformationService(courtApi).getViewModel(courtId);
+    const result = await new CourtProfessionalInformationService(courtApi).getViewModel(courtId);
 
     expect(result).toMatchObject({
       accessScheme: false,
@@ -74,7 +74,7 @@ describe('ProfessionalInformationService', () => {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).getViewModel(courtId);
+    const result = await new CourtProfessionalInformationService(courtApi).getViewModel(courtId);
 
     expect(result).toMatchObject({
       dxCodes: [{ code: '', description: '' }],
@@ -88,7 +88,7 @@ describe('ProfessionalInformationService', () => {
 
   test('returns upstream status codes while building the view model', async () => {
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
         })
@@ -96,7 +96,7 @@ describe('ProfessionalInformationService', () => {
     ).resolves.toBe(HttpStatusCode.NotFound);
 
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
         })
@@ -109,7 +109,7 @@ describe('ProfessionalInformationService', () => {
       getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).getViewModel(courtId);
+    const result = await new CourtProfessionalInformationService(courtApi).getViewModel(courtId);
 
     expect(result).toMatchObject({
       courtId,
@@ -127,7 +127,7 @@ describe('ProfessionalInformationService', () => {
       .mockResolvedValue(null);
 
     try {
-      const result = await new ProfessionalInformationService().getViewModel(courtId);
+      const result = await new CourtProfessionalInformationService().getViewModel(courtId);
 
       expect(getCourtByIdSpy).toHaveBeenCalledWith(courtId);
       expect(getCourtProfessionalInformationSpy).toHaveBeenCalledWith(courtId);
@@ -148,7 +148,7 @@ describe('ProfessionalInformationService', () => {
     }) as never as {
       saveCourtProfessionalInformation: jest.Mock;
     };
-    const service = new ProfessionalInformationService(courtApi as never);
+    const service = new CourtProfessionalInformationService(courtApi as never);
 
     const result = await service.save(courtId, {
       accessScheme: 'false',
@@ -204,7 +204,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {});
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {});
 
     expect(result).toMatchObject({ status: 'saved' });
     expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalledWith(courtId, {
@@ -227,7 +227,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
       courtTypes: ['family', 'crown'],
       crownCourtCode: 'ABC',
       'dxCodeDescription-0': 'Documents',
@@ -264,7 +264,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCode-0': '@£@$&()@$)(@()$',
       'dxCodeDescription-0': '@£@$&()@$)(@()$',
       'dxCodeDescriptionCy-0': '@£@$&()@$)(@()$',
@@ -312,7 +312,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCode-0': 'DX 12345',
       'dxCodeDescription-0': 'Documents',
       'dxCode-1': 'DX 54321',
@@ -346,7 +346,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCodeDescriptionCy-0': 'Esboniad',
       'dxCode-1': 'DX VALID',
       'dxCodeDescription-1': 'A'.repeat(251),
@@ -378,10 +378,10 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('validates missing and non-numeric interview room counts', async () => {
-    const missingCount = await new ProfessionalInformationService(buildCourtApi()).save(courtId, {
+    const missingCount = await new CourtProfessionalInformationService(buildCourtApi()).save(courtId, {
       interviewRooms: 'true',
     });
-    const nonNumericCount = await new ProfessionalInformationService(buildCourtApi()).save(courtId, {
+    const nonNumericCount = await new CourtProfessionalInformationService(buildCourtApi()).save(courtId, {
       interviewRoomCount: 'abc',
       interviewRooms: 'true',
     });
@@ -410,7 +410,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {
       interviewRoomCount: '150',
       interviewRooms: 'true',
     });
@@ -447,7 +447,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).save(courtId, {});
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {});
 
     expect(result).toMatchObject({
       status: 'validationError',
@@ -503,7 +503,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).save(courtId, {});
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {});
 
     expect(result).toMatchObject({
       status: 'validationError',
@@ -556,7 +556,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {
       'dxCode-0': 'DX 123',
       'dxCode-1': 'Invalid DX',
       'dxCodeDescription-1': 'Invalid DX explanation',
@@ -613,7 +613,7 @@ describe('ProfessionalInformationService', () => {
       ),
     });
 
-    const result = await new ProfessionalInformationService(courtApi).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {
       'dxCode-0': 'Invalid DX 1',
       'dxCode-1': 'DX 2',
       'dxCode-2': 'DX 3',
@@ -663,7 +663,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCode-3': 'Invalid DX 4',
       'faxNumber-4': '020 0000 0004',
     });
@@ -697,7 +697,7 @@ describe('ProfessionalInformationService', () => {
       saveCourtProfessionalInformation: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
       'dxCodeDescription-3': 'Documents',
       'faxNumberDescription-4': 'Secondary fax',
     });
@@ -730,7 +730,7 @@ describe('ProfessionalInformationService', () => {
 
   test('returns status codes from save dependencies', async () => {
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
         })
@@ -738,7 +738,7 @@ describe('ProfessionalInformationService', () => {
     ).resolves.toBe(HttpStatusCode.NotFound);
 
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           saveCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.Forbidden),
         })
@@ -758,13 +758,12 @@ describe('ProfessionalInformationService', () => {
       getCourtLocalAuthorities: jest.Mock;
     };
 
-    const result = await new ProfessionalInformationService(courtApi as never).requiresFamilyCourtRemovalConfirmation(
-      courtId,
-      {
-        courtTypes: ['crown'],
-        crownCourtCode: '456',
-      }
-    );
+    const result = await new CourtProfessionalInformationService(
+      courtApi as never
+    ).requiresFamilyCourtRemovalConfirmation(courtId, {
+      courtTypes: ['crown'],
+      crownCourtCode: '456',
+    });
 
     expect(result).toEqual({
       courtName: 'Reading Crown Court',
@@ -775,7 +774,7 @@ describe('ProfessionalInformationService', () => {
 
   test('does not require family court removal confirmation when family remains selected or nothing is selected', async () => {
     await expect(
-      new ProfessionalInformationService(buildCourtApi()).requiresFamilyCourtRemovalConfirmation(courtId, {
+      new CourtProfessionalInformationService(buildCourtApi()).requiresFamilyCourtRemovalConfirmation(courtId, {
         courtTypes: ['family'],
       })
     ).resolves.toEqual({
@@ -784,7 +783,7 @@ describe('ProfessionalInformationService', () => {
     });
 
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
         })
@@ -797,7 +796,7 @@ describe('ProfessionalInformationService', () => {
 
   test('returns status codes from family court removal confirmation dependencies', async () => {
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
         })
@@ -805,7 +804,7 @@ describe('ProfessionalInformationService', () => {
     ).resolves.toBe(HttpStatusCode.NotFound);
 
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
         })
@@ -815,7 +814,7 @@ describe('ProfessionalInformationService', () => {
 
   test('returns status when professional information lookup fails during removal confirmation', async () => {
     await expect(
-      new ProfessionalInformationService(
+      new CourtProfessionalInformationService(
         buildCourtApi({
           getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
         })
@@ -831,7 +830,7 @@ describe('ProfessionalInformationService', () => {
     };
 
     await expect(
-      new ProfessionalInformationService(noProfessionalInfoApi as never).requiresFamilyCourtRemovalConfirmation(
+      new CourtProfessionalInformationService(noProfessionalInfoApi as never).requiresFamilyCourtRemovalConfirmation(
         courtId,
         {
           courtTypes: [],
@@ -848,7 +847,7 @@ describe('ProfessionalInformationService', () => {
     });
 
     await expect(
-      new ProfessionalInformationService(noLocalAuthoritiesApi).requiresFamilyCourtRemovalConfirmation(courtId, {
+      new CourtProfessionalInformationService(noLocalAuthoritiesApi).requiresFamilyCourtRemovalConfirmation(courtId, {
         courtTypes: [],
       })
     ).resolves.toEqual({
@@ -858,7 +857,7 @@ describe('ProfessionalInformationService', () => {
   });
 
   test('covers API error classifier helper branches through typed access', () => {
-    const service = new ProfessionalInformationService(buildCourtApi());
+    const service = new CourtProfessionalInformationService(buildCourtApi());
     const serviceTestAccess = service as unknown as {
       apiErrorHref: (field: string, text: string) => string;
       toString: (value: string | string[] | undefined) => string;

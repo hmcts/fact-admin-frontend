@@ -1,8 +1,8 @@
 import type { Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 
-import AddCourtController from '../../../main/controllers/AddCourtController';
-import { AddCourtService } from '../../../main/services/AddCourtService';
+import AddCourtController from '../../../main/controllers/courts/AddCourtController';
+import { AddCourtService } from '../../../main/services/courts/AddCourtService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('AddCourtController', () => {

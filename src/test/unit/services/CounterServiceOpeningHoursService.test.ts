@@ -5,7 +5,7 @@ import {
   CounterServiceOpeningHoursForm,
   CounterServiceOpeningHoursService,
   SaveCounterServiceOpeningHoursResult,
-} from '../../../main/services/CounterServiceOpeningHoursService';
+} from '../../../main/services/courts/CounterServiceOpeningHoursService';
 
 type ValidationErrorResult = Extract<SaveCounterServiceOpeningHoursResult, { type: 'validation_error' }>;
 

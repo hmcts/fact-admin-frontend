@@ -1,8 +1,8 @@
 import type { Response } from 'express';
 import { assert, mock, stub } from 'sinon';
 
-import AddServiceCentreController from '../../../main/controllers/AddServiceCentreController';
-import { AddServiceCentreService } from '../../../main/services/AddServiceCentreService';
+import AddServiceCentreController from '../../../main/controllers/service-centres/AddServiceCentreController';
+import { AddServiceCentreService } from '../../../main/services/service-centres/AddServiceCentreService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('AddServiceCentreController', () => {

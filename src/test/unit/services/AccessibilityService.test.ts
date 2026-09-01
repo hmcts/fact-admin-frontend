@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import { AccessibilityService } from '../../../main/services/AccessibilityService';
+import { CourtAccessibilityService } from '../../../main/services/courts/CourtAccessibilityService';
 
 jest.mock('../../../main/utils/accessibilityValidationConfig', () => ({
   validate: jest.fn(),
@@ -18,7 +18,7 @@ const { mapHearingEnhancementEquipment } = jest.requireMock('../../../main/utils
   mapHearingEnhancementEquipment: jest.Mock;
 };
 
-describe('AccessibilityService', () => {
+describe('CourtAccessibilityService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
 
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('AccessibilityService', () => {
   });
 
   test('retrieve returns status when court lookup fails', async () => {
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
       getAccessibility: jest.fn(),
     } as never);
@@ -37,7 +37,7 @@ describe('AccessibilityService', () => {
   });
 
   test('retrieve returns status when accessibility lookup fails', async () => {
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Court A' }),
       getAccessibility: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
     } as never);
@@ -48,7 +48,7 @@ describe('AccessibilityService', () => {
   });
 
   test('retrieve returns merged model when successful', async () => {
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Court A' }),
       getAccessibility: jest.fn().mockResolvedValue({ courtId, accessibleParking: true }),
     } as never);
@@ -62,7 +62,7 @@ describe('AccessibilityService', () => {
     validate.mockReturnValueOnce({ quietRoom: ['Select whether a quiet room is available'] });
 
     const updateAccessibility = jest.fn();
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Court A' }),
       updateAccessibility,
     } as never);
@@ -83,7 +83,7 @@ describe('AccessibilityService', () => {
     mapHearingEnhancementEquipment.mockReturnValueOnce('INFRARED_SYSTEMS');
 
     const updateAccessibility = jest.fn().mockResolvedValue({ id: 'acc-1', courtId, quietRoom: true });
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Court A' }),
       updateAccessibility,
     } as never);
@@ -103,7 +103,7 @@ describe('AccessibilityService', () => {
   });
 
   test('save returns status when court lookup fails', async () => {
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
       updateAccessibility: jest.fn(),
     } as never);
@@ -117,7 +117,7 @@ describe('AccessibilityService', () => {
     validate.mockReturnValueOnce(undefined);
     mapHearingEnhancementEquipment.mockReturnValueOnce(undefined);
 
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Court A' }),
       updateAccessibility: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     } as never);
@@ -131,7 +131,7 @@ describe('AccessibilityService', () => {
     validate.mockReturnValueOnce(undefined);
     mapHearingEnhancementEquipment.mockReturnValueOnce(undefined);
 
-    const service = new AccessibilityService({
+    const service = new CourtAccessibilityService({
       getCourtById: jest.fn().mockResolvedValue({ id: courtId, name: 'Court A' }),
       updateAccessibility: jest.fn().mockResolvedValue(new Map([['liftDoorWidth', 'Invalid number']])),
     } as never);

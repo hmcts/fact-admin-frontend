@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { ServiceCentreAddressType } from '../../../main/schemas/serviceCentreAddressSchema';
-import { ServiceCentreAddressService } from '../../../main/services/ServiceCentreAddressService';
+import { ServiceCentreAddressService } from '../../../main/services/service-centres/ServiceCentreAddressService';
 
 describe('ServiceCentreAddressService', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';

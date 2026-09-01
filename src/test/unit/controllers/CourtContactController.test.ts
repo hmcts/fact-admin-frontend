@@ -2,10 +2,10 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import CourtContactController from '../../../main/controllers/CourtContactController';
+import CourtContactController from '../../../main/controllers/courts/CourtContactController';
 import { CourtApi } from '../../../main/requests/CourtApi';
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
-import { CourtContactService } from '../../../main/services/CourtContactService';
+import { CourtContactService } from '../../../main/services/courts/CourtContactService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtContactController', () => {

@@ -1,8 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
-import { SinglePointOfEntryService } from '../../../main/services/SinglePointOfEntryService';
+import { CourtSinglePointOfEntryService } from '../../../main/services/courts/CourtSinglePointOfEntryService';
 
-describe('SinglePointOfEntryService', () => {
+describe('CourtSinglePointOfEntryService', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
   const childrenAreaOfLawId = '22222222-2222-4222-8222-222222222222';
 
@@ -19,7 +19,7 @@ describe('SinglePointOfEntryService', () => {
       ]),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -43,7 +43,7 @@ describe('SinglePointOfEntryService', () => {
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue([]),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -58,7 +58,7 @@ describe('SinglePointOfEntryService', () => {
       getCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -72,7 +72,7 @@ describe('SinglePointOfEntryService', () => {
       getCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.retrieve(courtId);
 
@@ -99,7 +99,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.Ok),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
@@ -136,7 +136,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: false });
 
@@ -150,7 +150,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
@@ -166,7 +166,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
@@ -187,7 +187,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, {});
 
@@ -213,7 +213,7 @@ describe('SinglePointOfEntryService', () => {
       ),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: false });
 
@@ -239,7 +239,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, { [childrenAreaOfLawId]: true });
 
@@ -260,7 +260,7 @@ describe('SinglePointOfEntryService', () => {
       updateCourtSinglePointOfEntry: jest.fn(),
     };
 
-    const service = new SinglePointOfEntryService(courtApi as never);
+    const service = new CourtSinglePointOfEntryService(courtApi as never);
 
     const result = await service.update(courtId, {
       [childrenAreaOfLawId]: true,

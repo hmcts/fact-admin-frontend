@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
-import ServiceCentreCasesHeardController from '../../../main/controllers/ServiceCentreCasesHeardController';
-import { ServiceCentreCasesHeardService } from '../../../main/services/ServiceCentreCasesHeardService';
+import ServiceCentreCasesHeardController from '../../../main/controllers/service-centres/ServiceCentreCasesHeardController';
+import { ServiceCentreCasesHeardService } from '../../../main/services/service-centres/ServiceCentreCasesHeardService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';

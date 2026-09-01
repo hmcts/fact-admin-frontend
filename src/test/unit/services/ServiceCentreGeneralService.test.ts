@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { Region } from '../../../main/schemas/regionSchema';
-import { ServiceCentreGeneralService } from '../../../main/services/ServiceCentreGeneralService';
+import { ServiceCentreGeneralService } from '../../../main/services/service-centres/ServiceCentreGeneralService';
 
 describe('ServiceCentreGeneralService', () => {
   const serviceCentre = {

@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 import request from 'supertest';
 
 import { app } from '../../main/app';
-import { CourtOpeningHoursService } from '../../main/services/CourtOpeningHoursService';
+import { CourtOpeningHoursService } from '../../main/services/courts/CourtOpeningHoursService';
 
 describe('Court opening hours routes', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';

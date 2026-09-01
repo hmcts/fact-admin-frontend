@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { restore, stub } from 'sinon';
 
-import CounterServiceOpeningHoursController from '../../../main/controllers/CounterServiceOpeningHoursController';
-import { CounterServiceOpeningHoursService } from '../../../main/services/CounterServiceOpeningHoursService';
+import CounterServiceOpeningHoursController from '../../../main/controllers/courts/CounterServiceOpeningHoursController';
+import { CounterServiceOpeningHoursService } from '../../../main/services/courts/CounterServiceOpeningHoursService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CounterServiceOpeningHoursController', () => {
