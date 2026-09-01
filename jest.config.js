@@ -5,8 +5,8 @@ module.exports = {
   testEnvironment: 'node',
   transform: {
     '^.+\\.ts?$': 'ts-jest',
-    '^.+\\.js$': 'babel-jest',
+    '^.+\\.(js|mjs)$': 'babel-jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!chai|uuid)'],
+  transformIgnorePatterns: ['/node_modules/(?!chai|uuid|config)'],
   modulePathIgnorePatterns: ['<rootDir>/src/test/unit/mocks'],
 };
