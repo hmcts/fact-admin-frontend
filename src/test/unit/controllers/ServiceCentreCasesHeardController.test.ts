@@ -93,6 +93,31 @@ describe('ServiceCentreCasesHeardController', () => {
     }
   });
 
+  test('renders error when cases-heard view model returns a non-404 status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    const responseMock = mock(response);
+
+    const getCasesHeardPageStub = stub(ServiceCentreCasesHeardService.prototype, 'getCasesHeardPage').resolves(
+      HttpStatusCode.InternalServerError
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(request, response);
+      assert.calledOnce(getCasesHeardPageStub);
+      responseMock.verify();
+    } finally {
+      getCasesHeardPageStub.restore();
+    }
+  });
+
   test('renders validation state when post has no selected areas', async () => {
     const response = {
       render: () => '',
@@ -187,6 +212,33 @@ describe('ServiceCentreCasesHeardController', () => {
     try {
       await controller.postSuccess(request, response);
       assert.calledOnce(saveCasesHeardStub);
+      responseMock.verify();
+    } finally {
+      getSelectedAreasOfLawStub.restore();
+      saveCasesHeardStub.restore();
+    }
+  });
+
+  test('renders not-found when post serviceCentreId is invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'bad-id' };
+    request.body = { areasOfLaw: ['abc'] };
+    const responseMock = mock(response);
+
+    const getSelectedAreasOfLawStub = stub(ServiceCentreCasesHeardService.prototype, 'getSelectedAreasOfLaw');
+    const saveCasesHeardStub = stub(ServiceCentreCasesHeardService.prototype, 'saveCasesHeard');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.notCalled(getSelectedAreasOfLawStub);
+      assert.notCalled(saveCasesHeardStub);
       responseMock.verify();
     } finally {
       getSelectedAreasOfLawStub.restore();

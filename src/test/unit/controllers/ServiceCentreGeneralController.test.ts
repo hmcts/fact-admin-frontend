@@ -92,6 +92,29 @@ describe('ServiceCentreGeneralController', () => {
     }
   });
 
+  test('renders error when retrieve returns non-404 status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreGeneralService.prototype, 'retrieve').resolves(HttpStatusCode.BadGateway);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(request, response);
+      assert.calledOnce(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
   test('renders validation errors from save result', async () => {
     const response = {
       render: () => '',
@@ -129,6 +152,72 @@ describe('ServiceCentreGeneralController', () => {
         id: SERVICE_CENTRE_ID,
         name: 'Reading Service Centre',
         open: true,
+        serviceAreaIds: [],
+        regionId: REGION_ID,
+      });
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('renders not-found when serviceCentreId is invalid for save', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'bad-id' };
+    request.body = {
+      name: 'Reading Service Centre',
+      open: 'true',
+      serviceAreaIds: ['aaa'],
+      regionId: REGION_ID,
+    };
+    const responseMock = mock(response);
+
+    const saveStub = stub(ServiceCentreGeneralService.prototype, 'save');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.save(request, response);
+      assert.notCalled(saveStub);
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('parses unknown open value and empty service area string when saving', async () => {
+    const response = { render: () => '' } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    request.body = {
+      name: 'Updated Service Centre',
+      open: 'unknown',
+      serviceAreaIds: '',
+      regionId: REGION_ID,
+    };
+    const responseMock = mock(response);
+
+    const saveStub = stub(ServiceCentreGeneralService.prototype, 'save').resolves({
+      type: 'saved',
+      viewModel: {
+        id: SERVICE_CENTRE_ID,
+        name: 'Updated Service Centre',
+      },
+    });
+
+    responseMock.expects('render').once().withArgs('common-edit-success', match.object);
+
+    try {
+      await controller.save(request, response);
+      assert.calledWith(saveStub, {
+        id: SERVICE_CENTRE_ID,
+        name: 'Updated Service Centre',
+        open: undefined,
         serviceAreaIds: [],
         regionId: REGION_ID,
       });

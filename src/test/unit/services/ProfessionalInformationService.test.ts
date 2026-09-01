@@ -1,5 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
+import { CourtApi } from '../../../main/requests/CourtApi';
 import { ProfessionalInformationService } from '../../../main/services/ProfessionalInformationService';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
@@ -101,6 +102,44 @@ describe('ProfessionalInformationService', () => {
         })
       ).getViewModel(courtId)
     ).resolves.toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('builds an empty view model when professional information returns not-found', async () => {
+    const courtApi = buildCourtApi({
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+
+    const result = await new ProfessionalInformationService(courtApi).getViewModel(courtId);
+
+    expect(result).toMatchObject({
+      courtId,
+      courtName: 'Reading Crown Court',
+      dxCodes: [{ code: '', description: '' }],
+      faxNumbers: [{ code: '', description: '' }],
+      selectedCourtTypes: [],
+    });
+  });
+
+  test('uses the default CourtApi when dependency injection is not provided', async () => {
+    const getCourtByIdSpy = jest.spyOn(CourtApi.prototype, 'getCourtById').mockResolvedValue(court as never);
+    const getCourtProfessionalInformationSpy = jest
+      .spyOn(CourtApi.prototype, 'getCourtProfessionalInformation')
+      .mockResolvedValue(null);
+
+    try {
+      const result = await new ProfessionalInformationService().getViewModel(courtId);
+
+      expect(getCourtByIdSpy).toHaveBeenCalledWith(courtId);
+      expect(getCourtProfessionalInformationSpy).toHaveBeenCalledWith(courtId);
+      expect(result).toMatchObject({
+        courtId,
+        courtName: 'Reading Crown Court',
+        selectedCourtTypes: [],
+      });
+    } finally {
+      getCourtByIdSpy.mockRestore();
+      getCourtProfessionalInformationSpy.mockRestore();
+    }
   });
 
   test('saves valid submitted professional information', async () => {
@@ -302,6 +341,42 @@ describe('ProfessionalInformationService', () => {
     expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
   });
 
+  test('validates Welsh-only and max-length errors for repeatable descriptions', async () => {
+    const courtApi = buildCourtApi() as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new ProfessionalInformationService(courtApi as never).save(courtId, {
+      'dxCodeDescriptionCy-0': 'Esboniad',
+      'dxCode-1': 'DX VALID',
+      'dxCodeDescription-1': 'A'.repeat(251),
+      'dxCode-2': 'DX VALID TWO',
+      'dxCodeDescriptionCy-2': 'A'.repeat(251),
+      'faxNumberDescriptionCy-0': 'Disgrifiad',
+      'faxNumber-1': '020 7450 4000',
+      'faxNumberDescription-1': 'A'.repeat(251),
+      'faxNumber-2': '01273 800 900',
+      'faxNumberDescriptionCy-2': 'A'.repeat(251),
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        fieldErrors: {
+          'dxCode-0':
+            'DX code 1: You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation',
+          'dxCodeDescription-1': 'DX code 2 explanation: DX explanation must be 250 characters or fewer',
+          'dxCodeDescriptionCy-2': 'DX code 3 Welsh explanation: DX Welsh explanation must be 250 characters or fewer',
+          'faxNumber-0':
+            'Fax number 1: You have entered a Welsh description without a fax number, please add a number or remove the description',
+          'faxNumberDescription-1': 'Fax number 2 description: Fax description must be 250 characters or fewer',
+          'faxNumberDescriptionCy-2': 'Fax number 3 Welsh description: Fax description must be 250 characters or fewer',
+        },
+      },
+    });
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+  });
+
   test('validates missing and non-numeric interview room counts', async () => {
     const missingCount = await new ProfessionalInformationService(buildCourtApi()).save(courtId, {
       interviewRooms: 'true',
@@ -404,6 +479,64 @@ describe('ProfessionalInformationService', () => {
           interviewPhoneNumber: 'Interview phone number must be 20 characters or fewer',
           videoHearings: 'Video hearing facilities must be true or false',
         },
+      },
+    });
+  });
+
+  test('maps additional API validation anchors and invalid-character fallbacks', async () => {
+    const courtApi = buildCourtApi({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['codes.magistrateCourtCode', 'Magistrates court code contains invalid characters'],
+          ['codes.familyCourtCode', 'Family court code contains invalid characters'],
+          ['codes.tribunalCode', 'Tribunal code contains invalid characters'],
+          ['codes.crownCourtCode', 'Crown court code contains invalid characters'],
+          ['professionalInformation.interviewRooms', 'Interview rooms must be true or false'],
+          ['faxNumber', 'Contains invalid characters'],
+          ['faxNumberDescription', 'Contains invalid characters'],
+          ['dxCodeDescription', 'Contains invalid characters'],
+          ['dxCode', 'Contains invalid characters'],
+          ['gbs', 'Contains invalid characters'],
+          ['someUnknownField', 'Unknown field error'],
+          ['message', 'Generic error message'],
+        ])
+      ),
+    });
+
+    const result = await new ProfessionalInformationService(courtApi).save(courtId, {});
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: expect.arrayContaining([
+          { href: '#magistrateCourtCode', text: 'Magistrates court code contains invalid characters' },
+          { href: '#familyCourtCode', text: 'Family court code contains invalid characters' },
+          { href: '#tribunalCode', text: 'Tribunal code contains invalid characters' },
+          { href: '#crownCourtCode', text: 'Crown court code contains invalid characters' },
+          { href: '#interviewRooms', text: 'Interview rooms must be true or false' },
+          {
+            href: '#faxNumber-0',
+            text: 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          },
+          {
+            href: '#faxNumberDescription-0',
+            text: 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#dxCodeDescription-0',
+            text: 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#dxCode-0',
+            text: 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#gbs',
+            text: 'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          { href: '#someUnknownField', text: 'Unknown field error' },
+          { href: '', text: 'Generic error message' },
+        ]),
       },
     });
   });
@@ -678,5 +811,71 @@ describe('ProfessionalInformationService', () => {
         })
       ).requiresFamilyCourtRemovalConfirmation(courtId, { courtTypes: [] })
     ).resolves.toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('returns status when professional information lookup fails during removal confirmation', async () => {
+    await expect(
+      new ProfessionalInformationService(
+        buildCourtApi({
+          getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+        })
+      ).requiresFamilyCourtRemovalConfirmation(courtId, {})
+    ).resolves.toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('returns no removal confirmation when professional information or local authorities are not found', async () => {
+    const noProfessionalInfoApi = buildCourtApi({
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    }) as never as {
+      getCourtLocalAuthorities: jest.Mock;
+    };
+
+    await expect(
+      new ProfessionalInformationService(noProfessionalInfoApi as never).requiresFamilyCourtRemovalConfirmation(
+        courtId,
+        {
+          courtTypes: [],
+        }
+      )
+    ).resolves.toEqual({
+      courtName: 'Reading Crown Court',
+      required: false,
+    });
+    expect(noProfessionalInfoApi.getCourtLocalAuthorities).not.toHaveBeenCalled();
+
+    const noLocalAuthoritiesApi = buildCourtApi({
+      getCourtLocalAuthorities: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+
+    await expect(
+      new ProfessionalInformationService(noLocalAuthoritiesApi).requiresFamilyCourtRemovalConfirmation(courtId, {
+        courtTypes: [],
+      })
+    ).resolves.toEqual({
+      courtName: 'Reading Crown Court',
+      required: false,
+    });
+  });
+
+  test('covers API error classifier helper branches through typed access', () => {
+    const service = new ProfessionalInformationService(buildCourtApi());
+    const serviceTestAccess = service as unknown as {
+      apiErrorHref: (field: string, text: string) => string;
+      toString: (value: string | string[] | undefined) => string;
+      toOptionalNumber: (value: string | number | null | undefined) => number | null;
+    };
+
+    expect(serviceTestAccess.apiErrorHref('otherField', 'dx code explanation text')).toBe('#dxCodeDescription-0');
+    expect(serviceTestAccess.apiErrorHref('otherField', 'invalid explanation text provided')).toBe(
+      '#dxCodeDescription-0'
+    );
+    expect(serviceTestAccess.apiErrorHref('faxnumbers[2].description', 'invalid value')).toBe(
+      '#faxNumberDescription-2'
+    );
+    expect(serviceTestAccess.apiErrorHref('otherField', 'phone must match the regex')).toBe('#faxNumber-0');
+    expect(serviceTestAccess.toString(['value-one', 'value-two'])).toBe('value-one');
+    expect(serviceTestAccess.toString([])).toBe('');
+    expect(serviceTestAccess.toOptionalNumber('123')).toBe(123);
+    expect(serviceTestAccess.toOptionalNumber('')).toBeNull();
   });
 });

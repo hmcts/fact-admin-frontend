@@ -192,6 +192,60 @@ describe('ServiceCentreContactController', () => {
     }
   });
 
+  test('renders not-found when add route serviceCentreId is invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'invalid-id' };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderAdd(request, response);
+      assert.notCalled(getServiceCentreByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+    }
+  });
+
+  test('renders error when add route service-centre lookup fails with status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves(
+      HttpStatusCode.BadGateway
+    );
+    const getContactDescriptionTypeItemsStub = stub(
+      ServiceCentreContactService.prototype,
+      'getContactDescriptionTypeItems'
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.renderAdd(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.notCalled(getContactDescriptionTypeItemsStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDescriptionTypeItemsStub.restore();
+    }
+  });
+
   test('renders error when add page cannot load contact description types', async () => {
     const response = {
       render: () => '',
@@ -245,6 +299,57 @@ describe('ServiceCentreContactController', () => {
       await controller.renderEdit(request, response);
       assert.calledOnce(getServiceCentreByIdStub);
       assert.calledOnce(getContactDetailByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDetailByIdStub.restore();
+    }
+  });
+
+  test('renders not-found when renderEdit route ids are invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderEdit(request, response);
+      assert.notCalled(getServiceCentreByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+    }
+  });
+
+  test('renders not-found when renderEdit service-centre lookup returns not-found', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves(
+      HttpStatusCode.NotFound
+    );
+    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderEdit(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.notCalled(getContactDetailByIdStub);
       responseMock.verify();
     } finally {
       getServiceCentreByIdStub.restore();
@@ -362,6 +467,33 @@ describe('ServiceCentreContactController', () => {
     }
   });
 
+  test('renders not-found when add submission route id is invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'bad-id' };
+    request.body = {};
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById');
+    const submitContactDetailFlowStub = stub(ServiceCentreContactService.prototype, 'submitContactDetailFlow');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.addContactDetail(request, response);
+      assert.notCalled(getServiceCentreByIdStub);
+      assert.notCalled(submitContactDetailFlowStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      submitContactDetailFlowStub.restore();
+    }
+  });
+
   test('renders error when update submission returns save-error', async () => {
     const response = {
       render: () => '',
@@ -383,6 +515,53 @@ describe('ServiceCentreContactController', () => {
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.updateContactDetail(request, response);
+      assert.calledOnce(submitContactDetailFlowStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      submitContactDetailFlowStub.restore();
+    }
+  });
+
+  test('renders bad request and form model when update submission has validation errors', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    request.body = {};
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+      id: SERVICE_CENTRE_ID,
+      name: 'Reading Service Centre',
+    } as never);
+    const submitContactDetailFlowStub = stub(ServiceCentreContactService.prototype, 'submitContactDetailFlow').resolves(
+      {
+        type: 'validation-error',
+        formViewModel: {
+          pageTitle: 'Error: Edit contact details - Reading Service Centre',
+        },
+      }
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'service-centre-contact-form',
+        match((viewModel: Record<string, unknown>) => {
+          return (
+            Array.isArray(viewModel.breadcrumbs) &&
+            (viewModel.breadcrumbs as { text: string }[]).some(b => b.text === 'Edit contact details')
+          );
+        })
+      );
 
     try {
       await controller.updateContactDetail(request, response);
@@ -550,6 +729,68 @@ describe('ServiceCentreContactController', () => {
     }
   });
 
+  test('renders error when delete confirmation contact lookup returns status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+      id: SERVICE_CENTRE_ID,
+      name: 'Reading Service Centre',
+    } as never);
+    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves(
+      HttpStatusCode.BadGateway
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.renderDelete(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.calledOnce(getContactDetailByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDetailByIdStub.restore();
+    }
+  });
+
+  test('renders not-found when delete confirmation contact is missing', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+      id: SERVICE_CENTRE_ID,
+      name: 'Reading Service Centre',
+    } as never);
+    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves(
+      undefined
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderDelete(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.calledOnce(getContactDetailByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDetailByIdStub.restore();
+    }
+  });
+
   test('renders not-found when delete confirmation route ids are invalid', async () => {
     const response = {
       render: () => '',
@@ -564,6 +805,34 @@ describe('ServiceCentreContactController', () => {
 
     await controller.renderDelete(request, response);
     responseMock.verify();
+  });
+
+  test('renders not-found when delete confirmation service-centre lookup returns not-found', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves(
+      HttpStatusCode.NotFound
+    );
+    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderDelete(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.notCalled(getContactDetailByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDetailByIdStub.restore();
+    }
   });
 
   test('renders not-found when delete success contact detail is missing', async () => {
@@ -591,6 +860,68 @@ describe('ServiceCentreContactController', () => {
     } finally {
       getServiceCentreByIdStub.restore();
       getContactDetailByIdStub.restore();
+    }
+  });
+
+  test('renders error when delete success service-centre lookup fails with status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves(
+      HttpStatusCode.BadGateway
+    );
+    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.deleteContactDetail(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.notCalled(getContactDetailByIdStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDetailByIdStub.restore();
+    }
+  });
+
+  test('renders error when delete success contact lookup returns status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+      id: SERVICE_CENTRE_ID,
+      name: 'Reading Service Centre',
+    } as never);
+    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves(
+      HttpStatusCode.BadGateway
+    );
+    const deleteContactDetailStub = stub(ServiceCentreContactService.prototype, 'deleteContactDetail');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.deleteContactDetail(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.calledOnce(getContactDetailByIdStub);
+      assert.notCalled(deleteContactDetailStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getContactDetailByIdStub.restore();
+      deleteContactDetailStub.restore();
     }
   });
 
@@ -635,5 +966,26 @@ describe('ServiceCentreContactController', () => {
       resolveContactDetailDescriptionStub.restore();
       deleteContactDetailStub.restore();
     }
+  });
+
+  test('covers details generator branches for phone-only and email-only values', () => {
+    const serviceCentreContactController = new ServiceCentreContactController() as unknown as {
+      detailsGenerator: (data: Record<string, string | undefined>, email: string, phone: string) => string;
+    };
+
+    expect(
+      serviceCentreContactController.detailsGenerator(
+        { email: undefined, phoneNumber: '01234 567890' },
+        'email',
+        'phoneNumber'
+      )
+    ).toBe('01234 567890');
+    expect(
+      serviceCentreContactController.detailsGenerator(
+        { email: 'enquiries@example.test', phoneNumber: undefined },
+        'email',
+        'phoneNumber'
+      )
+    ).toBe('enquiries@example.test');
   });
 });

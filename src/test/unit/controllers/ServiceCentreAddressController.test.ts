@@ -103,6 +103,29 @@ describe('ServiceCentreAddressController', () => {
     }
   });
 
+  test('renders not-found when list returns not-found', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    const responseMock = mock(response);
+
+    const listStub = stub(ServiceCentreAddressService.prototype, 'list').resolves(HttpStatusCode.NotFound);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderAddressList(request, response);
+      assert.calledOnce(listStub);
+      responseMock.verify();
+    } finally {
+      listStub.restore();
+    }
+  });
+
   test('renders find page for new address', async () => {
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
@@ -118,6 +141,29 @@ describe('ServiceCentreAddressController', () => {
 
     try {
       await controller.renderFindNew(request, response);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+    }
+  });
+
+  test('renders not-found when rendering find page for new address with invalid id', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'invalid-id' };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(ServiceCentreAddressService.prototype, 'retrieveServiceCentreName');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderFindNew(request, response);
+      assert.notCalled(retrieveServiceCentreNameStub);
       responseMock.verify();
     } finally {
       retrieveServiceCentreNameStub.restore();
@@ -204,6 +250,52 @@ describe('ServiceCentreAddressController', () => {
     }
   });
 
+  test('renders not-found when rendering find page for update with invalid ids', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderFindForUpdate(request, response);
+      assert.notCalled(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
+  test('renders error when rendering find page for update and retrieve fails', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve').resolves(HttpStatusCode.BadGateway);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.renderFindForUpdate(request, response);
+      assert.calledOnce(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
   test('renders error when postcode search returns status code in select new', async () => {
     const response = {
       render: () => '',
@@ -258,6 +350,58 @@ describe('ServiceCentreAddressController', () => {
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderSelectNew(request, response);
+      assert.calledOnce(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      isValidPostcodeStub.restore();
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('renders not-found when select new route has invalid service centre id', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderSelectNew(request, response);
+      assert.notCalled(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('renders select page for new address when postcode search succeeds', async () => {
+    const response = { render: () => '' } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    request.query = { postcode: 'SW1A 1AA' };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves('Reading Service Centre');
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves([
+      { ADDRESS: '1 Test Street' },
+    ]);
+
+    responseMock.expects('render').once().withArgs('service-centre-address-select', match.has('postcode', 'SW1A 1AA'));
 
     try {
       await controller.renderSelectNew(request, response);
@@ -444,6 +588,124 @@ describe('ServiceCentreAddressController', () => {
     }
   });
 
+  test('renders not-found when select for update route ids are invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderSelectForUpdate(request, response);
+      assert.notCalled(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('returns early when select for update cannot resolve service centre name', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    request.query = { postcode: 'SW1A 1AA' };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves(HttpStatusCode.NotFound);
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderSelectForUpdate(request, response);
+      assert.notCalled(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('renders not-found when postcode search returns not-found in select for update', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    request.query = { postcode: 'SW1A 1AA' };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves('Reading Service Centre');
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves(
+      HttpStatusCode.NotFound
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderSelectForUpdate(request, response);
+      assert.calledOnce(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      isValidPostcodeStub.restore();
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
+  test('re-renders find page when postcode search returns invalid result in select for update', async () => {
+    const response = { render: () => '' } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    request.query = { postcode: 'SW1A 1AA' };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves('Reading Service Centre');
+    const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves({
+      status: 'invalid',
+      error: 'No matching address found',
+    });
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('service-centre-address-find', match.has('error', 'No matching address found'));
+
+    try {
+      await controller.renderSelectForUpdate(request, response);
+      assert.calledOnce(retrieveAddressOptionsStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      isValidPostcodeStub.restore();
+      retrieveAddressOptionsStub.restore();
+    }
+  });
+
   test('renders edit page from selected DPA address data', async () => {
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
@@ -469,6 +731,54 @@ describe('ServiceCentreAddressController', () => {
           return address.addressLine1 === 'Reading Service Centre' && address.postcode === 'SW1A 1AA';
         })
       );
+
+    try {
+      await controller.addAddress(request, response);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+    }
+  });
+
+  test('renders not-found when add address route has invalid service centre id', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(ServiceCentreAddressService.prototype, 'retrieveServiceCentreName');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.addAddress(request, response);
+      assert.notCalled(retrieveServiceCentreNameStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+    }
+  });
+
+  test('returns early when add address cannot resolve service centre name', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves(HttpStatusCode.NotFound);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
 
     try {
       await controller.addAddress(request, response);
@@ -673,6 +983,40 @@ describe('ServiceCentreAddressController', () => {
     responseMock.verify();
   });
 
+  test('renders error when save new address returns non-not-found status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID };
+    request.body = {
+      addressLine1: '1 Test Street',
+      addressType: 'VISIT_US',
+      postcode: 'SW1A 1AA',
+      townCity: 'London',
+    };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves('Reading Service Centre');
+    const saveStub = stub(ServiceCentreAddressService.prototype, 'save').resolves(HttpStatusCode.BadGateway);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.saveNewAddress(request, response);
+      assert.calledOnce(saveStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      saveStub.restore();
+    }
+  });
+
   test('renders edit address page for existing address', async () => {
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
@@ -695,6 +1039,63 @@ describe('ServiceCentreAddressController', () => {
     ).resolves('Reading Service Centre');
 
     responseMock.expects('render').once().withArgs('service-centre-address-edit', match.has('addressId', ADDRESS_ID));
+
+    try {
+      await controller.editAddress(request, response);
+      assert.calledOnce(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+      retrieveServiceCentreNameStub.restore();
+    }
+  });
+
+  test('renders not-found when edit address route ids are invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.editAddress(request, response);
+      assert.notCalled(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
+  test('returns early when edit address cannot resolve service centre name', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve').resolves({
+      id: ADDRESS_ID,
+      addressLine1: '1 Test Street',
+      postcode: 'SW1A 1AA',
+      townCity: 'London',
+      addressType: 'VISIT_US',
+    } as never);
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves(HttpStatusCode.NotFound);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
 
     try {
       await controller.editAddress(request, response);
@@ -781,6 +1182,40 @@ describe('ServiceCentreAddressController', () => {
     try {
       await controller.updateAddress(request, response);
       assert.calledOnce(saveStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      saveStub.restore();
+    }
+  });
+
+  test('returns early when update address cannot resolve service centre name', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    request.body = {
+      addressLine1: '1 Updated Street',
+      addressType: 'VISIT_US',
+      postcode: 'SW1A 1AA',
+      townCity: 'London',
+    };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves(HttpStatusCode.NotFound);
+    const saveStub = stub(ServiceCentreAddressService.prototype, 'save');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.updateAddress(request, response);
+      assert.notCalled(saveStub);
       responseMock.verify();
     } finally {
       retrieveServiceCentreNameStub.restore();
@@ -946,6 +1381,85 @@ describe('ServiceCentreAddressController', () => {
         'service-centre-address-delete',
         match({ cancelHref: `/service-centres/${SERVICE_CENTRE_ID}/edit/address` })
       );
+
+    try {
+      await controller.renderDeleteAddress(request, response);
+      assert.calledOnce(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      retrieveStub.restore();
+    }
+  });
+
+  test('renders not-found when delete confirmation route ids are invalid', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: 'bad-id' };
+    const responseMock = mock(response);
+
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderDeleteAddress(request, response);
+      assert.notCalled(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveStub.restore();
+    }
+  });
+
+  test('returns early when delete confirmation cannot resolve service centre name', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves(HttpStatusCode.NotFound);
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve');
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('service-centre-not-found');
+
+    try {
+      await controller.renderDeleteAddress(request, response);
+      assert.notCalled(retrieveStub);
+      responseMock.verify();
+    } finally {
+      retrieveServiceCentreNameStub.restore();
+      retrieveStub.restore();
+    }
+  });
+
+  test('renders error when delete confirmation retrieve returns status code', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+    const responseMock = mock(response);
+
+    const retrieveServiceCentreNameStub = stub(
+      ServiceCentreAddressService.prototype,
+      'retrieveServiceCentreName'
+    ).resolves('Reading Service Centre');
+    const retrieveStub = stub(ServiceCentreAddressService.prototype, 'retrieve').resolves(HttpStatusCode.BadGateway);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
 
     try {
       await controller.renderDeleteAddress(request, response);

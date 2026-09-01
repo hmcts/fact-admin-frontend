@@ -9,7 +9,7 @@ import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/warning-notice')
-export default class WarningNoticeController extends BaseController {
+export default class CourtWarningNoticeController extends BaseController {
   constructor(private readonly warningNoticeService = new WarningNoticeService()) {
     super();
   }

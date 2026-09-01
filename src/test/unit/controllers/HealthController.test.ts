@@ -119,6 +119,18 @@ describe('HealthController', () => {
     jest.useRealTimers();
   });
 
+  test('returns Redis down when Redis client is not configured', async () => {
+    app.locals.redisClient = undefined;
+
+    const controller = new HealthController();
+    controller.get({} as never, {} as never);
+
+    const config = configureMock.firstCall.args[0];
+    await expect(config.checks.redis()).resolves.toEqual({ status: 'DOWN' });
+
+    assert.calledWithMatch(downMock, { message: 'Redis client is not configured' });
+  });
+
   test('returns liveness status', () => {
     const controller = new HealthController();
     const response = {
@@ -142,5 +154,23 @@ describe('HealthController', () => {
 
     assert.calledWithMatch(checkReadinessMock, match.object);
     assert.calledWith(readinessHandler, request, response);
+  });
+
+  test('marks readiness down when shutdown is in progress', () => {
+    app.locals.shutdown = true;
+
+    const controller = new HealthController();
+    controller.readiness({} as never, {} as never);
+
+    const readinessChecks = checkReadinessMock.firstCall.args[0];
+    expect(readinessChecks.shutdownCheck()).toEqual({ status: 'DOWN' });
+  });
+
+  test('includes Redis in readiness checks', async () => {
+    const controller = new HealthController();
+    controller.readiness({} as never, {} as never);
+
+    const readinessChecks = checkReadinessMock.firstCall.args[0];
+    await expect(readinessChecks.redis()).resolves.toEqual({ status: 'UP' });
   });
 });

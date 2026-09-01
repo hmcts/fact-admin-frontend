@@ -259,6 +259,72 @@ describe('CasesHeardController', () => {
     }
   });
 
+  test('renders not found when save returns not found status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      areasOfLaw: ['22222222-2222-4222-8222-222222222222'],
+    };
+    request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(
+      HttpStatusCode.NotFound
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
+    responseMock.expects('render').once().withArgs('court-not-found');
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.calledOnce(getCourtByIdStub);
+      assert.calledOnce(updateCourtAreasOfLawStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      updateCourtAreasOfLawStub.restore();
+    }
+  });
+
+  test('renders error when save returns non-not-found status', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      areasOfLaw: ['22222222-2222-4222-8222-222222222222'],
+    };
+    request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Reading Crown Court',
+    } as never);
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(
+      HttpStatusCode.InternalServerError
+    );
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.calledOnce(getCourtByIdStub);
+      assert.calledOnce(updateCourtAreasOfLawStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      updateCourtAreasOfLawStub.restore();
+    }
+  });
+
   test('renders the confirmation page when removing an adoption case type used by local authorities', async () => {
     const response = {
       render: () => '',
@@ -289,6 +355,95 @@ describe('CasesHeardController', () => {
           'Reading Crown Court',
           'Cases heard confirm update'
         ),
+      });
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.notCalled(getCourtByIdStub);
+      assert.notCalled(updateCourtAreasOfLawStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      updateCourtAreasOfLawStub.restore();
+    }
+  });
+
+  test('renders the confirmation page with plural message when removing multiple case types', async () => {
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      adoption: '11111111-1111-4111-8111-111111111111',
+      areasOfLaw: ['22222222-2222-4222-8222-222222222222'],
+      children: '33333333-3333-4333-8333-333333333333',
+      courtName: 'Reading Crown Court',
+    };
+    request.params = { courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw');
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('cases-heard-confirm', {
+        cancelHref: '/courts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/edit/cases-heard',
+        courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        courtName: 'Reading Crown Court',
+        message:
+          'You are removing the cases heard types: Adoption, Children. These are being used by the local authorities admin page. If you remove them it will remove the local authority config. Do you want to remove them?',
+        selectedAreasOfLaw: ['22222222-2222-4222-8222-222222222222'],
+        breadcrumbs: buildCasesHeardBreadcrumbs(
+          'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          'Reading Crown Court',
+          'Cases heard confirm update'
+        ),
+      });
+
+    try {
+      await controller.postSuccess(request, response);
+      assert.notCalled(getCourtByIdStub);
+      assert.notCalled(updateCourtAreasOfLawStub);
+      responseMock.verify();
+    } finally {
+      getCourtByIdStub.restore();
+      updateCourtAreasOfLawStub.restore();
+    }
+  });
+
+  test('uses first courtId value when post route param is an array and renders divorce confirmation', async () => {
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.body = {
+      areasOfLaw: ['22222222-2222-4222-8222-222222222222'],
+      courtName: 'Reading Crown Court',
+      divorce: '33333333-3333-4333-8333-333333333333',
+    };
+    request.params = {
+      courtId: ['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'] as never,
+    };
+    const responseMock = mock(response);
+    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
+    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw');
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('cases-heard-confirm', {
+        breadcrumbs: buildCasesHeardBreadcrumbs(
+          'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          'Reading Crown Court',
+          'Cases heard confirm update'
+        ),
+        cancelHref: '/courts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/edit/cases-heard',
+        courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        courtName: 'Reading Crown Court',
+        message:
+          'You are removing the cases heard type of Divorce. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?',
+        selectedAreasOfLaw: ['22222222-2222-4222-8222-222222222222'],
       });
 
     try {

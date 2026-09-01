@@ -190,4 +190,120 @@ describe('ServiceCentreWarningNoticeService', () => {
 
     expect(result).toEqual({ status: HttpStatusCode.BadGateway, type: 'status' });
   });
+
+  test('returns validation error when Welsh warning is provided without English', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+      warningNoticeCy: null,
+    } as never);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, '   ', 'Rhybudd yn Gymraeg');
+
+    expect(result.type).toBe('validation-error');
+    expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe(
+      'Because you provided a warning notice in Welsh, the English translation is now mandatory'
+    );
+    expect(updateServiceCentreStub.notCalled).toBe(true);
+  });
+
+  test('returns validation error when English warning is provided without Welsh', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+      warningNoticeCy: null,
+    } as never);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'English warning', '   ');
+
+    expect(result.type).toBe('validation-error');
+    expect(result['viewModel']?.errors?.warningNoticeCy?.[0]).toBe(
+      'Because you provided a warning notice in English, the Welsh translation is now mandatory'
+    );
+    expect(updateServiceCentreStub.notCalled).toBe(true);
+  });
+
+  test('returns validation error when English warning contains unsupported characters', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+      warningNoticeCy: null,
+    } as never);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'Warning 😀', 'Rhybudd');
+
+    expect(result.type).toBe('validation-error');
+    expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe(
+      'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses'
+    );
+    expect(updateServiceCentreStub.notCalled).toBe(true);
+  });
+
+  test('returns validation error when Welsh warning contains unsupported characters', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+      warningNoticeCy: null,
+    } as never);
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'English warning', 'Rhybudd_test');
+
+    expect(result.type).toBe('validation-error');
+    expect(result['viewModel']?.errors?.warningNoticeCy?.[0]).toBe(
+      'Warning notice in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses'
+    );
+    expect(updateServiceCentreStub.notCalled).toBe(true);
+  });
+
+  test('returns validation error when update returns API validation map and ignores timestamp', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: serviceCentreId,
+      name: 'Reading Service Centre',
+      open: true,
+      regionId: null,
+      slug: 'reading-service-centre',
+      warningNotice: null,
+      warningNoticeCy: null,
+    } as never);
+    stub(ServiceCentreApi.prototype, 'updateServiceCentre').resolves(
+      new Map([
+        ['warningNotice', 'Warning notice is invalid'],
+        ['warningNoticeCy', 'Warning notice in Welsh is invalid'],
+        ['timestamp', '2026-08-25T00:00:00.000Z'],
+      ]) as never
+    );
+
+    const service = new ServiceCentreWarningNoticeService();
+    const result = await service.save(serviceCentreId, 'English warning', 'Rhybudd');
+
+    expect(result.type).toBe('validation-error');
+    expect(result['viewModel']?.errors).toEqual({
+      warningNotice: ['Warning notice is invalid'],
+      warningNoticeCy: ['Warning notice in Welsh is invalid'],
+    });
+  });
 });

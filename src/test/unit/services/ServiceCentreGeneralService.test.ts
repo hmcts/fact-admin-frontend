@@ -78,6 +78,39 @@ describe('ServiceCentreGeneralService', () => {
     expect(requests.getRegions).not.toHaveBeenCalled();
   });
 
+  test('retrieve returns status when regions cannot be loaded', async () => {
+    const requests = {
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.retrieve(serviceCentre.id);
+
+    expect(result).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('retrieve maps undefined service areas and region id to view model defaults', async () => {
+    const requests = {
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreById: jest.fn().mockResolvedValue({
+        ...serviceCentre,
+        regionId: undefined,
+        serviceAreaIds: undefined,
+      }),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.retrieve(serviceCentre.id);
+
+    expect(result).toMatchObject({
+      serviceAreaIds: [],
+      regionId: undefined,
+    });
+  });
+
   test('save returns validation errors when service areas are empty', async () => {
     const requests = {
       getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
@@ -202,6 +235,140 @@ describe('ServiceCentreGeneralService', () => {
     expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
     expect(requests.updateServiceCentre).not.toHaveBeenCalled();
     expect(requests.getRegions).not.toHaveBeenCalled();
+  });
+
+  test('save returns status when regions cannot be loaded', async () => {
+    const requests = {
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+      getRegions: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
+      updateServiceCentre: jest.fn(),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.save({
+      id: serviceCentre.id,
+      name: 'Updated Service Centre',
+      open: true,
+      serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
+    });
+
+    expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'status' });
+    expect(requests.updateServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('save returns validation errors for blank name, missing open and invalid region', async () => {
+    const requests = {
+      getServiceCentreById: jest.fn().mockResolvedValue({ ...serviceCentre, regionId: undefined }),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      updateServiceCentre: jest.fn(),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.save({
+      id: serviceCentre.id,
+      name: '   ',
+      open: undefined,
+      serviceAreaIds: [serviceAreas[0].id],
+      regionId: '',
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.viewModel.errors).toEqual({
+      name: ['Enter a name for the service centre'],
+      open: ['Select whether the service centre is open or closed'],
+      regionId: ['Please specify the region for this service centre'],
+    });
+    expect(requests.updateServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('save returns both name length and character validation errors', async () => {
+    const requests = {
+      getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      updateServiceCentre: jest.fn(),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.save({
+      id: serviceCentre.id,
+      name: 'A#',
+      open: true,
+      serviceAreaIds: [serviceAreas[0].id],
+      regionId: regions[0].id,
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.viewModel.errors?.name).toEqual([
+      'Service centre name should be between 5 and 200 characters',
+      'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+    ]);
+    expect(requests.updateServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('save evaluates nullish fallback values when optional fields are omitted', async () => {
+    const requests = {
+      getServiceCentreById: jest.fn().mockResolvedValue(serviceCentre),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      updateServiceCentre: jest.fn(),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.save({
+      id: serviceCentre.id,
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.viewModel.errors).toMatchObject({
+      name: ['Enter a name for the service centre'],
+      open: ['Select whether the service centre is open or closed'],
+      serviceAreaIds: ['Please specify the service areas of the service centre'],
+    });
+    expect(requests.updateServiceCentre).not.toHaveBeenCalled();
+  });
+
+  test('save falls back to empty region id when both submitted and existing region ids are missing', async () => {
+    const requests = {
+      getServiceCentreById: jest.fn().mockResolvedValue({ ...serviceCentre, regionId: undefined }),
+      getServiceAreas: jest.fn().mockResolvedValue(serviceAreas),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      updateServiceCentre: jest.fn(),
+    };
+
+    const service = new ServiceCentreGeneralService(requests as never, requests as never, requests as never);
+    const result = await service.save({
+      id: serviceCentre.id,
+      name: 'Updated Service Centre',
+      open: true,
+      serviceAreaIds: [serviceAreas[0].id],
+      regionId: undefined,
+    });
+
+    expect(result.type).toBe('validation-error');
+    if (result.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(result.viewModel.errors).toMatchObject({
+      regionId: ['Please specify the region for this service centre'],
+    });
+    expect(requests.updateServiceCentre).not.toHaveBeenCalled();
   });
 
   test('save returns validation-error when a court with the same name exists', async () => {
