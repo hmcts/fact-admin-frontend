@@ -2,23 +2,7 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import BuildingFacilitiesController from '../../../main/controllers/BuildingFacilitiesController';
-
-// Mock service module used by controller
-jest.mock('../../../main/services/BuildingFacilitiesService', () => {
-  const retrieve = jest.fn();
-  const save = jest.fn();
-
-  return {
-    BuildingFacilitiesService: jest.fn().mockImplementation(() => ({
-      retrieve,
-      save,
-    })),
-    __mocks: {
-      retrieve,
-      save,
-    },
-  };
-});
+import type { BuildingFacilitiesService } from '../../../main/services/BuildingFacilitiesService';
 
 jest.mock('../../../main/utils/valueParsers', () => ({
   isUuid: jest.fn(() => true),
@@ -34,12 +18,15 @@ jest.mock('../../../main/utils/mapper', () => ({
   addFoodAndDrink: jest.fn(m => m),
 }));
 
-const { __mocks: serviceMocks } = jest.requireMock('../../../main/services/BuildingFacilitiesService');
-const retrieveMock = serviceMocks.retrieve as jest.Mock;
-const saveMock = serviceMocks.save as jest.Mock;
+const retrieveMock = jest.fn();
+const saveMock = jest.fn();
+const buildingFacilitiesService = {
+  retrieve: retrieveMock,
+  save: saveMock,
+} as unknown as BuildingFacilitiesService;
 
 describe('BuildingFacilitiesController', () => {
-  const controller = new BuildingFacilitiesController();
+  const controller = new BuildingFacilitiesController(buildingFacilitiesService);
 
   type MockResponse = Response & {
     status: jest.Mock;

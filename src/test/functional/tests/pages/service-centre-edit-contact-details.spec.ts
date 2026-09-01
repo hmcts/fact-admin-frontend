@@ -135,6 +135,31 @@ test.describe(
       );
     });
 
+    test('does not auto-select a contact type when autocomplete loses focus', async ({
+      playwright,
+      serviceCentreContactDetailsPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Contact Autocomplete Blur Functional Test',
+        { open: true, withContactDetails: false },
+        async ({ createdServiceCentre }) => {
+          const uniqueSuffix = Date.now();
+          const contactEmail = `service-centre-autocomplete-${uniqueSuffix}@example.test`;
+
+          await serviceCentreContactDetailsPage.gotoAdd(createdServiceCentre.id);
+          await serviceCentreContactDetailsPage.openContactTypeAndBlur();
+          await expect.poll(() => serviceCentreContactDetailsPage.selectedContactTypeValue()).toBe('');
+
+          await serviceCentreContactDetailsPage.emailCheckbox.check();
+          await serviceCentreContactDetailsPage.emailInput.fill(contactEmail);
+          await serviceCentreContactDetailsPage.save();
+
+          await expect(serviceCentreContactDetailsPage.errorSummary).toContainText('Select a contact type');
+        }
+      );
+    });
+
     test('shows validation errors for invalid contact email and phone values', async ({
       playwright,
       serviceCentreContactDetailsPage,

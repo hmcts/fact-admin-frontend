@@ -10,18 +10,25 @@ const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
 const CONTACT_DETAIL_ID = '22222222-2222-4222-8222-222222222222';
 
 describe('ServiceCentreContactController', () => {
+  let serviceCentreContactService = new ServiceCentreContactService();
+  let controller = new ServiceCentreContactController(serviceCentreContactService);
+
+  beforeEach(() => {
+    serviceCentreContactService = new ServiceCentreContactService();
+    controller = new ServiceCentreContactController(serviceCentreContactService);
+  });
+
   test('renders contact details list when service centre and contacts load', async () => {
-    const controller = new ServiceCentreContactController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const listContactDetailsStub = stub(ServiceCentreContactService.prototype, 'listContactDetails').resolves([]);
+    const listContactDetailsStub = stub(serviceCentreContactService, 'listContactDetails').resolves([]);
 
     responseMock
       .expects('render')
@@ -49,7 +56,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when serviceCentreId is invalid', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -58,7 +64,7 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: 'invalid-id' };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById');
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -73,7 +79,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when list contact details returns status code', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -82,11 +87,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const listContactDetailsStub = stub(ServiceCentreContactService.prototype, 'listContactDetails').resolves(
+    const listContactDetailsStub = stub(serviceCentreContactService, 'listContactDetails').resolves(
       HttpStatusCode.InternalServerError
     );
 
@@ -105,7 +110,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders service-centre-not-found when service-centre lookup returns not-found', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -114,10 +118,10 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves(
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves(
       HttpStatusCode.NotFound
     );
-    const listContactDetailsStub = stub(ServiceCentreContactService.prototype, 'listContactDetails');
+    const listContactDetailsStub = stub(serviceCentreContactService, 'listContactDetails');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -134,13 +138,12 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders add form when add page data loads', async () => {
-    const controller = new ServiceCentreContactController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
@@ -148,7 +151,7 @@ describe('ServiceCentreContactController', () => {
       ServiceCentreContactService.prototype,
       'getContactDescriptionTypeItems'
     ).resolves([]);
-    const getEmptyFormValuesStub = stub(ServiceCentreContactService.prototype, 'getEmptyFormValues').returns({
+    const getEmptyFormValuesStub = stub(serviceCentreContactService, 'getEmptyFormValues').returns({
       contactEmail: '',
       contactExplanation: '',
       contactMethods: [],
@@ -190,7 +193,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when add route serviceCentreId is invalid', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -214,7 +216,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when add route service-centre lookup fails with status', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -246,7 +247,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when add page cannot load contact description types', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -255,7 +255,7 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
@@ -278,7 +278,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders service-centre-not-found when editing a missing contact detail', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -287,13 +286,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves(
-      undefined
-    );
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves(undefined);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -310,7 +307,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when renderEdit route ids are invalid', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -334,7 +330,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when renderEdit service-centre lookup returns not-found', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -363,7 +358,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders edit form when contact detail exists', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -371,11 +365,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves({
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves({
       id: CONTACT_DETAIL_ID,
       serviceCentreId: SERVICE_CENTRE_ID,
       serviceCentreContactDescriptionId: 'desc-1',
@@ -388,7 +382,7 @@ describe('ServiceCentreContactController', () => {
       ServiceCentreContactService.prototype,
       'getContactDescriptionTypeItems'
     ).resolves([]);
-    const buildFormValuesStub = stub(ServiceCentreContactService.prototype, 'buildFormValues').returns({
+    const buildFormValuesStub = stub(serviceCentreContactService, 'buildFormValues').returns({
       contactEmail: 'test@example.com',
       contactExplanation: '',
       contactMethods: ['email'],
@@ -410,7 +404,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when render edit contact detail lookup returns status', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -419,11 +412,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves(
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves(
       HttpStatusCode.BadGateway
     );
 
@@ -441,7 +434,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders bad request and form model when add submission has validation errors', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -451,18 +443,16 @@ describe('ServiceCentreContactController', () => {
     request.body = {};
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const submitContactDetailFlowStub = stub(ServiceCentreContactService.prototype, 'submitContactDetailFlow').resolves(
-      {
-        type: 'validation-error',
-        formViewModel: {
-          pageTitle: 'Error: Add contact details - Reading Service Centre',
-        },
-      }
-    );
+    const submitContactDetailFlowStub = stub(serviceCentreContactService, 'submitContactDetailFlow').resolves({
+      type: 'validation-error',
+      formViewModel: {
+        pageTitle: 'Error: Add contact details - Reading Service Centre',
+      },
+    });
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-contact-form', match.object);
@@ -478,7 +468,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when add submission route id is invalid', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -506,7 +495,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when update submission returns save-error', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -516,16 +504,14 @@ describe('ServiceCentreContactController', () => {
     request.body = {};
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const submitContactDetailFlowStub = stub(ServiceCentreContactService.prototype, 'submitContactDetailFlow').resolves(
-      {
-        type: 'save-error',
-        status: HttpStatusCode.InternalServerError,
-      }
-    );
+    const submitContactDetailFlowStub = stub(serviceCentreContactService, 'submitContactDetailFlow').resolves({
+      type: 'save-error',
+      status: HttpStatusCode.InternalServerError,
+    });
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -541,7 +527,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders bad request and form model when update submission has validation errors', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -589,7 +574,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders delete success page when delete returns no-content', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -597,11 +581,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves({
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves({
       id: CONTACT_DETAIL_ID,
       email: 'enquiries@example.test',
       phoneNumber: '01234 567890',
@@ -612,7 +596,7 @@ describe('ServiceCentreContactController', () => {
       ServiceCentreContactService.prototype,
       'resolveContactDetailDescription'
     ).resolves('General enquiries');
-    const deleteContactDetailStub = stub(ServiceCentreContactService.prototype, 'deleteContactDetail').resolves(
+    const deleteContactDetailStub = stub(serviceCentreContactService, 'deleteContactDetail').resolves(
       HttpStatusCode.NoContent
     );
 
@@ -643,7 +627,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders success panel when add submission succeeds', async () => {
-    const controller = new ServiceCentreContactController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
@@ -653,16 +636,14 @@ describe('ServiceCentreContactController', () => {
     };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const submitContactDetailFlowStub = stub(ServiceCentreContactService.prototype, 'submitContactDetailFlow').resolves(
-      {
-        type: 'success',
-        successPanelBody: 'General enquiries',
-      }
-    );
+    const submitContactDetailFlowStub = stub(serviceCentreContactService, 'submitContactDetailFlow').resolves({
+      type: 'success',
+      successPanelBody: 'General enquiries',
+    });
 
     responseMock
       .expects('render')
@@ -685,7 +666,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when update route ids are invalid', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -694,7 +674,7 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: 'bad-id' };
     const responseMock = mock(response);
 
-    const submitContactDetailFlowStub = stub(ServiceCentreContactService.prototype, 'submitContactDetailFlow');
+    const submitContactDetailFlowStub = stub(serviceCentreContactService, 'submitContactDetailFlow');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -709,17 +689,16 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders delete confirmation page when contact exists', async () => {
-    const controller = new ServiceCentreContactController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves({
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves({
       id: CONTACT_DETAIL_ID,
       serviceCentreId: SERVICE_CENTRE_ID,
       serviceCentreContactDescription: null,
@@ -751,7 +730,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when delete confirmation contact lookup returns status', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -783,7 +761,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when delete confirmation contact is missing', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -815,7 +792,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when delete confirmation route ids are invalid', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -832,7 +808,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when delete confirmation service-centre lookup returns not-found', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -861,7 +836,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders not-found when delete success contact detail is missing', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -870,13 +844,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves(
-      undefined
-    );
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves(undefined);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -892,7 +864,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when delete success service-centre lookup fails with status', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -921,7 +892,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when delete success contact lookup returns status', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -956,7 +926,6 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('renders error when delete contact detail returns non-no-content status', async () => {
-    const controller = new ServiceCentreContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -965,11 +934,11 @@ describe('ServiceCentreContactController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, contactDetailId: CONTACT_DETAIL_ID };
     const responseMock = mock(response);
 
-    const getServiceCentreByIdStub = stub(ServiceCentreContactService.prototype, 'getServiceCentreById').resolves({
+    const getServiceCentreByIdStub = stub(serviceCentreContactService, 'getServiceCentreById').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
     } as never);
-    const getContactDetailByIdStub = stub(ServiceCentreContactService.prototype, 'getContactDetailById').resolves({
+    const getContactDetailByIdStub = stub(serviceCentreContactService, 'getContactDetailById').resolves({
       id: CONTACT_DETAIL_ID,
       serviceCentreId: SERVICE_CENTRE_ID,
       serviceCentreContactDescription: null,
@@ -980,7 +949,7 @@ describe('ServiceCentreContactController', () => {
       ServiceCentreContactService.prototype,
       'resolveContactDetailDescription'
     ).resolves('General enquiries');
-    const deleteContactDetailStub = stub(ServiceCentreContactService.prototype, 'deleteContactDetail').resolves(
+    const deleteContactDetailStub = stub(serviceCentreContactService, 'deleteContactDetail').resolves(
       HttpStatusCode.BadGateway
     );
 
@@ -1000,15 +969,23 @@ describe('ServiceCentreContactController', () => {
   });
 
   test('covers details generator branches for phone-only and email-only values', () => {
-    const controller = new ServiceCentreContactController() as unknown as {
+    const serviceCentreContactController = new ServiceCentreContactController() as unknown as {
       detailsGenerator: (data: Record<string, string | undefined>, email: string, phone: string) => string;
     };
 
-    expect(controller.detailsGenerator({ email: undefined, phoneNumber: '01234 567890' }, 'email', 'phoneNumber')).toBe(
-      '01234 567890'
-    );
     expect(
-      controller.detailsGenerator({ email: 'enquiries@example.test', phoneNumber: undefined }, 'email', 'phoneNumber')
+      serviceCentreContactController.detailsGenerator(
+        { email: undefined, phoneNumber: '01234 567890' },
+        'email',
+        'phoneNumber'
+      )
+    ).toBe('01234 567890');
+    expect(
+      serviceCentreContactController.detailsGenerator(
+        { email: 'enquiries@example.test', phoneNumber: undefined },
+        'email',
+        'phoneNumber'
+      )
     ).toBe('enquiries@example.test');
   });
 });

@@ -3,19 +3,21 @@ import { Request, Response } from 'express';
 
 import { AddServiceCentreService } from '../services/AddServiceCentreService';
 
+import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
-const addServiceCentreService = new AddServiceCentreService();
-
 @route('/add-service-centre')
-export default class AddServiceCentreController {
+export default class AddServiceCentreController extends BaseController {
+  constructor(private readonly addServiceCentreService = new AddServiceCentreService()) {
+    super();
+  }
+
   @GET()
   public async get(_req: Request, res: Response): Promise<void> {
-    const viewModel = await addServiceCentreService.getViewModel();
+    const viewModel = await this.addServiceCentreService.getViewModel();
 
     if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      res.render('error');
+      this.renderError(res, viewModel);
       return;
     }
 
@@ -27,15 +29,14 @@ export default class AddServiceCentreController {
 
   @POST()
   public async createServiceCentre(req: Request, res: Response): Promise<void> {
-    const createResult = await addServiceCentreService.create({
+    const createResult = await this.addServiceCentreService.create({
       name: req.body?.name ?? undefined,
       regionId: req.body?.regionId ?? undefined,
       serviceAreaIds: this.getSelectedServiceAreaIds(req.body?.serviceAreaIds),
     });
 
     if (typeof createResult === 'number') {
-      res.status(createResult);
-      res.render('error');
+      this.renderError(res, createResult);
       return;
     }
 

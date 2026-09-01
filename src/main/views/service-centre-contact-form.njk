@@ -33,6 +33,9 @@
             label: {
               text: "Contact type"
             },
+            hint: {
+              text: "Please type to view matching contact types"
+            },
             errorMessage: {
               text: formErrors.contactType
             } if formErrors.contactType else null,
@@ -133,3 +136,10 @@
     </div>
   </div>
 {% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script nonce="{{ cspNonce }}" src="/assets/js/accessible-autocomplete.min.js"></script>
+  <script nonce="{{ cspNonce }}" src="/assets/js/contact-type-autocomplete.js"></script>
+{% endblock %}
+

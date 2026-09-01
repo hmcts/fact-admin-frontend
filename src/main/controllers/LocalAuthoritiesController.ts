@@ -10,31 +10,28 @@ import {
 } from '../services/LocalAuthoritiesService';
 import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
-const localAuthoritiesService = new LocalAuthoritiesService();
 const logger = Logger.getLogger('app');
 
 @route('/courts/:courtId/edit/local-authorities')
-export default class LocalAuthoritiesController {
+export default class LocalAuthoritiesController extends BaseController {
+  constructor(private readonly localAuthoritiesService = new LocalAuthoritiesService()) {
+    super();
+  }
+
   @GET()
   public async renderLocalAuthoritiesView(req: Request, res: Response): Promise<void> {
-    const resolvedCourtId = this.resolveCourtIdOrRenderNotFound(req);
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
     if (resolvedCourtId === undefined) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return this.renderCourtNotFound(res);
     }
 
-    const viewModel = await localAuthoritiesService.retrieve(resolvedCourtId);
+    const viewModel = await this.localAuthoritiesService.retrieve(resolvedCourtId);
 
-    if (viewModel === HttpStatusCode.NotFound) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
-    }
-
-    if (typeof viewModel === 'number') {
-      res.status(viewModel);
-      return res.render('error');
+    if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
+      return;
     }
 
     return res.render('local-authorities', {
@@ -46,22 +43,17 @@ export default class LocalAuthoritiesController {
   @route('/success')
   @POST()
   public async updateLocalAuthorities(req: Request, res: Response): Promise<void> {
-    const resolvedCourtId = this.resolveCourtIdOrRenderNotFound(req);
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
     if (resolvedCourtId === undefined) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('court-not-found');
+      return this.renderCourtNotFound(res);
     }
 
     const updatePayload = this.parseSelectionsFromBody(req.body);
 
-    const saveResult = await localAuthoritiesService.update(resolvedCourtId, updatePayload);
+    const saveResult = await this.localAuthoritiesService.update(resolvedCourtId, updatePayload);
 
-    if (typeof saveResult === 'number') {
-      res.status(saveResult);
-      if (saveResult === HttpStatusCode.NotFound) {
-        return res.render('court-not-found');
-      }
-      return res.render('error');
+    if (this.renderStatusResponse(res, saveResult, 'court-not-found')) {
+      return;
     }
 
     // this will only happen if there's a server-side error that generated something other than just
@@ -73,8 +65,7 @@ export default class LocalAuthoritiesController {
       logger.warnEvent('local_authorities.save.invalid_state', {
         errorCount: Object.values(saveResult.errors ?? {}).flat().length,
       });
-      res.status(HttpStatusCode.BadRequest);
-      return res.render('error');
+      return this.renderError(res, HttpStatusCode.BadRequest);
     }
 
     return res.render('local-authorities-success', {
@@ -90,13 +81,6 @@ export default class LocalAuthoritiesController {
 
   // --------------------------------------------------------------------------
   // util methods
-
-  private resolveCourtIdOrRenderNotFound(req: Request): string | undefined {
-    const { courtId } = req.params;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-
-    return resolvedCourtId && isUuid(resolvedCourtId) ? resolvedCourtId : undefined;
-  }
 
   private parseSelectionsFromBody(body: Request['body']): LocalAuthoritySelections {
     const selections: LocalAuthoritySelections = {};

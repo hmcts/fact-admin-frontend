@@ -7,14 +7,15 @@ import { ServiceCentre } from '../schemas/serviceCentreSchema';
 import { SubjectType } from '../schemas/subjectTypeSchema';
 import { ServiceCentreContactService } from '../services/ServiceCentreContactService';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
-import { renderError, renderServiceCentreNotFound } from './helpers/responseRenderers';
-import { getUuidRouteParam } from './helpers/routeParams';
-
-const serviceCentreContactService = new ServiceCentreContactService();
 
 @route('/service-centres/:serviceCentreId/edit/contact-details')
-export default class ServiceCentreContactController {
+export default class ServiceCentreContactController extends BaseController {
+  constructor(private readonly serviceCentreContactService = new ServiceCentreContactService()) {
+    super();
+  }
+
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
     const serviceCentreId = this.resolveRequiredServiceCentreId(req, res);
@@ -27,9 +28,10 @@ export default class ServiceCentreContactController {
       return;
     }
 
-    const serviceCentreContactDetailsResponse = await serviceCentreContactService.listContactDetails(serviceCentreId);
+    const serviceCentreContactDetailsResponse =
+      await this.serviceCentreContactService.listContactDetails(serviceCentreId);
     if (typeof serviceCentreContactDetailsResponse === 'number') {
-      renderError(res, serviceCentreContactDetailsResponse);
+      this.renderError(res, serviceCentreContactDetailsResponse);
       return;
     }
 
@@ -55,9 +57,9 @@ export default class ServiceCentreContactController {
       return;
     }
 
-    const contactDescriptionTypesResponse = await serviceCentreContactService.getContactDescriptionTypeItems();
+    const contactDescriptionTypesResponse = await this.serviceCentreContactService.getContactDescriptionTypeItems();
     if (typeof contactDescriptionTypesResponse === 'number') {
-      renderError(res, contactDescriptionTypesResponse);
+      this.renderError(res, contactDescriptionTypesResponse);
       return;
     }
 
@@ -70,7 +72,7 @@ export default class ServiceCentreContactController {
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
       formHeading: 'Add contact details',
-      formValues: serviceCentreContactService.getEmptyFormValues(),
+      formValues: this.serviceCentreContactService.getEmptyFormValues(),
       pageTitle: `Add contact details - ${serviceCentreResponse.name}`,
       serviceCentreId,
       serviceCentreName: serviceCentreResponse.name,
@@ -91,17 +93,17 @@ export default class ServiceCentreContactController {
       return;
     }
 
-    const contactDetailResponse = await serviceCentreContactService.getContactDetailById(
+    const contactDetailResponse = await this.serviceCentreContactService.getContactDetailById(
       serviceCentreId,
       contactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      renderError(res, contactDetailResponse);
+      this.renderError(res, contactDetailResponse);
       return;
     }
 
     if (!contactDetailResponse) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -109,9 +111,9 @@ export default class ServiceCentreContactController {
       contactDetailResponse.serviceCentreContactDescription?.id ??
       contactDetailResponse.serviceCentreContactDescriptionId;
     const contactDescriptionTypesResponse =
-      await serviceCentreContactService.getContactDescriptionTypeItems(selectedTypeId);
+      await this.serviceCentreContactService.getContactDescriptionTypeItems(selectedTypeId);
     if (typeof contactDescriptionTypesResponse === 'number') {
-      renderError(res, contactDescriptionTypesResponse);
+      this.renderError(res, contactDescriptionTypesResponse);
       return;
     }
 
@@ -125,7 +127,7 @@ export default class ServiceCentreContactController {
       contactDetailId,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/edit/${contactDetailId}/success`,
       formHeading: 'Edit contact details',
-      formValues: serviceCentreContactService.buildFormValues(contactDetailResponse),
+      formValues: this.serviceCentreContactService.buildFormValues(contactDetailResponse),
       pageTitle: `Edit contact details - ${serviceCentreResponse.name}`,
       serviceCentreId,
       serviceCentreName: serviceCentreResponse.name,
@@ -190,21 +192,22 @@ export default class ServiceCentreContactController {
       return;
     }
 
-    const contactDetailResponse = await serviceCentreContactService.getContactDetailById(
+    const contactDetailResponse = await this.serviceCentreContactService.getContactDetailById(
       serviceCentreId,
       contactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      renderError(res, contactDetailResponse);
+      this.renderError(res, contactDetailResponse);
       return;
     }
 
     if (!contactDetailResponse) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
-    const contactDescription = await serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
+    const contactDescription =
+      await this.serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
 
     res.render('service-centre-contact-delete', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(
@@ -238,25 +241,26 @@ export default class ServiceCentreContactController {
       return;
     }
 
-    const contactDetailResponse = await serviceCentreContactService.getContactDetailById(
+    const contactDetailResponse = await this.serviceCentreContactService.getContactDetailById(
       serviceCentreId,
       contactDetailId
     );
     if (typeof contactDetailResponse === 'number') {
-      renderError(res, contactDetailResponse);
+      this.renderError(res, contactDetailResponse);
       return;
     }
 
     if (!contactDetailResponse) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
-    const contactDescription = await serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
+    const contactDescription =
+      await this.serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
 
-    const deleteStatus = await serviceCentreContactService.deleteContactDetail(serviceCentreId, contactDetailId);
+    const deleteStatus = await this.serviceCentreContactService.deleteContactDetail(serviceCentreId, contactDetailId);
     if (deleteStatus !== HttpStatusCode.NoContent) {
-      renderError(res, deleteStatus);
+      this.renderError(res, deleteStatus);
       return;
     }
 
@@ -288,7 +292,7 @@ export default class ServiceCentreContactController {
       contactDetailId?: string;
     }
   ): Promise<void> {
-    const submitFlowOutcome = await serviceCentreContactService.submitContactDetailFlow({
+    const submitFlowOutcome = await this.serviceCentreContactService.submitContactDetailFlow({
       body: req.body as Record<string, unknown>,
       contactDetailId: options.contactDetailId,
       formAction: options.formAction,
@@ -311,7 +315,7 @@ export default class ServiceCentreContactController {
     }
 
     if (submitFlowOutcome.type === 'save-error') {
-      renderError(res, submitFlowOutcome.status);
+      this.renderError(res, submitFlowOutcome.status);
       return;
     }
 
@@ -338,9 +342,9 @@ export default class ServiceCentreContactController {
   }
 
   private resolveRequiredServiceCentreId(req: Request, res: Response): string | undefined {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
     if (!serviceCentreId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -356,11 +360,11 @@ export default class ServiceCentreContactController {
         contactDetailId: string;
       }
     | undefined {
-    const serviceCentreId = getUuidRouteParam(req, 'serviceCentreId');
-    const contactDetailId = getUuidRouteParam(req, 'contactDetailId');
+    const serviceCentreId = this.getUuidRouteParam(req, 'serviceCentreId');
+    const contactDetailId = this.getUuidRouteParam(req, 'contactDetailId');
 
     if (!serviceCentreId || !contactDetailId) {
-      renderServiceCentreNotFound(res);
+      this.renderServiceCentreNotFound(res);
       return;
     }
 
@@ -371,15 +375,10 @@ export default class ServiceCentreContactController {
     serviceCentreId: string,
     res: Response
   ): Promise<ServiceCentre | undefined> {
-    const serviceCentreResponse = await serviceCentreContactService.getServiceCentreById(serviceCentreId);
-
-    if (serviceCentreResponse === HttpStatusCode.NotFound) {
-      renderServiceCentreNotFound(res);
-      return;
-    }
+    const serviceCentreResponse = await this.serviceCentreContactService.getServiceCentreById(serviceCentreId);
 
     if (typeof serviceCentreResponse === 'number') {
-      renderError(res, serviceCentreResponse);
+      this.renderStatus(res, serviceCentreResponse, 'service-centre-not-found');
       return;
     }
 

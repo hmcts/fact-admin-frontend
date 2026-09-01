@@ -6,9 +6,8 @@ import { Request, Response } from 'express';
 
 import { Logger } from '../modules/logging';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { Audit } from '../schemas/auditSchema';
 import { AuditFilterCategoriesService } from '../services/AuditFilterCategoriesService';
-import { AuditCsvFile, AuditListViewModel, AuditService } from '../services/AuditService';
+import { AuditListViewModel, AuditService } from '../services/AuditService';
 import {
   isUuid,
   parseDate,
@@ -20,6 +19,7 @@ import {
   toUkDateTimeString,
 } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 const logger = Logger.getLogger('audit-controller');
@@ -27,11 +27,13 @@ const logger = Logger.getLogger('audit-controller');
 const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
 
 @route('/audits')
-export default class AuditController {
+export default class AuditController extends BaseController {
   constructor(
     private readonly auditService = new AuditService(),
     private readonly auditFilterCategoriesService = new AuditFilterCategoriesService()
-  ) {}
+  ) {
+    super();
+  }
 
   @GET()
   public async renderAuditSearchPage(req: Request, res: Response): Promise<void> {
@@ -88,7 +90,7 @@ export default class AuditController {
         );
 
         if (!res.headersSent) {
-          res.status(HttpStatusCode.InternalServerError).render('error');
+          this.renderError(res, HttpStatusCode.InternalServerError);
         }
         return;
       }
@@ -100,10 +102,9 @@ export default class AuditController {
   @route('/:auditId')
   @GET()
   public async renderAuditDetailPage(req: Request, res: Response): Promise<void> {
-    const auditId = this.resolveAuditId(req);
+    const auditId = this.getUuidRouteParam(req, 'auditId');
     if (!auditId) {
-      res.status(HttpStatusCode.NotFound);
-      return res.render('not-found');
+      return this.renderNotFound(res);
     }
 
     const audit = await this.auditService.retrieve(auditId);
@@ -128,26 +129,6 @@ export default class AuditController {
 
   // --------------------------------------------------------------------------
   // util methods
-
-  private resolveAuditId(req: Request): string | null {
-    const auditId = req.params?.auditId as string | string[] | undefined;
-    const resolvedAuditId = Array.isArray(auditId) ? auditId[0] : auditId;
-
-    return typeof resolvedAuditId === 'string' && isUuid(resolvedAuditId) ? resolvedAuditId : null;
-  }
-
-  private renderStatusResponse(
-    res: Response,
-    result: AuditListViewModel | Audit | AuditCsvFile | HttpStatusCode
-  ): result is HttpStatusCode {
-    if (typeof result !== 'number') {
-      return false;
-    }
-
-    res.status(result);
-    res.render('error');
-    return true;
-  }
 
   private getFiltersFromQueryOrDefault(query: Request['query']): GetAuditsParams {
     const subjectType = parseOptionalString(query?.subjectType);

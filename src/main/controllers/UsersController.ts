@@ -3,11 +3,14 @@ import { Request, Response } from 'express';
 
 import { UsersPageService } from '../services/UsersPageService';
 
+import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/users')
-export default class UsersController {
-  public constructor(private readonly usersPageService = new UsersPageService()) {}
+export default class UsersController extends BaseController {
+  public constructor(private readonly usersPageService = new UsersPageService()) {
+    super();
+  }
 
   @GET()
   public async get(req: Request, res: Response): Promise<void> {

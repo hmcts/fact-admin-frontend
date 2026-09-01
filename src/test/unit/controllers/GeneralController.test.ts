@@ -7,15 +7,22 @@ import { GeneralService } from '../../../main/services/GeneralService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('GeneralController', () => {
+  let generalService = new GeneralService();
+  let controller = new GeneralController(generalService);
+
+  beforeEach(() => {
+    generalService = new GeneralService();
+    controller = new GeneralController(generalService);
+  });
+
   test('renders the general edit view when retrieval succeeds', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
     } as unknown as Response;
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const retrieveStub = stub(GeneralService.prototype, 'retrieve').resolves({
+    const retrieveStub = stub(generalService, 'retrieve').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     });
@@ -47,7 +54,6 @@ describe('GeneralController', () => {
   });
 
   test('renders court not found when courtId is invalid for GET', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
       status: () => response,
@@ -55,7 +61,7 @@ describe('GeneralController', () => {
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
-    const retrieveStub = stub(GeneralService.prototype, 'retrieve');
+    const retrieveStub = stub(generalService, 'retrieve');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -70,7 +76,6 @@ describe('GeneralController', () => {
   });
 
   test('renders court not found when retrieval returns not found for GET', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
       status: () => response,
@@ -78,7 +83,7 @@ describe('GeneralController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const retrieveStub = stub(GeneralService.prototype, 'retrieve').resolves(HttpStatusCode.NotFound);
+    const retrieveStub = stub(generalService, 'retrieve').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -93,7 +98,6 @@ describe('GeneralController', () => {
   });
 
   test('renders generic error when retrieval returns another status for GET', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
       status: () => response,
@@ -101,7 +105,7 @@ describe('GeneralController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const retrieveStub = stub(GeneralService.prototype, 'retrieve').resolves(HttpStatusCode.InternalServerError);
+    const retrieveStub = stub(generalService, 'retrieve').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -116,7 +120,6 @@ describe('GeneralController', () => {
   });
 
   test('renders court not found when courtId is invalid for POST', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
       status: () => response,
@@ -124,7 +127,7 @@ describe('GeneralController', () => {
     const request = mockRequest({});
     request.params = { courtId: 'invalid-id' };
     const responseMock = mock(response);
-    const saveStub = stub(GeneralService.prototype, 'save');
+    const saveStub = stub(generalService, 'save');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -139,7 +142,6 @@ describe('GeneralController', () => {
   });
 
   test('renders court not found when save returns not found for POST', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
       status: () => response,
@@ -148,7 +150,7 @@ describe('GeneralController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     request.body = { name: 'Reading Crown Court', open: 'true', regionId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
-    const saveStub = stub(GeneralService.prototype, 'save').resolves(HttpStatusCode.NotFound);
+    const saveStub = stub(generalService, 'save').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -169,7 +171,6 @@ describe('GeneralController', () => {
   });
 
   test('renders generic error when save returns another status for POST', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
       status: () => response,
@@ -178,7 +179,7 @@ describe('GeneralController', () => {
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     request.body = { name: 'Reading Crown Court', open: true, regionId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
-    const saveStub = stub(GeneralService.prototype, 'save').resolves(HttpStatusCode.InternalServerError);
+    const saveStub = stub(generalService, 'save').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -193,7 +194,6 @@ describe('GeneralController', () => {
   });
 
   test('re-renders edit page when save returns validation errors for POST', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -208,7 +208,7 @@ describe('GeneralController', () => {
         name: ['Enter a name for the court'],
       },
     };
-    const saveStub = stub(GeneralService.prototype, 'save').resolves(saveResult);
+    const saveStub = stub(generalService, 'save').resolves(saveResult);
 
     responseMock
       .expects('render')
@@ -233,7 +233,6 @@ describe('GeneralController', () => {
   });
 
   test('renders success page when save succeeds for POST', async () => {
-    const controller = new GeneralController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -245,7 +244,7 @@ describe('GeneralController', () => {
       regionId: '22222222-2222-4222-8222-222222222222',
     };
     const responseMock = mock(response);
-    const saveStub = stub(GeneralService.prototype, 'save').resolves({
+    const saveStub = stub(generalService, 'save').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     });

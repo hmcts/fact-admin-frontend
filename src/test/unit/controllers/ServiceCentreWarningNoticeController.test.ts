@@ -9,14 +9,21 @@ import { mockRequest } from '../mocks/mockRequest';
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
 
 describe('ServiceCentreWarningNoticeController', () => {
+  let serviceCentreWarningNoticeService = new ServiceCentreWarningNoticeService();
+  let controller = new ServiceCentreWarningNoticeController(serviceCentreWarningNoticeService);
+
+  beforeEach(() => {
+    serviceCentreWarningNoticeService = new ServiceCentreWarningNoticeService();
+    controller = new ServiceCentreWarningNoticeController(serviceCentreWarningNoticeService);
+  });
+
   test('renders warning notice edit page when retrieval succeeds', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const retrieveStub = stub(ServiceCentreWarningNoticeService.prototype, 'retrieve').resolves({
+    const retrieveStub = stub(serviceCentreWarningNoticeService, 'retrieve').resolves({
       id: SERVICE_CENTRE_ID,
       name: 'Reading Service Centre',
       warningNotice: 'Existing warning',
@@ -36,7 +43,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders not-found when serviceCentreId is invalid on get', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,
@@ -45,7 +51,7 @@ describe('ServiceCentreWarningNoticeController', () => {
     request.params = { serviceCentreId: 'bad-id' };
     const responseMock = mock(response);
 
-    const retrieveStub = stub(ServiceCentreWarningNoticeService.prototype, 'retrieve');
+    const retrieveStub = stub(serviceCentreWarningNoticeService, 'retrieve');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -60,7 +66,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders not-found when retrieve returns not-found', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,
@@ -69,9 +74,7 @@ describe('ServiceCentreWarningNoticeController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const retrieveStub = stub(ServiceCentreWarningNoticeService.prototype, 'retrieve').resolves(
-      HttpStatusCode.NotFound
-    );
+    const retrieveStub = stub(serviceCentreWarningNoticeService, 'retrieve').resolves(HttpStatusCode.NotFound);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -86,7 +89,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders error when retrieve returns a non-404 status', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,
@@ -112,7 +114,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders validation model on save validation-error', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,
@@ -122,7 +123,7 @@ describe('ServiceCentreWarningNoticeController', () => {
     request.body = { warningNotice: 'x'.repeat(251) };
     const responseMock = mock(response);
 
-    const saveStub = stub(ServiceCentreWarningNoticeService.prototype, 'save').resolves({
+    const saveStub = stub(serviceCentreWarningNoticeService, 'save').resolves({
       type: 'validation-error',
       viewModel: {
         id: SERVICE_CENTRE_ID,
@@ -148,7 +149,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders error when save returns status', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,
@@ -158,7 +158,7 @@ describe('ServiceCentreWarningNoticeController', () => {
     request.body = { warningNotice: 'Updated warning' };
     const responseMock = mock(response);
 
-    const saveStub = stub(ServiceCentreWarningNoticeService.prototype, 'save').resolves({
+    const saveStub = stub(serviceCentreWarningNoticeService, 'save').resolves({
       type: 'status',
       status: HttpStatusCode.InternalServerError,
     });
@@ -176,14 +176,13 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders success when save returns saved view model', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     request.body = { warningNotice: 'Updated warning' };
     const responseMock = mock(response);
 
-    const saveStub = stub(ServiceCentreWarningNoticeService.prototype, 'save').resolves({
+    const saveStub = stub(serviceCentreWarningNoticeService, 'save').resolves({
       type: 'saved',
       viewModel: {
         id: SERVICE_CENTRE_ID,
@@ -215,7 +214,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders not-found when save returns not-found status', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,
@@ -225,7 +223,7 @@ describe('ServiceCentreWarningNoticeController', () => {
     request.body = { warningNotice: 'Updated warning' };
     const responseMock = mock(response);
 
-    const saveStub = stub(ServiceCentreWarningNoticeService.prototype, 'save').resolves({
+    const saveStub = stub(serviceCentreWarningNoticeService, 'save').resolves({
       type: 'status',
       status: HttpStatusCode.NotFound,
     });
@@ -243,7 +241,6 @@ describe('ServiceCentreWarningNoticeController', () => {
   });
 
   test('renders not-found when serviceCentreId is invalid on save', async () => {
-    const controller = new ServiceCentreWarningNoticeController();
     const response = {
       render: () => '',
       status: () => response,

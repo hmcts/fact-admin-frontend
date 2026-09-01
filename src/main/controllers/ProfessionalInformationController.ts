@@ -5,11 +5,9 @@ import { Request, Response } from 'express';
 import {
   FamilyCourtRemovalConfirmation,
   ProfessionalInformationService,
-  ProfessionalInformationViewModel,
-  SaveProfessionalInformationResult,
 } from '../services/ProfessionalInformationService';
-import { isUuid } from '../utils/valueParsers';
 
+import BaseController from './BaseController';
 import { buildSectionBreadcrumbs } from './helpers/breadcrumbs';
 
 type HiddenInput = {
@@ -17,34 +15,21 @@ type HiddenInput = {
   value: string;
 };
 
-type ProfessionalInformationServiceFactory = () => Promise<ProfessionalInformationService>;
-
 @route('/courts/:courtId/edit/information-for-professionals')
-export default class ProfessionalInformationController {
-  private professionalInformationService?: ProfessionalInformationService;
-  private readonly professionalInformationServiceFactory?: ProfessionalInformationServiceFactory;
-
-  public constructor(
-    professionalInformationServiceFactory?: ProfessionalInformationService | ProfessionalInformationServiceFactory
-  ) {
-    if (typeof professionalInformationServiceFactory === 'function') {
-      this.professionalInformationServiceFactory = professionalInformationServiceFactory;
-    } else {
-      this.professionalInformationService =
-        professionalInformationServiceFactory ?? new ProfessionalInformationService();
-    }
+export default class ProfessionalInformationController extends BaseController {
+  public constructor(private readonly professionalInformationService = new ProfessionalInformationService()) {
+    super();
   }
 
   @GET()
   public async get(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveCourtId(req);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
     if (!courtId) {
       return this.renderCourtNotFound(res);
     }
 
-    const professionalInformationService = await this.getProfessionalInformationService();
-    const viewModel = await professionalInformationService.getViewModel(courtId);
-    if (this.renderStatusResponse(res, viewModel)) {
+    const viewModel = await this.professionalInformationService.getViewModel(courtId);
+    if (this.renderStatusResponse(res, viewModel, 'court-not-found')) {
       return;
     }
 
@@ -57,18 +42,17 @@ export default class ProfessionalInformationController {
   @route('/success')
   @POST()
   public async postSuccess(req: Request, res: Response): Promise<void> {
-    const courtId = this.resolveCourtId(req);
+    const courtId = this.getUuidRouteParam(req, 'courtId');
     if (!courtId) {
       return this.renderCourtNotFound(res);
     }
 
     if (req.body?.confirmFamilyCourtRemoval !== 'true') {
-      const professionalInformationService = await this.getProfessionalInformationService();
-      const confirmation = await professionalInformationService.requiresFamilyCourtRemovalConfirmation(
+      const confirmation = await this.professionalInformationService.requiresFamilyCourtRemovalConfirmation(
         courtId,
         req.body
       );
-      if (this.renderStatusResponse(res, confirmation)) {
+      if (this.renderStatusResponse(res, confirmation, 'court-not-found')) {
         return;
       }
 
@@ -77,9 +61,8 @@ export default class ProfessionalInformationController {
       }
     }
 
-    const professionalInformationService = await this.getProfessionalInformationService();
-    const saveResponse = await professionalInformationService.save(courtId, req.body);
-    if (this.renderStatusResponse(res, saveResponse)) {
+    const saveResponse = await this.professionalInformationService.save(courtId, req.body);
+    if (this.renderStatusResponse(res, saveResponse, 'court-not-found')) {
       return;
     }
 
@@ -102,40 +85,6 @@ export default class ProfessionalInformationController {
     });
   }
 
-  private resolveCourtId(req: Request): string | null {
-    const courtId = req.params?.courtId as string | string[] | undefined;
-    const resolvedCourtId = Array.isArray(courtId) ? courtId[0] : courtId;
-
-    return typeof resolvedCourtId === 'string' && isUuid(resolvedCourtId) ? resolvedCourtId : null;
-  }
-
-  private renderStatusResponse(
-    res: Response,
-    response:
-      | FamilyCourtRemovalConfirmation
-      | HttpStatusCode
-      | ProfessionalInformationViewModel
-      | SaveProfessionalInformationResult
-  ): response is HttpStatusCode {
-    if (typeof response !== 'number') {
-      return false;
-    }
-
-    if (response === HttpStatusCode.NotFound) {
-      this.renderCourtNotFound(res);
-      return true;
-    }
-
-    res.status(response);
-    res.render('error');
-    return true;
-  }
-
-  private renderCourtNotFound(res: Response): void {
-    res.status(HttpStatusCode.NotFound);
-    res.render('court-not-found');
-  }
-
   private renderConfirmation(
     res: Response,
     courtId: string,
@@ -155,16 +104,6 @@ export default class ProfessionalInformationController {
       message:
         'You are removing the court type of Family court. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?',
     });
-  }
-
-  private async getProfessionalInformationService(): Promise<ProfessionalInformationService> {
-    if (!this.professionalInformationService) {
-      this.professionalInformationService = this.professionalInformationServiceFactory
-        ? await this.professionalInformationServiceFactory()
-        : new ProfessionalInformationService();
-    }
-
-    return this.professionalInformationService;
   }
 
   private buildHiddenInputs(body: Request['body']): HiddenInput[] {

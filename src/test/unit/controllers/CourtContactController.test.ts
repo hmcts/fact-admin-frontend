@@ -5,11 +5,19 @@ import { assert, match, mock, stub } from 'sinon';
 import CourtContactController from '../../../main/controllers/CourtContactController';
 import { CourtApi } from '../../../main/requests/CourtApi';
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
+import { CourtContactService } from '../../../main/services/CourtContactService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtContactController', () => {
+  let courtContactService = new CourtContactService();
+  let controller = new CourtContactController(courtContactService);
+
+  beforeEach(() => {
+    courtContactService = new CourtContactService();
+    controller = new CourtContactController(courtContactService);
+  });
+
   test('renders contact details list when the court exists', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -85,7 +93,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when court id is invalid', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -113,7 +120,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when the court does not exist', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -141,7 +147,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when contact details cannot be loaded', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -179,7 +184,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders add contact details page when the court exists', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -244,7 +248,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found on add contact details page when court id is invalid', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -269,7 +272,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found on add contact details page when the court does not exist', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -294,7 +296,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on add contact details page when the lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -319,7 +320,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on add contact details page when description type lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -352,7 +352,6 @@ describe('CourtContactController', () => {
   });
 
   test('creates contact details and renders success screen', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -426,7 +425,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when create contact details fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -464,7 +462,6 @@ describe('CourtContactController', () => {
   });
 
   test('re-renders add form with validation errors when required fields are missing', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -519,7 +516,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders edit contact details page when the contact exists', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -606,7 +602,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found on edit contact details page when contact id is invalid', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -637,7 +632,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found on edit contact details page when contact detail is missing', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -671,7 +665,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on edit contact details page when court lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -702,7 +695,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on edit contact details page when contact detail lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -741,7 +733,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on edit contact details page when description type lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -785,7 +776,6 @@ describe('CourtContactController', () => {
   });
 
   test('updates contact details and renders success screen', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -866,7 +856,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when update contact details fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -907,7 +896,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when creating contact details with an invalid court id', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -935,7 +923,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when creating contact details for a missing court', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -963,7 +950,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when updating contact details with invalid ids', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -994,7 +980,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when updating contact details and court lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1025,7 +1010,6 @@ describe('CourtContactController', () => {
   });
 
   test('re-renders edit form with validation errors when selected method value is missing', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1083,7 +1067,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders delete contact details confirmation when the contact exists', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -1157,7 +1140,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders delete contact details confirmation with description resolved from type id', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -1230,7 +1212,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found on delete contact details page when contact detail is missing', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1264,7 +1245,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found on delete contact details page when ids are invalid', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1295,7 +1275,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on delete contact details page when court lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1326,7 +1305,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error on delete contact details page when contact detail lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1362,7 +1340,6 @@ describe('CourtContactController', () => {
   });
 
   test('deletes contact details and renders success screen', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1430,7 +1407,6 @@ describe('CourtContactController', () => {
   });
 
   test('deletes contact details and renders success screen when only email exists', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1489,7 +1465,6 @@ describe('CourtContactController', () => {
   });
 
   test('deletes contact details and renders success screen when only phone exists', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1548,7 +1523,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when deleting contact details fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1600,7 +1574,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when deleting contact details with invalid ids', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1631,7 +1604,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when deleting contact details and court lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1662,7 +1634,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders court not found when deleting contact details and contact detail is missing', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1699,7 +1670,6 @@ describe('CourtContactController', () => {
   });
 
   test('renders error when deleting contact details and contact detail lookup fails', async () => {
-    const controller = new CourtContactController();
     const response = {
       render: () => '',
       status: () => response,
@@ -1738,7 +1708,7 @@ describe('CourtContactController', () => {
   });
 
   test('returns email text from details generator when only email exists', () => {
-    const controller = new CourtContactController() as unknown as {
+    const courtContactController = new CourtContactController() as unknown as {
       detailsGenerator: (
         contactDetail: Record<string, string | undefined>,
         email: string,
@@ -1747,7 +1717,11 @@ describe('CourtContactController', () => {
     };
 
     expect(
-      controller.detailsGenerator({ email: 'enquiries@example.test', phoneNumber: undefined }, 'email', 'phoneNumber')
+      courtContactController.detailsGenerator(
+        { email: 'enquiries@example.test', phoneNumber: undefined },
+        'email',
+        'phoneNumber'
+      )
     ).toBe('enquiries@example.test');
   });
 });

@@ -3,16 +3,20 @@ import { Request, Response } from 'express';
 
 import { AddCourtService } from '../services/AddCourtService';
 
-const addCourtService = new AddCourtService();
+import BaseController from './BaseController';
 
 @route('/add-court')
-export default class AddCourtController {
+export default class AddCourtController extends BaseController {
+  constructor(private readonly addCourtService = new AddCourtService()) {
+    super();
+  }
+
   @GET()
   public async get(_req: Request, res: Response): Promise<void> {
-    const viewModel = await addCourtService.getViewModel();
+    const viewModel = await this.addCourtService.getViewModel();
 
     if (typeof viewModel === 'number') {
-      return res.status(viewModel).render('error');
+      return this.renderError(res, viewModel);
     }
 
     return res.render('add-court', {
@@ -26,13 +30,13 @@ export default class AddCourtController {
 
   @POST()
   public async createCourt(req: Request, res: Response): Promise<void> {
-    const createResult = await addCourtService.create({
+    const createResult = await this.addCourtService.create({
       name: req.body?.name ?? undefined,
       regionId: req.body?.regionId ?? undefined,
     });
 
     if (typeof createResult === 'number') {
-      return res.status(createResult).render('error');
+      return this.renderError(res, createResult);
     }
 
     if ('errors' in createResult) {
@@ -46,7 +50,7 @@ export default class AddCourtController {
     }
 
     if (!('courtId' in createResult)) {
-      return res.status(500).render('error');
+      return this.renderError(res, 500);
     }
 
     return res.render('add-court-success', {

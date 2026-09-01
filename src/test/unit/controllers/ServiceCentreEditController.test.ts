@@ -2,25 +2,31 @@ import { HttpStatusCode } from 'axios';
 import type { Request, Response } from 'express';
 import { assert, match, mock, restore, stub } from 'sinon';
 
-import ServiceCentreEditController from '../../../main/controllers/ServiceCentreEditController';
+import { ServiceCentreEditController } from '../../../main/controllers/ServiceCentreEditController';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('ServiceCentreEditController', () => {
+  let serviceCentreApi = new ServiceCentreApi();
+  let operationsApi = new OperationsApi();
+  let controller = new ServiceCentreEditController(serviceCentreApi, operationsApi);
+
   beforeEach(() => {
     restore();
+    serviceCentreApi = new ServiceCentreApi();
+    operationsApi = new OperationsApi();
+    controller = new ServiceCentreEditController(serviceCentreApi, operationsApi);
   });
 
   test('renders the service centre edit view', async () => {
-    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+    stub(serviceCentreApi, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
       open: true,
       slug: 'national-business-centre',
     } as never);
-    const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
       status: () => response,
@@ -29,7 +35,7 @@ describe('ServiceCentreEditController', () => {
     request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
 
-    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves([]);
+    const getLocksStub = stub(operationsApi, 'getLocks').resolves([]);
 
     responseMock
       .expects('render')
@@ -59,7 +65,6 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('renders the generic not found page for an invalid UUID', async () => {
-    const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
       status: () => response,
@@ -83,7 +88,6 @@ describe('ServiceCentreEditController', () => {
       open: true,
       slug: 'national-business-centre',
     } as never);
-    const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
       status: () => response,
@@ -143,7 +147,6 @@ describe('ServiceCentreEditController', () => {
       open: true,
       slug: 'national-business-centre',
     } as never);
-    const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -168,7 +171,6 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('renders generic error when lock lookup returns status code', async () => {
-    const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
       status: () => response,
@@ -200,7 +202,6 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('renders generic error when service-centre lookup fails', async () => {
-    const controller = new ServiceCentreEditController();
     const response = {
       render: () => '',
       status: () => response,
@@ -208,7 +209,7 @@ describe('ServiceCentreEditController', () => {
     const request = mockRequest({});
     request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
     const responseMock = mock(response);
-    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves(
+    const getServiceCentreByIdStub = stub(serviceCentreApi, 'getServiceCentreById').resolves(
       HttpStatusCode.InternalServerError
     );
 
@@ -225,11 +226,11 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('renders approval confirmation for SuperAdmin', async () => {
-    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+    stub(serviceCentreApi, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
     } as never);
-    stub(OperationsApi.prototype, 'getApprovals').resolves([
+    stub(operationsApi, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -241,7 +242,6 @@ describe('ServiceCentreEditController', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const controller = new ServiceCentreEditController();
     const response = approvalResponse();
 
     await controller.getApprove(approvalRequest('SuperAdmin'), response);
@@ -265,11 +265,11 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('approves service centre data for Viewer', async () => {
-    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+    stub(serviceCentreApi, 'getServiceCentreById').resolves({
       id: '22222222-2222-4222-8222-222222222222',
       name: 'National Business Centre',
     } as never);
-    stub(OperationsApi.prototype, 'getApprovals').resolves([
+    stub(operationsApi, 'getApprovals').resolves([
       {
         subjectId: '22222222-2222-4222-8222-222222222222',
         subjectType: 'SERVICE_CENTRE',
@@ -281,8 +281,7 @@ describe('ServiceCentreEditController', () => {
         lastUpdatedAt: null,
       },
     ]);
-    const createApproval = stub(OperationsApi.prototype, 'createApproval').resolves(HttpStatusCode.Created);
-    const controller = new ServiceCentreEditController();
+    const createApproval = stub(operationsApi, 'createApproval').resolves(HttpStatusCode.Created);
     const response = approvalResponse();
 
     await controller.postApprove(approvalRequest('Viewer'), response);
@@ -305,8 +304,6 @@ describe('ServiceCentreEditController', () => {
   });
 
   test('denies Admin approval and handles invalid or failed approval requests', async () => {
-    const controller = new ServiceCentreEditController();
-
     const deniedResponse = approvalResponse();
     await controller.getApprove(approvalRequest('Admin'), deniedResponse);
     expect(deniedResponse.status).toHaveBeenCalledWith(HttpStatusCode.Forbidden);
@@ -318,7 +315,7 @@ describe('ServiceCentreEditController', () => {
     await controller.getApprove(invalidRequest, invalidResponse);
     expect(invalidResponse.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
 
-    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves(HttpStatusCode.BadGateway);
+    stub(serviceCentreApi, 'getServiceCentreById').resolves(HttpStatusCode.BadGateway);
     const failedResponse = approvalResponse();
     await controller.getApprove(approvalRequest('SuperAdmin'), failedResponse);
     expect(failedResponse.status).toHaveBeenCalledWith(HttpStatusCode.BadGateway);

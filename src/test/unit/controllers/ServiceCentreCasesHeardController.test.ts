@@ -9,14 +9,21 @@ import { mockRequest } from '../mocks/mockRequest';
 const SERVICE_CENTRE_ID = '11111111-1111-4111-8111-111111111111';
 
 describe('ServiceCentreCasesHeardController', () => {
+  let serviceCentreCasesHeardService = new ServiceCentreCasesHeardService();
+  let controller = new ServiceCentreCasesHeardController(serviceCentreCasesHeardService);
+
+  beforeEach(() => {
+    serviceCentreCasesHeardService = new ServiceCentreCasesHeardService();
+    controller = new ServiceCentreCasesHeardController(serviceCentreCasesHeardService);
+  });
+
   test('renders cases-heard page when lookup succeeds', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getCasesHeardPageStub = stub(ServiceCentreCasesHeardService.prototype, 'getCasesHeardPage').resolves({
+    const getCasesHeardPageStub = stub(serviceCentreCasesHeardService, 'getCasesHeardPage').resolves({
       serviceCentreId: SERVICE_CENTRE_ID,
       serviceCentreName: 'Reading Service Centre',
       pageTitle: 'Cases heard - Reading Service Centre',
@@ -39,7 +46,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders not-found when serviceCentreId is invalid', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -48,7 +54,7 @@ describe('ServiceCentreCasesHeardController', () => {
     request.params = { serviceCentreId: 'bad-id' };
     const responseMock = mock(response);
 
-    const getCasesHeardPageStub = stub(ServiceCentreCasesHeardService.prototype, 'getCasesHeardPage');
+    const getCasesHeardPageStub = stub(serviceCentreCasesHeardService, 'getCasesHeardPage');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('service-centre-not-found');
@@ -63,7 +69,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders not-found when cases-heard view model returns not-found', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -72,7 +77,7 @@ describe('ServiceCentreCasesHeardController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     const responseMock = mock(response);
 
-    const getCasesHeardPageStub = stub(ServiceCentreCasesHeardService.prototype, 'getCasesHeardPage').resolves(
+    const getCasesHeardPageStub = stub(serviceCentreCasesHeardService, 'getCasesHeardPage').resolves(
       HttpStatusCode.NotFound
     );
 
@@ -89,7 +94,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders error when cases-heard view model returns a non-404 status', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -115,7 +119,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders validation state when post has no selected areas', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -125,10 +128,8 @@ describe('ServiceCentreCasesHeardController', () => {
     request.body = {};
     const responseMock = mock(response);
 
-    const getSelectedAreasOfLawStub = stub(ServiceCentreCasesHeardService.prototype, 'getSelectedAreasOfLaw').returns(
-      []
-    );
-    const saveCasesHeardStub = stub(ServiceCentreCasesHeardService.prototype, 'saveCasesHeard').resolves({
+    const getSelectedAreasOfLawStub = stub(serviceCentreCasesHeardService, 'getSelectedAreasOfLaw').returns([]);
+    const saveCasesHeardStub = stub(serviceCentreCasesHeardService, 'saveCasesHeard').resolves({
       type: 'validation_error',
       viewModel: {
         serviceCentreId: SERVICE_CENTRE_ID,
@@ -161,7 +162,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders error when post save returns status', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -171,10 +171,8 @@ describe('ServiceCentreCasesHeardController', () => {
     request.body = { areasOfLaw: ['abc'] };
     const responseMock = mock(response);
 
-    const getSelectedAreasOfLawStub = stub(ServiceCentreCasesHeardService.prototype, 'getSelectedAreasOfLaw').returns([
-      'abc',
-    ]);
-    const saveCasesHeardStub = stub(ServiceCentreCasesHeardService.prototype, 'saveCasesHeard').resolves({
+    const getSelectedAreasOfLawStub = stub(serviceCentreCasesHeardService, 'getSelectedAreasOfLaw').returns(['abc']);
+    const saveCasesHeardStub = stub(serviceCentreCasesHeardService, 'saveCasesHeard').resolves({
       type: 'status',
       status: HttpStatusCode.InternalServerError,
     });
@@ -193,7 +191,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders not-found when post save returns not-found status', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -203,10 +200,8 @@ describe('ServiceCentreCasesHeardController', () => {
     request.body = { areasOfLaw: ['abc'] };
     const responseMock = mock(response);
 
-    const getSelectedAreasOfLawStub = stub(ServiceCentreCasesHeardService.prototype, 'getSelectedAreasOfLaw').returns([
-      'abc',
-    ]);
-    const saveCasesHeardStub = stub(ServiceCentreCasesHeardService.prototype, 'saveCasesHeard').resolves({
+    const getSelectedAreasOfLawStub = stub(serviceCentreCasesHeardService, 'getSelectedAreasOfLaw').returns(['abc']);
+    const saveCasesHeardStub = stub(serviceCentreCasesHeardService, 'saveCasesHeard').resolves({
       type: 'status',
       status: HttpStatusCode.NotFound,
     });
@@ -225,7 +220,6 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders not-found when post serviceCentreId is invalid', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -253,17 +247,14 @@ describe('ServiceCentreCasesHeardController', () => {
   });
 
   test('renders success when post save succeeds', async () => {
-    const controller = new ServiceCentreCasesHeardController();
     const response = { render: () => '' } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     request.body = { areasOfLaw: ['abc'] };
     const responseMock = mock(response);
 
-    const getSelectedAreasOfLawStub = stub(ServiceCentreCasesHeardService.prototype, 'getSelectedAreasOfLaw').returns([
-      'abc',
-    ]);
-    const saveCasesHeardStub = stub(ServiceCentreCasesHeardService.prototype, 'saveCasesHeard').resolves({
+    const getSelectedAreasOfLawStub = stub(serviceCentreCasesHeardService, 'getSelectedAreasOfLaw').returns(['abc']);
+    const saveCasesHeardStub = stub(serviceCentreCasesHeardService, 'saveCasesHeard').resolves({
       type: 'success',
       viewModel: {
         serviceCentreId: SERVICE_CENTRE_ID,

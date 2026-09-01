@@ -7,6 +7,14 @@ import { CourtPhotoService } from '../../../main/services/CourtPhotoService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('CourtPhotoController', () => {
+  let courtPhotoService = new CourtPhotoService();
+  let controller = new CourtPhotoController(courtPhotoService);
+
+  beforeEach(() => {
+    courtPhotoService = new CourtPhotoService();
+    controller = new CourtPhotoController(courtPhotoService);
+  });
+
   const courtId = '11111111-1111-4111-8111-111111111111';
   const courtName = 'Reading Crown Court';
   const model = {
@@ -39,10 +47,10 @@ describe('CourtPhotoController', () => {
   }
 
   test('renders the court photo page with breadcrumbs', async () => {
-    const retrieve = stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
+    const retrieve = stub(courtPhotoService, 'retrieve').resolves(model);
     const response = responseMock();
 
-    await new CourtPhotoController().get(requestMock(), response);
+    await controller.get(requestMock(), response);
 
     expect(retrieve.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo', {
@@ -53,10 +61,10 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders court not found without calling the service for an invalid court id', async () => {
-    const retrieve = stub(CourtPhotoService.prototype, 'retrieve');
+    const retrieve = stub(courtPhotoService, 'retrieve');
     const response = responseMock();
 
-    await new CourtPhotoController().get(requestMock('not-a-uuid'), response);
+    await controller.get(requestMock('not-a-uuid'), response);
 
     expect(retrieve.notCalled).toBe(true);
     expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
@@ -67,18 +75,18 @@ describe('CourtPhotoController', () => {
     [HttpStatusCode.NotFound, 'court-not-found'],
     [HttpStatusCode.InternalServerError, 'error'],
   ])('renders the expected page when retrieving a photo returns %s', async (status, view) => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(status);
+    stub(courtPhotoService, 'retrieve').resolves(status);
     const response = responseMock();
 
-    await new CourtPhotoController().get(requestMock(), response);
+    await controller.get(requestMock(), response);
 
     expect(response.status).toHaveBeenCalledWith(status);
     expect(response.render).toHaveBeenCalledWith(view);
   });
 
   test('renders a middleware upload error before validating the file', async () => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
-    const upload = stub(CourtPhotoService.prototype, 'upload');
+    stub(courtPhotoService, 'retrieve').resolves(model);
+    const upload = stub(courtPhotoService, 'upload');
     const request = requestMock();
     request.uploadError = {
       code: 'fileTooLarge',
@@ -86,7 +94,7 @@ describe('CourtPhotoController', () => {
     };
     const response = responseMock();
 
-    await new CourtPhotoController().update(request, response);
+    await controller.update(request, response);
 
     expect(upload.notCalled).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo', {
@@ -100,11 +108,11 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders a validation error when no file is selected', async () => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
-    const upload = stub(CourtPhotoService.prototype, 'upload');
+    stub(courtPhotoService, 'retrieve').resolves(model);
+    const upload = stub(courtPhotoService, 'upload');
     const response = responseMock();
 
-    await new CourtPhotoController().update(requestMock(), response);
+    await controller.update(requestMock(), response);
 
     expect(upload.notCalled).toBe(true);
     expect(response.render).toHaveBeenCalledWith(
@@ -119,8 +127,8 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders a validation error for an unsupported MIME type', async () => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
-    const upload = stub(CourtPhotoService.prototype, 'upload');
+    stub(courtPhotoService, 'retrieve').resolves(model);
+    const upload = stub(courtPhotoService, 'upload');
     const request = requestMock();
     request.file = {
       buffer: Buffer.from('not-an-image'),
@@ -128,7 +136,7 @@ describe('CourtPhotoController', () => {
     } as Express.Multer.File;
     const response = responseMock();
 
-    await new CourtPhotoController().update(request, response);
+    await controller.update(request, response);
 
     expect(upload.notCalled).toBe(true);
     expect(response.render).toHaveBeenCalledWith(
@@ -143,18 +151,18 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders API validation errors returned from an upload', async () => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
+    stub(courtPhotoService, 'retrieve').resolves(model);
     const updatedModel = {
       ...model,
       errors: { photo: ['The image dimensions are invalid'] },
     };
-    const upload = stub(CourtPhotoService.prototype, 'upload').resolves(updatedModel);
+    const upload = stub(courtPhotoService, 'upload').resolves(updatedModel);
     const request = requestMock();
     const buffer = Buffer.from('png-data');
     request.file = { buffer, mimetype: 'image/png' } as Express.Multer.File;
     const response = responseMock();
 
-    await new CourtPhotoController().update(request, response);
+    await controller.update(request, response);
 
     expect(upload.calledOnceWith(courtId, buffer, 'image/png')).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo', {
@@ -165,14 +173,14 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders upload success after a valid upload', async () => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
-    const upload = stub(CourtPhotoService.prototype, 'upload').resolves(model);
+    stub(courtPhotoService, 'retrieve').resolves(model);
+    const upload = stub(courtPhotoService, 'upload').resolves(model);
     const request = requestMock();
     const buffer = Buffer.from('jpeg-data');
     request.file = { buffer, mimetype: 'image/jpeg' } as Express.Multer.File;
     const response = responseMock();
 
-    await new CourtPhotoController().update(request, response);
+    await controller.update(request, response);
 
     expect(upload.calledOnceWith(courtId, buffer, 'image/jpeg')).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo-upload-success', {
@@ -186,24 +194,24 @@ describe('CourtPhotoController', () => {
     [HttpStatusCode.NotFound, 'court-not-found'],
     [HttpStatusCode.InternalServerError, 'error'],
   ])('renders the expected page when upload returns %s', async (status, view) => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(model);
-    stub(CourtPhotoService.prototype, 'upload').resolves(status);
+    stub(courtPhotoService, 'retrieve').resolves(model);
+    stub(courtPhotoService, 'upload').resolves(status);
     const request = requestMock();
     request.file = { buffer: Buffer.from('png-data'), mimetype: 'image/png' } as Express.Multer.File;
     const response = responseMock();
 
-    await new CourtPhotoController().update(request, response);
+    await controller.update(request, response);
 
     expect(response.status).toHaveBeenCalledWith(status);
     expect(response.render).toHaveBeenCalledWith(view);
   });
 
   test('does not process an upload when the initial court lookup returns not found', async () => {
-    stub(CourtPhotoService.prototype, 'retrieve').resolves(HttpStatusCode.NotFound);
-    const upload = stub(CourtPhotoService.prototype, 'upload');
+    stub(courtPhotoService, 'retrieve').resolves(HttpStatusCode.NotFound);
+    const upload = stub(courtPhotoService, 'upload');
     const response = responseMock();
 
-    await new CourtPhotoController().update(requestMock(), response);
+    await controller.update(requestMock(), response);
 
     expect(upload.notCalled).toBe(true);
     expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
@@ -211,10 +219,10 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders the delete confirmation page', async () => {
-    const retrieveCourtName = stub(CourtPhotoService.prototype, 'retrieveCourtName').resolves(courtName);
+    const retrieveCourtName = stub(courtPhotoService, 'retrieveCourtName').resolves(courtName);
     const response = responseMock();
 
-    await new CourtPhotoController().confirmDelete(requestMock(), response);
+    await controller.confirmDelete(requestMock(), response);
 
     expect(retrieveCourtName.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo-delete-confirm', {
@@ -227,11 +235,11 @@ describe('CourtPhotoController', () => {
   });
 
   test('renders delete success when the API returns no content', async () => {
-    stub(CourtPhotoService.prototype, 'retrieveCourtName').resolves(courtName);
-    const deletePhoto = stub(CourtPhotoService.prototype, 'delete').resolves(HttpStatusCode.NoContent);
+    stub(courtPhotoService, 'retrieveCourtName').resolves(courtName);
+    const deletePhoto = stub(courtPhotoService, 'delete').resolves(HttpStatusCode.NoContent);
     const response = responseMock();
 
-    await new CourtPhotoController().delete(requestMock(), response);
+    await controller.delete(requestMock(), response);
 
     expect(deletePhoto.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo-delete-success', {
@@ -245,11 +253,11 @@ describe('CourtPhotoController', () => {
     [HttpStatusCode.NotFound, 'court-not-found'],
     [HttpStatusCode.InternalServerError, 'error'],
   ])('renders the expected page when delete returns %s', async (status, view) => {
-    stub(CourtPhotoService.prototype, 'retrieveCourtName').resolves(courtName);
-    stub(CourtPhotoService.prototype, 'delete').resolves(status);
+    stub(courtPhotoService, 'retrieveCourtName').resolves(courtName);
+    stub(courtPhotoService, 'delete').resolves(status);
     const response = responseMock();
 
-    await new CourtPhotoController().delete(requestMock(), response);
+    await controller.delete(requestMock(), response);
 
     expect(response.status).toHaveBeenCalledWith(status);
     expect(response.render).toHaveBeenCalledWith(view);
@@ -258,11 +266,11 @@ describe('CourtPhotoController', () => {
   test.each(['confirmDelete', 'delete'] as const)(
     'renders court not found and skips deletion when the court-name lookup fails in %s',
     async action => {
-      stub(CourtPhotoService.prototype, 'retrieveCourtName').rejects(new Error('lookup failed'));
-      const deletePhoto = stub(CourtPhotoService.prototype, 'delete');
+      stub(courtPhotoService, 'retrieveCourtName').rejects(new Error('lookup failed'));
+      const deletePhoto = stub(courtPhotoService, 'delete');
       const response = responseMock();
 
-      await new CourtPhotoController()[action](requestMock(), response);
+      await controller[action](requestMock(), response);
 
       expect(deletePhoto.notCalled).toBe(true);
       expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
@@ -273,10 +281,10 @@ describe('CourtPhotoController', () => {
   test.each(['confirmDelete', 'delete'] as const)(
     'renders court not found without a lookup when %s receives an invalid court id',
     async action => {
-      const retrieveCourtName = stub(CourtPhotoService.prototype, 'retrieveCourtName');
+      const retrieveCourtName = stub(courtPhotoService, 'retrieveCourtName');
       const response = responseMock();
 
-      await new CourtPhotoController()[action](requestMock('not-a-uuid'), response);
+      await controller[action](requestMock('not-a-uuid'), response);
 
       expect(retrieveCourtName.notCalled).toBe(true);
       expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);

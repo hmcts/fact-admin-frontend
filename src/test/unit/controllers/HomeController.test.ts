@@ -6,8 +6,15 @@ import { HomePageService } from '../../../main/services/HomePageService';
 import { mockRequest } from '../mocks/mockRequest';
 
 describe('HomeController', () => {
+  let homePageService = new HomePageService();
+  let controller = new HomeController(homePageService);
+
+  beforeEach(() => {
+    homePageService = new HomePageService();
+    controller = new HomeController(homePageService);
+  });
+
   test('renders the home view', async () => {
-    const controller = new HomeController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -45,8 +52,8 @@ describe('HomeController', () => {
       regionOptions: [],
       resultsMessage: 'No courts, tribunals or service centres found.',
     };
-    const getFiltersStub = stub(HomePageService.prototype, 'getFilters').returns(filters);
-    const getHomePageViewModelStub = stub(HomePageService.prototype, 'getHomePageViewModel').resolves(viewModel);
+    const getFiltersStub = stub(homePageService, 'getFilters').returns(filters);
+    const getHomePageViewModelStub = stub(homePageService, 'getHomePageViewModel').resolves(viewModel);
 
     responseMock.expects('render').once().withArgs('home', viewModel);
 

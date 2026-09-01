@@ -4,6 +4,7 @@ import { assert, mock, stub } from 'sinon';
 
 import CasesHeardController from '../../../main/controllers/CasesHeardController';
 import { CourtApi } from '../../../main/requests/CourtApi';
+import { CasesHeardService } from '../../../main/services/CasesHeardService';
 import { mockRequest } from '../mocks/mockRequest';
 
 const buildCasesHeardBreadcrumbs = (courtId: string, courtName: string, currentPage?: string) => {
@@ -21,8 +22,17 @@ const buildCasesHeardBreadcrumbs = (courtId: string, courtName: string, currentP
 };
 
 describe('CasesHeardController', () => {
+  let courtApi = new CourtApi();
+  let casesHeardService = new CasesHeardService(courtApi);
+  let controller = new CasesHeardController(casesHeardService);
+
+  beforeEach(() => {
+    courtApi = new CourtApi();
+    casesHeardService = new CasesHeardService(courtApi);
+    controller = new CasesHeardController(casesHeardService);
+  });
+
   test('renders the cases heard view when the court exists', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -55,11 +65,11 @@ describe('CasesHeardController', () => {
       ],
       pageTitle: 'Cases heard - Reading Crown Court',
     };
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw').resolves([
+    const getCourtAreasOfLawStub = stub(courtApi, 'getCourtAreasOfLaw').resolves([
       {
         areaOfLawType: {
           id: '22222222-2222-4222-8222-222222222222',
@@ -100,7 +110,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders court not found when the court does not exist', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -108,8 +117,8 @@ describe('CasesHeardController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.NotFound);
-    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves(HttpStatusCode.NotFound);
+    const getCourtAreasOfLawStub = stub(courtApi, 'getCourtAreasOfLaw');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -126,7 +135,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders error when the court lookup fails', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -134,8 +142,8 @@ describe('CasesHeardController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
-    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves(HttpStatusCode.InternalServerError);
+    const getCourtAreasOfLawStub = stub(courtApi, 'getCourtAreasOfLaw');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -152,7 +160,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders error when the areas of law lookup fails', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -160,13 +167,11 @@ describe('CasesHeardController', () => {
     const request = mockRequest({});
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw').resolves(
-      HttpStatusCode.InternalServerError
-    );
+    const getCourtAreasOfLawStub = stub(courtApi, 'getCourtAreasOfLaw').resolves(HttpStatusCode.InternalServerError);
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
     responseMock.expects('render').once().withArgs('error');
@@ -183,7 +188,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders court not found when the courtId is missing or invalid', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -191,8 +195,8 @@ describe('CasesHeardController', () => {
     const request = mockRequest({});
     request.params = { courtId: 'not-a-uuid' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
-    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw');
+    const getCourtByIdStub = stub(courtApi, 'getCourtById');
+    const getCourtAreasOfLawStub = stub(courtApi, 'getCourtAreasOfLaw');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.NotFound).returns(response);
     responseMock.expects('render').once().withArgs('court-not-found');
@@ -209,7 +213,6 @@ describe('CasesHeardController', () => {
   });
 
   test('updates the selected areas of law and renders the success page', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -219,11 +222,11 @@ describe('CasesHeardController', () => {
     };
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
+    const updateCourtAreasOfLawStub = stub(courtApi, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
     responseMock
       .expects('render')
@@ -257,7 +260,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders not found when save returns not found status', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -291,7 +293,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders error when save returns non-not-found status', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -325,7 +326,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders the confirmation page when removing an adoption case type used by local authorities', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -337,8 +337,8 @@ describe('CasesHeardController', () => {
     };
     request.params = { courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById');
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw');
+    const getCourtByIdStub = stub(courtApi, 'getCourtById');
+    const updateCourtAreasOfLawStub = stub(courtApi, 'updateCourtAreasOfLaw');
 
     responseMock
       .expects('render')
@@ -369,7 +369,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders the confirmation page with plural message when removing multiple case types', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -414,7 +413,6 @@ describe('CasesHeardController', () => {
   });
 
   test('uses first courtId value when post route param is an array and renders divorce confirmation', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -460,7 +458,6 @@ describe('CasesHeardController', () => {
   });
 
   test('saves comma-separated selected areas posted from the confirmation page', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
     } as unknown as Response;
@@ -470,11 +467,11 @@ describe('CasesHeardController', () => {
     };
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
+    const updateCourtAreasOfLawStub = stub(courtApi, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
     responseMock
       .expects('render')
@@ -508,7 +505,6 @@ describe('CasesHeardController', () => {
   });
 
   test('renders a validation error when no areas of law are selected', async () => {
-    const controller = new CasesHeardController();
     const response = {
       render: () => '',
       status: () => response,
@@ -517,11 +513,11 @@ describe('CasesHeardController', () => {
     request.body = {};
     request.params = { courtId: '11111111-1111-4111-8111-111111111111' };
     const responseMock = mock(response);
-    const getCourtByIdStub = stub(CourtApi.prototype, 'getCourtById').resolves({
+    const getCourtByIdStub = stub(courtApi, 'getCourtById').resolves({
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Reading Crown Court',
     } as never);
-    const getCourtAreasOfLawStub = stub(CourtApi.prototype, 'getCourtAreasOfLaw').resolves([
+    const getCourtAreasOfLawStub = stub(courtApi, 'getCourtAreasOfLaw').resolves([
       {
         areaOfLawType: {
           id: '22222222-2222-4222-8222-222222222222',
@@ -531,7 +527,7 @@ describe('CasesHeardController', () => {
         selected: true,
       },
     ] as never);
-    const updateCourtAreasOfLawStub = stub(CourtApi.prototype, 'updateCourtAreasOfLaw');
+    const updateCourtAreasOfLawStub = stub(courtApi, 'updateCourtAreasOfLaw');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
     responseMock
