@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 import type { Request, Response } from 'express';
-import { assert, mock, restore, stub } from 'sinon';
+import { assert, match, mock, restore, stub } from 'sinon';
 
 import { ServiceCentreEditController } from '../../../main/controllers/ServiceCentreEditController';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
@@ -29,6 +29,7 @@ describe('ServiceCentreEditController', () => {
     } as never);
     const response = {
       render: () => '',
+      status: () => response,
     } as unknown as Response;
     const request = mockRequest({});
     request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
@@ -78,6 +79,126 @@ describe('ServiceCentreEditController', () => {
     await controller.get(request, response);
 
     responseMock.verify();
+  });
+
+  test('renders the service centre edit view for viewer without fetching locks', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: '22222222-2222-4222-8222-222222222222',
+      name: 'National Business Centre',
+      open: true,
+      slug: 'national-business-centre',
+    } as never);
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({}) as Request & {
+      appSession: { factUser: { id: string; role: 'Viewer' } };
+    };
+    request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
+    request.appSession = { factUser: { id: 'test-user-id', role: 'Viewer' } };
+    const responseMock = mock(response);
+
+    const getApprovalsStub = stub(OperationsApi.prototype, 'getApprovals').resolves([
+      {
+        subjectId: '22222222-2222-4222-8222-222222222222',
+        subjectType: 'SERVICE_CENTRE',
+        name: 'National Business Centre',
+        approved: false,
+        approvalId: null,
+        userId: null,
+        user: null,
+        lastUpdatedAt: null,
+      },
+    ]);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks');
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('service-centre-edit', {
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          {
+            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+            text: 'Edit National Business Centre',
+          },
+        ],
+        pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+        pageTitle: 'Reviewing - National Business Centre',
+        serviceCentreId: '22222222-2222-4222-8222-222222222222',
+        serviceCentreName: 'National Business Centre',
+        showApproveData: true,
+        approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
+        serviceCentreLocks: [],
+        timeoutMins: undefined,
+      });
+
+    await controller.get(request, response);
+    assert.calledOnce(getApprovalsStub);
+    assert.notCalled(getLocksStub);
+    responseMock.verify();
+  });
+
+  test('renders timeout minutes when timeout query parameter is valid', async () => {
+    stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: '22222222-2222-4222-8222-222222222222',
+      name: 'National Business Centre',
+      open: true,
+      slug: 'national-business-centre',
+    } as never);
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
+    request.query = { timeout: '7' };
+    const responseMock = mock(response);
+
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves([]);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'service-centre-edit',
+        match((viewModel: Record<string, unknown>) => viewModel.timeoutMins === 7)
+      );
+
+    await controller.get(request, response);
+    assert.calledOnce(getLocksStub);
+    responseMock.verify();
+  });
+
+  test('renders generic error when lock lookup returns status code', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { serviceCentreId: '22222222-2222-4222-8222-222222222222' };
+    const responseMock = mock(response);
+
+    const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
+      id: '22222222-2222-4222-8222-222222222222',
+      name: 'National Business Centre',
+      open: true,
+      slug: 'national-business-centre',
+    } as never);
+    const getLocksStub = stub(OperationsApi.prototype, 'getLocks').resolves(HttpStatusCode.BadGateway);
+
+    responseMock.expects('status').once().withArgs(HttpStatusCode.BadGateway).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.get(request, response);
+      assert.calledOnce(getServiceCentreByIdStub);
+      assert.calledOnce(getLocksStub);
+      responseMock.verify();
+    } finally {
+      getServiceCentreByIdStub.restore();
+      getLocksStub.restore();
+    }
   });
 
   test('renders generic error when service-centre lookup fails', async () => {

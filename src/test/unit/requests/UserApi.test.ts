@@ -237,6 +237,14 @@ describe('UserApi', () => {
     await expect(userApi.getFavourites(params)).resolves.toEqual(responseBody);
   });
 
+  it('returns internal server error when getFavourites fails without an axios error', async () => {
+    getStub.withArgs('/user/v1/favourites', { params: {} }).rejects(errorMessage);
+
+    const response = await userApi.getFavourites();
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
   it('gets batched favourite statuses', async () => {
     const subjects = [
       {
@@ -248,6 +256,15 @@ describe('UserApi', () => {
     postStub.withArgs('/user/v1/favourites/status', { subjects }).resolves({ data: responseBody });
 
     await expect(userApi.getFavouriteStatuses(subjects)).resolves.toEqual(responseBody);
+  });
+
+  it('returns internal server error when getFavouriteStatuses fails without an axios error', async () => {
+    const subjects = [{ subjectId: '11111111-1111-4111-8111-111111111111', subjectType: 'COURT' as const }];
+    postStub.withArgs('/user/v1/favourites/status', { subjects }).rejects(errorMessage);
+
+    const response = await userApi.getFavouriteStatuses(subjects);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
   it('adds and removes a subject favourite', async () => {

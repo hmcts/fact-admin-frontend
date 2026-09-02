@@ -61,6 +61,25 @@ describe('ServiceCentreContactService', () => {
     expect(result).toBe(HttpStatusCode.NotFound);
   });
 
+  test('listContactDetails falls back to empty description when type lookup fails for an existing description id', async () => {
+    jest.spyOn(ServiceCentreApi.prototype, 'getServiceCentreContactDetails').mockResolvedValue([
+      {
+        id: '22222222-2222-4222-8222-222222222222',
+        serviceCentreId,
+        serviceCentreContactDescription: null,
+        serviceCentreContactDescriptionId: contactTypeId,
+        email: 'enquiries@example.test',
+      },
+    ] as never);
+    jest
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
+      .mockResolvedValue(HttpStatusCode.InternalServerError);
+
+    const result = await new ServiceCentreContactService().listContactDetails(serviceCentreId);
+
+    expect(result).toEqual([expect.objectContaining({ description: '' })]);
+  });
+
   test('getContactDetailById returns status, undefined, or matched detail', async () => {
     const getServiceCentreContactDetails = jest
       .spyOn(ServiceCentreApi.prototype, 'getServiceCentreContactDetails')
@@ -165,6 +184,137 @@ describe('ServiceCentreContactService', () => {
     expect(createServiceCentreContactDetail).not.toHaveBeenCalled();
   });
 
+  test('submitContactDetailFlow validates missing and malformed email values', async () => {
+    jest
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
+      .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
+    const service = new ServiceCentreContactService();
+
+    const missingEmail = await service.submitContactDetailFlow({
+      body: {
+        'contact-email': '',
+        'contact-methods': ['email'],
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    const malformedEmail = await service.submitContactDetailFlow({
+      body: {
+        'contact-email': 'invalid-email',
+        'contact-methods': ['email'],
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    expect(missingEmail.type).toBe('validation-error');
+    expect(malformedEmail.type).toBe('validation-error');
+    if (missingEmail.type !== 'validation-error' || malformedEmail.type !== 'validation-error') {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(missingEmail.formViewModel.formErrors.contactEmail).toBe('Enter an email address');
+    expect(malformedEmail.formViewModel.formErrors.contactEmail).toBe('Enter an email address in the correct format');
+  });
+
+  test('submitContactDetailFlow validates explanation format, length and translation dependencies', async () => {
+    jest
+      .spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes')
+      .mockResolvedValue([{ id: contactTypeId, name: 'General enquiries' }] as never);
+    const service = new ServiceCentreContactService();
+
+    const englishInvalid = await service.submitContactDetailFlow({
+      body: {
+        'contact-explanation': 'Invalid/',
+        'contact-methods': ['email'],
+        'contact-email': 'enquiries@example.test',
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    const englishMissingWelsh = await service.submitContactDetailFlow({
+      body: {
+        'contact-explanation': 'General enquiries',
+        'contact-explanation-cy': '',
+        'contact-methods': ['email'],
+        'contact-email': 'enquiries@example.test',
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    const welshInvalid = await service.submitContactDetailFlow({
+      body: {
+        'contact-explanation': '',
+        'contact-explanation-cy': 'Annilys/',
+        'contact-methods': ['email'],
+        'contact-email': 'enquiries@example.test',
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    const welshTooLong = await service.submitContactDetailFlow({
+      body: {
+        'contact-explanation': 'General enquiries',
+        'contact-explanation-cy': 'a'.repeat(251),
+        'contact-methods': ['email'],
+        'contact-email': 'enquiries@example.test',
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    expect(englishInvalid.type).toBe('validation-error');
+    expect(englishMissingWelsh.type).toBe('validation-error');
+    expect(welshInvalid.type).toBe('validation-error');
+    expect(welshTooLong.type).toBe('validation-error');
+    if (
+      englishInvalid.type !== 'validation-error' ||
+      englishMissingWelsh.type !== 'validation-error' ||
+      welshInvalid.type !== 'validation-error' ||
+      welshTooLong.type !== 'validation-error'
+    ) {
+      throw new Error('Expected validation-error outcome');
+    }
+
+    expect(englishInvalid.formViewModel.formErrors.contactExplanation).toBe(
+      'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+    );
+    expect(englishMissingWelsh.formViewModel.formErrors.contactExplanationCy).toBe(
+      'Because you provided an explanation in English, the Welsh translation is now mandatory'
+    );
+    expect(welshInvalid.formViewModel.formErrors.contactExplanation).toBe(
+      'Because you provided an explanation in Welsh, the English translation is now mandatory'
+    );
+    expect(welshInvalid.formViewModel.formErrors.contactExplanationCy).toBe(
+      'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+    );
+    expect(welshTooLong.formViewModel.formErrors.contactExplanationCy).toBe(
+      'Explanation in Welsh must be 250 characters or fewer'
+    );
+  });
+
   test('submitContactDetailFlow returns save-error when type lookup fails during validation', async () => {
     jest.spyOn(ReferenceDataApi.prototype, 'getContactDescriptionTypes').mockResolvedValue(HttpStatusCode.BadGateway);
 
@@ -210,6 +360,32 @@ describe('ServiceCentreContactService', () => {
       serviceCentreContactDescriptionId: contactTypeId,
       serviceCentreId,
     });
+  });
+
+  test('submitContactDetailFlow returns internal-server-error when save result is undefined', async () => {
+    const service = new ServiceCentreContactService() as unknown as {
+      submitContactDetailFlow: ServiceCentreContactService['submitContactDetailFlow'];
+      saveContactDetail: (
+        serviceCentreId: string,
+        payload: Record<string, unknown>,
+        contactDetailId?: string
+      ) => Promise<HttpStatusCode | Map<string, string> | undefined>;
+    };
+    jest.spyOn(service, 'saveContactDetail').mockResolvedValue(undefined);
+
+    const result = await service.submitContactDetailFlow({
+      body: {
+        'contact-email': 'enquiries@example.test',
+        'contact-methods': ['email'],
+        'contact-type': contactTypeId,
+      },
+      formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
+      formHeading: 'Add contact details',
+      serviceCentreId,
+      serviceCentreName: 'Reading Service Centre',
+    });
+
+    expect(result).toEqual({ status: HttpStatusCode.InternalServerError, type: 'save-error' });
   });
 
   test('submitContactDetailFlow maps backend validation map into form errors', async () => {

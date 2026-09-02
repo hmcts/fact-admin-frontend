@@ -61,6 +61,33 @@ describe('FavouriteController', () => {
     expect(requests.addFavourite).not.toHaveBeenCalled();
   });
 
+  test('rejects non-string subjectId when subjectType is valid', async () => {
+    const requests = { addFavourite: jest.fn() };
+    const controller = new FavouriteController(requests as never);
+    const res = response();
+
+    await controller.add({ body: {}, params: { subjectId: 123, subjectType: 'COURT' } } as never, res as never);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest);
+    expect(requests.addFavourite).not.toHaveBeenCalled();
+  });
+
+  test('renders error when remove returns an unexpected success status', async () => {
+    const requests = { removeFavourite: jest.fn().mockResolvedValue(HttpStatusCode.Ok) };
+    const controller = new FavouriteController(requests as never);
+    const req = {
+      body: { returnPath: '/?tab=favourites#favourites' },
+      params: { subjectId, subjectType: 'COURT' },
+    };
+    const res = response();
+
+    await controller.remove(req as never, res as never);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok);
+    expect(res.render).toHaveBeenCalledWith('error');
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   test.each([
     ['https://evil.example/', '/'],
     ['//evil.example/', '/'],
@@ -69,7 +96,13 @@ describe('FavouriteController', () => {
     ['/?tab=unknown', '/'],
     ['/?pageNumber=-1', '/'],
     ['/?regionId=not-a-uuid', '/'],
+    ['/?pageSize=0', '/'],
+    ['/?pageSize=1001', '/'],
+    ['/?partialCourtName=London123', '/'],
+    ['/?includeClosed=yes', '/'],
     ['/?sortOrder=desc', '/'],
+    ['/?sortBy=rating', '/'],
+    ['/?pageNumber=1&pageNumber=2', '/'],
     ['/?tab=favourites#unknown', '/'],
     ['/?tab=favourites&favouritesPageNumber=1#favourites', '/?tab=favourites&favouritesPageNumber=1#favourites'],
   ])('normalises safe return path %s', (input, expected) => {

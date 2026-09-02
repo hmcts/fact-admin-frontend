@@ -2,17 +2,17 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { restore, stub } from 'sinon';
 
-import WarningNoticeController from '../../../main/controllers/WarningNoticeController';
+import CourtWarningNoticeController from '../../../main/controllers/CourtWarningNoticeController';
 import { WarningNoticeService } from '../../../main/services/WarningNoticeService';
 import { mockRequest } from '../mocks/mockRequest';
 
-describe('WarningNoticeController', () => {
+describe('CourtWarningNoticeController', () => {
   let warningNoticeService = new WarningNoticeService();
-  let controller = new WarningNoticeController(warningNoticeService);
+  let controller = new CourtWarningNoticeController(warningNoticeService);
 
   beforeEach(() => {
     warningNoticeService = new WarningNoticeService();
-    controller = new WarningNoticeController(warningNoticeService);
+    controller = new CourtWarningNoticeController(warningNoticeService);
   });
 
   const courtId = '11111111-1111-4111-8111-111111111111';

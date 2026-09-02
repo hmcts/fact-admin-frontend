@@ -1388,6 +1388,27 @@ describe('CourtApi', () => {
     expect(response).toBe(HttpStatusCode.NoContent);
   });
 
+  it('returns conflict when saving translation services fails with an axios status', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const payload = {
+      courtId,
+      email: 'translations@example.com',
+      phoneNumber: '+443465456784',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/translation-services`, payload).rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    const response = await courtApi.saveTranslationServices(courtId, payload);
+
+    expect(response).toBe(HttpStatusCode.Conflict);
+  });
+
   it('returns parsed court local authorities when response is valid', async () => {
     const courtId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     const localAuthorities = [
@@ -1686,6 +1707,97 @@ describe('CourtApi', () => {
     const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
 
     expect(response).toEqual(professionalInformation);
+  });
+
+  it('returns validation errors map when save court professional information endpoint returns a 400', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+    const professionalInformation = {
+      professionalInformation: {
+        interviewRooms: true,
+        videoHearings: true,
+        commonPlatform: false,
+        accessScheme: true,
+        interviewRoomCount: 3,
+        interviewPhoneNumber: '01234567891',
+      },
+      codes: {
+        countyCourtCode: 101,
+        crownCourtCode: null,
+        familyCourtCode: 202,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [
+        {
+          dxCode: 'DX 999',
+          explanation: null,
+        },
+      ],
+      faxNumbers: [
+        {
+          faxNumber: '02000000000',
+          description: 'Main fax',
+        },
+      ],
+    };
+    const apiErrors = {
+      professionalInformation: 'Invalid professional information',
+    };
+
+    postStub.withArgs(`/courts/${courtId}/v1/professional-information`, professionalInformation).rejects({
+      isAxiosError: true,
+      response: {
+        data: apiErrors,
+        status: HttpStatusCode.BadRequest,
+      },
+    });
+
+    const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
+
+    expect(response).toEqual(new Map(Object.entries(apiErrors)));
+  });
+
+  it('returns internal server error when save court professional information throws a non-axios error', async () => {
+    const courtId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+    const professionalInformation = {
+      professionalInformation: {
+        interviewRooms: true,
+        videoHearings: true,
+        commonPlatform: false,
+        accessScheme: true,
+        interviewRoomCount: 3,
+        interviewPhoneNumber: '01234 567890',
+      },
+      codes: {
+        countyCourtCode: 101,
+        crownCourtCode: null,
+        familyCourtCode: 202,
+        gbs: null,
+        magistrateCourtCode: null,
+        tribunalCode: null,
+      },
+      dxCodes: [
+        {
+          dxCode: 'DX 999',
+          explanation: null,
+        },
+      ],
+      faxNumbers: [
+        {
+          faxNumber: '020 0000 0000',
+          description: 'Main fax',
+        },
+      ],
+    };
+
+    postStub
+      .withArgs(`/courts/${courtId}/v1/professional-information`, professionalInformation)
+      .rejects(new Error('Unexpected error'));
+
+    const response = await courtApi.saveCourtProfessionalInformation(courtId, professionalInformation);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
   it('returns forbidden when court professional information endpoint returns a 403', async () => {
