@@ -468,4 +468,3 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     expect(invalidPostCounterServiceResponse.render).toHaveBeenCalledWith('not-found');
   });
 });
-
