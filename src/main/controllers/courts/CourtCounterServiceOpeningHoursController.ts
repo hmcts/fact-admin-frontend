@@ -11,7 +11,7 @@ import BaseController from '../BaseController';
 import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/counter-service-opening-hours')
-export default class CounterServiceOpeningHoursController extends BaseController {
+export default class CourtCounterServiceOpeningHoursController extends BaseController {
   constructor(private readonly counterServiceOpeningHoursService = new CounterServiceOpeningHoursService()) {
     super();
   }
@@ -227,3 +227,4 @@ export default class CounterServiceOpeningHoursController extends BaseController
     };
   }
 }
+

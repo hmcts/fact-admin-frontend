@@ -2,17 +2,17 @@ import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { restore, stub } from 'sinon';
 
-import CounterServiceOpeningHoursController from '../../../../main/controllers/courts/CounterServiceOpeningHoursController';
+import CourtCounterServiceOpeningHoursController from '../../../../main/controllers/courts/CourtCounterServiceOpeningHoursController';
 import { CounterServiceOpeningHoursService } from '../../../../main/services/courts/CounterServiceOpeningHoursService';
 import { mockRequest } from '../../mocks/mockRequest';
 
-describe('CounterServiceOpeningHoursController', () => {
+describe('CourtCounterServiceOpeningHoursController', () => {
   let counterServiceOpeningHoursService = new CounterServiceOpeningHoursService();
-  let controller = new CounterServiceOpeningHoursController(counterServiceOpeningHoursService);
+  let controller = new CourtCounterServiceOpeningHoursController(counterServiceOpeningHoursService);
 
   beforeEach(() => {
     counterServiceOpeningHoursService = new CounterServiceOpeningHoursService();
-    controller = new CounterServiceOpeningHoursController(counterServiceOpeningHoursService);
+    controller = new CourtCounterServiceOpeningHoursController(counterServiceOpeningHoursService);
   });
 
   const courtId = '11111111-1111-4111-8111-111111111111';
@@ -468,3 +468,4 @@ describe('CounterServiceOpeningHoursController', () => {
     expect(invalidPostCounterServiceResponse.render).toHaveBeenCalledWith('not-found');
   });
 });
+
