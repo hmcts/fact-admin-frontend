@@ -2078,7 +2078,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/allure-legacy@npm:^1.0.2":
+"@codeceptjs/allure-legacy@npm:1.0.2":
   version: 1.0.2
   resolution: "@codeceptjs/allure-legacy@npm:1.0.2"
   dependencies:
@@ -2482,7 +2482,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/info-provider@npm:^1.4.0":
+"@hmcts/info-provider@npm:1.4.0":
   version: 1.4.0
   resolution: "@hmcts/info-provider@npm:1.4.0"
   dependencies:
@@ -2504,7 +2504,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/nodejs-logging@npm:^4.0.4":
+"@hmcts/nodejs-logging@npm:4.0.4, @hmcts/nodejs-logging@npm:^4.0.4":
   version: 4.0.4
   resolution: "@hmcts/nodejs-logging@npm:4.0.4"
   dependencies:
@@ -2515,7 +2515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/playwright-common@npm:^1.1.5":
+"@hmcts/playwright-common@npm:1.1.5":
   version: 1.1.5
   resolution: "@hmcts/playwright-common@npm:1.1.5"
   dependencies:
@@ -5654,7 +5654,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*, @types/chai@npm:^5.2.3":
+"@types/chai@npm:*, @types/chai@npm:5.2.3":
   version: 5.2.3
   resolution: "@types/chai@npm:5.2.3"
   dependencies:
@@ -5726,7 +5726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/govuk-frontend@npm:^5.11.0":
+"@types/govuk-frontend@npm:5.11.0":
   version: 5.11.0
   resolution: "@types/govuk-frontend@npm:5.11.0"
   checksum: 10/ee702a0a7e07e2d76a90c91c65a0103ac05b0d589a2aca42b1cf8c9c7f46c8c761360a1f23431e0d537cef02b68df88245cf8bdd3c83b25f0f9260930de51fc9
@@ -5772,7 +5772,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^30.0.0":
+"@types/jest@npm:30.0.0":
   version: 30.0.0
   resolution: "@types/jest@npm:30.0.0"
   dependencies:
@@ -5810,7 +5810,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/moment-timezone@npm:^0.5.30":
+"@types/moment-timezone@npm:0.5.30":
   version: 0.5.30
   resolution: "@types/moment-timezone@npm:0.5.30"
   dependencies:
@@ -5819,7 +5819,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:^2.2.0":
+"@types/multer@npm:2.2.0":
   version: 2.2.0
   resolution: "@types/multer@npm:2.2.0"
   dependencies:
@@ -5871,7 +5871,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/pa11y@npm:^5.3.7":
+"@types/pa11y@npm:5.3.7":
   version: 5.3.7
   resolution: "@types/pa11y@npm:5.3.7"
   dependencies:
@@ -5999,7 +5999,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/supertest@npm:^7.2.1":
+"@types/supertest@npm:7.2.1":
   version: 7.2.1
   resolution: "@types/supertest@npm:7.2.1"
   dependencies:
@@ -8381,7 +8381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:^4.1.0":
+"codeceptjs@npm:4.1.0":
   version: 4.1.0
   resolution: "codeceptjs@npm:4.1.0"
   dependencies:
@@ -9391,7 +9391,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^17.4.2":
+"dotenv@npm:17.4.2":
   version: 17.4.2
   resolution: "dotenv@npm:17.4.2"
   checksum: 10/ca1b6f54d58e39914901e1518958e86083aca8deb5aa2e7f2a51acd53291d97852479b0ab26ed949b6a45a0e9adcc7b0d1c3c72375e8ea670f7005e341c6daba
@@ -10349,31 +10349,31 @@ __metadata:
     "@babel/plugin-proposal-decorators": "npm:7.29.7"
     "@babel/preset-env": "npm:7.29.7"
     "@babel/preset-typescript": "npm:7.29.7"
-    "@codeceptjs/allure-legacy": "npm:^1.0.2"
+    "@codeceptjs/allure-legacy": "npm:1.0.2"
     "@codeceptjs/configure": "npm:1.0.6"
     "@eslint/eslintrc": "npm:3.3.6"
     "@eslint/js": "npm:9.39.5"
-    "@hmcts/info-provider": "npm:^1.4.0"
+    "@hmcts/info-provider": "npm:1.4.0"
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
-    "@hmcts/nodejs-logging": "npm:^4.0.4"
-    "@hmcts/playwright-common": "npm:^1.1.5"
+    "@hmcts/nodejs-logging": "npm:4.0.4"
+    "@hmcts/playwright-common": "npm:1.1.5"
     "@hmcts/properties-volume": "npm:1.4.1"
     "@ministryofjustice/frontend": "npm:11.0.0"
     "@playwright/test": "npm:1.62.1"
     "@types/babel__preset-env": "npm:7.10.0"
-    "@types/chai": "npm:^5.2.3"
+    "@types/chai": "npm:5.2.3"
     "@types/chai-as-promised": "npm:8.0.2"
     "@types/cookie-parser": "npm:1.4.10"
     "@types/express": "npm:5.0.6"
-    "@types/govuk-frontend": "npm:^5.11.0"
-    "@types/jest": "npm:^30.0.0"
+    "@types/govuk-frontend": "npm:5.11.0"
+    "@types/jest": "npm:30.0.0"
     "@types/lodash": "npm:4.17.25"
-    "@types/moment-timezone": "npm:^0.5.30"
-    "@types/multer": "npm:^2.2.0"
+    "@types/moment-timezone": "npm:0.5.30"
+    "@types/multer": "npm:2.2.0"
     "@types/node": "npm:26.4.0"
     "@types/nunjucks": "npm:3.2.6"
-    "@types/pa11y": "npm:^5.3.7"
-    "@types/supertest": "npm:^7.2.1"
+    "@types/pa11y": "npm:5.3.7"
+    "@types/supertest": "npm:7.2.1"
     "@typescript-eslint/eslint-plugin": "npm:8.69.0"
     "@typescript-eslint/parser": "npm:8.69.0"
     applicationinsights: "npm:3.16.0"
@@ -10383,13 +10383,13 @@ __metadata:
     axios: "npm:1.20.0"
     babel-jest: "npm:30.5.1"
     chai: "npm:6.2.2"
-    codeceptjs: "npm:^4.1.0"
+    codeceptjs: "npm:4.1.0"
     config: "npm:5.0.1"
     cookie-parser: "npm:1.4.7"
     copy-webpack-plugin: "npm:14.0.0"
     css-loader: "npm:7.1.5"
     debug: "npm:4.4.3"
-    dotenv: "npm:^17.4.2"
+    dotenv: "npm:17.4.2"
     eslint: "npm:9.39.5"
     eslint-config-prettier: "npm:10.1.8"
     eslint-plugin-import: "npm:2.32.0"
@@ -10397,7 +10397,7 @@ __metadata:
     express: "npm:5.2.1"
     express-openid-connect: "npm:3.4.0"
     express-rate-limit: "npm:8.7.0"
-    get-port: "npm:^7.2.0"
+    get-port: "npm:7.2.0"
     globals: "npm:17.11.0"
     govuk-frontend: "npm:6.5.0"
     helmet: "npm:8.3.0"
@@ -10414,21 +10414,21 @@ __metadata:
     pa11y: "npm:10.0.0"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
-    playwright-lighthouse: "npm:^4.0.0"
+    playwright-lighthouse: "npm:4.0.0"
     prettier: "npm:3.9.6"
-    redis: "npm:^6.2.1"
+    redis: "npm:6.2.1"
     sass: "npm:1.103.1"
     sass-loader: "npm:17.0.1"
     sinon: "npm:22.1.0"
     style-loader: "npm:4.0.0"
     stylelint: "npm:17.14.1"
-    supertest: "npm:^7.2.2"
+    supertest: "npm:7.2.2"
     ts-jest: "npm:29.4.12"
     ts-loader: "npm:9.6.2"
     ts-node: "npm:10.9.2"
     typescript: "npm:6.0.3"
     webpack: "npm:5.110.2"
-    webpack-cli: "npm:^7.2.3"
+    webpack-cli: "npm:7.2.3"
     webpack-dev-middleware: "npm:8.1.1"
     zod: "npm:4.5.4"
   languageName: unknown
@@ -10999,7 +10999,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-port@npm:^7.1.0, get-port@npm:^7.2.0":
+"get-port@npm:7.2.0, get-port@npm:^7.1.0":
   version: 7.2.0
   resolution: "get-port@npm:7.2.0"
   checksum: 10/f8785ccdcc52b1e03f1b1de3fcd46dbc41fe4079e234f2727c3e154ca76bb94318fb0d341daa28a6c87eff24ad4016eaa8b1b4e26eff0d6a2196dd1c1ffc63a1
@@ -14971,7 +14971,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-lighthouse@npm:^4.0.0":
+"playwright-lighthouse@npm:4.0.0, playwright-lighthouse@npm:^4.0.0":
   version: 4.0.0
   resolution: "playwright-lighthouse@npm:4.0.0"
   dependencies:
@@ -15537,7 +15537,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^6.2.1":
+"redis@npm:6.2.1":
   version: 6.2.1
   resolution: "redis@npm:6.2.1"
   dependencies:
@@ -16730,7 +16730,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supertest@npm:^7.2.2":
+"supertest@npm:7.2.2":
   version: 7.2.2
   resolution: "supertest@npm:7.2.2"
   dependencies:
@@ -17814,7 +17814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:^7.2.3":
+"webpack-cli@npm:7.2.3":
   version: 7.2.3
   resolution: "webpack-cli@npm:7.2.3"
   dependencies:
