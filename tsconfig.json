@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "outDir": "./src/",
+    "rootDir": "./src",
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "ES2024",
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
