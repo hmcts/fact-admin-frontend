@@ -83,9 +83,7 @@ describe('RedisModule', () => {
 
     enableRedis();
 
-    expect(mockCreateClient).toHaveBeenCalledWith(
-      expect.objectContaining({ url: 'redis://:@redis.test:6379' })
-    );
+    expect(mockCreateClient).toHaveBeenCalledWith(expect.objectContaining({ url: 'redis://:@redis.test:6379' }));
   });
 
   test('uses mounted Key Vault secrets when environment configuration is absent', () => {
