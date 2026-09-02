@@ -1,12 +1,7 @@
+const baseConfig = require('./jest.base.config');
+
 module.exports = {
+  ...baseConfig,
   roots: ['<rootDir>/src/test/unit'],
-  testRegex: '(/src/test/.*|\\.(test|spec))\\.(ts|js)$',
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  testEnvironment: 'node',
-  transform: {
-    '^.+\\.ts?$': 'ts-jest',
-    '^.+\\.js$': 'babel-jest',
-  },
-  transformIgnorePatterns: ['/node_modules/(?!chai|uuid)'],
   modulePathIgnorePatterns: ['<rootDir>/src/test/unit/mocks'],
 };
