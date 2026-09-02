@@ -122,7 +122,7 @@
     "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.10.0",
     "@opentelemetry/sdk-node": "0.221.0",
     "body-parser@npm:^2.2.1": "npm:2.3.0",
-    "body-parser@npm:~1.20.5": "npm:1.20.6",
+    "body-parser@npm:~1.20.5": "npm:body-parser@2.3.0",
     "form-data": "4.0.6",
     "ip-address": "10.5.0",
     "joi": "18.2.5",
