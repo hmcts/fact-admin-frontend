@@ -119,14 +119,7 @@
   "resolutions": {
     "@opentelemetry/exporter-prometheus": "0.221.0",
     "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.10.0",
-    "@opentelemetry/sdk-node": "0.221.0",
-    "body-parser@npm:^2.2.1": "npm:2.3.0",
-    "body-parser@npm:~1.20.5": "npm:1.20.6",
-    "js-yaml@npm:^3.13.1": "npm:js-yaml@3.15.2",
-    "js-yaml@npm:^4.0.0": "npm:4.3.1",
-    "js-yaml@npm:^4.1.0": "npm:4.3.1",
-    "js-yaml@npm:^4.1.1": "npm:4.3.1",
-    "js-yaml@npm:^4.3.0": "npm:4.3.1"
+    "@opentelemetry/sdk-node": "0.221.0"
   },
   "packageManager": "yarn@4.18.0"
 }
