@@ -74,7 +74,7 @@
     "@types/lodash": "4.17.25",
     "@types/moment-timezone": "0.5.30",
     "@types/multer": "2.2.0",
-    "@types/node": "26.4.0",
+    "@types/node": "26.4.1",
     "@types/nunjucks": "3.2.6",
     "@types/pa11y": "5.3.7",
     "@types/supertest": "7.2.1",
@@ -112,7 +112,7 @@
     "supertest": "7.2.2",
     "ts-jest": "29.4.12",
     "ts-loader": "9.6.2",
-    "webpack": "5.110.2",
+    "webpack": "5.110.3",
     "webpack-cli": "7.2.3",
     "webpack-dev-middleware": "8.1.1"
   },
