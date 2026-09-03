@@ -635,6 +635,54 @@ describe('CourtProfessionalInformationService', () => {
     });
   });
 
+  test('maps indexed Welsh API validation errors to the matching Welsh repeatable field anchors', async () => {
+    const courtApi = buildCourtApi({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['dxCodes[1].explanationCy', 'Contains invalid characters'],
+          ['faxNumbers[1].descriptionCy', 'Contains invalid characters'],
+        ])
+      ),
+    });
+
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {
+      'dxCode-0': 'DX 123',
+      'dxCode-1': 'DX 456',
+      'dxCodeDescription-0': 'Documents one',
+      'dxCodeDescriptionCy-0': 'Dogfennau un',
+      'dxCodeDescription-1': 'Documents two',
+      'dxCodeDescriptionCy-1': 'Dogfennau dau',
+      'faxNumber-0': '020 0000 0000',
+      'faxNumber-1': '020 0000 0001',
+      'faxNumberDescription-0': 'Main fax',
+      'faxNumberDescriptionCy-0': 'Prif ffacs',
+      'faxNumberDescription-1': 'Second fax',
+      'faxNumberDescriptionCy-1': 'Ail ffacs',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          {
+            href: '#dxCodeDescriptionCy-1',
+            text: 'DX code 2 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#faxNumberDescriptionCy-1',
+            text: 'Fax number 2 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+        ],
+        fieldErrors: {
+          'dxCodeDescriptionCy-1':
+            'DX code 2 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'faxNumberDescriptionCy-1':
+            'Fax number 2 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+        },
+      },
+    });
+  });
+
   test('keeps repeated API validation errors linked and labelled by repeatable field index', async () => {
     const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(

@@ -601,7 +601,7 @@ export class CourtProfessionalInformationService {
     viewModel?: ProfessionalInformationViewModel
   ): RepeatableApiError | undefined {
     const repeatableErrorMatch = field.match(
-      /^(dxCodes|faxNumbers)(?:\[(\d+)])(?:\.(dxCode|explanation|faxNumber|description))?$/i
+      /^(dxCodes|faxNumbers)\[(\d+)](?:\.(dxCode|explanation|explanationCy|faxNumber|description|descriptionCy))?$/i
     );
     if (!repeatableErrorMatch) {
       return undefined;
@@ -610,11 +610,18 @@ export class CourtProfessionalInformationService {
     const [, listName, payloadIndex, fieldName] = repeatableErrorMatch;
     const formIndex = this.repeatableFormIndex(listName, Number(payloadIndex), viewModel);
     const displayIndex = formIndex + 1;
+    const normalizedFieldName = fieldName?.toLowerCase();
     if (listName.toLowerCase() === 'dxcodes') {
-      if (fieldName?.toLowerCase() === 'explanation') {
+      if (normalizedFieldName === 'explanation') {
         return {
           href: `#dxCodeDescription-${formIndex}`,
           label: `DX code ${displayIndex} explanation`,
+        };
+      }
+      if (normalizedFieldName === 'explanationcy') {
+        return {
+          href: `#dxCodeDescriptionCy-${formIndex}`,
+          label: `DX code ${displayIndex} Welsh explanation`,
         };
       }
       return {
@@ -623,10 +630,16 @@ export class CourtProfessionalInformationService {
       };
     }
 
-    if (fieldName?.toLowerCase() === 'description') {
+    if (normalizedFieldName === 'description') {
       return {
         href: `#faxNumberDescription-${formIndex}`,
         label: `Fax number ${displayIndex} description`,
+      };
+    }
+    if (normalizedFieldName === 'descriptioncy') {
+      return {
+        href: `#faxNumberDescriptionCy-${formIndex}`,
+        label: `Fax number ${displayIndex} Welsh description`,
       };
     }
     return {
