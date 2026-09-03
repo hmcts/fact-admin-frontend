@@ -1,8 +1,9 @@
 import { randomBytes } from 'crypto';
+
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import type * as express from 'express';
 import helmet from 'helmet';
 
-import type * as express from 'express';
 
 import { Helmet } from '../../../../main/modules/helmet';
 
@@ -216,8 +217,7 @@ describe('Helmet module', () => {
     )[];
 
     const nonceFn = scriptSrc.find(
-      (entry): entry is (req: unknown, res: { locals: { cspNonce: string } }) => string =>
-        typeof entry === 'function'
+      (entry): entry is (req: unknown, res: { locals: { cspNonce: string } }) => string => typeof entry === 'function'
     );
     expect(nonceFn).toBeDefined();
 
