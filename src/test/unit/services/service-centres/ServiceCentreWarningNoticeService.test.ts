@@ -96,7 +96,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     });
   });
 
-  test('accepts Welsh warning notice diacritics', async () => {
+  test('accepts Welsh warning notice with Welsh letters and English punctuation', async () => {
     const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
@@ -111,19 +111,23 @@ describe('ServiceCentreWarningNoticeService', () => {
       open: true,
       regionId: null,
       slug: 'reading-service-centre',
-      warningNotice: 'English warning',
-      warningNoticeCy: 'Rhybudd gyda ŵ ŷ â ê î ô û',
+      warningNotice: 'English warning @ 5pm / lift outage',
+      warningNoticeCy: 'Rhybudd gyda @ 5pm / diffyg lifft ŵ ŷ â ê î ô û',
     } as never);
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'English warning', 'Rhybudd gyda ŵ ŷ â ê î ô û');
+    const result = await service.save(
+      serviceCentreId,
+      'English warning @ 5pm / lift outage',
+      'Rhybudd gyda @ 5pm / diffyg lifft ŵ ŷ â ê î ô û'
+    );
 
     expect(result.type).toBe('saved');
     expect(getServiceCentreByIdStub.calledOnce).toBe(true);
     expect(updateServiceCentreStub.calledOnce).toBe(true);
     expect(updateServiceCentreStub.firstCall.args[0]).toMatchObject({
-      warningNotice: 'English warning',
-      warningNoticeCy: 'Rhybudd gyda ŵ ŷ â ê î ô û',
+      warningNotice: 'English warning @ 5pm / lift outage',
+      warningNoticeCy: 'Rhybudd gyda @ 5pm / diffyg lifft ŵ ŷ â ê î ô û',
     });
   });
 

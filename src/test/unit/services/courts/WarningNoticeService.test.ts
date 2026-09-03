@@ -178,7 +178,7 @@ describe('CourtWarningNoticeService', () => {
 
     const result = await service.save(courtId, {
       warningNotice: 'Temporary closure @ 5pm',
-      warningNoticeCy: 'Cau dros dro @ 5pm',
+      warningNoticeCy: 'Cau_dros_dro @ 5pm',
     });
 
     expect(result).toEqual({
@@ -188,7 +188,7 @@ describe('CourtWarningNoticeService', () => {
         courtName: 'Reading Crown Court',
         form: {
           warningNotice: 'Temporary closure @ 5pm',
-          warningNoticeCy: 'Cau dros dro @ 5pm',
+          warningNoticeCy: 'Cau_dros_dro @ 5pm',
         },
         errors: {
           warningNoticeCy:
@@ -204,6 +204,25 @@ describe('CourtWarningNoticeService', () => {
       },
     });
     expect(updateCourt).not.toHaveBeenCalled();
+  });
+
+  test('allows Welsh warning notice to include Welsh letters and English punctuation', async () => {
+    const { updateCourt, service } = buildService({
+      updateCourt: jest.fn().mockResolvedValue({ id: courtId }),
+    });
+
+    const result = await service.save(courtId, {
+      warningNotice: 'Temporary closure @ 5pm / lift outage',
+      warningNoticeCy: 'Cau dros dro @ 5pm / diffyg lifft gyda ŵ ŷ â ê î ô û',
+    });
+
+    expect(updateCourt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        warningNotice: 'Temporary closure @ 5pm / lift outage',
+        warningNoticeCy: 'Cau dros dro @ 5pm / diffyg lifft gyda ŵ ŷ â ê î ô û',
+      })
+    );
+    expect(result.type).toBe('success');
   });
 
   test('returns status when updateCourt returns an error status', async () => {
