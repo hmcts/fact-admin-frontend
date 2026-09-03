@@ -68,4 +68,21 @@ describe('Court Address Edit View', () => {
     expect(html).toContain('Select yes if this applies to a court type');
     expect(html).toContain('Enter a postcode');
   });
+
+  test('preserves an LPI selection through hidden identity fields', () => {
+    const html = env.render('court-address-edit.njk', {
+      ...baseContext,
+      address: {
+        ...baseContext.address,
+        osAddressDataset: 'LPI',
+        osAddressUprn: '100',
+        osAddressLpiKey: 'lpi-100',
+        osAddressSelectionPostcode: 'BS15AH',
+      },
+    });
+
+    expect(html).toContain('name="osAddressDataset" value="LPI"');
+    expect(html).toContain('name="osAddressUprn" value="100"');
+    expect(html).toContain('name="osAddressLpiKey" value="lpi-100"');
+  });
 });

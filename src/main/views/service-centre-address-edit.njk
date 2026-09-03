@@ -3,6 +3,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
 
 {% block pageTitle %}
@@ -27,6 +28,13 @@
       {% endset %}
 
       <form action="{{ actionUrl }}" method="post">
+
+        {% if address.osAddressDataset and address.osAddressUprn %}
+          <input type="hidden" name="osAddressDataset" value="{{ address.osAddressDataset }}">
+          <input type="hidden" name="osAddressUprn" value="{{ address.osAddressUprn }}">
+          <input type="hidden" name="osAddressLpiKey" value="{{ address.osAddressLpiKey }}">
+          <input type="hidden" name="osAddressSelectionPostcode" value="{{ address.osAddressSelectionPostcode }}">
+        {% endif %}
 
         {% if isNewSC %}
           <input type="hidden" name="isNewSC" value="true">

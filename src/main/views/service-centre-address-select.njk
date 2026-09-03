@@ -18,7 +18,7 @@
 {% if addresses.length %}
   {% for row in addresses %}
     {% set addressOptions = (addressOptions.push(
-      { value: row | dump, text: row.ADDRESS }
+      { value: row | dump, text: row.address }
     ), addressOptions) %}
   {% endfor %}
 {% endif %}
@@ -30,27 +30,35 @@
 
       <p class="govuk-body">Postcode: {{ postcode }}.</p>
 
+      {% if addresses.length %}
+        <form method="POST" action="{{ actionUrl }}">
+
+          <input type="hidden" name="postcode" value="{{ postcode }}">
+
+          {% if isNewSC %}
+            <input type="hidden" name="isNewSC" value="true">
+          {% endif %}
+
+          {{ govukSelect({
+            id: "address",
+            name: "address",
+            label: {
+              text: "Choose an address"
+            },
+            items: addressOptions
+          }) }}
+
+          {{ govukButton({
+            text: "Continue"
+          }) }}
+        </form>
+      {% else %}
+        <p class="govuk-body">No addresses were found for this postcode. Enter the address manually.</p>
+      {% endif %}
+
       <form method="POST" action="{{ actionUrl }}">
 
-        {% if isNewSC %}
-          <input type="hidden" name="isNewSC" value="true">
-        {% endif %}
-
-        {{ govukSelect({
-          id: "address",
-          name: "address",
-          label: {
-            text: "Choose an address"
-          },
-          items: addressOptions
-        }) }}
-
-        {{ govukButton({
-          text: "Continue"
-        }) }}
-      </form>
-
-      <form method="POST" action="{{ actionUrl }}">
+        <input type="hidden" name="postcode" value="{{ postcode }}">
 
         {% if isNewSC %}
           <input type="hidden" name="isNewSC" value="true">
