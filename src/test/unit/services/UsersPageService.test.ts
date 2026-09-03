@@ -140,6 +140,14 @@ describe('UsersPageService', () => {
   test('validates pagination and sort query params before calling the users API', async () => {
     const filtersService = new UsersPageFiltersService();
 
+    expect(filtersService.validateFilters(filtersService.getFilters({ search: 'a'.repeat(250) }))).toEqual([]);
+    expect(filtersService.validateFilters(filtersService.getFilters({ search: 'a'.repeat(251) }))).toEqual([
+      {
+        href: '#search',
+        text: 'Search must only include letters, numbers, @ symbols, dots, underscores, plus signs and hyphens.',
+      },
+    ]);
+
     expect(filtersService.validateFilters(filtersService.getFilters({ pageSize: '0' }))).toEqual([
       { href: '#main-content', text: 'pageSize must be greater than 0' },
     ]);
