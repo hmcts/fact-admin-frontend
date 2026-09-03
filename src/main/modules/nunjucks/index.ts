@@ -13,8 +13,10 @@ export class Nunjucks {
     const govukTemplates = path.dirname(require.resolve('govuk-frontend/package.json')) + '/dist';
     const mojTemplates = path.dirname(require.resolve('@ministryofjustice/frontend/package.json'));
     const viewsPath = path.join(__dirname, '..', '..', 'views');
+    const courtViewsPath = path.join(viewsPath, 'courts');
+    const serviceCentreViewsPath = path.join(viewsPath, 'service-centres');
 
-    nunjucks.configure([govukTemplates, mojTemplates, viewsPath], {
+    nunjucks.configure([govukTemplates, mojTemplates, viewsPath, courtViewsPath, serviceCentreViewsPath], {
       autoescape: true,
       watch: this.developmentMode,
       express: app,

@@ -5,10 +5,10 @@ import { app } from '../../main/app';
 import { ServiceCentreApi } from '../../main/requests/ServiceCentreApi';
 import { UserApi } from '../../main/requests/UserApi';
 import { ApprovalService } from '../../main/services/ApprovalService';
-import { CounterServiceOpeningHoursService } from '../../main/services/CounterServiceOpeningHoursService';
 import { HomePageService } from '../../main/services/HomePageService';
 import { UsersPageService } from '../../main/services/UsersPageService';
-import { WarningNoticeService } from '../../main/services/WarningNoticeService';
+import { CounterServiceOpeningHoursService } from '../../main/services/courts/CounterServiceOpeningHoursService';
+import { CourtWarningNoticeService } from '../../main/services/courts/CourtWarningNoticeService';
 
 const emptyUsersFilters = {
   pageNumber: 0,
@@ -200,7 +200,7 @@ describe('Authentication routing', () => {
       counterServiceOpeningHours: [],
       pageTitle: 'Counter service opening hours - Reading Crown Court',
     });
-    stub(WarningNoticeService.prototype, 'getWarningNoticePage').resolves({
+    stub(CourtWarningNoticeService.prototype, 'getWarningNoticePage').resolves({
       courtId,
       courtName: 'Reading Crown Court',
       errorSummary: [],
