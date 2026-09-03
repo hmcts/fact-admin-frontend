@@ -273,4 +273,90 @@ describe('CourtLocalAuthoritiesController', () => {
       updateStub.restore();
     }
   });
+
+  test('updates with empty selections and renders success page when request body is missing', async () => {
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    request.body = undefined;
+    const responseMock = mock(response);
+
+    const updateStub = stub(localAuthoritiesService, 'update').resolves({
+      status: 'saved',
+      courtName: 'Reading Crown Court',
+    });
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('local-authorities-success', {
+        courtId: COURT_ID,
+        courtName: 'Reading Crown Court',
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
+          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
+          { href: '#', text: 'Local authorities saved' },
+        ],
+      });
+
+    try {
+      await controller.updateLocalAuthorities(request, response);
+      assert.calledOnce(updateStub);
+      assert.calledWith(updateStub, COURT_ID, {});
+      responseMock.verify();
+    } finally {
+      updateStub.restore();
+    }
+  });
+
+  test('ignores duplicate, unsupported and empty-id selection keys when building update payload', async () => {
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    request.body = {
+      [`Adoption.${ADOPTION_AREA_ID}`]: LA_ID_1,
+      [`Adoption.${DIVORCE_AREA_ID}`]: LA_ID_2,
+      [`Unknown.${CHILDREN_AREA_ID}`]: LA_ID_3,
+      'Children.': LA_ID_3,
+    };
+    const responseMock = mock(response);
+
+    const updateStub = stub(localAuthoritiesService, 'update').resolves({
+      status: 'saved',
+      courtName: 'Reading Crown Court',
+    });
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('local-authorities-success', {
+        courtId: COURT_ID,
+        courtName: 'Reading Crown Court',
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
+          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
+          { href: '#', text: 'Local authorities saved' },
+        ],
+      });
+
+    try {
+      await controller.updateLocalAuthorities(request, response);
+      assert.calledOnce(updateStub);
+      assert.calledWith(updateStub, COURT_ID, {
+        Adoption: {
+          areaOfLawId: ADOPTION_AREA_ID,
+          localAuthorities: [{ id: LA_ID_1, selected: true }],
+        },
+      });
+      responseMock.verify();
+    } finally {
+      updateStub.restore();
+    }
+  });
 });
