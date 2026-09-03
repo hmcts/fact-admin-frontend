@@ -536,4 +536,131 @@ describe('AuditController', () => {
     });
     responseMock.verify();
   });
+
+  test('renders validation-error search result and preserves errors', async () => {
+    const viewModel = {
+      filters: {
+        pageNumber: -1,
+        pageSize: 25,
+        email: 'admin@example.com',
+        subjectType: 'COURT',
+        courtId: '11111111-1111-4111-8111-111111111111',
+        serviceCentreId: undefined,
+        fromDate: '2026-06-25',
+        toDate: '',
+      },
+      audits: {
+        content: [],
+        page: {
+          number: -1,
+          size: 25,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+      errors: {
+        pageNumber: ['Page number must be 1 or greater'],
+      },
+      subjects: new Map([['COURT', new Map([['11111111-1111-4111-8111-111111111111', 'Reading Crown Court']])]]),
+    };
+
+    const categories = [
+      {
+        heading: { text: 'Page number' },
+        items: [{ text: 'Page number must be 1 or greater', href: '#pageNumber' }],
+      },
+    ];
+
+    const auditService = {
+      getAudits: stub().resolves(viewModel),
+    };
+    const auditFilterCategoriesService = {
+      buildFilterCategories: stub().returns(categories),
+    };
+
+    const controller = new AuditController(auditService as never, auditFilterCategoriesService as never);
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.query = {
+      pageNumber: '0',
+      pageSize: '25',
+      email: 'admin@example.com',
+      subjectType: 'COURT',
+      courtId: '11111111-1111-4111-8111-111111111111',
+      fromDate: '25/6/2026',
+    };
+
+    const responseMock = mock(response);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'audit-list',
+        match((renderModel: Record<string, unknown>) => {
+          const filters = renderModel.filters as { pageNumber?: number };
+          const errors = renderModel.errors as Record<string, unknown> | undefined;
+
+          return (
+            renderModel.pageTitle === 'Error: Audits' &&
+            renderModel.downloadUrl === undefined &&
+            filters?.pageNumber === 1 &&
+            errors?.pageNumber !== undefined
+          );
+        })
+      );
+
+    await controller.renderAuditSearchPage(request, response);
+
+    assert.calledWith(auditFilterCategoriesService.buildFilterCategories, {
+      pageNumber: 1,
+      pageSize: 25,
+      email: 'admin@example.com',
+      subjectType: 'COURT',
+      courtId: '11111111-1111-4111-8111-111111111111',
+      serviceCentreId: undefined,
+      fromDate: '25/6/2026',
+      toDate: '',
+    });
+    responseMock.verify();
+  });
+
+  test('does not render error when download send fails after headers are sent', async () => {
+    const auditService = {
+      generateCsv: stub().resolves({
+        filename: 'audits-2026-06-26.csv',
+        filePath: '/tmp/audit-controller-test.csv',
+      }),
+    };
+    const controller = new AuditController(auditService as never, {} as never);
+    const response = {
+      download: () => '',
+      headersSent: true,
+      render: () => '',
+      status: () => response,
+      setHeader: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    stub(fs, 'unlink').callsFake((_path, callback) => callback(null));
+
+    const responseMock = mock(response);
+    responseMock
+      .expects('download')
+      .once()
+      .callsFake((_path: string, _filename: string, cb: (err: Error | null) => void) => {
+        cb(new Error('download failed'));
+      });
+    responseMock.expects('status').never();
+    responseMock.expects('render').never();
+
+    await controller.downloadAudits(request, response);
+
+    assert.calledOnce(auditService.generateCsv);
+    expect(mockAuditControllerLogger.error).toHaveBeenCalledWith(
+      'audit.export.download_failed: filename=audits-2026-06-26.csv, headersSent=true',
+      expect.any(Error)
+    );
+    responseMock.verify();
+  });
 });
