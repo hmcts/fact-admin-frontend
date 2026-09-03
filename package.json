@@ -60,7 +60,7 @@
     "@babel/preset-typescript": "7.29.7",
     "@codeceptjs/allure-legacy": "1.0.2",
     "@codeceptjs/configure": "1.0.6",
-    "@eslint/eslintrc": "3.3.6",
+    "@eslint/eslintrc": "3.3.7",
     "@eslint/js": "9.39.5",
     "@hmcts/playwright-common": "1.1.5",
     "@playwright/test": "1.62.1",
@@ -74,7 +74,7 @@
     "@types/lodash": "4.17.25",
     "@types/moment-timezone": "0.5.30",
     "@types/multer": "2.2.0",
-    "@types/node": "26.4.0",
+    "@types/node": "26.4.1",
     "@types/nunjucks": "3.2.6",
     "@types/pa11y": "5.3.7",
     "@types/supertest": "7.2.1",
@@ -92,7 +92,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jest": "29.16.6",
     "get-port": "7.2.0",
-    "globals": "17.11.0",
+    "globals": "17.12.0",
     "html-webpack-plugin": "5.6.8",
     "jest": "30.5.1",
     "jest-html-reporter": "4.4.0",
@@ -112,14 +112,15 @@
     "supertest": "7.2.2",
     "ts-jest": "29.4.12",
     "ts-loader": "9.6.2",
-    "webpack": "5.110.2",
+    "webpack": "5.110.3",
     "webpack-cli": "7.2.3",
     "webpack-dev-middleware": "8.1.1"
   },
   "resolutions": {
     "@opentelemetry/exporter-prometheus": "0.221.0",
     "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.10.0",
-    "@opentelemetry/sdk-node": "0.221.0"
+    "@opentelemetry/sdk-node": "0.221.0",
+    "qs": "6.16.0"
   },
   "packageManager": "yarn@4.18.0"
 }

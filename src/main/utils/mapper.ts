@@ -1,8 +1,8 @@
 import { UpdateAccessibilityRequest } from '../requests/types/UpdateAccessibilityRequest';
 import { HEARING_ENHANCEMENT_EQUIPMENT_MAP, HearingEnhancementEquipmentUi } from '../schemas/accessibilitySchema';
 import { FOOD_DRINK_OPTIONS, FoodDrinkOption } from '../schemas/buildingFacilitiesSchema';
-import { AccessibilityModel } from '../services/AccessibilityService';
-import { FacilityModel } from '../services/BuildingFacilitiesService';
+import { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
+import { FacilityModel } from '../services/courts/CourtBuildingFacilitiesService';
 type FoodDrinkBooleans = Record<FoodDrinkOption, boolean | null>;
 
 // Map the food and drink options to the expected boolean values for the API
