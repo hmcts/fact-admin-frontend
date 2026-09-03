@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type * as express from 'express';
 import helmet from 'helmet';
 
-
 import { Helmet } from '../../../../main/modules/helmet';
 
 jest.mock('helmet', () => {
