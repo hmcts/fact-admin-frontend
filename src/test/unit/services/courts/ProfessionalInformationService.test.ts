@@ -205,6 +205,34 @@ describe('CourtProfessionalInformationService', () => {
     });
   });
 
+  test('saves Welsh DX and fax descriptions that use decomposed diacritics', async () => {
+    const courtApi = buildCourtApi({
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
+    }) as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+    const service = new CourtProfessionalInformationService(courtApi as never);
+    const welshWithCombiningMarks = 'Disgrifiad gyda w\u0302 y\u0302 a\u0302 e\u0302 i\u0302 o\u0302 u\u0302';
+
+    const result = await service.save(courtId, {
+      'dxCode-0': 'DX 12345',
+      'dxCodeDescription-0': 'Documents',
+      'dxCodeDescriptionCy-0': welshWithCombiningMarks,
+      'faxNumber-0': '01273 800 900',
+      'faxNumberDescription-0': 'Main fax',
+      'faxNumberDescriptionCy-0': welshWithCombiningMarks,
+    });
+
+    expect(result).toMatchObject({ status: 'saved' });
+    expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalledWith(
+      courtId,
+      expect.objectContaining({
+        dxCodes: [expect.objectContaining({ explanationCy: welshWithCombiningMarks })],
+        faxNumbers: [expect.objectContaining({ descriptionCy: welshWithCombiningMarks })],
+      })
+    );
+  });
+
   test('saves optional empty fields as nulls, empty arrays and false booleans', async () => {
     const courtApi = buildCourtApi() as never as {
       saveCourtProfessionalInformation: jest.Mock;
