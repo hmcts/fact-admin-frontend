@@ -1,7 +1,10 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../../../main/requests/CourtApi';
-import { CourtProfessionalInformationService } from '../../../../main/services/courts/CourtProfessionalInformationService';
+import {
+  CourtProfessionalInformationService,
+  ProfessionalInformationViewModel,
+} from '../../../../main/services/courts/CourtProfessionalInformationService';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 const court = {
@@ -856,10 +859,52 @@ describe('CourtProfessionalInformationService', () => {
     });
   });
 
-  test('covers API error classifier helper branches through typed access', () => {
+  test('validates repeatable entries and oversized DX codes', () => {
+    const service = new CourtProfessionalInformationService(buildCourtApi());
+    const serviceTestAccess = service as unknown as {
+      validate: (viewModel: ProfessionalInformationViewModel) => { href: string; text: string }[];
+    };
+    const sparseViewModel: ProfessionalInformationViewModel = {
+      courtId,
+      courtName: court.name,
+      courtTypeOptions: [],
+      dxCodes: [{}],
+      errorSummary: [],
+      faxNumbers: [{}],
+      fieldErrors: {},
+      gbs: '',
+      interviewPhoneNumber: '',
+      interviewRoomCount: '',
+      interviewRooms: false,
+      pageTitle: 'Information for professionals - Reading Crown Court',
+      selectedCourtTypeCodes: {
+        countyCourtCode: '',
+        crownCourtCode: '',
+        familyCourtCode: '',
+        magistrateCourtCode: '',
+        tribunalCode: '',
+      },
+      selectedCourtTypes: [],
+      videoHearings: false,
+    };
+
+    expect(serviceTestAccess.validate(sparseViewModel)).toEqual([]);
+    expect(
+      serviceTestAccess.validate({
+        ...sparseViewModel,
+        dxCodes: [{ code: 'X'.repeat(201) }],
+      })
+    ).toContainEqual({
+      href: '#dxCode-0',
+      text: 'DX code 1: DX code must be 200 characters or fewer',
+    });
+  });
+
+  test('normalises less common API errors and scalar values', () => {
     const service = new CourtProfessionalInformationService(buildCourtApi());
     const serviceTestAccess = service as unknown as {
       apiErrorHref: (field: string, text: string) => string;
+      apiErrorText: (field: string, text: string, href?: string) => string;
       toString: (value: string | string[] | undefined) => string;
       toOptionalNumber: (value: string | number | null | undefined) => number | null;
     };
@@ -871,9 +916,17 @@ describe('CourtProfessionalInformationService', () => {
     expect(serviceTestAccess.apiErrorHref('faxnumbers[2].description', 'invalid value')).toBe(
       '#faxNumberDescription-2'
     );
+    expect(serviceTestAccess.apiErrorHref('dxcodes.legacy.explanation', 'invalid value')).toBe('#dxCodeDescription-0');
+    expect(serviceTestAccess.apiErrorHref('faxnumbers.legacy.description', 'invalid value')).toBe(
+      '#faxNumberDescription-0'
+    );
     expect(serviceTestAccess.apiErrorHref('otherField', 'phone must match the regex')).toBe('#faxNumber-0');
+    expect(serviceTestAccess.apiErrorText('fax', 'invalid characters', '#other')).toBe(
+      'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000'
+    );
     expect(serviceTestAccess.toString(['value-one', 'value-two'])).toBe('value-one');
     expect(serviceTestAccess.toString([])).toBe('');
+    expect(serviceTestAccess.toOptionalNumber(123)).toBe(123);
     expect(serviceTestAccess.toOptionalNumber('123')).toBe(123);
     expect(serviceTestAccess.toOptionalNumber('')).toBeNull();
   });

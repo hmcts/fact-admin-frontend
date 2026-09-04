@@ -31,6 +31,9 @@ const errorMessage = {
 };
 
 describe('CourtApi', () => {
+  const testContactDetailId = '22222222-2222-4222-8222-222222222222';
+  const testCourtId = '55555555-5555-4555-8555-555555555555';
+  const testRecordId = '33333333-3333-4333-8333-333333333333';
   let getStub: sinon.SinonStub;
   let postStub: sinon.SinonStub;
   let putStub: sinon.SinonStub;
@@ -2630,5 +2633,148 @@ describe('CourtApi', () => {
     const response = await courtApi.deleteCourtPhoto(courtId);
 
     expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns parsed court contact details when the response is valid', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const contactDetails = [
+      {
+        courtContactDescriptionId: '11111111-1111-4111-8111-111111111111',
+        email: 'enquiries@example.com',
+        explanation: 'General enquiries',
+        explanationCy: null,
+        id: '22222222-2222-4222-8222-222222222222',
+        phoneNumber: '01234 567890',
+      },
+    ];
+
+    getStub.withArgs(`/courts/${courtId}/v1/contact-details`).resolves({ data: contactDetails });
+
+    await expect(courtApi.getCourtContactDetails(courtId)).resolves.toEqual(contactDetails);
+  });
+
+  it('returns no content when deleting a court contact detail succeeds', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const contactDetailId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub
+      .withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`)
+      .resolves({ status: HttpStatusCode.NoContent });
+
+    await expect(courtApi.deleteCourtContactDetail(courtId, contactDetailId)).resolves.toBe(HttpStatusCode.NoContent);
+  });
+
+  it('returns internal server error when deleting a court contact detail returns an unexpected status', async () => {
+    const courtId = '55555555-5555-4555-8555-555555555555';
+    const contactDetailId = '22222222-2222-4222-8222-222222222222';
+
+    deleteStub
+      .withArgs(`/courts/${courtId}/v1/contact-details/${contactDetailId}`)
+      .resolves({ status: HttpStatusCode.Ok });
+
+    await expect(courtApi.deleteCourtContactDetail(courtId, contactDetailId)).resolves.toBe(
+      HttpStatusCode.InternalServerError
+    );
+  });
+
+  it.each([
+    ['creating a court', 'post', () => courtApi.createCourt({ name: 'Test court', open: true, regionId: testCourtId })],
+    [
+      'updating court areas of law',
+      'put',
+      () => courtApi.updateCourtAreasOfLaw({ areasOfLaw: [], courtId: testCourtId }),
+    ],
+    ['getting court contact details', 'get', () => courtApi.getCourtContactDetails(testCourtId)],
+    ['creating a court contact detail', 'post', () => courtApi.createCourtContactDetail(testCourtId, {} as never)],
+    [
+      'updating a court contact detail',
+      'put',
+      () => courtApi.updateCourtContactDetail(testCourtId, testContactDetailId, {} as never),
+    ],
+    [
+      'deleting a court contact detail',
+      'delete',
+      () => courtApi.deleteCourtContactDetail(testCourtId, testContactDetailId),
+    ],
+    ['getting court opening hours by id', 'get', () => courtApi.getCourtOpeningHoursById(testCourtId, testRecordId)],
+    ['saving court opening hours', 'put', () => courtApi.saveCourtOpeningHours(testCourtId, {})],
+    ['deleting court opening hours', 'delete', () => courtApi.deleteCourtOpeningHours(testCourtId, testRecordId)],
+    ['getting translation services', 'get', () => courtApi.getTranslationServices(testCourtId)],
+    [
+      'saving translation services',
+      'post',
+      () => courtApi.saveTranslationServices(testCourtId, { courtId: testCourtId, email: null, phoneNumber: null }),
+    ],
+    [
+      'getting counter service opening hours by id',
+      'get',
+      () => courtApi.getCounterServiceOpeningHoursById(testCourtId, testRecordId),
+    ],
+    ['getting a court photo', 'get', () => courtApi.getCourtPhotoFileLink(testCourtId)],
+    [
+      'updating a court photo',
+      'post',
+      () => courtApi.updateCourtPhoto(testCourtId, Buffer.from('photo'), 'image/jpeg'),
+    ],
+    ['deleting a court photo', 'delete', () => courtApi.deleteCourtPhoto(testCourtId)],
+  ] as const)('returns internal server error when %s fails with a non-Axios error', async (_name, method, request) => {
+    const requestStubs = { delete: deleteStub, get: getStub, post: postStub, put: putStub };
+    requestStubs[method].rejects(errorMessage);
+
+    await expect(request()).resolves.toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it.each([
+    ['getting a court by name', 'get', () => courtApi.getCourtByName('Test court')],
+    ['getting court contact details', 'get', () => courtApi.getCourtContactDetails(testCourtId)],
+    [
+      'deleting a court contact detail',
+      'delete',
+      () => courtApi.deleteCourtContactDetail(testCourtId, testContactDetailId),
+    ],
+    ['updating court local authorities', 'put', () => courtApi.updateCourtLocalAuthorities(testCourtId, [])],
+    ['updating court single point of entry', 'put', () => courtApi.updateCourtSinglePointOfEntry(testCourtId, [])],
+    [
+      'saving court professional information',
+      'post',
+      () => courtApi.saveCourtProfessionalInformation(testCourtId, {} as never),
+    ],
+    ['getting building facilities', 'get', () => courtApi.getBuildingFacilities(testCourtId)],
+    ['updating building facilities', 'post', () => courtApi.updateBuildingFacilities(testCourtId, {} as never)],
+    ['getting accessibility options', 'get', () => courtApi.getAccessibility(testCourtId)],
+    ['updating accessibility options', 'post', () => courtApi.updateAccessibility(testCourtId, {} as never)],
+    [
+      'updating a court photo',
+      'post',
+      () => courtApi.updateCourtPhoto(testCourtId, Buffer.from('photo'), 'image/jpeg'),
+    ],
+  ] as const)('returns conflict when %s fails with an Axios response', async (_name, method, request) => {
+    const requestStubs = { delete: deleteStub, get: getStub, post: postStub, put: putStub };
+    requestStubs[method].rejects({
+      isAxiosError: true,
+      response: {
+        data: 'conflict',
+        status: HttpStatusCode.Conflict,
+      },
+    });
+
+    await expect(request()).resolves.toBe(HttpStatusCode.Conflict);
+  });
+
+  it.each([
+    ['getting', 'get', () => courtApi.getCourtPhotoFileLink(testCourtId)],
+    ['updating', 'post', () => courtApi.updateCourtPhoto(testCourtId, Buffer.from('photo'), 'image/jpeg')],
+  ] as const)('returns undefined when %s a court photo without a file link', async (_name, method, request) => {
+    const requestStubs = { get: getStub, post: postStub };
+    requestStubs[method].resolves({
+      data: {
+        courtId: testCourtId,
+        fileLink: null,
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        lastUpdatedAt: '2026-04-29T10:00:00Z',
+      },
+    });
+
+    await expect(request()).resolves.toBeUndefined();
   });
 });
