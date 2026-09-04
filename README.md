@@ -96,6 +96,7 @@ Start Redis:
 ```bash
 docker compose up -d
 ```
+
 Stop Redis:
 
 ```bash
@@ -106,20 +107,17 @@ Redis is exposed on `127.0.0.1:6379`.
 
 To run the frontend application, use the normal app commands (for example `yarn start:dev`).
 
-
 ### Healthcheck
 
 The frontend exposes a health endpoint at `https://localhost:3355/health`, implemented in [`HealthController.ts`](src/main/controllers/HealthController.ts) using the [Nodejs Healthcheck](https://github.com/hmcts/nodejs-healthcheck) library.
 
 The `/info` endpoint also reports downstream Data API health. That check is performed by [`OperationsApi.ts`](src/main/requests/OperationsApi.ts) via `checkHealth()`, which calls the Data API `/health` endpoint.
 
-
 ### Maintenance mode
 
 Set `MAINTENANCE_MODE=true` to show a service unavailable page to authenticated Admin and Viewer users. SuperAdmin
 users retain access to the application. If the variable is missing or set to any value other than `true`, maintenance
 mode is disabled.
-
 
 ## Development
 
@@ -243,9 +241,11 @@ Security header behavior is configured in [`src/main/modules/helmet/index.ts`](s
 Example config:
 
 ```json
-    "security": {
-      "referrerPolicy": "origin"
-    }
+{
+  "security": {
+    "referrerPolicy": "origin"
+  }
+}
 ```
 
 Make sure you have those values set correctly for your application.
@@ -263,7 +263,6 @@ Contributions are welcome. Please keep changes focused, update tests/docs where 
 - Route tests pass: `yarn test:routes`
 - Functional/a11y checks as needed: `yarn test:functional`
 - Manual testing: verify core user flows locally
-
 
 ## License
 
