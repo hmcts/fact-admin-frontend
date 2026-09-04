@@ -38,6 +38,44 @@ yarn start:dev
 
 The application home page will be available at https://localhost:3355/
 
+### Environment variables (local)
+
+Set the required environment variables before running the app locally.
+
+> Note: local app startup (`yarn start:dev`) reads environment variables from your shell/run configuration. Ensure these values are exported in your terminal (or configured in your IDE run config) before starting the app.
+
+#### Required for app startup
+
+```bash
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_LOCAL=true
+```
+
+#### Required for login/auth & API flows
+
+```bash
+SSO_APP_REG_ID=...
+SSO_APP_REG_SECRET=...
+SSO_APP_REG_TENANT_ID=...
+API_APP_REG_ID=...
+FRONTEND_APP_REG_ID=...
+FRONTEND_APP_REG_SECRET=...
+AZURE_TENANT_ID=...
+```
+
+`DATA_API_URL` defaults to `http://localhost:8989` and `FRONTEND_URL` defaults to `https://localhost:3355`; set them only when using non-default endpoints.
+
+SSO test account credentials are required for login-based functional tests and should be requested via your team’s secure secret-management process (for example, your team lead/line manager).
+
+#### Optional for functional tests (Playwright)
+
+```bash
+TEST_URL=...
+PLAYWRIGHT_REPORTERS=...
+PLAYWRIGHT_VIDEO_MODE=...
+PW_ODHIN_CONSOLE_LOG=...
+```
 
 ### Running Redis locally with Docker
 
@@ -47,13 +85,7 @@ This is configured in the [app.ts](./src/main/app.ts) file.
 
 Alongside this, the local unit/route tests use a mock Redis implementation to simulate the interactions.
 
-For local development against the Redis container in `docker-compose.yml`, set:
-
-```bash
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-REDIS_LOCAL=true
-```
+Use the Redis environment variables listed in [Environment variables (local)](#environment-variables-local) before starting Redis locally.
 
 `REDIS_PASSWORD` is only needed when connecting to an environment Redis instance that requires authentication.
 
