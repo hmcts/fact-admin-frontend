@@ -181,4 +181,28 @@ describe('accessibilityValidationConfig.validate', () => {
 
     expect(result).toBeUndefined();
   });
+
+  test('rejects Welsh toilet descriptions with unsupported punctuation', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: '01234567890',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '01234567891',
+      lift: true,
+      liftDoorWidth: 100,
+      liftDoorLimit: 500,
+      quietRoom: true,
+      accessibleToiletDescription: 'Ground floor and first floor',
+      accessibleToiletDescriptionCy: 'Llawr gwaelod!',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        accessibleToiletDescriptionCy: [
+          'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+        ],
+      })
+    );
+  });
 });

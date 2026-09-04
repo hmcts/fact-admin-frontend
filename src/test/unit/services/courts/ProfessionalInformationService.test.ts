@@ -158,12 +158,12 @@ describe('CourtProfessionalInformationService', () => {
       'dxCode-0': ' DX 12345 ',
       'dxCode-1': '',
       'dxCodeDescription-0': ' Documents ',
-      'dxCodeDescriptionCy-0': ' Dogfennau ',
+      'dxCodeDescriptionCy-0': ' Dogfennau ŵ ŷ â ê î ô û ',
       'dxCodeDescription-1': '',
       familyCourtCode: '123',
       'faxNumber-0': ' 01273 800 900 ',
       'faxNumberDescription-0': ' Main fax ',
-      'faxNumberDescriptionCy-0': ' Prif ffacs ',
+      'faxNumberDescriptionCy-0': ' Prif ffacs ŵ ŷ â ê î ô û ',
       gbs: ' GBS123 ',
       interviewPhoneNumber: ' 020 7450 4000 ',
       interviewRoomCount: '2',
@@ -186,8 +186,14 @@ describe('CourtProfessionalInformationService', () => {
         magistrateCourtCode: null,
         tribunalCode: null,
       },
-      dxCodes: [{ dxCode: 'DX 12345', explanation: 'Documents', explanationCy: 'Dogfennau' }],
-      faxNumbers: [{ faxNumber: '01273 800 900', description: 'Main fax', descriptionCy: 'Prif ffacs' }],
+      dxCodes: [{ dxCode: 'DX 12345', explanation: 'Documents', explanationCy: 'Dogfennau ŵ ŷ â ê î ô û' }],
+      faxNumbers: [
+        {
+          faxNumber: '01273 800 900',
+          description: 'Main fax',
+          descriptionCy: 'Prif ffacs ŵ ŷ â ê î ô û',
+        },
+      ],
       professionalInformation: {
         accessScheme: false,
         commonPlatform: true,
@@ -197,6 +203,34 @@ describe('CourtProfessionalInformationService', () => {
         videoHearings: false,
       },
     });
+  });
+
+  test('saves Welsh DX and fax descriptions that use decomposed diacritics', async () => {
+    const courtApi = buildCourtApi({
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
+    }) as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+    const service = new CourtProfessionalInformationService(courtApi as never);
+    const welshWithCombiningMarks = 'Disgrifiad gyda w\u0302 y\u0302 a\u0302 e\u0302 i\u0302 o\u0302 u\u0302';
+
+    const result = await service.save(courtId, {
+      'dxCode-0': 'DX 12345',
+      'dxCodeDescription-0': 'Documents',
+      'dxCodeDescriptionCy-0': welshWithCombiningMarks,
+      'faxNumber-0': '01273 800 900',
+      'faxNumberDescription-0': 'Main fax',
+      'faxNumberDescriptionCy-0': welshWithCombiningMarks,
+    });
+
+    expect(result).toMatchObject({ status: 'saved' });
+    expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalledWith(
+      courtId,
+      expect.objectContaining({
+        dxCodes: [expect.objectContaining({ explanationCy: welshWithCombiningMarks })],
+        faxNumbers: [expect.objectContaining({ descriptionCy: welshWithCombiningMarks })],
+      })
+    );
   });
 
   test('saves optional empty fields as nulls, empty arrays and false booleans', async () => {
@@ -253,6 +287,34 @@ describe('CourtProfessionalInformationService', () => {
             'Fax number 2: You have entered a description without a fax number, please add a number or remove the description',
           gbs: 'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           interviewRoomCount: 'Enter a number of interview rooms between 1 and 150, or select No',
+        },
+      },
+    });
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+  });
+
+  test('returns validation errors when Welsh repeatable descriptions use unsupported punctuation', async () => {
+    const courtApi = buildCourtApi() as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
+      'dxCode-0': 'DX 12345',
+      'dxCodeDescription-0': 'Documents',
+      'dxCodeDescriptionCy-0': 'Dogfennau!',
+      'faxNumber-0': '01273 800 900',
+      'faxNumberDescription-0': 'Main fax',
+      'faxNumberDescriptionCy-0': 'Prif ffacs?',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        fieldErrors: {
+          'dxCodeDescriptionCy-0':
+            'DX code 1 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'faxNumberDescriptionCy-0':
+            'Fax number 1 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
         },
       },
     });
@@ -596,6 +658,54 @@ describe('CourtProfessionalInformationService', () => {
             'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           'faxNumberDescription-1':
             'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+        },
+      },
+    });
+  });
+
+  test('maps indexed Welsh API validation errors to the matching Welsh repeatable field anchors', async () => {
+    const courtApi = buildCourtApi({
+      saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
+        new Map([
+          ['dxCodes[1].explanationCy', 'Contains invalid characters'],
+          ['faxNumbers[1].descriptionCy', 'Contains invalid characters'],
+        ])
+      ),
+    });
+
+    const result = await new CourtProfessionalInformationService(courtApi).save(courtId, {
+      'dxCode-0': 'DX 123',
+      'dxCode-1': 'DX 456',
+      'dxCodeDescription-0': 'Documents one',
+      'dxCodeDescriptionCy-0': 'Dogfennau un',
+      'dxCodeDescription-1': 'Documents two',
+      'dxCodeDescriptionCy-1': 'Dogfennau dau',
+      'faxNumber-0': '020 0000 0000',
+      'faxNumber-1': '020 0000 0001',
+      'faxNumberDescription-0': 'Main fax',
+      'faxNumberDescriptionCy-0': 'Prif ffacs',
+      'faxNumberDescription-1': 'Second fax',
+      'faxNumberDescriptionCy-1': 'Ail ffacs',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        errorSummary: [
+          {
+            href: '#dxCodeDescriptionCy-1',
+            text: 'DX code 2 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+          {
+            href: '#faxNumberDescriptionCy-1',
+            text: 'Fax number 2 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          },
+        ],
+        fieldErrors: {
+          'dxCodeDescriptionCy-1':
+            'DX code 2 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'faxNumberDescriptionCy-1':
+            'Fax number 2 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
         },
       },
     });

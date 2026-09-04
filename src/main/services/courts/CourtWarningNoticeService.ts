@@ -4,7 +4,7 @@ import { CourtApi } from '../../requests/CourtApi';
 import { isHttpStatusCode } from '../../utils/valueParsers';
 
 const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
-const welshWarningFormatRegex = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
+const welshWarningFormatRegex = /^[\p{L}0-9.,!?:;'"()\-/&@+\s]+$/u;
 
 export type WarningNoticeForm = {
   warningNotice?: string;

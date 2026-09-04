@@ -4,7 +4,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 
 export const maxServiceCentreWarningNoticeLength = 250;
 const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
-const welshWarningFormatRegex = /^[\p{L}\p{N}\s.,'":;()!?&+-]*$/u;
+const welshWarningFormatRegex = /^[\p{L}0-9.,!?:;'"()\-/&@+\s]+$/u;
 
 export type ServiceCentreWarningNoticeViewModel = {
   errors?: Record<string, string[]>;
