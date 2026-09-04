@@ -30,6 +30,9 @@
       <form action="{{ actionUrl }}" method="post">
 
         {% if address.osAddressDataset and address.osAddressUprn %}
+          {# The API looks up the chosen OS record again before saving coordinates. These
+             fields carry its identity across this edit step; they are not treated as trusted data.
+             The selection postcode lets the controller drop them if the postcode is changed. #}
           <input type="hidden" name="osAddressDataset" value="{{ address.osAddressDataset }}">
           <input type="hidden" name="osAddressUprn" value="{{ address.osAddressUprn }}">
           <input type="hidden" name="osAddressLpiKey" value="{{ address.osAddressLpiKey }}">

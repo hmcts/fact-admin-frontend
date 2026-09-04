@@ -445,10 +445,10 @@ export default class ServiceCentreAddressController extends BaseController {
     serviceCentreName: string,
     addressId?: string,
     addressModel?: Partial<ServiceCentreAddress>,
-    dpaAddressData?: string,
+    addressOptionData?: string,
     isNewSC: boolean = false
   ): Promise<void> {
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData, addressModel) : (addressModel ?? {});
+    const address = addressOptionData ? this.buildAddressData(addressOptionData, addressModel) : (addressModel ?? {});
 
     res.render('service-centre-address-edit', {
       address,
@@ -466,6 +466,8 @@ export default class ServiceCentreAddressController extends BaseController {
     serviceCentreId: string,
     addressId?: string
   ): Partial<ServiceCentreAddress> {
+    // The identifiers belong to the OS result selected on the previous page. If the
+    // postcode has since been edited, do not send stale selection data to the API.
     const selectionMatchesPostcode =
       normalisePostcode(body.postcode) === normalisePostcode(body.osAddressSelectionPostcode);
 
@@ -485,13 +487,13 @@ export default class ServiceCentreAddressController extends BaseController {
   }
 
   private buildAddressData(
-    dpaAddressData: string,
+    addressOptionData: string,
     existingAddress?: Partial<ServiceCentreAddress>
   ): Partial<ServiceCentreAddress> {
     const result: Partial<ServiceCentreAddress> = existingAddress ?? {};
 
     try {
-      const addressOption = osAddressOptionSchema.parse(JSON.parse(dpaAddressData));
+      const addressOption = osAddressOptionSchema.parse(JSON.parse(addressOptionData));
       result.addressLine1 = addressOption.addressLine1;
       result.addressLine2 = addressOption.addressLine2;
       result.county = addressOption.county;

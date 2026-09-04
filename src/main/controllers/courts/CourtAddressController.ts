@@ -282,7 +282,7 @@ export class CourtAddressController extends BaseController {
     aolSelected: boolean,
     ctSelected: boolean,
     courtAddress?: CourtAddress,
-    dpaAddressData?: string
+    addressOptionData?: string
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -294,7 +294,7 @@ export class CourtAddressController extends BaseController {
       return;
     }
 
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData) : (courtAddress ?? {});
+    const address = addressOptionData ? this.buildAddressData(addressOptionData) : (courtAddress ?? {});
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
@@ -405,7 +405,7 @@ export class CourtAddressController extends BaseController {
     courtAddress: CourtAddress,
     aolSelected: boolean,
     ctSelected: boolean,
-    dpaAddressData?: string
+    addressOptionData?: string
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -417,7 +417,7 @@ export class CourtAddressController extends BaseController {
       return;
     }
 
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData, courtAddress) : courtAddress;
+    const address = addressOptionData ? this.buildAddressData(addressOptionData, courtAddress) : courtAddress;
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
@@ -538,6 +538,8 @@ export class CourtAddressController extends BaseController {
     courtId: string,
     addressId?: string
   ): Partial<CourtAddress> {
+    // The identifiers belong to the OS result selected on the previous page. If the
+    // postcode has since been edited, do not send stale selection data to the API.
     const selectionMatchesPostcode =
       normalisePostcode(body.postcode) === normalisePostcode(body.osAddressSelectionPostcode);
 
@@ -559,10 +561,10 @@ export class CourtAddressController extends BaseController {
     };
   }
 
-  private buildAddressData(dpaAddressData: string, existingAddress?: CourtAddress): Partial<CourtAddress> {
+  private buildAddressData(addressOptionData: string, existingAddress?: CourtAddress): Partial<CourtAddress> {
     const result: Partial<CourtAddress> = existingAddress ?? {};
     try {
-      const addressOption = osAddressOptionSchema.parse(JSON.parse(dpaAddressData));
+      const addressOption = osAddressOptionSchema.parse(JSON.parse(addressOptionData));
 
       result.addressLine1 = addressOption.addressLine1;
       result.addressLine2 = addressOption.addressLine2;

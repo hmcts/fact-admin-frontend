@@ -33,8 +33,6 @@
       {% if addresses.length %}
         <form method="POST" action="{{ actionUrl }}">
 
-          <input type="hidden" name="postcode" value="{{ postcode }}">
-
           {% if isNewSC %}
             <input type="hidden" name="isNewSC" value="true">
           {% endif %}
@@ -57,8 +55,6 @@
       {% endif %}
 
       <form method="POST" action="{{ actionUrl }}">
-
-        <input type="hidden" name="postcode" value="{{ postcode }}">
 
         {% if isNewSC %}
           <input type="hidden" name="isNewSC" value="true">

@@ -2,6 +2,10 @@ import { DpaAddress, LpiAddress, OsAddressOption, OsData } from '../schemas/osDa
 
 const MAX_ADDRESS_LINE_LENGTH = 255;
 
+/**
+ * Converts the two OS result shapes into the one shape used by both admin address forms.
+ * DPA records stay first, so a property returned by both datasets keeps its DPA version.
+ */
 export function buildOsAddressOptions(osData: OsData, selectionPostcode: string): OsAddressOption[] {
   const optionsByKey = new Map<string, OsAddressOption>();
 
@@ -17,6 +21,8 @@ export function buildOsAddressOptions(osData: OsData, selectionPostcode: string)
     .map(lpi => buildLpiOption(lpi, selectionPostcode))
     .filter((option): option is OsAddressOption => option !== null);
 
+  // A property can appear in both datasets. UPRN identifies that property, while
+  // inserting DPA first keeps the postal address when both versions are available.
   for (const option of [...dpaOptions, ...lpiOptions]) {
     if (!optionsByKey.has(option.uprn)) {
       optionsByKey.set(option.uprn, option);
@@ -56,6 +62,10 @@ function buildDpaOption(dpa: DpaAddress, selectionPostcode: string): OsAddressOp
   };
 }
 
+/**
+ * Maps an LPI record to the same form fields as DPA. LPI uses separate primary and
+ * secondary addressable-object fields, so it cannot use the DPA mapping directly.
+ */
 function buildLpiOption(lpi: LpiAddress, selectionPostcode: string): OsAddressOption | null {
   const organisation = clean(lpi.ORGANISATION);
   const sao =

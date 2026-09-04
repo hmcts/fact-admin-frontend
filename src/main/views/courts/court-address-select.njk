@@ -34,8 +34,6 @@
       {% if addresses.length %}
         <form method="POST" action="{{ actionUrl }}">
 
-          <input type="hidden" name="postcode" value="{{ postcode }}">
-
           {{ govukSelect({
             id: "address",
             name: "address",
@@ -55,7 +53,6 @@
       {% endif %}
 
       <form method="POST" action="{{ actionUrl }}">
-        <input type="hidden" name="postcode" value="{{ postcode }}">
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"
