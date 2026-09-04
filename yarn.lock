@@ -7029,6 +7029,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ansi-html-community@npm:^0.0.8":
+  version: 0.0.8
+  resolution: "ansi-html-community@npm:0.0.8"
+  bin:
+    ansi-html: bin/ansi-html
+  checksum: 10/08df3696720edacd001a8d53b197bb5728242c55484680117dab9f7633a6320e961a939bddd88ee5c71d4a64f3ddb49444d1c694bd0668adbb3f95ba114f2386
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^0.2.0, ansi-regex@npm:^0.2.1":
   version: 0.2.1
   resolution: "ansi-regex@npm:0.2.1"
@@ -10446,7 +10455,7 @@ __metadata:
     typescript: "npm:6.0.3"
     webpack: "npm:5.110.3"
     webpack-cli: "npm:7.2.3"
-    webpack-dev-middleware: "npm:8.1.1"
+    webpack-dev-middleware: "npm:8.2.0"
     zod: "npm:4.5.4"
   languageName: unknown
   linkType: soft
@@ -17858,10 +17867,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-middleware@npm:8.1.1":
-  version: 8.1.1
-  resolution: "webpack-dev-middleware@npm:8.1.1"
+"webpack-dev-middleware@npm:8.2.0":
+  version: 8.2.0
+  resolution: "webpack-dev-middleware@npm:8.2.0"
   dependencies:
+    ansi-html-community: "npm:^0.0.8"
     memfs: "npm:^4.56.10"
     mime-types: "npm:^3.0.2"
     range-parser: "npm:^1.2.1"
@@ -17871,7 +17881,7 @@ __metadata:
   peerDependenciesMeta:
     webpack:
       optional: true
-  checksum: 10/f1b49b3611bceb0b4c4d912a3fe0002360155e70a3e4c3f73f7cc817c40ab3445771fd387bfa3d76d880d448808a47cfc0787fcce93d2383a6bec5c31ef2fdae
+  checksum: 10/8f8a044226b68a95c7256cc0a71f8b02cf30f2ec36df7f289e89c0110707427c884a4b5e32276686c6f95759d943a2490d56ac51e0e675d6ec3e7b93708bb9fa
   languageName: node
   linkType: hard
 
