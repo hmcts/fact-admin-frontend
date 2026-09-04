@@ -3,11 +3,12 @@ import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
 import { Logger } from '../../modules/logging';
-import { dpaAddressSchema } from '../../schemas/osDataSchema';
+import { osAddressOptionSchema } from '../../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../../schemas/serviceCentreAddressSchema';
 import { SubjectType } from '../../schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../../services/service-centres/ServiceCentreAddressService';
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
+import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController from '../BaseController';
 import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
@@ -444,10 +445,10 @@ export default class ServiceCentreAddressController extends BaseController {
     serviceCentreName: string,
     addressId?: string,
     addressModel?: Partial<ServiceCentreAddress>,
-    dpaAddressData?: string,
+    addressOptionData?: string,
     isNewSC: boolean = false
   ): Promise<void> {
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData, addressModel) : (addressModel ?? {});
+    const address = addressOptionData ? this.buildAddressData(addressOptionData, addressModel) : (addressModel ?? {});
 
     res.render('service-centre-address-edit', {
       address,
@@ -465,6 +466,11 @@ export default class ServiceCentreAddressController extends BaseController {
     serviceCentreId: string,
     addressId?: string
   ): Partial<ServiceCentreAddress> {
+    // The identifiers belong to the OS result selected on the previous page. If the
+    // postcode has since been edited, do not send stale selection data to the API.
+    const selectionMatchesPostcode =
+      normalisePostcode(body.postcode) === normalisePostcode(body.osAddressSelectionPostcode);
+
     return {
       addressLine1: body.addressLine1,
       addressLine2: body.addressLine2,
@@ -472,41 +478,31 @@ export default class ServiceCentreAddressController extends BaseController {
       county: body.county?.trim() === '' ? undefined : body.county?.trim(),
       id: addressId,
       postcode: body.postcode,
+      osAddressDataset: selectionMatchesPostcode ? body.osAddressDataset : undefined,
+      osAddressUprn: selectionMatchesPostcode ? body.osAddressUprn : undefined,
+      osAddressLpiKey: selectionMatchesPostcode ? body.osAddressLpiKey : undefined,
       serviceCentreId,
       townCity: body.townCity,
     };
   }
 
   private buildAddressData(
-    dpaAddressData: string,
+    addressOptionData: string,
     existingAddress?: Partial<ServiceCentreAddress>
   ): Partial<ServiceCentreAddress> {
     const result: Partial<ServiceCentreAddress> = existingAddress ?? {};
 
     try {
-      const dpaAddress = dpaAddressSchema.parse(JSON.parse(dpaAddressData));
-      result.addressLine2 = null;
-      result.county = null;
-
-      if (dpaAddress.ORGANISATION_NAME) {
-        result.addressLine1 = dpaAddress.ORGANISATION_NAME;
-        result.addressLine2 = (
-          (dpaAddress.BUILDING_NUMBER ?? dpaAddress.BUILDING_NAME ?? '') +
-          ' ' +
-          dpaAddress.THOROUGHFARE_NAME
-        ).trim();
-      } else {
-        result.addressLine1 = (
-          (dpaAddress.BUILDING_NUMBER ?? dpaAddress.BUILDING_NAME ?? '') +
-          ' ' +
-          dpaAddress.THOROUGHFARE_NAME
-        ).trim();
-      }
-
-      result.lat = dpaAddress.LAT;
-      result.lon = dpaAddress.LNG;
-      result.postcode = dpaAddress.POSTCODE ?? undefined;
-      result.townCity = dpaAddress.POST_TOWN ?? undefined;
+      const addressOption = osAddressOptionSchema.parse(JSON.parse(addressOptionData));
+      result.addressLine1 = addressOption.addressLine1;
+      result.addressLine2 = addressOption.addressLine2;
+      result.county = addressOption.county;
+      result.postcode = addressOption.postcode;
+      result.townCity = addressOption.townCity;
+      result.osAddressDataset = addressOption.dataset;
+      result.osAddressUprn = addressOption.uprn;
+      result.osAddressLpiKey = addressOption.lpiKey;
+      result.osAddressSelectionPostcode = addressOption.selectionPostcode;
     } catch (error) {
       logger.warn('Unable to parse address data:', error);
     }

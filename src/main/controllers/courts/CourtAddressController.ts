@@ -4,10 +4,11 @@ import { Request, Response } from 'express';
 
 import { Logger } from '../../modules/logging';
 import { CourtAddress } from '../../schemas/courtAddressSchema';
-import { dpaAddressSchema } from '../../schemas/osDataSchema';
+import { osAddressOptionSchema } from '../../schemas/osDataSchema';
 import { TypesService } from '../../services/TypesService';
 import { CourtAddressService } from '../../services/courts/CourtAddressService';
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
+import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController, { type NotFoundTemplate } from '../BaseController';
 import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
@@ -281,7 +282,7 @@ export class CourtAddressController extends BaseController {
     aolSelected: boolean,
     ctSelected: boolean,
     courtAddress?: CourtAddress,
-    dpaAddressData?: string
+    addressOptionData?: string
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -293,7 +294,7 @@ export class CourtAddressController extends BaseController {
       return;
     }
 
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData) : (courtAddress ?? {});
+    const address = addressOptionData ? this.buildAddressData(addressOptionData) : (courtAddress ?? {});
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
@@ -324,7 +325,6 @@ export class CourtAddressController extends BaseController {
     if (!this.validateServiceResponse(courtName, res, 'not-found')) {
       return;
     }
-
     const courtAddress = await this.courtAddressService.retrieve(courtId, addressId);
     if (!this.validateServiceResponse(courtAddress, res, 'not-found')) {
       return;
@@ -405,7 +405,7 @@ export class CourtAddressController extends BaseController {
     courtAddress: CourtAddress,
     aolSelected: boolean,
     ctSelected: boolean,
-    dpaAddressData?: string
+    addressOptionData?: string
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -417,7 +417,7 @@ export class CourtAddressController extends BaseController {
       return;
     }
 
-    const address = dpaAddressData ? this.buildAddressData(dpaAddressData, courtAddress) : courtAddress;
+    const address = addressOptionData ? this.buildAddressData(addressOptionData, courtAddress) : courtAddress;
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
@@ -538,6 +538,11 @@ export class CourtAddressController extends BaseController {
     courtId: string,
     addressId?: string
   ): Partial<CourtAddress> {
+    // The identifiers belong to the OS result selected on the previous page. If the
+    // postcode has since been edited, do not send stale selection data to the API.
+    const selectionMatchesPostcode =
+      normalisePostcode(body.postcode) === normalisePostcode(body.osAddressSelectionPostcode);
+
     return {
       id: addressId,
       courtId,
@@ -547,40 +552,29 @@ export class CourtAddressController extends BaseController {
       county: body.county?.trim() === '' ? undefined : body.county?.trim(),
       postcode: body.postcode,
       epimId: body.epimId?.trim() === '' ? undefined : body.epimId?.trim(),
+      osAddressDataset: selectionMatchesPostcode ? body.osAddressDataset : undefined,
+      osAddressUprn: selectionMatchesPostcode ? body.osAddressUprn : undefined,
+      osAddressLpiKey: selectionMatchesPostcode ? body.osAddressLpiKey : undefined,
       addressType: body.addressType,
       areasOfLaw: body['areas-of-law'] ? [body['areas-of-law']].flat() : undefined,
       courtTypes: body['court-types'] ? [body['court-types']].flat() : undefined,
     };
   }
 
-  private buildAddressData(dpaAddressData: string, existingAddress?: CourtAddress): Partial<CourtAddress> {
+  private buildAddressData(addressOptionData: string, existingAddress?: CourtAddress): Partial<CourtAddress> {
     const result: Partial<CourtAddress> = existingAddress ?? {};
     try {
-      const dpaAddress = dpaAddressSchema.parse(JSON.parse(dpaAddressData));
+      const addressOption = osAddressOptionSchema.parse(JSON.parse(addressOptionData));
 
-      // clear out the data we aren't going to overwrite
-      result.addressLine2 = null;
-      result.county = null;
-
-      // merge in the new address data
-      if (dpaAddress.ORGANISATION_NAME) {
-        result.addressLine1 = dpaAddress.ORGANISATION_NAME;
-        result.addressLine2 = (
-          (dpaAddress.BUILDING_NUMBER ?? dpaAddress.BUILDING_NAME ?? '') +
-          ' ' +
-          dpaAddress.THOROUGHFARE_NAME
-        ).trim();
-      } else {
-        result.addressLine1 = (
-          (dpaAddress.BUILDING_NUMBER ?? dpaAddress.BUILDING_NAME ?? '') +
-          ' ' +
-          dpaAddress.THOROUGHFARE_NAME
-        ).trim();
-      }
-      result.townCity = dpaAddress.POST_TOWN ?? undefined;
-      result.postcode = dpaAddress.POSTCODE ?? undefined;
-      result.lat = dpaAddress.LAT;
-      result.lon = dpaAddress.LNG;
+      result.addressLine1 = addressOption.addressLine1;
+      result.addressLine2 = addressOption.addressLine2;
+      result.townCity = addressOption.townCity;
+      result.county = addressOption.county;
+      result.postcode = addressOption.postcode;
+      result.osAddressDataset = addressOption.dataset;
+      result.osAddressUprn = addressOption.uprn;
+      result.osAddressLpiKey = addressOption.lpiKey;
+      result.osAddressSelectionPostcode = addressOption.selectionPostcode;
     } catch (error) {
       logger.warn('Unable to parse address data:', error);
     }
