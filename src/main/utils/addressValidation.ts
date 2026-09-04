@@ -94,8 +94,8 @@ export const validateTownCityField = (value: string | undefined): string[] => {
 export const validateCountyField = (value: string | undefined): string[] => {
   const errors: string[] = [];
 
-  if (value && value.length > 255) {
-    errors.push('County must be 255 characters or less');
+  if (value && value.length > 100) {
+    errors.push('County must be 100 characters or less');
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
