@@ -173,4 +173,37 @@ describe('HealthController', () => {
     const readinessChecks = checkReadinessMock.firstCall.args[0];
     await expect(readinessChecks.redis()).resolves.toEqual({ status: 'UP' });
   });
+
+  test('marks readiness up when shutdown is not in progress', () => {
+    app.locals.shutdown = false;
+
+    const controller = new HealthController();
+    controller.readiness({} as never, {} as never);
+
+    const readinessChecks = checkReadinessMock.firstCall.args[0];
+    expect(readinessChecks.shutdownCheck()).toEqual({ status: 'UP' });
+    assert.called(upMock);
+  });
+
+  test('returns Redis down when ping returns unexpected response', async () => {
+    mockRedisPing.mockResolvedValue('LOADING');
+
+    const controller = new HealthController();
+    controller.get({} as never, {} as never);
+
+    const config = configureMock.firstCall.args[0];
+    await expect(config.checks.redis()).resolves.toEqual({ status: 'DOWN' });
+    assert.calledWithMatch(downMock, { message: 'Redis ping returned LOADING' });
+  });
+
+  test('returns Redis down when ping rejects with non-Error value', async () => {
+    mockRedisPing.mockRejectedValue('Redis unavailable');
+
+    const controller = new HealthController();
+    controller.get({} as never, {} as never);
+
+    const config = configureMock.firstCall.args[0];
+    await expect(config.checks.redis()).resolves.toEqual({ status: 'DOWN' });
+    assert.calledWithMatch(downMock, { message: 'Redis unavailable' });
+  });
 });
