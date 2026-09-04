@@ -117,9 +117,9 @@
     "webpack-dev-middleware": "8.2.0"
   },
   "resolutions": {
-    "@opentelemetry/exporter-prometheus": "0.221.0",
-    "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.10.0",
-    "@opentelemetry/sdk-node": "0.221.0",
+    "@opentelemetry/exporter-prometheus": "0.222.0",
+    "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.11.0",
+    "@opentelemetry/sdk-node": "0.222.0",
     "qs": "6.16.0"
   },
   "packageManager": "yarn@4.18.0"
