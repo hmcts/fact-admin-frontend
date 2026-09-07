@@ -93,4 +93,82 @@ describe('Logger', () => {
       },
     });
   });
+
+  test.each([
+    ['silly', 'Verbose'],
+    ['debug', 'Verbose'],
+    ['verbose', 'Verbose'],
+    ['info', 'Information'],
+  ] as const)('writes %s messages to the console logger and Application Insights', (level, severity) => {
+    const logger = Logger.getLogger(`level-${level}`);
+
+    logger[level]('Log message', 12);
+
+    expect(delegateLogger[level]).toHaveBeenCalledWith('Log message', 12);
+    expect(trackTrace).toHaveBeenCalledWith({
+      message: 'Log message 12',
+      severity,
+      properties: {
+        loggerName: `level-${level}`,
+      },
+    });
+  });
+
+  test.each([
+    ['infoEvent', 'info', 'Information'],
+    ['warnEvent', 'warn', 'Warning'],
+    ['errorEvent', 'error', 'Error'],
+  ] as const)('writes %s without optional properties', (eventMethod, delegateMethod, severity) => {
+    const logger = Logger.getLogger(`event-${delegateMethod}`);
+
+    logger[eventMethod]('application.event');
+
+    expect(delegateLogger[delegateMethod]).toHaveBeenCalledWith('application.event');
+    expect(trackTrace).toHaveBeenCalledWith({
+      message: 'application.event',
+      severity,
+      properties: {
+        eventName: 'application.event',
+        loggerName: `event-${delegateMethod}`,
+      },
+    });
+  });
+
+  test('formats errors, dates, circular values, null, and undefined for telemetry', () => {
+    const logger = Logger.getLogger('values');
+    const errorWithStack = new Error('with stack');
+    errorWithStack.stack = 'test stack';
+    const errorWithoutStack = new Error('without stack');
+    errorWithoutStack.stack = '';
+    const circularValue: { name: string; self?: unknown } = { name: 'circular' };
+    circularValue.self = circularValue;
+
+    logger.info(
+      errorWithStack,
+      errorWithoutStack,
+      new Date('2026-09-02T12:00:00.000Z'),
+      circularValue,
+      null,
+      undefined
+    );
+
+    expect(trackTrace).toHaveBeenCalledWith({
+      message: 'test stack Error: without stack 2026-09-02T12:00:00.000Z name=circular, self=[Circular] null undefined',
+      severity: 'Information',
+      properties: {
+        loggerName: 'values',
+      },
+    });
+  });
+
+  test('does not interrupt event logging if telemetry throws', () => {
+    const logger = Logger.getLogger('events');
+    const error = new Error('save failed');
+    trackTrace.mockImplementationOnce(() => {
+      throw new Error('telemetry unavailable');
+    });
+
+    expect(() => logger.errorEvent('court.save.failed', { stage: 'save' }, error)).not.toThrow();
+    expect(delegateLogger.error).toHaveBeenCalledWith('court.save.failed: stage=save', error);
+  });
 });

@@ -274,4 +274,56 @@ describe('CourtGeneralController', () => {
       saveStub.restore();
     }
   });
+
+  test('re-renders edit page using originalName when save returns validation errors and open is false string', async () => {
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    const courtId = '11111111-1111-4111-8111-111111111111';
+    request.params = { courtId };
+    request.body = { open: 'false' };
+    const responseMock = mock(response);
+
+    const saveResult = {
+      id: courtId,
+      originalName: 'Reading Crown Court',
+      name: undefined,
+      open: false,
+      regionId: undefined,
+      errors: {
+        name: ['Enter a name for the court'],
+        regionId: ['Select a region for the court'],
+      },
+    };
+
+    const saveStub = stub(generalService, 'save').resolves(saveResult);
+
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('general-edit', {
+        breadcrumbs: [
+          { href: '/', text: 'Home' },
+          { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
+          { href: `/courts/${courtId}/edit/general`, text: 'General' },
+        ],
+        model: saveResult,
+        pageTitle: 'Error: General - Reading Crown Court',
+      });
+
+    try {
+      await controller.updateCourt(request, response);
+      assert.calledOnce(saveStub);
+      assert.calledWith(saveStub, {
+        id: courtId,
+        name: undefined,
+        open: false,
+        regionId: undefined,
+      });
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
 });

@@ -153,7 +153,131 @@ describe('LocationApprovalController', () => {
     expect(approvalService.approveData).not.toHaveBeenCalled();
   });
 
-  test('renders success view when approval is saved', async () => {
+  test('renders edit view when optional callbacks are not configured', async () => {
+    const approvalService = createApprovalService({
+      getEditApprovalAction: jest.fn().mockResolvedValue({
+        approvePath: `/courts/${locationId}/edit/approve`,
+        showApproveData: true,
+      }),
+    });
+
+    const getLocation = jest.fn().mockResolvedValue({ name: locationName });
+    const controller = createController(approvalService, { getLocation });
+    const request = buildRequest('Viewer', { courtId: locationId });
+    const response = createResponse();
+
+    await controller.get(request, response);
+
+    expect(approvalService.getEditApprovalAction).toHaveBeenCalledWith(
+      locationId,
+      'COURT',
+      `/courts/${locationId}/edit/approve`,
+      true
+    );
+    expect(response.render).toHaveBeenCalledWith(
+      'court-edit',
+      expect.objectContaining({
+        approvePath: `/courts/${locationId}/edit/approve`,
+        showApproveData: true,
+        courtId: locationId,
+        courtName: locationName,
+        pagePath: `/courts/${locationId}/edit`,
+        pageTitle: `Reviewing - ${locationName}`,
+      })
+    );
+
+    const [, model] = (response.render as jest.Mock).mock.calls[0];
+    expect(model).not.toHaveProperty('breadcrumbs');
+  });
+
+  test('renders not-found when approval action lookup returns status code', async () => {
+    const approvalService = createApprovalService({
+      getEditApprovalAction: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    });
+    const controller = createController(approvalService);
+    const request = buildRequest('Viewer', { courtId: locationId });
+    const response = createResponse();
+
+    await controller.get(request, response);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
+    expect(response.render).toHaveBeenCalledWith('not-found');
+    expect(response.render).not.toHaveBeenCalledWith('court-edit', expect.anything());
+  });
+
+  test('rejects postApprove for Admin user who cannot approve', async () => {
+    const getLocation = jest.fn();
+    const approvalService = createApprovalService();
+    const controller = createController(approvalService, { getLocation });
+    const request = buildRequest('Admin', { courtId: locationId });
+    const response = createResponse();
+
+    await controller.postApprove(request, response);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.Forbidden);
+    expect(response.render).toHaveBeenCalledWith('access-denied');
+    expect(getLocation).not.toHaveBeenCalled();
+    expect(approvalService.approveData).not.toHaveBeenCalled();
+  });
+
+  test('renders configured not found on postApprove when locationId is invalid', async () => {
+    const getLocation = jest.fn();
+    const approvalService = createApprovalService();
+    const controller = createController(approvalService, { getLocation });
+    const request = buildRequest('SuperAdmin', { courtId: 'not-a-uuid' });
+    const response = createResponse();
+
+    await controller.postApprove(request, response);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.NotFound);
+    expect(response.render).toHaveBeenCalledWith('court-not-found');
+    expect(getLocation).not.toHaveBeenCalled();
+    expect(approvalService.approveData).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    [HttpStatusCode.NotFound, 'court-not-found'],
+    [HttpStatusCode.BadGateway, 'error'],
+  ] as const)(
+    'renders status-derived error on postApprove when location lookup fails with %s',
+    async (statusCode, expectedView) => {
+      const approvalService = createApprovalService();
+      const controller = createController(approvalService, {
+        getLocation: jest.fn().mockResolvedValue(statusCode),
+      });
+      const request = buildRequest('SuperAdmin', { courtId: locationId });
+      const response = createResponse();
+
+      await controller.postApprove(request, response);
+
+      expect(response.status).toHaveBeenCalledWith(statusCode);
+      expect(response.render).toHaveBeenCalledWith(expectedView);
+      expect(approvalService.approveData).not.toHaveBeenCalled();
+      expect(response.render).not.toHaveBeenCalledWith('common-edit-success', expect.anything());
+    }
+  );
+
+  test('renders error when approval save returns status code', async () => {
+    const approvalService = createApprovalService({
+      approveData: jest.fn().mockResolvedValue(HttpStatusCode.BadGateway),
+    });
+    const controller = createController(approvalService, {
+      getLocation: jest.fn().mockResolvedValue({ name: locationName }),
+    });
+    const request = buildRequest('SuperAdmin', { courtId: locationId });
+    const response = createResponse();
+
+    await controller.postApprove(request, response);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatusCode.BadGateway);
+    expect(response.render).toHaveBeenCalledWith('error');
+    expect(response.render).not.toHaveBeenCalledWith('common-edit-success', expect.anything());
+  });
+
+  test.each([
+    ['Viewer', 'Reviewing'],
+    ['SuperAdmin', 'Editing'],
+  ] as const)('renders success view with %s wording when approval is saved', async (role, expectedModeWord) => {
     const approvalService = createApprovalService({
       approveData: jest.fn().mockResolvedValue({
         editPath: `/courts/${locationId}/edit`,
@@ -164,7 +288,7 @@ describe('LocationApprovalController', () => {
       }),
     });
     const controller = createController(approvalService);
-    const request = buildRequest('Viewer', { courtId: locationId });
+    const request = buildRequest(role, { courtId: locationId });
     const response = createResponse();
 
     await controller.postApprove(request, response);
@@ -180,7 +304,7 @@ describe('LocationApprovalController', () => {
       'common-edit-success',
       expect.objectContaining({
         continueUpdatingHref: `/courts/${locationId}/edit`,
-        continueUpdatingText: `Back to Reviewing - ${locationName}`,
+        continueUpdatingText: `Back to ${expectedModeWord} - ${locationName}`,
         pagePath: `/courts/${locationId}/edit/approve`,
         pageTitle: `Approval saved - ${locationName}`,
         successPanelTitle: 'Approval saved',

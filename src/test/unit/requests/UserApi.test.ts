@@ -245,6 +245,14 @@ describe('UserApi', () => {
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
 
+  it('returns the API status when getFavourites fails with an axios response', async () => {
+    getStub.withArgs('/user/v1/favourites', { params: {} }).rejects(errorResponse);
+
+    const response = await userApi.getFavourites();
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+  });
+
   it('gets batched favourite statuses', async () => {
     const subjects = [
       {
@@ -265,6 +273,20 @@ describe('UserApi', () => {
     const response = await userApi.getFavouriteStatuses(subjects);
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  it('returns the API status when getFavouriteStatuses fails with an axios response', async () => {
+    const subjects = [
+      {
+        subjectId: '11111111-1111-4111-8111-111111111111',
+        subjectType: 'COURT' as const,
+      },
+    ];
+    postStub.withArgs('/user/v1/favourites/status', { subjects }).rejects(errorResponse);
+
+    const response = await userApi.getFavouriteStatuses(subjects);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
   });
 
   it('adds and removes a subject favourite', async () => {
@@ -291,5 +313,17 @@ describe('UserApi', () => {
 
     await expect(userApi.addFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
     await expect(userApi.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.NotFound);
+  });
+
+  it('returns internal server error when a favourite mutation fails without an axios response', async () => {
+    const favourite = {
+      subjectId: '22222222-2222-4222-8222-222222222222',
+      subjectType: 'COURT' as const,
+    };
+    postStub.withArgs('/user/v1/favourites', favourite).rejects(errorMessage);
+    deleteStub.withArgs(`/user/v1/favourites/COURT/${favourite.subjectId}`).rejects(errorMessage);
+
+    await expect(userApi.addFavourite(favourite)).resolves.toBe(HttpStatusCode.InternalServerError);
+    await expect(userApi.removeFavourite(favourite)).resolves.toBe(HttpStatusCode.InternalServerError);
   });
 });

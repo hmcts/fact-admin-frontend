@@ -223,4 +223,68 @@ describe('AddCourtService', () => {
       regions,
     });
   });
+
+  test('create returns a status when regions lookup fails during valid creation', async () => {
+    const requests = {
+      createCourt: jest.fn(),
+      getCourtByName: jest.fn(),
+      getRegions: jest.fn().mockResolvedValue(500),
+      getServiceCentreByName: jest.fn(),
+    };
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
+
+    await expect(service.create({ name: createdCourt.name, regionId: regions[0].id })).resolves.toBe(500);
+    expect(requests.getCourtByName).not.toHaveBeenCalled();
+    expect(requests.getServiceCentreByName).not.toHaveBeenCalled();
+    expect(requests.createCourt).not.toHaveBeenCalled();
+  });
+
+  test('create returns a status when court duplicate lookup fails', async () => {
+    const requests = {
+      createCourt: jest.fn(),
+      getCourtByName: jest.fn().mockResolvedValue(502),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn(),
+    };
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
+
+    await expect(service.create({ name: createdCourt.name, regionId: regions[0].id })).resolves.toBe(502);
+    expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.getServiceCentreByName).not.toHaveBeenCalled();
+    expect(requests.createCourt).not.toHaveBeenCalled();
+  });
+
+  test('create returns a status when court creation fails after duplicate checks pass', async () => {
+    const requests = {
+      createCourt: jest.fn().mockResolvedValue(500),
+      getCourtByName: jest.fn().mockResolvedValue(404),
+      getRegions: jest.fn().mockResolvedValue(regions),
+      getServiceCentreByName: jest.fn().mockResolvedValue(404),
+    };
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
+
+    await expect(service.create({ name: createdCourt.name, regionId: regions[0].id })).resolves.toBe(500);
+    expect(requests.getCourtByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.getServiceCentreByName).toHaveBeenCalledWith(createdCourt.name);
+    expect(requests.createCourt).toHaveBeenCalledWith({
+      name: createdCourt.name,
+      open: false,
+      regionId: regions[0].id,
+    });
+  });
+
+  test('create returns a status when regions fail while rebuilding validation errors', async () => {
+    const requests = {
+      createCourt: jest.fn(),
+      getCourtByName: jest.fn(),
+      getRegions: jest.fn().mockResolvedValue(502),
+      getServiceCentreByName: jest.fn(),
+    };
+    const service = new AddCourtService(requests as never, requests as never, requests as never);
+
+    await expect(service.create({ name: 'Test', regionId: '' })).resolves.toBe(502);
+    expect(requests.getCourtByName).not.toHaveBeenCalled();
+    expect(requests.getServiceCentreByName).not.toHaveBeenCalled();
+    expect(requests.createCourt).not.toHaveBeenCalled();
+  });
 });

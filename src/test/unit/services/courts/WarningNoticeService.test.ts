@@ -49,6 +49,31 @@ describe('CourtWarningNoticeService', () => {
     });
   });
 
+  test('returns empty warning notice fields when values are missing on getPage', async () => {
+    const { getCourtById, service } = buildService({
+      getCourtById: jest.fn().mockResolvedValue({
+        ...courtResponse,
+        warningNotice: null,
+        warningNoticeCy: undefined,
+      }),
+    });
+
+    const result = await service.getWarningNoticePage(courtId);
+
+    expect(getCourtById).toHaveBeenCalledWith(courtId);
+    expect(result).toEqual({
+      courtId,
+      courtName: 'Reading Crown Court',
+      form: {
+        warningNotice: '',
+        warningNoticeCy: '',
+      },
+      errors: {},
+      errorSummary: [],
+      pageTitle: 'Warning notice - Reading Crown Court',
+    });
+  });
+
   test('returns upstream status when court lookup fails on getPage', async () => {
     const { service } = buildService({
       getCourtById: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
@@ -173,7 +198,7 @@ describe('CourtWarningNoticeService', () => {
     expect(updateCourt).not.toHaveBeenCalled();
   });
 
-  test('returns validation_error when warning notices contain invalid characters', async () => {
+  test('returns validation_error when welsh warning notice contains invalid characters', async () => {
     const { updateCourt, service } = buildService();
 
     const result = await service.save(courtId, {
@@ -225,6 +250,39 @@ describe('CourtWarningNoticeService', () => {
     expect(result.type).toBe('success');
   });
 
+  test('returns validation_error when english warning notice contains unsupported characters', async () => {
+    const { updateCourt, service } = buildService();
+
+    const result = await service.save(courtId, {
+      warningNotice: 'Warning 😀',
+      warningNoticeCy: 'Rhybudd dilys',
+    });
+
+    expect(result).toEqual({
+      type: 'validation_error',
+      viewModel: {
+        courtId,
+        courtName: 'Reading Crown Court',
+        form: {
+          warningNotice: 'Warning 😀',
+          warningNoticeCy: 'Rhybudd dilys',
+        },
+        errors: {
+          warningNotice:
+            'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+        },
+        errorSummary: [
+          {
+            href: '#warningNotice',
+            text: 'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+          },
+        ],
+        pageTitle: 'Error: Warning notice - Reading Crown Court',
+      },
+    });
+    expect(updateCourt).not.toHaveBeenCalled();
+  });
+
   test('returns status when updateCourt returns an error status', async () => {
     const { service } = buildService({
       updateCourt: jest.fn().mockResolvedValue(HttpStatusCode.InternalServerError),
@@ -238,6 +296,46 @@ describe('CourtWarningNoticeService', () => {
     expect(result).toEqual({
       type: 'status',
       status: HttpStatusCode.InternalServerError,
+    });
+  });
+
+  test('returns validation_error when api returns field validation errors from updateCourt', async () => {
+    const { updateCourt, service } = buildService({
+      updateCourt: jest.fn().mockResolvedValue(
+        new Map([
+          ['warningNotice', 'Warning notice is invalid'],
+          ['warningNoticeCy', 'Welsh warning notice is invalid'],
+        ])
+      ),
+    });
+
+    const form: WarningNoticeForm = {
+      warningNotice: 'Fire alarm out of service',
+      warningNoticeCy: 'Larwm tân allan o wasanaeth',
+    };
+
+    const result = await service.save(courtId, form);
+
+    expect(updateCourt).toHaveBeenCalled();
+    expect(result).toEqual({
+      type: 'validation_error',
+      viewModel: {
+        courtId,
+        courtName: 'Reading Crown Court',
+        form: {
+          warningNotice: 'Fire alarm out of service',
+          warningNoticeCy: 'Larwm tân allan o wasanaeth',
+        },
+        errors: {
+          warningNotice: 'Warning notice is invalid',
+          warningNoticeCy: 'Welsh warning notice is invalid',
+        },
+        errorSummary: [
+          { href: '#warningNotice', text: 'Warning notice is invalid' },
+          { href: '#warningNoticeCy', text: 'Welsh warning notice is invalid' },
+        ],
+        pageTitle: 'Error: Warning notice - Reading Crown Court',
+      },
     });
   });
 

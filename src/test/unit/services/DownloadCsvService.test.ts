@@ -277,4 +277,179 @@ describe('DownloadCsvService', () => {
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
   });
+
+  test('exports a closed court row without inventing optional values', async () => {
+    const service = new DownloadCsvService({
+      getAllLocations: jest.fn().mockResolvedValue([
+        {
+          locationType: 'COURT',
+          serviceCentre: false,
+          serviceCentreDetails: null,
+          court: {
+            id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+            name: 'Closed Court',
+            slug: 'closed-court',
+            open: false,
+            openOnCath: false,
+            warningNotice: null,
+            mrdId: 'MRD-CLOSED',
+            lastUpdatedAt: '2026-05-01T10:00:00Z',
+            region: { country: 'England', name: 'London' },
+
+            courtAddresses: [
+              {
+                addressLine1: '10 Quiet Road',
+                addressLine2: null,
+                addressType: 'VISIT_US',
+                areasOfLaw: [],
+                county: null,
+                courtTypes: [],
+                epimId: null,
+                lat: null,
+                lon: null,
+                postcode: 'SW1A 3AA',
+                townCity: 'London',
+              },
+            ],
+            courtAreasOfLaw: [],
+            courtAccessibilityOptions: [],
+            courtPhotos: [],
+            courtProfessionalInformation: [],
+            courtFaxNumbers: [],
+
+            // all court-type and exported code fields null -> no type label, no numeric codes
+            courtCodes: [
+              {
+                countyCourtCode: null,
+                crownCourtCode: null,
+                familyCourtCode: null,
+                gbs: null,
+                magistrateCourtCode: null,
+                tribunalCode: null,
+              },
+            ],
+
+            // absent optional contact values
+            courtContactDetails: [
+              {
+                courtContactDescription: { name: 'Enquiries', nameCy: 'Ymholiadau' },
+                courtContactDescriptionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+                email: null,
+                explanation: null,
+                explanationCy: null,
+                phoneNumber: null,
+              },
+            ],
+            courtTranslations: [{ email: null, phoneNumber: null }],
+
+            // explanation null -> bare DX code, no parentheses
+            courtDxCodes: [{ dxCode: 'DX 999', explanation: null }],
+
+            courtFacilities: [],
+            courtOpeningHours: [],
+            courtCounterServiceOpeningHours: [],
+          },
+        },
+      ]),
+    } as never);
+
+    const response = await service.getDownloadCsv(new Date('2026-05-05T10:00:00Z'));
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected CSV response');
+    }
+
+    const [, dataLine] = response.csv.split('\n');
+
+    expect(dataLine).toContain('Closed Court,Closed,2026-05-01');
+    expect(dataLine).toContain(',DX 999,'); // DX present as bare code in DX column context
+    expect(dataLine).not.toContain('DX 999 (');
+
+    // No invented optional values
+    expect(dataLine).toContain('https://localhost:3344/courts/closed-court');
+    expect(dataLine).not.toContain('null');
+    expect(dataLine).not.toContain("Magistrates' Court");
+    expect(dataLine).not.toContain('Family Court');
+    expect(dataLine).not.toContain('Tribunal');
+    expect(dataLine).not.toContain('County Court');
+    expect(dataLine).not.toContain('Crown Court');
+
+    // No email/contact values invented
+    expect(dataLine).not.toContain('@');
+    expect(dataLine).not.toContain('Enquiries');
+    expect(dataLine).not.toContain('01234');
+  });
+
+  test('exports a closed service centre row with empty optional columns', async () => {
+    const service = new DownloadCsvService({
+      getAllLocations: jest.fn().mockResolvedValue([
+        {
+          locationType: 'SERVICE_CENTRE',
+          serviceCentre: true,
+          court: null,
+          serviceCentreDetails: {
+            id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            name: 'Closed Service Centre',
+            slug: 'closed-service-centre',
+            open: false,
+            warningNotice: null,
+            createdAt: '2026-05-01T09:00:00Z',
+            lastUpdatedAt: '2026-05-02T10:00:00Z',
+            catchmentType: 'NATIONAL',
+
+            serviceAreas: [],
+            serviceCentreAddresses: [
+              {
+                addressLine1: '20 Service Lane',
+                addressLine2: null,
+                addressType: 'VISIT_US',
+                county: null,
+                lat: null,
+                lon: null,
+                postcode: 'SW1A 4AA',
+                townCity: 'London',
+              },
+            ],
+
+            // area-of-law group with null areasOfLaw
+            serviceCentreAreasOfLaw: [{ areasOfLaw: null }],
+
+            // absent optional contact values
+            serviceCentreContactDetails: [
+              {
+                email: null,
+                explanation: null,
+                explanationCy: null,
+                phoneNumber: null,
+                serviceCentreContactDescription: {
+                  id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+                  name: 'Enquiries',
+                  nameCy: 'Ymholiadau',
+                },
+              },
+            ],
+          },
+        },
+      ]),
+    } as never);
+
+    const response = await service.getDownloadCsv(new Date('2026-05-05T10:00:00Z'));
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected CSV response');
+    }
+
+    const [, dataLine] = response.csv.split('\n');
+
+    expect(dataLine).toContain('Closed Service Centre,Closed,2026-05-02');
+    expect(dataLine).toContain('Visit us: 20 Service Lane, London, SW1A 4AA');
+
+    // Areas-of-law, emails, contacts are empty for this fixture
+    expect(dataLine).toContain(',https://localhost:3344/service-centres/closed-service-centre,,,,');
+    expect(dataLine).not.toContain('service@example.com');
+    expect(dataLine).not.toContain('Enquiries -');
+    expect(dataLine).not.toContain('01234');
+  });
 });
