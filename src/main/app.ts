@@ -20,6 +20,7 @@ import {
   isViewer,
 } from './modules/authentication/authenticationHelper';
 import { Container } from './modules/awilix';
+import { CsrfProtection } from './modules/csrf';
 import { Helmet } from './modules/helmet';
 import { LockingInterceptor } from './modules/locking';
 import { Logger } from './modules/logging';
@@ -137,6 +138,10 @@ app.use((req, res, next) => {
     return res.render('not-found');
   });
 });
+
+if (config.get<boolean>('useCSRFProtection')) {
+  new CsrfProtection().enableFor(app);
+}
 
 // add our custom page locking interceptor
 new LockingInterceptor().enableFor(app);

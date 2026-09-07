@@ -21,36 +21,37 @@ jest.mock('../../main/modules/locking', () => ({
   },
 }));
 
-jest.mock('express-openid-connect', () => ({
-  auth: () => (req, res, next) => {
-    const unauthenticated = req.headers['x-test-unauthenticated'] === 'true';
-    const role = req.headers['x-test-role'] ?? 'Admin';
+jest.mock('express-openid-connect', () => {
+  const appSession: Record<string, unknown> = {};
 
-    req.oidc = {
-      isAuthenticated: () => !unauthenticated,
-    };
-    req.appSession = unauthenticated
-      ? {}
-      : {
-          factUser: {
-            id: 'test-user-id',
-            role,
-          },
-        };
-    res.oidc = {
-      login: () => res.redirect('/sso/login'),
-    };
+  return {
+    auth: () => (req, res, next) => {
+      const unauthenticated = req.headers['x-test-unauthenticated'] === 'true';
+      const role = req.headers['x-test-role'] ?? 'Admin';
 
-    next();
-  },
-  requiresAuth:
-    () =>
-    (req, res, next): void => {
-      if (!req.oidc?.isAuthenticated()) {
-        res.oidc.login();
-        return;
-      }
+      req.oidc = {
+        isAuthenticated: () => !unauthenticated,
+      };
+      appSession.factUser = {
+        id: 'test-user-id',
+        role,
+      };
+      req.appSession = unauthenticated ? {} : appSession;
+      res.oidc = {
+        login: () => res.redirect('/sso/login'),
+      };
 
       next();
     },
-}));
+    requiresAuth:
+      () =>
+      (req, res, next): void => {
+        if (!req.oidc?.isAuthenticated()) {
+          res.oidc.login();
+          return;
+        }
+
+        next();
+      },
+  };
+});
