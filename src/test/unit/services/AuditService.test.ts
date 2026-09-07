@@ -14,6 +14,7 @@ jest.mock('@hmcts/nodejs-logging', () => ({
 }));
 
 import { GetAuditsParams } from '../../../main/requests/types/GetAuditsParams';
+import { SubjectType } from '../../../main/schemas/subjectTypeSchema';
 import { AuditService } from '../../../main/services/AuditService';
 
 const subjectId = '11111111-1111-4111-8111-111111111111';
@@ -413,5 +414,144 @@ describe('AuditService', () => {
     });
 
     expect(response).toBe(HttpStatusCode.InternalServerError);
+  });
+
+  test('getAudits applies default paging for valid date range and subject type', async () => {
+    const operationsApi = {
+      getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
+      getAudits: jest.fn().mockResolvedValue({
+        content: [{ ...baseAudit }],
+        page: {
+          number: 0,
+          size: 25,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      }),
+    };
+    const service = new AuditService(operationsApi as never);
+
+    const response = await service.getAudits({
+      fromDate: '2026-06-25',
+      toDate: '2026-06-26',
+      subjectType: 'COURT',
+    });
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected successful response object');
+    }
+
+    expect(response.errors).toBeUndefined();
+    expect(operationsApi.getAudits).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fromDate: '2026-06-25',
+        toDate: '2026-06-26',
+        subjectType: 'COURT',
+        pageNumber: 0,
+        pageSize: 25,
+      })
+    );
+  });
+
+  test('getAudits returns validation error for unsupported subject type and skips audits API', async () => {
+    const operationsApi = {
+      getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
+      getAudits: jest.fn(),
+    };
+    const service = new AuditService(operationsApi as never);
+
+    const response = await service.getAudits({
+      fromDate: '2026-06-26',
+      pageNumber: 0,
+      pageSize: 25,
+      subjectType: 'NOT_A_REAL_SUBJECT_TYPE' as never,
+    });
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected validation response object');
+    }
+
+    expect(response.errors?.subjectType).toEqual([
+      'Subject type must be one of: ' + Object.keys(SubjectType).join(', '),
+    ]);
+    expect(operationsApi.getAudits).not.toHaveBeenCalled();
+  });
+
+  test('generateCsv writes nullable fields as <unknown>, <deleted>, and empty diff', async () => {
+    const unknownSubjectId = '55555555-5555-4555-8555-555555555555';
+    const operationsApi = {
+      getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
+      getAudits: jest.fn().mockResolvedValueOnce({
+        content: [
+          {
+            ...baseAudit,
+            user: null,
+            subjectId: unknownSubjectId,
+            actionDataDiff: null,
+          },
+        ],
+        page: {
+          number: 0,
+          size: 1000,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      }),
+    };
+    const service = new AuditService(operationsApi as never);
+
+    const response = await service.generateCsv({
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-25',
+    });
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected CSV file response');
+    }
+
+    const csv = await fs.readFile(response.filePath, 'utf8');
+    expect(csv).toContain('"<unknown>"');
+    expect(csv).toContain('"<deleted>: court"');
+    // I'm not mad: JSON.stringify('') used for the diff produces two quotes. CSV escaping
+    // doubles both, then adds the field delimiters, resulting in six consecutive quotes.
+    expect(csv).toContain('"<deleted>: court",""""""');
+    expect(csv).not.toContain('null');
+
+    await fs.unlink(response.filePath);
+  });
+
+  test('generateCsv stops after first page when max csv pages is one', async () => {
+    const operationsApi = {
+      getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
+      getAudits: jest.fn().mockResolvedValue({
+        content: [{ ...baseAudit }],
+        page: {
+          number: 0,
+          size: 1000,
+          totalElements: 2,
+          totalPages: 2,
+        },
+      }),
+    };
+    const service = new AuditService(operationsApi as never);
+
+    const response = await service.generateCsv({
+      pageNumber: 0,
+      pageSize: 25,
+      fromDate: '2026-06-25',
+    });
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected CSV file response');
+    }
+
+    expect(operationsApi.getAudits).toHaveBeenCalledTimes(1);
+
+    await fs.unlink(response.filePath);
   });
 });

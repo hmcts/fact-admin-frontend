@@ -285,4 +285,103 @@ describe('HomePageViewService', () => {
       totalPages: 1,
     });
   });
+
+  test('treats locations without a favourite status as not favourited', () => {
+    const rows = service.buildCourtTableRows(
+      filters,
+      {
+        content: [court],
+        page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
+      } as PagedCourts,
+      false,
+      new Map()
+    );
+
+    expect(rows[0][0].html).toContain('aria-pressed="false"');
+    expect(rows[0][0].html).toContain(`action="/favourites/COURT/${court.id}"`);
+  });
+
+  test('uses default court pagination values when page metadata is absent', () => {
+    const page = {
+      content: [court],
+      page: { totalElements: 1 },
+    } as PagedCourts;
+
+    expect(service.buildPagination(page, filters)).toEqual({
+      currentPage: 0,
+      items: [],
+      next: undefined,
+      previous: undefined,
+      totalPages: 0,
+    });
+    expect(service.buildPageTitle(page, false)).toBe('Courts, tribunals and service centres');
+    expect(
+      service.buildPageTitle(
+        {
+          ...page,
+          page: { ...page.page, totalPages: 2 },
+        },
+        false
+      )
+    ).toBe('Courts, tribunals and service centres (page 1 of 2)');
+    expect(service.buildResultsMessage(page)).toBe('Showing 1 to 1 of 1 courts, tribunals and service centres');
+    expect(
+      service.buildResultsMessage({
+        content: [court],
+        page: {},
+      } as unknown as PagedCourts)
+    ).toBe('No courts, tribunals or service centres found.');
+  });
+
+  test('uses default favourites values and builds a next-page link', () => {
+    const page = {
+      content: [serviceCentre],
+      page: { totalElements: 1, totalPages: 2 },
+    } as PagedCourts;
+
+    const rows = service.buildFavouriteTableRows(filters, {
+      ...page,
+      page: { ...page.page, number: 0 },
+    });
+    const pagination = service.buildFavouritesPagination(page, filters);
+
+    expect(rows[0][3].html).toContain('Edit<span');
+    expect(pagination.currentPage).toBe(0);
+    expect(pagination.next?.href).toContain('favouritesPageNumber=1');
+    expect(service.buildFavouritesPageTitle(page)).toBe('Favourites (page 1 of 2)');
+    expect(service.buildFavouritesResultsMessage(page)).toBe(
+      'Showing 1 to 1 of 1 favourite courts, tribunals and service centres'
+    );
+  });
+
+  test('uses empty defaults when favourites page metadata is absent', () => {
+    const page = {
+      content: [],
+      page: {},
+    } as unknown as PagedCourts;
+
+    expect(service.buildFavouritesPagination(page, filters)).toEqual({
+      currentPage: 0,
+      items: [],
+      next: undefined,
+      previous: undefined,
+      totalPages: 0,
+    });
+    expect(service.buildFavouritesPageTitle(page)).toBe('Favourites');
+    expect(service.buildFavouritesResultsMessage(page)).toBe(
+      'No favourite courts, tribunals or service centres found.'
+    );
+  });
+
+  test('adds ellipses to favourites pagination when page ranges are skipped', () => {
+    const pagination = service.buildFavouritesPagination(
+      {
+        content: [serviceCentre],
+        page: { number: 4, size: 25, totalElements: 250, totalPages: 10 },
+      } as PagedCourts,
+      filters
+    );
+
+    expect(pagination.items.filter(item => item.ellipsis)).toHaveLength(2);
+  });
 });

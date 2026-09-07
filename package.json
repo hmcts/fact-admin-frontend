@@ -30,7 +30,7 @@
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/nodejs-logging": "4.0.4",
     "@hmcts/properties-volume": "1.4.1",
-    "@ministryofjustice/frontend": "11.0.0",
+    "@ministryofjustice/frontend": "11.0.1",
     "applicationinsights": "3.16.0",
     "async-mutex": "0.5.0",
     "awilix": "13.0.5",
@@ -114,7 +114,7 @@
     "ts-loader": "9.6.2",
     "webpack": "5.110.3",
     "webpack-cli": "7.2.3",
-    "webpack-dev-middleware": "8.1.1"
+    "webpack-dev-middleware": "8.2.0"
   },
   "resolutions": {
     "@opentelemetry/exporter-prometheus": "0.221.0",
