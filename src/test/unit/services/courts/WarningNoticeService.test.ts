@@ -202,8 +202,8 @@ describe('CourtWarningNoticeService', () => {
     const { updateCourt, service } = buildService();
 
     const result = await service.save(courtId, {
-      warningNotice: 'Temporary closure at 5pm',
-      warningNoticeCy: 'Cau dros dro @ 5pm',
+      warningNotice: 'Temporary closure @ 5pm',
+      warningNoticeCy: 'Cau_dros_dro @ 5pm',
     });
 
     expect(result).toEqual({
@@ -212,8 +212,8 @@ describe('CourtWarningNoticeService', () => {
         courtId,
         courtName: 'Reading Crown Court',
         form: {
-          warningNotice: 'Temporary closure at 5pm',
-          warningNoticeCy: 'Cau dros dro @ 5pm',
+          warningNotice: 'Temporary closure @ 5pm',
+          warningNoticeCy: 'Cau_dros_dro @ 5pm',
         },
         errors: {
           warningNoticeCy:
@@ -229,6 +229,25 @@ describe('CourtWarningNoticeService', () => {
       },
     });
     expect(updateCourt).not.toHaveBeenCalled();
+  });
+
+  test('allows Welsh warning notice to include Welsh letters and English punctuation', async () => {
+    const { updateCourt, service } = buildService({
+      updateCourt: jest.fn().mockResolvedValue({ id: courtId }),
+    });
+
+    const result = await service.save(courtId, {
+      warningNotice: 'Temporary closure @ 5pm / lift outage',
+      warningNoticeCy: 'Cau dros dro @ 5pm / diffyg lifft gyda ŵ ŷ â ê î ô û',
+    });
+
+    expect(updateCourt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        warningNotice: 'Temporary closure @ 5pm / lift outage',
+        warningNoticeCy: 'Cau dros dro @ 5pm / diffyg lifft gyda ŵ ŷ â ê î ô û',
+      })
+    );
+    expect(result.type).toBe('success');
   });
 
   test('returns validation_error when english warning notice contains unsupported characters', async () => {
