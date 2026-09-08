@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export const approvalSubjectTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
+import { SUBJECT_TYPE } from '../utils/variablesConstants';
+
 
 const approvalUserSchema = z.object({
   email: z.email().nullable().optional(),
@@ -12,7 +13,7 @@ const approvalUserSchema = z.object({
 
 export const approvalStatusSchema = z.object({
   subjectId: z.uuid(),
-  subjectType: approvalSubjectTypeSchema,
+  subjectType: SUBJECT_TYPE,
   name: z.string(),
   approved: z.boolean(),
   approvalId: z.uuid().nullable(),
@@ -24,7 +25,7 @@ export const approvalStatusSchema = z.object({
 export const approvalStatusListSchema = z.array(approvalStatusSchema);
 
 export type ApprovalStatus = z.infer<typeof approvalStatusSchema>;
-export type ApprovalSubjectType = z.infer<typeof approvalSubjectTypeSchema>;
+export type ApprovalSubjectType = z.infer<typeof SUBJECT_TYPE>;
 
 export type CreateApprovalRequest = {
   subjectId: string;

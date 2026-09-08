@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // Approval service
 export const APPROVAL_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 
@@ -170,3 +172,11 @@ export const SAFE_RETURN_KEYS = new Set([
 ]);
 export const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
 export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
+
+// Schemas
+export const SUBJECT_TYPE = z.enum(['COURT', 'SERVICE_CENTRE']);
+export const ADDRESS_TYPE = z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']);
+export const CATCHMENT_TYPE = z.enum(['LOCAL', 'NATIONAL', 'REGIONAL']);
+
+
+

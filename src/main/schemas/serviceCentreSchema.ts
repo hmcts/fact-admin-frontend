@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
+import { CATCHMENT_TYPE } from '../utils/variablesConstants';
+
 export const serviceCentreSchema = z.object({
-  catchmentType: z.enum(['LOCAL', 'NATIONAL', 'REGIONAL']).nullable().optional(),
+  catchmentType:CATCHMENT_TYPE.nullable().optional(),
   createdAt: z.string().optional(),
   id: z.uuid(),
   lastUpdatedAt: z.string().optional(),

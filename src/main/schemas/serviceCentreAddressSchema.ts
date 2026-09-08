@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const serviceCentreAddressTypeSchema = z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']);
+import { ADDRESS_TYPE } from '../utils/variablesConstants';
 
 export const serviceCentreAddressSchema = z.object({
   id: z.string().nullable(),
@@ -12,10 +12,10 @@ export const serviceCentreAddressSchema = z.object({
   postcode: z.string(),
   lat: z.number().nullable(),
   lon: z.number().nullable(),
-  addressType: serviceCentreAddressTypeSchema,
+  addressType: ADDRESS_TYPE,
 });
 
 export const serviceCentreAddressListSchema = z.array(serviceCentreAddressSchema);
 
 export type ServiceCentreAddress = z.infer<typeof serviceCentreAddressSchema>;
-export const ServiceCentreAddressType = serviceCentreAddressTypeSchema.enum;
+export const ServiceCentreAddressType = ADDRESS_TYPE.enum;

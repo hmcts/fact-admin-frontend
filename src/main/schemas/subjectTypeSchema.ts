@@ -1,5 +1,4 @@
-import { z } from 'zod';
+import { SUBJECT_TYPE } from '../utils/variablesConstants';
 
-export const subjectTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
-export const SubjectType = subjectTypeSchema.enum;
+export const SubjectType = SUBJECT_TYPE.enum;
 export type Subject = (typeof SubjectType)[keyof typeof SubjectType];

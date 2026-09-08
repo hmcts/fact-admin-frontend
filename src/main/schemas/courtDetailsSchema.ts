@@ -1,8 +1,11 @@
 import { z } from 'zod';
 
+import { ADDRESS_TYPE, CATCHMENT_TYPE } from '../utils/variablesConstants';
+
 import { areaOfLawSchema } from './areaOfLawSchema';
 import { courtAddressSchema } from './courtAddressSchema';
 import { courtTypeSchema } from './courtTypeSchema';
+
 
 const courtRegionSchema = z.object({
   name: z.string(),
@@ -146,7 +149,7 @@ const serviceCentreAddressSchema = z.object({
   postcode: nullableString.optional(),
   lat: z.number().nullable().optional(),
   lon: z.number().nullable().optional(),
-  addressType: z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']),
+  addressType: ADDRESS_TYPE,
 });
 
 const serviceCentreContactDescriptionSchema = z.object({
@@ -221,7 +224,7 @@ export const serviceCentreDetailsSchema = z.object({
   createdAt: nullableString.optional(),
   lastUpdatedAt: z.string(),
   serviceAreas: z.array(serviceAreaSchema).optional().default([]),
-  catchmentType: z.enum(['LOCAL', 'NATIONAL', 'REGIONAL']).nullable().optional(),
+  catchmentType: CATCHMENT_TYPE.nullable().optional(),
   serviceCentreAddresses: z.array(serviceCentreAddressSchema).optional().default([]),
   serviceCentreContactDetails: z.array(serviceCentreContactDetailSchema).optional().default([]),
   serviceCentreAreasOfLaw: z.array(serviceCentreAreasOfLawSchema).optional().default([]),

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export const courtAddressTypeSchema = z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']);
+import { ADDRESS_TYPE } from '../utils/variablesConstants';
+
 
 export const courtAddressSchema = z.object({
   id: z.string().nullable(),
@@ -13,7 +14,7 @@ export const courtAddressSchema = z.object({
   epimId: z.string().nullable(),
   lat: z.number().nullable(),
   lon: z.number().nullable(),
-  addressType: courtAddressTypeSchema,
+  addressType: ADDRESS_TYPE,
   areasOfLaw: z.array(z.string()).nullable(),
   courtTypes: z.array(z.string()).nullable(),
 });
@@ -21,4 +22,4 @@ export const courtAddressSchema = z.object({
 export const courtAddressListSchema = z.array(courtAddressSchema);
 
 export type CourtAddress = z.infer<typeof courtAddressSchema>;
-export const CourtAddressType = courtAddressTypeSchema.enum;
+export const CourtAddressType = ADDRESS_TYPE.enum;
