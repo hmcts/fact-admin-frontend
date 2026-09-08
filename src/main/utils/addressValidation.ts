@@ -1,22 +1,12 @@
 // ----------------------------------------------------------------------------
 // Address & Postcode Validation
 
-export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
-export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
-const JURISDICTION_ERROR_REGEXES = {
-  northernIrelandPostcode: /^(BT)/i,
-  guernseyPostcode: /^(GY)/i,
-  jerseyPostcode: /^(JE)/i,
-  isleOfManPostcode: /^(IM)/i,
-};
-export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
-  blankPostcode: 'Enter a postcode',
-  invalidPostcode: 'Postcode format is invalid',
-  northernIrelandPostcode: 'Northern Ireland postcodes are not supported for this service',
-  guernseyPostcode: 'Guernsey postcodes are not supported for this service',
-  jerseyPostcode: 'Jersey postcodes are not supported for this service',
-  isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
-};
+import {
+  JURISDICTION_ERROR_REGEXES,
+  POSTCODE_ERROR_MESSAGES,
+  VALID_ADDRESS_LINE_REGEX,
+  VALID_POSTCODE_REGEX,
+} from './variablesConstants';
 
 export const isValidPostcode = (value: string): boolean => {
   return validatePostcodeField(value) === undefined;

@@ -178,5 +178,31 @@ export const SUBJECT_TYPE = z.enum(['COURT', 'SERVICE_CENTRE']);
 export const ADDRESS_TYPE = z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT_US']);
 export const CATCHMENT_TYPE = z.enum(['LOCAL', 'NATIONAL', 'REGIONAL']);
 
+// Court accessibility validation Config
+export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
+export const TOILET_DESC_REGEX_WELSH = /^[\p{L}0-9 ()':,\-;.]+$/u;
+export const MIN_LIFT_DOOR_WIDTH_CM = 1;
+export const MAX_LIFT_DOOR_WIDTH_CM = 1000;
+export const MIN_LIFT_DOOR_LIMIT_KG = 1;
+export const MAX_LIFT_DOOR_LIMIT_KG = 10000;
 
+// Address validation
+export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
+export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
+export  const JURISDICTION_ERROR_REGEXES = {
+  northernIrelandPostcode: /^(BT)/i,
+  guernseyPostcode: /^(GY)/i,
+  jerseyPostcode: /^(JE)/i,
+  isleOfManPostcode: /^(IM)/i,
+};
+export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
+  blankPostcode: 'Enter a postcode',
+  invalidPostcode: 'Postcode format is invalid',
+  northernIrelandPostcode: 'Northern Ireland postcodes are not supported for this service',
+  guernseyPostcode: 'Guernsey postcodes are not supported for this service',
+  jerseyPostcode: 'Jersey postcodes are not supported for this service',
+  isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
+};
 
+// Value parsers
+export const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;

@@ -2,16 +2,16 @@
 import type { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
 
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
+import {
+  MAX_LIFT_DOOR_LIMIT_KG,
+  MAX_LIFT_DOOR_WIDTH_CM,
+  MIN_LIFT_DOOR_LIMIT_KG,
+  MIN_LIFT_DOOR_WIDTH_CM,
+  PHONE_NUMBER_REGEX,
+  TOILET_DESC_REGEX,
+  TOILET_DESC_REGEX_WELSH,
+} from './variablesConstants';
 
-// Regex constants
-export const UK_PHONE_REGEX = /^((\+44|)[0-9 ]{10,20})$/; // kept same regex in backend ideally it should be 10-12 digit though
-export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
-export const TOILET_DESC_REGEX_WELSH = /^[\p{L}0-9 ()':,\-;.]+$/u;
-
-const MIN_LIFT_DOOR_WIDTH_CM = 1;
-const MAX_LIFT_DOOR_WIDTH_CM = 1000;
-const MIN_LIFT_DOOR_LIMIT_KG = 1;
-const MAX_LIFT_DOOR_LIMIT_KG = 10000;
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);
@@ -115,17 +115,17 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     // Phone pattern
     patternRule(
       'accessibleParkingPhoneNumber',
-      UK_PHONE_REGEX,
+      PHONE_NUMBER_REGEX,
       'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
     ),
     patternRule(
       'accessibleEntrancePhoneNumber',
-      UK_PHONE_REGEX,
+      PHONE_NUMBER_REGEX,
       'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
     ),
     patternRule(
       'liftSupportPhoneNumber',
-      UK_PHONE_REGEX,
+      PHONE_NUMBER_REGEX,
       'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
     ),
 

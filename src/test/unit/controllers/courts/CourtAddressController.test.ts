@@ -6,7 +6,7 @@ import { CourtAddressController } from '../../../../main/controllers/courts/Cour
 import { CourtAddress, CourtAddressType } from '../../../../main/schemas/courtAddressSchema';
 import { TypesService } from '../../../../main/services/TypesService';
 import { CourtAddressService } from '../../../../main/services/courts/CourtAddressService';
-import * as addressValidation from '../../../../main/utils/addressValidation';
+import { POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/variablesConstants';
 import { mockRequest } from '../../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
@@ -146,7 +146,7 @@ describe('CourtAddressController', () => {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         courtId: COURT_ID,
         pageTitle: 'Find Address',
-        error: addressValidation.POSTCODE_ERROR_MESSAGES.blankPostcode,
+        error: POSTCODE_ERROR_MESSAGES.blankPostcode,
       });
 
     try {
@@ -553,7 +553,7 @@ describe('CourtAddressController', () => {
         courtId: COURT_ID,
         addressId: ADDRESS_ID,
         pageTitle: 'Find Address',
-        error: addressValidation.POSTCODE_ERROR_MESSAGES.blankPostcode,
+        error: POSTCODE_ERROR_MESSAGES.blankPostcode,
       });
 
     try {
