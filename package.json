@@ -64,7 +64,7 @@
     "@eslint/eslintrc": "3.3.7",
     "@eslint/js": "9.39.5",
     "@hmcts/playwright-common": "1.1.5",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "@types/babel__preset-env": "7.10.0",
     "@types/chai": "5.2.3",
     "@types/chai-as-promised": "8.0.2",
@@ -101,11 +101,11 @@
     "mini-css-extract-plugin": "2.10.2",
     "odhin-reports-playwright": "1.2.2",
     "pa11y": "10.0.0",
-    "playwright": "1.62.1",
-    "playwright-core": "1.62.1",
+    "playwright": "1.63.0",
+    "playwright-core": "1.63.0",
     "playwright-lighthouse": "4.0.0",
     "prettier": "3.9.6",
-    "sass": "1.103.1",
+    "sass": "1.104.0",
     "sass-loader": "17.0.1",
     "sinon": "22.1.0",
     "style-loader": "4.0.0",
@@ -118,9 +118,9 @@
     "webpack-dev-middleware": "8.3.0"
   },
   "resolutions": {
-    "@opentelemetry/exporter-prometheus": "0.221.0",
-    "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.10.0",
-    "@opentelemetry/sdk-node": "0.221.0",
+    "@opentelemetry/exporter-prometheus": "0.222.0",
+    "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.11.0",
+    "@opentelemetry/sdk-node": "0.222.0",
     "qs": "6.16.0"
   },
   "packageManager": "yarn@4.18.0"
