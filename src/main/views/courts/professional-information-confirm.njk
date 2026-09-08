@@ -28,7 +28,9 @@
         }) }}
 
         {% for input in hiddenInputs %}
-          <input type="hidden" name="{{ input.name }}" value="{{ input.value }}">
+          {% if input.name !== "_csrf" %}
+            <input type="hidden" name="{{ input.name }}" value="{{ input.value }}">
+          {% endif %}
         {% endfor %}
 
         {{ confirmationActions("Continue", cancelHref) }}
