@@ -3,13 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../schemas/openingHoursSchema';
-import { ALLOWED_OPENING_HOUR_TYPES, OPENING_HOUR_DAYS } from '../../utils/variablesConstants';
-
-type Day = {
-  idPrefix: string;
-  name: string;
-  value: string;
-};
+import { ALLOWED_OPENING_HOUR_TYPES, OPENING_HOUR_DAYS, OpeningHourDay } from '../../utils/variablesConstants';
 
 export type OpeningHoursForm = {
   openingHourTypeId?: string;
@@ -30,7 +24,7 @@ export type OpeningHoursError = {
 export type OpeningHoursEditViewModel = {
   courtId: string;
   courtName: string;
-  days: Day[];
+  days: OpeningHourDay[];
   errors: Record<string, string>;
   errorSummary: OpeningHoursError[];
   form: OpeningHoursForm;
@@ -294,7 +288,8 @@ export class CourtOpeningHoursService {
   }
 
   private filterAndSortOpeningHourTypes(types: OpeningHourType[], openingHours?: CourtOpeningHours): OpeningHourType[] {
-    const allowedTypeSet: ReadonlySet<string> = new Set<string>(ALLOWED_OPENING_HOUR_TYPES as readonly string[]);    const currentTypeId = openingHours?.openingHourTypeId;
+    const allowedTypeSet: ReadonlySet<string> = new Set<string>(ALLOWED_OPENING_HOUR_TYPES as readonly string[]);
+    const currentTypeId = openingHours?.openingHourTypeId;
 
     return types
       .filter(type => allowedTypeSet.has(type.name) || type.id === currentTypeId)
@@ -433,7 +428,7 @@ export class CourtOpeningHoursService {
 
     return form.selectedDays
       .map(day => OPENING_HOUR_DAYS.find(dayConfig => dayConfig.value === day))
-      .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
+      .filter((dayConfig): dayConfig is OpeningHourDay => Boolean(dayConfig))
       .map(dayConfig => ({
         dayOfWeek: dayConfig.value,
         openingTime: this.formatTime(

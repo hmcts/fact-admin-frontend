@@ -79,9 +79,9 @@ export const UK_TIME_ZONE = 'Europe/London';
 export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 // Court counter service opening hours service
-export const EMAIL_REGEX = /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
+export const EMAIL_REGEX =
+  /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
 
-//
 // Court contact details service
 export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ]{10,20}$/;
 export const ENGLISH_EXPLANATION_REGEX = /^[A-Za-z0-9 '\-()&+]*$/;
