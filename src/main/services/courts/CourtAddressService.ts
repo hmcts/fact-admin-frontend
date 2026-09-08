@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../../schemas/courtAddressSchema';
-import { DpaAddress } from '../../schemas/osDataSchema';
+import { OsAddressOption } from '../../schemas/osDataSchema';
 import {
   validateAddressLine1Field,
   validateAddressLine2Field,
@@ -11,6 +11,7 @@ import {
   validatePostcodeField,
   validateTownCityField,
 } from '../../utils/addressValidation';
+import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
 
 export type SaveCourtAddressResponse =
@@ -27,7 +28,7 @@ export type SaveCourtAddressResponse =
   | HttpStatusCode;
 
 export type RetrieveAddressOptionsResponse =
-  | DpaAddress[]
+  | OsAddressOption[]
   | {
       status: 'invalid';
       error: string;
@@ -78,7 +79,7 @@ export class CourtAddressService {
       }
     }
 
-    return result.results.map(resultItem => resultItem.DPA).filter((dpa): dpa is DpaAddress => dpa !== null);
+    return buildOsAddressOptions(result, postcode);
   }
 
   public async save(

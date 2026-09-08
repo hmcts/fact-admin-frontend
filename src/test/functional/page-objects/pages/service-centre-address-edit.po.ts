@@ -19,6 +19,10 @@ export class ServiceCentreAddressEditPage extends Base {
   public readonly townCityInput: Locator;
   public readonly countyInput: Locator;
   public readonly postcodeInput: Locator;
+  public readonly osAddressDatasetInput: Locator;
+  public readonly osAddressUprnInput: Locator;
+  public readonly osAddressLpiKeyInput: Locator;
+  public readonly osAddressSelectionPostcodeInput: Locator;
   public readonly saveButton: Locator;
   public readonly errorSummary: Locator;
 
@@ -32,6 +36,10 @@ export class ServiceCentreAddressEditPage extends Base {
     this.townCityInput = this.page.getByLabel('Town or city');
     this.countyInput = this.page.getByLabel('County (optional)');
     this.postcodeInput = this.page.getByLabel('Postcode');
+    this.osAddressDatasetInput = this.page.locator('input[name="osAddressDataset"]');
+    this.osAddressUprnInput = this.page.locator('input[name="osAddressUprn"]');
+    this.osAddressLpiKeyInput = this.page.locator('input[name="osAddressLpiKey"]');
+    this.osAddressSelectionPostcodeInput = this.page.locator('input[name="osAddressSelectionPostcode"]');
     this.saveButton = this.page.getByRole('button', { name: 'Save' });
     this.errorSummary = this.page.locator('.govuk-error-summary');
   }

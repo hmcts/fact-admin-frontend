@@ -96,13 +96,16 @@ describe('Court address edit routes', () => {
   test('renders select address page for a valid postcode search', async () => {
     stub(CourtAddressService.prototype, 'retrieveAddressOptions').resolves([
       {
-        ADDRESS: '10 High Street, Bristol, BS1 6GR',
-        BUILDING_NUMBER: '10',
-        THOROUGHFARE_NAME: 'High Street',
-        POST_TOWN: 'Bristol',
-        POSTCODE: 'BS1 6GR',
-        LAT: 51.45,
-        LNG: -2.59,
+        dataset: 'DPA',
+        uprn: '100',
+        lpiKey: null,
+        address: '10 High Street, Bristol, BS1 6GR',
+        addressLine1: '10 High Street',
+        addressLine2: null,
+        townCity: 'Bristol',
+        county: null,
+        postcode: 'BS1 6GR',
+        selectionPostcode: 'BS16GR',
       },
     ] as never);
 
@@ -117,7 +120,7 @@ describe('Court address edit routes', () => {
     stub(TypesService.prototype, 'listAreasOfLaw').resolves([{ id: 'aol-1', name: 'Civil' }] as never);
     stub(TypesService.prototype, 'listCourtTypes').resolves([{ id: 'ct-1', name: 'County Court' }] as never);
 
-    const response = await request(app).post(`/courts/${courtId}/edit/address/details`).send({});
+    const response = await request(app).post(`/courts/${courtId}/edit/address/details`).send({ manual: 'true' });
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Enter an address');

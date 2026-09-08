@@ -12,6 +12,10 @@ export const serviceCentreAddressSchema = z.object({
   postcode: z.string(),
   lat: z.number().nullable(),
   lon: z.number().nullable(),
+  osAddressDataset: z.enum(['DPA', 'LPI']).optional(),
+  osAddressUprn: z.string().nullable().optional(),
+  osAddressLpiKey: z.string().nullable().optional(),
+  osAddressSelectionPostcode: z.string().optional(),
   addressType: serviceCentreAddressTypeSchema,
 });
 

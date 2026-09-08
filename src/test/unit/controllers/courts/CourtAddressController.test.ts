@@ -168,19 +168,16 @@ describe('CourtAddressController', () => {
     request.query = { postcode: 'RG1 2AA' };
     const addressOptions = [
       {
-        UPRN: '100',
-        UDPRN: null,
-        ADDRESS: 'Reading Crown Court, RG1 2AA',
-        ORGANISATION_NAME: 'Reading Crown Court',
-        BUILDING_NUMBER: '1',
-        BUILDING_NAME: null,
-        THOROUGHFARE_NAME: 'Main Street',
-        POST_TOWN: 'Reading',
-        POSTCODE: 'RG1 2AA',
-        LNG: -0.9781,
-        LAT: 51.4543,
-        LOCAL_CUSTODIAN_CODE: 111,
-        LOCAL_CUSTODIAN_CODE_DESCRIPTION: 'test',
+        dataset: 'DPA' as const,
+        uprn: '100',
+        lpiKey: null,
+        address: 'Reading Crown Court, RG1 2AA',
+        addressLine1: 'Reading Crown Court',
+        addressLine2: '1 Main Street',
+        townCity: 'Reading',
+        county: null,
+        postcode: 'RG1 2AA',
+        selectionPostcode: 'RG12AA',
       },
     ];
     const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves(addressOptions);
@@ -225,6 +222,10 @@ describe('CourtAddressController', () => {
       'court-types': [COURT_TYPE_ID],
       areasOfLaw: 'yes',
       courtTypes: 'yes',
+      osAddressDataset: 'LPI',
+      osAddressUprn: '100',
+      osAddressLpiKey: 'lpi-100',
+      osAddressSelectionPostcode: 'RG12AA',
     };
 
     const saveResponse = {
@@ -259,6 +260,9 @@ describe('CourtAddressController', () => {
           courtId: COURT_ID,
           county: undefined,
           epimId: 'EP-22',
+          osAddressDataset: 'LPI',
+          osAddressUprn: '100',
+          osAddressLpiKey: 'lpi-100',
           areasOfLaw: [AREA_OF_LAW_ID],
           courtTypes: [COURT_TYPE_ID],
         },
@@ -266,6 +270,42 @@ describe('CourtAddressController', () => {
         true,
         true
       );
+      responseMock.verify();
+    } finally {
+      saveStub.restore();
+    }
+  });
+
+  test('does not submit an OS selection after the postcode is changed', async () => {
+    const response = {
+      render: () => '',
+      status: () => response,
+    } as unknown as Response;
+    const responseMock = mock(response);
+    const request = mockRequest({});
+    request.params = { courtId: COURT_ID };
+    request.body = {
+      addressLine1: '10 Kings Road',
+      townCity: 'Reading',
+      postcode: 'RG1 2AB',
+      addressType: CourtAddressType.VISIT_US,
+      osAddressDataset: 'LPI',
+      osAddressUprn: '100',
+      osAddressLpiKey: 'lpi-100',
+      osAddressSelectionPostcode: 'RG12AA',
+    };
+
+    const saveStub = stub(courtAddressService, 'save').resolves(HttpStatusCode.InternalServerError);
+    responseMock.expects('status').once().withArgs(HttpStatusCode.InternalServerError).returns(response);
+    responseMock.expects('render').once().withArgs('error');
+
+    try {
+      await controller.saveNewAddress(request, response);
+      assert.calledWithMatch(saveStub, {
+        osAddressDataset: undefined,
+        osAddressUprn: undefined,
+        osAddressLpiKey: undefined,
+      });
       responseMock.verify();
     } finally {
       saveStub.restore();
@@ -433,19 +473,16 @@ describe('CourtAddressController', () => {
     request.params = { courtId: COURT_ID };
     request.body = {
       address: JSON.stringify({
-        UPRN: '100',
-        UDPRN: null,
-        ADDRESS: 'Reading Crown Court',
-        ORGANISATION_NAME: 'Reading Crown Court',
-        BUILDING_NUMBER: '1',
-        BUILDING_NAME: null,
-        THOROUGHFARE_NAME: 'Main Street',
-        POST_TOWN: 'Reading',
-        POSTCODE: 'RG1 2AA',
-        LNG: -0.9781,
-        LAT: 51.4543,
-        LOCAL_CUSTODIAN_CODE: 111,
-        LOCAL_CUSTODIAN_CODE_DESCRIPTION: 'test',
+        dataset: 'DPA',
+        uprn: '100',
+        lpiKey: null,
+        address: 'Reading Crown Court, RG1 2AA',
+        addressLine1: 'Reading Crown Court',
+        addressLine2: '1 Main Street',
+        townCity: 'Reading',
+        county: null,
+        postcode: 'RG1 2AA',
+        selectionPostcode: 'RG12AA',
       }),
     };
 
@@ -620,19 +657,16 @@ describe('CourtAddressController', () => {
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
     request.body = {
       address: JSON.stringify({
-        UPRN: '100',
-        UDPRN: '200',
-        ADDRESS: 'The Mews, RG1 2AA',
-        ORGANISATION_NAME: '',
-        BUILDING_NUMBER: null,
-        BUILDING_NAME: 'The Mews',
-        THOROUGHFARE_NAME: 'Main Street',
-        POST_TOWN: 'Reading',
-        POSTCODE: 'RG1 2AA',
-        LNG: -0.9781,
-        LAT: 51.4543,
-        LOCAL_CUSTODIAN_CODE: 111,
-        LOCAL_CUSTODIAN_CODE_DESCRIPTION: 'test',
+        dataset: 'DPA',
+        uprn: '100',
+        lpiKey: null,
+        address: 'The Mews, Main Street, Reading, RG1 2AA',
+        addressLine1: 'The Mews Main Street',
+        addressLine2: null,
+        townCity: 'Reading',
+        county: null,
+        postcode: 'RG1 2AA',
+        selectionPostcode: 'RG12AA',
       }),
     };
 
@@ -1005,6 +1039,7 @@ describe('CourtAddressController', () => {
     const responseMock = mock(response);
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+    request.body = { manual: 'true' };
 
     const retrieveStub = stub(courtAddressService, 'retrieve').resolves(HttpStatusCode.NotFound);
     const listAreasOfLawStub = stub(typesService, 'listAreasOfLaw');
@@ -1031,7 +1066,7 @@ describe('CourtAddressController', () => {
     const responseMock = mock(response);
     const request = mockRequest({});
     request.params = { courtId: COURT_ID };
-    request.body = {};
+    request.body = { manual: 'true' };
 
     const listAreasOfLawStub = stub(typesService, 'listAreasOfLaw').resolves(HttpStatusCode.NotFound);
     const listCourtTypesStub = stub(typesService, 'listCourtTypes');
@@ -1058,7 +1093,7 @@ describe('CourtAddressController', () => {
     const responseMock = mock(response);
     const request = mockRequest({});
     request.params = { courtId: COURT_ID };
-    request.body = {};
+    request.body = { manual: 'true' };
 
     const listAreasOfLawStub = stub(typesService, 'listAreasOfLaw').resolves([] as never);
     const listCourtTypesStub = stub(typesService, 'listCourtTypes').resolves(HttpStatusCode.NotFound);
