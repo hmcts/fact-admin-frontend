@@ -83,9 +83,9 @@ export const EMAIL_REGEX =
   /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
 
 // Court contact details service
-export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ]{10,20}$/;
-export const ENGLISH_EXPLANATION_REGEX = /^[A-Za-z0-9 '\-()&+]*$/;
-export const WELSH_EXPLANATION_REGEX = /^[\p{L}\p{N} '\-()&+]*$/u;
+export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
+export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+]+$/;
+export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+]+$/u;
 export const MAX_EXPLANATION_LENGTH = 250;
 
 // Court opening hours service
@@ -112,3 +112,24 @@ export const OPENING_HOUR_DAYS: readonly OpeningHourDay[] = [
   { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
   { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
 ];
+
+// Court professional information service
+export const MAX_REPEATABLE_ENTRIES = 5;
+export const INTEGER_REGEX = /^\d+$/;
+export const DX_CODE_MAX_LENGTH = 200;
+export const REPEATABLE_DESCRIPTION_MAX_LENGTH = 250;
+export const FAX_NUMBER_VALIDATION_ERROR =
+  'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
+export const GBS_VALIDATION_ERROR =
+  'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms between 1 and 150, or select No';
+export const DX_VALIDATION_ERROR =
+  'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+
+// Court single point of entry service
+export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
+  {
+    areaOfLawName: 'Children',
+    label: 'Childcare arrangements',
+  },
+] as const;

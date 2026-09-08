@@ -2,9 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { isHttpStatusCode } from '../../utils/valueParsers';
-
-const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
-const welshWarningFormatRegex = /^[\p{L}0-9.,!?:;'"()\-/&@+\s]+$/u;
+import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/variablesConstants';
 
 export type WarningNoticeForm = {
   warningNotice?: string;
@@ -136,12 +134,12 @@ export class CourtWarningNoticeService {
       errors.warningNoticeCy = 'Welsh warning notice must be 250 characters or less';
     }
 
-    if (warningNotice && !englishWarningFormatRegex.test(warningNotice)) {
+    if (warningNotice && !ENGLISH_TEXT_REGEX.test(warningNotice)) {
       errors.warningNotice =
         'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
     }
 
-    if (warningNoticeCy && !welshWarningFormatRegex.test(warningNoticeCy)) {
+    if (warningNoticeCy && !WELSH_TEXT_REGEX.test(warningNoticeCy)) {
       errors.warningNoticeCy =
         'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
     }

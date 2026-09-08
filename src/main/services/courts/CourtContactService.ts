@@ -8,10 +8,10 @@ import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { parseString } from '../../utils/valueParsers';
 import {
   EMAIL_REGEX,
-  ENGLISH_EXPLANATION_REGEX,
+  ENGLISH_TEXT_REGEX,
   MAX_EXPLANATION_LENGTH,
   PHONE_NUMBER_REGEX,
-  WELSH_EXPLANATION_REGEX,
+  WELSH_TEXT_REGEX,
 } from '../../utils/variablesConstants';
 
 export type CourtContactFormValues = {
@@ -247,7 +247,7 @@ export class CourtContactService {
       if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
         formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-      } else if (!ENGLISH_EXPLANATION_REGEX.test(contactExplanation)) {
+      } else if (!ENGLISH_TEXT_REGEX.test(contactExplanation)) {
         formErrors.contactExplanation =
           'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
@@ -270,7 +270,7 @@ export class CourtContactService {
       if (contactExplanationCy.length > MAX_EXPLANATION_LENGTH) {
         formErrors.contactExplanationCy = 'Welsh translation must be 250 characters or fewer';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      } else if (!WELSH_EXPLANATION_REGEX.test(contactExplanationCy)) {
+      } else if (!WELSH_TEXT_REGEX.test(contactExplanationCy)) {
         formErrors.contactExplanationCy =
           'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });

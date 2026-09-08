@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { TranslationServices } from '../../schemas/translationServicesSchema';
+import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from '../../utils/variablesConstants';
 
 export type TranslationAndInterpretationForm = {
   contactMethods?: string | string[];
@@ -36,9 +37,6 @@ export type SaveTranslationAndInterpretationResult =
       viewModel: TranslationAndInterpretationViewModel;
     }
   | HttpStatusCode;
-
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 
 export class CourtTranslationAndInterpretationService {
   public constructor(private readonly courtApi = new CourtApi()) {}
@@ -151,7 +149,7 @@ export class CourtTranslationAndInterpretationService {
         href: '#email',
         text: 'Enter an email address',
       });
-    } else if (viewModel.email && !emailPattern.test(viewModel.email)) {
+    } else if (viewModel.email && !EMAIL_REGEX.test(viewModel.email)) {
       errors.push({
         href: '#email',
         text: 'Enter an email address in the correct format',
@@ -163,7 +161,7 @@ export class CourtTranslationAndInterpretationService {
         href: '#phoneNumber',
         text: 'Enter a telephone number',
       });
-    } else if (viewModel.phoneNumber && !phoneNumberPattern.test(viewModel.phoneNumber)) {
+    } else if (viewModel.phoneNumber && !PHONE_NUMBER_REGEX.test(viewModel.phoneNumber)) {
       errors.push({
         href: '#phoneNumber',
         text: 'Enter a telephone number in the correct format',
