@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -32,6 +33,7 @@
       <p class="govuk-body">Postcode: {{ postcode }}.</p>
 
       <form method="POST" action="{{ actionUrl }}">
+        {{ csrfProtection(csrfToken) }}
 
         {{ govukSelect({
           id: "address",
@@ -49,6 +51,7 @@
       </form>
 
       <form method="POST" action="{{ actionUrl }}">
+        {{ csrfProtection(csrfToken) }}
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"

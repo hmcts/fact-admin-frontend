@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/common-components.njk" import confirmationActions %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   Information for professionals confirm update - {{ courtName }}
@@ -12,6 +13,7 @@
       <h1 class="govuk-heading-xl">Are you sure you want to save the changes to Information for professionals?</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/information-for-professionals/success">
+        {{ csrfProtection(csrfToken) }}
         {{ govukSummaryList({
           rows: [
             {
