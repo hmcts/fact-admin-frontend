@@ -7,6 +7,14 @@ type RequestWithAppSession = Request & {
   };
 };
 
+const csrfProtectedRoutes = [
+  '/add-court',
+  '/add-service-centre',
+  /^\/approvals\/[^/]+\/undo$/,
+  /^\/courts\/[^/]+\/edit(?:\/|$)/,
+  /^\/service-centres\/[^/]+\/edit(?:\/|$)/,
+];
+
 export class CsrfProtection {
   private readonly csrf = csrfSync({
     getTokenFromRequest: req => {
@@ -27,7 +35,7 @@ export class CsrfProtection {
 
   public enableFor(app: Application): void {
     app.use(
-      '/add-service-centre',
+      csrfProtectedRoutes,
       this.csrf.csrfSynchronisedProtection,
       (req: Request, res: Response, next: NextFunction) => {
         res.locals.csrfToken = this.csrf.generateToken(req);
