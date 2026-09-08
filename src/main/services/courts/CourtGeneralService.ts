@@ -4,14 +4,13 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
+import { VALID_COURT_NAME_REGEX } from '../../utils/variablesConstants';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
   originalName?: string;
   regions?: Region[];
 };
-
-const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class CourtGeneralService {
   public constructor(

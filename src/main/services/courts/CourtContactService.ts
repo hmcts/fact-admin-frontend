@@ -6,6 +6,13 @@ import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtCon
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { parseString } from '../../utils/valueParsers';
+import {
+  EMAIL_REGEX,
+  ENGLISH_EXPLANATION_REGEX,
+  MAX_EXPLANATION_LENGTH,
+  PHONE_NUMBER_REGEX,
+  WELSH_EXPLANATION_REGEX,
+} from '../../utils/variablesConstants';
 
 export type CourtContactFormValues = {
   contactEmail: string;
@@ -85,12 +92,6 @@ type ApiValidationMapping = {
   formField: keyof CourtContactFormErrors;
   href: string;
 };
-
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
-const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
-const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
-const maxExplanationLength = 250;
 
 const courtApi = new CourtApi();
 const referenceDataApi = new ReferenceDataApi();
@@ -223,7 +224,7 @@ export class CourtContactService {
       if (!contactEmail) {
         formErrors.contactEmail = 'Enter an email address';
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      } else if (!emailPattern.test(contactEmail)) {
+      } else if (!EMAIL_REGEX.test(contactEmail)) {
         formErrors.contactEmail = 'Enter an email address in the correct format';
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       }
@@ -233,7 +234,7 @@ export class CourtContactService {
       if (!contactTelephone) {
         formErrors.contactTelephone = 'Enter a phone number';
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      } else if (!phoneNumberPattern.test(contactTelephone)) {
+      } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
         formErrors.contactTelephone = 'Enter a phone number in the correct format';
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       }
@@ -243,10 +244,10 @@ export class CourtContactService {
     const contactExplanationCy = formValues.contactExplanationCy;
 
     if (contactExplanation) {
-      if (contactExplanation.length > maxExplanationLength) {
+      if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
         formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-      } else if (!explanationPattern.test(contactExplanation)) {
+      } else if (!ENGLISH_EXPLANATION_REGEX.test(contactExplanation)) {
         formErrors.contactExplanation =
           'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
@@ -266,10 +267,10 @@ export class CourtContactService {
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 
-      if (contactExplanationCy.length > maxExplanationLength) {
+      if (contactExplanationCy.length > MAX_EXPLANATION_LENGTH) {
         formErrors.contactExplanationCy = 'Welsh translation must be 250 characters or fewer';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      } else if (!welshExplanationPattern.test(contactExplanationCy)) {
+      } else if (!WELSH_EXPLANATION_REGEX.test(contactExplanationCy)) {
         formErrors.contactExplanationCy =
           'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });

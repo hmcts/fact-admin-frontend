@@ -3,6 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../schemas/openingHoursSchema';
+import { ALLOWED_OPENING_HOUR_TYPES, OPENING_HOUR_DAYS } from '../../utils/variablesConstants';
 
 type Day = {
   idPrefix: string;
@@ -70,26 +71,6 @@ export type SaveOpeningHoursResult =
   | { type: 'success'; viewModel: OpeningHoursSuccessViewModel }
   | { type: 'validation_error'; viewModel: OpeningHoursEditViewModel }
   | { status: HttpStatusCode; type: 'status' };
-
-const allowedOpeningHourTypes = [
-  'Bailiff office open',
-  'County Court open',
-  'Court open',
-  'Crown Court open',
-  'Family Court open',
-  "Magistrates' Court open",
-  'Telephone enquiries answered',
-  'Telephone payments accepted',
-  'Tribunal open',
-];
-
-const days: Day[] = [
-  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
-  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
-  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
-  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
-  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
-];
 
 export class CourtOpeningHoursService {
   public constructor(
@@ -302,7 +283,7 @@ export class CourtOpeningHoursService {
     return {
       courtId,
       courtName: courtResponse.name,
-      days,
+      days: [...OPENING_HOUR_DAYS],
       errors: {},
       errorSummary: [],
       form: postedForm ?? this.toForm(openingHours),
@@ -313,14 +294,13 @@ export class CourtOpeningHoursService {
   }
 
   private filterAndSortOpeningHourTypes(types: OpeningHourType[], openingHours?: CourtOpeningHours): OpeningHourType[] {
-    const allowedTypeSet = new Set(allowedOpeningHourTypes);
-    const currentTypeId = openingHours?.openingHourTypeId;
+    const allowedTypeSet: ReadonlySet<string> = new Set<string>(ALLOWED_OPENING_HOUR_TYPES as readonly string[]);    const currentTypeId = openingHours?.openingHourTypeId;
 
     return types
       .filter(type => allowedTypeSet.has(type.name) || type.id === currentTypeId)
       .sort((left, right) => {
-        const leftIndex = allowedOpeningHourTypes.indexOf(left.name);
-        const rightIndex = allowedOpeningHourTypes.indexOf(right.name);
+        const leftIndex = (ALLOWED_OPENING_HOUR_TYPES as readonly string[]).indexOf(left.name);
+        const rightIndex = (ALLOWED_OPENING_HOUR_TYPES as readonly string[]).indexOf(right.name);
 
         if (leftIndex === -1 && rightIndex === -1) {
           return left.name.localeCompare(right.name);
@@ -372,7 +352,7 @@ export class CourtOpeningHoursService {
     }
 
     form.selectedDays.forEach(day => {
-      const dayConfig = days.find(config => config.value === day);
+      const dayConfig = OPENING_HOUR_DAYS.find(config => config.value === day);
       if (dayConfig) {
         this.validateTimeGroup(errors, form, dayConfig.idPrefix, dayConfig.name);
       }
@@ -452,7 +432,7 @@ export class CourtOpeningHoursService {
     }
 
     return form.selectedDays
-      .map(day => days.find(dayConfig => dayConfig.value === day))
+      .map(day => OPENING_HOUR_DAYS.find(dayConfig => dayConfig.value === day))
       .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
       .map(dayConfig => ({
         dayOfWeek: dayConfig.value,
@@ -473,7 +453,7 @@ export class CourtOpeningHoursService {
       return [];
     }
 
-    const supportedDayValues = new Set(days.map(day => day.value).concat('EVERYDAY'));
+    const supportedDayValues = new Set(OPENING_HOUR_DAYS.map(day => day.value).concat('EVERYDAY'));
     return openingHours.openingTimesDetails.filter(detail => !supportedDayValues.has(detail.dayOfWeek));
   }
 
@@ -498,7 +478,7 @@ export class CourtOpeningHoursService {
     form.sameTime = 'no';
     form.selectedDays = openingHours.openingTimesDetails.map(detail => detail.dayOfWeek);
     openingHours.openingTimesDetails.forEach(detail => {
-      const dayConfig = days.find(day => day.value === detail.dayOfWeek);
+      const dayConfig = OPENING_HOUR_DAYS.find(day => day.value === detail.dayOfWeek);
       if (dayConfig) {
         this.assignTimeFields(form, dayConfig.idPrefix, detail);
       }
@@ -535,7 +515,7 @@ export class CourtOpeningHoursService {
       return 'Monday to Friday';
     }
 
-    const dayConfig = days.find(day => day.value === dayOfWeek);
+    const dayConfig = OPENING_HOUR_DAYS.find(day => day.value === dayOfWeek);
     return dayConfig?.name ?? dayOfWeek;
   }
 

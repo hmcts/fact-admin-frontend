@@ -6,8 +6,8 @@ import {
   DEFAULT_SORT_ORDER,
   MAX_PAGE_PARAM,
   SEARCH_MAX_LENGTH,
-  SEARCH_PATTERN,
-  VALID_SORT_BY_LAST_LOGIN_VALUE,
+  SEARCH_REGEX,
+  VALID_SORT_BY_LAST_LOGIN_VALUES,
   VALID_SORT_ORDER_VALUES,
 } from '../utils/variablesConstants';
 
@@ -36,7 +36,7 @@ export class UsersPageFiltersService {
   public validateFilters(filters: UsersPageFilters): UsersPageValidationError[] {
     const errors: UsersPageValidationError[] = [];
 
-    if (filters.search.length > SEARCH_MAX_LENGTH || !SEARCH_PATTERN.test(filters.search)) {
+    if (filters.search.length > SEARCH_MAX_LENGTH || !SEARCH_REGEX.test(filters.search)) {
       errors.push({
         href: '#search',
         text: 'Search must only include letters, numbers, @ symbols, dots, underscores, plus signs and hyphens.',
@@ -68,7 +68,7 @@ export class UsersPageFiltersService {
     if (filters.rawSortBy !== undefined && filters.rawSortBy !== 'lastLogin') {
       errors.push({
         href: '#main-content',
-        text: `sortBy must be one of: ${VALID_SORT_BY_LAST_LOGIN_VALUE.join(', ')}`,
+        text: `sortBy must be one of: ${VALID_SORT_BY_LAST_LOGIN_VALUES.join(', ')}`,
       });
     }
 

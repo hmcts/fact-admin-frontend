@@ -7,7 +7,7 @@ import {
   DEFAULT_SORT_ORDER,
   MAX_PAGE_PARAM,
   PARTIAL_COURT_NAME_ERROR,
-  PARTIAL_COURT_NAME_PATTERN,
+  PARTIAL_COURT_NAME_REGEX,
   VALID_SORT_BY_VALUES,
   VALID_SORT_ORDER_VALUES,
 } from '../utils/variablesConstants';
@@ -54,7 +54,7 @@ export class HomePageFiltersService {
     const errors: HomePageValidationError[] = [];
 
     // Partial court name
-    if (!PARTIAL_COURT_NAME_PATTERN.test(filters.partialCourtName)) {
+    if (!PARTIAL_COURT_NAME_REGEX.test(filters.partialCourtName)) {
       errors.push({
         href: '#partialCourtName',
         text: PARTIAL_COURT_NAME_ERROR,

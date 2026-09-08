@@ -52,7 +52,7 @@ export const FACILITY_LABELS = {
 
 // Home page filters service
 export const DEFAULT_SORT_ORDER = 'asc';
-export const PARTIAL_COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
+export const PARTIAL_COURT_NAME_REGEX = /^[A-Za-z&'()\- ]*$/;
 export const PARTIAL_COURT_NAME_ERROR =
   'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.';
 export const VALID_SORT_BY_VALUES = ['lastUpdated', 'name'] as const;
@@ -69,8 +69,8 @@ export const SORT_ICON_PATHS = {
 
 // Users page filters service
 export const SEARCH_MAX_LENGTH = 250;
-export const SEARCH_PATTERN = /^[A-Za-z0-9._+\-@]*$/;
-export const VALID_SORT_BY_LAST_LOGIN_VALUE = ['lastLogin'] as const;
+export const SEARCH_REGEX = /^[A-Za-z0-9._+\-@]*$/;
+export const VALID_SORT_BY_LAST_LOGIN_VALUES = ['lastLogin'] as const;
 
 // Users page view service
 export const UK_TIME_ZONE = 'Europe/London';
@@ -80,3 +80,35 @@ export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 // Court counter service opening hours service
 export const EMAIL_REGEX = /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
+
+//
+// Court contact details service
+export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ]{10,20}$/;
+export const ENGLISH_EXPLANATION_REGEX = /^[A-Za-z0-9 '\-()&+]*$/;
+export const WELSH_EXPLANATION_REGEX = /^[\p{L}\p{N} '\-()&+]*$/u;
+export const MAX_EXPLANATION_LENGTH = 250;
+
+// Court opening hours service
+export const ALLOWED_OPENING_HOUR_TYPES = [
+  'Bailiff office open',
+  'County Court open',
+  'Court open',
+  'Crown Court open',
+  'Family Court open',
+  "Magistrates' Court open",
+  'Telephone enquiries answered',
+  'Telephone payments accepted',
+  'Tribunal open',
+] as const;
+export type OpeningHourDay = {
+  idPrefix: string;
+  name: string;
+  value: string;
+};
+export const OPENING_HOUR_DAYS: readonly OpeningHourDay[] = [
+  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
+  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
+  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
+  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
+  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
+];
