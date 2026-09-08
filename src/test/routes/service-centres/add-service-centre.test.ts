@@ -113,7 +113,7 @@ describe('Add service centre page', () => {
   test('rejects a post without a csrf token', async () => {
     const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre');
 
-    const response = await request(app).post('/add-service-centre').send({
+    const response = await request(app).post('/add-service-centre').set('x-test-csrf-missing', 'true').send({
       name: 'National Business Centre',
       regionId: regions[0].id,
       serviceAreaIds: serviceAreas[0].id,

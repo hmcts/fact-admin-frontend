@@ -25,6 +25,7 @@ describe('Add court page', () => {
     expect(response.text).toContain('aria-label="Breadcrumb"');
     expect(response.text).toContain('<a class="govuk-breadcrumbs__link" href="/">Home</a>');
     expect(response.text).toContain('Add new court');
+    expect(response.text).toMatch(/name="_csrf" value="[^"]+"/);
   });
 
   test('re-renders the add court page with validation errors', async () => {
@@ -39,6 +40,19 @@ describe('Add court page', () => {
     expect(response.text).toContain('There is a problem');
     expect(response.text).toContain('Court name should be between 5 and 200 characters');
     expect(response.text).toContain('Select a region for the court');
+    expect(createCourtStub.notCalled).toBe(true);
+  });
+
+  test('rejects a post without a csrf token', async () => {
+    const createCourtStub = stub(CourtApi.prototype, 'createCourt');
+
+    const response = await request(app)
+      .post('/add-court')
+      .set('x-test-csrf-missing', 'true')
+      .send({ name: 'Reading Crown Court', regionId: '22222222-2222-4222-8222-222222222222' });
+
+    expect(response.status).toBe(403);
+    expect(response.text).toContain('Something went wrong');
     expect(createCourtStub.notCalled).toBe(true);
   });
 

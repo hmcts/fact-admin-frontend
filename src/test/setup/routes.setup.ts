@@ -22,6 +22,7 @@ jest.mock('../../main/modules/locking', () => ({
 }));
 
 jest.mock('express-openid-connect', () => {
+  const csrfToken = 'route-test-csrf-token';
   const appSession: Record<string, unknown> = {};
 
   return {
@@ -36,7 +37,11 @@ jest.mock('express-openid-connect', () => {
         id: 'test-user-id',
         role,
       };
+      appSession.csrfToken ??= csrfToken;
       req.appSession = unauthenticated ? {} : appSession;
+      if (!unauthenticated && req.method === 'POST' && req.headers['x-test-csrf-missing'] !== 'true') {
+        req.body = { ...req.body, _csrf: csrfToken };
+      }
       res.oidc = {
         login: () => res.redirect('/sso/login'),
       };
