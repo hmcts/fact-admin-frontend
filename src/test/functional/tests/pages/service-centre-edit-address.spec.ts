@@ -9,6 +9,7 @@ import {
 } from './service-centre-address-test-support';
 
 const TEST_POSTCODE = 'RG1 2AA';
+const LPI_TEST_POSTCODE = 'DH1 3RG';
 
 test.describe(
   'Service Centre Edit Address',
@@ -43,6 +44,34 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    test('LPI selection is carried to the address details form', async ({
+      playwright,
+      serviceCentreAddressEditPage,
+      serviceCentreAddressSelectPage,
+    }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Address LPI Select Functional Test',
+        { open: true },
+        async ({ createdServiceCentre }) => {
+          await serviceCentreAddressSelectPage.goto(createdServiceCentre.id, LPI_TEST_POSTCODE);
+
+          await expect(serviceCentreAddressSelectPage.lpiAddressOptions.first()).toBeAttached();
+          await serviceCentreAddressSelectPage.selectFirstLpiAddress();
+          await serviceCentreAddressSelectPage.clickContinue();
+
+          await expect(serviceCentreAddressEditPage.page).toHaveURL(
+            new RegExp(`/service-centres/${createdServiceCentre.id}/edit/address/details$`)
+          );
+          await expect(serviceCentreAddressEditPage.postcodeInput).toHaveValue(LPI_TEST_POSTCODE);
+          await expect(serviceCentreAddressEditPage.osAddressDatasetInput).toHaveValue('LPI');
+          await expect(serviceCentreAddressEditPage.osAddressUprnInput).toHaveValue(/\S+/);
+          await expect(serviceCentreAddressEditPage.osAddressLpiKeyInput).toHaveValue(/\S+/);
+          await expect(serviceCentreAddressEditPage.osAddressSelectionPostcodeInput).toHaveValue('DH13RG');
+        }
+      );
+    });
+
     test('adds, edits and deletes a service-centre address via find/select/details flows', async ({
       page,
       playwright,

@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
-import { DpaAddress } from '../../schemas/osDataSchema';
+import { OsAddressOption } from '../../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../../schemas/serviceCentreAddressSchema';
 import {
   validateAddressLine1Field,
@@ -11,6 +11,7 @@ import {
   validatePostcodeField,
   validateTownCityField,
 } from '../../utils/addressValidation';
+import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
 
 export type SaveServiceCentreAddressResponse =
@@ -35,7 +36,7 @@ export type DeleteServiceCentreAddressResponse =
   | HttpStatusCode;
 
 export type RetrieveAddressOptionsResponse =
-  | DpaAddress[]
+  | OsAddressOption[]
   | {
       status: 'invalid';
       error: string;
@@ -78,7 +79,7 @@ export class ServiceCentreAddressService {
       return HttpStatusCode.BadRequest;
     }
 
-    return result.results.map(resultItem => resultItem.DPA).filter((dpa): dpa is DpaAddress => dpa !== null);
+    return buildOsAddressOptions(result, postcode);
   }
 
   public async save(

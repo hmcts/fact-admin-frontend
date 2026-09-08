@@ -9,7 +9,7 @@ describe('Court Address Select View', () => {
   test('renders postcode and address options for new address flow', () => {
     const html = env.render('court-address-select.njk', {
       addressId: undefined,
-      addresses: [{ ADDRESS: '1 High Street, Bristol, BS1 5AH' }, { ADDRESS: '2 High Street, Bristol, BS1 5AH' }],
+      addresses: [{ address: '1 High Street, Bristol, BS1 5AH' }, { address: '2 High Street, Bristol, BS1 5AH' }],
       courtId: ids.courtId,
       pagePath: `/courts/${ids.courtId}/edit/address/select`,
       pageTitle: 'Select an address',
@@ -26,7 +26,7 @@ describe('Court Address Select View', () => {
   test('renders edit flow action when address id is provided', () => {
     const html = env.render('court-address-select.njk', {
       addressId: ids.addressId,
-      addresses: [{ ADDRESS: '10 Downing Street, London, SW1A 2AA' }],
+      addresses: [{ address: '10 Downing Street, London, SW1A 2AA' }],
       courtId: ids.courtId,
       pagePath: `/courts/${ids.courtId}/edit/address/select/${ids.addressId}`,
       pageTitle: 'Select an address',
@@ -36,5 +36,19 @@ describe('Court Address Select View', () => {
     expect(html).toContain(`/courts/${ids.courtId}/edit/address/details/${ids.addressId}`);
     expect(html).toContain('Continue');
     expect(html).toContain('Enter address manually');
+  });
+
+  test('explains that manual entry is available when OS returns no options', () => {
+    const html = env.render('court-address-select.njk', {
+      addresses: [],
+      courtId: ids.courtId,
+      pagePath: `/courts/${ids.courtId}/edit/address/select`,
+      pageTitle: 'Select an address',
+      postcode: 'WR1 1EQ',
+    });
+
+    expect(html).toContain('No addresses were found for this postcode');
+    expect(html).toContain('Enter address manually');
+    expect(html).not.toContain('Choose an address');
   });
 });
