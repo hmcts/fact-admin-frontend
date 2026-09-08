@@ -11,8 +11,8 @@ const csrfProtectedRoutes = [
   '/add-court',
   '/add-service-centre',
   /^\/approvals\/[^/]+\/undo$/,
-  /^\/courts\/[^/]+\/edit(?:\/|$)/,
-  /^\/service-centres\/[^/]+\/edit(?:\/|$)/,
+  /^\/courts\/[^/]+\/edit(?:\/.*)?$/,
+  /^\/service-centres\/[^/]+\/edit(?:\/.*)?$/,
 ];
 
 export class CsrfProtection {
