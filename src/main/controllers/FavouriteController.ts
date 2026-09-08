@@ -5,24 +5,9 @@ import { Request, Response } from 'express';
 import { UserApi } from '../requests/UserApi';
 import { subjectTypeSchema } from '../schemas/subjectTypeSchema';
 import { isUuid } from '../utils/valueParsers';
+import { COURT_NAME_PATTERN, SAFE_ORIGIN, SAFE_RETURN_HASHES, SAFE_RETURN_KEYS } from '../utils/variablesConstants';
 
 import BaseController from './BaseController';
-
-const SAFE_ORIGIN = 'https://fact-admin.local';
-const SAFE_RETURN_KEYS = new Set([
-  'favouritesPageNumber',
-  'includeClosed',
-  'onlyServiceCentres',
-  'pageNumber',
-  'pageSize',
-  'partialCourtName',
-  'regionId',
-  'sortBy',
-  'sortOrder',
-  'tab',
-]);
-const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
-const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 
 @route('/favourites/:subjectType/:subjectId')
 export default class FavouriteController extends BaseController {

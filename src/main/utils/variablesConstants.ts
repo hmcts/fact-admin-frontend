@@ -150,3 +150,23 @@ export const SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE =
 
 // Service centre warning notice service
 export const MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH = 250;
+
+// Audit controller
+export const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
+
+// Favourite controller
+export const SAFE_ORIGIN = 'https://fact-admin.local';
+export const SAFE_RETURN_KEYS = new Set([
+  'favouritesPageNumber',
+  'includeClosed',
+  'onlyServiceCentres',
+  'pageNumber',
+  'pageSize',
+  'partialCourtName',
+  'regionId',
+  'sortBy',
+  'sortOrder',
+  'tab',
+]);
+export const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
+export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
