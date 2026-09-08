@@ -9,6 +9,7 @@ import { dataApiRequestContext } from '../../../main/requests/utils/dataApiReque
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 const COURT_NAME = 'Reading Crown Court';
 const FILE_LINK = 'https://example.com/court-photo.jpg?cache-key';
+const CSRF_TOKEN = 'route-test-csrf-token';
 const COURT = {
   id: COURT_ID,
   name: COURT_NAME,
@@ -108,6 +109,7 @@ describe('Court photo routes', () => {
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
+      .field('_csrf', CSRF_TOKEN)
       .attach('photo', file, { contentType: mimeType, filename });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
@@ -120,7 +122,7 @@ describe('Court photo routes', () => {
     stubCourtPhoto();
     const updateCourtPhoto = stub(CourtApi.prototype, 'updateCourtPhoto');
 
-    const response = await request(app).post(`/courts/${COURT_ID}/edit/photo/upload`);
+    const response = await request(app).post(`/courts/${COURT_ID}/edit/photo/upload`).field('_csrf', CSRF_TOKEN);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('There is a problem');
@@ -134,6 +136,7 @@ describe('Court photo routes', () => {
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
+      .field('_csrf', CSRF_TOKEN)
       .attach('photo', Buffer.from('plain text'), { contentType: 'text/plain', filename: 'court.txt' });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
@@ -147,6 +150,7 @@ describe('Court photo routes', () => {
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
+      .field('_csrf', CSRF_TOKEN)
       .attach('photo', Buffer.alloc(4 * 1024 * 1024 + 1), { contentType: 'image/png', filename: 'large.png' });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
@@ -165,6 +169,7 @@ describe('Court photo routes', () => {
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
+      .field('_csrf', CSRF_TOKEN)
       .attach('photo', Buffer.from('png-data'), { contentType: 'image/png', filename: 'court.png' });
 
     expect(response.status).toBe(HttpStatusCode.Ok);
@@ -182,6 +187,7 @@ describe('Court photo routes', () => {
 
     const response = await request(app)
       .post(`/courts/${COURT_ID}/edit/photo/upload`)
+      .field('_csrf', CSRF_TOKEN)
       .attach('photo', Buffer.from('png-data'), { contentType: 'image/png', filename: 'court.png' });
 
     expect(response.status).toBe(status);

@@ -9,6 +9,7 @@ import { requiresAuth } from 'express-openid-connect';
 import RateLimit from 'express-rate-limit';
 
 import { HTTPError } from './HttpError';
+import { photoUploadMiddleware } from './controllers/helpers/multerUpload';
 import { setupDev } from './development';
 import { AppInsights } from './modules/appinsights';
 import { Authentication } from './modules/authentication';
@@ -138,6 +139,8 @@ app.use((req, res, next) => {
     return res.render('not-found');
   });
 });
+
+app.post('/courts/:courtId/edit/photo/upload', photoUploadMiddleware('photo', 4));
 
 if (config.get<boolean>('useCSRFProtection')) {
   new CsrfProtection().enableFor(app);
