@@ -4,8 +4,8 @@ import { restore, stub } from 'sinon';
 import { ServiceCentreApi } from '../../../../main/requests/ServiceCentreApi';
 import {
   ServiceCentreWarningNoticeService,
-  maxServiceCentreWarningNoticeLength,
 } from '../../../../main/services/service-centres/ServiceCentreWarningNoticeService';
+import { MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH } from '../../../../main/utils/variablesConstants';
 
 describe('ServiceCentreWarningNoticeService', () => {
   const serviceCentreId = '22222222-2222-4222-8222-222222222222';
@@ -23,7 +23,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'a'.repeat(maxServiceCentreWarningNoticeLength + 1), 'test');
+    const result = await service.save(serviceCentreId, 'a'.repeat(MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH + 1), 'test');
 
     expect(result.type).toBe('validation-error');
     expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 250 characters or fewer');

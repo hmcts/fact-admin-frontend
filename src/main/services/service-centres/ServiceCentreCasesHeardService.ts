@@ -2,9 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { CourtAreaOfLawSelection } from '../../schemas/areaOfLawSchema';
-
-export const serviceCentreAreasOfLawValidationMessage =
-  'Select at least one type of case heard at this service centre.';
+import { SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE } from '../../utils/variablesConstants';
 
 export type ServiceCentreCasesHeardViewModel = {
   areasOfLawError?: string;
@@ -38,7 +36,7 @@ export class ServiceCentreCasesHeardService {
   }
 
   public validateSelectedAreasOfLaw(selectedAreasOfLaw: string[]): string | undefined {
-    return selectedAreasOfLaw.length === 0 ? serviceCentreAreasOfLawValidationMessage : undefined;
+    return selectedAreasOfLaw.length === 0 ? SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE : undefined;
   }
 
   public async getCasesHeardPage(

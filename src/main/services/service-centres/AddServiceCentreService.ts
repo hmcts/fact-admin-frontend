@@ -5,6 +5,7 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
+import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/variablesConstants';
 
 type AddServiceCentreForm = {
   name?: string;
@@ -37,8 +38,6 @@ type AddServiceCentreSuccessModel = {
 };
 
 type AddServiceCentreResult = AddServiceCentrePageModel | AddServiceCentreSuccessModel | HttpStatusCode;
-
-const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 
 export class AddServiceCentreService {
   public constructor(

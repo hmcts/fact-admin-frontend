@@ -2,13 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
-import { EMAIL_REGEX } from '../../utils/variablesConstants';
-
-type Day = {
-  idPrefix: string;
-  name: string;
-  value: string;
-};
+import { EMAIL_REGEX, OPENING_HOUR_DAYS, OpeningHourDay } from '../../utils/variablesConstants';
 
 export type CounterServiceOpeningHoursForm = {
   assistWith: string[];
@@ -45,7 +39,7 @@ export type CounterServiceListViewModel = {
 export type CounterServiceEditViewModel = {
   courtId: string;
   courtName: string;
-  days: Day[];
+  days: OpeningHourDay[];
   errors: Record<string, string>;
   errorSummary: CounterServiceEditError[];
   form: CounterServiceOpeningHoursForm;
@@ -72,14 +66,6 @@ export type CounterServiceSuccessViewModel = {
   courtName: string;
   assistanceAvailable: string;
 };
-
-const days: Day[] = [
-  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
-  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
-  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
-  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
-  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
-];
 
 export class CounterServiceOpeningHoursService {
   public constructor(private readonly courtApi = new CourtApi()) {}
@@ -281,7 +267,7 @@ export class CounterServiceOpeningHoursService {
     return {
       courtId,
       courtName: courtResponse.name,
-      days,
+      days: [...OPENING_HOUR_DAYS],
       errors: {},
       errorSummary: [],
       form,
@@ -322,7 +308,7 @@ export class CounterServiceOpeningHoursService {
     }
 
     form.selectedDays.forEach(day => {
-      const dayConfig = days.find(config => config.value === day);
+      const dayConfig = OPENING_HOUR_DAYS.find(config => config.value === day);
       if (dayConfig) {
         this.validateTimeGroup(errors, form, dayConfig.idPrefix, dayConfig.name);
       }
@@ -396,8 +382,8 @@ export class CounterServiceOpeningHoursService {
     }
 
     return form.selectedDays
-      .map(day => days.find(dayConfig => dayConfig.value === day))
-      .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
+      .map(day => OPENING_HOUR_DAYS.find(dayConfig => dayConfig.value === day))
+      .filter((dayConfig): dayConfig is OpeningHourDay => Boolean(dayConfig))
       .map(dayConfig => ({
         dayOfWeek: dayConfig.value,
         openingTime: this.formatTime(

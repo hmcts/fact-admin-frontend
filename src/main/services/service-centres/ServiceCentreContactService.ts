@@ -6,6 +6,13 @@ import { SaveServiceCentreContactDetailRequest } from '../../requests/types/Save
 import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import { parseString } from '../../utils/valueParsers';
+import {
+  EMAIL_REGEX,
+  ENGLISH_TEXT_REGEX,
+  MAX_EXPLANATION_LENGTH,
+  PHONE_NUMBER_REGEX,
+  WELSH_TEXT_REGEX,
+} from '../../utils/variablesConstants';
 
 export type ServiceCentreContactFormValues = {
   contactEmail: string;
@@ -80,12 +87,6 @@ export type ServiceCentreContactSubmitFlowOutcome =
       type: 'saved';
       successPanelBody: string;
     };
-
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
-const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
-const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
-const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
   public constructor(
@@ -300,7 +301,7 @@ export class ServiceCentreContactService {
       if (!contactEmail) {
         formErrors.contactEmail = 'Enter an email address';
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      } else if (!emailPattern.test(contactEmail)) {
+      } else if (!EMAIL_REGEX.test(contactEmail)) {
         formErrors.contactEmail = 'Enter an email address in the correct format';
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       }
@@ -310,7 +311,7 @@ export class ServiceCentreContactService {
       if (!contactTelephone) {
         formErrors.contactTelephone = 'Enter a phone number';
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      } else if (!phoneNumberPattern.test(contactTelephone)) {
+      } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
         formErrors.contactTelephone = 'Enter a phone number in the correct format';
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       }
@@ -366,8 +367,8 @@ export class ServiceCentreContactService {
 
   private validateContactExplanation(contactExplanation: string, welsh: boolean) {
     const insert = welsh ? 'in Welsh ' : '';
-    const pattern = welsh ? welshExplanationPattern : explanationPattern;
-    if (contactExplanation.length > maxExplanationLength) {
+    const pattern = welsh ? WELSH_TEXT_REGEX : ENGLISH_TEXT_REGEX;
+    if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
       return `Explanation ${insert}must be 250 characters or fewer`;
     } else if (contactExplanation && !pattern.test(contactExplanation)) {
       return `Explanation ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs`;

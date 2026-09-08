@@ -1,3 +1,6 @@
+// Approval service
+export const APPROVAL_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss';
+
 // Audit service
 export const DEFAULT_PAGE_NUMBER = 0;
 export const DEFAULT_PAGE_SIZE = 25;
@@ -78,6 +81,10 @@ export const UK_TIME_ZONE = 'Europe/London';
 // Add court service
 export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
+
+//Court address service
+export const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
+
 // Court counter service opening hours service
 export const EMAIL_REGEX =
   /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
@@ -133,3 +140,13 @@ export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
     label: 'Childcare arrangements',
   },
 ] as const;
+
+// Add service centre service
+export const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
+
+// Service centre cases heard service
+export const SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE =
+  'Select at least one type of case heard at this service centre.';
+
+// Service centre warning notice service
+export const MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH = 250;

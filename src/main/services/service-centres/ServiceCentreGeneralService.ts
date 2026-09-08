@@ -6,8 +6,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
-
-const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
+import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/variablesConstants';
 
 type ServiceAreaCheckboxItem = {
   checked: boolean;

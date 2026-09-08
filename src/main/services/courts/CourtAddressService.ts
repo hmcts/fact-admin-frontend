@@ -12,6 +12,7 @@ import {
   validateTownCityField,
 } from '../../utils/addressValidation';
 import { addError } from '../../utils/validation';
+import { VALID_EPIM_ID_REGEX } from '../../utils/variablesConstants';
 
 export type SaveCourtAddressResponse =
   | {
@@ -46,8 +47,6 @@ export type DeleteCourtAddressResponse =
       address: Partial<CourtAddress> & { errors?: Record<string, string[] | undefined> };
     }
   | HttpStatusCode;
-
-const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 
 const courtApi = new CourtApi();
 const referenceDataApi = new ReferenceDataApi();
