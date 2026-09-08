@@ -1,18 +1,18 @@
 import { GetCourtsParams } from '../requests/types/GetCourtsParams';
 import { Region } from '../schemas/regionSchema';
 import { isUuid, parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
+import {
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT_ORDER,
+  MAX_PAGE_PARAM,
+  PARTIAL_COURT_NAME_ERROR,
+  PARTIAL_COURT_NAME_PATTERN,
+  VALID_SORT_BY_VALUES,
+  VALID_SORT_ORDER_VALUES,
+} from '../utils/variablesConstants';
 
 import { HomePageFilters, HomePageValidationError } from './types/HomePage.types';
-
-const DEFAULT_PAGE_NUMBER = 0;
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_PARAM = 1000;
-const DEFAULT_SORT_ORDER = 'asc';
-const PARTIAL_COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
-const PARTIAL_COURT_NAME_ERROR =
-  'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.';
-const VALID_SORT_BY_VALUES = ['lastUpdated', 'name'] as const;
-const VALID_SORT_ORDER_VALUES = ['asc', 'desc'] as const;
 
 /**
  * Parses, validates, and maps homepage query filters.

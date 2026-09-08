@@ -4,6 +4,7 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
+import { VALID_COURT_NAME_REGEX } from '../../utils/variablesConstants';
 
 type AddCourtForm = {
   name?: string;
@@ -27,8 +28,6 @@ type AddCourtResult =
       pageTitle: string;
     }
   | HttpStatusCode;
-
-const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class AddCourtService {
   public constructor(

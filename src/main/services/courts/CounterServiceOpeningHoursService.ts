@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
+import { EMAIL_REGEX } from '../../utils/variablesConstants';
 
 type Day = {
   idPrefix: string;
@@ -79,8 +80,6 @@ const days: Day[] = [
   { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
   { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
 ];
-
-const EMAIL_PATTERN = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 export class CounterServiceOpeningHoursService {
   public constructor(private readonly courtApi = new CourtApi()) {}
@@ -303,10 +302,7 @@ export class CounterServiceOpeningHoursService {
       errors.appointmentNeeded = 'Select yes if an appointment is needed';
     }
 
-    if (
-      form.appointmentNeeded === 'yes' &&
-      (!form.appointmentContact || !EMAIL_PATTERN.test(form.appointmentContact))
-    ) {
+    if (form.appointmentNeeded === 'yes' && (!form.appointmentContact || !EMAIL_REGEX.test(form.appointmentContact))) {
       errors.appointmentContact = 'Enter a valid contact email address';
     }
 

@@ -1,5 +1,6 @@
 import { PagedUsers } from '../schemas/userListSchema';
 import type { User } from '../schemas/userSchema';
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, SORT_ICON_PATHS, UK_TIME_ZONE } from '../utils/variablesConstants';
 
 import {
   UsersPageFilters,
@@ -9,15 +10,6 @@ import {
   UsersPageTableCell,
   UsersPageTableHeadCell,
 } from './types/UsersPage.types';
-
-const DEFAULT_PAGE_NUMBER = 0;
-const DEFAULT_PAGE_SIZE = 25;
-const UK_TIME_ZONE = 'Europe/London';
-const SORT_ICON_PATHS = {
-  ascending: '<path d="M6.5625 15.5L11 6.63125L15.4375 15.5H6.5625Z" fill="currentColor"/>',
-  descending: '<path d="M15.4375 7L11 15.8687L6.5625 7L15.4375 7Z" fill="currentColor"/>',
-  none: '<path d="M8.1875 9.5L10.9609 3.95703L13.7344 9.5H8.1875Z" fill="currentColor"/><path d="M13.7344 12.0781L10.9609 17.6211L8.1875 12.0781H13.7344Z" fill="currentColor"/>',
-} as const;
 
 export class UsersPageViewService {
   public buildUserTableHead(filters: UsersPageFilters): UsersPageTableHeadCell[] {

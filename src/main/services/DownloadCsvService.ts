@@ -2,49 +2,13 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../requests/CourtApi';
 import { AllLocationDetails, CourtDetails, ServiceCentreDetails } from '../schemas/courtDetailsSchema';
-
-const CSV_HEADERS = [
-  'Name',
-  'Open/Closed',
-  'Updated date',
-  'Addresses',
-  'Areas of law',
-  'Type',
-  'Crown court code',
-  'County court code',
-  'Magistrates court code',
-  'Facilities',
-  'Url',
-  'Emails',
-  'Contacts',
-  'DX',
-  'Opening times',
-] as const;
-const PUBLIC_FRONTEND_URL = process.env.PUBLIC_FRONTEND_URL || 'https://localhost:3344';
-const ADDRESS_TYPE_LABELS = {
-  VISIT_OR_CONTACT_US: 'Visit or contact us',
-  VISIT_US: 'Visit us',
-  WRITE_TO_US: 'Write to us',
-} as const;
-const COURT_TYPE_CODE_LABELS = [
-  ['magistrateCourtCode', "Magistrates' Court"],
-  ['familyCourtCode', 'Family Court'],
-  ['tribunalCode', 'Tribunal'],
-  ['countyCourtCode', 'County Court'],
-  ['crownCourtCode', 'Crown Court'],
-] as const;
-const FACILITY_LABELS = {
-  parking: 'Parking',
-  babyChanging: 'Baby changing',
-  cafeteria: 'Cafeteria',
-  drinkVendingMachines: 'Drink vending machines',
-  freeWaterDispensers: 'Free water dispensers',
-  quietRoom: 'Quiet room',
-  snackVendingMachines: 'Snack vending machines',
-  waitingArea: 'Waiting area',
-  waitingAreaChildren: 'Children waiting area',
-  wifi: 'WiFi',
-} as const;
+import {
+  ADDRESS_TYPE_LABELS,
+  COURT_TYPE_CODE_LABELS,
+  CSV_HEADERS,
+  FACILITY_LABELS,
+  PUBLIC_FRONTEND_URL,
+} from '../utils/variablesConstants';
 
 export type CsvDownload = {
   csv: string;

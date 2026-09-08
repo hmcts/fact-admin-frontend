@@ -1,16 +1,17 @@
 import { GetUsersParams } from '../requests/types/GetUsersParams';
 import { parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
+import {
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT_ORDER,
+  MAX_PAGE_PARAM,
+  SEARCH_MAX_LENGTH,
+  SEARCH_PATTERN,
+  VALID_SORT_BY_LAST_LOGIN_VALUE,
+  VALID_SORT_ORDER_VALUES,
+} from '../utils/variablesConstants';
 
 import { UsersPageFilters, UsersPageValidationError } from './types/UsersPage.types';
-
-const DEFAULT_PAGE_NUMBER = 0;
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_PARAM = 1000;
-const DEFAULT_SORT_ORDER = 'asc';
-const SEARCH_MAX_LENGTH = 250;
-const SEARCH_PATTERN = /^[A-Za-z0-9._+\-@]*$/;
-const VALID_SORT_BY_VALUES = ['lastLogin'] as const;
-const VALID_SORT_ORDER_VALUES = ['asc', 'desc'] as const;
 
 export class UsersPageFiltersService {
   public getFilters(query: Record<string, unknown>): UsersPageFilters {
@@ -65,7 +66,10 @@ export class UsersPageFiltersService {
     }
 
     if (filters.rawSortBy !== undefined && filters.rawSortBy !== 'lastLogin') {
-      errors.push({ href: '#main-content', text: `sortBy must be one of: ${VALID_SORT_BY_VALUES.join(', ')}` });
+      errors.push({
+        href: '#main-content',
+        text: `sortBy must be one of: ${VALID_SORT_BY_LAST_LOGIN_VALUE.join(', ')}`,
+      });
     }
 
     if (filters.rawSortOrder !== undefined && !VALID_SORT_ORDER_VALUES.includes(filters.rawSortOrder as never)) {

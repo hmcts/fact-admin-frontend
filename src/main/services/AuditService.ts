@@ -11,15 +11,14 @@ import { OperationsApi } from '../requests/OperationsApi';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 import { SubjectType } from '../schemas/subjectTypeSchema';
-
-const DEFAULT_PAGE_NUMBER = 0;
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_PARAM = 1000;
-
-const CSV_PAGE_SIZE = 1000;
-const MAX_CSV_PAGES = 1;
-
-const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
+import {
+  CSV_PAGE_SIZE,
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  EMAIL_PARTIAL_REGEX,
+  MAX_CSV_PAGES,
+  MAX_PAGE_PARAM,
+} from '../utils/variablesConstants';
 
 const logger = Logger.getLogger('audit-service');
 
@@ -231,7 +230,7 @@ export class AuditService {
       errors.pageSize = [`Page size must be between 1 and ${MAX_PAGE_PARAM}`];
     }
     // partial email format check
-    if (params.email && !EMAIL_PARAM_REGEX.test(params.email)) {
+    if (params.email && !EMAIL_PARTIAL_REGEX.test(params.email)) {
       errors.email = [
         'Email match may only contain letters, hyphens, periods, plus/minus signs,' +
           " underscores, and a single 'at' (@) symbol",
