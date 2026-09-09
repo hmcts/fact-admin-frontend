@@ -125,7 +125,8 @@ export class UsersPageViewService {
 
   private buildSortableHeadItem(label: string, filters: UsersPageFilters): UsersPageTableHeadCell {
     const isCurrentSort = filters.sortBy === 'lastLogin';
-    const ariaSort = isCurrentSort ? (filters.sortOrder === 'desc' ? 'descending' : 'ascending') : 'none';
+    const sortOrder = filters.sortOrder === 'desc' ? 'descending' : 'ascending';
+    const ariaSort = isCurrentSort ? sortOrder : 'none';
     const nextSortOrder = isCurrentSort && filters.sortOrder === 'asc' ? 'descending' : 'ascending';
 
     return {

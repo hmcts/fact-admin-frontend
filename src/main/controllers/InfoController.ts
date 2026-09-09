@@ -1,4 +1,4 @@
-import * as os from 'os';
+import * as os from 'node:os';
 
 import { InfoContributor, infoRequestHandler } from '@hmcts/info-provider';
 import { GET, route } from 'awilix-express';

@@ -39,11 +39,11 @@ const normalizeHearingEnhancementEquipment = (
     return undefined;
   }
 
-  if (Object.prototype.hasOwnProperty.call(HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE, value)) {
+  if (Object.hasOwn(HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE, value)) {
     return HEARING_ENHANCEMENT_EQUIPMENT_MAP_REVERSE[value as HearingEnhancementEquipmentApi];
   }
 
-  if (Object.prototype.hasOwnProperty.call(HEARING_ENHANCEMENT_EQUIPMENT_MAP, value)) {
+  if (Object.hasOwn(HEARING_ENHANCEMENT_EQUIPMENT_MAP, value)) {
     return value as HearingEnhancementEquipmentUi;
   }
 

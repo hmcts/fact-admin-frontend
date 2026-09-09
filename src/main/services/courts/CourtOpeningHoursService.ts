@@ -143,13 +143,7 @@ export class CourtOpeningHoursService {
     courtId: string,
     openingHoursId?: string
   ): Promise<OpeningHoursEditViewModel | HttpStatusCode> {
-    const baseModel = await this.getEditPageBase(courtId, openingHoursId);
-
-    if (this.isHttpStatusCode(baseModel)) {
-      return baseModel;
-    }
-
-    return baseModel;
+    return this.getEditPageBase(courtId, openingHoursId);
   }
 
   public async save(

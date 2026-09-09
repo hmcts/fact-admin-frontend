@@ -214,30 +214,7 @@ export class CourtContactService {
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
-    if (!selectedContactMethods.length) {
-      formErrors.contactMethods = 'Select at least one contact method';
-      errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
-    }
-
-    if (selectedContactMethods.includes('email')) {
-      if (!contactEmail) {
-        formErrors.contactEmail = 'Enter an email address';
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      } else if (!emailPattern.test(contactEmail)) {
-        formErrors.contactEmail = 'Enter an email address in the correct format';
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      }
-    }
-
-    if (selectedContactMethods.includes('phone')) {
-      if (!contactTelephone) {
-        formErrors.contactTelephone = 'Enter a phone number';
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      } else if (!phoneNumberPattern.test(contactTelephone)) {
-        formErrors.contactTelephone = 'Enter a phone number in the correct format';
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      }
-    }
+    this.validateContactMethods(selectedContactMethods, formErrors, errorSummary, contactEmail, contactTelephone);
 
     const contactExplanation = formValues.contactExplanation;
     const contactExplanationCy = formValues.contactExplanationCy;
@@ -283,6 +260,39 @@ export class CourtContactService {
       payload,
       selectedContactTypeId,
     };
+  }
+
+  private validateContactMethods(
+    selectedContactMethods: string[],
+    formErrors: CourtContactFormErrors,
+    errorSummary: CourtContactValidationError[],
+    contactEmail: string,
+    contactTelephone: string
+  ): void {
+    if (!selectedContactMethods.length) {
+      formErrors.contactMethods = 'Select at least one contact method';
+      errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
+    }
+
+    if (selectedContactMethods.includes('email')) {
+      if (!contactEmail) {
+        formErrors.contactEmail = 'Enter an email address';
+        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
+      } else if (!emailPattern.test(contactEmail)) {
+        formErrors.contactEmail = 'Enter an email address in the correct format';
+        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
+      }
+    }
+
+    if (selectedContactMethods.includes('phone')) {
+      if (!contactTelephone) {
+        formErrors.contactTelephone = 'Enter a phone number';
+        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
+      } else if (!phoneNumberPattern.test(contactTelephone)) {
+        formErrors.contactTelephone = 'Enter a phone number in the correct format';
+        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
+      }
+    }
   }
 
   public async saveContactDetail(

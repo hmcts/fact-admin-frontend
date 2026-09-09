@@ -8,8 +8,6 @@ import { OpeningHourType } from '../schemas/openingHoursSchema';
 
 const referenceDataApi = new ReferenceDataApi();
 
-// TODO: decide if we need this. it's currently just wrapping calls the the data api, which is only useful
-//       if these things are needed outside of the service package.
 export class TypesService {
   public async listAreasOfLaw(): Promise<AreaOfLawType[] | HttpStatusCode> {
     return referenceDataApi.getAreasOfLaw();
