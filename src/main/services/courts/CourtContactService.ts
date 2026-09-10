@@ -5,6 +5,7 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
+import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
 
 export type CourtContactFormValues = {
@@ -86,8 +87,6 @@ type ApiValidationMapping = {
   href: string;
 };
 
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
 const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
@@ -214,7 +213,7 @@ export class CourtContactService {
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
-    this.validateContactMethods(selectedContactMethods, formErrors, errorSummary, contactEmail, contactTelephone);
+    validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
     const contactExplanation = formValues.contactExplanation;
     const contactExplanationCy = formValues.contactExplanationCy;
@@ -260,39 +259,6 @@ export class CourtContactService {
       payload,
       selectedContactTypeId,
     };
-  }
-
-  private validateContactMethods(
-    selectedContactMethods: string[],
-    formErrors: CourtContactFormErrors,
-    errorSummary: CourtContactValidationError[],
-    contactEmail: string,
-    contactTelephone: string
-  ): void {
-    if (!selectedContactMethods.length) {
-      formErrors.contactMethods = 'Select at least one contact method';
-      errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
-    }
-
-    if (selectedContactMethods.includes('email')) {
-      if (!contactEmail) {
-        formErrors.contactEmail = 'Enter an email address';
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      } else if (!emailPattern.test(contactEmail)) {
-        formErrors.contactEmail = 'Enter an email address in the correct format';
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      }
-    }
-
-    if (selectedContactMethods.includes('phone')) {
-      if (!contactTelephone) {
-        formErrors.contactTelephone = 'Enter a phone number';
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      } else if (!phoneNumberPattern.test(contactTelephone)) {
-        formErrors.contactTelephone = 'Enter a phone number in the correct format';
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      }
-    }
   }
 
   public async saveContactDetail(

@@ -5,6 +5,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
+import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
 
 export type ServiceCentreContactFormValues = {
@@ -81,8 +82,6 @@ export type ServiceCentreContactSubmitFlowOutcome =
       successPanelBody: string;
     };
 
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
 const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
 const maxExplanationLength = 250;
@@ -291,30 +290,7 @@ export class ServiceCentreContactService {
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
-    if (!selectedContactMethods.length) {
-      formErrors.contactMethods = 'Select at least one contact method';
-      errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
-    }
-
-    if (selectedContactMethods.includes('email')) {
-      if (!contactEmail) {
-        formErrors.contactEmail = 'Enter an email address';
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      } else if (!emailPattern.test(contactEmail)) {
-        formErrors.contactEmail = 'Enter an email address in the correct format';
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      }
-    }
-
-    if (selectedContactMethods.includes('phone')) {
-      if (!contactTelephone) {
-        formErrors.contactTelephone = 'Enter a phone number';
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      } else if (!phoneNumberPattern.test(contactTelephone)) {
-        formErrors.contactTelephone = 'Enter a phone number in the correct format';
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      }
-    }
+    validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
     this.validateContactExplanationFields(formValues, formErrors, errorSummary);
 
