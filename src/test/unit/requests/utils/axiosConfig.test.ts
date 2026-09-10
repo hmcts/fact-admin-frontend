@@ -51,7 +51,6 @@ describe('processRequest', () => {
     expect(result.headers?.['X-User-Id']).toBe('user-123');
   });
 
-
   it('does not add X-User-Id header without a user id in the request context', async () => {
     const cfg: Partial<InternalAxiosRequestConfig> = { method: 'put', url: '/courts/123/entity/v1' };
 
