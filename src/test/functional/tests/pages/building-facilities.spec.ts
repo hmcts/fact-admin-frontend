@@ -54,6 +54,25 @@ test.describe('Building Facilities Page Tests', () => {
     });
   });
 
+  test('rejects a form submission without a csrf token', async ({ buildingFacilitiesPage, playwright }) => {
+    await withCreatedCourt(playwright, 'Building Facilities CSRF Test', {}, async ({ createdCourt }) => {
+      await buildingFacilitiesPage.goto(createdCourt.id);
+      await expect(buildingFacilitiesPage.csrfTokenInput).not.toHaveValue('');
+      await buildingFacilitiesPage.csrfTokenInput.evaluate(element => element.remove());
+
+      const responsePromise = buildingFacilitiesPage.page.waitForResponse(
+        response =>
+          response.request().method() === 'POST' &&
+          new URL(response.url()).pathname === `/courts/${createdCourt.id}/edit/building-facilities/success`
+      );
+      await buildingFacilitiesPage.save();
+      const response = await responsePromise;
+
+      expect(response.status()).toBe(403);
+      await expect(buildingFacilitiesPage.heading).toContainText('Something went wrong');
+    });
+  });
+
   test('renders validation error when children waiting area is not selected', async ({
     buildingFacilitiesPage,
     playwright,
