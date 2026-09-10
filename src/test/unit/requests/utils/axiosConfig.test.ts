@@ -39,13 +39,18 @@ describe('processRequest', () => {
     expect(result.headers?.Authorization).toBe(`Bearer ${mockToken}`);
   });
 
-  it('adds X-User-Id header when a user id is available in the request context', async () => {
-    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'put', url: '/courts/123/entity/v1' };
+  it.each([
+    ['a user id is available in the request context', 'put', '/courts/123/entity/v1'],
+    ['POST requests outside excluded endpoints', 'post', '/courts/123/entity/v1'],
+    ['the paginated users GET', 'get', '/user/v1'],
+  ])('adds X-User-Id header when %s', async (_case, method, url) => {
+    const cfg: Partial<InternalAxiosRequestConfig> = { method, url };
 
     const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
 
     expect(result.headers?.['X-User-Id']).toBe('user-123');
   });
+
 
   it('does not add X-User-Id header without a user id in the request context', async () => {
     const cfg: Partial<InternalAxiosRequestConfig> = { method: 'put', url: '/courts/123/entity/v1' };
@@ -55,28 +60,12 @@ describe('processRequest', () => {
     expect(result.headers?.['X-User-Id']).toBeUndefined();
   });
 
-  it('adds X-User-Id header to POST requests outside excluded endpoints', async () => {
-    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/courts/123/entity/v1' };
-
-    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
-
-    expect(result.headers?.['X-User-Id']).toBe('user-123');
-  });
-
   it('does not add X-User-Id header to the data API user creation/update POST', async () => {
     const cfg: Partial<InternalAxiosRequestConfig> = { method: 'post', url: '/user/v1' };
 
     const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
 
     expect(result.headers?.['X-User-Id']).toBeUndefined();
-  });
-
-  it('adds X-User-Id header to the paginated users GET', async () => {
-    const cfg: Partial<InternalAxiosRequestConfig> = { method: 'get', url: '/user/v1' };
-
-    const result = await runWithDataApiUserId('user-123', () => processRequest(cfg as InternalAxiosRequestConfig));
-
-    expect(result.headers?.['X-User-Id']).toBe('user-123');
   });
 
   it('adds X-User-Id header when method and url are missing (defaults apply)', async () => {
