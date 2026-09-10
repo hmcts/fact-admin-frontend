@@ -64,6 +64,6 @@ describe('AccessibilityScheme', () => {
       accessibleParkingPhoneNumber: null,
     });
 
-    expect(result.accessibleParkingPhoneNumber).toBe(null);
+    expect(result.accessibleParkingPhoneNumber).toBeNull();
   });
 });
