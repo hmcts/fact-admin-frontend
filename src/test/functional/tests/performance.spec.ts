@@ -149,6 +149,7 @@ test.describe(
         await lighthousePage.goto(`${config.urls.homePageUrl}/approvals?name=${encodeURIComponent(createdCourt.name)}`);
         await lighthousePage.getByRole('heading', { name: 'Approvals tracker' }).waitFor();
         await lighthousePage.getByRole('row').filter({ hasText: createdCourt.name }).waitFor();
+        await expect(lighthousePage.getByRole('row').filter({ hasText: createdCourt.name })).toBeVisible();
         await lighthouseUtils.audit(LIGHTHOUSE_THRESHOLDS);
       });
     });

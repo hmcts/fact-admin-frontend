@@ -481,7 +481,7 @@ test.describe(
       });
     });
 
-    test('sorts courts by last updated in ascending and descending order', async ({ homePage, page, playwright }) => {
+    test('sorts courts by last updated in ascending and descending order', async ({ homePage, playwright }) => {
       await withTestCourtPrefix(playwright, 'Home Functional Test', async ({ apiContext, courtNamePrefix }) => {
         const olderCourtName = `${courtNamePrefix} Older`;
         const newerCourtName = `${courtNamePrefix} Newer`;
@@ -489,7 +489,7 @@ test.describe(
           courtName: olderCourtName,
           open: true,
         });
-        await page.waitForTimeout(1100);
+        await new Promise(resolve => setTimeout(resolve, 1100));
         await createTestCourt(apiContext, {
           courtName: newerCourtName,
           open: true,

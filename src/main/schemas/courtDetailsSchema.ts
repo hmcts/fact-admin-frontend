@@ -175,13 +175,11 @@ const serviceCentreAreasOfLawSchema = z.object({
 });
 
 const serviceAreaSchema = z.union([
-  z
-    .object({
-      id: z.string(),
-      name: z.string().nullable().optional(),
-      nameCy: z.string().nullable().optional(),
-    })
-    .passthrough(),
+  z.looseObject({
+    id: z.string(),
+    name: z.string().nullable().optional(),
+    nameCy: z.string().nullable().optional(),
+  }),
   z.string(),
 ]);
 

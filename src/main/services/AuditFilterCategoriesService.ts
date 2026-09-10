@@ -1,5 +1,5 @@
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { parseDate, toJsDateString } from '../utils/valueParsers';
+import { hasValue, parseDate, toJsDateString } from '../utils/valueParsers';
 
 export type FilterCategory = {
   heading: { text: string };
@@ -37,7 +37,7 @@ export class AuditFilterCategoriesService {
    */
   public buildFilterCategories(filters: GetAuditsParams): FilterCategory[] {
     const entries = Object.entries(filters).filter(
-      ([key, value]) => INCLUDED_CATEGORIES.has(key) && this.hasValue(value) && !this.isHiddenFromDate(key, value)
+      ([key, value]) => INCLUDED_CATEGORIES.has(key) && hasValue(value) && !this.isHiddenFromDate(key, value)
     );
 
     const grouped = new Map<string, { key: string; itemText: string }[]>();
@@ -59,7 +59,7 @@ export class AuditFilterCategoriesService {
       const items = groupEntries.map(({ key, itemText }) => {
         const params = new URLSearchParams(
           Object.entries(filters)
-            .filter(([candidateKey, candidateValue]) => candidateKey !== key && this.hasValue(candidateValue))
+            .filter(([candidateKey, candidateValue]) => candidateKey !== key && hasValue(candidateValue))
             .map(([candidateKey, candidateValue]) => [candidateKey, String(candidateValue)])
         );
 
@@ -76,10 +76,6 @@ export class AuditFilterCategoriesService {
     }
 
     return categories;
-  }
-
-  private hasValue(value: unknown): boolean {
-    return value !== undefined && value !== null && String(value).trim() !== '';
   }
 
   private isHiddenFromDate(key: string, value: unknown): boolean {

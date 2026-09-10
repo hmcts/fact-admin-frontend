@@ -12,7 +12,9 @@ type CourtTypeOption = {
   value: string;
 };
 
-export type ProfessionalInformationForm = Record<string, string | string[] | undefined>;
+type ProfessionalInformationFormValue = string | string[] | undefined;
+
+export type ProfessionalInformationForm = Record<string, ProfessionalInformationFormValue>;
 
 export type ProfessionalInformationError = {
   href: string;
@@ -290,6 +292,26 @@ export class CourtProfessionalInformationService {
   private validate(viewModel: ProfessionalInformationViewModel): ProfessionalInformationError[] {
     const errors: ProfessionalInformationError[] = [];
 
+    this.validateCourtTypeOptions(viewModel, errors);
+
+    if (viewModel.gbs.trim() && !englishTextPattern.test(viewModel.gbs.trim())) {
+      errors.push({
+        href: '#gbs',
+        text: gbsValidationError,
+      });
+    }
+
+    this.validateInterviewRooms(viewModel, errors);
+    this.validateDxCodes(viewModel, errors);
+    this.validateFaxNumbers(viewModel, errors);
+
+    return errors;
+  }
+
+  private validateCourtTypeOptions(
+    viewModel: ProfessionalInformationViewModel,
+    errors: ProfessionalInformationError[]
+  ) {
     for (const option of courtTypeOptions) {
       if (!viewModel.selectedCourtTypes.includes(option.value)) {
         continue;
@@ -308,14 +330,9 @@ export class CourtProfessionalInformationService {
         });
       }
     }
+  }
 
-    if (viewModel.gbs.trim() && !englishTextPattern.test(viewModel.gbs.trim())) {
-      errors.push({
-        href: '#gbs',
-        text: gbsValidationError,
-      });
-    }
-
+  private validateInterviewRooms(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
     if (viewModel.interviewRooms === true) {
       if (!viewModel.interviewRoomCount.trim()) {
         errors.push({
@@ -337,7 +354,71 @@ export class CourtProfessionalInformationService {
         }
       }
     }
+  }
 
+  private validateFaxNumbers(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
+    viewModel.faxNumbers.forEach((faxNumber, index) => {
+      const formIndex = faxNumber.formIndex ?? index;
+      const code = faxNumber.code?.trim() ?? '';
+      const description = faxNumber.description?.trim() ?? '';
+      const descriptionCy = faxNumber.descriptionCy?.trim() ?? '';
+      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
+      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
+      if (description && !code) {
+        errors.push({
+          href: `#faxNumber-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
+        });
+      }
+      if (descriptionCy && !code) {
+        errors.push({
+          href: `#faxNumber-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
+        });
+      } else if (code && !phoneNumberPattern.test(code)) {
+        errors.push({
+          href: `#faxNumber-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: ${faxNumberValidationError}`,
+        });
+      }
+      if (hasEnglishDescriptionOnly) {
+        errors.push({
+          href: `#faxNumberDescriptionCy-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: Because you provided an description in English, the Welsh translation is now mandatory`,
+        });
+      }
+      if (hasWelshDescriptionOnly) {
+        errors.push({
+          href: `#faxNumberDescription-${formIndex}`,
+          text: `Fax number ${formIndex + 1}: Because you provided an description in Welsh, the English translation is now mandatory`,
+        });
+      }
+      if (description.length > repeatableDescriptionMaxLength) {
+        errors.push({
+          href: `#faxNumberDescription-${formIndex}`,
+          text: `Fax number ${formIndex + 1} description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
+        });
+      } else if (description && !englishTextPattern.test(description)) {
+        errors.push({
+          href: `#faxNumberDescription-${formIndex}`,
+          text: `Fax number ${formIndex + 1} description: ${dxValidationError}`,
+        });
+      }
+      if (descriptionCy.length > repeatableDescriptionMaxLength) {
+        errors.push({
+          href: `#faxNumberDescriptionCy-${formIndex}`,
+          text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
+        });
+      } else if (descriptionCy && !welshTextPattern.test(descriptionCy)) {
+        errors.push({
+          href: `#faxNumberDescriptionCy-${formIndex}`,
+          text: `Fax number ${formIndex + 1} Welsh description: ${dxValidationError}`,
+        });
+      }
+    });
+  }
+
+  private validateDxCodes(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
     viewModel.dxCodes.forEach((dxCode, index) => {
       const formIndex = dxCode.formIndex ?? index;
       const code = dxCode.code?.trim() ?? '';
@@ -403,68 +484,6 @@ export class CourtProfessionalInformationService {
         });
       }
     });
-
-    viewModel.faxNumbers.forEach((faxNumber, index) => {
-      const formIndex = faxNumber.formIndex ?? index;
-      const code = faxNumber.code?.trim() ?? '';
-      const description = faxNumber.description?.trim() ?? '';
-      const descriptionCy = faxNumber.descriptionCy?.trim() ?? '';
-      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
-      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
-      if (description && !code) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
-        });
-      }
-      if (descriptionCy && !code) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
-        });
-      } else if (code && !phoneNumberPattern.test(code)) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${faxNumberValidationError}`,
-        });
-      }
-      if (hasEnglishDescriptionOnly) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Because you provided an description in English, the Welsh translation is now mandatory`,
-        });
-      }
-      if (hasWelshDescriptionOnly) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Because you provided an description in Welsh, the English translation is now mandatory`,
-        });
-      }
-      if (description.length > repeatableDescriptionMaxLength) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
-        });
-      } else if (description && !englishTextPattern.test(description)) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: ${dxValidationError}`,
-        });
-      }
-      if (descriptionCy.length > repeatableDescriptionMaxLength) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
-        });
-      } else if (descriptionCy && !welshTextPattern.test(descriptionCy)) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: ${dxValidationError}`,
-        });
-      }
-    });
-
-    return errors;
   }
 
   private toPayload(viewModel: ProfessionalInformationViewModel): CourtProfessionalInformation {
@@ -600,9 +619,9 @@ export class CourtProfessionalInformationService {
     field: string,
     viewModel?: ProfessionalInformationViewModel
   ): RepeatableApiError | undefined {
-    const repeatableErrorMatch = field.match(
+    const repeatableErrorMatch = new RegExp(
       /^(dxCodes|faxNumbers)\[(\d+)](?:\.(dxCode|explanation|explanationCy|faxNumber|description|descriptionCy))?$/i
-    );
+    ).exec(field);
     if (!repeatableErrorMatch) {
       return undefined;
     }
@@ -791,15 +810,15 @@ export class CourtProfessionalInformationService {
     return entries.length ? entries : [{ code: '', description: '', descriptionCy: '', formIndex: 0 }];
   }
 
-  private toArray(value: string | string[] | undefined): string[] {
+  private toArray(value: ProfessionalInformationFormValue): string[] {
     return [value].flat().filter((item): item is string => Boolean(item));
   }
 
-  private toString(value: string | string[] | undefined): string {
+  private toString(value: ProfessionalInformationFormValue): string {
     return Array.isArray(value) ? value[0] || '' : value || '';
   }
 
-  private toOptionalBoolean(value: string | string[] | undefined): boolean | undefined {
+  private toOptionalBoolean(value: ProfessionalInformationFormValue): boolean | undefined {
     const resolvedValue = this.toString(value);
     if (resolvedValue === 'true') {
       return true;
@@ -824,7 +843,7 @@ export class CourtProfessionalInformationService {
     return resolvedValue || null;
   }
 
-  private toDisplayString(value: unknown): string {
+  private toDisplayString<T>(value: T | null | undefined): string {
     if (value === null || value === undefined) {
       return '';
     }
