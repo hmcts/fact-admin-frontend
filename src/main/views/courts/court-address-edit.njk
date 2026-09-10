@@ -6,6 +6,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# MACROS #}
 
@@ -84,6 +85,7 @@
       {% endset %}
 
       <form action="{{ actionUrl }}" method="post">
+        {{ csrfProtection(csrfToken) }}
 
         {% if address.osAddressDataset and address.osAddressUprn %}
           {# The API looks up the chosen OS record again before saving coordinates. These
