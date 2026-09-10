@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -33,6 +34,7 @@
 
       {% if addresses.length %}
         <form method="POST" action="{{ actionUrl }}">
+        {{ csrfProtection(csrfToken) }}
 
           {{ govukSelect({
             id: "address",
@@ -53,6 +55,7 @@
       {% endif %}
 
       <form method="POST" action="{{ actionUrl }}">
+        {{ csrfProtection(csrfToken) }}
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"
