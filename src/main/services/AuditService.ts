@@ -172,8 +172,7 @@ export class AuditService {
     }
   }
 
-  private csvEscape(value: unknown): string {
-    const s = String(value ?? '');
+  private csvEscape(s = ''): string {
     return `"${s.replaceAll('"', '""')}"`;
   }
 

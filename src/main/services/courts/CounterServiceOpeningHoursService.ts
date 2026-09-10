@@ -122,13 +122,7 @@ export class CounterServiceOpeningHoursService {
     courtId: string,
     counterServiceId?: string
   ): Promise<CounterServiceEditViewModel | HttpStatusCode> {
-    const baseModel = await this.getEditPageBase(courtId, counterServiceId);
-
-    if (this.isHttpStatusCode(baseModel)) {
-      return baseModel;
-    }
-
-    return baseModel;
+    return this.getEditPageBase(courtId, counterServiceId);
   }
 
   public async save(
@@ -488,7 +482,7 @@ export class CounterServiceOpeningHoursService {
 
   private formatDisplayTime(time: string): string {
     const [hour, minute] = time.split(':');
-    const hourNum = parseInt(hour, 10);
+    const hourNum = Number.parseInt(hour, 10);
     const period = hourNum >= 12 ? 'pm' : 'am';
     const displayHour = hourNum % 12 === 0 ? 12 : hourNum % 12;
     return minute === '00' ? `${displayHour}${period}` : `${displayHour}:${minute}${period}`;

@@ -333,16 +333,15 @@ export class CourtAddressController extends BaseController {
     const aolSelected = courtAddress['areasOfLaw']?.[0];
     const ctSelected = courtAddress['courtTypes']?.[0];
 
-    await this.renderEditAddress(
-      res,
+    await this.renderEditAddress(res, {
       courtId,
-      courtName as string,
+      courtName: courtName as string,
       addressId,
-      courtAddress as CourtAddress,
+      courtAddress: courtAddress as CourtAddress,
       aolSelected,
       ctSelected,
-      req.body?.address
-    );
+      addressOptionData: req.body?.address,
+    });
   }
 
   @route('/details/success/:addressId')
@@ -374,15 +373,14 @@ export class CourtAddressController extends BaseController {
     }
 
     if (saveResult['status'] === 'invalid') {
-      await this.renderEditAddress(
-        res,
+      await this.renderEditAddress(res, {
         courtId,
-        courtName as string,
+        courtName: courtName as string,
         addressId,
-        saveResult['address'] as CourtAddress,
+        courtAddress: saveResult['address'] as CourtAddress,
         aolSelected,
-        ctSelected
-      );
+        ctSelected,
+      });
       return;
     }
 
@@ -399,13 +397,15 @@ export class CourtAddressController extends BaseController {
 
   private async renderEditAddress(
     res: Response,
-    courtId: string,
-    courtName: string,
-    addressId: string,
-    courtAddress: CourtAddress,
-    aolSelected: boolean,
-    ctSelected: boolean,
-    addressOptionData?: string
+    context: {
+      courtId: string;
+      courtName: string;
+      addressId: string;
+      courtAddress: CourtAddress;
+      aolSelected: boolean;
+      ctSelected: boolean;
+      addressOptionData?: string;
+    }
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -417,17 +417,19 @@ export class CourtAddressController extends BaseController {
       return;
     }
 
-    const address = addressOptionData ? this.buildAddressData(addressOptionData, courtAddress) : courtAddress;
+    const address = context.addressOptionData
+      ? this.buildAddressData(context.addressOptionData, context.courtAddress)
+      : context.courtAddress;
 
     res.render('court-address-edit', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
+      breadcrumbs: this.buildAddressBreadcrumbs(context.courtId, context.courtName, 'Edit address'),
       address,
       courtTypes,
       areasOfLaw,
-      aolSelected: aolSelected || address.areasOfLaw?.[0],
-      ctSelected: ctSelected || address.courtTypes?.[0],
-      courtId,
-      addressId,
+      aolSelected: context.aolSelected || address.areasOfLaw?.[0],
+      ctSelected: context.ctSelected || address.courtTypes?.[0],
+      courtId: context.courtId,
+      addressId: context.addressId,
       pageTitle: 'Manage Addresses',
     });
   }

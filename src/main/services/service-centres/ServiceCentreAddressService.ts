@@ -112,14 +112,7 @@ export class ServiceCentreAddressService {
     }
 
     if (result instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of result) {
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
-      return { status: 'invalid', address: { ...address, errors } };
+      return this.buildApiValidationErrorResponse(result, address);
     }
 
     let serviceCentreOpened = false;
@@ -141,6 +134,20 @@ export class ServiceCentreAddressService {
     }
 
     return { status: 'saved', address: result, serviceCentreName: serviceCentreResponse.name, serviceCentreOpened };
+  }
+
+  private buildApiValidationErrorResponse(
+    result: Map<string, string>,
+    address: Partial<ServiceCentreAddress>
+  ): SaveServiceCentreAddressResponse {
+    const errors: Record<string, string[]> = {};
+    for (const [key, value] of result) {
+      if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
+        continue;
+      }
+      errors[key] = [value];
+    }
+    return { status: 'invalid', address: { ...address, errors } };
   }
 
   public async delete(serviceCentreId: string, addressId: string): Promise<DeleteServiceCentreAddressResponse> {
