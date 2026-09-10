@@ -292,6 +292,26 @@ export class CourtProfessionalInformationService {
   private validate(viewModel: ProfessionalInformationViewModel): ProfessionalInformationError[] {
     const errors: ProfessionalInformationError[] = [];
 
+    this.validateCourtTypeOptions(viewModel, errors);
+
+    if (viewModel.gbs.trim() && !englishTextPattern.test(viewModel.gbs.trim())) {
+      errors.push({
+        href: '#gbs',
+        text: gbsValidationError,
+      });
+    }
+
+    this.validateInterviewRooms(viewModel, errors);
+    this.validateDxCodes(viewModel, errors);
+    this.validateFaxNumbers(viewModel, errors);
+
+    return errors;
+  }
+
+  private validateCourtTypeOptions(
+    viewModel: ProfessionalInformationViewModel,
+    errors: ProfessionalInformationError[]
+  ) {
     for (const option of courtTypeOptions) {
       if (!viewModel.selectedCourtTypes.includes(option.value)) {
         continue;
@@ -310,14 +330,9 @@ export class CourtProfessionalInformationService {
         });
       }
     }
+  }
 
-    if (viewModel.gbs.trim() && !englishTextPattern.test(viewModel.gbs.trim())) {
-      errors.push({
-        href: '#gbs',
-        text: gbsValidationError,
-      });
-    }
-
+  private validateInterviewRooms(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
     if (viewModel.interviewRooms === true) {
       if (!viewModel.interviewRoomCount.trim()) {
         errors.push({
@@ -339,11 +354,6 @@ export class CourtProfessionalInformationService {
         }
       }
     }
-
-    this.validateDxCodes(viewModel, errors);
-    this.validateFaxNumbers(viewModel, errors);
-
-    return errors;
   }
 
   private validateFaxNumbers(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
@@ -833,7 +843,7 @@ export class CourtProfessionalInformationService {
     return resolvedValue || null;
   }
 
-  private toDisplayString(value: string | number | null | undefined): string {
+  private toDisplayString<T>(value: T | null | undefined): string {
     if (value === null || value === undefined) {
       return '';
     }
