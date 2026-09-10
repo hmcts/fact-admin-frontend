@@ -83,4 +83,25 @@ describe('Add Service Centre View', () => {
     expect(html).toContain(`data-redirect-url="/service-centres/${serviceCentreId}/edit/address"`);
     expect(html).toContain('Continue to add an address for National Business Centre');
   });
+
+  test('renders csrf hidden input in add service centre form', () => {
+    const html = env.render('add-service-centre.njk', {
+      csrfToken: 'test-csrf-token-123',
+      leftColumnServiceAreaItems: [
+        { checked: false, text: 'Money claims', value: '44444444-4444-4444-8444-444444444444' },
+      ],
+      pagePath: '/add-service-centre',
+      pageTitle: 'Add new service centre',
+      regions: [{ id: '22222222-2222-4222-8222-222222222222', name: 'South East' }],
+      rightColumnServiceAreaItems: [{ checked: false, text: 'Probate', value: '55555555-5555-4555-8555-555555555555' }],
+      serviceAreas: [
+        { id: '44444444-4444-4444-8444-444444444444', name: 'Money claims' },
+        { id: '55555555-5555-4555-8555-555555555555', name: 'Probate' },
+      ],
+    });
+
+    expect(html).toContain('name="_csrf"');
+    expect(html).toContain('type="hidden"');
+    expect(html).toContain('value="test-csrf-token-123"');
+  });
 });

@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/common-components.njk" import addressBlock, addressType, confirmationActions %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -12,6 +13,7 @@
       <h1 class="govuk-heading-xl">Are you sure you want to delete this address?</h1>
 
       <form method="POST" action="/service-centres/{{ address.serviceCentreId }}/edit/address/delete/success/{{ address.id }}">
+        {{ csrfProtection(csrfToken) }}
         {{ govukSummaryList({
           rows: [
             {

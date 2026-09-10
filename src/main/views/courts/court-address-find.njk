@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -70,6 +71,7 @@
       {% endset %}
 
       <form method="POST" action="{{ manualEditUrl }}">
+        {{ csrfProtection(csrfToken) }}
 
         {{ govukButton({
           text: "Enter address manually",
