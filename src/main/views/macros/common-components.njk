@@ -49,21 +49,51 @@
 
 {# common error summary/linking for templates where we #}
 {# explicitly map field ids to schema keys #}
-{% macro modelDrivenErrorSummary(modelErrors) %}
+{% macro modelDrivenErrorSummary(modelErrors, options={}) %}
+  {% set options = options or {} %}
+  {% set ignoreFields = options.ignoreFields or [] %}
+  {% set unlinkedFields = options.unlinkedFields or ["message"] %}
   {% set errorList = [] %}
-  {% for field, errors in modelErrors %}
-    {% for error in errors %}
-      {% set href = "#" + field if field !== "message" else null %}
-      {% set errorList = (errorList.push({
-        text: error,
-        href: href
-      }), errorList) %}
-    {% endfor %}
+  {% for field, errors in modelErrors or {} %}
+    {% if field not in ignoreFields %}
+      {% for error in errors %}
+        {% set href = "#" + field if field not in unlinkedFields else null %}
+        {% set errorList = (errorList.push({
+          text: error,
+          href: href
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
   {% endfor %}
   {{ govukErrorSummary({
     titleText: "There is a problem",
     errorList: errorList
   }) }}
+{% endmacro %}
+
+{# Common contact details block for list and summary-list rows #}
+{% macro contactDetailsBlock(contact, options={}) %}
+  {% set options = options or {} %}
+  {% if options.inline %}
+    {% set parts = [] %}
+    {% if options.includeExplanation and contact.explanation %}
+      {% set parts = (parts.push(contact.explanation), parts) %}
+    {% endif %}
+    {% if contact.phoneNumber %}
+      {% set parts = (parts.push('Phone: ' + contact.phoneNumber), parts) %}
+    {% endif %}
+    {% if contact.email %}
+      {% set parts = (parts.push('Email: ' + contact.email), parts) %}
+    {% endif %}
+    {{ parts.join('<br>') | safe }}
+  {% else %}
+    {% if contact.phoneNumber %}
+      <p class="govuk-body govuk-!-margin-bottom-1"><strong>Telephone </strong> {{ contact.phoneNumber }}</p>
+    {% endif %}
+    {% if contact.email %}
+      <p class="govuk-body govuk-!-margin-bottom-0"><strong>Email </strong> {{ contact.email }}</p>
+    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {# Generic row actions list for table/list action links #}
@@ -78,3 +108,16 @@
     {% endfor %}
   </ul>
 {% endmacro %}
+
+{# Common follow-up actions shown after success panels #}
+{% macro nextActionsList(items, headingText="What do you want to do next?") %}
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">{{ headingText }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    {% for item in items %}
+      {% if item and item.href %}
+        <li><a href="{{ item.href }}" class="govuk-link govuk-link--no-visited-state">{{ item.text }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
