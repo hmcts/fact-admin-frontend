@@ -1,30 +1,10 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
-
-{% macro modelDrivenErrorSummary(model) %}
-  {% set errorList = [] %}
-  {% for field, errors in model.errors %}
-    {% if field !== "timestamp" %}
-      {% set fieldErrors = [] %}
-      {% for error in errors %}
-        {% set href = "#" + field if field !== "message" else null %}
-        {% set errorList = (errorList.push({
-          text: error,
-          href: href
-        }), errorList) %}
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
-  {{ govukErrorSummary({
-    titleText: "There is a problem",
-    errorList: errorList
-  }) }}
-{% endmacro %}
 {% block pageTitle %}
   {{ pageTitle }}
 {% endblock %}
@@ -63,7 +43,7 @@
 
     <div class="govuk-grid-column-full">
       {% if model.errors %}
-        {{ modelDrivenErrorSummary(model) }}
+        {{ modelDrivenErrorSummary(model.errors, { ignoreFields: ['timestamp'] }) }}
       {% endif %}
 
       <h1 class="govuk-heading-l">Building Facilities</h1>

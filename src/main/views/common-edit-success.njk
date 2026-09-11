@@ -1,5 +1,5 @@
 {% extends "template.njk" %}
-{% from "macros/common-components.njk" import successPanel %}
+{% from "macros/common-components.njk" import successPanel, nextActionsList %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -11,11 +11,8 @@
   {% set continueUpdatingText = continueUpdatingText or 'Continue updating ' + courtName %}
   {% set homeHref = homeHref or '/' %}
   {% set homeText = homeText or 'Home' %}
-  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">What do you want to do next?</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>
-    <a href="{{ continueUpdatingHref }}" class="govuk-link govuk-link--no-visited-state">{{ continueUpdatingText }}</a>
-    </li>
-    <li><a href="{{ homeHref }}" class="govuk-link govuk-link--no-visited-state">{{ homeText }}</a></li>
-  </ul>
+  {{ nextActionsList([
+    { href: continueUpdatingHref, text: continueUpdatingText },
+    { href: homeHref, text: homeText }
+  ]) }}
 {% endblock %}

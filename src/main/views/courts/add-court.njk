@@ -1,27 +1,10 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/common-components.njk" import modelDrivenErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
-{% macro modelDrivenErrorSummary(errors) %}
-  {% set errorList = [] %}
-  {% for field, fieldErrors in errors %}
-    {% if field !== "timestamp" %}
-      {% for error in fieldErrors %}
-        {% set errorList = (errorList.push({
-          text: error,
-          href: "#" + field
-        }), errorList) %}
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
-  {{ govukErrorSummary({
-    titleText: "There is a problem",
-    errorList: errorList
-  }) }}
-{% endmacro %}
 
 {% set regionOptions = [] %}
 {% if regions.length %}
