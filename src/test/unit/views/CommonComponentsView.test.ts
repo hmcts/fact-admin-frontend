@@ -87,4 +87,81 @@ describe('Common Components View', () => {
 
     expect(html.trim()).toBe(expectedLabel);
   });
+
+  test('renders contact details block for list rows', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import contactDetailsBlock %}
+      {{ contactDetailsBlock(contact) }}
+    `,
+      {
+        contact: {
+          email: 'enquiries@example.test',
+          phoneNumber: '01234 567890',
+        },
+      }
+    );
+
+    expect(html).toContain('Telephone');
+    expect(html).toContain('01234 567890');
+    expect(html).toContain('Email');
+    expect(html).toContain('enquiries@example.test');
+  });
+
+  test('renders contact details block for inline summary rows', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import contactDetailsBlock %}
+      {{ contactDetailsBlock(contact, { inline: true, includeExplanation: true }) }}
+    `,
+      {
+        contact: {
+          email: 'enquiries@example.test',
+          explanation: 'General enquiries only',
+          phoneNumber: '01234 567890',
+        },
+      }
+    );
+
+    expect(html).toContain('General enquiries only<br>Phone: 01234 567890<br>Email: enquiries@example.test');
+  });
+
+  test('supports ignored fields in model driven error summary', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+      {{ modelDrivenErrorSummary(errors, { ignoreFields: ["timestamp"] }) }}
+    `,
+      {
+        errors: {
+          name: ['Name is required'],
+          timestamp: ['Timestamp is invalid'],
+        },
+      }
+    );
+
+    expect(html).toContain('Name is required');
+    expect(html).not.toContain('Timestamp is invalid');
+  });
+
+  test('renders next actions list links', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import nextActionsList %}
+      {{ nextActionsList(actions) }}
+    `,
+      {
+        actions: [
+          { href: '/edit', text: 'Continue updating' },
+          { href: '/', text: 'Home' },
+        ],
+      }
+    );
+
+    expect(html).toContain('What do you want to do next?');
+    expect(html).toContain('href="/edit"');
+    expect(html).toContain('Continue updating');
+    expect(html).toContain('href="/"');
+    expect(html).toContain('Home');
+  });
 });
