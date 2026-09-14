@@ -6,7 +6,7 @@ import { Logger } from '../../modules/logging';
 import { CourtAddress } from '../../schemas/courtAddressSchema';
 import { osAddressOptionSchema } from '../../schemas/osDataSchema';
 import { TypesService } from '../../services/TypesService';
-import { CourtAddressService } from '../../services/courts/CourtAddressService';
+import { CourtAddressService, SaveCourtAddressResponse } from '../../services/courts/CourtAddressService';
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
 import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController, { type NotFoundTemplate } from '../BaseController';
@@ -265,18 +265,7 @@ export class CourtAddressController extends BaseController {
     }
 
     if (saveResult['status'] === 'saved') {
-      const address = saveResult['address'] as CourtAddress;
-      const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
-      res.render('common-edit-success.njk', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
-        courtName: saveResult['courtName'],
-        courtId,
-        pageTitle: 'Address Saved',
-        successPanelTitle: `Address saved: ${this.formatAddressRow(address)}`,
-        successPanelBody: saveResult['courtOpened'] ? `${successMessage} The court is now open.` : successMessage,
-        continueUpdatingHref: `/courts/${courtId}/edit/address`,
-        continueUpdatingText: 'Back to addresses',
-      });
+      this.renderAddressSavedSuccess(res, courtId, saveResult);
     }
   }
 
@@ -390,19 +379,22 @@ export class CourtAddressController extends BaseController {
     }
 
     if (saveResult['status'] === 'saved') {
-      const address = saveResult['address'] as CourtAddress;
-      const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
-      res.render('common-edit-success.njk', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
-        courtName: saveResult['courtName'],
-        courtId,
-        pageTitle: 'Address Saved',
-        successPanelTitle: `Address saved: ${this.formatAddressRow(address)}`,
-        successPanelBody: saveResult['courtOpened'] ? `${successMessage} The court is now open.` : successMessage,
-        continueUpdatingHref: `/courts/${courtId}/edit/address`,
-        continueUpdatingText: 'Back to addresses',
-      });
+      this.renderAddressSavedSuccess(res, courtId, saveResult);
     }
+  }
+
+  private renderAddressSavedSuccess(res: Response, courtId: string, saveResult: SaveCourtAddressResponse): void {
+    const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
+    res.render('common-edit-success.njk', {
+      breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
+      courtName: saveResult['courtName'],
+      courtId,
+      pageTitle: 'Address Saved',
+      successPanelTitle: `Address saved: ${this.formatAddressRow(saveResult['address'] as CourtAddress)}`,
+      successPanelBody: saveResult['courtOpened'] ? `${successMessage} The court is now open.` : successMessage,
+      continueUpdatingHref: `/courts/${courtId}/edit/address`,
+      continueUpdatingText: 'Back to addresses',
+    });
   }
 
   private async renderEditAddress(
