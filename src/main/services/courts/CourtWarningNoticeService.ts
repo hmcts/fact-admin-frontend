@@ -2,7 +2,15 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { isHttpStatusCode } from '../../utils/valueParsers';
-import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/variablesConstants';
+import {
+  ENGLISH_TEXT_REGEX,
+  ENGLISH_TRANSLATION_REQUIRED_MESSAGE, WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  WARNING_NOTICE_MAX_LENGTH,
+  WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+  WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+  WELSH_TEXT_REGEX,
+  WELSH_TRANSLATION_REQUIRED_MESSAGE, WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+} from '../../utils/variablesConstants';
 
 export type WarningNoticeForm = {
   warningNotice?: string;
@@ -119,29 +127,27 @@ export class CourtWarningNoticeService {
 
     const { warningNotice, warningNoticeCy } = form;
     if (warningNotice && !warningNoticeCy) {
-      errors.warningNoticeCy = 'Because you provided an explanation in English, the Welsh translation is now mandatory';
+      errors.warningNoticeCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
     }
 
     if (warningNoticeCy && !warningNotice) {
-      errors.warningNotice = 'Because you provided an explanation in Welsh, the English translation is now mandatory';
+      errors.warningNotice = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
     }
 
-    if (warningNotice && warningNotice.length > 250) {
-      errors.warningNotice = 'Warning notice must be 250 characters or less';
+    if (warningNotice && warningNotice.length > WARNING_NOTICE_MAX_LENGTH) {
+      errors.warningNotice = WARNING_NOTICE_MAX_LENGTH_MESSAGE;
     }
 
-    if (warningNoticeCy && warningNoticeCy.length > 250) {
-      errors.warningNoticeCy = 'Welsh warning notice must be 250 characters or less';
+    if (warningNoticeCy && warningNoticeCy.length > WARNING_NOTICE_MAX_LENGTH) {
+      errors.warningNoticeCy = WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE;
     }
 
     if (warningNotice && !ENGLISH_TEXT_REGEX.test(warningNotice)) {
-      errors.warningNotice =
-        'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+      errors.warningNotice = WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
     }
 
     if (warningNoticeCy && !WELSH_TEXT_REGEX.test(warningNoticeCy)) {
-      errors.warningNoticeCy =
-        'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+      errors.warningNoticeCy = WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
     }
 
     return errors;

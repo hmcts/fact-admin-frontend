@@ -3,13 +3,23 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtProfessionalInformation } from '../../schemas/courtProfessionalInformationSchema';
 import {
+  DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE,
   DX_CODE_MAX_LENGTH,
+  DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE,
+  DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE,
   DX_VALIDATION_ERROR,
   ENGLISH_TEXT_REGEX,
+  FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE,
+  FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   FAX_NUMBER_VALIDATION_ERROR,
+  FAX_NUMBER_WELSH_DESCRIPTION_WITHOUT_NUMBER_MESSAGE,
+  FAX_NUMBER_WELSH_TRANSLATION_REQUIRED_MESSAGE,
   GBS_VALIDATION_ERROR,
   INTEGER_REGEX,
   INTERVIEW_ROOM_COUNT_ERROR,
+  INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR,
+  INTERVIEW_ROOM_COUNT_REQUIRED_ERROR,
   MAX_REPEATABLE_ENTRIES,
   PHONE_NUMBER_REGEX,
   REPEATABLE_DESCRIPTION_MAX_LENGTH,
@@ -320,12 +330,12 @@ export class CourtProfessionalInformationService {
       if (!viewModel.interviewRoomCount.trim()) {
         errors.push({
           href: '#interviewRoomCount',
-          text: 'Enter the number of interview rooms',
+          text: INTERVIEW_ROOM_COUNT_REQUIRED_ERROR,
         });
       } else if (!INTEGER_REGEX.test(viewModel.interviewRoomCount.trim())) {
         errors.push({
           href: '#interviewRoomCount',
-          text: 'Enter the number of interview rooms using numbers only',
+          text: INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR,
         });
       } else {
         const interviewRoomCount = Number(viewModel.interviewRoomCount.trim());
@@ -348,25 +358,25 @@ export class CourtProfessionalInformationService {
       if (description && !code) {
         errors.push({
           href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
+          text: `DX code ${formIndex + 1}: ${DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE}`,
         });
       }
       if (descriptionCy && !code) {
         errors.push({
           href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation`,
+          text: `DX code ${formIndex + 1}: ${DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE}`,
         });
       }
       if (hasEnglishDescriptionOnly) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1}: Because you provided an explanation in English, the Welsh translation is now mandatory`,
+          text: `DX code ${formIndex + 1}: ${DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
         });
       }
       if (hasWelshDescriptionOnly) {
         errors.push({
           href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1}: Because you provided an explanation in Welsh, the English translation is now mandatory`,
+          text: `DX code ${formIndex + 1}: ${DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
         });
       }
       if (code.length > DX_CODE_MAX_LENGTH) {
@@ -414,13 +424,13 @@ export class CourtProfessionalInformationService {
       if (description && !code) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
+          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE}`,
         });
       }
       if (descriptionCy && !code) {
         errors.push({
           href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
+          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_WELSH_DESCRIPTION_WITHOUT_NUMBER_MESSAGE}`,
         });
       } else if (code && !PHONE_NUMBER_REGEX.test(code)) {
         errors.push({
@@ -431,13 +441,13 @@ export class CourtProfessionalInformationService {
       if (hasEnglishDescriptionOnly) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Because you provided an description in English, the Welsh translation is now mandatory`,
+          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
         });
       }
       if (hasWelshDescriptionOnly) {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Because you provided an description in Welsh, the English translation is now mandatory`,
+          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
         });
       }
       if (description.length > REPEATABLE_DESCRIPTION_MAX_LENGTH) {

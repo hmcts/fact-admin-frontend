@@ -7,17 +7,17 @@ import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { parseString } from '../../utils/valueParsers';
 import {
-  COURT_CONTACT_EMAIL_INVALID_MESSAGE,
-  COURT_CONTACT_EMAIL_REQUIRED_MESSAGE,
-  COURT_CONTACT_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  EMAIL_INVALID_MESSAGE,
+  EMAIL_REQUIRED_MESSAGE,
+  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
   COURT_CONTACT_METHOD_REQUIRED_MESSAGE,
-  COURT_CONTACT_PHONE_INVALID_MESSAGE,
-  COURT_CONTACT_PHONE_REQUIRED_MESSAGE,
+  PHONE_NUMBER_INVALID_MESSAGE,
+  PHONE_NUMBER_REQUIRED_MESSAGE,
   COURT_CONTACT_TYPE_REQUIRED_MESSAGE, COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-  COURT_CONTACT_WELSH_TRANSLATION_REQUIRED_MESSAGE,
+  WELSH_TRANSLATION_REQUIRED_MESSAGE,
   EMAIL_REGEX,
   ENGLISH_TEXT_REGEX,
   MAX_EXPLANATION_LENGTH,
@@ -233,20 +233,20 @@ export class CourtContactService {
 
     if (selectedContactMethods.includes('email')) {
       if (!contactEmail) {
-        formErrors.contactEmail = COURT_CONTACT_EMAIL_REQUIRED_MESSAGE;
+        formErrors.contactEmail = EMAIL_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       } else if (!EMAIL_REGEX.test(contactEmail)) {
-        formErrors.contactEmail = COURT_CONTACT_EMAIL_INVALID_MESSAGE;
+        formErrors.contactEmail = EMAIL_INVALID_MESSAGE;
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       }
     }
 
     if (selectedContactMethods.includes('phone')) {
       if (!contactTelephone) {
-        formErrors.contactTelephone = COURT_CONTACT_PHONE_REQUIRED_MESSAGE;
+        formErrors.contactTelephone = PHONE_NUMBER_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
-        formErrors.contactTelephone = COURT_CONTACT_PHONE_INVALID_MESSAGE;
+        formErrors.contactTelephone = PHONE_NUMBER_INVALID_MESSAGE;
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       }
     }
@@ -264,14 +264,14 @@ export class CourtContactService {
       }
 
       if (!contactExplanationCy) {
-        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_TRANSLATION_REQUIRED_MESSAGE;
+        formErrors.contactExplanationCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       }
     }
 
     if (contactExplanationCy) {
       if (!contactExplanation) {
-        formErrors.contactExplanation = COURT_CONTACT_ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
+        formErrors.contactExplanation = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 
