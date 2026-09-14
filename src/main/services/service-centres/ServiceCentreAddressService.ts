@@ -12,6 +12,11 @@ import {
   validateTownCityField,
 } from '../../utils/addressValidation';
 import { addError } from '../../utils/validation';
+import {
+  COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
+  SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE,
+  SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE,
+} from '../../utils/variablesConstants';
 
 export type SaveServiceCentreAddressResponse =
   | {
@@ -73,7 +78,7 @@ export class ServiceCentreAddressService {
 
     if (result instanceof Map) {
       if (result.has('message')) {
-        return { status: 'invalid', error: result.get('message') ?? 'Unable to fetch address options' };
+        return { status: 'invalid', error: result.get('message') ?? SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE };
       }
       return HttpStatusCode.BadRequest;
     }
@@ -174,13 +179,11 @@ export class ServiceCentreAddressService {
     const errors: Record<string, string[]> = {};
 
     if (!addressId && existingAddresses.length > 0) {
-      addError(errors, 'message', [
-        'Only a single address can be added for a service centre, and this service centre already has an address assigned.',
-      ]);
+      addError(errors, 'message', [SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE]);
     }
 
     if (!address.addressType) {
-      addError(errors, 'addressType', ['Select an address type']);
+      addError(errors, 'addressType', [COURT_ADDRESS_TYPE_REQUIRED_MESSAGE]);
     }
 
     addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));

@@ -12,10 +12,10 @@ import {
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
-  COURT_CONTACT_METHOD_REQUIRED_MESSAGE,
+  CONTACT_METHOD_REQUIRED_MESSAGE,
   PHONE_NUMBER_INVALID_MESSAGE,
   PHONE_NUMBER_REQUIRED_MESSAGE,
-  COURT_CONTACT_TYPE_REQUIRED_MESSAGE, COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  CONTACT_TYPE_REQUIRED_MESSAGE, COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
   EMAIL_REGEX,
@@ -222,12 +222,12 @@ export class CourtContactService {
     const errorSummary: CourtContactValidationError[] = [];
 
     if (!selectedContactTypeId) {
-      formErrors.contactType = COURT_CONTACT_TYPE_REQUIRED_MESSAGE;
+      formErrors.contactType = CONTACT_TYPE_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
     if (!selectedContactMethods.length) {
-      formErrors.contactMethods = COURT_CONTACT_METHOD_REQUIRED_MESSAGE;
+      formErrors.contactMethods = CONTACT_METHOD_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
     }
 

@@ -4,12 +4,14 @@ import { CourtApi } from '../../requests/CourtApi';
 import { isHttpStatusCode } from '../../utils/valueParsers';
 import {
   ENGLISH_TEXT_REGEX,
-  ENGLISH_TRANSLATION_REQUIRED_MESSAGE, WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
+  WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
   WARNING_NOTICE_MAX_LENGTH,
   WARNING_NOTICE_MAX_LENGTH_MESSAGE,
-  WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
   WELSH_TEXT_REGEX,
-  WELSH_TRANSLATION_REQUIRED_MESSAGE, WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+  WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/variablesConstants';
 
 export type WarningNoticeForm = {
@@ -127,11 +129,11 @@ export class CourtWarningNoticeService {
 
     const { warningNotice, warningNoticeCy } = form;
     if (warningNotice && !warningNoticeCy) {
-      errors.warningNoticeCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
+      errors.warningNoticeCy = WELSH_WARNING_NOTICE_REQUIRED_MESSAGE;
     }
 
     if (warningNoticeCy && !warningNotice) {
-      errors.warningNotice = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
+      errors.warningNotice = ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE;
     }
 
     if (warningNotice && warningNotice.length > WARNING_NOTICE_MAX_LENGTH) {

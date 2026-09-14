@@ -5,7 +5,16 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
-import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/variablesConstants';
+import {
+  SERVICE_CENTRE_NAME_LENGTH_ERROR,
+  SERVICE_CENTRE_NAME_MAX_LENGTH,
+  SERVICE_CENTRE_NAME_MESSAGE,
+  SERVICE_CENTRE_NAME_MIN_LENGTH,
+  SERVICE_CENTRE_REGION_MESSAGE,
+  SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
+  VALID_SERVICE_CENTRE_NAME_REGEX,
+  VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE,
+} from '../../utils/variablesConstants';
 
 type AddServiceCentreForm = {
   name?: string;
@@ -67,25 +76,23 @@ export class AddServiceCentreService {
 
     const nameErrors: string[] = [];
     if (!name || name.length === 0) {
-      nameErrors.push('Enter a name for the service centre');
-    } else if (name.length < 5 || name.length > 200) {
-      nameErrors.push('Service centre name should be between 5 and 200 characters');
+      nameErrors.push(SERVICE_CENTRE_NAME_MESSAGE);
+    } else if (name.length < SERVICE_CENTRE_NAME_MIN_LENGTH || name.length > SERVICE_CENTRE_NAME_MAX_LENGTH) {
+      nameErrors.push(SERVICE_CENTRE_NAME_LENGTH_ERROR);
     }
     if (name && !VALID_SERVICE_CENTRE_NAME_REGEX.test(name)) {
-      nameErrors.push(
-        'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses'
-      );
+      nameErrors.push(VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE);
     }
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }
 
     if (!form.regionId || form.regionId.trim().length === 0) {
-      errors.regionId = ['Select a region for the service centre'];
+      errors.regionId = [SERVICE_CENTRE_REGION_MESSAGE];
     }
 
     if (!form.serviceAreaIds || form.serviceAreaIds.length === 0) {
-      errors.serviceAreaIds = ['Please specify the service areas of the service centre'];
+      errors.serviceAreaIds = [SERVICE_CENTRE_SERVICE_AREA_MESSAGE];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;

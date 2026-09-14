@@ -138,8 +138,8 @@ export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
 export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+]+$/;
 export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+]+$/u;
 export const MAX_EXPLANATION_LENGTH = 250;
-export const COURT_CONTACT_TYPE_REQUIRED_MESSAGE = 'Select a contact type';
-export const COURT_CONTACT_METHOD_REQUIRED_MESSAGE = 'Select at least one contact method';
+export const CONTACT_TYPE_REQUIRED_MESSAGE = 'Select a contact type';
+export const CONTACT_METHOD_REQUIRED_MESSAGE = 'Select at least one contact method';
 export const EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
 export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
@@ -240,9 +240,28 @@ export const WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
   'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 export const WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
   'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+export const ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE =
+  'Because you provided a warning notice in Welsh, the English translation is now mandatory';
+export const WELSH_WARNING_NOTICE_REQUIRED_MESSAGE =
+  'Because you provided a warning notice in English, the Welsh translation is now mandatory';
 
 // Add service centre service
 export const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
+export const SERVICE_CENTRE_NAME_MIN_LENGTH = 5;
+export const SERVICE_CENTRE_NAME_MAX_LENGTH = 200;
+export const SERVICE_CENTRE_NAME_MESSAGE = 'Enter a name for the service centre';
+export const SERVICE_CENTRE_NAME_LENGTH_ERROR =
+  `Service centre name should be between ${SERVICE_CENTRE_NAME_MIN_LENGTH} and ${SERVICE_CENTRE_NAME_MAX_LENGTH} characters`;
+export const VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE =
+  'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+export const SERVICE_CENTRE_REGION_MESSAGE = 'Select a region for the service centre';
+export const SERVICE_CENTRE_SERVICE_AREA_MESSAGE = 'Please specify the service areas of the service centre';
+export const SERVICE_CENTRE_OPEN_MESSAGE = 'Select whether the service centre is open or closed';
+
+// Service centre address service
+export const SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE = 'Unable to fetch address options';
+export const SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE =
+  'Only a single address can be added for a service centre, and this service centre already has an address assigned.';
 
 // Service centre cases heard service
 export const SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE =

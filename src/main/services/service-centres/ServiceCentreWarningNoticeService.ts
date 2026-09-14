@@ -2,9 +2,9 @@ import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import {
-  ENGLISH_TEXT_REGEX,
+  ENGLISH_TEXT_REGEX, ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
-  WELSH_TEXT_REGEX,
+  WELSH_TEXT_REGEX, WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/variablesConstants';
 
 export type ServiceCentreWarningNoticeViewModel = {
@@ -116,9 +116,7 @@ export class ServiceCentreWarningNoticeService {
     }
 
     if (warningNoticeCy.length > 0 && warningNotice.length === 0) {
-      errors.warningNotice = [
-        'Because you provided a warning notice in Welsh, the English translation is now mandatory',
-      ];
+      errors.warningNotice = [ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE];
     }
 
     const warningNoticeCyError = this.validateWarningNotice(warningNoticeCy, true);
@@ -127,9 +125,7 @@ export class ServiceCentreWarningNoticeService {
     }
 
     if (warningNotice.length > 0 && warningNoticeCy.length === 0) {
-      errors.warningNoticeCy = [
-        'Because you provided a warning notice in English, the Welsh translation is now mandatory',
-      ];
+      errors.warningNoticeCy = [WELSH_WARNING_NOTICE_REQUIRED_MESSAGE];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;

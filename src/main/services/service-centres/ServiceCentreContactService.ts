@@ -7,11 +7,19 @@ import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDe
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import { parseString } from '../../utils/valueParsers';
 import {
+  CONTACT_METHOD_REQUIRED_MESSAGE,
+  CONTACT_TYPE_REQUIRED_MESSAGE,
+  EMAIL_INVALID_MESSAGE,
   EMAIL_REGEX,
+  EMAIL_REQUIRED_MESSAGE,
   ENGLISH_TEXT_REGEX,
+  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   MAX_EXPLANATION_LENGTH,
+  PHONE_NUMBER_INVALID_MESSAGE,
   PHONE_NUMBER_REGEX,
+  PHONE_NUMBER_REQUIRED_MESSAGE,
   WELSH_TEXT_REGEX,
+  WELSH_TRANSLATION_REQUIRED_MESSAGE,
 } from '../../utils/variablesConstants';
 
 export type ServiceCentreContactFormValues = {
@@ -288,31 +296,31 @@ export class ServiceCentreContactService {
     const errorSummary: ServiceCentreContactValidationError[] = [];
 
     if (!selectedContactTypeId) {
-      formErrors.contactType = 'Select a contact type';
+      formErrors.contactType = CONTACT_TYPE_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
     if (!selectedContactMethods.length) {
-      formErrors.contactMethods = 'Select at least one contact method';
+      formErrors.contactMethods = CONTACT_METHOD_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
     }
 
     if (selectedContactMethods.includes('email')) {
       if (!contactEmail) {
-        formErrors.contactEmail = 'Enter an email address';
+        formErrors.contactEmail = EMAIL_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       } else if (!EMAIL_REGEX.test(contactEmail)) {
-        formErrors.contactEmail = 'Enter an email address in the correct format';
+        formErrors.contactEmail = EMAIL_INVALID_MESSAGE;
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       }
     }
 
     if (selectedContactMethods.includes('phone')) {
       if (!contactTelephone) {
-        formErrors.contactTelephone = 'Enter a phone number';
+        formErrors.contactTelephone = PHONE_NUMBER_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
-        formErrors.contactTelephone = 'Enter a phone number in the correct format';
+        formErrors.contactTelephone = PHONE_NUMBER_INVALID_MESSAGE;
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       }
     }
@@ -353,14 +361,12 @@ export class ServiceCentreContactService {
     }
 
     if (formValues.contactExplanation.length > 0 && formValues.contactExplanationCy.length === 0) {
-      formErrors.contactExplanationCy =
-        'Because you provided an explanation in English, the Welsh translation is now mandatory';
+      formErrors.contactExplanationCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
     }
 
     if (formValues.contactExplanationCy.length > 0 && formValues.contactExplanation.length === 0) {
-      formErrors.contactExplanation =
-        'Because you provided an explanation in Welsh, the English translation is now mandatory';
+      formErrors.contactExplanation = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
     }
   }
