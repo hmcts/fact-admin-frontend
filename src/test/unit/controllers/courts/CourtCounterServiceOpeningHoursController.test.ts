@@ -99,7 +99,10 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     await controller.getList(request, response);
 
     expect(getListPage.calledWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours', expect.objectContaining({ courtId }));
+    expect(response.render).toHaveBeenCalledWith(
+      'court-counter-service-opening-hours',
+      expect.objectContaining({ courtId })
+    );
   });
 
   test('renders the add page when the service returns a view model', async () => {
@@ -419,7 +422,10 @@ describe('CourtCounterServiceOpeningHoursController', () => {
       ],
     };
 
-    expect(deleteResponse.render).toHaveBeenCalledWith('court-counter-service-opening-hours-delete', expectedDeleteViewModel);
+    expect(deleteResponse.render).toHaveBeenCalledWith(
+      'court-counter-service-opening-hours-delete',
+      expectedDeleteViewModel
+    );
     expect(successResponse.render).toHaveBeenCalledWith(
       'court-counter-service-opening-hours-delete-success',
       expectedSuccessViewModel
