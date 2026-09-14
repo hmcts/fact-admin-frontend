@@ -106,8 +106,7 @@ export const PAGE_SIZE_MAX_ERROR = `pageSize must be less than or equal to ${MAX
 export const PAGE_NUMBER_MIN_ERROR = 'pageNumber must be greater than or equal to 0';
 export const PAGE_NUMBER_MAX_ERROR = `pageNumber must be less than or equal to ${MAX_PAGE_PARAM}`;
 export const HOME_PAGE_FAVOURITES_PAGE_NUMBER_MIN_ERROR = 'favouritesPageNumber must be greater than or equal to 0';
-export const HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR =
-  `favouritesPageNumber must be less than or equal to ${MAX_PAGE_PARAM}`;
+export const HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR = `favouritesPageNumber must be less than or equal to ${MAX_PAGE_PARAM}`;
 export const SORT_ORDER_WITHOUT_SORT_BY_ERROR = 'sortOrder cannot be provided without sortBy';
 export const HOME_PAGE_REGION_UUID_ERROR = 'Region must be a valid UUID';
 export const HOME_PAGE_REGION_INVALID_ERROR = 'Region must be a valid region';
