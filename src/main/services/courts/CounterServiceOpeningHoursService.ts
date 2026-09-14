@@ -2,7 +2,20 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
-import { EMAIL_REGEX, OPENING_HOUR_DAYS, OpeningHourDay } from '../../utils/variablesConstants';
+import {
+  COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_CLOSING_BEFORE_OPENING_MESSAGE,
+  COUNTER_SERVICE_CLOSING_EQUALS_OPENING_MESSAGE,
+  COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
+  COUNTER_SERVICE_OPENING_AFTER_CLOSING_MESSAGE,
+  COUNTER_SERVICE_OPENING_EQUALS_CLOSING_MESSAGE,
+  COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  EMAIL_REGEX,
+  OPENING_HOUR_DAYS,
+  OpeningHourDay,
+} from '../../utils/variablesConstants';
 
 export type CounterServiceOpeningHoursForm = {
   assistWith: string[];
@@ -281,19 +294,19 @@ export class CounterServiceOpeningHoursService {
 
     const assistWith = this.getSelectedDays(form.assistWith);
     if (assistWith.length === 0) {
-      errors.assistWith = 'Select what the counter can assist with';
+      errors.assistWith = COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE;
     }
 
     if (!form.appointmentNeeded) {
-      errors.appointmentNeeded = 'Select yes if an appointment is needed';
+      errors.appointmentNeeded = COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE;
     }
 
     if (form.appointmentNeeded === 'yes' && (!form.appointmentContact || !EMAIL_REGEX.test(form.appointmentContact))) {
-      errors.appointmentContact = 'Enter a valid contact email address';
+      errors.appointmentContact = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
-      errors.sameTimeYes = 'Select whether the counter opens and closes at the same time Monday to Friday';
+      errors.sameTimeYes = COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -303,7 +316,7 @@ export class CounterServiceOpeningHoursService {
     }
 
     if (form.selectedDays.length === 0) {
-      errors.selectedDays = 'Select at least one day';
+      errors.selectedDays = COUNTER_SERVICE_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -342,11 +355,11 @@ export class CounterServiceOpeningHoursService {
     const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
 
     if (openingTime > closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be after the closing time';
-      errors[closingHourKey] = 'The closing time cannot be before the opening time';
+      errors[openingHourKey] = COUNTER_SERVICE_OPENING_AFTER_CLOSING_MESSAGE;
+      errors[closingHourKey] = COUNTER_SERVICE_CLOSING_BEFORE_OPENING_MESSAGE;
     } else if (openingTime === closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
-      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
+      errors[openingHourKey] = COUNTER_SERVICE_OPENING_EQUALS_CLOSING_MESSAGE;
+      errors[closingHourKey] = COUNTER_SERVICE_CLOSING_EQUALS_OPENING_MESSAGE;
     }
   }
 

@@ -82,14 +82,43 @@ export const UK_TIME_ZONE = 'Europe/London';
 
 // Add court service
 export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
-
+export const COURT_NAME_MIN_LENGTH = 5;
+export const COURT_NAME_MAX_LENGTH = 200;
+export const COURT_NAME_LENGTH_ERROR =
+  `Court name should be between ${COURT_NAME_MIN_LENGTH} and ${COURT_NAME_MAX_LENGTH} characters`;
+export const VALID_COURT_NAME_REGEX_MESSAGE =
+  'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const COURT_NAME_MESSAGE = 'Enter a name for the court';
+export const COURT_REGION_MESSAGE = 'Select a region for the court';
 
 //Court address service
 export const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
+export const COURT_ADDRESS_TYPE_REQUIRED_MESSAGE = 'Select an address type';
+export const COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE =
+  'Please select between 1 and 5 areas of law that this address is relevant for';
+export const COURT_ADDRESS_COURT_TYPES_REQUIRED_MESSAGE =
+  'Please select at least one court type that this address is relevant for';
+export const EPIM_ID_MAX_LENGTH_MESSAGE = 'ePIMS Ref ID must be 10 characters or less';
+export const EPIM_ID_REGEX_MESSAGE = 'ePIMS Ref ID must only include letters a to z, spaces and dashes.';
+export const COURT_ADDRESS_DELETE_REQUIRES_AT_LEAST_ONE_MESSAGE =
+  'Unable to delete this address: At least one address is required for a court.';
+export const COURT_ADDRESS_SINGLE_VISIT_ADDRESS_MESSAGE =
+  'A court can only have one listed address for visiting and this court already has one.  Please edit the other visit address first.';
 
 // Court counter service opening hours service
 export const EMAIL_REGEX =
   /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
+
+export const COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE = 'Select what the counter can assist with';
+export const COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE = 'Select yes if an appointment is needed';
+export const COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter a valid contact email address';
+export const COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
+  'Select whether the counter opens and closes at the same time Monday to Friday';
+export const COUNTER_SERVICE_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE = 'Select at least one day';
+export const COUNTER_SERVICE_OPENING_AFTER_CLOSING_MESSAGE = 'The opening time cannot be after the closing time';
+export const COUNTER_SERVICE_CLOSING_BEFORE_OPENING_MESSAGE = 'The closing time cannot be before the opening time';
+export const COUNTER_SERVICE_OPENING_EQUALS_CLOSING_MESSAGE = 'The opening time cannot be the same as the closing time';
+export const COUNTER_SERVICE_CLOSING_EQUALS_OPENING_MESSAGE = 'The closing time cannot be the same as the opening time';
 
 // Court contact details service
 export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
