@@ -339,8 +339,7 @@ export class CourtOpeningHoursService {
         existing => existing.openingHourTypeId === form.openingHourTypeId && existing.id !== openingHoursId
       )
     ) {
-      errors.openingHourTypeId =
-        OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE;
+      errors.openingHourTypeId = OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE;
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {

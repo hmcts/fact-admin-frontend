@@ -84,8 +84,7 @@ export const UK_TIME_ZONE = 'Europe/London';
 export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 export const COURT_NAME_MIN_LENGTH = 5;
 export const COURT_NAME_MAX_LENGTH = 200;
-export const COURT_NAME_LENGTH_ERROR =
-  `Court name should be between ${COURT_NAME_MIN_LENGTH} and ${COURT_NAME_MAX_LENGTH} characters`;
+export const COURT_NAME_LENGTH_ERROR = `Court name should be between ${COURT_NAME_MIN_LENGTH} and ${COURT_NAME_MAX_LENGTH} characters`;
 export const VALID_COURT_NAME_REGEX_MESSAGE =
   'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const COURT_NAME_MESSAGE = 'Enter a name for the court';
@@ -108,16 +107,11 @@ export const COURT_ADDRESS_SINGLE_VISIT_ADDRESS_MESSAGE =
   'A court can only have one listed address for visiting and this court already has one.  Please edit the other visit address first.';
 
 // Court building facilities service
-export const COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE =
-  'Select whether the parking is available';
-export const COURT_BUILDING_FACILITIES_WAITING_AREA_REQUIRED_MESSAGE =
-  'Select whether the waiting area is available';
-export const COURT_BUILDING_FACILITIES_QUIET_ROOM_REQUIRED_MESSAGE =
-  'Select whether the quiet room is available';
-export const COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE =
-  'Select whether the baby changing is available';
-export const COURT_BUILDING_FACILITIES_WIFI_REQUIRED_MESSAGE =
-  'Select whether the WiFi is available';
+export const COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE = 'Select whether the parking is available';
+export const COURT_BUILDING_FACILITIES_WAITING_AREA_REQUIRED_MESSAGE = 'Select whether the waiting area is available';
+export const COURT_BUILDING_FACILITIES_QUIET_ROOM_REQUIRED_MESSAGE = 'Select whether the quiet room is available';
+export const COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE = 'Select whether the baby changing is available';
+export const COURT_BUILDING_FACILITIES_WIFI_REQUIRED_MESSAGE = 'Select whether the WiFi is available';
 export const COURT_BUILDING_FACILITIES_WAITING_AREA_CHILDREN_REQUIRED_MESSAGE =
   'Select if a separate waiting area is available for children';
 
@@ -144,16 +138,14 @@ export const EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
 export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
 export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a phone number in the correct format';
-export const COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE =
-  'Explanation must be 250 characters or fewer';
+export const COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = 'Explanation must be 250 characters or fewer';
 export const COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
   'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 export const WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in Welsh, the English translation is now mandatory';
-export const COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE =
-  'Welsh translation must be 250 characters or fewer';
+export const COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = 'Welsh translation must be 250 characters or fewer';
 export const COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
   'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
@@ -223,7 +215,6 @@ export const FAX_NUMBER_WELSH_TRANSLATION_REQUIRED_MESSAGE =
 export const FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided a description in Welsh, the English translation is now mandatory';
 
-
 // Court single point of entry service
 export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
   {
@@ -250,8 +241,7 @@ export const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 export const SERVICE_CENTRE_NAME_MIN_LENGTH = 5;
 export const SERVICE_CENTRE_NAME_MAX_LENGTH = 200;
 export const SERVICE_CENTRE_NAME_MESSAGE = 'Enter a name for the service centre';
-export const SERVICE_CENTRE_NAME_LENGTH_ERROR =
-  `Service centre name should be between ${SERVICE_CENTRE_NAME_MIN_LENGTH} and ${SERVICE_CENTRE_NAME_MAX_LENGTH} characters`;
+export const SERVICE_CENTRE_NAME_LENGTH_ERROR = `Service centre name should be between ${SERVICE_CENTRE_NAME_MIN_LENGTH} and ${SERVICE_CENTRE_NAME_MAX_LENGTH} characters`;
 export const VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE =
   'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 export const SERVICE_CENTRE_REGION_MESSAGE = 'Select a region for the service centre';
@@ -306,7 +296,7 @@ export const MAX_LIFT_DOOR_LIMIT_KG = 10000;
 // Address validation
 export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
 export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
-export  const JURISDICTION_ERROR_REGEXES = {
+export const JURISDICTION_ERROR_REGEXES = {
   northernIrelandPostcode: /^(BT)/i,
   guernseyPostcode: /^(GY)/i,
   jerseyPostcode: /^(JE)/i,

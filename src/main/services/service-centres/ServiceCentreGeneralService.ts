@@ -233,7 +233,10 @@ export class ServiceCentreGeneralService {
     const nameErrors: string[] = [];
     if (!model.name || model.name.trim().length === 0) {
       nameErrors.push(SERVICE_CENTRE_NAME_MESSAGE);
-    } else if (model.name.length < SERVICE_CENTRE_NAME_MIN_LENGTH || model.name.length > SERVICE_CENTRE_NAME_MAX_LENGTH) {
+    } else if (
+      model.name.length < SERVICE_CENTRE_NAME_MIN_LENGTH ||
+      model.name.length > SERVICE_CENTRE_NAME_MAX_LENGTH
+    ) {
       nameErrors.push(SERVICE_CENTRE_NAME_LENGTH_ERROR);
     }
     if (model.name && !VALID_SERVICE_CENTRE_NAME_REGEX.test(model.name)) {

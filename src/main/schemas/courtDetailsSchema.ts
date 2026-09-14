@@ -6,7 +6,6 @@ import { areaOfLawSchema } from './areaOfLawSchema';
 import { courtAddressSchema } from './courtAddressSchema';
 import { courtTypeSchema } from './courtTypeSchema';
 
-
 const courtRegionSchema = z.object({
   name: z.string(),
   country: z.string(),

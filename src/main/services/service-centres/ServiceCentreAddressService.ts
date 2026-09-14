@@ -78,7 +78,10 @@ export class ServiceCentreAddressService {
 
     if (result instanceof Map) {
       if (result.has('message')) {
-        return { status: 'invalid', error: result.get('message') ?? SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE };
+        return {
+          status: 'invalid',
+          error: result.get('message') ?? SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE,
+        };
       }
       return HttpStatusCode.BadRequest;
     }

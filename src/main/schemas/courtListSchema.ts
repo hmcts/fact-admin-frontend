@@ -4,7 +4,6 @@ import { SUBJECT_TYPE } from '../utils/variablesConstants';
 
 import { pageMetadataSchema } from './pagedMetadataSchema';
 
-
 export const locationListItemSchema = z.object({
   createdAt: z.string().nullable(),
   id: z.string().uuid(),

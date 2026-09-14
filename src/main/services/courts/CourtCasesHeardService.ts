@@ -4,7 +4,6 @@ import { CourtApi } from '../../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../../schemas/areaOfLawSchema';
 import { AREA_OF_LAW_VALIDATION_MESSAGE } from '../../utils/variablesConstants';
 
-
 export type CasesHeardViewModel = {
   areasOfLawError?: string;
   courtId: string;

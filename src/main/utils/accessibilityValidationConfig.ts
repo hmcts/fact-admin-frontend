@@ -12,7 +12,6 @@ import {
   TOILET_DESC_REGEX_WELSH,
 } from './variablesConstants';
 
-
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);
 const isBelowMin = (value: number | null | undefined, min: number): boolean =>

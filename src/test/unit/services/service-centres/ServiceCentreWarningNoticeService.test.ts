@@ -2,9 +2,7 @@ import { HttpStatusCode } from 'axios';
 import { restore, stub } from 'sinon';
 
 import { ServiceCentreApi } from '../../../../main/requests/ServiceCentreApi';
-import {
-  ServiceCentreWarningNoticeService,
-} from '../../../../main/services/service-centres/ServiceCentreWarningNoticeService';
+import { ServiceCentreWarningNoticeService } from '../../../../main/services/service-centres/ServiceCentreWarningNoticeService';
 import { MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH } from '../../../../main/utils/variablesConstants';
 
 describe('ServiceCentreWarningNoticeService', () => {
@@ -23,7 +21,11 @@ describe('ServiceCentreWarningNoticeService', () => {
     const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(serviceCentreId, 'a'.repeat(MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH + 1), 'test');
+    const result = await service.save(
+      serviceCentreId,
+      'a'.repeat(MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH + 1),
+      'test'
+    );
 
     expect(result.type).toBe('validation-error');
     expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 250 characters or fewer');

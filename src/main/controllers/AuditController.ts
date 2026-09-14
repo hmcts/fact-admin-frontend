@@ -23,7 +23,6 @@ import { UI_DATE_FORMAT } from '../utils/variablesConstants';
 import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
-
 const logger = Logger.getLogger('audit-controller');
 
 @route('/audits')
