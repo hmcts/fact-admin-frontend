@@ -9,7 +9,6 @@ import {
   DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE,
   DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE,
   DX_VALIDATION_ERROR,
-  ENGLISH_TEXT_REGEX,
   FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE,
   FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   FAX_NUMBER_VALIDATION_ERROR,
@@ -22,8 +21,9 @@ import {
   INTERVIEW_ROOM_COUNT_REQUIRED_ERROR,
   MAX_REPEATABLE_ENTRIES,
   PHONE_NUMBER_REGEX,
+  PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
+  PROFESSIONAL_INFO_WELSH_TEXT_REGEX,
   REPEATABLE_DESCRIPTION_MAX_LENGTH,
-  WELSH_TEXT_REGEX,
 } from '../../utils/variablesConstants';
 
 type CourtCodeField = 'magistrateCourtCode' | 'familyCourtCode' | 'tribunalCode' | 'countyCourtCode' | 'crownCourtCode';
@@ -319,7 +319,7 @@ export class CourtProfessionalInformationService {
       }
     }
 
-    if (viewModel.gbs.trim() && !ENGLISH_TEXT_REGEX.test(viewModel.gbs.trim())) {
+    if (viewModel.gbs.trim() && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(viewModel.gbs.trim())) {
       errors.push({
         href: '#gbs',
         text: GBS_VALIDATION_ERROR,
@@ -384,7 +384,7 @@ export class CourtProfessionalInformationService {
           href: `#dxCode-${formIndex}`,
           text: `DX code ${formIndex + 1}: DX code must be ${DX_CODE_MAX_LENGTH} characters or fewer`,
         });
-      } else if (code && !ENGLISH_TEXT_REGEX.test(code)) {
+      } else if (code && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(code)) {
         errors.push({
           href: `#dxCode-${formIndex}`,
           text: `DX code ${formIndex + 1}: ${DX_VALIDATION_ERROR}`,
@@ -395,7 +395,7 @@ export class CourtProfessionalInformationService {
           href: `#dxCodeDescription-${formIndex}`,
           text: `DX code ${formIndex + 1} explanation: DX explanation must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
         });
-      } else if (description && !ENGLISH_TEXT_REGEX.test(description)) {
+      } else if (description && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(description)) {
         errors.push({
           href: `#dxCodeDescription-${formIndex}`,
           text: `DX code ${formIndex + 1} explanation: ${DX_VALIDATION_ERROR}`,
@@ -406,7 +406,7 @@ export class CourtProfessionalInformationService {
           href: `#dxCodeDescriptionCy-${formIndex}`,
           text: `DX code ${formIndex + 1} Welsh explanation: DX Welsh explanation must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
         });
-      } else if (descriptionCy && !WELSH_TEXT_REGEX.test(descriptionCy)) {
+      } else if (descriptionCy && !PROFESSIONAL_INFO_WELSH_TEXT_REGEX.test(descriptionCy)) {
         errors.push({
           href: `#dxCodeDescriptionCy-${formIndex}`,
           text: `DX code ${formIndex + 1} Welsh explanation: ${DX_VALIDATION_ERROR}`,
@@ -455,7 +455,7 @@ export class CourtProfessionalInformationService {
           href: `#faxNumberDescription-${formIndex}`,
           text: `Fax number ${formIndex + 1} description: Fax description must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
         });
-      } else if (description && !ENGLISH_TEXT_REGEX.test(description)) {
+      } else if (description && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(description)) {
         errors.push({
           href: `#faxNumberDescription-${formIndex}`,
           text: `Fax number ${formIndex + 1} description: ${DX_VALIDATION_ERROR}`,
@@ -466,7 +466,7 @@ export class CourtProfessionalInformationService {
           href: `#faxNumberDescriptionCy-${formIndex}`,
           text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
         });
-      } else if (descriptionCy && !WELSH_TEXT_REGEX.test(descriptionCy)) {
+      } else if (descriptionCy && !PROFESSIONAL_INFO_WELSH_TEXT_REGEX.test(descriptionCy)) {
         errors.push({
           href: `#faxNumberDescriptionCy-${formIndex}`,
           text: `Fax number ${formIndex + 1} Welsh description: ${DX_VALIDATION_ERROR}`,

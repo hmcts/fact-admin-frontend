@@ -129,9 +129,9 @@ describe('CourtTranslationAndInterpretationService', () => {
         emailSelected: true,
         errorSummary: [
           { href: '#email', text: 'Enter an email address' },
-          { href: '#phoneNumber', text: 'Enter a telephone number' },
+          { href: '#phoneNumber', text: 'Enter a phone number' },
         ],
-        phoneNumberError: 'Enter a telephone number',
+        phoneNumberError: 'Enter a phone number',
         phoneNumberSelected: true,
       },
     });
@@ -156,7 +156,7 @@ describe('CourtTranslationAndInterpretationService', () => {
       viewModel: {
         errorSummary: [
           { href: '#email', text: 'Enter an email address in the correct format' },
-          { href: '#phoneNumber', text: 'Enter a telephone number in the correct format' },
+          { href: '#phoneNumber', text: 'Enter a phone number in the correct format' },
         ],
       },
     });

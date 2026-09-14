@@ -23,10 +23,10 @@ import {
   COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE,
   COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE,
-  MAX_LIFT_DOOR_LIMIT_KG,
   MAX_LIFT_DOOR_WIDTH_CM,
-  MIN_LIFT_DOOR_LIMIT_KG,
+  MAX_LIFT_WEIGHT_LIMIT_KG,
   MIN_LIFT_DOOR_WIDTH_CM,
+  MIN_LIFT_WEIGHT_LIMIT_KG,
   PHONE_NUMBER_REGEX,
   TOILET_DESC_REGEX,
   TOILET_DESC_REGEX_WELSH,
@@ -103,14 +103,14 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     {
       key: 'liftDoorLimit',
       validate: m =>
-        m.lift && isBelowMin(m.liftDoorLimit, MIN_LIFT_DOOR_LIMIT_KG)
+        m.lift && isBelowMin(m.liftDoorLimit, MIN_LIFT_WEIGHT_LIMIT_KG)
           ? [COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MIN_MESSAGE]
           : undefined,
     },
     {
       key: 'liftDoorLimit',
       validate: m =>
-        m.lift && isAboveMax(m.liftDoorLimit, MAX_LIFT_DOOR_LIMIT_KG)
+        m.lift && isAboveMax(m.liftDoorLimit, MAX_LIFT_WEIGHT_LIMIT_KG)
           ? [COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MAX_MESSAGE]
           : undefined,
     },

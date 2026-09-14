@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import moment from 'moment-timezone';
 
-import { ISO_DATE_REGEX, UK_TIME_ZONE } from './variablesConstants';
+import { ISO_DATE_REGEX, UI_DATE_FORMAT, UK_TIME_ZONE } from './variablesConstants';
 
 /**
  * Parses an integer-like value, falling back when the value is invalid.
@@ -122,7 +122,7 @@ export function parseDate(value: string | undefined): Date {
  *
  * Returns the original value when parsing fails.
  */
-export function toUkDateTimeString(value: string, format = 'DD/MM/YYYY HH:mm:ss.SSS'): string {
+export function toUkDateTimeString(value: string, format = UI_DATE_FORMAT): string {
   const parsedUtc = moment.utc(value, moment.ISO_8601, true);
   return parsedUtc.isValid() ? parsedUtc.tz(UK_TIME_ZONE).format(format) : value;
 }

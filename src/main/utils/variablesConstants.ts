@@ -243,6 +243,8 @@ export const OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
 // Court professional information service
 export const MAX_REPEATABLE_ENTRIES = 5;
 export const INTEGER_REGEX = /^\d+$/;
+export const PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
+export const PROFESSIONAL_INFO_WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 ()':,\-;.]+$/u;
 export const DX_CODE_MAX_LENGTH = 200;
 export const REPEATABLE_DESCRIPTION_MAX_LENGTH = 250;
 export const INTERVIEW_ROOM_COUNT_REQUIRED_ERROR = 'Enter the number of interview rooms';
@@ -346,8 +348,8 @@ export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
 export const TOILET_DESC_REGEX_WELSH = /^[\p{L}0-9 ()':,\-;.]+$/u;
 export const MIN_LIFT_DOOR_WIDTH_CM = 1;
 export const MAX_LIFT_DOOR_WIDTH_CM = 1000;
-export const MIN_LIFT_DOOR_LIMIT_KG = 1;
-export const MAX_LIFT_DOOR_LIMIT_KG = 10000;
+export const MIN_LIFT_WEIGHT_LIMIT_KG = 1;
+export const MAX_LIFT_WEIGHT_LIMIT_KG = 10000;
 export const COURT_ACCESSIBILITY_PARKING_REQUIRED_MESSAGE = 'Select whether accessible parking is available';
 export const COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE =
   'Select whether there is step free access from the street to the courtrooms';
@@ -359,8 +361,8 @@ export const COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MIN_MESSAGE = `Lift door width 
 export const COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MAX_MESSAGE = `Lift door width needs to be under ${MAX_LIFT_DOOR_WIDTH_CM}cm`;
 export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_REQUIRED_MESSAGE = 'Enter the lift weight limit';
 export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_INVALID_NUMBER_MESSAGE = 'Lift weight limit must be a valid number';
-export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MIN_MESSAGE = `Lift weight limit should be at least ${MIN_LIFT_DOOR_LIMIT_KG}kg`;
-export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MAX_MESSAGE = `Lift weight limit should be at most ${MAX_LIFT_DOOR_LIMIT_KG}kg`;
+export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MIN_MESSAGE = `Lift weight limit should be at least ${MIN_LIFT_WEIGHT_LIMIT_KG}kg`;
+export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MAX_MESSAGE = `Lift weight limit should be at most ${MAX_LIFT_WEIGHT_LIMIT_KG}kg`;
 export const COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE = 'Enter a phone number for the accessible entrance';
 export const COURT_ACCESSIBILITY_LIFT_SUPPORT_PHONE_REQUIRED_MESSAGE =
   'Enter telephone number for organising support at court';
