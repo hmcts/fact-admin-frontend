@@ -441,10 +441,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
       'court-counter-service-opening-hours-delete',
       expectedDeleteViewModel
     );
-    expect(successResponse.render).toHaveBeenCalledWith(
-      'common-edit-success.njk',
-      expectedSuccessViewModel
-    );
+    expect(successResponse.render).toHaveBeenCalledWith('common-edit-success.njk', expectedSuccessViewModel);
   });
 
   test('renders generic not found when a counter service to delete no longer exists', async () => {

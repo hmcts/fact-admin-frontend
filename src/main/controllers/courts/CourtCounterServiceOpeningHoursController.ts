@@ -191,7 +191,11 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
 
     res.render('common-edit-success.njk', {
       ...saveResult.viewModel,
-      breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Counter service opening hours saved'),
+      breadcrumbs: this.buildCounterServiceBreadcrumbs(
+        courtId,
+        saveResult.viewModel.courtName,
+        'Counter service opening hours saved'
+      ),
       pageTitle: 'Counter service opening hours saved',
       successPanelTitle: 'Counter service opening hours saved',
       successPanelBody: `Counter service opening hours for ${saveResult.viewModel.courtName} have been successfully updated.`,
