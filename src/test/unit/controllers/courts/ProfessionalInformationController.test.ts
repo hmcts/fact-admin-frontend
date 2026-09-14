@@ -74,7 +74,7 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('professional-information', {
+      .withArgs('court-professional-information', {
         ...viewModel,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
@@ -114,7 +114,7 @@ describe('CourtProfessionalInformationController', () => {
     const response = buildResponse();
     const responseMock = mock(response);
 
-    responseMock.expects('render').once().withArgs('professional-information');
+    responseMock.expects('render').once().withArgs('court-professional-information');
 
     await controller.get(buildRequest({ courtId: [courtId] }), response);
 
@@ -161,7 +161,7 @@ describe('CourtProfessionalInformationController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'professional-information-confirm',
+        'court-professional-information-confirm',
         sinonMatch({
           cancelHref: `/courts/${courtId}/edit/information-for-professionals`,
           courtId,
@@ -204,7 +204,7 @@ describe('CourtProfessionalInformationController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'professional-information-confirm',
+        'court-professional-information-confirm',
         sinonMatch({
           hiddenInputs: [
             { name: 'courtTypes', value: 'family' },
@@ -235,7 +235,7 @@ describe('CourtProfessionalInformationController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'professional-information-confirm',
+        'court-professional-information-confirm',
         sinonMatch({
           hiddenInputs: [{ name: 'confirmFamilyCourtRemoval', value: 'true' }],
         })
@@ -266,7 +266,7 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('professional-information-success', {
+      .withArgs('court-professional-information-success', {
         courtId,
         courtName,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName, 'Information for professionals saved'),
@@ -300,7 +300,7 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('professional-information-success', {
+      .withArgs('court-professional-information-success', {
         courtId,
         courtName,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName, 'Information for professionals saved'),
@@ -333,7 +333,7 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('professional-information', {
+      .withArgs('court-professional-information', {
         ...viewModel,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
@@ -368,7 +368,7 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('professional-information', {
+      .withArgs('court-professional-information', {
         ...viewModel,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });

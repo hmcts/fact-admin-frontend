@@ -24,7 +24,7 @@ export default class CourtGeneralController extends BaseController {
       return;
     }
 
-    res.render('general-edit', {
+    res.render('court-general-edit', {
       breadcrumbs: this.buildSectionBreadcrumbs(resolvedCourtId, model.name!, 'General'),
       model,
       pageTitle: `General - ${model.name}`,
@@ -67,7 +67,7 @@ export default class CourtGeneralController extends BaseController {
     }
 
     if (updateResponse.errors) {
-      res.render('general-edit', {
+      res.render('court-general-edit', {
         breadcrumbs: this.buildSectionBreadcrumbs(
           resolvedCourtId,
           updateResponse.originalName! ?? updateResponse.name,

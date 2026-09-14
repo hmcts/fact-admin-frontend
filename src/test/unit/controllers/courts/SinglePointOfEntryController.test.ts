@@ -112,7 +112,7 @@ describe('CourtSinglePointOfEntryController', () => {
       responseMock
         .expects('render')
         .once()
-        .withArgs('single-point-of-entry', {
+        .withArgs('court-single-point-of-entry', {
           ...viewModel,
           breadcrumbs: expectedBreadcrumbs,
         });
@@ -170,7 +170,7 @@ describe('CourtSinglePointOfEntryController', () => {
         responseMock
           .expects('render')
           .once()
-          .withArgs('single-point-of-entry-success', {
+          .withArgs('court-single-point-of-entry-success', {
             breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
             courtId: COURT_ID,
             courtName: 'Reading Crown Court',
@@ -193,7 +193,7 @@ describe('CourtSinglePointOfEntryController', () => {
         responseMock
           .expects('render')
           .once()
-          .withArgs('single-point-of-entry-success', {
+          .withArgs('court-single-point-of-entry-success', {
             breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
             courtId: COURT_ID,
             courtName: 'Reading Crown Court',

@@ -30,7 +30,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, viewModel),
-      'counter-service-opening-hours',
+      'court-counter-service-opening-hours',
       'court-not-found'
     );
   }
@@ -50,7 +50,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
-      'counter-service-opening-hours-edit',
+      'court-counter-service-opening-hours-edit',
       'court-not-found'
     );
   }
@@ -76,7 +76,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
-      'counter-service-opening-hours-edit',
+      'court-counter-service-opening-hours-edit',
       'not-found'
     );
   }
@@ -121,7 +121,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, deleteViewModel, 'Delete opening hours'),
-      'counter-service-opening-hours-delete',
+      'court-counter-service-opening-hours-delete',
       'not-found'
     );
   }
@@ -147,7 +147,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     this.renderResponse(
       res,
       this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted'),
-      'counter-service-opening-hours-delete-success',
+      'court-counter-service-opening-hours-delete-success',
       'not-found'
     );
   }
@@ -170,7 +170,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     const saveResult = await this.counterServiceOpeningHoursService.save(courtId, counterServiceId, form);
 
     if (saveResult.type === 'validation_error') {
-      return res.status(HttpStatusCode.BadRequest).render('counter-service-opening-hours-edit', {
+      return res.status(HttpStatusCode.BadRequest).render('court-counter-service-opening-hours-edit', {
         ...saveResult.viewModel,
         breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Edit opening hours'),
       });
@@ -181,7 +181,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
       return;
     }
 
-    res.render('counter-service-opening-hours-save-success', {
+    res.render('court-counter-service-opening-hours-save-success', {
       ...saveResult.viewModel,
       breadcrumbs: this.buildCounterServiceBreadcrumbs(
         courtId,

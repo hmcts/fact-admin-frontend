@@ -30,7 +30,7 @@ describe('CourtGeneralController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('general-edit', {
+      .withArgs('court-general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
@@ -213,7 +213,7 @@ describe('CourtGeneralController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('general-edit', {
+      .withArgs('court-general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit bob' },
@@ -302,7 +302,7 @@ describe('CourtGeneralController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('general-edit', {
+      .withArgs('court-general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },

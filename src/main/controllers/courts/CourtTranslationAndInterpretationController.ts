@@ -26,7 +26,7 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
       return;
     }
 
-    return res.render('translation-and-interpretation', {
+    return res.render('court-translation-and-interpretation', {
       ...viewModel,
       breadcrumbs: this.buildTranslationBreadcrumbs(courtId, viewModel.courtName),
     });
@@ -49,13 +49,13 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
 
     if (saveResponse.status === 'validationError') {
       res.status(HttpStatusCode.BadRequest);
-      return res.render('translation-and-interpretation', {
+      return res.render('court-translation-and-interpretation', {
         ...saveResponse.viewModel,
         breadcrumbs: this.buildTranslationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
       });
     }
 
-    return res.render('translation-and-interpretation-success', {
+    return res.render('court-translation-and-interpretation-success', {
       breadcrumbs: this.buildTranslationBreadcrumbs(
         courtId,
         saveResponse.viewModel.courtName,

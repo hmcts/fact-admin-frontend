@@ -55,7 +55,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     };
 
     expect(getListPage.calledWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours', expectedViewModel);
   });
 
   test('renders court not found when the list court id is invalid', async () => {
@@ -99,7 +99,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     await controller.getList(request, response);
 
     expect(getListPage.calledWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours', expect.objectContaining({ courtId }));
+    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours', expect.objectContaining({ courtId }));
   });
 
   test('renders the add page when the service returns a view model', async () => {
@@ -130,7 +130,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     };
 
     expect(getEditPage.calledWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours-edit', expectedViewModel);
   });
 
   test('renders court not found when the add court id is invalid', async () => {
@@ -257,7 +257,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     });
 
     expect(response.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-edit', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours-edit', expectedViewModel);
   });
 
   test('renders save success when saving add succeeds', async () => {
@@ -297,7 +297,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
 
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBeUndefined();
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours-save-success', expectedViewModel);
   });
 
   test('renders save success when saving edit succeeds', async () => {
@@ -337,7 +337,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
 
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBe(counterServiceId);
-    expect(response.render).toHaveBeenCalledWith('counter-service-opening-hours-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours-save-success', expectedViewModel);
   });
 
   test('renders generic not found when saving edit returns 404', async () => {
@@ -419,9 +419,9 @@ describe('CourtCounterServiceOpeningHoursController', () => {
       ],
     };
 
-    expect(deleteResponse.render).toHaveBeenCalledWith('counter-service-opening-hours-delete', expectedDeleteViewModel);
+    expect(deleteResponse.render).toHaveBeenCalledWith('court-counter-service-opening-hours-delete', expectedDeleteViewModel);
     expect(successResponse.render).toHaveBeenCalledWith(
-      'counter-service-opening-hours-delete-success',
+      'court-counter-service-opening-hours-delete-success',
       expectedSuccessViewModel
     );
   });

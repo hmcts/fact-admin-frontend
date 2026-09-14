@@ -49,7 +49,7 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities', {
+      .withArgs('court-local-authorities', {
         ...viewModel,
         breadcrumbs: [
           { href: '/', text: 'Home' },
@@ -159,7 +159,7 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities-success', {
+      .withArgs('court-local-authorities-success', {
         courtId: COURT_ID,
         courtName: 'Reading Crown Court',
         breadcrumbs: [
@@ -291,7 +291,7 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities-success', {
+      .withArgs('court-local-authorities-success', {
         courtId: COURT_ID,
         courtName: 'Reading Crown Court',
         breadcrumbs: [
@@ -334,7 +334,7 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities-success', {
+      .withArgs('court-local-authorities-success', {
         courtId: COURT_ID,
         courtName: 'Reading Crown Court',
         breadcrumbs: [

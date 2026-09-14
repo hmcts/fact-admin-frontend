@@ -41,7 +41,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('translation-and-interpretation', {
+      .withArgs('court-translation-and-interpretation', {
         courtId,
         courtName: 'Reading Crown Court',
         email: 'translations@example.com',
@@ -80,7 +80,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     } as never);
     const getTranslationServicesStub = stub(courtApi, 'getTranslationServices').resolves(null);
 
-    responseMock.expects('render').once().withArgs('translation-and-interpretation');
+    responseMock.expects('render').once().withArgs('court-translation-and-interpretation');
 
     try {
       await controller.get(request, response);
@@ -175,7 +175,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('translation-and-interpretation-success', {
+      .withArgs('court-translation-and-interpretation-success', {
         courtId,
         courtName: 'Reading Crown Court',
         breadcrumbs: [
@@ -217,7 +217,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
-    responseMock.expects('render').once().withArgs('translation-and-interpretation');
+    responseMock.expects('render').once().withArgs('court-translation-and-interpretation');
 
     try {
       await controller.postSuccess(request, response);

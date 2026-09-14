@@ -26,7 +26,7 @@ export default class CourtBuildingFacilitiesController extends BaseController {
       return;
     }
     const result = addFoodAndDrink(model);
-    res.render('building-facilities-edit', {
+    res.render('court-building-facilities-edit', {
       breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model: result,
@@ -65,7 +65,7 @@ export default class CourtBuildingFacilitiesController extends BaseController {
     }
 
     if (updateResponse.errors) {
-      res.render('building-facilities-edit', {
+      res.render('court-building-facilities-edit', {
         breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: addFoodAndDrink(updateResponse),

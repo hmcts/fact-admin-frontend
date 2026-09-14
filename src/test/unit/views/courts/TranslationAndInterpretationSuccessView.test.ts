@@ -5,7 +5,7 @@ describe('Translation and Interpretation Success View', () => {
   const courtEditPath = `/courts/${courtId}/edit`;
 
   test('renders the success panel and next actions', () => {
-    const html = env.render('translation-and-interpretation-success.njk', {
+    const html = env.render('court-translation-and-interpretation-success.njk', {
       courtId,
       courtName: 'Reading Crown Court',
       pagePath: `${courtEditPath}/translation-and-interpretation`,

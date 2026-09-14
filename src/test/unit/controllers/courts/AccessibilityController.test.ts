@@ -93,7 +93,7 @@ describe('CourtAccessibilityController', () => {
       await controller.renderEditView(req, res);
 
       expect(res.render).toHaveBeenCalledWith(
-        'accessibility-edit',
+        'court-accessibility-edit',
         expect.objectContaining({
           courtId: req.params.courtId,
           model: expect.any(Object),
@@ -185,7 +185,7 @@ describe('CourtAccessibilityController', () => {
       await controller.updateCourt(req, res);
 
       expect(res.render).toHaveBeenCalledWith(
-        'accessibility-edit',
+        'court-accessibility-edit',
         expect.objectContaining({
           pageTitle: 'Error: Accessibility - Court A',
         })
