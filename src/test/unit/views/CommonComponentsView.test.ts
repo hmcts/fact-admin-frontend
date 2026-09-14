@@ -16,20 +16,6 @@ describe('Common Components View', () => {
     expect(html).toContain('href="/courts/court-id/edit/address">Cancel</a>');
   });
 
-  test('renders a success panel with title and text', () => {
-    const html = env.renderString(
-      `
-      {% from "macros/common-components.njk" import successPanel %}
-      {{ successPanel("Court updated", "The court details have been saved successfully.") }}
-    `,
-      {}
-    );
-
-    expect(html).toContain('govuk-panel govuk-panel--confirmation');
-    expect(html).toContain('Court updated');
-    expect(html).toContain('The court details have been saved successfully.');
-  });
-
   test('renders address block as a single row including optional fields', () => {
     const html = env.renderString(
       `
@@ -142,26 +128,5 @@ describe('Common Components View', () => {
 
     expect(html).toContain('Name is required');
     expect(html).not.toContain('Timestamp is invalid');
-  });
-
-  test('renders next actions list links', () => {
-    const html = env.renderString(
-      `
-      {% from "macros/common-components.njk" import nextActionsList %}
-      {{ nextActionsList(actions) }}
-    `,
-      {
-        actions: [
-          { href: '/edit', text: 'Continue updating' },
-          { href: '/', text: 'Home' },
-        ],
-      }
-    );
-
-    expect(html).toContain('What do you want to do next?');
-    expect(html).toContain('href="/edit"');
-    expect(html).toContain('Continue updating');
-    expect(html).toContain('href="/"');
-    expect(html).toContain('Home');
   });
 });

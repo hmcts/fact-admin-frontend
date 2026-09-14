@@ -55,7 +55,7 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
       });
     }
 
-    return res.render('court-translation-and-interpretation-success', {
+    return res.render('common-edit-success.njk', {
       breadcrumbs: this.buildTranslationBreadcrumbs(
         courtId,
         saveResponse.viewModel.courtName,
@@ -63,6 +63,9 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
       ),
       courtId,
       courtName: saveResponse.viewModel.courtName,
+      pageTitle: `Translation and interpretation saved - ${saveResponse.viewModel.courtName}`,
+      successPanelTitle: 'Translation and interpretation saved',
+      successPanelBody: `Translation and interpretation contact for ${saveResponse.viewModel.courtName} has been saved successfully.`,
     });
   }
 

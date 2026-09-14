@@ -65,7 +65,7 @@ export default class CourtSinglePointOfEntryController extends BaseController {
       return this.renderStatus(res, HttpStatusCode.BadRequest, 'court-not-found');
     }
 
-    return res.render('court-single-point-of-entry-success', {
+    return res.render('common-edit-success.njk', {
       breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(
         courtId,
         saveResult.courtName,
@@ -73,6 +73,8 @@ export default class CourtSinglePointOfEntryController extends BaseController {
       ),
       courtId,
       courtName: saveResult.courtName,
+      pageTitle: `Single points of entry saved - ${saveResult.courtName}`,
+      successPanelTitle: `Single points of entry settings for ${saveResult.courtName} have been successfully updated`,
     });
   }
 

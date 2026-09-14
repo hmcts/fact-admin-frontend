@@ -265,12 +265,17 @@ export class CourtAddressController extends BaseController {
     }
 
     if (saveResult['status'] === 'saved') {
-      res.render('court-address-edit-success', {
+      const address = saveResult['address'] as CourtAddress;
+      const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
+      res.render('common-edit-success.njk', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
         courtName: saveResult['courtName'],
-        address: saveResult['address'] as CourtAddress,
         courtId,
-        courtOpened: saveResult['courtOpened'],
+        pageTitle: 'Address Saved',
+        successPanelTitle: `Address saved: ${this.formatAddressRow(address)}`,
+        successPanelBody: saveResult['courtOpened'] ? `${successMessage} The court is now open.` : successMessage,
+        continueUpdatingHref: `/courts/${courtId}/edit/address`,
+        continueUpdatingText: 'Back to addresses',
       });
     }
   }
@@ -385,12 +390,17 @@ export class CourtAddressController extends BaseController {
     }
 
     if (saveResult['status'] === 'saved') {
-      res.render('court-address-edit-success', {
+      const address = saveResult['address'] as CourtAddress;
+      const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
+      res.render('common-edit-success.njk', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
         courtName: saveResult['courtName'],
-        address: saveResult['address'] as CourtAddress,
         courtId,
-        courtOpened: saveResult['courtOpened'],
+        pageTitle: 'Address Saved',
+        successPanelTitle: `Address saved: ${this.formatAddressRow(address)}`,
+        successPanelBody: saveResult['courtOpened'] ? `${successMessage} The court is now open.` : successMessage,
+        continueUpdatingHref: `/courts/${courtId}/edit/address`,
+        continueUpdatingText: 'Back to addresses',
       });
     }
   }
@@ -500,11 +510,16 @@ export class CourtAddressController extends BaseController {
     }
 
     // The only other option is 'deleted'
-    res.render('court-address-delete-success', {
+    const address = deleteResult['address'] as CourtAddress;
+    res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Address deleted'),
       courtName: deleteResult['courtName'],
-      address: deleteResult['address'],
       courtId,
+      pageTitle: 'Address Deleted',
+      successPanelTitle: `Address deleted: ${this.formatAddressRow(address)}`,
+      successPanelBody: `You have removed this address for ${deleteResult['courtName']}`,
+      continueUpdatingHref: `/courts/${courtId}/edit/address`,
+      continueUpdatingText: 'Back to addresses',
     });
   }
 
@@ -581,6 +596,15 @@ export class CourtAddressController extends BaseController {
       logger.warn('Unable to parse address data:', error);
     }
     return result;
+  }
+
+  private formatAddressRow(address: Partial<CourtAddress>): string {
+    const line1 = address.addressLine1 ?? '';
+    const line2 = address.addressLine2 ? `${address.addressLine2}, ` : '';
+    const townCity = address.townCity ?? '';
+    const county = address.county ? `${address.county}, ` : '';
+    const postcode = address.postcode ?? '';
+    return `${line1}, ${line2}${townCity}, ${county}${postcode}`;
   }
 
   private buildAddressBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {

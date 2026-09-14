@@ -1,18 +1,27 @@
 {% extends "template.njk" %}
-{% from "macros/common-components.njk" import successPanel, nextActionsList %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 {% block pageTitle %}
   {{ pageTitle }}
 {% endblock %}
 
 {% block content %}
-  {{ successPanel(successPanelTitle , successPanelBody ) }}
+
   {% set continueUpdatingHref = continueUpdatingHref or '/courts/' + courtId + '/edit' %}
   {% set continueUpdatingText = continueUpdatingText or 'Continue updating ' + courtName %}
   {% set homeHref = homeHref or '/' %}
   {% set homeText = homeText or 'Home' %}
-  {{ nextActionsList([
-    { href: continueUpdatingHref, text: continueUpdatingText },
-    { href: homeHref, text: homeText }
-  ]) }}
+  {% set headingText = headingText or 'What do you want to do next?' %}
+
+  {{ govukPanel({
+    titleText: successPanelTitle,
+    text: successPanelBody
+  }) }}
+
+  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">{{ headingText }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a href="{{ continueUpdatingHref }}" class="govuk-link govuk-link--no-visited-state">{{ continueUpdatingText }}</a></li>
+    <li><a href="{{ homeHref }}" class="govuk-link govuk-link--no-visited-state">{{ homeText }}</a></li>
+  </ul>
+
 {% endblock %}

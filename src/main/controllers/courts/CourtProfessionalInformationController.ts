@@ -73,7 +73,7 @@ export default class CourtProfessionalInformationController extends BaseControll
       });
     }
 
-    res.render('court-professional-information-success', {
+    res.render('common-edit-success.njk', {
       breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
         courtId,
         saveResponse.viewModel.courtName,
@@ -81,6 +81,9 @@ export default class CourtProfessionalInformationController extends BaseControll
       ),
       courtId,
       courtName: saveResponse.viewModel.courtName,
+      pageTitle: `Information for professionals saved - ${saveResponse.viewModel.courtName}`,
+      successPanelTitle: 'Information for professionals saved',
+      successPanelBody: `Information for professionals for ${saveResponse.viewModel.courtName} has been saved successfully.`,
     });
   }
 

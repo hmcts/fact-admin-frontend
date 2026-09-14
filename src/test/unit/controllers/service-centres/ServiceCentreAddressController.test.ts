@@ -933,11 +933,11 @@ describe('ServiceCentreAddressController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'service-centre-address-edit-success',
+        'common-edit-success.njk',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.serviceCentreId === SERVICE_CENTRE_ID &&
-            viewModel.serviceCentreName === 'Reading Service Centre' &&
+            viewModel.courtId === SERVICE_CENTRE_ID &&
+            viewModel.courtName === 'Reading Service Centre' &&
             viewModel.pageTitle === 'Address saved - Reading Service Centre'
           );
         })
@@ -1198,7 +1198,7 @@ describe('ServiceCentreAddressController', () => {
       },
     });
 
-    responseMock.expects('render').once().withArgs('service-centre-address-edit-success', match.object);
+    responseMock.expects('render').once().withArgs('common-edit-success.njk', match.object);
 
     try {
       await controller.updateAddress(request, response);
@@ -1532,11 +1532,11 @@ describe('ServiceCentreAddressController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'service-centre-address-delete-success',
+        'common-edit-success.njk',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.serviceCentreId === SERVICE_CENTRE_ID &&
-            viewModel.serviceCentreName === 'Reading Service Centre' &&
+            viewModel.courtId === SERVICE_CENTRE_ID &&
+            viewModel.courtName === 'Reading Service Centre' &&
             viewModel.pageTitle === 'Address deleted - Reading Service Centre'
           );
         })

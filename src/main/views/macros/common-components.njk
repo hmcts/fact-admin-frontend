@@ -1,4 +1,3 @@
-{% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
@@ -10,13 +9,6 @@
     }) }}
     <a class="govuk-link govuk-link--no-visited-state" href="{{ cancelHref }}">Cancel</a>
   </div>
-{% endmacro %}
-
-{% macro successPanel(title='', text='') %}
-  {{ govukPanel({
-    titleText: title,
-    text: text
-  }) }}
 {% endmacro %}
 
 {# Address Block #}
@@ -109,15 +101,20 @@
   </ul>
 {% endmacro %}
 
-{# Common follow-up actions shown after success panels #}
-{% macro nextActionsList(items, headingText="What do you want to do next?") %}
-  <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-6">{{ headingText }}</p>
-  <ul class="govuk-list govuk-list--bullet">
-    {% for item in items %}
-      {% if item and item.href %}
-        <li><a href="{{ item.href }}" class="govuk-link govuk-link--no-visited-state">{{ item.text }}</a></li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+{# shared redirection success panel #}
+{% macro renderRedirectSuccess(redirectUrl, spinnerMessage, continueText, redirectDelay='7000') %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="hods-loading-spinner" role="status" data-redirect-url="{{ redirectUrl }}" data-redirect-delay="{{ redirectDelay }}">
+        <div class="hods-loading-spinner__spinner"></div>
+        <div class="hods-loading-spinner__content">
+          <h1 class="govuk-heading-m">{{ spinnerMessage }}</h1>
+        </div>
+      </div>
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ redirectUrl }}">{{ continueText }}</a>
+      </p>
+    </div>
+  </div>
 {% endmacro %}
 

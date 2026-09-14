@@ -7,14 +7,14 @@ const ids = {
 
 describe('Court Address Delete Success View', () => {
   test('renders success panel and next-step links', () => {
-    const html = env.render('court-address-delete-success.njk', {
-      address: {
-        addressLine1: '10 Downing Street',
-        postcode: 'SW1A 2AA',
-        townCity: 'London',
-      },
+    const html = env.render('common-edit-success.njk', {
       courtId: ids.courtId,
       courtName: 'Reading Crown Court',
+      pageTitle: 'Address Deleted',
+      successPanelTitle: 'Address deleted: 10 Downing Street, London, SW1A 2AA',
+      successPanelBody: 'You have removed this address for Reading Crown Court',
+      continueUpdatingHref: `/courts/${ids.courtId}/edit/address`,
+      continueUpdatingText: 'Back to addresses',
       pagePath: `/courts/${ids.courtId}/edit/address/delete/success/${ids.addressId}`,
     });
 

@@ -7,15 +7,14 @@ const ids = {
 
 describe('Court Address Edit Success View', () => {
   test('renders saved success panel and navigation links', () => {
-    const html = env.render('court-address-edit-success.njk', {
-      address: {
-        addressLine1: '1 High Street',
-        postcode: 'BS1 5AH',
-        townCity: 'Bristol',
-      },
+    const html = env.render('common-edit-success.njk', {
       courtId: ids.courtId,
       courtName: 'Reading Crown Court',
-      courtOpened: false,
+      pageTitle: 'Address Saved',
+      successPanelTitle: 'Address saved: 1 High Street, Bristol, BS1 5AH',
+      successPanelBody: 'Addresses for Reading Crown Court have been successfully updated.',
+      continueUpdatingHref: `/courts/${ids.courtId}/edit/address`,
+      continueUpdatingText: 'Back to addresses',
       pagePath: `/courts/${ids.courtId}/edit/address/details/success/${ids.addressId}`,
     });
 
@@ -28,15 +27,14 @@ describe('Court Address Edit Success View', () => {
   });
 
   test('renders court opened message when the first address opens the court', () => {
-    const html = env.render('court-address-edit-success.njk', {
-      address: {
-        addressLine1: '1 High Street',
-        postcode: 'BS1 5AH',
-        townCity: 'Bristol',
-      },
+    const html = env.render('common-edit-success.njk', {
       courtId: ids.courtId,
       courtName: 'Reading Crown Court',
-      courtOpened: true,
+      pageTitle: 'Address Saved',
+      successPanelTitle: 'Address saved: 1 High Street, Bristol, BS1 5AH',
+      successPanelBody: 'Addresses for Reading Crown Court have been successfully updated. The court is now open.',
+      continueUpdatingHref: `/courts/${ids.courtId}/edit/address`,
+      continueUpdatingText: 'Back to addresses',
       pagePath: `/courts/${ids.courtId}/edit/address/details/success`,
     });
 

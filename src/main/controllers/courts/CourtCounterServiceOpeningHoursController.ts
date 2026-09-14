@@ -144,12 +144,20 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
 
     const viewModel = await this.counterServiceOpeningHoursService.delete(courtId, counterServiceId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted'),
-      'court-counter-service-opening-hours-delete-success',
-      'not-found'
-    );
+    if (typeof viewModel === 'number') {
+      this.renderStatus(res, viewModel, 'not-found');
+      return;
+    }
+
+    res.render('common-edit-success.njk', {
+      ...viewModel,
+      breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, viewModel.courtName, 'Opening hours deleted'),
+      pageTitle: 'Counter service opening hours deleted',
+      successPanelTitle: `Opening hours deleted ${viewModel.assistanceAvailable}.`,
+      successPanelBody: `You have removed this counter service opening hour for ${viewModel.courtName}.`,
+      continueUpdatingHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
+      continueUpdatingText: 'Back to Counter service opening hours',
+    });
   }
 
   private async save(req: Request, res: Response, isEdit = false): Promise<void> {
@@ -181,13 +189,14 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
       return;
     }
 
-    res.render('court-counter-service-opening-hours-save-success', {
+    res.render('common-edit-success.njk', {
       ...saveResult.viewModel,
-      breadcrumbs: this.buildCounterServiceBreadcrumbs(
-        courtId,
-        saveResult.viewModel.courtName,
-        'Counter service opening hours saved'
-      ),
+      breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Counter service opening hours saved'),
+      pageTitle: 'Counter service opening hours saved',
+      successPanelTitle: 'Counter service opening hours saved',
+      successPanelBody: `Counter service opening hours for ${saveResult.viewModel.courtName} have been successfully updated.`,
+      continueUpdatingHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
+      continueUpdatingText: 'Back to Counter service opening hours',
     });
   }
 

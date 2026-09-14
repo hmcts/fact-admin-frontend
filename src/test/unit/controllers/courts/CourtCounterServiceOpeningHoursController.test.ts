@@ -296,11 +296,16 @@ describe('CourtCounterServiceOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
         { href: '#', text: 'Counter service opening hours saved' },
       ],
+      pageTitle: 'Counter service opening hours saved',
+      successPanelTitle: 'Counter service opening hours saved',
+      successPanelBody: 'Counter service opening hours for Reading Crown Court have been successfully updated.',
+      continueUpdatingHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
+      continueUpdatingText: 'Back to Counter service opening hours',
     };
 
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBeUndefined();
-    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', expectedViewModel);
   });
 
   test('renders save success when saving edit succeeds', async () => {
@@ -336,11 +341,16 @@ describe('CourtCounterServiceOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
         { href: '#', text: 'Counter service opening hours saved' },
       ],
+      pageTitle: 'Counter service opening hours saved',
+      successPanelTitle: 'Counter service opening hours saved',
+      successPanelBody: 'Counter service opening hours for Reading Crown Court have been successfully updated.',
+      continueUpdatingHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
+      continueUpdatingText: 'Back to Counter service opening hours',
     };
 
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBe(counterServiceId);
-    expect(response.render).toHaveBeenCalledWith('court-counter-service-opening-hours-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', expectedViewModel);
   });
 
   test('renders generic not found when saving edit returns 404', async () => {
@@ -420,6 +430,11 @@ describe('CourtCounterServiceOpeningHoursController', () => {
         { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
         { href: '#', text: 'Opening hours deleted' },
       ],
+      pageTitle: 'Counter service opening hours deleted',
+      successPanelTitle: 'Opening hours deleted Forms.',
+      successPanelBody: 'You have removed this counter service opening hour for Reading Crown Court.',
+      continueUpdatingHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
+      continueUpdatingText: 'Back to Counter service opening hours',
     };
 
     expect(deleteResponse.render).toHaveBeenCalledWith(
@@ -427,7 +442,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
       expectedDeleteViewModel
     );
     expect(successResponse.render).toHaveBeenCalledWith(
-      'court-counter-service-opening-hours-delete-success',
+      'common-edit-success.njk',
       expectedSuccessViewModel
     );
   });

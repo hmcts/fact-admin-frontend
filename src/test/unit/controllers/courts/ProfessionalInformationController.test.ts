@@ -266,9 +266,12 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('court-professional-information-success', {
+      .withArgs('common-edit-success.njk', {
         courtId,
         courtName,
+        pageTitle: `Information for professionals saved - ${courtName}`,
+        successPanelTitle: 'Information for professionals saved',
+        successPanelBody: `Information for professionals for ${courtName} has been saved successfully.`,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName, 'Information for professionals saved'),
       });
 
@@ -300,9 +303,12 @@ describe('CourtProfessionalInformationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('court-professional-information-success', {
+      .withArgs('common-edit-success.njk', {
         courtId,
         courtName,
+        pageTitle: `Information for professionals saved - ${courtName}`,
+        successPanelTitle: 'Information for professionals saved',
+        successPanelBody: `Information for professionals for ${courtName} has been saved successfully.`,
         breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName, 'Information for professionals saved'),
       });
 
