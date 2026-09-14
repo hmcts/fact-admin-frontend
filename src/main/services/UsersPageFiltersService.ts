@@ -5,8 +5,14 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT_ORDER,
   MAX_PAGE_PARAM,
+  PAGE_NUMBER_MAX_ERROR,
+  PAGE_NUMBER_MIN_ERROR,
+  PAGE_SIZE_MAX_ERROR,
+  PAGE_SIZE_MIN_ERROR,
   SEARCH_MAX_LENGTH,
   SEARCH_REGEX,
+  SORT_ORDER_WITHOUT_SORT_BY_ERROR,
+  USERS_PAGE_SEARCH_VALIDATION_ERROR,
   VALID_SORT_BY_LAST_LOGIN_VALUES,
   VALID_SORT_ORDER_VALUES,
 } from '../utils/variablesConstants';
@@ -39,30 +45,30 @@ export class UsersPageFiltersService {
     if (filters.search.length > SEARCH_MAX_LENGTH || !SEARCH_REGEX.test(filters.search)) {
       errors.push({
         href: '#search',
-        text: 'Search must only include letters, numbers, @ symbols, dots, underscores, plus signs and hyphens.',
+        text: USERS_PAGE_SEARCH_VALIDATION_ERROR,
       });
     }
 
     if (filters.rawPageSize !== undefined) {
       const pageSize = Number(filters.rawPageSize);
       if (!Number.isInteger(pageSize) || pageSize <= 0) {
-        errors.push({ href: '#main-content', text: 'pageSize must be greater than 0' });
+        errors.push({ href: '#main-content', text: PAGE_SIZE_MIN_ERROR });
       } else if (pageSize > MAX_PAGE_PARAM) {
-        errors.push({ href: '#main-content', text: `pageSize must be less than or equal to ${MAX_PAGE_PARAM}` });
+        errors.push({ href: '#main-content', text: PAGE_SIZE_MAX_ERROR });
       }
     }
 
     if (filters.rawPageNumber !== undefined) {
       const pageNumber = Number(filters.rawPageNumber);
       if (!Number.isInteger(pageNumber) || pageNumber < 0) {
-        errors.push({ href: '#main-content', text: 'pageNumber must be greater than or equal to 0' });
+        errors.push({ href: '#main-content', text: PAGE_NUMBER_MIN_ERROR });
       } else if (pageNumber > MAX_PAGE_PARAM) {
-        errors.push({ href: '#main-content', text: `pageNumber must be less than or equal to ${MAX_PAGE_PARAM}` });
+        errors.push({ href: '#main-content', text: PAGE_NUMBER_MAX_ERROR });
       }
     }
 
     if (filters.rawSortOrder !== undefined && filters.rawSortBy === undefined) {
-      errors.push({ href: '#main-content', text: 'sortOrder cannot be provided without sortBy' });
+      errors.push({ href: '#main-content', text: SORT_ORDER_WITHOUT_SORT_BY_ERROR });
     }
 
     if (filters.rawSortBy !== undefined && filters.rawSortBy !== 'lastLogin') {

@@ -3,6 +3,32 @@ import { z } from 'zod';
 // Approval service
 export const APPROVAL_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 
+// Audit filter categories service
+export const INCLUDED_AUDIT_FILTER_CATEGORIES = new Set([
+  'email',
+  'subjectType',
+  'courtId',
+  'serviceCentreId',
+  'fromDate',
+  'toDate',
+]);
+export const AUDIT_FILTER_CATEGORY_LABELS: Record<string, string> = {
+  email: 'Email address',
+  subjectType: 'Subject',
+  courtId: 'Subject',
+  serviceCentreId: 'Subject',
+  fromDate: 'Between',
+  toDate: 'Between',
+};
+export const AUDIT_FILTER_ITEM_LABELS: Record<string, string> = {
+  email: 'Email address',
+  subjectType: 'Type',
+  courtId: 'Court Name',
+  serviceCentreId: 'Service Centre Name',
+  fromDate: 'From date',
+  toDate: 'To date',
+};
+
 // Audit service
 export const DEFAULT_PAGE_NUMBER = 0;
 export const DEFAULT_PAGE_SIZE = 25;
@@ -10,6 +36,17 @@ export const MAX_PAGE_PARAM = 1000;
 export const CSV_PAGE_SIZE = 1000;
 export const MAX_CSV_PAGES = 1;
 export const EMAIL_PARTIAL_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
+export const PAGE_NUMBER_MIN = 0;
+export const PAGE_NUMBER_MAX = 100000;
+export const PAGE_NUMBER_RANGE_ERROR = `Page number must be between ${PAGE_NUMBER_MIN} and ${PAGE_NUMBER_MAX}`;
+export const PAGE_SIZE_MIN = 1;
+export const PAGE_SIZE_RANGE_ERROR = `Page size must be between ${PAGE_SIZE_MIN} and ${MAX_PAGE_PARAM}`;
+export const EMAIL_PARTIAL_REGEX_ERROR =
+  "Email match may only contain letters, hyphens, periods, plus/minus signs, underscores, and a single 'at' (@) symbol";
+export const FROM_DATE_INVALID_MESSAGE = 'From date must be a valid date';
+export const FROM_DATE_IN_FUTURE_MESSAGE = 'From date must not be in the future';
+export const FROM_DATE_AFTER_TO_DATE_MESSAGE = 'From date must not be after To date';
+export const TO_DATE_BEFORE_FROM_DATE_MESSAGE = 'To date must not be before From date';
 
 // Download CSV file service
 export const CSV_HEADERS = [
@@ -62,6 +99,24 @@ export const PARTIAL_COURT_NAME_ERROR =
   'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.';
 export const VALID_SORT_BY_VALUES = ['lastUpdated', 'name'] as const;
 export const VALID_SORT_ORDER_VALUES = ['asc', 'desc'] as const;
+export const HOME_PAGE_INCLUDE_CLOSED_BOOLEAN_ERROR = 'includeClosed must be true or false';
+export const HOME_PAGE_ONLY_SERVICE_CENTRES_BOOLEAN_ERROR = 'onlyServiceCentres must be true or false';
+export const PAGE_SIZE_MIN_ERROR = 'pageSize must be greater than 0';
+export const PAGE_SIZE_MAX_ERROR = `pageSize must be less than or equal to ${MAX_PAGE_PARAM}`;
+export const PAGE_NUMBER_MIN_ERROR = 'pageNumber must be greater than or equal to 0';
+export const PAGE_NUMBER_MAX_ERROR = `pageNumber must be less than or equal to ${MAX_PAGE_PARAM}`;
+export const HOME_PAGE_FAVOURITES_PAGE_NUMBER_MIN_ERROR = 'favouritesPageNumber must be greater than or equal to 0';
+export const HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR =
+  `favouritesPageNumber must be less than or equal to ${MAX_PAGE_PARAM}`;
+export const SORT_ORDER_WITHOUT_SORT_BY_ERROR = 'sortOrder cannot be provided without sortBy';
+export const HOME_PAGE_REGION_UUID_ERROR = 'Region must be a valid UUID';
+export const HOME_PAGE_REGION_INVALID_ERROR = 'Region must be a valid region';
+export const HOME_PAGE_FAVOURITE_STATUS_ERROR_MESSAGE = 'There was a problem loading favourite status.';
+export const HOME_PAGE_FAVOURITES_ERROR_MESSAGE = 'There was a problem loading favourites.';
+export const HOME_PAGE_REGIONS_AND_COURTS_LOAD_ERROR_MESSAGE =
+  'There was a problem loading regions and courts, tribunals and service centres.';
+export const HOME_PAGE_REGIONS_LOAD_ERROR_MESSAGE = 'There was a problem loading regions.';
+export const HOME_PAGE_COURTS_LOAD_ERROR_MESSAGE = 'There was a problem loading courts, tribunals and service centres.';
 
 // Home page view service
 export const HOME_PAGE_TITLE = 'Courts, tribunals and service centres';
@@ -76,6 +131,8 @@ export const SORT_ICON_PATHS = {
 export const SEARCH_MAX_LENGTH = 250;
 export const SEARCH_REGEX = /^[A-Za-z0-9._+\-@]*$/;
 export const VALID_SORT_BY_LAST_LOGIN_VALUES = ['lastLogin'] as const;
+export const USERS_PAGE_SEARCH_VALIDATION_ERROR =
+  'Search must only include letters, numbers, @ symbols, dots, underscores, plus signs and hyphens.';
 
 // Users page view service
 export const UK_TIME_ZONE = 'Europe/London';
