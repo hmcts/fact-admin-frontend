@@ -348,10 +348,55 @@ export const MIN_LIFT_DOOR_WIDTH_CM = 1;
 export const MAX_LIFT_DOOR_WIDTH_CM = 1000;
 export const MIN_LIFT_DOOR_LIMIT_KG = 1;
 export const MAX_LIFT_DOOR_LIMIT_KG = 10000;
+export const COURT_ACCESSIBILITY_PARKING_REQUIRED_MESSAGE = 'Select whether accessible parking is available';
+export const COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE =
+  'Select whether there is step free access from the street to the courtrooms';
+export const COURT_ACCESSIBILITY_LIFT_REQUIRED_MESSAGE = 'Select whether a lift is available';
+export const COURT_ACCESSIBILITY_QUIET_ROOM_REQUIRED_MESSAGE = 'Select whether a quiet room is available';
+export const COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_REQUIRED_MESSAGE = 'Enter the lift door width';
+export const COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_INVALID_NUMBER_MESSAGE = 'Lift door width must be a valid number';
+export const COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MIN_MESSAGE = `Lift door width needs to be over ${MIN_LIFT_DOOR_WIDTH_CM}cm`;
+export const COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MAX_MESSAGE = `Lift door width needs to be under ${MAX_LIFT_DOOR_WIDTH_CM}cm`;
+export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_REQUIRED_MESSAGE = 'Enter the lift weight limit';
+export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_INVALID_NUMBER_MESSAGE = 'Lift weight limit must be a valid number';
+export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MIN_MESSAGE = `Lift weight limit should be at least ${MIN_LIFT_DOOR_LIMIT_KG}kg`;
+export const COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MAX_MESSAGE = `Lift weight limit should be at most ${MAX_LIFT_DOOR_LIMIT_KG}kg`;
+export const COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE = 'Enter a phone number for the accessible entrance';
+export const COURT_ACCESSIBILITY_LIFT_SUPPORT_PHONE_REQUIRED_MESSAGE =
+  'Enter telephone number for organising support at court';
+export const COURT_ACCESSIBILITY_PHONE_NUMBER_INVALID_MESSAGE =
+  'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)';
+export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE =
+  'Enter a description of the accessible toilet facilities';
+export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE =
+  'Enter a Welsh description of the accessible toilet facilities';
+export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE =
+  'Accessible toilet description in English must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE =
+  'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE =
+  'Select what hearing enhancement equipment is available';
 
 // Address validation
 export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
 export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
+export const ADDRESS_LINE_MAX_LENGTH = 255;
+export const TOWN_CITY_MAX_LENGTH = 100;
+export const COUNTY_MAX_LENGTH = 100;
+export const ADDRESS_LINE_1_REQUIRED_MESSAGE = 'Enter address line 1, typically the building and street';
+export const ADDRESS_LINE_1_MAX_LENGTH_MESSAGE = `Address line 1 must be ${ADDRESS_LINE_MAX_LENGTH} characters or less`;
+export const ADDRESS_LINE_1_INVALID_CHARACTERS_MESSAGE =
+  'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const ADDRESS_LINE_2_MAX_LENGTH_MESSAGE = `Address line 2 must be ${ADDRESS_LINE_MAX_LENGTH} characters or less`;
+export const ADDRESS_LINE_2_INVALID_CHARACTERS_MESSAGE =
+  'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const TOWN_CITY_REQUIRED_MESSAGE = 'Enter a town or city';
+export const TOWN_CITY_MAX_LENGTH_MESSAGE = `Town or city must be ${TOWN_CITY_MAX_LENGTH} characters or less`;
+export const TOWN_CITY_INVALID_CHARACTERS_MESSAGE =
+  'Town or city must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const COUNTY_MAX_LENGTH_MESSAGE = `County must be ${COUNTY_MAX_LENGTH} characters or less`;
+export const COUNTY_INVALID_CHARACTERS_MESSAGE =
+  'County must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const JURISDICTION_ERROR_REGEXES = {
   northernIrelandPostcode: /^(BT)/i,
   guernseyPostcode: /^(GY)/i,
