@@ -26,7 +26,7 @@ export default class CourtAccessibilityController extends BaseController {
       return;
     }
 
-    return res.render('accessibility-edit', {
+    return res.render('court-accessibility-edit', {
       breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model,
@@ -53,7 +53,7 @@ export default class CourtAccessibilityController extends BaseController {
       const updatedLiftDoorLimit = Number.isNaN(updateResponse.liftDoorLimit) ? liftDoorLimit : model.liftDoorLimit;
       const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
 
-      return res.render('accessibility-edit', {
+      return res.render('court-accessibility-edit', {
         breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },

@@ -74,7 +74,7 @@ describe('CourtBuildingFacilitiesController', () => {
       await controller.renderEditView(req, res);
 
       expect(res.render).toHaveBeenCalledWith(
-        'building-facilities-edit',
+        'court-building-facilities-edit',
         expect.objectContaining({
           courtId: req.params.courtId,
           model: expect.any(Object),
@@ -93,7 +93,7 @@ describe('CourtBuildingFacilitiesController', () => {
 
       expect(retrieveMock).toHaveBeenCalledWith('11111111-1111-1111-1111-111111111111');
       expect(res.render).toHaveBeenCalledWith(
-        'building-facilities-edit',
+        'court-building-facilities-edit',
         expect.objectContaining({ courtId: '11111111-1111-1111-1111-111111111111' })
       );
     });
@@ -229,7 +229,7 @@ describe('CourtBuildingFacilitiesController', () => {
       await controller.updateCourt(req, res);
 
       expect(res.render).toHaveBeenCalledWith(
-        'building-facilities-edit',
+        'court-building-facilities-edit',
         expect.objectContaining({
           courtId: req.params.courtId,
           pageTitle: 'Error: Building Facilities - Court A',

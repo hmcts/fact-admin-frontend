@@ -112,7 +112,7 @@ describe('CourtSinglePointOfEntryController', () => {
       responseMock
         .expects('render')
         .once()
-        .withArgs('single-point-of-entry', {
+        .withArgs('court-single-point-of-entry', {
           ...viewModel,
           breadcrumbs: expectedBreadcrumbs,
         });
@@ -170,10 +170,12 @@ describe('CourtSinglePointOfEntryController', () => {
         responseMock
           .expects('render')
           .once()
-          .withArgs('single-point-of-entry-success', {
+          .withArgs('common-edit-success.njk', {
             breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
             courtId: COURT_ID,
             courtName: 'Reading Crown Court',
+            pageTitle: 'Single points of entry saved - Reading Crown Court',
+            successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
           });
 
         await controller.updateSinglePointOfEntry(request, response);
@@ -193,10 +195,12 @@ describe('CourtSinglePointOfEntryController', () => {
         responseMock
           .expects('render')
           .once()
-          .withArgs('single-point-of-entry-success', {
+          .withArgs('common-edit-success.njk', {
             breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
             courtId: COURT_ID,
             courtName: 'Reading Crown Court',
+            pageTitle: 'Single points of entry saved - Reading Crown Court',
+            successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
           });
 
         await controller.updateSinglePointOfEntry(request, response);

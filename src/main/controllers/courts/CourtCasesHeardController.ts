@@ -32,7 +32,7 @@ export default class CourtCasesHeardController extends BaseController {
       return;
     }
 
-    return res.render('cases-heard', {
+    return res.render('court-cases-heard', {
       ...viewModel,
       breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, viewModel.courtName),
     });
@@ -65,7 +65,7 @@ export default class CourtCasesHeardController extends BaseController {
     const saveResult = await this.casesHeardService.saveCasesHeard(resolvedCourtId, selectedAreasOfLaw);
 
     if (saveResult.type === 'validation_error') {
-      return res.status(HttpStatusCode.BadRequest).render('cases-heard', {
+      return res.status(HttpStatusCode.BadRequest).render('court-cases-heard', {
         ...saveResult.viewModel,
         breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, saveResult.viewModel.courtName),
       });
@@ -101,14 +101,14 @@ export default class CourtCasesHeardController extends BaseController {
       .filter(key => confirmations[key])
       .forEach(k => selectedAuthorityList.push(k));
 
-    let message = '';
+    let message: string;
     if (selectedAuthorityList.length > 1) {
       message = `You are removing the cases heard types: ${selectedAuthorityList.join(', ')}. These are being used by the local authorities admin page. If you remove them it will remove the local authority config. Do you want to remove them?`;
     } else {
       message = `You are removing the cases heard type of ${selectedAuthorityList[0]}. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?`;
     }
 
-    return res.render('cases-heard-confirm', {
+    return res.render('court-cases-heard-confirm', {
       breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, courtName, 'Cases heard confirm update'),
       cancelHref: `/courts/${resolvedCourtId}/edit/cases-heard`,
       courtId: resolvedCourtId,

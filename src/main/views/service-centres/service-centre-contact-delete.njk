@@ -1,21 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "macros/common-components.njk" import confirmationActions %}
+{% from "macros/common-components.njk" import confirmationActions, contactDetailsBlock %}
 {% from "macros/csrf.njk" import csrfProtection %}
-
-{% macro contactDetailsBlock(contactDetail) %}
-  {% set parts = [] %}
-  {% if contactDetail.explanation %}
-    {% set parts = (parts.push(contactDetail.explanation), parts) %}
-  {% endif %}
-  {% if contactDetail.phoneNumber %}
-    {% set parts = (parts.push('Phone: ' + contactDetail.phoneNumber), parts) %}
-  {% endif %}
-  {% if contactDetail.email %}
-    {% set parts = (parts.push('Email: ' + contactDetail.email), parts) %}
-  {% endif %}
-  {{ parts.join('<br>') | safe }}
-{% endmacro %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -40,7 +26,7 @@
             },
             {
               key: { text: "Details" },
-              value: { html: contactDetailsBlock(contactDetail) }
+              value: { html: contactDetailsBlock(contactDetail, { inline: true, includeExplanation: true }) }
             }
           ]
         }) }}

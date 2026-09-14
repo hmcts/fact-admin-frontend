@@ -243,12 +243,15 @@ describe('CourtAddressController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('court-address-edit-success', {
+      .withArgs('common-edit-success.njk', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address saved'),
         courtName: 'Reading Crown Court',
-        address: saveResponse.address,
         courtId: COURT_ID,
-        courtOpened: true,
+        pageTitle: 'Address Saved',
+        successPanelTitle: 'Address saved: 10 Kings Road, Reading, RG1 2AA',
+        successPanelBody: 'Addresses for Reading Crown Court have been successfully updated. The court is now open.',
+        continueUpdatingHref: `/courts/${COURT_ID}/edit/address`,
+        continueUpdatingText: 'Back to addresses',
       });
 
     try {
@@ -412,11 +415,15 @@ describe('CourtAddressController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('court-address-delete-success', {
+      .withArgs('common-edit-success.njk', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address deleted'),
         courtName: 'Reading Crown Court',
-        address: deleteResponse.address,
         courtId: COURT_ID,
+        pageTitle: 'Address Deleted',
+        successPanelTitle: 'Address deleted: Reading Crown Court, Reading, RG1 2AA',
+        successPanelBody: 'You have removed this address for Reading Crown Court',
+        continueUpdatingHref: `/courts/${COURT_ID}/edit/address`,
+        continueUpdatingText: 'Back to addresses',
       });
 
     try {
@@ -742,12 +749,15 @@ describe('CourtAddressController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('court-address-edit-success', {
+      .withArgs('common-edit-success.njk', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address saved'),
         courtName: 'Reading Crown Court',
-        address: saveResponse.address,
         courtId: COURT_ID,
-        courtOpened: false,
+        pageTitle: 'Address Saved',
+        successPanelTitle: 'Address saved: Updated line 1, Reading, RG1 2AA',
+        successPanelBody: 'Addresses for Reading Crown Court have been successfully updated.',
+        continueUpdatingHref: `/courts/${COURT_ID}/edit/address`,
+        continueUpdatingText: 'Back to addresses',
       });
 
     try {

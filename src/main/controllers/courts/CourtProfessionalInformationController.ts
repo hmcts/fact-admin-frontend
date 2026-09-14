@@ -32,7 +32,7 @@ export default class CourtProfessionalInformationController extends BaseControll
       return;
     }
 
-    res.render('professional-information', {
+    res.render('court-professional-information', {
       ...viewModel,
       breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, viewModel.courtName),
     });
@@ -67,13 +67,13 @@ export default class CourtProfessionalInformationController extends BaseControll
 
     if (saveResponse.status === 'validationError') {
       res.status(HttpStatusCode.BadRequest);
-      return res.render('professional-information', {
+      return res.render('court-professional-information', {
         ...saveResponse.viewModel,
         breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
       });
     }
 
-    res.render('professional-information-success', {
+    res.render('common-edit-success.njk', {
       breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
         courtId,
         saveResponse.viewModel.courtName,
@@ -81,6 +81,9 @@ export default class CourtProfessionalInformationController extends BaseControll
       ),
       courtId,
       courtName: saveResponse.viewModel.courtName,
+      pageTitle: `Information for professionals saved - ${saveResponse.viewModel.courtName}`,
+      successPanelTitle: 'Information for professionals saved',
+      successPanelBody: `Information for professionals for ${saveResponse.viewModel.courtName} has been saved successfully.`,
     });
   }
 
@@ -90,7 +93,7 @@ export default class CourtProfessionalInformationController extends BaseControll
     confirmation: FamilyCourtRemovalConfirmation,
     body: Request['body']
   ): void {
-    res.render('professional-information-confirm', {
+    res.render('court-professional-information-confirm', {
       breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
         courtId,
         confirmation.courtName,

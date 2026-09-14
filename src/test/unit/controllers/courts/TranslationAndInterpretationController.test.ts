@@ -41,7 +41,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('translation-and-interpretation', {
+      .withArgs('court-translation-and-interpretation', {
         courtId,
         courtName: 'Reading Crown Court',
         email: 'translations@example.com',
@@ -80,7 +80,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     } as never);
     const getTranslationServicesStub = stub(courtApi, 'getTranslationServices').resolves(null);
 
-    responseMock.expects('render').once().withArgs('translation-and-interpretation');
+    responseMock.expects('render').once().withArgs('court-translation-and-interpretation');
 
     try {
       await controller.get(request, response);
@@ -175,9 +175,12 @@ describe('CourtTranslationAndInterpretationController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('translation-and-interpretation-success', {
+      .withArgs('common-edit-success.njk', {
         courtId,
         courtName: 'Reading Crown Court',
+        pageTitle: 'Translation and interpretation saved - Reading Crown Court',
+        successPanelTitle: 'Translation and interpretation saved',
+        successPanelBody: 'Translation and interpretation contact for Reading Crown Court has been saved successfully.',
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
@@ -217,7 +220,7 @@ describe('CourtTranslationAndInterpretationController', () => {
     const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices');
 
     responseMock.expects('status').once().withArgs(HttpStatusCode.BadRequest).returns(response);
-    responseMock.expects('render').once().withArgs('translation-and-interpretation');
+    responseMock.expects('render').once().withArgs('court-translation-and-interpretation');
 
     try {
       await controller.postSuccess(request, response);

@@ -9,7 +9,7 @@ describe('Single point of entry view', () => {
   ];
 
   test('renders single points of entry form with no selected by default', () => {
-    const html = env.render('single-point-of-entry.njk', {
+    const html = env.render('court-single-point-of-entry.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/single-point-of-entry`,
       pageTitle: 'Single points of entry - Reading Crown Court',
@@ -42,9 +42,11 @@ describe('Single point of entry view', () => {
   });
 
   test('renders success page navigation links', () => {
-    const html = env.render('single-point-of-entry-success.njk', {
+    const html = env.render('common-edit-success.njk', {
       courtId,
       courtName: 'Reading Crown Court',
+      pageTitle: 'Single points of entry saved - Reading Crown Court',
+      successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
       breadcrumbs: [...breadcrumbs, { href: '#', text: 'Single points of entry saved' }],
       pagePath: `/courts/${courtId}/edit/single-point-of-entry/success`,
     });

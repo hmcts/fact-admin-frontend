@@ -3,7 +3,7 @@ import { env } from '../../../../testUtils/nunjucksHelper';
 describe('General View', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
   test('renders the general edit page', () => {
-    const html = env.render('general-edit.njk', {
+    const html = env.render('court-general-edit.njk', {
       model: {
         errors: {},
         id: courtId,
@@ -31,7 +31,7 @@ describe('General View', () => {
   });
 
   test('renders persisted fields read-only and removes save for viewer users', () => {
-    const html = env.render('general-edit.njk', {
+    const html = env.render('court-general-edit.njk', {
       isViewer: true,
       model: {
         errors: {},
@@ -50,7 +50,7 @@ describe('General View', () => {
   });
 
   test('renders validation errors in the summary and field message', () => {
-    const html = env.render('general-edit.njk', {
+    const html = env.render('court-general-edit.njk', {
       model: {
         errors: {
           name: ['Name is required'],
@@ -73,7 +73,7 @@ describe('General View', () => {
   });
 
   test('renders court status validation errors correctly', () => {
-    const html = env.render('general-edit.njk', {
+    const html = env.render('court-general-edit.njk', {
       model: {
         errors: {
           open: ['Select whether the court is open or closed'],
@@ -95,7 +95,7 @@ describe('General View', () => {
   });
 
   test('renders region validation errors correctly', () => {
-    const html = env.render('general-edit.njk', {
+    const html = env.render('court-general-edit.njk', {
       model: {
         errors: {
           regionId: ['Some made up issue with the selected region'],

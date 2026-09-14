@@ -307,13 +307,18 @@ export default class ServiceCentreAddressController extends BaseController {
       return;
     }
 
-    res.render('service-centre-address-edit-success', {
-      address: saveResult.address,
-      pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
-      serviceCentreId,
+    const successMessage = `Addresses for ${saveResult.serviceCentreName} have been successfully updated.`;
+    res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
-      serviceCentreName: saveResult.serviceCentreName,
-      serviceCentreOpened: saveResult.serviceCentreOpened,
+      courtId: serviceCentreId,
+      courtName: saveResult.serviceCentreName,
+      pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
+      successPanelTitle: `Address saved: ${this.formatAddressRow(saveResult.address)}`,
+      successPanelBody: saveResult.serviceCentreOpened
+        ? `${successMessage} The service centre is now open.`
+        : successMessage,
+      continueUpdatingHref: `/service-centres/${serviceCentreId}/edit/address`,
+      continueUpdatingText: 'Back to address',
     });
   }
 
@@ -377,12 +382,15 @@ export default class ServiceCentreAddressController extends BaseController {
       return;
     }
 
-    res.render('service-centre-address-edit-success', {
-      address: saveResult.address,
-      pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
-      serviceCentreId,
+    res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
-      serviceCentreName: saveResult.serviceCentreName,
+      courtId: serviceCentreId,
+      courtName: saveResult.serviceCentreName,
+      pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
+      successPanelTitle: `Address saved: ${this.formatAddressRow(saveResult.address)}`,
+      successPanelBody: `Addresses for ${saveResult.serviceCentreName} have been successfully updated.`,
+      continueUpdatingHref: `/service-centres/${serviceCentreId}/edit/address`,
+      continueUpdatingText: 'Back to address',
     });
   }
 
@@ -430,12 +438,15 @@ export default class ServiceCentreAddressController extends BaseController {
       return;
     }
 
-    res.render('service-centre-address-delete-success', {
-      address: deleteResult.address,
-      pageTitle: `Address deleted - ${deleteResult.serviceCentreName}`,
-      serviceCentreId,
+    res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, deleteResult.serviceCentreName, 'Address deleted'),
-      serviceCentreName: deleteResult.serviceCentreName,
+      courtId: serviceCentreId,
+      courtName: deleteResult.serviceCentreName,
+      pageTitle: `Address deleted - ${deleteResult.serviceCentreName}`,
+      successPanelTitle: `Address deleted: ${this.formatAddressRow(deleteResult.address)}`,
+      successPanelBody: `You have removed this address for ${deleteResult.serviceCentreName}`,
+      continueUpdatingHref: `/service-centres/${serviceCentreId}/edit/address`,
+      continueUpdatingText: 'Back to address',
     });
   }
 
@@ -508,6 +519,15 @@ export default class ServiceCentreAddressController extends BaseController {
     }
 
     return result;
+  }
+
+  private formatAddressRow(address: Partial<ServiceCentreAddress>): string {
+    const line1 = address.addressLine1 ?? '';
+    const line2 = address.addressLine2 ? `${address.addressLine2}, ` : '';
+    const townCity = address.townCity ?? '';
+    const county = address.county ? `${address.county}, ` : '';
+    const postcode = address.postcode ?? '';
+    return `${line1}, ${line2}${townCity}, ${county}${postcode}`;
   }
 
   private async resolveServiceCentreName(res: Response, serviceCentreId: string): Promise<string | undefined> {
