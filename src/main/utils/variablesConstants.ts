@@ -90,6 +90,8 @@ export const VALID_COURT_NAME_REGEX_MESSAGE =
   'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const COURT_NAME_MESSAGE = 'Enter a name for the court';
 export const COURT_REGION_MESSAGE = 'Select a region for the court';
+export const COURT_OPEN_MESSAGE = 'Select whether the court is open or closed';
+export const COURT_ALREADY_EXISTS_MESSAGE = 'A court with the entered name already exists';
 
 //Court address service
 export const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
@@ -105,26 +107,55 @@ export const COURT_ADDRESS_DELETE_REQUIRES_AT_LEAST_ONE_MESSAGE =
 export const COURT_ADDRESS_SINGLE_VISIT_ADDRESS_MESSAGE =
   'A court can only have one listed address for visiting and this court already has one.  Please edit the other visit address first.';
 
+// Court building facilities service
+export const COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE =
+  'Select whether the parking is available';
+export const COURT_BUILDING_FACILITIES_WAITING_AREA_REQUIRED_MESSAGE =
+  'Select whether the waiting area is available';
+export const COURT_BUILDING_FACILITIES_QUIET_ROOM_REQUIRED_MESSAGE =
+  'Select whether the quiet room is available';
+export const COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE =
+  'Select whether the baby changing is available';
+export const COURT_BUILDING_FACILITIES_WIFI_REQUIRED_MESSAGE =
+  'Select whether the WiFi is available';
+export const COURT_BUILDING_FACILITIES_WAITING_AREA_CHILDREN_REQUIRED_MESSAGE =
+  'Select if a separate waiting area is available for children';
+
+// Court cases heard Service
+export const AREA_OF_LAW_VALIDATION_MESSAGE = 'Select at least one type of case heard at this court.';
+
 // Court counter service opening hours service
 export const EMAIL_REGEX =
   /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
-
 export const COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE = 'Select what the counter can assist with';
 export const COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE = 'Select yes if an appointment is needed';
 export const COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter a valid contact email address';
 export const COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
   'Select whether the counter opens and closes at the same time Monday to Friday';
-export const COUNTER_SERVICE_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE = 'Select at least one day';
-export const COUNTER_SERVICE_OPENING_AFTER_CLOSING_MESSAGE = 'The opening time cannot be after the closing time';
-export const COUNTER_SERVICE_CLOSING_BEFORE_OPENING_MESSAGE = 'The closing time cannot be before the opening time';
-export const COUNTER_SERVICE_OPENING_EQUALS_CLOSING_MESSAGE = 'The opening time cannot be the same as the closing time';
-export const COUNTER_SERVICE_CLOSING_EQUALS_OPENING_MESSAGE = 'The closing time cannot be the same as the opening time';
 
 // Court contact details service
 export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
 export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+]+$/;
 export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+]+$/u;
 export const MAX_EXPLANATION_LENGTH = 250;
+export const COURT_CONTACT_TYPE_REQUIRED_MESSAGE = 'Select a contact type';
+export const COURT_CONTACT_METHOD_REQUIRED_MESSAGE = 'Select at least one contact method';
+export const COURT_CONTACT_EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
+export const COURT_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
+export const COURT_CONTACT_PHONE_REQUIRED_MESSAGE = 'Enter a phone number';
+export const COURT_CONTACT_PHONE_INVALID_MESSAGE = 'Enter a phone number in the correct format';
+export const COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE =
+  'Explanation must be 250 characters or fewer';
+export const COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
+  'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+export const COURT_CONTACT_WELSH_TRANSLATION_REQUIRED_MESSAGE =
+  'Because you provided an explanation in English, the Welsh translation is now mandatory';
+export const COURT_CONTACT_ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
+  'Because you provided an explanation in Welsh, the English translation is now mandatory';
+export const COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE =
+  'Welsh translation must be 250 characters or fewer';
+export const COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
+  'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
 // Court opening hours service
 export const ALLOWED_OPENING_HOUR_TYPES = [
@@ -150,6 +181,16 @@ export const OPENING_HOUR_DAYS: readonly OpeningHourDay[] = [
   { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
   { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
 ];
+export const OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE = 'Select at least one day';
+export const OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE = 'The opening time cannot be after the closing time';
+export const OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE = 'The closing time cannot be before the opening time';
+export const OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE = 'The opening time cannot be the same as the closing time';
+export const OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE = 'The closing time cannot be the same as the opening time';
+export const OPENING_HOUR_TYPE_REQUIRED_MESSAGE = 'Select an opening hours type';
+export const OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE =
+  'A court can only have one opening hour per opening hour type. Please edit the other opening hour first.';
+export const OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
+  'Select whether the court opens and closes at the same time Monday to Friday';
 
 // Court professional information service
 export const MAX_REPEATABLE_ENTRIES = 5;

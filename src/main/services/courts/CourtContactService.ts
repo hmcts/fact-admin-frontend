@@ -7,6 +7,17 @@ import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { parseString } from '../../utils/valueParsers';
 import {
+  COURT_CONTACT_EMAIL_INVALID_MESSAGE,
+  COURT_CONTACT_EMAIL_REQUIRED_MESSAGE,
+  COURT_CONTACT_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
+  COURT_CONTACT_METHOD_REQUIRED_MESSAGE,
+  COURT_CONTACT_PHONE_INVALID_MESSAGE,
+  COURT_CONTACT_PHONE_REQUIRED_MESSAGE,
+  COURT_CONTACT_TYPE_REQUIRED_MESSAGE, COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
+  COURT_CONTACT_WELSH_TRANSLATION_REQUIRED_MESSAGE,
   EMAIL_REGEX,
   ENGLISH_TEXT_REGEX,
   MAX_EXPLANATION_LENGTH,
@@ -211,31 +222,31 @@ export class CourtContactService {
     const errorSummary: CourtContactValidationError[] = [];
 
     if (!selectedContactTypeId) {
-      formErrors.contactType = 'Select a contact type';
+      formErrors.contactType = COURT_CONTACT_TYPE_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
     if (!selectedContactMethods.length) {
-      formErrors.contactMethods = 'Select at least one contact method';
+      formErrors.contactMethods = COURT_CONTACT_METHOD_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
     }
 
     if (selectedContactMethods.includes('email')) {
       if (!contactEmail) {
-        formErrors.contactEmail = 'Enter an email address';
+        formErrors.contactEmail = COURT_CONTACT_EMAIL_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       } else if (!EMAIL_REGEX.test(contactEmail)) {
-        formErrors.contactEmail = 'Enter an email address in the correct format';
+        formErrors.contactEmail = COURT_CONTACT_EMAIL_INVALID_MESSAGE;
         errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
       }
     }
 
     if (selectedContactMethods.includes('phone')) {
       if (!contactTelephone) {
-        formErrors.contactTelephone = 'Enter a phone number';
+        formErrors.contactTelephone = COURT_CONTACT_PHONE_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
-        formErrors.contactTelephone = 'Enter a phone number in the correct format';
+        formErrors.contactTelephone = COURT_CONTACT_PHONE_INVALID_MESSAGE;
         errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
       }
     }
@@ -245,34 +256,30 @@ export class CourtContactService {
 
     if (contactExplanation) {
       if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
-        formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
+        formErrors.contactExplanation = COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       } else if (!ENGLISH_TEXT_REGEX.test(contactExplanation)) {
-        formErrors.contactExplanation =
-          'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+        formErrors.contactExplanation = COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 
       if (!contactExplanationCy) {
-        formErrors.contactExplanationCy =
-          'Because you provided an explanation in English, the Welsh translation is now mandatory';
+        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_TRANSLATION_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       }
     }
 
     if (contactExplanationCy) {
       if (!contactExplanation) {
-        formErrors.contactExplanation =
-          'Because you provided an explanation in Welsh, the English translation is now mandatory';
+        formErrors.contactExplanation = COURT_CONTACT_ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 
       if (contactExplanationCy.length > MAX_EXPLANATION_LENGTH) {
-        formErrors.contactExplanationCy = 'Welsh translation must be 250 characters or fewer';
+        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       } else if (!WELSH_TEXT_REGEX.test(contactExplanationCy)) {
-        formErrors.contactExplanationCy =
-          'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       }
     }

@@ -5,15 +5,15 @@ import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/co
 import {
   COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
   COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
-  COUNTER_SERVICE_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
-  COUNTER_SERVICE_CLOSING_BEFORE_OPENING_MESSAGE,
-  COUNTER_SERVICE_CLOSING_EQUALS_OPENING_MESSAGE,
   COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
-  COUNTER_SERVICE_OPENING_AFTER_CLOSING_MESSAGE,
-  COUNTER_SERVICE_OPENING_EQUALS_CLOSING_MESSAGE,
   COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
   EMAIL_REGEX,
+  OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+  OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
   OPENING_HOUR_DAYS,
+  OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+  OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
   OpeningHourDay,
 } from '../../utils/variablesConstants';
 
@@ -316,7 +316,7 @@ export class CounterServiceOpeningHoursService {
     }
 
     if (form.selectedDays.length === 0) {
-      errors.selectedDays = COUNTER_SERVICE_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE;
+      errors.selectedDays = OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -355,11 +355,11 @@ export class CounterServiceOpeningHoursService {
     const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
 
     if (openingTime > closingTime) {
-      errors[openingHourKey] = COUNTER_SERVICE_OPENING_AFTER_CLOSING_MESSAGE;
-      errors[closingHourKey] = COUNTER_SERVICE_CLOSING_BEFORE_OPENING_MESSAGE;
+      errors[openingHourKey] = OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE;
     } else if (openingTime === closingTime) {
-      errors[openingHourKey] = COUNTER_SERVICE_OPENING_EQUALS_CLOSING_MESSAGE;
-      errors[closingHourKey] = COUNTER_SERVICE_CLOSING_EQUALS_OPENING_MESSAGE;
+      errors[openingHourKey] = OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE;
     }
   }
 

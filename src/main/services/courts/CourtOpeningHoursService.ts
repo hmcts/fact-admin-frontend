@@ -3,7 +3,19 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../schemas/openingHoursSchema';
-import { ALLOWED_OPENING_HOUR_TYPES, OPENING_HOUR_DAYS, OpeningHourDay } from '../../utils/variablesConstants';
+import {
+  ALLOWED_OPENING_HOUR_TYPES,
+  OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+  OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
+  OPENING_HOUR_DAYS,
+  OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+  OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+  OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE,
+  OPENING_HOUR_TYPE_REQUIRED_MESSAGE,
+  OpeningHourDay,
+} from '../../utils/variablesConstants';
 
 export type OpeningHoursForm = {
   openingHourTypeId?: string;
@@ -321,18 +333,18 @@ export class CourtOpeningHoursService {
     const errors: Record<string, string> = {};
 
     if (!form.openingHourTypeId) {
-      errors.openingHourTypeId = 'Select an opening hours type';
+      errors.openingHourTypeId = OPENING_HOUR_TYPE_REQUIRED_MESSAGE;
     } else if (
       existingOpeningHours.some(
         existing => existing.openingHourTypeId === form.openingHourTypeId && existing.id !== openingHoursId
       )
     ) {
       errors.openingHourTypeId =
-        'A court can only have one opening hour per opening hour type. Please edit the other opening hour first.';
+        OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE;
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
-      errors.sameTimeYes = 'Select whether the court opens and closes at the same time Monday to Friday';
+      errors.sameTimeYes = OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -342,7 +354,7 @@ export class CourtOpeningHoursService {
     }
 
     if (form.selectedDays.length === 0) {
-      errors.selectedDays = 'Select at least one day';
+      errors.selectedDays = OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -382,11 +394,11 @@ export class CourtOpeningHoursService {
     const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
 
     if (openingTime > closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be after the closing time';
-      errors[closingHourKey] = 'The closing time cannot be before the opening time';
+      errors[openingHourKey] = OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE;
     } else if (openingTime === closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
-      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
+      errors[openingHourKey] = OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE;
     }
   }
 
