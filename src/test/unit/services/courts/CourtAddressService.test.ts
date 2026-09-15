@@ -85,7 +85,7 @@ describe('CourtAddressService', () => {
             POST_TOWN: 'London',
             THOROUGHFARE_NAME: 'High Street',
             UDPRN: null,
-            UPRN: null,
+            UPRN: '100',
           },
         },
         { DPA: null },
@@ -97,7 +97,9 @@ describe('CourtAddressService', () => {
 
     expect(result).toEqual([
       expect.objectContaining({
-        ADDRESS: '1 High Street, London, SW1A 1AA',
+        address: '1 High Street, London, SW1A 1AA',
+        dataset: 'DPA',
+        selectionPostcode: 'SW1A1AA',
       }),
     ]);
   });

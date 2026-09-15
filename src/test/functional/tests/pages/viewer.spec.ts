@@ -291,6 +291,41 @@ test.describe(
   () => {
     test.use({ storageState: config.users.superAdmin.sessionFile });
 
+    test('rejects undoing an approval without a csrf token', async ({ page, playwright }) => {
+      await withCreatedCourt(playwright, 'SuperAdmin Approval Undo CSRF Test', {}, async ({ createdCourt }) => {
+        const editPath = `/courts/${createdCourt.id}/edit`;
+        await page.goto(config.urls.homePageUrl + editPath);
+
+        await page.getByRole('button', { name: 'Approve data' }).click();
+        await page.getByRole('button', { name: 'Confirm data' }).click();
+        await expect(page.getByText(`You have approved the data for ${createdCourt.name}.`)).toBeVisible();
+
+        await page.goto(`${config.urls.homePageUrl}/approvals`);
+        await page.getByLabel('Search by name').fill(createdCourt.name);
+        await page.getByLabel('Approval status').selectOption('approved');
+        await page.getByRole('button', { name: 'Apply filters' }).click();
+        await page
+          .getByRole('row')
+          .filter({ hasText: createdCourt.name })
+          .getByRole('link', { name: 'Undo approval' })
+          .click();
+
+        const undoPath = new URL(page.url()).pathname;
+        const csrfTokenInput = page.locator('input[name="_csrf"]');
+        await expect(csrfTokenInput).not.toHaveValue('');
+        await csrfTokenInput.evaluate(element => element.remove());
+
+        const responsePromise = page.waitForResponse(
+          response => response.request().method() === 'POST' && new URL(response.url()).pathname === undoPath
+        );
+        await page.getByRole('button', { name: 'Undo approval' }).click();
+        const response = await responsePromise;
+
+        expect(response.status()).toBe(403);
+        await expect(page.getByRole('heading', { name: 'Something went wrong' })).toBeVisible();
+      });
+    });
+
     test('can approve a court and undo its approval from the tracker', async ({ page, playwright }) => {
       await withCreatedCourt(playwright, 'SuperAdmin Approval Undo Test', {}, async ({ createdCourt }) => {
         const editPath = `/courts/${createdCourt.id}/edit`;

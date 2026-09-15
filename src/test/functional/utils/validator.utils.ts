@@ -11,6 +11,6 @@ export class ValidatorUtils {
   public validateDate(date: string): void {
     const dateRegex = /^\d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/;
     expect(date).toMatch(dateRegex);
-    expect(Date.parse(date)).not.toBe(Number.NaN);
+    expect(Date.parse(date)).not.toBeNaN();
   }
 }

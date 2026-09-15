@@ -1,8 +1,6 @@
 import { HttpStatusCode } from 'axios';
 
-import {
-  ServiceCentreCasesHeardService,
-} from '../../../../main/services/service-centres/ServiceCentreCasesHeardService';
+import { ServiceCentreCasesHeardService } from '../../../../main/services/service-centres/ServiceCentreCasesHeardService';
 import { SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE } from '../../../../main/utils/variablesConstants';
 
 describe('ServiceCentreCasesHeardService', () => {

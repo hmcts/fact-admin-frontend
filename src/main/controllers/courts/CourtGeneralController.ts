@@ -95,6 +95,12 @@ export default class CourtGeneralController extends BaseController {
   }
 
   private buildSectionBreadcrumbs(courtId: string, courtName: string, section: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, section, section.toLowerCase().replace(/ /g, '-'), currentPage);
+    return buildSectionBreadcrumbs(
+      courtId,
+      courtName,
+      section,
+      section.toLowerCase().replaceAll(' ', '-'),
+      currentPage
+    );
   }
 }

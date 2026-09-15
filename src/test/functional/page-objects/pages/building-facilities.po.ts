@@ -4,12 +4,14 @@ import { config } from '../../utils';
 import { Base } from '../base';
 
 export class BuildingFacilitiesPage extends Base {
+  public readonly csrfTokenInput: Locator;
   public readonly errorSummary: Locator;
   public readonly successPanel: Locator;
   public readonly saveButton: Locator;
 
   constructor(page: Page) {
     super(page);
+    this.csrfTokenInput = this.page.locator('input[name="_csrf"]');
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.successPanel = this.page.locator('.govuk-panel--confirmation');
     this.saveButton = this.page.getByRole('button', { name: 'Save' });

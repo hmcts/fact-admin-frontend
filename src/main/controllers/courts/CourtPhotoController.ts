@@ -1,4 +1,4 @@
-import { GET, POST, before, route } from 'awilix-express';
+import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
@@ -6,7 +6,6 @@ import { Logger } from '../../modules/logging';
 import { CourtPhotoService } from '../../services/courts/CourtPhotoService';
 import BaseController from '../BaseController';
 import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-import { photoUploadMiddleware } from '../helpers/multerUpload';
 
 const logger = Logger.getLogger('app');
 
@@ -37,7 +36,6 @@ export default class CourtPhotoController extends BaseController {
 
   @route('/upload')
   @POST()
-  @before(photoUploadMiddleware('photo', 4))
   public async update(req: Request, res: Response): Promise<void> {
     const courtId = this.getUuidRouteParam(req, 'courtId');
     if (!courtId) {

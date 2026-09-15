@@ -65,7 +65,7 @@ export default class CourtSinglePointOfEntryController extends BaseController {
       return this.renderStatus(res, HttpStatusCode.BadRequest, 'court-not-found');
     }
 
-    return void res.render('single-point-of-entry-success', {
+    return res.render('single-point-of-entry-success', {
       breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(
         courtId,
         saveResult.courtName,

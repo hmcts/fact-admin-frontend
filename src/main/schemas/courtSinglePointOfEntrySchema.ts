@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const courtSinglePointOfEntrySchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().nullable().optional(),
   nameCy: z.string().nullable().optional(),
   selected: z.boolean(),

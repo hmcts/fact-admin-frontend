@@ -109,58 +109,27 @@ describe('Single point of entry routes', () => {
     ).toBe(true);
   });
 
-  test('rejects invalid radio values before calling the service', async () => {
+  test.each([
+    [
+      'invalid radio values',
+      'singlePointOfEntry.22222222-2222-4222-8222-222222222222=false&singlePointOfEntry.22222222-2222-4222-8222-222222222222=maybe',
+    ],
+    [
+      'unexpected checkbox value order',
+      'singlePointOfEntry.22222222-2222-4222-8222-222222222222=true&singlePointOfEntry.22222222-2222-4222-8222-222222222222=false',
+    ],
+    [
+      'repeated checkbox values',
+      'singlePointOfEntry.22222222-2222-4222-8222-222222222222=false&singlePointOfEntry.22222222-2222-4222-8222-222222222222=false',
+    ],
+    ['invalid area of law ids', 'singlePointOfEntry.not-a-uuid=true'],
+  ])('rejects %s before calling the service', async (_scenario, formPayload) => {
     const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
 
     const response = await request(app)
       .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
       .type('form')
-      .send(
-        'singlePointOfEntry.22222222-2222-4222-8222-222222222222=false&singlePointOfEntry.22222222-2222-4222-8222-222222222222=maybe'
-      );
-
-    expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('Something went wrong');
-    expect(updateStub.notCalled).toBe(true);
-  });
-
-  test('rejects unexpected checkbox value order before calling the service', async () => {
-    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
-
-    const response = await request(app)
-      .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
-      .type('form')
-      .send(
-        'singlePointOfEntry.22222222-2222-4222-8222-222222222222=true&singlePointOfEntry.22222222-2222-4222-8222-222222222222=false'
-      );
-
-    expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('Something went wrong');
-    expect(updateStub.notCalled).toBe(true);
-  });
-
-  test('rejects repeated checkbox values before calling the service', async () => {
-    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
-
-    const response = await request(app)
-      .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
-      .type('form')
-      .send(
-        'singlePointOfEntry.22222222-2222-4222-8222-222222222222=false&singlePointOfEntry.22222222-2222-4222-8222-222222222222=false'
-      );
-
-    expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('Something went wrong');
-    expect(updateStub.notCalled).toBe(true);
-  });
-
-  test('rejects invalid area of law ids before calling the service', async () => {
-    const updateStub = stub(CourtSinglePointOfEntryService.prototype, 'update');
-
-    const response = await request(app)
-      .post(`/courts/${courtId}/edit/single-point-of-entry/success`)
-      .type('form')
-      .send('singlePointOfEntry.not-a-uuid=true');
+      .send(formPayload);
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('Something went wrong');

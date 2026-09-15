@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -23,6 +24,7 @@
       <p class="govuk-body">Use this field to display a temporary notice of building closure or temporary disruption to court services. This is limited to 250 characters.</p>
 
       <form method="post" action="/courts/{{ courtId }}/edit/warning-notice/success" novalidate>
+        {{ csrfProtection(csrfToken) }}
         <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
         <legend class="govuk-fieldset__legend govuk-visually-hidden">Warning notice details</legend>
 

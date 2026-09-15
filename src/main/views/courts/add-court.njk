@@ -3,6 +3,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% macro modelDrivenErrorSummary(errors) %}
   {% set errorList = [] %}
@@ -49,6 +50,7 @@
       </p>
 
       <form method="post" action="/add-court">
+        {{ csrfProtection(csrfToken) }}
         {{ govukInput({
           label: {
             text: "Name",

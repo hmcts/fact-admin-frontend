@@ -54,7 +54,7 @@ export const parseBoolean = (value: unknown): boolean | undefined => {
 
 export const parseLiftMetric = (value: unknown): number | undefined => {
   if (typeof value === 'number') {
-    return Number.isFinite(value) ? value : NaN;
+    return Number.isFinite(value) ? value : Number.NaN;
   }
 
   if (typeof value !== 'string') {
@@ -67,7 +67,7 @@ export const parseLiftMetric = (value: unknown): number | undefined => {
   }
 
   const parsed = Number(trimmed);
-  return Number.isFinite(parsed) ? parsed : NaN;
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
 };
 
 /**
@@ -132,4 +132,17 @@ export function toUkDateTimeString(value: string, format = UI_DATE_FORMAT): stri
  */
 export function isHttpStatusCode(value: unknown): value is HttpStatusCode {
   return typeof value === 'number';
+}
+
+/**
+ * Moves a common pattern used in some of the services to a utility function that checks if a
+ * field has a legitimate value.
+ * @param value
+ */
+export function hasValue(value: unknown): boolean {
+  if (value !== null && value !== undefined) {
+    const str = String(value); // NOSONAR
+    return str.trim() !== '';
+  }
+  return false;
 }

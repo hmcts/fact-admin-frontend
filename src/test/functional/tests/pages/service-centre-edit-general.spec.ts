@@ -34,6 +34,30 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    test('rejects a form submission without a csrf token', async ({ serviceCentreGeneralPage, playwright }) => {
+      await withCreatedServiceCentre(
+        playwright,
+        'Service Centre Edit General CSRF Test',
+        { open: true },
+        async ({ createdServiceCentre }) => {
+          await serviceCentreGeneralPage.goto(createdServiceCentre.id);
+          await expect(serviceCentreGeneralPage.csrfTokenInput).not.toHaveValue('');
+          await serviceCentreGeneralPage.csrfTokenInput.evaluate(element => element.remove());
+
+          const responsePromise = serviceCentreGeneralPage.page.waitForResponse(
+            response =>
+              response.request().method() === 'POST' &&
+              new URL(response.url()).pathname === `/service-centres/${createdServiceCentre.id}/edit/general/success`
+          );
+          await serviceCentreGeneralPage.save();
+          const response = await responsePromise;
+
+          expect(response.status()).toBe(403);
+          await expect(serviceCentreGeneralPage.heading).toContainText('Something went wrong');
+        }
+      );
+    });
+
     test('saves general details and persists values on re-open', async ({ serviceCentreGeneralPage, playwright }) => {
       await withCreatedServiceCentre(
         playwright,

@@ -146,4 +146,17 @@ describe('Approvals routes', () => {
     expect(response.text).toContain('Back to Courts, tribunals and service centres list');
     expect(undoApprovalStub.calledWith('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa')).toBe(true);
   });
+
+  test('rejects undoing an approval without a csrf token', async () => {
+    const undoApprovalStub = stub(ApprovalService.prototype, 'undoApproval');
+
+    const response = await request(app)
+      .post('/approvals/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/undo')
+      .set('x-test-role', 'SuperAdmin')
+      .set('x-test-csrf-missing', 'true');
+
+    expect(response.status).toBe(HttpStatusCode.Forbidden);
+    expect(response.text).toContain('Something went wrong');
+    expect(undoApprovalStub.notCalled).toBe(true);
+  });
 });

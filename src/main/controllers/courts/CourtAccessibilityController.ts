@@ -42,6 +42,36 @@ export default class CourtAccessibilityController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
+    const { liftDoorWidth, liftDoorLimit, model } = this.buildAccessibilityModel(req, resolvedCourtId);
+
+    const updateResponse = await this.accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
+    if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
+      return;
+    }
+
+    if (updateResponse.errors) {
+      const updatedLiftDoorLimit = Number.isNaN(updateResponse.liftDoorLimit) ? liftDoorLimit : model.liftDoorLimit;
+      const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
+
+      return res.render('accessibility-edit', {
+        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
+        courtId: resolvedCourtId,
+        model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
+        pageTitle: `Error: Accessibility - ${updateResponse.name}`,
+      });
+    }
+
+    return res.render('common-edit-success', {
+      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!, 'Accessibility saved'),
+      courtId: resolvedCourtId,
+      pageTitle: `Accessibility saved - ${updateResponse.name}`,
+      successPanelTitle: 'Accessibility details saved',
+      successPanelBody: `Accessibility details saved for ${updateResponse.name}`,
+      courtName: updateResponse.name,
+    });
+  }
+
+  private buildAccessibilityModel(req: Request, resolvedCourtId: string) {
     const {
       accessibleParking,
       accessibleParkingPhoneNumber,
@@ -84,32 +114,7 @@ export default class CourtAccessibilityController extends BaseController {
         typeof liftSupportPhoneNumber === 'string' && parseBoolean(lift) === false ? liftSupportPhoneNumber : undefined,
       quietRoom: parseBoolean(quietRoom),
     };
-
-    const updateResponse = await this.accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
-    if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
-      return;
-    }
-
-    if (updateResponse.errors) {
-      const updatedLiftDoorLimit = Number.isNaN(updateResponse.liftDoorLimit) ? liftDoorLimit : model.liftDoorLimit;
-      const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
-
-      return res.render('accessibility-edit', {
-        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
-        courtId: resolvedCourtId,
-        model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
-        pageTitle: `Error: Accessibility - ${updateResponse.name}`,
-      });
-    }
-
-    return res.render('common-edit-success', {
-      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!, 'Accessibility saved'),
-      courtId: resolvedCourtId,
-      pageTitle: `Accessibility saved - ${updateResponse.name}`,
-      successPanelTitle: 'Accessibility details saved',
-      successPanelBody: `Accessibility details saved for ${updateResponse.name}`,
-      courtName: updateResponse.name,
-    });
+    return { liftDoorWidth, liftDoorLimit, model };
   }
 
   private buildAccessibilityBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {

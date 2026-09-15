@@ -63,6 +63,7 @@ test.describe(
       await usersPage.goto();
 
       const rowCount = await usersPage.tableRows.count();
+      // Skip the test if there are no user rows to verify SSO ID search
       test.skip(rowCount === 0, 'Requires at least one user row to verify SSO ID search.');
 
       const ssoId = await usersPage.getFirstRowSsoId();

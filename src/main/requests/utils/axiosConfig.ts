@@ -3,7 +3,7 @@ import { Mutex } from 'async-mutex';
 import { InternalAxiosRequestConfig, create } from 'axios';
 import config from 'config';
 
-import { dataApiRequestContext, runWithDataApiUserId } from './dataApiRequestContext';
+import { dataApiRequestContext } from './dataApiRequestContext';
 
 const tokenMutex = new Mutex();
 
@@ -26,7 +26,7 @@ export const dataApi = create({
 let cachedTokenRefreshTS: number = 0;
 let cachedToken: string | null = null;
 
-export { runWithDataApiUserId };
+export { runWithDataApiUserId } from './dataApiRequestContext';
 
 function getToken(): Promise<string> {
   return tokenMutex.runExclusive(async () => {

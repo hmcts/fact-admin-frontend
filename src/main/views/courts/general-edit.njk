@@ -5,6 +5,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {# MACROS - maybe add to common components? #}
 {% macro modelDrivenErrorSummary(model) %}
@@ -52,6 +53,7 @@
       <h1 class="govuk-heading-l">General</h1>
 
       <form method="post" action="/courts/{{ model.id }}/edit/general/success">
+        {{ csrfProtection(csrfToken) }}
         <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
           <legend class="govuk-fieldset__legend govuk-visually-hidden">General details</legend>
 

@@ -72,7 +72,38 @@ export class HomePageFiltersService {
       });
     }
 
-    // Pagination and boolean filters
+    // Pagination filters
+    this.detectPaginationFilterErrors(filters, errors);
+
+    // favourites pagination
+    if (filters.rawFavouritesPageNumber !== undefined) {
+      const favouritesPageNumber = Number(filters.rawFavouritesPageNumber);
+      if (!Number.isInteger(favouritesPageNumber) || favouritesPageNumber < 0) {
+        errors.push({
+          href: '#favourites',
+          text: HOME_PAGE_FAVOURITES_PAGE_NUMBER_MIN_ERROR,
+        });
+      } else if (favouritesPageNumber > MAX_PAGE_PARAM) {
+        errors.push({
+          href: '#favourites',
+          text: HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR,
+        });
+      }
+    }
+
+    // Region
+    const regionError = this.validateRegion(filters.regionId, regions);
+    if (regionError) {
+      errors.push(regionError);
+    }
+
+    // Sorting
+    this.detectSortingErrors(filters, errors);
+
+    return errors;
+  }
+
+  private detectPaginationFilterErrors(filters: HomePageFilters, errors: HomePageValidationError[]): void {
     if (
       filters.rawIncludeClosed !== undefined &&
       filters.rawIncludeClosed !== 'true' &&
@@ -96,7 +127,6 @@ export class HomePageFiltersService {
         text: HOME_PAGE_ONLY_SERVICE_CENTRES_BOOLEAN_ERROR,
       });
     }
-
     if (filters.rawPageSize !== undefined) {
       const pageSize = Number(filters.rawPageSize);
       if (!Number.isInteger(pageSize) || pageSize <= 0) {
@@ -126,29 +156,9 @@ export class HomePageFiltersService {
         });
       }
     }
+  }
 
-    if (filters.rawFavouritesPageNumber !== undefined) {
-      const favouritesPageNumber = Number(filters.rawFavouritesPageNumber);
-      if (!Number.isInteger(favouritesPageNumber) || favouritesPageNumber < 0) {
-        errors.push({
-          href: '#favourites',
-          text: HOME_PAGE_FAVOURITES_PAGE_NUMBER_MIN_ERROR,
-        });
-      } else if (favouritesPageNumber > MAX_PAGE_PARAM) {
-        errors.push({
-          href: '#favourites',
-          text: HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR,
-        });
-      }
-    }
-
-    // Region
-    const regionError = this.validateRegion(filters.regionId, regions);
-    if (regionError) {
-      errors.push(regionError);
-    }
-
-    // Sorting
+  private detectSortingErrors(filters: HomePageFilters, errors: HomePageValidationError[]): void {
     if (filters.rawSortOrder !== undefined && filters.rawSortBy === undefined) {
       errors.push({
         href: '#main-content',
@@ -169,8 +179,6 @@ export class HomePageFiltersService {
         text: `sortOrder must be one of: ${VALID_SORT_ORDER_VALUES.join(', ')}`,
       });
     }
-
-    return errors;
   }
 
   /**

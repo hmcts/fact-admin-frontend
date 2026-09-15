@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/common-components.njk" import confirmationActions %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -41,6 +42,7 @@
       }) }}
 
       <form method="post" action="/courts/{{ courtId }}/edit/court-opening-hours/delete/success/{{ openingHoursId }}">
+        {{ csrfProtection(csrfToken) }}
         {{ confirmationActions("Delete opening hours", cancelHref) }}
       </form>
     </div>

@@ -6,6 +6,7 @@
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% macro localAuthoritySelection(selections, id, legendText=null, hintText=null) %}
 
@@ -138,6 +139,7 @@
         {%  endif %}
 
         <form method="post" action="/courts/{{ courtId }}/edit/local-authorities/success">
+          {{ csrfProtection(csrfToken) }}
 
           {{ govukTabs({
             items: items

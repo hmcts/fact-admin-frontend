@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../../schemas/courtAddressSchema';
-import { DpaAddress } from '../../schemas/osDataSchema';
+import { OsAddressOption } from '../../schemas/osDataSchema';
 import {
   validateAddressLine1Field,
   validateAddressLine2Field,
@@ -11,6 +11,7 @@ import {
   validatePostcodeField,
   validateTownCityField,
 } from '../../utils/addressValidation';
+import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
 import {
   COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE,
@@ -37,7 +38,7 @@ export type SaveCourtAddressResponse =
   | HttpStatusCode;
 
 export type RetrieveAddressOptionsResponse =
-  | DpaAddress[]
+  | OsAddressOption[]
   | {
       status: 'invalid';
       error: string;
@@ -86,7 +87,7 @@ export class CourtAddressService {
       }
     }
 
-    return result.results.map(resultItem => resultItem.DPA).filter((dpa): dpa is DpaAddress => dpa !== null);
+    return buildOsAddressOptions(result, postcode);
   }
 
   public async save(
@@ -126,16 +127,7 @@ export class CourtAddressService {
 
     // if it's a Map, it's validation errors from the API
     if (result instanceof Map) {
-      // convert the mapped errors into our expected error format
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of result) {
-        // ignore the timestamp entry when decanting error responses
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
-      return { status: 'invalid', address: { ...address, errors } };
+      return this.buildApiValidationErrorResponse(result, address);
     }
 
     let courtOpened = false;
@@ -158,6 +150,22 @@ export class CourtAddressService {
 
     // otherwise, it's a successful save and we can return the saved address
     return { status: 'saved', courtName: courtResponse.name, address: result, courtOpened };
+  }
+
+  private buildApiValidationErrorResponse(
+    result: Map<string, string>,
+    address: Partial<CourtAddress>
+  ): SaveCourtAddressResponse {
+    // convert the mapped errors into our expected error format
+    const errors: Record<string, string[]> = {};
+    for (const [key, value] of result) {
+      // ignore the timestamp entry when decanting error responses
+      if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
+        continue;
+      }
+      errors[key] = [value];
+    }
+    return { status: 'invalid', address: { ...address, errors } };
   }
 
   public async delete(courtId: string, addressId: string): Promise<DeleteCourtAddressResponse> {

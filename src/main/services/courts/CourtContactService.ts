@@ -5,23 +5,17 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
+import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
 import {
-  CONTACT_METHOD_REQUIRED_MESSAGE,
   CONTACT_TYPE_REQUIRED_MESSAGE,
   COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
   COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-  EMAIL_INVALID_MESSAGE,
-  EMAIL_REGEX,
-  EMAIL_REQUIRED_MESSAGE,
   ENGLISH_TEXT_REGEX,
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   MAX_EXPLANATION_LENGTH,
-  PHONE_NUMBER_INVALID_MESSAGE,
-  PHONE_NUMBER_REGEX,
-  PHONE_NUMBER_REQUIRED_MESSAGE,
   WELSH_TEXT_REGEX,
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
 } from '../../utils/variablesConstants';
@@ -227,30 +221,7 @@ export class CourtContactService {
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
-    if (!selectedContactMethods.length) {
-      formErrors.contactMethods = CONTACT_METHOD_REQUIRED_MESSAGE;
-      errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
-    }
-
-    if (selectedContactMethods.includes('email')) {
-      if (!contactEmail) {
-        formErrors.contactEmail = EMAIL_REQUIRED_MESSAGE;
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      } else if (!EMAIL_REGEX.test(contactEmail)) {
-        formErrors.contactEmail = EMAIL_INVALID_MESSAGE;
-        errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-      }
-    }
-
-    if (selectedContactMethods.includes('phone')) {
-      if (!contactTelephone) {
-        formErrors.contactTelephone = PHONE_NUMBER_REQUIRED_MESSAGE;
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
-        formErrors.contactTelephone = PHONE_NUMBER_INVALID_MESSAGE;
-        errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-      }
-    }
+    validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
     const contactExplanation = formValues.contactExplanation;
     const contactExplanationCy = formValues.contactExplanationCy;

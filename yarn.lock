@@ -5956,12 +5956,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:26.4.1":
-  version: 26.4.1
-  resolution: "@types/node@npm:26.4.1"
+"@types/node@npm:26.5.1":
+  version: 26.5.1
+  resolution: "@types/node@npm:26.5.1"
   dependencies:
-    undici-types: "npm:~8.3.0"
-  checksum: 10/63fbe80250fc8824d52a1c8787b591f17be566db11560fad0a29e9e3d230303ca7a3e77d5c474d60438d14120dcb9323950641db754197b4822e4fae3c506927
+    undici-types: "npm:~8.9.0"
+  checksum: 10/5b509d30dc9344c91cba3291acecf6f424320cb763c8192befd50cc8b1a8207dd7dcff8c4f313eea6468e9f2121cc78ffb6affbd7ecd951b4b32e2629ea9856d
   languageName: node
   linkType: hard
 
@@ -8933,6 +8933,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"csrf-sync@npm:4.2.1":
+  version: 4.2.1
+  resolution: "csrf-sync@npm:4.2.1"
+  dependencies:
+    http-errors: "npm:^2.0.0"
+  checksum: 10/6c25ed72c0930763152daaeaea5cff9e68e2f846ee74731267aa8417474636fe9b1ab4fd050bd52a6318cf790f5b700f94b19568e9adf16f0cd6e56a3d5a5505
+  languageName: node
+  linkType: hard
+
 "css-functions-list@npm:^3.3.3":
   version: 3.3.3
   resolution: "css-functions-list@npm:3.3.3"
@@ -10480,7 +10489,7 @@ __metadata:
     "@types/lodash": "npm:4.17.25"
     "@types/moment-timezone": "npm:0.5.30"
     "@types/multer": "npm:2.2.0"
-    "@types/node": "npm:26.4.1"
+    "@types/node": "npm:26.5.1"
     "@types/nunjucks": "npm:3.2.6"
     "@types/pa11y": "npm:5.3.7"
     "@types/supertest": "npm:7.2.1"
@@ -10497,6 +10506,7 @@ __metadata:
     config: "npm:5.0.1"
     cookie-parser: "npm:1.4.7"
     copy-webpack-plugin: "npm:14.0.0"
+    csrf-sync: "npm:4.2.1"
     css-loader: "npm:7.1.5"
     debug: "npm:4.4.3"
     dotenv: "npm:17.4.2"
@@ -10513,7 +10523,7 @@ __metadata:
     helmet: "npm:8.3.0"
     html-webpack-plugin: "npm:5.6.8"
     jest: "npm:30.5.1"
-    jest-html-reporter: "npm:4.4.0"
+    jest-html-reporter: "npm:4.4.2"
     lighthouse: "npm:13.4.1"
     lodash: "npm:4.18.1"
     mini-css-extract-plugin: "npm:2.10.2"
@@ -12644,9 +12654,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-html-reporter@npm:4.4.0":
-  version: 4.4.0
-  resolution: "jest-html-reporter@npm:4.4.0"
+"jest-html-reporter@npm:4.4.2":
+  version: 4.4.2
+  resolution: "jest-html-reporter@npm:4.4.2"
   dependencies:
     "@jest/reporters": "npm:^30.0.2"
     "@jest/test-result": "npm:^30.0.2"
@@ -12657,7 +12667,7 @@ __metadata:
     xmlbuilder: "npm:15.0.0"
   peerDependencies:
     jest: 19.x - 30.x
-  checksum: 10/6d3b8c3f0658f9614c437bfda96826aa02e5d3fedca5221602edd4148aba4b306195a9a6e87befe47e5853692f3bd9d256ac31675d3a89506fd87911172fc822
+  checksum: 10/007fce90e5d7b800c9cb42de6b3b1e7a233d6713a0845b08f8237ee4936b8f5b76f629d4a869f46d62d209838a082604782e5c4156a1d87f537b6315cb0f8c9c
   languageName: node
   linkType: hard
 
@@ -17556,10 +17566,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~8.3.0":
-  version: 8.3.0
-  resolution: "undici-types@npm:8.3.0"
-  checksum: 10/6681d2837ac75a75ac1cc46090aa2b8ddc7c6b8ecc295a6cdb06838752a730da3d8afeecf05e5ab7903160eafad3a8b6ffa1927e5ded260590f4d4fef18646d5
+"undici-types@npm:~8.9.0":
+  version: 8.9.0
+  resolution: "undici-types@npm:8.9.0"
+  checksum: 10/8785591929de2b71d281c684e915c4a8c41becc225adbf42a3e89148f8b384724a21533494c30a1cbb85b4cbccd088d020788ff4f2d605013eb2863cd47a1639
   languageName: node
   linkType: hard
 

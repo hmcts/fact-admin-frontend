@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../requests/CourtApi';
 import { ReferenceDataApi } from '../requests/ReferenceDataApi';
 import { UserApi } from '../requests/UserApi';
-import { PagedCourts } from '../schemas/courtListSchema';
+import { PagedLocations } from '../schemas/courtListSchema';
 import { FavouriteStatus, PagedFavourites } from '../schemas/favouriteSchema';
 import { Region } from '../schemas/regionSchema';
 import {
@@ -118,24 +118,30 @@ export class HomePageService {
    */
   private buildErrorMessage(
     regionsResponse: Region[] | HttpStatusCode,
-    courtsResponse: PagedCourts | HttpStatusCode
+    courtsResponse: PagedLocations | HttpStatusCode
   ): string | undefined {
     const hasRegionError = !Array.isArray(regionsResponse);
     const hasCourtsError = !this.isPagedCourts(courtsResponse);
 
-    return hasRegionError && hasCourtsError
-      ? HOME_PAGE_REGIONS_AND_COURTS_LOAD_ERROR_MESSAGE
-      : hasRegionError
-        ? HOME_PAGE_REGIONS_LOAD_ERROR_MESSAGE
-        : hasCourtsError
-          ? HOME_PAGE_COURTS_LOAD_ERROR_MESSAGE
-          : undefined;
+    if (hasRegionError && hasCourtsError) {
+      return HOME_PAGE_REGIONS_AND_COURTS_LOAD_ERROR_MESSAGE;
+    }
+
+    if (hasRegionError) {
+      return HOME_PAGE_REGIONS_LOAD_ERROR_MESSAGE;
+    }
+
+    if (hasCourtsError) {
+      return HOME_PAGE_COURTS_LOAD_ERROR_MESSAGE;
+    }
+
+    return undefined;
   }
 
   /**
    * Returns an empty paged response shape for validation or upstream failure cases.
    */
-  private emptyCourtsPage(filters: HomePageFilters): PagedCourts {
+  private emptyCourtsPage(filters: HomePageFilters): PagedLocations {
     return {
       content: [],
       page: {
@@ -190,7 +196,7 @@ export class HomePageService {
   /**
    * Type guard for distinguishing a successful paged courts response from an HTTP status code.
    */
-  private isPagedCourts(response: PagedCourts | HttpStatusCode): response is PagedCourts {
+  private isPagedCourts(response: PagedLocations | HttpStatusCode): response is PagedLocations {
     return typeof response === 'object' && response !== null && 'content' in response && 'page' in response;
   }
 }

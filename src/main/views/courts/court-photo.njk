@@ -3,6 +3,7 @@
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   Court photo - {{ model.courtName }}
@@ -31,6 +32,7 @@
         </p>
       {% endif %}
       <form action="/courts/{{ courtId }}/edit/photo/delete" method="post">
+        {{ csrfProtection(csrfToken) }}
         <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
             <h1 class="govuk-fieldset__heading">
@@ -60,6 +62,7 @@
 
       {% if not isViewer %}
         <form action="/courts/{{ courtId }}/edit/photo/upload" method="post" enctype="multipart/form-data">
+          {{ csrfProtection(csrfToken) }}
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
               Add or update court photo

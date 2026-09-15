@@ -4,6 +4,7 @@ import { config } from '../../utils';
 import { Base } from '../base';
 
 export class ServiceCentreGeneralPage extends Base {
+  public readonly csrfTokenInput: Locator;
   public readonly errorSummary: Locator;
   public readonly nameInput: Locator;
   public readonly openRadio: Locator;
@@ -15,6 +16,7 @@ export class ServiceCentreGeneralPage extends Base {
 
   constructor(page: Page) {
     super(page);
+    this.csrfTokenInput = this.page.locator('input[name="_csrf"]');
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.nameInput = this.page.getByLabel('Service centre name');
     this.openRadio = this.page.getByRole('radio', { name: 'Open' });

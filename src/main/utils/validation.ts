@@ -13,7 +13,10 @@ export const addError = (
   if (!messages || messages.length === 0) {
     return;
   }
-  return (errors[key] = [...(errors[key] ?? []), ...messages]);
+
+  const next = [...(errors[key] ?? []), ...messages];
+  errors[key] = next;
+  return next;
 };
 
 export type Rule = {

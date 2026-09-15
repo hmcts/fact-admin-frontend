@@ -7,6 +7,7 @@ export class AddServiceCentrePage extends Base {
   public readonly nameInput: Locator;
   public readonly regionSelect: Locator;
   public readonly serviceAreaCheckboxes: Locator;
+  public readonly csrfTokenInput: Locator;
   public readonly addServiceCentreButton: Locator;
   public readonly errorSummary: Locator;
   public readonly continueToAddressLink: Locator;
@@ -17,6 +18,7 @@ export class AddServiceCentrePage extends Base {
     this.nameInput = this.page.getByLabel('Name');
     this.regionSelect = this.page.getByLabel('Region');
     this.serviceAreaCheckboxes = this.page.locator('input[name="serviceAreaIds"]');
+    this.csrfTokenInput = this.page.locator('input[name="_csrf"]');
     this.addServiceCentreButton = this.page.getByRole('button', { name: 'Add service centre' });
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.continueToAddressLink = this.page.getByRole('link', { name: /Continue to add an address for/ });

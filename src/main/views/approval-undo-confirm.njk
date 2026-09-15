@@ -1,5 +1,6 @@
 {% extends "template.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -13,6 +14,7 @@
       <p class="govuk-body govuk-!-font-weight-bold">{{ name }}</p>
 
       <form method="post" action="/approvals/{{ approvalId }}/undo">
+        {{ csrfProtection(csrfToken) }}
         <div class="govuk-button-group">
           {{ govukButton({
             text: "Undo approval",

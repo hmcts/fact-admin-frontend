@@ -711,8 +711,18 @@ describe('ServiceCentreAddressController', () => {
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     request.body = {
-      address:
-        '{"UPRN":"100","UDPRN":"200","ADDRESS":"1 High Street, London, SW1A 1AA","ORGANISATION_NAME":"Reading Service Centre","BUILDING_NUMBER":"1","BUILDING_NAME":"Test House","THOROUGHFARE_NAME":"High Street","POST_TOWN":"London","POSTCODE":"SW1A 1AA","LNG":-0.1,"LAT":51.5,"LOCAL_CUSTODIAN_CODE":123,"LOCAL_CUSTODIAN_CODE_DESCRIPTION":"test"}',
+      address: JSON.stringify({
+        dataset: 'DPA',
+        uprn: '100',
+        lpiKey: null,
+        address: '1 High Street, London, SW1A 1AA',
+        addressLine1: 'Reading Service Centre',
+        addressLine2: '1 High Street',
+        townCity: 'London',
+        county: null,
+        postcode: 'SW1A 1AA',
+        selectionPostcode: 'SW1A1AA',
+      }),
     };
     const responseMock = mock(response);
 
@@ -793,8 +803,18 @@ describe('ServiceCentreAddressController', () => {
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     request.body = {
-      address:
-        '{"UPRN":"100","UDPRN":"200","ADDRESS":"1 High Street, London, SW1A 1AA","ORGANISATION_NAME":null,"BUILDING_NUMBER":"1","BUILDING_NAME":"Test House","THOROUGHFARE_NAME":"High Street","POST_TOWN":"London","POSTCODE":"SW1A 1AA","LNG":-0.1,"LAT":51.5,"LOCAL_CUSTODIAN_CODE":123,"LOCAL_CUSTODIAN_CODE_DESCRIPTION":"test"}',
+      address: JSON.stringify({
+        dataset: 'DPA',
+        uprn: '100',
+        lpiKey: null,
+        address: '1 High Street, London, SW1A 1AA',
+        addressLine1: '1 High Street',
+        addressLine2: null,
+        townCity: 'London',
+        county: null,
+        postcode: 'SW1A 1AA',
+        selectionPostcode: 'SW1A1AA',
+      }),
     };
     const responseMock = mock(response);
 
@@ -1023,6 +1043,7 @@ describe('ServiceCentreAddressController', () => {
     request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
     request.body = {
       address: '',
+      manual: 'true',
     };
     const responseMock = mock(response);
 

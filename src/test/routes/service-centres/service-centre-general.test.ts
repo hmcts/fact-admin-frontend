@@ -128,4 +128,20 @@ describe('Service centre general page', () => {
     expect(response.text).toContain('Error: General - Updated Service Centre');
     expect(updateServiceCentreStub.notCalled).toBe(true);
   });
+
+  test('rejects an update without a csrf token', async () => {
+    const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
+
+    const response = await request(app)
+      .post(`/service-centres/${serviceCentreId}/edit/general/success`)
+      .set('x-test-csrf-missing', 'true')
+      .type('form')
+      .send(
+        `name=Updated%20Service%20Centre&open=false&serviceAreaIds=${serviceAreas[1].id}&regionId=${regions[0].id}`
+      );
+
+    expect(response.status).toBe(HttpStatusCode.Forbidden);
+    expect(response.text).toContain('Something went wrong');
+    expect(updateServiceCentreStub.notCalled).toBe(true);
+  });
 });

@@ -5,6 +5,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% macro repeatableSection(type, heading, entries, addButtonText, removeButtonText, firstLabel, secondLabel,thirdLabel, firstHint, secondHint,thirdHint) %}
   <div data-professional-information-list="{{ type }}" data-professional-information-max="5">
@@ -109,6 +110,7 @@
   </div>
 
   <form method="post" action="/courts/{{ courtId }}/edit/information-for-professionals/success" novalidate>
+    {{ csrfProtection(csrfToken) }}
     <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
     <legend class="govuk-fieldset__legend govuk-visually-hidden">Information for professionals details</legend>
     <div class="govuk-grid-row">

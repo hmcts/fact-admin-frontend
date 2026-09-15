@@ -150,7 +150,7 @@ function handleRemoveClick(
 ): void {
   const target = event.target as HTMLElement | null;
   const removeButton = target?.closest?.(removeButtonSelector) as HTMLButtonElement | null;
-  if (!removeButton || removeButton.closest(listSelector) !== list) {
+  if (removeButton?.closest(listSelector) !== list) {
     return;
   }
 
@@ -178,7 +178,7 @@ function removeRepeatableItem(
   addButton: HTMLButtonElement
 ): void {
   const item = button.closest(itemSelector);
-  if (!item || item.closest(listSelector) !== list) {
+  if (item?.closest(listSelector) !== list) {
     return;
   }
 

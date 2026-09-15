@@ -1,4 +1,4 @@
-import { LocationListItem, PagedCourts } from '../schemas/courtListSchema';
+import { LocationListItem, PagedLocations } from '../schemas/courtListSchema';
 import { Region } from '../schemas/regionSchema';
 import {
   DEFAULT_PAGE_NUMBER,
@@ -41,7 +41,7 @@ export class HomePageViewService {
    */
   public buildCourtTableRows(
     filters: HomePageFilters,
-    courtsPage: PagedCourts,
+    courtsPage: PagedLocations,
     isReviewMode = false,
     favouriteStatuses?: Map<string, boolean>
   ): HomePageTableCell[][] {
@@ -75,7 +75,7 @@ export class HomePageViewService {
 
   public buildFavouriteTableRows(
     filters: HomePageFilters,
-    favouritesPage: PagedCourts,
+    favouritesPage: PagedLocations,
     isReviewMode = false
   ): HomePageTableCell[][] {
     const returnPath = this.buildFavouritesHref(filters, favouritesPage.page.number);
@@ -94,7 +94,7 @@ export class HomePageViewService {
   /**
    * Builds the pagination view model for the current results page.
    */
-  public buildPagination(courtsPage: PagedCourts, filters: HomePageFilters): HomePagePagination {
+  public buildPagination(courtsPage: PagedLocations, filters: HomePageFilters): HomePagePagination {
     const totalPages = courtsPage.page.totalPages ?? 0;
     const currentPage = courtsPage.page.number ?? filters.pageNumber;
     const items = this.buildPaginationItems(totalPages, currentPage, filters);
@@ -109,7 +109,7 @@ export class HomePageViewService {
     };
   }
 
-  public buildFavouritesPagination(favouritesPage: PagedCourts, filters: HomePageFilters): HomePagePagination {
+  public buildFavouritesPagination(favouritesPage: PagedLocations, filters: HomePageFilters): HomePagePagination {
     const totalPages = favouritesPage.page.totalPages ?? 0;
     const currentPage = favouritesPage.page.number ?? filters.favouritesPageNumber ?? DEFAULT_PAGE_NUMBER;
     const pageIndexes = this.getVisiblePageIndexes(totalPages, currentPage);
@@ -138,7 +138,7 @@ export class HomePageViewService {
   /**
    * Builds the page title, including validation and pagination context when needed.
    */
-  public buildPageTitle(courtsPage: PagedCourts, hasValidationErrors: boolean): string {
+  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean): string {
     const titlePrefix = hasValidationErrors ? 'Error: ' : '';
 
     if ((courtsPage.page.totalPages ?? 0) > 1) {
@@ -148,7 +148,7 @@ export class HomePageViewService {
     return `${titlePrefix}${HOME_PAGE_TITLE}`;
   }
 
-  public buildFavouritesPageTitle(favouritesPage: PagedCourts): string {
+  public buildFavouritesPageTitle(favouritesPage: PagedLocations): string {
     return (favouritesPage.page.totalPages ?? 0) > 1
       ? `Favourites (page ${(favouritesPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${favouritesPage.page.totalPages})`
       : 'Favourites';
@@ -157,7 +157,7 @@ export class HomePageViewService {
   /**
    * Builds the summary text shown above the results table.
    */
-  public buildResultsMessage(courtsPage: PagedCourts): string {
+  public buildResultsMessage(courtsPage: PagedLocations): string {
     const totalElements = courtsPage.page.totalElements ?? 0;
 
     if (totalElements === 0 || courtsPage.content.length === 0) {
@@ -167,7 +167,7 @@ export class HomePageViewService {
     return `Showing ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + 1} to ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) * (courtsPage.page.size ?? DEFAULT_PAGE_SIZE) + courtsPage.content.length} of ${totalElements} courts, tribunals and service centres`;
   }
 
-  public buildFavouritesResultsMessage(favouritesPage: PagedCourts): string {
+  public buildFavouritesResultsMessage(favouritesPage: PagedLocations): string {
     const totalElements = favouritesPage.page.totalElements ?? 0;
     if (totalElements === 0 || favouritesPage.content.length === 0) {
       return 'No favourite courts, tribunals or service centres found.';
@@ -346,7 +346,8 @@ export class HomePageViewService {
     filters: HomePageFilters
   ): HomePageTableHeadCell {
     const isCurrentSort = filters.sortBy === sortBy;
-    const ariaSort = isCurrentSort ? (filters.sortOrder === 'desc' ? 'descending' : 'ascending') : 'none';
+    const sortOrder = filters.sortOrder === 'desc' ? 'descending' : 'ascending';
+    const ariaSort = isCurrentSort ? sortOrder : 'none';
     const nextSortOrder = isCurrentSort && filters.sortOrder === 'asc' ? 'descending' : 'ascending';
 
     return {

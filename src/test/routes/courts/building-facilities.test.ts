@@ -119,4 +119,25 @@ describe('Building facilities page', () => {
     expect(response.text).toContain('Building Facilities details saved');
     expect(response.text).toContain('Reading Crown Court');
   });
+
+  test('rejects an update without a csrf token', async () => {
+    const updateBuildingFacilitiesStub = stub(CourtApi.prototype, 'updateBuildingFacilities');
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/building-facilities/success`)
+      .set('x-test-csrf-missing', 'true')
+      .type('form')
+      .send({
+        parking: 'true',
+        waitingArea: 'true',
+        waitingAreaChildren: 'true',
+        quietRoom: 'false',
+        babyChanging: 'false',
+        wifi: 'true',
+      });
+
+    expect(response.status).toBe(HttpStatusCode.Forbidden);
+    expect(response.text).toContain('Something went wrong');
+    expect(updateBuildingFacilitiesStub.notCalled).toBe(true);
+  });
 });

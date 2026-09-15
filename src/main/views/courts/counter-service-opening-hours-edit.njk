@@ -5,6 +5,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% macro timeSection(prefix, kind, title, errors, form, classes) %}
   {% set sectionErrors = [] %}
@@ -134,6 +135,7 @@
       {% endset %}
 
       <form method="post" action="/courts/{{ courtId }}/edit/counter-service-opening-hours/save{% if counterServiceId %}/{{ counterServiceId }}{% endif %}" novalidate data-counter-service-opening-hours-form>
+        {{ csrfProtection(csrfToken) }}
         <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
         <legend class="govuk-fieldset__legend govuk-visually-hidden">Counter service opening hours details</legend>
 

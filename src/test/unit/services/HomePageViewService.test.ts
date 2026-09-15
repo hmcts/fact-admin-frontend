@@ -1,4 +1,4 @@
-import { PagedCourts } from '../../../main/schemas/courtListSchema';
+import { PagedLocations } from '../../../main/schemas/courtListSchema';
 import { HomePageViewService } from '../../../main/services/HomePageViewService';
 import { HomePageFilters } from '../../../main/services/types/HomePage.types';
 
@@ -81,7 +81,7 @@ describe('HomePageViewService', () => {
           totalElements: 2,
           totalPages: 1,
         },
-      } as PagedCourts
+      } as PagedLocations
     );
 
     expect(rows[0][0]).toEqual({ classes: 'homepage-courts-table__favourite', html: '' });
@@ -106,7 +106,7 @@ describe('HomePageViewService', () => {
           totalElements: 2,
           totalPages: 1,
         },
-      } as PagedCourts,
+      } as PagedLocations,
       true
     );
 
@@ -121,7 +121,7 @@ describe('HomePageViewService', () => {
       {
         content: [court, serviceCentre],
         page: { number: 0, size: 25, totalElements: 2, totalPages: 1 },
-      } as PagedCourts,
+      } as PagedLocations,
       false,
       new Map([
         [`COURT:${court.id}`, false],
@@ -152,7 +152,7 @@ describe('HomePageViewService', () => {
     const page = {
       content: [serviceCentre],
       page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
-    } as PagedCourts;
+    } as PagedLocations;
     const rows = service.buildFavouriteTableRows(filters, page, true);
     const pagination = service.buildFavouritesPagination(page, filters);
 
@@ -184,7 +184,7 @@ describe('HomePageViewService', () => {
           totalElements: 100,
           totalPages: 10,
         },
-      } as PagedCourts,
+      } as PagedLocations,
       {
         ...filters,
         includeClosed: true,
@@ -241,7 +241,7 @@ describe('HomePageViewService', () => {
         totalElements: 30,
         totalPages: 2,
       },
-    } as PagedCourts;
+    } as PagedLocations;
 
     expect(service.buildPageTitle(page, true)).toBe('Error: Courts, tribunals and service centres (page 2 of 2)');
     expect(service.buildResultsMessage(page)).toBe('Showing 26 to 26 of 30 courts, tribunals and service centres');
@@ -274,7 +274,7 @@ describe('HomePageViewService', () => {
             totalElements: 1,
             totalPages: 1,
           },
-        } as PagedCourts,
+        } as PagedLocations,
         filters
       )
     ).toEqual({
@@ -292,7 +292,7 @@ describe('HomePageViewService', () => {
       {
         content: [court],
         page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
-      } as PagedCourts,
+      } as PagedLocations,
       false,
       new Map()
     );
@@ -305,7 +305,7 @@ describe('HomePageViewService', () => {
     const page = {
       content: [court],
       page: { totalElements: 1 },
-    } as PagedCourts;
+    } as PagedLocations;
 
     expect(service.buildPagination(page, filters)).toEqual({
       currentPage: 0,
@@ -329,7 +329,7 @@ describe('HomePageViewService', () => {
       service.buildResultsMessage({
         content: [court],
         page: {},
-      } as unknown as PagedCourts)
+      } as unknown as PagedLocations)
     ).toBe('No courts, tribunals or service centres found.');
   });
 
@@ -337,7 +337,7 @@ describe('HomePageViewService', () => {
     const page = {
       content: [serviceCentre],
       page: { totalElements: 1, totalPages: 2 },
-    } as PagedCourts;
+    } as PagedLocations;
 
     const rows = service.buildFavouriteTableRows(filters, {
       ...page,
@@ -358,7 +358,7 @@ describe('HomePageViewService', () => {
     const page = {
       content: [],
       page: {},
-    } as unknown as PagedCourts;
+    } as unknown as PagedLocations;
 
     expect(service.buildFavouritesPagination(page, filters)).toEqual({
       currentPage: 0,
@@ -378,7 +378,7 @@ describe('HomePageViewService', () => {
       {
         content: [serviceCentre],
         page: { number: 4, size: 25, totalElements: 250, totalPages: 10 },
-      } as PagedCourts,
+      } as PagedLocations,
       filters
     );
 

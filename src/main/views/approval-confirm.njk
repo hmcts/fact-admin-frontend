@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/common-components.njk" import confirmationActions %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -13,6 +14,7 @@
       <p class="govuk-body">Make sure you have checked the data in all sections before approving.</p>
 
       <form method="post" action="{{ editPath }}/approve">
+        {{ csrfProtection(csrfToken) }}
         {{ govukSummaryList({
           rows: [
             {

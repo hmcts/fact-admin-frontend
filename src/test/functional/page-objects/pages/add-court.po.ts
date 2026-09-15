@@ -6,6 +6,7 @@ import { Base } from '../base';
 export class AddCourtPage extends Base {
   public readonly nameInput: Locator;
   public readonly regionSelect: Locator;
+  public readonly csrfTokenInput: Locator;
   public readonly addCourtButton: Locator;
   public readonly errorSummary: Locator;
   public readonly continueToAddressLink: Locator;
@@ -15,6 +16,7 @@ export class AddCourtPage extends Base {
     super(page);
     this.nameInput = this.page.getByLabel('Name');
     this.regionSelect = this.page.getByLabel('Region');
+    this.csrfTokenInput = this.page.locator('input[name="_csrf"]');
     this.addCourtButton = this.page.getByRole('button', { name: 'Add court' });
     this.errorSummary = this.page.locator('.govuk-error-summary');
     this.continueToAddressLink = this.page.getByRole('link', { name: /Continue to add an address for/ });

@@ -14,6 +14,15 @@ describe('Add service centre page', () => {
     restore();
   });
 
+  async function getCsrfToken(agent: ReturnType<typeof request.agent>): Promise<string> {
+    const response = await agent.get('/add-service-centre');
+    const token = response.text.match(/name="_csrf" value="([^"]+)"/)?.[1];
+
+    expect(response.status).toBe(200);
+    expect(token).toBeDefined();
+    return token as string;
+  }
+
   test('renders the add service centre page for admin users', async () => {
     stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
     stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas);
@@ -47,8 +56,10 @@ describe('Add service centre page', () => {
     stub(ReferenceDataApi.prototype, 'getRegions').resolves(regions);
     stub(ReferenceDataApi.prototype, 'getServiceAreas').resolves(serviceAreas);
     const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre');
+    const agent = request.agent(app);
+    const csrfToken = await getCsrfToken(agent);
 
-    const response = await request(app).post('/add-service-centre').send({ name: 'Te', regionId: '' });
+    const response = await agent.post('/add-service-centre').send({ _csrf: csrfToken, name: 'Te', regionId: '' });
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('There is a problem');
@@ -75,8 +86,11 @@ describe('Add service centre page', () => {
     stub(CourtApi.prototype, 'getCourtByName').resolves(404);
     stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(404);
     const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre').resolves(serviceCentre);
+    const agent = request.agent(app);
+    const csrfToken = await getCsrfToken(agent);
 
-    const response = await request(app).post('/add-service-centre').send({
+    const response = await agent.post('/add-service-centre').send({
+      _csrf: csrfToken,
       name: serviceCentre.name,
       regionId: serviceCentre.regionId,
       serviceAreaIds: serviceAreas[0].id,
@@ -94,6 +108,20 @@ describe('Add service centre page', () => {
     expect(response.text).toContain('New service centre has been created');
     expect(response.text).toContain(`/service-centres/${serviceCentre.id}/edit/address`);
     expect(response.text).toContain('hods-loading-spinner');
+  });
+
+  test('rejects a post without a csrf token', async () => {
+    const createServiceCentreStub = stub(ServiceCentreApi.prototype, 'createServiceCentre');
+
+    const response = await request(app).post('/add-service-centre').set('x-test-csrf-missing', 'true').send({
+      name: 'National Business Centre',
+      regionId: regions[0].id,
+      serviceAreaIds: serviceAreas[0].id,
+    });
+
+    expect(response.status).toBe(403);
+    expect(response.text).toContain('Something went wrong');
+    expect(createServiceCentreStub.notCalled).toBe(true);
   });
 
   test('renders the service centre address page after create flow', async () => {

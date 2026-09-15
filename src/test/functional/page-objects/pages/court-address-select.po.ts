@@ -5,12 +5,14 @@ import { Base } from '../base';
 
 export class CourtAddressSelectPage extends Base {
   public readonly addressSelect: Locator;
+  public readonly lpiAddressOptions: Locator;
   public readonly continueButton: Locator;
   public readonly enterAddressManuallyButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.addressSelect = this.page.getByLabel('Choose an address');
+    this.lpiAddressOptions = this.addressSelect.locator('option').filter({ hasText: 'Local property address (LPI)' });
     this.continueButton = this.page.getByRole('button', { name: 'Continue' });
     this.enterAddressManuallyButton = this.page.getByRole('button', { name: 'Enter address manually' });
   }
@@ -25,6 +27,14 @@ export class CourtAddressSelectPage extends Base {
 
   async selectFirstAddress(): Promise<void> {
     await this.addressSelect.selectOption({ index: 0 });
+  }
+
+  async selectFirstLpiAddress(): Promise<void> {
+    const value = await this.lpiAddressOptions.first().getAttribute('value');
+    if (!value) {
+      throw new Error('Expected at least one selectable LPI address.');
+    }
+    await this.addressSelect.selectOption(value);
   }
 
   async clickContinue(): Promise<void> {

@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
-import { DpaAddress } from '../../schemas/osDataSchema';
+import { OsAddressOption } from '../../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../../schemas/serviceCentreAddressSchema';
 import {
   validateAddressLine1Field,
@@ -11,6 +11,7 @@ import {
   validatePostcodeField,
   validateTownCityField,
 } from '../../utils/addressValidation';
+import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
 import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
@@ -40,7 +41,7 @@ export type DeleteServiceCentreAddressResponse =
   | HttpStatusCode;
 
 export type RetrieveAddressOptionsResponse =
-  | DpaAddress[]
+  | OsAddressOption[]
   | {
       status: 'invalid';
       error: string;
@@ -86,7 +87,7 @@ export class ServiceCentreAddressService {
       return HttpStatusCode.BadRequest;
     }
 
-    return result.results.map(resultItem => resultItem.DPA).filter((dpa): dpa is DpaAddress => dpa !== null);
+    return buildOsAddressOptions(result, postcode);
   }
 
   public async save(
@@ -119,14 +120,7 @@ export class ServiceCentreAddressService {
     }
 
     if (result instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of result) {
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
-      return { status: 'invalid', address: { ...address, errors } };
+      return this.buildApiValidationErrorResponse(result, address);
     }
 
     let serviceCentreOpened = false;
@@ -148,6 +142,20 @@ export class ServiceCentreAddressService {
     }
 
     return { status: 'saved', address: result, serviceCentreName: serviceCentreResponse.name, serviceCentreOpened };
+  }
+
+  private buildApiValidationErrorResponse(
+    result: Map<string, string>,
+    address: Partial<ServiceCentreAddress>
+  ): SaveServiceCentreAddressResponse {
+    const errors: Record<string, string[]> = {};
+    for (const [key, value] of result) {
+      if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
+        continue;
+      }
+      errors[key] = [value];
+    }
+    return { status: 'invalid', address: { ...address, errors } };
   }
 
   public async delete(serviceCentreId: string, addressId: string): Promise<DeleteServiceCentreAddressResponse> {

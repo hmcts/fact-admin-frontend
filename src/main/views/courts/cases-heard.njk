@@ -3,6 +3,7 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   {{ pageTitle }}
@@ -22,6 +23,7 @@
         text: "If you have set up local authority config for Adoption, Children and/or Divorce, and you remove these case types here, this will remove the local authority config and will affect search results"
       }) }}
       <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
+        {{ csrfProtection(csrfToken) }}
 
         {# these values are the ids of the related areas of law #}
         <input type="hidden" name="courtName" value="{{ courtName }}">

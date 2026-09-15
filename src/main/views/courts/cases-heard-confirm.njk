@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/common-components.njk" import confirmationActions %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   Cases heard confirm update - {{ courtName }}
@@ -14,6 +15,7 @@
       <h1 class="govuk-heading-xl">Are you sure you want to save the changes to Cases Heard?</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/cases-heard/success">
+        {{ csrfProtection(csrfToken) }}
 
         {{ govukSummaryList({
           rows: [

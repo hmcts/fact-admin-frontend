@@ -4,6 +4,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% macro modelDrivenErrorSummary(model) %}
   {% set errorList = [] %}
@@ -68,6 +69,7 @@
       <h1 class="govuk-heading-l">Building Facilities</h1>
 
       <form method="post" action="/courts/{{ courtId }}/edit/building-facilities/success">
+        {{ csrfProtection(csrfToken) }}
       <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
       <legend class="govuk-fieldset__legend govuk-visually-hidden">Building facilities details</legend>
       <h2 class="govuk-heading-m">Parking</h2>

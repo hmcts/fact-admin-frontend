@@ -31,6 +31,21 @@ test.describe(
       );
     });
 
+    test('rejects a form submission without a csrf token', async ({ addServiceCentrePage }) => {
+      await addServiceCentrePage.goto();
+      await expect(addServiceCentrePage.csrfTokenInput).not.toHaveValue('');
+      await addServiceCentrePage.csrfTokenInput.evaluate(element => element.remove());
+
+      const responsePromise = addServiceCentrePage.page.waitForResponse(
+        response => response.request().method() === 'POST' && new URL(response.url()).pathname === '/add-service-centre'
+      );
+      await addServiceCentrePage.submitInvalidServiceCentre();
+      const response = await responsePromise;
+
+      expect(response.status()).toBe(403);
+      await expect(addServiceCentrePage.heading).toContainText('Something went wrong');
+    });
+
     test('shows validation error when service centre name is shorter than five characters', async ({
       addServiceCentrePage,
     }) => {

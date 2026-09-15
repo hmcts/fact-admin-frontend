@@ -45,6 +45,7 @@ const mockAuthenticationEnableFor = jest.fn();
 const mockContainerEnableFor = jest.fn((expressApp: Express): void => {
   expressApp.locals.container = {};
 });
+const mockCsrfProtectionEnableFor = jest.fn();
 const mockHelmetEnableFor = jest.fn();
 const mockLockingEnableFor = jest.fn();
 const mockPropertiesVolumeEnableFor = jest.fn();
@@ -61,6 +62,10 @@ jest.mock('../../main/modules/authentication', () => ({
 
 jest.mock('../../main/modules/awilix', () => ({
   Container: jest.fn().mockImplementation(() => ({ enableFor: mockContainerEnableFor })),
+}));
+
+jest.mock('../../main/modules/csrf', () => ({
+  CsrfProtection: jest.fn().mockImplementation(() => ({ enableFor: mockCsrfProtectionEnableFor })),
 }));
 
 jest.mock('../../main/modules/helmet', () => ({
@@ -166,6 +171,7 @@ describe('app', () => {
     expect(mockRedisEnableFor).toHaveBeenCalledWith(app);
     expect(mockRequestLoggingEnableFor).toHaveBeenCalledWith(app);
     expect(mockAuthenticationEnableFor).toHaveBeenCalledWith(app);
+    expect(mockCsrfProtectionEnableFor).toHaveBeenCalledWith(app);
     expect(mockLockingEnableFor).toHaveBeenCalledWith(app);
     expect(mockScopePerRequest).toHaveBeenCalledWith(app.locals.container);
     expect(mockLoadControllers).toHaveBeenCalledTimes(2);

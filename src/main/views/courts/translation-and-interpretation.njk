@@ -3,6 +3,7 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
   Translation and interpretation
@@ -24,6 +25,7 @@
       </p>
 
       <form method="post" action="/courts/{{ courtId }}/edit/translation-and-interpretation/success" novalidate>
+        {{ csrfProtection(csrfToken) }}
         <fieldset class="govuk-fieldset"{% if isViewer %} disabled{% endif %}>
         <legend class="govuk-fieldset__legend govuk-visually-hidden">Translation and interpretation details</legend>
         {{ govukCheckboxes({

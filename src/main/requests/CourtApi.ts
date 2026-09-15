@@ -18,7 +18,7 @@ import { CourtAddress, courtAddressListSchema, courtAddressSchema } from '../sch
 import { CourtContactDetail, courtContactDetailListSchema } from '../schemas/courtContactDetailSchema';
 import { AllLocationDetails, CourtDetails, allLocationDetailsListSchema } from '../schemas/courtDetailsSchema';
 import { CourtEntity, courtEntitySchema } from '../schemas/courtEntitySchema';
-import { PagedCourts, pagedCourtsSchema } from '../schemas/courtListSchema';
+import { PagedLocations, pagedCourtsSchema } from '../schemas/courtListSchema';
 import { CourtLocalAuthoritiesList, courtLocalAuthoritiesListSchema } from '../schemas/courtLocalAuthoritiesSchema';
 import { courtPhotoSchema } from '../schemas/courtPhotoSchema';
 import {
@@ -45,7 +45,7 @@ export class CourtApi {
   /**
    * Request to data API to get a filtered and paginated list of courts
    */
-  public async getCourts(params: GetCourtsParams = {}): Promise<PagedCourts | HttpStatusCode> {
+  public async getCourts(params: GetCourtsParams = {}): Promise<PagedLocations | HttpStatusCode> {
     try {
       const response = await dataApi.get('/all/v1', { params });
       return pagedCourtsSchema.parse(response.data);

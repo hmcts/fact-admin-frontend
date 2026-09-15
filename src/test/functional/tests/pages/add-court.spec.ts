@@ -62,6 +62,21 @@ test.describe(
       await expect(addCourtPage.mainContent.content).toContainText('Select a region for the court');
     });
 
+    test('rejects a form submission without a csrf token', async ({ addCourtPage }) => {
+      await addCourtPage.goto();
+      await expect(addCourtPage.csrfTokenInput).not.toHaveValue('');
+      await addCourtPage.csrfTokenInput.evaluate(element => element.remove());
+
+      const responsePromise = addCourtPage.page.waitForResponse(
+        response => response.request().method() === 'POST' && new URL(response.url()).pathname === '/add-court'
+      );
+      await addCourtPage.submitInvalidCourt();
+      const response = await responsePromise;
+
+      expect(response.status()).toBe(403);
+      await expect(addCourtPage.heading).toContainText('Something went wrong');
+    });
+
     test('shows validation error when court name is shorter than five characters', async ({ addCourtPage }) => {
       await addCourtPage.goto();
       await addCourtPage.nameInput.fill('Test');
