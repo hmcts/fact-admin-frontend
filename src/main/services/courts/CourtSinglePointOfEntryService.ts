@@ -2,13 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtSinglePointOfEntryList } from '../../schemas/courtSinglePointOfEntrySchema';
-
-const supportedSinglePointOfEntryServices = [
-  {
-    areaOfLawName: 'Children',
-    label: 'Childcare arrangements',
-  },
-];
+import { SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES } from '../../utils/variablesConstants';
 
 export type SinglePointOfEntryServiceSelection = {
   areaOfLawId: string;
@@ -94,7 +88,7 @@ export class CourtSinglePointOfEntryService {
   private buildSinglePointOfEntryServiceSelections(
     singlePointOfEntry: CourtSinglePointOfEntryList
   ): SinglePointOfEntryServiceSelection[] {
-    return supportedSinglePointOfEntryServices.flatMap(service => {
+    return SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES.flatMap(service => {
       const matchingEntry = singlePointOfEntry.find(entry => entry.name === service.areaOfLawName);
 
       return matchingEntry

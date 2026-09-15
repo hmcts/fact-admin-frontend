@@ -1,22 +1,25 @@
 // ----------------------------------------------------------------------------
 // Address & Postcode Validation
 
-export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
-export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
-const JURISDICTION_ERROR_REGEXES = {
-  northernIrelandPostcode: /^(BT)/i,
-  guernseyPostcode: /^(GY)/i,
-  jerseyPostcode: /^(JE)/i,
-  isleOfManPostcode: /^(IM)/i,
-};
-export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
-  blankPostcode: 'Enter a postcode',
-  invalidPostcode: 'Postcode format is invalid',
-  northernIrelandPostcode: 'Northern Ireland postcodes are not supported for this service',
-  guernseyPostcode: 'Guernsey postcodes are not supported for this service',
-  jerseyPostcode: 'Jersey postcodes are not supported for this service',
-  isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
-};
+import {
+  ADDRESS_LINE_1_INVALID_CHARACTERS_MESSAGE,
+  ADDRESS_LINE_1_MAX_LENGTH_MESSAGE,
+  ADDRESS_LINE_1_REQUIRED_MESSAGE,
+  ADDRESS_LINE_2_INVALID_CHARACTERS_MESSAGE,
+  ADDRESS_LINE_2_MAX_LENGTH_MESSAGE,
+  ADDRESS_LINE_MAX_LENGTH,
+  COUNTY_INVALID_CHARACTERS_MESSAGE,
+  COUNTY_MAX_LENGTH,
+  COUNTY_MAX_LENGTH_MESSAGE,
+  JURISDICTION_ERROR_REGEXES,
+  POSTCODE_ERROR_MESSAGES,
+  TOWN_CITY_INVALID_CHARACTERS_MESSAGE,
+  TOWN_CITY_MAX_LENGTH,
+  TOWN_CITY_MAX_LENGTH_MESSAGE,
+  TOWN_CITY_REQUIRED_MESSAGE,
+  VALID_ADDRESS_LINE_REGEX,
+  VALID_POSTCODE_REGEX,
+} from './variablesConstants';
 
 export const isValidPostcode = (value: string): boolean => {
   return validatePostcodeField(value) === undefined;
@@ -49,13 +52,13 @@ export const validateAddressLine1Field = (value: string | undefined): string[] =
   const errors: string[] = [];
 
   if (!value || value.trim().length === 0) {
-    errors.push('Enter address line 1, typically the building and street');
-  } else if (value.length > 255) {
-    errors.push('Address line 1 must be 255 characters or less');
+    errors.push(ADDRESS_LINE_1_REQUIRED_MESSAGE);
+  } else if (value.length > ADDRESS_LINE_MAX_LENGTH) {
+    errors.push(ADDRESS_LINE_1_MAX_LENGTH_MESSAGE);
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push('Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses');
+    errors.push(ADDRESS_LINE_1_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;
@@ -64,12 +67,12 @@ export const validateAddressLine1Field = (value: string | undefined): string[] =
 export const validateAddressLine2Field = (value: string | undefined): string[] => {
   const errors: string[] = [];
 
-  if (value && value.length > 255) {
-    errors.push('Address line 2 must be 255 characters or less');
+  if (value && value.length > ADDRESS_LINE_MAX_LENGTH) {
+    errors.push(ADDRESS_LINE_2_MAX_LENGTH_MESSAGE);
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push('Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses');
+    errors.push(ADDRESS_LINE_2_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;
@@ -79,13 +82,13 @@ export const validateTownCityField = (value: string | undefined): string[] => {
   const errors: string[] = [];
 
   if (!value || value.trim().length === 0) {
-    errors.push('Enter a town or city');
-  } else if (value.length > 100) {
-    errors.push('Town or city must be 100 characters or less');
+    errors.push(TOWN_CITY_REQUIRED_MESSAGE);
+  } else if (value.length > TOWN_CITY_MAX_LENGTH) {
+    errors.push(TOWN_CITY_MAX_LENGTH_MESSAGE);
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push('Town or city must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses');
+    errors.push(TOWN_CITY_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;
@@ -94,12 +97,12 @@ export const validateTownCityField = (value: string | undefined): string[] => {
 export const validateCountyField = (value: string | undefined): string[] => {
   const errors: string[] = [];
 
-  if (value && value.length > 100) {
-    errors.push('County must be 100 characters or less');
+  if (value && value.length > COUNTY_MAX_LENGTH) {
+    errors.push(COUNTY_MAX_LENGTH_MESSAGE);
   }
 
   if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push('County must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses');
+    errors.push(COUNTY_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;

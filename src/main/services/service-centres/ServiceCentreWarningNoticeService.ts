@@ -1,10 +1,13 @@
 import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
-
-export const maxServiceCentreWarningNoticeLength = 250;
-const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
-const welshWarningFormatRegex = /^[\p{L}0-9.,!?:;'"()\-/&@+\s]+$/u;
+import {
+  ENGLISH_TEXT_REGEX,
+  ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
+  MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
+  WELSH_TEXT_REGEX,
+  WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
+} from '../../utils/variablesConstants';
 
 export type ServiceCentreWarningNoticeViewModel = {
   errors?: Record<string, string[]>;
@@ -115,9 +118,7 @@ export class ServiceCentreWarningNoticeService {
     }
 
     if (warningNoticeCy.length > 0 && warningNotice.length === 0) {
-      errors.warningNotice = [
-        'Because you provided a warning notice in Welsh, the English translation is now mandatory',
-      ];
+      errors.warningNotice = [ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE];
     }
 
     const warningNoticeCyError = this.validateWarningNotice(warningNoticeCy, true);
@@ -126,9 +127,7 @@ export class ServiceCentreWarningNoticeService {
     }
 
     if (warningNotice.length > 0 && warningNoticeCy.length === 0) {
-      errors.warningNoticeCy = [
-        'Because you provided a warning notice in English, the Welsh translation is now mandatory',
-      ];
+      errors.warningNoticeCy = [WELSH_WARNING_NOTICE_REQUIRED_MESSAGE];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
@@ -136,9 +135,9 @@ export class ServiceCentreWarningNoticeService {
 
   private validateWarningNotice(warningNotice: string, welsh: boolean): string | undefined {
     const insert = welsh ? 'in Welsh ' : '';
-    const warningFormatRegex = welsh ? welshWarningFormatRegex : englishWarningFormatRegex;
-    if (warningNotice.length > maxServiceCentreWarningNoticeLength) {
-      return `Warning notice ${insert}must be ${maxServiceCentreWarningNoticeLength} characters or fewer`;
+    const warningFormatRegex = welsh ? WELSH_TEXT_REGEX : ENGLISH_TEXT_REGEX;
+    if (warningNotice.length > MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH) {
+      return `Warning notice ${insert}must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`;
     } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {
       return `Warning notice ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses`;
     }

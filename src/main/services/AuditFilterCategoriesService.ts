@@ -1,29 +1,14 @@
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { hasValue, parseDate, toJsDateString } from '../utils/valueParsers';
+import {
+  AUDIT_FILTER_CATEGORY_LABELS,
+  AUDIT_FILTER_ITEM_LABELS,
+  INCLUDED_AUDIT_FILTER_CATEGORIES,
+} from '../utils/variablesConstants';
 
 export type FilterCategory = {
   heading: { text: string };
   items: { text: string; href: string }[];
-};
-
-const INCLUDED_CATEGORIES = new Set(['email', 'subjectType', 'courtId', 'serviceCentreId', 'fromDate', 'toDate']);
-
-const CATEGORY_LABELS: Record<string, string> = {
-  email: 'Email address',
-  subjectType: 'Subject',
-  courtId: 'Subject',
-  serviceCentreId: 'Subject',
-  fromDate: 'Between',
-  toDate: 'Between',
-};
-
-const ITEM_LABELS: Record<string, string> = {
-  email: 'Email address',
-  subjectType: 'Type',
-  courtId: 'Court Name',
-  serviceCentreId: 'Service Centre Name',
-  fromDate: 'From date',
-  toDate: 'To date',
 };
 
 export class AuditFilterCategoriesService {
@@ -37,17 +22,18 @@ export class AuditFilterCategoriesService {
    */
   public buildFilterCategories(filters: GetAuditsParams): FilterCategory[] {
     const entries = Object.entries(filters).filter(
-      ([key, value]) => INCLUDED_CATEGORIES.has(key) && hasValue(value) && !this.isHiddenFromDate(key, value)
+      ([key, value]) =>
+        INCLUDED_AUDIT_FILTER_CATEGORIES.has(key) && hasValue(value) && !this.isHiddenFromDate(key, value)
     );
 
     const grouped = new Map<string, { key: string; itemText: string }[]>();
 
     for (const [key] of entries) {
-      const categoryLabel = CATEGORY_LABELS[key] ?? key;
+      const categoryLabel = AUDIT_FILTER_CATEGORY_LABELS[key] ?? key;
       const itemText =
         key === 'subjectType'
-          ? `${ITEM_LABELS[key]} (${filters.subjectType?.replaceAll('_', ' ')})`
-          : (ITEM_LABELS[key] ?? categoryLabel);
+          ? `${AUDIT_FILTER_ITEM_LABELS[key]} (${filters.subjectType?.replaceAll('_', ' ')})`
+          : (AUDIT_FILTER_ITEM_LABELS[key] ?? categoryLabel);
       const current = grouped.get(categoryLabel) ?? [];
       current.push({ key, itemText });
       grouped.set(categoryLabel, current);

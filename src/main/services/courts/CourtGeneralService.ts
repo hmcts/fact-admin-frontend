@@ -4,14 +4,23 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
+import {
+  COURT_ALREADY_EXISTS_MESSAGE,
+  COURT_NAME_LENGTH_ERROR,
+  COURT_NAME_MAX_LENGTH,
+  COURT_NAME_MESSAGE,
+  COURT_NAME_MIN_LENGTH,
+  COURT_OPEN_MESSAGE,
+  COURT_REGION_MESSAGE,
+  VALID_COURT_NAME_REGEX,
+  VALID_COURT_NAME_REGEX_MESSAGE,
+} from '../../utils/variablesConstants';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
   originalName?: string;
   regions?: Region[];
 };
-
-const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class CourtGeneralService {
   public constructor(
@@ -67,7 +76,7 @@ export class CourtGeneralService {
       return {
         ...courtEntity,
         errors: {
-          name: [`A court with the entered name already exists: '${duplicateCourt.name}'`],
+          name: [`${COURT_ALREADY_EXISTS_MESSAGE}: '${duplicateCourt.name}'`],
         },
       };
     }
@@ -78,7 +87,7 @@ export class CourtGeneralService {
       return result;
     }
 
-    // if it's a Map, it's [validation ]errors from the API
+    // if it's a Map, it's [validation] errors from the API
     if (result instanceof Map) {
       // convert the mapped errors into our expected error format
       const errors: Record<string, string[]> = {};
@@ -99,15 +108,13 @@ export class CourtGeneralService {
     const nameErrors: string[] = [];
     // Make sure we have a name and that it's within length limits
     if (!name || name.length === 0) {
-      nameErrors.push('Enter a name for the court');
-    } else if (name.length < 5 || name.length > 200) {
-      nameErrors.push('Court name should be between 5 and 200 characters');
+      nameErrors.push(COURT_NAME_MESSAGE);
+    } else if (name.length < COURT_NAME_MIN_LENGTH || name.length > COURT_NAME_MAX_LENGTH) {
+      nameErrors.push(COURT_NAME_LENGTH_ERROR);
     }
     // if it's been specified, regardless of other errors, ensure it's content is valid
     if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(
-        'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
-      );
+      nameErrors.push(VALID_COURT_NAME_REGEX_MESSAGE);
     }
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
@@ -116,7 +123,7 @@ export class CourtGeneralService {
     // region just has to be selected
     const regionErrors: string[] = [];
     if (!model.regionId || model.regionId.trim().length === 0) {
-      regionErrors.push('Select a region for the court');
+      regionErrors.push(COURT_REGION_MESSAGE);
     }
     if (regionErrors.length > 0) {
       errors.regionId = regionErrors;
@@ -125,7 +132,7 @@ export class CourtGeneralService {
     // in case someone manages to post without open being set to true or false, we should catch that too
     const openErrors: string[] = [];
     if (model.open === undefined || model.open === null) {
-      openErrors.push('Select whether the court is open or closed');
+      openErrors.push(COURT_OPEN_MESSAGE);
     }
     if (openErrors.length > 0) {
       errors.open = openErrors;

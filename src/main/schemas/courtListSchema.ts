@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
-import { pageMetadataSchema } from './pagedMetadataSchema';
+import { SUBJECT_TYPE } from '../utils/variablesConstants';
 
-export const locationTypeSchema = z.enum(['COURT', 'SERVICE_CENTRE']);
+import { pageMetadataSchema } from './pagedMetadataSchema';
 
 export const locationListItemSchema = z.object({
   createdAt: z.string().nullable(),
   id: z.uuid(),
   lastUpdatedAt: z.string(),
-  locationType: locationTypeSchema,
+  locationType: SUBJECT_TYPE,
   mrdId: z.string().nullable(),
   name: z.string(),
   open: z.boolean(),

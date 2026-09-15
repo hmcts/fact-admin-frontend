@@ -13,6 +13,16 @@ import {
 } from '../../utils/addressValidation';
 import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
+import {
+  COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE,
+  COURT_ADDRESS_COURT_TYPES_REQUIRED_MESSAGE,
+  COURT_ADDRESS_DELETE_REQUIRES_AT_LEAST_ONE_MESSAGE,
+  COURT_ADDRESS_SINGLE_VISIT_ADDRESS_MESSAGE,
+  COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
+  EPIM_ID_MAX_LENGTH_MESSAGE,
+  EPIM_ID_REGEX_MESSAGE,
+  VALID_EPIM_ID_REGEX,
+} from '../../utils/variablesConstants';
 
 export type SaveCourtAddressResponse =
   | {
@@ -47,8 +57,6 @@ export type DeleteCourtAddressResponse =
       address: Partial<CourtAddress> & { errors?: Record<string, string[] | undefined> };
     }
   | HttpStatusCode;
-
-const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 
 const courtApi = new CourtApi();
 const referenceDataApi = new ReferenceDataApi();
@@ -184,7 +192,7 @@ export class CourtAddressService {
         courtName: courtResponse.name,
         address: {
           ...courtAddress,
-          errors: { message: ['Unable to delete this address: At least one address is required for a court.'] },
+          errors: { message: [COURT_ADDRESS_DELETE_REQUIRES_AT_LEAST_ONE_MESSAGE] },
         },
       };
     }
@@ -239,14 +247,14 @@ export class CourtAddressService {
     addError(errors, 'epimId', this.validateEpimId(address));
 
     if (aolSelected && (!address.areasOfLaw || address.areasOfLaw.length === 0 || address.areasOfLaw.length > 5)) {
-      addError(errors, 'areasOfLaw', ['Please select between 1 and 5 areas of law that this address is relevant for']);
+      addError(errors, 'areasOfLaw', [COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE]);
     }
 
     if (
       courtTypesSelected &&
       (!address.courtTypes || address.courtTypes.length === 0 || address.courtTypes.length > 5)
     ) {
-      addError(errors, 'courtTypes', ['Please select at least one court type that this address is relevant for']);
+      addError(errors, 'courtTypes', [COURT_ADDRESS_COURT_TYPES_REQUIRED_MESSAGE]);
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
@@ -255,17 +263,14 @@ export class CourtAddressService {
   private validateAddressType(address: Partial<CourtAddress>, existingAddresses: CourtAddress[]): string[] {
     const addressTypeErrors: string[] = [];
     if (!address.addressType) {
-      addressTypeErrors.push('Select an address type');
+      addressTypeErrors.push(COURT_ADDRESS_TYPE_REQUIRED_MESSAGE);
     } else if (
       address.addressType === CourtAddressType.VISIT_US &&
       existingAddresses.some(
         existingAddress => existingAddress.addressType === address.addressType && existingAddress.id !== address.id
       )
     ) {
-      addressTypeErrors.push(
-        'A court can only have one listed address for visiting and this court already has one.' +
-          '  Please edit the other visit address first.'
-      );
+      addressTypeErrors.push(COURT_ADDRESS_SINGLE_VISIT_ADDRESS_MESSAGE);
     }
     return addressTypeErrors;
   }
@@ -273,10 +278,10 @@ export class CourtAddressService {
   private validateEpimId(address: Partial<CourtAddress>): string[] {
     const epimIdErrors: string[] = [];
     if (address.epimId && address.epimId.length > 10) {
-      epimIdErrors.push('ePIMS Ref ID must be 10 characters or less');
+      epimIdErrors.push(EPIM_ID_MAX_LENGTH_MESSAGE);
     }
     if (address.epimId && !VALID_EPIM_ID_REGEX.test(address.epimId.trim())) {
-      epimIdErrors.push('ePIMS Ref ID must only include letters a to z, spaces and dashes.');
+      epimIdErrors.push(EPIM_ID_REGEX_MESSAGE);
     }
     return epimIdErrors;
   }

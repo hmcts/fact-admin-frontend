@@ -1,18 +1,29 @@
 import { GetCourtsParams } from '../requests/types/GetCourtsParams';
 import { Region } from '../schemas/regionSchema';
 import { isUuid, parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
+import {
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT_ORDER,
+  HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR,
+  HOME_PAGE_FAVOURITES_PAGE_NUMBER_MIN_ERROR,
+  HOME_PAGE_INCLUDE_CLOSED_BOOLEAN_ERROR,
+  HOME_PAGE_ONLY_SERVICE_CENTRES_BOOLEAN_ERROR,
+  HOME_PAGE_REGION_INVALID_ERROR,
+  HOME_PAGE_REGION_UUID_ERROR,
+  MAX_PAGE_PARAM,
+  PAGE_NUMBER_MAX_ERROR,
+  PAGE_NUMBER_MIN_ERROR,
+  PAGE_SIZE_MAX_ERROR,
+  PAGE_SIZE_MIN_ERROR,
+  PARTIAL_COURT_NAME_ERROR,
+  PARTIAL_COURT_NAME_REGEX,
+  SORT_ORDER_WITHOUT_SORT_BY_ERROR,
+  VALID_SORT_BY_VALUES,
+  VALID_SORT_ORDER_VALUES,
+} from '../utils/variablesConstants';
 
 import { HomePageFilters, HomePageValidationError } from './types/HomePage.types';
-
-const DEFAULT_PAGE_NUMBER = 0;
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_PARAM = 1000;
-const DEFAULT_SORT_ORDER = 'asc';
-const PARTIAL_COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
-const PARTIAL_COURT_NAME_ERROR =
-  'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.';
-const VALID_SORT_BY_VALUES = ['lastUpdated', 'name'] as const;
-const VALID_SORT_ORDER_VALUES = ['asc', 'desc'] as const;
 
 /**
  * Parses, validates, and maps homepage query filters.
@@ -54,7 +65,7 @@ export class HomePageFiltersService {
     const errors: HomePageValidationError[] = [];
 
     // Partial court name
-    if (!PARTIAL_COURT_NAME_PATTERN.test(filters.partialCourtName)) {
+    if (!PARTIAL_COURT_NAME_REGEX.test(filters.partialCourtName)) {
       errors.push({
         href: '#partialCourtName',
         text: PARTIAL_COURT_NAME_ERROR,
@@ -70,12 +81,12 @@ export class HomePageFiltersService {
       if (!Number.isInteger(favouritesPageNumber) || favouritesPageNumber < 0) {
         errors.push({
           href: '#favourites',
-          text: 'favouritesPageNumber must be greater than or equal to 0',
+          text: HOME_PAGE_FAVOURITES_PAGE_NUMBER_MIN_ERROR,
         });
       } else if (favouritesPageNumber > MAX_PAGE_PARAM) {
         errors.push({
           href: '#favourites',
-          text: `favouritesPageNumber must be less than or equal to ${MAX_PAGE_PARAM}`,
+          text: HOME_PAGE_FAVOURITES_PAGE_NUMBER_MAX_ERROR,
         });
       }
     }
@@ -101,7 +112,7 @@ export class HomePageFiltersService {
     ) {
       errors.push({
         href: '#main-content',
-        text: 'includeClosed must be true or false',
+        text: HOME_PAGE_INCLUDE_CLOSED_BOOLEAN_ERROR,
       });
     }
 
@@ -113,7 +124,7 @@ export class HomePageFiltersService {
     ) {
       errors.push({
         href: '#main-content',
-        text: 'onlyServiceCentres must be true or false',
+        text: HOME_PAGE_ONLY_SERVICE_CENTRES_BOOLEAN_ERROR,
       });
     }
     if (filters.rawPageSize !== undefined) {
@@ -121,12 +132,12 @@ export class HomePageFiltersService {
       if (!Number.isInteger(pageSize) || pageSize <= 0) {
         errors.push({
           href: '#main-content',
-          text: 'pageSize must be greater than 0',
+          text: PAGE_SIZE_MIN_ERROR,
         });
       } else if (pageSize > MAX_PAGE_PARAM) {
         errors.push({
           href: '#main-content',
-          text: `pageSize must be less than or equal to ${MAX_PAGE_PARAM}`,
+          text: PAGE_SIZE_MAX_ERROR,
         });
       }
     }
@@ -136,12 +147,12 @@ export class HomePageFiltersService {
       if (!Number.isInteger(pageNumber) || pageNumber < 0) {
         errors.push({
           href: '#main-content',
-          text: 'pageNumber must be greater than or equal to 0',
+          text: PAGE_NUMBER_MIN_ERROR,
         });
       } else if (pageNumber > MAX_PAGE_PARAM) {
         errors.push({
           href: '#main-content',
-          text: `pageNumber must be less than or equal to ${MAX_PAGE_PARAM}`,
+          text: PAGE_NUMBER_MAX_ERROR,
         });
       }
     }
@@ -151,7 +162,7 @@ export class HomePageFiltersService {
     if (filters.rawSortOrder !== undefined && filters.rawSortBy === undefined) {
       errors.push({
         href: '#main-content',
-        text: 'sortOrder cannot be provided without sortBy',
+        text: SORT_ORDER_WITHOUT_SORT_BY_ERROR,
       });
     }
 
@@ -206,14 +217,14 @@ export class HomePageFiltersService {
     if (!isUuid(regionId)) {
       return {
         href: '#regionId',
-        text: 'Region must be a valid UUID',
+        text: HOME_PAGE_REGION_UUID_ERROR,
       };
     }
 
     if (regions.length > 0 && !regions.some(region => region.id === regionId)) {
       return {
         href: '#regionId',
-        text: 'Region must be a valid region',
+        text: HOME_PAGE_REGION_INVALID_ERROR,
       };
     }
 

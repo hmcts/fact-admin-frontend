@@ -7,6 +7,14 @@ import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDe
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
+import {
+  CONTACT_TYPE_REQUIRED_MESSAGE,
+  ENGLISH_TEXT_REGEX,
+  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  MAX_EXPLANATION_LENGTH,
+  WELSH_TEXT_REGEX,
+  WELSH_TRANSLATION_REQUIRED_MESSAGE,
+} from '../../utils/variablesConstants';
 
 export type ServiceCentreContactFormValues = {
   contactEmail: string;
@@ -81,10 +89,6 @@ export type ServiceCentreContactSubmitFlowOutcome =
       type: 'saved';
       successPanelBody: string;
     };
-
-const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
-const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
-const maxExplanationLength = 250;
 
 export class ServiceCentreContactService {
   public constructor(
@@ -286,7 +290,7 @@ export class ServiceCentreContactService {
     const errorSummary: ServiceCentreContactValidationError[] = [];
 
     if (!selectedContactTypeId) {
-      formErrors.contactType = 'Select a contact type';
+      formErrors.contactType = CONTACT_TYPE_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
@@ -328,22 +332,20 @@ export class ServiceCentreContactService {
     }
 
     if (formValues.contactExplanation.length > 0 && formValues.contactExplanationCy.length === 0) {
-      formErrors.contactExplanationCy =
-        'Because you provided an explanation in English, the Welsh translation is now mandatory';
+      formErrors.contactExplanationCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
     }
 
     if (formValues.contactExplanationCy.length > 0 && formValues.contactExplanation.length === 0) {
-      formErrors.contactExplanation =
-        'Because you provided an explanation in Welsh, the English translation is now mandatory';
+      formErrors.contactExplanation = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
     }
   }
 
   private validateContactExplanation(contactExplanation: string, welsh: boolean) {
     const insert = welsh ? 'in Welsh ' : '';
-    const pattern = welsh ? welshExplanationPattern : explanationPattern;
-    if (contactExplanation.length > maxExplanationLength) {
+    const pattern = welsh ? WELSH_TEXT_REGEX : ENGLISH_TEXT_REGEX;
+    if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
       return `Explanation ${insert}must be 250 characters or fewer`;
     } else if (contactExplanation && !pattern.test(contactExplanation)) {
       return `Explanation ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs`;

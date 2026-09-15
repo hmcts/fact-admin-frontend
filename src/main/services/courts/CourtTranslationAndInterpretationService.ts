@@ -2,6 +2,14 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { TranslationServices } from '../../schemas/translationServicesSchema';
+import {
+  EMAIL_INVALID_MESSAGE,
+  EMAIL_REGEX,
+  EMAIL_REQUIRED_MESSAGE,
+  PHONE_NUMBER_INVALID_MESSAGE,
+  PHONE_NUMBER_REGEX,
+  PHONE_NUMBER_REQUIRED_MESSAGE,
+} from '../../utils/variablesConstants';
 
 export type TranslationAndInterpretationForm = {
   contactMethods?: string | string[];
@@ -36,9 +44,6 @@ export type SaveTranslationAndInterpretationResult =
       viewModel: TranslationAndInterpretationViewModel;
     }
   | HttpStatusCode;
-
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 
 export class CourtTranslationAndInterpretationService {
   public constructor(private readonly courtApi = new CourtApi()) {}
@@ -149,24 +154,24 @@ export class CourtTranslationAndInterpretationService {
     if (viewModel.emailSelected && !viewModel.email) {
       errors.push({
         href: '#email',
-        text: 'Enter an email address',
+        text: EMAIL_REQUIRED_MESSAGE,
       });
-    } else if (viewModel.email && !emailPattern.test(viewModel.email)) {
+    } else if (viewModel.email && !EMAIL_REGEX.test(viewModel.email)) {
       errors.push({
         href: '#email',
-        text: 'Enter an email address in the correct format',
+        text: EMAIL_INVALID_MESSAGE,
       });
     }
 
     if (viewModel.phoneNumberSelected && !viewModel.phoneNumber) {
       errors.push({
         href: '#phoneNumber',
-        text: 'Enter a telephone number',
+        text: PHONE_NUMBER_REQUIRED_MESSAGE,
       });
-    } else if (viewModel.phoneNumber && !phoneNumberPattern.test(viewModel.phoneNumber)) {
+    } else if (viewModel.phoneNumber && !PHONE_NUMBER_REGEX.test(viewModel.phoneNumber)) {
       errors.push({
         href: '#phoneNumber',
-        text: 'Enter a telephone number in the correct format',
+        text: PHONE_NUMBER_INVALID_MESSAGE,
       });
     }
 

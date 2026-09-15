@@ -2,8 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../../schemas/areaOfLawSchema';
-
-export const areasOfLawValidationMessage = 'Select at least one type of case heard at this court.';
+import { AREA_OF_LAW_VALIDATION_MESSAGE } from '../../utils/variablesConstants';
 
 export type CasesHeardViewModel = {
   areasOfLawError?: string;
@@ -51,7 +50,7 @@ export class CourtCasesHeardService {
    * Applies the minimum-one validation rule for the page.
    */
   public validateSelectedAreasOfLaw(selectedAreasOfLaw: string[]): string | undefined {
-    return selectedAreasOfLaw.length === 0 ? areasOfLawValidationMessage : undefined;
+    return selectedAreasOfLaw.length === 0 ? AREA_OF_LAW_VALIDATION_MESSAGE : undefined;
   }
 
   /**

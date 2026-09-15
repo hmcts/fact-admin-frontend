@@ -3,12 +3,19 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../schemas/openingHoursSchema';
-
-type Day = {
-  idPrefix: string;
-  name: string;
-  value: string;
-};
+import {
+  ALLOWED_OPENING_HOUR_TYPES,
+  OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+  OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
+  OPENING_HOUR_DAYS,
+  OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+  OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+  OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE,
+  OPENING_HOUR_TYPE_REQUIRED_MESSAGE,
+  OpeningHourDay,
+} from '../../utils/variablesConstants';
 
 export type OpeningHoursForm = {
   openingHourTypeId?: string;
@@ -29,7 +36,7 @@ export type OpeningHoursError = {
 export type OpeningHoursEditViewModel = {
   courtId: string;
   courtName: string;
-  days: Day[];
+  days: OpeningHourDay[];
   errors: Record<string, string>;
   errorSummary: OpeningHoursError[];
   form: OpeningHoursForm;
@@ -70,26 +77,6 @@ export type SaveOpeningHoursResult =
   | { type: 'success'; viewModel: OpeningHoursSuccessViewModel }
   | { type: 'validation_error'; viewModel: OpeningHoursEditViewModel }
   | { status: HttpStatusCode; type: 'status' };
-
-const allowedOpeningHourTypes = [
-  'Bailiff office open',
-  'County Court open',
-  'Court open',
-  'Crown Court open',
-  'Family Court open',
-  "Magistrates' Court open",
-  'Telephone enquiries answered',
-  'Telephone payments accepted',
-  'Tribunal open',
-];
-
-const days: Day[] = [
-  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
-  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
-  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
-  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
-  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
-];
 
 export class CourtOpeningHoursService {
   public constructor(
@@ -296,7 +283,7 @@ export class CourtOpeningHoursService {
     return {
       courtId,
       courtName: courtResponse.name,
-      days,
+      days: [...OPENING_HOUR_DAYS],
       errors: {},
       errorSummary: [],
       form: postedForm ?? this.toForm(openingHours),
@@ -307,14 +294,14 @@ export class CourtOpeningHoursService {
   }
 
   private filterAndSortOpeningHourTypes(types: OpeningHourType[], openingHours?: CourtOpeningHours): OpeningHourType[] {
-    const allowedTypeSet = new Set(allowedOpeningHourTypes);
+    const allowedTypeSet: ReadonlySet<string> = new Set<string>(ALLOWED_OPENING_HOUR_TYPES as readonly string[]);
     const currentTypeId = openingHours?.openingHourTypeId;
 
     return types
       .filter(type => allowedTypeSet.has(type.name) || type.id === currentTypeId)
       .sort((left, right) => {
-        const leftIndex = allowedOpeningHourTypes.indexOf(left.name);
-        const rightIndex = allowedOpeningHourTypes.indexOf(right.name);
+        const leftIndex = (ALLOWED_OPENING_HOUR_TYPES as readonly string[]).indexOf(left.name);
+        const rightIndex = (ALLOWED_OPENING_HOUR_TYPES as readonly string[]).indexOf(right.name);
 
         if (leftIndex === -1 && rightIndex === -1) {
           return left.name.localeCompare(right.name);
@@ -340,18 +327,17 @@ export class CourtOpeningHoursService {
     const errors: Record<string, string> = {};
 
     if (!form.openingHourTypeId) {
-      errors.openingHourTypeId = 'Select an opening hours type';
+      errors.openingHourTypeId = OPENING_HOUR_TYPE_REQUIRED_MESSAGE;
     } else if (
       existingOpeningHours.some(
         existing => existing.openingHourTypeId === form.openingHourTypeId && existing.id !== openingHoursId
       )
     ) {
-      errors.openingHourTypeId =
-        'A court can only have one opening hour per opening hour type. Please edit the other opening hour first.';
+      errors.openingHourTypeId = OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE;
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
-      errors.sameTimeYes = 'Select whether the court opens and closes at the same time Monday to Friday';
+      errors.sameTimeYes = OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -361,12 +347,12 @@ export class CourtOpeningHoursService {
     }
 
     if (form.selectedDays.length === 0) {
-      errors.selectedDays = 'Select at least one day';
+      errors.selectedDays = OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE;
       return errors;
     }
 
     form.selectedDays.forEach(day => {
-      const dayConfig = days.find(config => config.value === day);
+      const dayConfig = OPENING_HOUR_DAYS.find(config => config.value === day);
       if (dayConfig) {
         this.validateTimeGroup(errors, form, dayConfig.idPrefix, dayConfig.name);
       }
@@ -401,11 +387,11 @@ export class CourtOpeningHoursService {
     const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
 
     if (openingTime > closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be after the closing time';
-      errors[closingHourKey] = 'The closing time cannot be before the opening time';
+      errors[openingHourKey] = OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE;
     } else if (openingTime === closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
-      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
+      errors[openingHourKey] = OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE;
     }
   }
 
@@ -446,8 +432,8 @@ export class CourtOpeningHoursService {
     }
 
     return form.selectedDays
-      .map(day => days.find(dayConfig => dayConfig.value === day))
-      .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
+      .map(day => OPENING_HOUR_DAYS.find(dayConfig => dayConfig.value === day))
+      .filter((dayConfig): dayConfig is OpeningHourDay => Boolean(dayConfig))
       .map(dayConfig => ({
         dayOfWeek: dayConfig.value,
         openingTime: this.formatTime(
@@ -467,7 +453,7 @@ export class CourtOpeningHoursService {
       return [];
     }
 
-    const supportedDayValues = new Set(days.map(day => day.value).concat('EVERYDAY'));
+    const supportedDayValues = new Set(OPENING_HOUR_DAYS.map(day => day.value).concat('EVERYDAY'));
     return openingHours.openingTimesDetails.filter(detail => !supportedDayValues.has(detail.dayOfWeek));
   }
 
@@ -492,7 +478,7 @@ export class CourtOpeningHoursService {
     form.sameTime = 'no';
     form.selectedDays = openingHours.openingTimesDetails.map(detail => detail.dayOfWeek);
     openingHours.openingTimesDetails.forEach(detail => {
-      const dayConfig = days.find(day => day.value === detail.dayOfWeek);
+      const dayConfig = OPENING_HOUR_DAYS.find(day => day.value === detail.dayOfWeek);
       if (dayConfig) {
         this.assignTimeFields(form, dayConfig.idPrefix, detail);
       }
@@ -529,7 +515,7 @@ export class CourtOpeningHoursService {
       return 'Monday to Friday';
     }
 
-    const dayConfig = days.find(day => day.value === dayOfWeek);
+    const dayConfig = OPENING_HOUR_DAYS.find(day => day.value === dayOfWeek);
     return dayConfig?.name ?? dayOfWeek;
   }
 

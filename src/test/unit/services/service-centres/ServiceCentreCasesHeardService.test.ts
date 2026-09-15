@@ -1,9 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import {
-  ServiceCentreCasesHeardService,
-  serviceCentreAreasOfLawValidationMessage,
-} from '../../../../main/services/service-centres/ServiceCentreCasesHeardService';
+import { ServiceCentreCasesHeardService } from '../../../../main/services/service-centres/ServiceCentreCasesHeardService';
+import { SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE } from '../../../../main/utils/variablesConstants';
 
 describe('ServiceCentreCasesHeardService', () => {
   test('normalises checkbox values from a single string or an array', () => {
@@ -220,7 +218,7 @@ describe('ServiceCentreCasesHeardService', () => {
       throw new Error('Expected validation_error outcome');
     }
 
-    expect(result.viewModel.areasOfLawError).toBe(serviceCentreAreasOfLawValidationMessage);
+    expect(result.viewModel.areasOfLawError).toBe(SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE);
     expect(updateServiceCentreAreasOfLaw).not.toHaveBeenCalled();
   });
 

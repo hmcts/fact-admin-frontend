@@ -397,9 +397,9 @@ describe('CourtProfessionalInformationService', () => {
           'dxCodeDescription-1':
             'DX code 2: Because you provided an explanation in Welsh, the English translation is now mandatory',
           'faxNumberDescription-0':
-            'Fax number 1: Because you provided an description in Welsh, the English translation is now mandatory',
+            'Fax number 1: Because you provided a description in Welsh, the English translation is now mandatory',
           'faxNumberDescriptionCy-1':
-            'Fax number 2: Because you provided an description in English, the Welsh translation is now mandatory',
+            'Fax number 2: Because you provided a description in English, the Welsh translation is now mandatory',
         },
       },
     });
@@ -833,7 +833,7 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#faxNumberDescriptionCy-4',
-            text: 'Fax number 5: Because you provided an description in English, the Welsh translation is now mandatory',
+            text: 'Fax number 5: Because you provided a description in English, the Welsh translation is now mandatory',
           },
         ],
       },

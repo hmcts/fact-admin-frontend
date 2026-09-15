@@ -11,15 +11,24 @@ import { OperationsApi } from '../requests/OperationsApi';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 import { SubjectType } from '../schemas/subjectTypeSchema';
-
-const DEFAULT_PAGE_NUMBER = 0;
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_PARAM = 1000;
-
-const CSV_PAGE_SIZE = 1000;
-const MAX_CSV_PAGES = 1;
-
-const EMAIL_PARAM_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
+import {
+  CSV_PAGE_SIZE,
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  EMAIL_PARTIAL_REGEX,
+  EMAIL_PARTIAL_REGEX_ERROR,
+  FROM_DATE_AFTER_TO_DATE_MESSAGE,
+  FROM_DATE_INVALID_MESSAGE,
+  FROM_DATE_IN_FUTURE_MESSAGE,
+  MAX_CSV_PAGES,
+  MAX_PAGE_PARAM,
+  PAGE_NUMBER_MAX,
+  PAGE_NUMBER_MIN,
+  PAGE_NUMBER_RANGE_ERROR,
+  PAGE_SIZE_MIN,
+  PAGE_SIZE_RANGE_ERROR,
+  TO_DATE_BEFORE_FROM_DATE_MESSAGE,
+} from '../utils/variablesConstants';
 
 const logger = Logger.getLogger('audit-service');
 
@@ -222,19 +231,16 @@ export class AuditService {
     const errors: Record<string, string[]> = {};
 
     // page number bounds check
-    if (params.pageNumber < 0 || params.pageNumber > 100000) {
-      errors.pageNumber = ['Page number must be between 0 and 100000'];
+    if (params.pageNumber < PAGE_NUMBER_MIN || params.pageNumber > PAGE_NUMBER_MAX) {
+      errors.pageNumber = [PAGE_NUMBER_RANGE_ERROR];
     }
     // page size bounds check
-    if (params.pageSize < 1 || params.pageSize > MAX_PAGE_PARAM) {
-      errors.pageSize = [`Page size must be between 1 and ${MAX_PAGE_PARAM}`];
+    if (params.pageSize < PAGE_SIZE_MIN || params.pageSize > MAX_PAGE_PARAM) {
+      errors.pageSize = [PAGE_SIZE_RANGE_ERROR];
     }
     // partial email format check
-    if (params.email && !EMAIL_PARAM_REGEX.test(params.email)) {
-      errors.email = [
-        'Email match may only contain letters, hyphens, periods, plus/minus signs,' +
-          " underscores, and a single 'at' (@) symbol",
-      ];
+    if (params.email && !EMAIL_PARTIAL_REGEX.test(params.email)) {
+      errors.email = [EMAIL_PARTIAL_REGEX_ERROR];
     }
     // subject type check
     if (params.subjectType && !Object.keys(SubjectType).includes(params.subjectType)) {
@@ -251,17 +257,17 @@ export class AuditService {
     const fromDate = new Date(params.fromDate);
 
     if (Number.isNaN(fromDate.getTime())) {
-      fromDateErrors.push('From date must be a valid date');
+      fromDateErrors.push(FROM_DATE_INVALID_MESSAGE);
     } else {
       if (fromDate > new Date(this.today())) {
-        fromDateErrors.push('From date must not be in the future');
+        fromDateErrors.push(FROM_DATE_IN_FUTURE_MESSAGE);
       }
 
       if (params.toDate) {
         const toDate = new Date(params.toDate);
         if (!Number.isNaN(toDate.getTime()) && fromDate > toDate) {
-          fromDateErrors.push('From date must not be after To date');
-          errors.toDate = ['To date must not be before From date'];
+          fromDateErrors.push(FROM_DATE_AFTER_TO_DATE_MESSAGE);
+          errors.toDate = [TO_DATE_BEFORE_FROM_DATE_MESSAGE];
         }
       }
     }

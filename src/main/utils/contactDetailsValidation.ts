@@ -1,3 +1,11 @@
+import {
+  CONTACT_METHOD_REQUIRED_MESSAGE,
+  EMAIL_INVALID_MESSAGE,
+  EMAIL_REQUIRED_MESSAGE,
+  PHONE_NUMBER_INVALID_MESSAGE,
+  PHONE_NUMBER_REQUIRED_MESSAGE,
+} from './variablesConstants';
+
 export type ContactValidationError = {
   href: string;
   text: string;
@@ -20,26 +28,26 @@ export const validateContactDetailsMethods = (
   errorSummary: ContactValidationError[]
 ): void => {
   if (!selectedContactMethods.length) {
-    formErrors.contactMethods = 'Select at least one contact method';
+    formErrors.contactMethods = CONTACT_METHOD_REQUIRED_MESSAGE;
     errorSummary.push({ href: '#contact-methods', text: formErrors.contactMethods });
   }
 
   if (selectedContactMethods.includes('email')) {
     if (!contactEmail) {
-      formErrors.contactEmail = 'Enter an email address';
+      formErrors.contactEmail = EMAIL_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
     } else if (!emailPattern.test(contactEmail)) {
-      formErrors.contactEmail = 'Enter an email address in the correct format';
+      formErrors.contactEmail = EMAIL_INVALID_MESSAGE;
       errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
     }
   }
 
   if (selectedContactMethods.includes('phone')) {
     if (!contactTelephone) {
-      formErrors.contactTelephone = 'Enter a phone number';
+      formErrors.contactTelephone = PHONE_NUMBER_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
     } else if (!phoneNumberPattern.test(contactTelephone)) {
-      formErrors.contactTelephone = 'Enter a phone number in the correct format';
+      formErrors.contactTelephone = PHONE_NUMBER_INVALID_MESSAGE;
       errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
     }
   }

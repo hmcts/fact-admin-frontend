@@ -3,8 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { OperationsApi } from '../requests/OperationsApi';
 import { ApprovalStatus, ApprovalSubjectType } from '../schemas/approvalSchema';
 import { toUkDateTimeString } from '../utils/valueParsers';
-
-const APPROVAL_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss';
+import { APPROVAL_DATE_FORMAT } from '../utils/variablesConstants';
 
 export type ApprovalTrackerRow = {
   approvalId: string;
