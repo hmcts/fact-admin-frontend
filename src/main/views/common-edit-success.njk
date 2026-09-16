@@ -7,8 +7,14 @@
 
 {% block content %}
 
-  {% set continueUpdatingHref = continueUpdatingHref or '/courts/' + courtId + '/edit' %}
-  {% set continueUpdatingText = continueUpdatingText or 'Continue updating ' + courtName %}
+  {% if subjectType === 'SERVICE_CENTER' %}
+    {% set subject = 'service-centres' %}
+  {% else %}
+    {% set subject = 'courts' %}
+  {% endif %}
+
+  {% set continueUpdatingHref = continueUpdatingHref or '/'+ subject +'/' + subjectId + '/edit' %}
+  {% set continueUpdatingText = continueUpdatingText or 'Continue updating ' + subjectName %}
   {% set homeHref = homeHref or '/' %}
   {% set homeText = homeText or 'Home' %}
   {% set headingText = headingText or 'What do you want to do next?' %}

@@ -289,7 +289,8 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     await controller.postAdd(request, response);
 
     const expectedViewModel = {
-      ...viewModel,
+      subjectId: courtId,
+      subjectName: viewModel.courtName,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
@@ -334,7 +335,8 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     await controller.postEdit(request, response);
 
     const expectedViewModel = {
-      ...viewModel,
+      subjectId: courtId,
+      subjectName: viewModel.courtName,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
@@ -423,7 +425,8 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     };
 
     const expectedSuccessViewModel = {
-      ...successViewModel,
+      subjectId: courtId,
+      subjectName: successViewModel.courtName,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${successViewModel.courtName}` },

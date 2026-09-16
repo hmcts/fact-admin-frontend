@@ -92,8 +92,8 @@ describe('Building Facilities Views', () => {
 
   test('renders success view with next-action links', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId,
-      courtName: 'Reading Crown Court',
+      subjectId: courtId,
+      subjectName: 'Reading Crown Court',
       pageTitle: 'Building Facilities saved - Reading Crown Court',
       successPanelTitle: 'Building Facilities details saved',
       successPanelBody: 'Building Facilities details for Reading Crown Court have been saved successfully.',

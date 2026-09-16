@@ -61,8 +61,8 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
         saveResponse.viewModel.courtName,
         'Translation and interpretation saved'
       ),
-      courtId,
-      courtName: saveResponse.viewModel.courtName,
+      subjectId: courtId,
+      subjectName: saveResponse.viewModel.courtName,
       pageTitle: `Translation and interpretation saved - ${saveResponse.viewModel.courtName}`,
       successPanelTitle: 'Translation and interpretation saved',
       successPanelBody: `Translation and interpretation contact for ${saveResponse.viewModel.courtName} has been saved successfully.`,

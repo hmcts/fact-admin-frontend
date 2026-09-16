@@ -86,11 +86,11 @@ export default class CourtGeneralController extends BaseController {
         'General',
         'General saved'
       ),
-      courtId: resolvedCourtId,
+      subjectId: resolvedCourtId,
       pageTitle: `General saved - ${updateResponse.name}`,
       successPanelTitle: 'General details saved',
       successPanelBody: `General details for ${updateResponse.name} have been saved successfully.`,
-      courtName: updateResponse.name ?? model.name,
+      subjectName: updateResponse.name ?? model.name,
     });
   }
 

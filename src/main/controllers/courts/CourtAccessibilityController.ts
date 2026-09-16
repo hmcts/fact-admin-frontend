@@ -63,11 +63,11 @@ export default class CourtAccessibilityController extends BaseController {
 
     return res.render('common-edit-success', {
       breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!, 'Accessibility saved'),
-      courtId: resolvedCourtId,
+      subjectId: resolvedCourtId,
       pageTitle: `Accessibility saved - ${updateResponse.name}`,
       successPanelTitle: 'Accessibility details saved',
       successPanelBody: `Accessibility details saved for ${updateResponse.name}`,
-      courtName: updateResponse.name,
+      subjectName: updateResponse.name,
     });
   }
 

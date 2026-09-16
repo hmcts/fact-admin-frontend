@@ -245,8 +245,8 @@ describe('CourtAddressController', () => {
       .once()
       .withArgs('common-edit-success.njk', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address saved'),
-        courtName: 'Reading Crown Court',
-        courtId: COURT_ID,
+        subjectName: 'Reading Crown Court',
+        subjectId: COURT_ID,
         pageTitle: 'Address Saved',
         successPanelTitle: 'Address saved: 10 Kings Road, Reading, RG1 2AA',
         successPanelBody: 'Addresses for Reading Crown Court have been successfully updated. The court is now open.',
@@ -417,8 +417,8 @@ describe('CourtAddressController', () => {
       .once()
       .withArgs('common-edit-success.njk', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address deleted'),
-        courtName: 'Reading Crown Court',
-        courtId: COURT_ID,
+        subjectName: 'Reading Crown Court',
+        subjectId: COURT_ID,
         pageTitle: 'Address Deleted',
         successPanelTitle: 'Address deleted: Reading Crown Court, Reading, RG1 2AA',
         successPanelBody: 'You have removed this address for Reading Crown Court',
@@ -751,8 +751,8 @@ describe('CourtAddressController', () => {
       .once()
       .withArgs('common-edit-success.njk', {
         breadcrumbs: buildAddressBreadcrumbs('Reading Crown Court', 'Address saved'),
-        courtName: 'Reading Crown Court',
-        courtId: COURT_ID,
+        subjectName: 'Reading Crown Court',
+        subjectId: COURT_ID,
         pageTitle: 'Address Saved',
         successPanelTitle: 'Address saved: Updated line 1, Reading, RG1 2AA',
         successPanelBody: 'Addresses for Reading Crown Court have been successfully updated.',

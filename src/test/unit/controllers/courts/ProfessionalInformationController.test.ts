@@ -267,8 +267,8 @@ describe('CourtProfessionalInformationController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success.njk', {
-        courtId,
-        courtName,
+        subjectId: courtId,
+        subjectName: courtName,
         pageTitle: `Information for professionals saved - ${courtName}`,
         successPanelTitle: 'Information for professionals saved',
         successPanelBody: `Information for professionals for ${courtName} has been saved successfully.`,
@@ -304,8 +304,8 @@ describe('CourtProfessionalInformationController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success.njk', {
-        courtId,
-        courtName,
+        subjectId: courtId,
+        subjectName: courtName,
         pageTitle: `Information for professionals saved - ${courtName}`,
         successPanelTitle: 'Information for professionals saved',
         successPanelBody: `Information for professionals for ${courtName} has been saved successfully.`,

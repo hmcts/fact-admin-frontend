@@ -176,8 +176,8 @@ describe('CourtTranslationAndInterpretationController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success.njk', {
-        courtId,
-        courtName: 'Reading Crown Court',
+        subjectId: courtId,
+        subjectName: 'Reading Crown Court',
         pageTitle: 'Translation and interpretation saved - Reading Crown Court',
         successPanelTitle: 'Translation and interpretation saved',
         successPanelBody: 'Translation and interpretation contact for Reading Crown Court has been saved successfully.',

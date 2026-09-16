@@ -6,8 +6,8 @@ describe('Translation and Interpretation Success View', () => {
 
   test('renders the success panel and next actions', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId,
-      courtName: 'Reading Crown Court',
+      subjectId: courtId,
+      subjectName: 'Reading Crown Court',
       pageTitle: 'Translation and interpretation saved - Reading Crown Court',
       successPanelTitle: 'Translation and interpretation saved',
       successPanelBody: 'Translation and interpretation contact for Reading Crown Court has been saved successfully.',

@@ -160,8 +160,8 @@ describe('CourtLocalAuthoritiesController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success.njk', {
-        courtId: COURT_ID,
-        courtName: 'Reading Crown Court',
+        subjectId: COURT_ID,
+        subjectName: 'Reading Crown Court',
         pageTitle: 'Local authorities saved - Reading Crown Court',
         successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
         breadcrumbs: [
@@ -294,8 +294,8 @@ describe('CourtLocalAuthoritiesController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success.njk', {
-        courtId: COURT_ID,
-        courtName: 'Reading Crown Court',
+        subjectId: COURT_ID,
+        subjectName: 'Reading Crown Court',
         pageTitle: 'Local authorities saved - Reading Crown Court',
         successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
         breadcrumbs: [
@@ -339,8 +339,8 @@ describe('CourtLocalAuthoritiesController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success.njk', {
-        courtId: COURT_ID,
-        courtName: 'Reading Crown Court',
+        subjectId: COURT_ID,
+        subjectName: 'Reading Crown Court',
         pageTitle: 'Local authorities saved - Reading Crown Court',
         successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
         breadcrumbs: [

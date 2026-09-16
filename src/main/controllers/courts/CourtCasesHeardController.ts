@@ -81,11 +81,11 @@ export default class CourtCasesHeardController extends BaseController {
         saveResult.viewModel.courtName,
         'Cases heard saved'
       ),
-      courtId: resolvedCourtId,
+      subjectId: resolvedCourtId,
       pageTitle: `Cases heard saved - ${saveResult.viewModel.courtName}`,
       successPanelTitle: 'Cases heard saved',
       successPanelBody: `Cases heard for ${saveResult.viewModel.courtName} have been saved successfully.`,
-      courtName: saveResult.viewModel.courtName,
+      subjectName: saveResult.viewModel.courtName,
     });
   }
 

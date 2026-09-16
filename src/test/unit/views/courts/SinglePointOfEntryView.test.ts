@@ -43,8 +43,8 @@ describe('Single point of entry view', () => {
 
   test('renders success page navigation links', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId,
-      courtName: 'Reading Crown Court',
+      subjectId: courtId,
+      subjectName: 'Reading Crown Court',
       pageTitle: 'Single points of entry saved - Reading Crown Court',
       successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
       breadcrumbs: [...breadcrumbs, { href: '#', text: 'Single points of entry saved' }],

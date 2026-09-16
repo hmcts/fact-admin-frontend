@@ -167,7 +167,7 @@ describe('CourtAccessibilityController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'common-edit-success',
         expect.objectContaining({
-          courtId: req.params.courtId,
+          subjectId: req.params.courtId,
           pageTitle: 'Accessibility saved - Court A',
         })
       );

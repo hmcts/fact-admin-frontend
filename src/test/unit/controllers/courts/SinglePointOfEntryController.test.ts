@@ -172,8 +172,8 @@ describe('CourtSinglePointOfEntryController', () => {
           .once()
           .withArgs('common-edit-success.njk', {
             breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
-            courtId: COURT_ID,
-            courtName: 'Reading Crown Court',
+            subjectId: COURT_ID,
+            subjectName: 'Reading Crown Court',
             pageTitle: 'Single points of entry saved - Reading Crown Court',
             successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
           });
@@ -197,8 +197,8 @@ describe('CourtSinglePointOfEntryController', () => {
           .once()
           .withArgs('common-edit-success.njk', {
             breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
-            courtId: COURT_ID,
-            courtName: 'Reading Crown Court',
+            subjectId: COURT_ID,
+            subjectName: 'Reading Crown Court',
             pageTitle: 'Single points of entry saved - Reading Crown Court',
             successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
           });

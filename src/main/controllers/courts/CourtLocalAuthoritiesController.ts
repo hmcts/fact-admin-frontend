@@ -73,8 +73,8 @@ export default class CourtLocalAuthoritiesController extends BaseController {
         saveResult.courtName,
         'Local authorities saved'
       ),
-      courtId: resolvedCourtId,
-      courtName: saveResult.courtName,
+      subjectId: resolvedCourtId,
+      subjectName: saveResult.courtName,
       pageTitle: `Local authorities saved - ${saveResult.courtName}`,
       successPanelTitle: `Local authority settings for ${saveResult.courtName} have been successfully updated`,
     });

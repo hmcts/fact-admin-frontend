@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
 import ServiceCentreAddressController from '../../../../main/controllers/service-centres/ServiceCentreAddressController';
+import { SubjectType } from '../../../../main/schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../../../../main/services/service-centres/ServiceCentreAddressService';
 import * as addressValidation from '../../../../main/utils/addressValidation';
 import { mockRequest } from '../../mocks/mockRequest';
@@ -936,8 +937,9 @@ describe('ServiceCentreAddressController', () => {
         'common-edit-success.njk',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.courtId === SERVICE_CENTRE_ID &&
-            viewModel.courtName === 'Reading Service Centre' &&
+            viewModel.subjectId === SERVICE_CENTRE_ID &&
+            viewModel.subjectName === 'Reading Service Centre' &&
+            viewModel.subjectType === SubjectType.SERVICE_CENTRE &&
             viewModel.pageTitle === 'Address saved - Reading Service Centre'
           );
         })
@@ -1535,8 +1537,9 @@ describe('ServiceCentreAddressController', () => {
         'common-edit-success.njk',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.courtId === SERVICE_CENTRE_ID &&
-            viewModel.courtName === 'Reading Service Centre' &&
+            viewModel.subjectId === SERVICE_CENTRE_ID &&
+            viewModel.subjectName === 'Reading Service Centre' &&
+            viewModel.subjectType === SubjectType.SERVICE_CENTRE &&
             viewModel.pageTitle === 'Address deleted - Reading Service Centre'
           );
         })

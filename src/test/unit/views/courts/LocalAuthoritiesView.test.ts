@@ -121,8 +121,8 @@ describe('Local Authorities View', () => {
 
   test('renders local authorities success page navigation links', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId,
-      courtName,
+      subjectId: courtId,
+      subjectName: courtName,
       pageTitle: `Local authorities saved - ${courtName}`,
       successPanelTitle: `Local authority settings for ${courtName} have been successfully updated`,
       pagePath: `/courts/${courtId}/edit/local-authorities/success`,

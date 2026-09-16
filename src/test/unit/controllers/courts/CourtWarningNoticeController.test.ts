@@ -172,7 +172,8 @@ describe('CourtWarningNoticeController', () => {
     await controller.post(request, response);
 
     const expectedViewModel = {
-      ...viewModel,
+      subjectId: courtId,
+      subjectName: viewModel.courtName,
       pageTitle: 'Warning notice saved',
       successPanelTitle: 'Warning notice saved',
       successPanelBody: `Warning notice for ${viewModel.courtName} has been successfully updated.`,

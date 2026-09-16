@@ -232,11 +232,11 @@ describe('CourtCasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success', {
-        courtId: '11111111-1111-4111-8111-111111111111',
+        subjectId: '11111111-1111-4111-8111-111111111111',
         pageTitle: 'Cases heard saved - Reading Crown Court',
         successPanelTitle: 'Cases heard saved',
         successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
-        courtName: 'Reading Crown Court',
+        subjectName: 'Reading Crown Court',
         breadcrumbs: buildCasesHeardBreadcrumbs(
           '11111111-1111-4111-8111-111111111111',
           'Reading Crown Court',
@@ -477,11 +477,11 @@ describe('CourtCasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success', {
-        courtId: '11111111-1111-4111-8111-111111111111',
+        subjectId: '11111111-1111-4111-8111-111111111111',
         pageTitle: 'Cases heard saved - Reading Crown Court',
         successPanelTitle: 'Cases heard saved',
         successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
-        courtName: 'Reading Crown Court',
+        subjectName: 'Reading Crown Court',
         breadcrumbs: buildCasesHeardBreadcrumbs(
           '11111111-1111-4111-8111-111111111111',
           'Reading Crown Court',

@@ -310,8 +310,9 @@ export default class ServiceCentreAddressController extends BaseController {
     const successMessage = `Addresses for ${saveResult.serviceCentreName} have been successfully updated.`;
     res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
-      courtId: serviceCentreId,
-      courtName: saveResult.serviceCentreName,
+      subjectId: serviceCentreId,
+      subjectName: saveResult.serviceCentreName,
+      subjectType: SubjectType.SERVICE_CENTRE,
       pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
       successPanelTitle: `Address saved: ${this.formatAddressRow(saveResult.address)}`,
       successPanelBody: saveResult.serviceCentreOpened
@@ -384,8 +385,9 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
-      courtId: serviceCentreId,
-      courtName: saveResult.serviceCentreName,
+      subjectId: serviceCentreId,
+      subjectName: saveResult.serviceCentreName,
+      subjectType: SubjectType.SERVICE_CENTRE,
       pageTitle: `Address saved - ${saveResult.serviceCentreName}`,
       successPanelTitle: `Address saved: ${this.formatAddressRow(saveResult.address)}`,
       successPanelBody: `Addresses for ${saveResult.serviceCentreName} have been successfully updated.`,
@@ -440,8 +442,9 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, deleteResult.serviceCentreName, 'Address deleted'),
-      courtId: serviceCentreId,
-      courtName: deleteResult.serviceCentreName,
+      subjectId: serviceCentreId,
+      subjectName: deleteResult.serviceCentreName,
+      subjectType: SubjectType.SERVICE_CENTRE,
       pageTitle: `Address deleted - ${deleteResult.serviceCentreName}`,
       successPanelTitle: `Address deleted: ${this.formatAddressRow(deleteResult.address)}`,
       successPanelBody: `You have removed this address for ${deleteResult.serviceCentreName}`,

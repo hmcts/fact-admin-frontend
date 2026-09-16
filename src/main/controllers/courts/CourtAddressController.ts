@@ -387,8 +387,8 @@ export class CourtAddressController extends BaseController {
     const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
     res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
-      courtName: saveResult['courtName'],
-      courtId,
+      subjectName: saveResult['courtName'],
+      subjectId: courtId,
       pageTitle: 'Address Saved',
       successPanelTitle: `Address saved: ${this.formatAddressRow(saveResult['address'] as CourtAddress)}`,
       successPanelBody: saveResult['courtOpened'] ? `${successMessage} The court is now open.` : successMessage,
@@ -505,8 +505,8 @@ export class CourtAddressController extends BaseController {
     const address = deleteResult['address'] as CourtAddress;
     res.render('common-edit-success.njk', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Address deleted'),
-      courtName: deleteResult['courtName'],
-      courtId,
+      subjectName: deleteResult['courtName'],
+      subjectId: courtId,
       pageTitle: 'Address Deleted',
       successPanelTitle: `Address deleted: ${this.formatAddressRow(address)}`,
       successPanelBody: `You have removed this address for ${deleteResult['courtName']}`,

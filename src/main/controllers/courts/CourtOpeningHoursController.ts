@@ -142,8 +142,9 @@ export default class CourtOpeningHoursController extends BaseController {
     }
 
     res.render('common-edit-success.njk', {
-      ...viewModel,
-      breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, viewModel.courtName, 'Opening hours deleted'),
+      subjectId: viewModel.courtId,
+      subjectName: viewModel.courtName,
+      breadcrumbs: this.buildOpeningHoursBreadcrumbs(viewModel.courtId, viewModel.courtName, 'Opening hours deleted'),
       pageTitle: 'Opening hours deleted',
       successPanelTitle: `Opening hours deleted: ${viewModel.openingHourType}.`,
       successPanelBody: `You have removed this opening hour for ${viewModel.courtName}.`,
@@ -180,13 +181,16 @@ export default class CourtOpeningHoursController extends BaseController {
       return this.renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
     }
 
+    const courtName = saveResult.viewModel.courtName;
+
     return res.render('common-edit-success.njk', {
-      ...saveResult.viewModel,
-      breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Opening hours saved'),
+      subjectId: saveResult.viewModel.courtId,
+      subjectName: courtName,
+      breadcrumbs: this.buildOpeningHoursBreadcrumbs(saveResult.viewModel.courtId, courtName, 'Opening hours saved'),
       pageTitle: 'Opening hours saved',
       successPanelTitle: 'Opening hours saved',
-      successPanelBody: `Opening hours for ${saveResult.viewModel.courtName} have been successfully updated.`,
-      continueUpdatingHref: `/courts/${courtId}/edit/court-opening-hours`,
+      successPanelBody: `Opening hours for ${courtName} have been successfully updated.`,
+      continueUpdatingHref: `/courts/${saveResult.viewModel.courtId}/edit/court-opening-hours`,
       continueUpdatingText: 'Back to opening hours',
     });
   }

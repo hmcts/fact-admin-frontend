@@ -80,11 +80,11 @@ export default class CourtBuildingFacilitiesController extends BaseController {
         updateResponse.name!,
         'Building facilities saved'
       ),
-      courtId: resolvedCourtId,
+      subjectId: resolvedCourtId,
       pageTitle: `Building Facilities saved - ${updateResponse.name}`,
       successPanelTitle: 'Building Facilities details saved',
       successPanelBody: `Building Facilities details for ${updateResponse.name} have been saved successfully.`,
-      courtName: updateResponse.name,
+      subjectName: updateResponse.name,
     });
   }
 

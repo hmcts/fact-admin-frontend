@@ -117,11 +117,11 @@ describe('General View', () => {
   });
   test('renders the general success page', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId,
+      subjectId: courtId,
       pageTitle: 'General saved - Reading Crown Court',
       successPanelTitle: 'General details saved',
       successPanelBody: 'General details for Reading Crown Court have been saved successfully.',
-      courtName: 'Reading Crown Court',
+      subjectName: 'Reading Crown Court',
       pagePath: `/courts/${courtId}/edit/general/success`,
     });
 

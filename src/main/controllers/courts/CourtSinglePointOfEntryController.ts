@@ -71,8 +71,8 @@ export default class CourtSinglePointOfEntryController extends BaseController {
         saveResult.courtName,
         'Single points of entry saved'
       ),
-      courtId,
-      courtName: saveResult.courtName,
+      subjectId: courtId,
+      subjectName: saveResult.courtName,
       pageTitle: `Single points of entry saved - ${saveResult.courtName}`,
       successPanelTitle: `Single points of entry settings for ${saveResult.courtName} have been successfully updated`,
     });

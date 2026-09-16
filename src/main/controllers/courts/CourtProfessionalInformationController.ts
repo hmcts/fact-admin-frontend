@@ -79,8 +79,8 @@ export default class CourtProfessionalInformationController extends BaseControll
         saveResponse.viewModel.courtName,
         'Information for professionals saved'
       ),
-      courtId,
-      courtName: saveResponse.viewModel.courtName,
+      subjectId: courtId,
+      subjectName: saveResponse.viewModel.courtName,
       pageTitle: `Information for professionals saved - ${saveResponse.viewModel.courtName}`,
       successPanelTitle: 'Information for professionals saved',
       successPanelBody: `Information for professionals for ${saveResponse.viewModel.courtName} has been saved successfully.`,
