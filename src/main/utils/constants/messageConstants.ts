@@ -268,6 +268,10 @@ export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
   },
 ] as const;
 
+// Court translation and interpretation service
+export const TELEPHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a telephone number';
+export const TELEPHONE_NUMBER_INVALID_MESSAGE = 'Enter a telephone number in the correct format';
+
 // Court warning notice service
 export const WARNING_NOTICE_MAX_LENGTH = 250;
 export const WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
@@ -289,6 +293,7 @@ export const SERVICE_CENTRE_NAME_LENGTH_ERROR = `Service centre name should be b
 export const VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE =
   'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 export const SERVICE_CENTRE_REGION_MESSAGE = 'Select a region for the service centre';
+export const SERVICE_CENTRE_REGION_INVALID_MESSAGE = 'Please specify the region for this service centre';
 export const SERVICE_CENTRE_SERVICE_AREA_MESSAGE = 'Please specify the service areas of the service centre';
 export const SERVICE_CENTRE_OPEN_MESSAGE = 'Select whether the service centre is open or closed';
 

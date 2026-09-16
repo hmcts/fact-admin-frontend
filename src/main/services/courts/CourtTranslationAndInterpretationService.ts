@@ -5,8 +5,8 @@ import { TranslationServices } from '../../schemas/translationServicesSchema';
 import {
   EMAIL_INVALID_MESSAGE,
   EMAIL_REQUIRED_MESSAGE,
-  PHONE_NUMBER_INVALID_MESSAGE,
-  PHONE_NUMBER_REQUIRED_MESSAGE,
+  TELEPHONE_NUMBER_INVALID_MESSAGE,
+  TELEPHONE_NUMBER_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from '../../utils/constants/regexConstants';
 
@@ -165,12 +165,12 @@ export class CourtTranslationAndInterpretationService {
     if (viewModel.phoneNumberSelected && !viewModel.phoneNumber) {
       errors.push({
         href: '#phoneNumber',
-        text: PHONE_NUMBER_REQUIRED_MESSAGE,
+        text: TELEPHONE_NUMBER_REQUIRED_MESSAGE,
       });
     } else if (viewModel.phoneNumber && !PHONE_NUMBER_REGEX.test(viewModel.phoneNumber)) {
       errors.push({
         href: '#phoneNumber',
-        text: PHONE_NUMBER_INVALID_MESSAGE,
+        text: TELEPHONE_NUMBER_INVALID_MESSAGE,
       });
     }
 

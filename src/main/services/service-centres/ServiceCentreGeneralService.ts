@@ -12,7 +12,7 @@ import {
   SERVICE_CENTRE_NAME_MESSAGE,
   SERVICE_CENTRE_NAME_MIN_LENGTH,
   SERVICE_CENTRE_OPEN_MESSAGE,
-  SERVICE_CENTRE_REGION_MESSAGE,
+  SERVICE_CENTRE_REGION_INVALID_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
   VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE,
 } from '../../utils/constants/messageConstants';
@@ -255,7 +255,7 @@ export class ServiceCentreGeneralService {
     }
 
     if (!model.regionId || model.regionId.length === 0 || !model.regionIds.includes(model.regionId)) {
-      errors.regionId = [SERVICE_CENTRE_REGION_MESSAGE];
+      errors.regionId = [SERVICE_CENTRE_REGION_INVALID_MESSAGE];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;

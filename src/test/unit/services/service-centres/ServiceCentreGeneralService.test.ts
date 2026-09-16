@@ -283,7 +283,7 @@ describe('ServiceCentreGeneralService', () => {
     expect(result.viewModel.errors).toEqual({
       name: ['Enter a name for the service centre'],
       open: ['Select whether the service centre is open or closed'],
-      regionId: ['Select a region for the service centre'],
+      regionId: ['Please specify the region for this service centre'],
     });
     expect(requests.updateServiceCentre).not.toHaveBeenCalled();
   });
@@ -366,7 +366,7 @@ describe('ServiceCentreGeneralService', () => {
     }
 
     expect(result.viewModel.errors).toMatchObject({
-      regionId: ['Select a region for the service centre'],
+      regionId: ['Please specify the region for this service centre'],
     });
     expect(requests.updateServiceCentre).not.toHaveBeenCalled();
   });

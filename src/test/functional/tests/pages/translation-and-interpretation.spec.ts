@@ -215,7 +215,7 @@ test.describe(
 
           await expect(translationAndInterpretationPage.mainContent.content).toContainText('There is a problem');
           await expect(translationAndInterpretationPage.mainContent.content).toContainText('Enter an email address');
-          await expect(translationAndInterpretationPage.mainContent.content).toContainText('Enter a phone number');
+          await expect(translationAndInterpretationPage.mainContent.content).toContainText('Enter a telephone number');
           await expect(translationAndInterpretationPage.emailCheckbox).toBeChecked();
           await expect(translationAndInterpretationPage.phoneNumberCheckbox).toBeChecked();
           await expect(translationAndInterpretationPage.emailInput).toBeVisible();
@@ -243,7 +243,7 @@ test.describe(
             'Enter an email address in the correct format'
           );
           await expect(translationAndInterpretationPage.mainContent.content).toContainText(
-            'Enter a phone number in the correct format'
+            'Enter a telephone number in the correct format'
           );
           await expect(translationAndInterpretationPage.emailCheckbox).toBeChecked();
           await expect(translationAndInterpretationPage.phoneNumberCheckbox).toBeChecked();

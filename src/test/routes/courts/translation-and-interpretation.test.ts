@@ -128,7 +128,7 @@ describe('Translation and interpretation page', () => {
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('Enter an email address in the correct format');
-    expect(response.text).toContain('Enter a phone number in the correct format');
+    expect(response.text).toContain('Enter a telephone number in the correct format');
     expect(saveStub.notCalled).toBe(true);
   });
 
@@ -150,7 +150,7 @@ describe('Translation and interpretation page', () => {
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('Enter an email address');
-    expect(response.text).toContain('Enter a phone number');
+    expect(response.text).toContain('Enter a telephone number');
     expect(saveStub.notCalled).toBe(true);
   });
 
