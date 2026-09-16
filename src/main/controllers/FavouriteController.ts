@@ -4,11 +4,7 @@ import { Request, Response } from 'express';
 
 import { UserApi } from '../requests/UserApi';
 import { subjectTypeSchema } from '../schemas/subjectTypeSchema';
-import {
-  SAFE_ORIGIN,
-  SAFE_RETURN_HASHES,
-  SAFE_RETURN_KEYS,
-} from '../utils/constants/messageConstants';
+import { SAFE_ORIGIN, SAFE_RETURN_HASHES, SAFE_RETURN_KEYS } from '../utils/constants/messageConstants';
 import { COURT_NAME_PATTERN } from '../utils/constants/regexConstants';
 import { isUuid } from '../utils/valueParsers';
 

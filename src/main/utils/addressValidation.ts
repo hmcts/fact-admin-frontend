@@ -17,11 +17,7 @@ import {
   TOWN_CITY_MAX_LENGTH_MESSAGE,
   TOWN_CITY_REQUIRED_MESSAGE,
 } from './constants/messageConstants';
-import {
-  JURISDICTION_ERROR_REGEXES,
-  VALID_ADDRESS_LINE_REGEX,
-  VALID_POSTCODE_REGEX,
-} from './constants/regexConstants';
+import { JURISDICTION_ERROR_REGEXES, VALID_ADDRESS_LINE_REGEX, VALID_POSTCODE_REGEX } from './constants/regexConstants';
 
 export const isValidPostcode = (value: string): boolean => {
   return validatePostcodeField(value) === undefined;
