@@ -292,7 +292,8 @@ describe('ServiceCentreGeneralController', () => {
         'common-edit-success',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.pageTitle === 'General saved - Updated Service Centre' && viewModel.subjectId === SERVICE_CENTRE_ID
+            viewModel.pageTitle === 'General saved - Updated Service Centre' &&
+            viewModel.subjectId === SERVICE_CENTRE_ID
           );
         })
       );
