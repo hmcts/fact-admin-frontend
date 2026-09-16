@@ -167,7 +167,7 @@ test.describe(
 
           await expect(serviceCentreGeneralPage.errorSummary).toBeVisible();
           await expect(serviceCentreGeneralPage.mainContent.content).toContainText(
-            'Select a region for the service centre'
+            'Please specify the region for this service centre'
           );
         }
       );
