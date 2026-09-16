@@ -2,10 +2,10 @@ import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import {
-  ENGLISH_TEXT_REGEX,
+  ENGLISH_WARNING_NOTICE_REGEX,
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
-  WELSH_TEXT_REGEX,
+  WELSH_WARNING_NOTICE_REGEX,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/variablesConstants';
 
@@ -135,7 +135,7 @@ export class ServiceCentreWarningNoticeService {
 
   private validateWarningNotice(warningNotice: string, welsh: boolean): string | undefined {
     const insert = welsh ? 'in Welsh ' : '';
-    const warningFormatRegex = welsh ? WELSH_TEXT_REGEX : ENGLISH_TEXT_REGEX;
+    const warningFormatRegex = welsh ? WELSH_WARNING_NOTICE_REGEX : ENGLISH_WARNING_NOTICE_REGEX;
     if (warningNotice.length > MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH) {
       return `Warning notice ${insert}must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`;
     } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {

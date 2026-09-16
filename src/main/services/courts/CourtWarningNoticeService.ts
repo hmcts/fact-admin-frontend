@@ -3,14 +3,14 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { isHttpStatusCode } from '../../utils/valueParsers';
 import {
-  ENGLISH_TEXT_REGEX,
+  ENGLISH_WARNING_NOTICE_REGEX,
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
   WARNING_NOTICE_MAX_LENGTH,
   WARNING_NOTICE_MAX_LENGTH_MESSAGE,
-  WELSH_TEXT_REGEX,
   WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
   WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+  WELSH_WARNING_NOTICE_REGEX,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/variablesConstants';
 
@@ -144,11 +144,11 @@ export class CourtWarningNoticeService {
       errors.warningNoticeCy = WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE;
     }
 
-    if (warningNotice && !ENGLISH_TEXT_REGEX.test(warningNotice)) {
+    if (warningNotice && !ENGLISH_WARNING_NOTICE_REGEX.test(warningNotice)) {
       errors.warningNotice = WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
     }
 
-    if (warningNoticeCy && !WELSH_TEXT_REGEX.test(warningNoticeCy)) {
+    if (warningNoticeCy && !WELSH_WARNING_NOTICE_REGEX.test(warningNoticeCy)) {
       errors.warningNoticeCy = WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
     }
 
