@@ -7,7 +7,6 @@ import {
   COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
   COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
   COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
-  EMAIL_REGEX,
   OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
   OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
   OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
@@ -15,7 +14,8 @@ import {
   OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
   OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
   OpeningHourDay,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { EMAIL_REGEX } from '../../utils/constants/regexConstants';
 
 export type CounterServiceOpeningHoursForm = {
   assistWith: string[];

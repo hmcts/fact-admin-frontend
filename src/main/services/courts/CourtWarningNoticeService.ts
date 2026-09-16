@@ -1,18 +1,17 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
-import { isHttpStatusCode } from '../../utils/valueParsers';
 import {
-  ENGLISH_WARNING_NOTICE_REGEX,
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
   WARNING_NOTICE_MAX_LENGTH,
   WARNING_NOTICE_MAX_LENGTH_MESSAGE,
   WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
   WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
-  WELSH_WARNING_NOTICE_REGEX,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
+import { isHttpStatusCode } from '../../utils/valueParsers';
 
 export type WarningNoticeForm = {
   warningNotice?: string;

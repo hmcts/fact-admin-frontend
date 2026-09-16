@@ -1,5 +1,4 @@
 import { GetUsersParams } from '../requests/types/GetUsersParams';
-import { parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
@@ -10,12 +9,13 @@ import {
   PAGE_SIZE_MAX_ERROR,
   PAGE_SIZE_MIN_ERROR,
   SEARCH_MAX_LENGTH,
-  SEARCH_REGEX,
   SORT_ORDER_WITHOUT_SORT_BY_ERROR,
   USERS_PAGE_SEARCH_VALIDATION_ERROR,
   VALID_SORT_BY_LAST_LOGIN_VALUES,
   VALID_SORT_ORDER_VALUES,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
+import { SEARCH_REGEX } from '../utils/constants/regexConstants';
+import { parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
 
 import { UsersPageFilters, UsersPageValidationError } from './types/UsersPage.types';
 

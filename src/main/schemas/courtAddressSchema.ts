@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ADDRESS_TYPE } from '../utils/variablesConstants';
+import { ADDRESS_TYPE } from '../utils/constants/messageConstants';
 
 export const courtAddressSchema = z.object({
   id: z.string().nullable(),

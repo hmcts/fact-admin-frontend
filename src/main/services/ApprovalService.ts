@@ -2,8 +2,8 @@ import { HttpStatusCode } from 'axios';
 
 import { OperationsApi } from '../requests/OperationsApi';
 import { ApprovalStatus, ApprovalSubjectType } from '../schemas/approvalSchema';
+import { APPROVAL_DATE_FORMAT } from '../utils/constants/messageConstants';
 import { toUkDateTimeString } from '../utils/valueParsers';
-import { APPROVAL_DATE_FORMAT } from '../utils/variablesConstants';
 
 export type ApprovalTrackerRow = {
   approvalId: string;

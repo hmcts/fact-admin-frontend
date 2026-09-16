@@ -6,7 +6,7 @@ import { CourtAddressController } from '../../../../main/controllers/courts/Cour
 import { CourtAddress, CourtAddressType } from '../../../../main/schemas/courtAddressSchema';
 import { TypesService } from '../../../../main/services/TypesService';
 import { CourtAddressService } from '../../../../main/services/courts/CourtAddressService';
-import { POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/variablesConstants';
+import { POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/constants/messageConstants';
 import { mockRequest } from '../../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';

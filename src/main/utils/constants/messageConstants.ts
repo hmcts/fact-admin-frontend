@@ -35,7 +35,6 @@ export const DEFAULT_PAGE_SIZE = 25;
 export const MAX_PAGE_PARAM = 1000;
 export const CSV_PAGE_SIZE = 1000;
 export const MAX_CSV_PAGES = 1;
-export const EMAIL_PARTIAL_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 export const PAGE_NUMBER_MIN = 0;
 export const PAGE_NUMBER_MAX = 100000;
 export const PAGE_NUMBER_RANGE_ERROR = `Page number must be between ${PAGE_NUMBER_MIN} and ${PAGE_NUMBER_MAX}`;
@@ -94,7 +93,6 @@ export const FACILITY_LABELS = {
 
 // Home page filters service
 export const DEFAULT_SORT_ORDER = 'asc';
-export const PARTIAL_COURT_NAME_REGEX = /^[A-Za-z&'()\- ]*$/;
 export const PARTIAL_COURT_NAME_ERROR =
   'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.';
 export const VALID_SORT_BY_VALUES = ['lastUpdated', 'name'] as const;
@@ -128,7 +126,6 @@ export const SORT_ICON_PATHS = {
 
 // Users page filters service
 export const SEARCH_MAX_LENGTH = 250;
-export const SEARCH_REGEX = /^[A-Za-z0-9._+\-@]*$/;
 export const VALID_SORT_BY_LAST_LOGIN_VALUES = ['lastLogin'] as const;
 export const USERS_PAGE_SEARCH_VALIDATION_ERROR =
   'Search must only include letters, numbers, @ symbols, dots, underscores, plus signs and hyphens.';
@@ -137,7 +134,6 @@ export const USERS_PAGE_SEARCH_VALIDATION_ERROR =
 export const UK_TIME_ZONE = 'Europe/London';
 
 // Add court service
-export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 export const COURT_NAME_MIN_LENGTH = 5;
 export const COURT_NAME_MAX_LENGTH = 200;
 export const COURT_NAME_LENGTH_ERROR = `Court name should be between ${COURT_NAME_MIN_LENGTH} and ${COURT_NAME_MAX_LENGTH} characters`;
@@ -149,7 +145,6 @@ export const COURT_OPEN_MESSAGE = 'Select whether the court is open or closed';
 export const COURT_ALREADY_EXISTS_MESSAGE = 'A court with the entered name already exists';
 
 //Court address service
-export const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
 export const COURT_ADDRESS_TYPE_REQUIRED_MESSAGE = 'Select an address type';
 export const COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE =
   'Please select between 1 and 5 areas of law that this address is relevant for';
@@ -175,8 +170,6 @@ export const COURT_BUILDING_FACILITIES_WAITING_AREA_CHILDREN_REQUIRED_MESSAGE =
 export const AREA_OF_LAW_VALIDATION_MESSAGE = 'Select at least one type of case heard at this court.';
 
 // Court counter service opening hours service
-export const EMAIL_REGEX =
-  /^[A-Za-z0-9_+~-]+(?:\.[A-Za-z0-9_+~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
 export const COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE = 'Select what the counter can assist with';
 export const COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE = 'Select yes if an appointment is needed';
 export const COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter a valid contact email address';
@@ -184,9 +177,6 @@ export const COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
   'Select whether the counter opens and closes at the same time Monday to Friday';
 
 // Court contact details service
-export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
-export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+]+$/;
-export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+]+$/u;
 export const MAX_EXPLANATION_LENGTH = 250;
 export const CONTACT_TYPE_REQUIRED_MESSAGE = 'Select a contact type';
 export const CONTACT_METHOD_REQUIRED_MESSAGE = 'Select at least one contact method';
@@ -242,9 +232,6 @@ export const OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
 
 // Court professional information service
 export const MAX_REPEATABLE_ENTRIES = 5;
-export const INTEGER_REGEX = /^\d+$/;
-export const PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
-export const PROFESSIONAL_INFO_WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 ()':,\-;.]+$/u;
 export const DX_CODE_MAX_LENGTH = 200;
 export const REPEATABLE_DESCRIPTION_MAX_LENGTH = 250;
 export const INTERVIEW_ROOM_COUNT_REQUIRED_ERROR = 'Enter the number of interview rooms';
@@ -283,8 +270,6 @@ export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
 
 // Court warning notice service
 export const WARNING_NOTICE_MAX_LENGTH = 250;
-export const ENGLISH_WARNING_NOTICE_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+\s]+$/;
-export const WELSH_WARNING_NOTICE_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+\s]+$/u;
 export const WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Welsh warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
@@ -297,7 +282,6 @@ export const WELSH_WARNING_NOTICE_REQUIRED_MESSAGE =
   'Because you provided a warning notice in English, the Welsh translation is now mandatory';
 
 // Add service centre service
-export const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
 export const SERVICE_CENTRE_NAME_MIN_LENGTH = 5;
 export const SERVICE_CENTRE_NAME_MAX_LENGTH = 200;
 export const SERVICE_CENTRE_NAME_MESSAGE = 'Enter a name for the service centre';
@@ -338,7 +322,6 @@ export const SAFE_RETURN_KEYS = new Set([
   'tab',
 ]);
 export const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
-export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 
 // Schemas
 export const SUBJECT_TYPE = z.enum(['COURT', 'SERVICE_CENTRE']);
@@ -346,8 +329,6 @@ export const ADDRESS_TYPE = z.enum(['VISIT_US', 'WRITE_TO_US', 'VISIT_OR_CONTACT
 export const CATCHMENT_TYPE = z.enum(['LOCAL', 'NATIONAL', 'REGIONAL']);
 
 // Court accessibility validation Config
-export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
-export const TOILET_DESC_REGEX_WELSH = /^[\p{L}0-9 ()':,\-;.]+$/u;
 export const MIN_LIFT_DOOR_WIDTH_CM = 1;
 export const MAX_LIFT_DOOR_WIDTH_CM = 1000;
 export const MIN_LIFT_WEIGHT_LIMIT_KG = 1;
@@ -382,8 +363,6 @@ export const COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE =
   'Select what hearing enhancement equipment is available';
 
 // Address validation
-export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
-export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,.-]+$/i;
 export const ADDRESS_LINE_MAX_LENGTH = 255;
 export const TOWN_CITY_MAX_LENGTH = 100;
 export const COUNTY_MAX_LENGTH = 100;
@@ -401,12 +380,7 @@ export const TOWN_CITY_INVALID_CHARACTERS_MESSAGE =
 export const COUNTY_MAX_LENGTH_MESSAGE = `County must be ${COUNTY_MAX_LENGTH} characters or less`;
 export const COUNTY_INVALID_CHARACTERS_MESSAGE =
   'County must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
-export const JURISDICTION_ERROR_REGEXES = {
-  northernIrelandPostcode: /^(BT)/i,
-  guernseyPostcode: /^(GY)/i,
-  jerseyPostcode: /^(JE)/i,
-  isleOfManPostcode: /^(IM)/i,
-};
+
 export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
   blankPostcode: 'Enter a postcode',
   invalidPostcode: 'Postcode format is invalid',
@@ -415,6 +389,3 @@ export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
   jerseyPostcode: 'Jersey postcodes are not supported for this service',
   isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
 };
-
-// Value parsers
-export const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;

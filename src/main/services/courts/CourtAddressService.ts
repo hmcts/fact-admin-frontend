@@ -11,8 +11,6 @@ import {
   validatePostcodeField,
   validateTownCityField,
 } from '../../utils/addressValidation';
-import { buildOsAddressOptions } from '../../utils/osAddressOptions';
-import { addError } from '../../utils/validation';
 import {
   COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE,
   COURT_ADDRESS_COURT_TYPES_REQUIRED_MESSAGE,
@@ -21,8 +19,10 @@ import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
   EPIM_ID_MAX_LENGTH_MESSAGE,
   EPIM_ID_REGEX_MESSAGE,
-  VALID_EPIM_ID_REGEX,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { VALID_EPIM_ID_REGEX } from '../../utils/constants/regexConstants';
+import { buildOsAddressOptions } from '../../utils/osAddressOptions';
+import { addError } from '../../utils/validation';
 
 export type SaveCourtAddressResponse =
   | {

@@ -12,7 +12,7 @@ import {
   HOME_PAGE_FAVOURITE_STATUS_ERROR_MESSAGE,
   HOME_PAGE_REGIONS_AND_COURTS_LOAD_ERROR_MESSAGE,
   HOME_PAGE_REGIONS_LOAD_ERROR_MESSAGE,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
 
 import { HomePageFiltersService } from './HomePageFiltersService';
 import { HomePageViewService, buildFavouriteKey } from './HomePageViewService';

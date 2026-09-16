@@ -7,7 +7,7 @@ import {
   HOME_PAGE_TITLE,
   PUBLIC_FRONTEND_URL,
   SORT_ICON_PATHS,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
 
 import {
   HomePageFilters,

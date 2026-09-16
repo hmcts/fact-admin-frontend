@@ -1,4 +1,4 @@
-import { SUBJECT_TYPE } from '../utils/variablesConstants';
+import { SUBJECT_TYPE } from '../utils/constants/messageConstants';
 
 export const subjectTypeSchema = SUBJECT_TYPE;
 export const SubjectType = subjectTypeSchema.enum;

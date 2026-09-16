@@ -2,12 +2,11 @@ import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import {
-  ENGLISH_WARNING_NOTICE_REGEX,
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
-  WELSH_WARNING_NOTICE_REGEX,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
 
 export type ServiceCentreWarningNoticeViewModel = {
   errors?: Record<string, string[]>;

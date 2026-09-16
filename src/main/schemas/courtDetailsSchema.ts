@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ADDRESS_TYPE, CATCHMENT_TYPE } from '../utils/variablesConstants';
+import { ADDRESS_TYPE, CATCHMENT_TYPE } from '../utils/constants/messageConstants';
 
 import { areaOfLawSchema } from './areaOfLawSchema';
 import { courtAddressSchema } from './courtAddressSchema';

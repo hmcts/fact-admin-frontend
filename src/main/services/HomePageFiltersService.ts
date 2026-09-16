@@ -1,6 +1,5 @@
 import { GetCourtsParams } from '../requests/types/GetCourtsParams';
 import { Region } from '../schemas/regionSchema';
-import { isUuid, parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
@@ -17,11 +16,12 @@ import {
   PAGE_SIZE_MAX_ERROR,
   PAGE_SIZE_MIN_ERROR,
   PARTIAL_COURT_NAME_ERROR,
-  PARTIAL_COURT_NAME_REGEX,
   SORT_ORDER_WITHOUT_SORT_BY_ERROR,
   VALID_SORT_BY_VALUES,
   VALID_SORT_ORDER_VALUES,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
+import { PARTIAL_COURT_NAME_REGEX } from '../utils/constants/regexConstants';
+import { isUuid, parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
 
 import { HomePageFilters, HomePageValidationError } from './types/HomePage.types';
 

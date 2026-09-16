@@ -1,5 +1,5 @@
 import { isValidPostcode, validatePostcodeField } from '../../../main/utils/addressValidation';
-import { POSTCODE_ERROR_MESSAGES } from '../../../main/utils/variablesConstants';
+import { POSTCODE_ERROR_MESSAGES } from '../../../main/utils/constants/messageConstants';
 
 describe('AddressValidation', () => {
   test('returns postcode validation messages and boolean validity', () => {

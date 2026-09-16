@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../../schemas/areaOfLawSchema';
-import { AREA_OF_LAW_VALIDATION_MESSAGE } from '../../utils/variablesConstants';
+import { AREA_OF_LAW_VALIDATION_MESSAGE } from '../../utils/constants/messageConstants';
 
 export type CasesHeardViewModel = {
   areasOfLawError?: string;

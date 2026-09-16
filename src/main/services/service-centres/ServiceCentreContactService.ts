@@ -5,16 +5,15 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
-import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
-import { parseString } from '../../utils/valueParsers';
 import {
   CONTACT_TYPE_REQUIRED_MESSAGE,
-  ENGLISH_TEXT_REGEX,
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   MAX_EXPLANATION_LENGTH,
-  WELSH_TEXT_REGEX,
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
+import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
+import { parseString } from '../../utils/valueParsers';
 
 export type ServiceCentreContactFormValues = {
   contactEmail: string;

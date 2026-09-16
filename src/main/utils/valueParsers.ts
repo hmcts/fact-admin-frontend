@@ -1,7 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import moment from 'moment-timezone';
 
-import { ISO_DATE_REGEX, UI_DATE_FORMAT, UK_TIME_ZONE } from './variablesConstants';
+import { UI_DATE_FORMAT, UK_TIME_ZONE } from './constants/messageConstants';
+import { ISO_DATE_REGEX } from './constants/regexConstants';
 
 /**
  * Parses an integer-like value, falling back when the value is invalid.

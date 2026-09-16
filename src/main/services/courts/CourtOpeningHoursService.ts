@@ -15,7 +15,7 @@ import {
   OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE,
   OPENING_HOUR_TYPE_REQUIRED_MESSAGE,
   OpeningHourDay,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
 
 export type OpeningHoursForm = {
   openingHourTypeId?: string;

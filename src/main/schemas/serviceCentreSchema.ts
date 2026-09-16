@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CATCHMENT_TYPE } from '../utils/variablesConstants';
+import { CATCHMENT_TYPE } from '../utils/constants/messageConstants';
 
 export const serviceCentreSchema = z.object({
   catchmentType: CATCHMENT_TYPE.nullable().optional(),

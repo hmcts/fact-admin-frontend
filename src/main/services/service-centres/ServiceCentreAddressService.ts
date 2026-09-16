@@ -11,13 +11,13 @@ import {
   validatePostcodeField,
   validateTownCityField,
 } from '../../utils/addressValidation';
-import { buildOsAddressOptions } from '../../utils/osAddressOptions';
-import { addError } from '../../utils/validation';
 import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
   SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE,
   SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { buildOsAddressOptions } from '../../utils/osAddressOptions';
+import { addError } from '../../utils/validation';
 
 export type SaveServiceCentreAddressResponse =
   | {

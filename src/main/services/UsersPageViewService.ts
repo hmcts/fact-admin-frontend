@@ -1,6 +1,11 @@
 import { PagedUsers } from '../schemas/userListSchema';
 import type { User } from '../schemas/userSchema';
-import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, SORT_ICON_PATHS, UK_TIME_ZONE } from '../utils/variablesConstants';
+import {
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  SORT_ICON_PATHS,
+  UK_TIME_ZONE,
+} from '../utils/constants/messageConstants';
 
 import {
   UsersPageFilters,

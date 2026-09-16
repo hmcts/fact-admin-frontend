@@ -4,12 +4,11 @@ import { CourtApi } from '../../requests/CourtApi';
 import { TranslationServices } from '../../schemas/translationServicesSchema';
 import {
   EMAIL_INVALID_MESSAGE,
-  EMAIL_REGEX,
   EMAIL_REQUIRED_MESSAGE,
   PHONE_NUMBER_INVALID_MESSAGE,
-  PHONE_NUMBER_REGEX,
   PHONE_NUMBER_REQUIRED_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from '../../utils/constants/regexConstants';
 
 export type TranslationAndInterpretationForm = {
   contactMethods?: string | string[];

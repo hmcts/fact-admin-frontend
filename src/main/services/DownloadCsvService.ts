@@ -8,7 +8,7 @@ import {
   CSV_HEADERS,
   FACILITY_LABELS,
   PUBLIC_FRONTEND_URL,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
 
 export type CsvDownload = {
   csv: string;

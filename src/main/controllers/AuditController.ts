@@ -8,6 +8,7 @@ import { Logger } from '../modules/logging';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { AuditFilterCategoriesService } from '../services/AuditFilterCategoriesService';
 import { AuditListViewModel, AuditService } from '../services/AuditService';
+import { UI_DATE_FORMAT } from '../utils/constants/messageConstants';
 import {
   isUuid,
   parseDate,
@@ -18,7 +19,6 @@ import {
   toMojDateString,
   toUkDateTimeString,
 } from '../utils/valueParsers';
-import { UI_DATE_FORMAT } from '../utils/variablesConstants';
 
 import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';

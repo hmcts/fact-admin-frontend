@@ -4,7 +4,8 @@ import {
   EMAIL_REQUIRED_MESSAGE,
   PHONE_NUMBER_INVALID_MESSAGE,
   PHONE_NUMBER_REQUIRED_MESSAGE,
-} from './variablesConstants';
+} from './constants/messageConstants';
+import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from './constants/regexConstants';
 
 export type ContactValidationError = {
   href: string;
@@ -16,9 +17,6 @@ export type ContactFormErrors = {
   contactMethods?: string;
   contactTelephone?: string;
 };
-
-const emailPattern = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const phoneNumberPattern = /^(?:\+44)?[0-9 ]{10,20}$/;
 
 export const validateContactDetailsMethods = (
   selectedContactMethods: string[],
@@ -36,7 +34,7 @@ export const validateContactDetailsMethods = (
     if (!contactEmail) {
       formErrors.contactEmail = EMAIL_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
-    } else if (!emailPattern.test(contactEmail)) {
+    } else if (!EMAIL_REGEX.test(contactEmail)) {
       formErrors.contactEmail = EMAIL_INVALID_MESSAGE;
       errorSummary.push({ href: '#contact-email', text: formErrors.contactEmail });
     }
@@ -46,7 +44,7 @@ export const validateContactDetailsMethods = (
     if (!contactTelephone) {
       formErrors.contactTelephone = PHONE_NUMBER_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
-    } else if (!phoneNumberPattern.test(contactTelephone)) {
+    } else if (!PHONE_NUMBER_REGEX.test(contactTelephone)) {
       formErrors.contactTelephone = PHONE_NUMBER_INVALID_MESSAGE;
       errorSummary.push({ href: '#contact-telephone', text: formErrors.contactTelephone });
     }

@@ -5,20 +5,19 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
-import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
-import { parseString } from '../../utils/valueParsers';
 import {
   CONTACT_TYPE_REQUIRED_MESSAGE,
   COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
   COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
   COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-  ENGLISH_TEXT_REGEX,
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   MAX_EXPLANATION_LENGTH,
-  WELSH_TEXT_REGEX,
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
+import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
+import { parseString } from '../../utils/valueParsers';
 
 export type CourtContactFormValues = {
   contactEmail: string;

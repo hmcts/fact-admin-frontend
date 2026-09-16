@@ -10,9 +10,9 @@ import {
   COURT_NAME_MESSAGE,
   COURT_NAME_MIN_LENGTH,
   COURT_REGION_MESSAGE,
-  VALID_COURT_NAME_REGEX,
   VALID_COURT_NAME_REGEX_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { VALID_COURT_NAME_REGEX } from '../../utils/constants/regexConstants';
 
 type AddCourtForm = {
   name?: string;

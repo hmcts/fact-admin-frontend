@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { SUBJECT_TYPE } from '../utils/variablesConstants';
+import { SUBJECT_TYPE } from '../utils/constants/messageConstants';
 
 import { pageMetadataSchema } from './pagedMetadataSchema';
 

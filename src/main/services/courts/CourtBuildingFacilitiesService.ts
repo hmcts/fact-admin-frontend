@@ -3,7 +3,6 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { UpdateBuildingFacilitiesRequest } from '../../requests/types/UpdateBuildingFacilitiesRequest';
 import { BuildingFacilities } from '../../schemas/buildingFacilitiesSchema';
-import { validateBooleanField } from '../../utils/validation';
 import {
   COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE,
   COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE,
@@ -11,7 +10,8 @@ import {
   COURT_BUILDING_FACILITIES_WAITING_AREA_CHILDREN_REQUIRED_MESSAGE,
   COURT_BUILDING_FACILITIES_WAITING_AREA_REQUIRED_MESSAGE,
   COURT_BUILDING_FACILITIES_WIFI_REQUIRED_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { validateBooleanField } from '../../utils/validation';
 
 export type FacilityModel = Partial<BuildingFacilities> & { errors?: Record<string, string[]> } & { name?: string };
 

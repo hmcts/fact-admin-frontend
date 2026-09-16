@@ -15,16 +15,18 @@ import {
   FAX_NUMBER_WELSH_DESCRIPTION_WITHOUT_NUMBER_MESSAGE,
   FAX_NUMBER_WELSH_TRANSLATION_REQUIRED_MESSAGE,
   GBS_VALIDATION_ERROR,
-  INTEGER_REGEX,
   INTERVIEW_ROOM_COUNT_ERROR,
   INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR,
   INTERVIEW_ROOM_COUNT_REQUIRED_ERROR,
   MAX_REPEATABLE_ENTRIES,
+  REPEATABLE_DESCRIPTION_MAX_LENGTH,
+} from '../../utils/constants/messageConstants';
+import {
+  INTEGER_REGEX,
   PHONE_NUMBER_REGEX,
   PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
   PROFESSIONAL_INFO_WELSH_TEXT_REGEX,
-  REPEATABLE_DESCRIPTION_MAX_LENGTH,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/regexConstants';
 
 type CourtCodeField = 'magistrateCourtCode' | 'familyCourtCode' | 'tribunalCode' | 'countyCourtCode' | 'crownCourtCode';
 

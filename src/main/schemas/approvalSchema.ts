@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { SUBJECT_TYPE } from '../utils/variablesConstants';
+import { SUBJECT_TYPE } from '../utils/constants/messageConstants';
 
 const approvalUserSchema = z.object({
   email: z.email().nullable().optional(),

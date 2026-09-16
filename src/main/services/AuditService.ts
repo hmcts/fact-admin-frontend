@@ -15,7 +15,6 @@ import {
   CSV_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
-  EMAIL_PARTIAL_REGEX,
   EMAIL_PARTIAL_REGEX_ERROR,
   FROM_DATE_AFTER_TO_DATE_MESSAGE,
   FROM_DATE_INVALID_MESSAGE,
@@ -28,7 +27,8 @@ import {
   PAGE_SIZE_MIN,
   PAGE_SIZE_RANGE_ERROR,
   TO_DATE_BEFORE_FROM_DATE_MESSAGE,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
+import { EMAIL_PARTIAL_REGEX } from '../utils/constants/regexConstants';
 
 const logger = Logger.getLogger('audit-service');
 

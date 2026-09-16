@@ -1,7 +1,6 @@
 // eslint-disable-next-line import/namespace
 import type { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
 
-import { Rule, addError, patternRule, validateBooleanField } from './validation';
 import {
   COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE,
@@ -27,10 +26,9 @@ import {
   MAX_LIFT_WEIGHT_LIMIT_KG,
   MIN_LIFT_DOOR_WIDTH_CM,
   MIN_LIFT_WEIGHT_LIMIT_KG,
-  PHONE_NUMBER_REGEX,
-  TOILET_DESC_REGEX,
-  TOILET_DESC_REGEX_WELSH,
-} from './variablesConstants';
+} from './constants/messageConstants';
+import { PHONE_NUMBER_REGEX, TOILET_DESC_REGEX, TOILET_DESC_REGEX_WELSH } from './constants/regexConstants';
+import { Rule, addError, patternRule, validateBooleanField } from './validation';
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);

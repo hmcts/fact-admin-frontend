@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtSinglePointOfEntryList } from '../../schemas/courtSinglePointOfEntrySchema';
-import { SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES } from '../../utils/variablesConstants';
+import { SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES } from '../../utils/constants/messageConstants';
 
 export type SinglePointOfEntryServiceSelection = {
   areaOfLawId: string;

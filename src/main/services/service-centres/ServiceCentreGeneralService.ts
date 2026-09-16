@@ -6,6 +6,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
+import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/constants/regexConstants';
 import {
   SERVICE_CENTRE_NAME_LENGTH_ERROR,
   SERVICE_CENTRE_NAME_MAX_LENGTH,
@@ -14,9 +15,8 @@ import {
   SERVICE_CENTRE_OPEN_MESSAGE,
   SERVICE_CENTRE_REGION_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
-  VALID_SERVICE_CENTRE_NAME_REGEX,
   VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
 
 type ServiceAreaCheckboxItem = {
   checked: boolean;

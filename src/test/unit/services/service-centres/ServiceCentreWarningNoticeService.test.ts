@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 
 import { ServiceCentreApi } from '../../../../main/requests/ServiceCentreApi';
 import { ServiceCentreWarningNoticeService } from '../../../../main/services/service-centres/ServiceCentreWarningNoticeService';
-import { MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH } from '../../../../main/utils/variablesConstants';
+import { MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH } from '../../../../main/utils/constants/messageConstants';
 
 describe('ServiceCentreWarningNoticeService', () => {
   const serviceCentreId = '22222222-2222-4222-8222-222222222222';

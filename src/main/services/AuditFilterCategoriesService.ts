@@ -1,10 +1,10 @@
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
-import { hasValue, parseDate, toJsDateString } from '../utils/valueParsers';
 import {
   AUDIT_FILTER_CATEGORY_LABELS,
   AUDIT_FILTER_ITEM_LABELS,
   INCLUDED_AUDIT_FILTER_CATEGORIES,
-} from '../utils/variablesConstants';
+} from '../utils/constants/messageConstants';
+import { hasValue, parseDate, toJsDateString } from '../utils/valueParsers';
 
 export type FilterCategory = {
   heading: { text: string };

@@ -12,9 +12,9 @@ import {
   SERVICE_CENTRE_NAME_MIN_LENGTH,
   SERVICE_CENTRE_REGION_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
-  VALID_SERVICE_CENTRE_NAME_REGEX,
   VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE,
-} from '../../utils/variablesConstants';
+} from '../../utils/constants/messageConstants';
+import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/constants/regexConstants';
 
 type AddServiceCentreForm = {
   name?: string;
