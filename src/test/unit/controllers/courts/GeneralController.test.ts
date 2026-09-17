@@ -30,7 +30,7 @@ describe('CourtGeneralController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('general-edit', {
+      .withArgs('court-general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
@@ -213,7 +213,7 @@ describe('CourtGeneralController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('general-edit', {
+      .withArgs('court-general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit bob' },
@@ -259,11 +259,11 @@ describe('CourtGeneralController', () => {
           { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
           { href: '#', text: 'General saved' },
         ],
-        courtId: '11111111-1111-4111-8111-111111111111',
+        subjectId: '11111111-1111-4111-8111-111111111111',
         pageTitle: 'General saved - Reading Crown Court',
         successPanelTitle: 'General details saved',
         successPanelBody: 'General details for Reading Crown Court have been saved successfully.',
-        courtName: 'Reading Crown Court',
+        subjectName: 'Reading Crown Court',
       });
 
     try {
@@ -302,7 +302,7 @@ describe('CourtGeneralController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('general-edit', {
+      .withArgs('court-general-edit', {
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },

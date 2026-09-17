@@ -91,7 +91,7 @@ describe('CourtCasesHeardController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('cases-heard', {
+      .withArgs('court-cases-heard', {
         ...viewModel,
         breadcrumbs: buildCasesHeardBreadcrumbs('11111111-1111-4111-8111-111111111111', 'Reading Crown Court'),
       });
@@ -232,11 +232,11 @@ describe('CourtCasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success', {
-        courtId: '11111111-1111-4111-8111-111111111111',
+        subjectId: '11111111-1111-4111-8111-111111111111',
         pageTitle: 'Cases heard saved - Reading Crown Court',
         successPanelTitle: 'Cases heard saved',
         successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
-        courtName: 'Reading Crown Court',
+        subjectName: 'Reading Crown Court',
         breadcrumbs: buildCasesHeardBreadcrumbs(
           '11111111-1111-4111-8111-111111111111',
           'Reading Crown Court',
@@ -343,7 +343,7 @@ describe('CourtCasesHeardController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('cases-heard-confirm', {
+      .withArgs('court-cases-heard-confirm', {
         cancelHref: '/courts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/edit/cases-heard',
         courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         courtName: 'Reading Crown Court',
@@ -387,7 +387,7 @@ describe('CourtCasesHeardController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('cases-heard-confirm', {
+      .withArgs('court-cases-heard-confirm', {
         cancelHref: '/courts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/edit/cases-heard',
         courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         courtName: 'Reading Crown Court',
@@ -432,7 +432,7 @@ describe('CourtCasesHeardController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('cases-heard-confirm', {
+      .withArgs('court-cases-heard-confirm', {
         breadcrumbs: buildCasesHeardBreadcrumbs(
           'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
           'Reading Crown Court',
@@ -477,11 +477,11 @@ describe('CourtCasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('common-edit-success', {
-        courtId: '11111111-1111-4111-8111-111111111111',
+        subjectId: '11111111-1111-4111-8111-111111111111',
         pageTitle: 'Cases heard saved - Reading Crown Court',
         successPanelTitle: 'Cases heard saved',
         successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
-        courtName: 'Reading Crown Court',
+        subjectName: 'Reading Crown Court',
         breadcrumbs: buildCasesHeardBreadcrumbs(
           '11111111-1111-4111-8111-111111111111',
           'Reading Crown Court',
@@ -533,7 +533,7 @@ describe('CourtCasesHeardController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('cases-heard', {
+      .withArgs('court-cases-heard', {
         areasOfLawError: 'Select at least one type of case heard at this court.',
         confirmRemovalAreasOfLaw: {
           adoption: undefined,

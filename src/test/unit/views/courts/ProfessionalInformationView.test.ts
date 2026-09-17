@@ -6,7 +6,7 @@ describe('Professional Information View', () => {
   const pagePath = `/courts/${courtId}/edit/information-for-professionals`;
 
   test('renders the professional information form', () => {
-    const html = env.render('professional-information.njk', {
+    const html = env.render('court-professional-information.njk', {
       accessScheme: undefined,
       commonPlatform: undefined,
       courtId,
@@ -58,7 +58,7 @@ describe('Professional Information View', () => {
   });
 
   test('renders validation errors', () => {
-    const html = env.render('professional-information.njk', {
+    const html = env.render('court-professional-information.njk', {
       accessScheme: undefined,
       commonPlatform: undefined,
       courtId,
@@ -100,7 +100,7 @@ describe('Professional Information View', () => {
   });
 
   test('renders professional information read-only for viewer users', () => {
-    const html = env.render('professional-information.njk', {
+    const html = env.render('court-professional-information.njk', {
       accessScheme: true,
       commonPlatform: false,
       courtId,
@@ -142,7 +142,7 @@ describe('Professional Information View', () => {
       description: `Description ${index + 1}`,
     }));
 
-    const html = env.render('professional-information.njk', {
+    const html = env.render('court-professional-information.njk', {
       accessScheme: undefined,
       commonPlatform: undefined,
       courtId,

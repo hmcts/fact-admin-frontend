@@ -183,10 +183,12 @@ describe('CourtPhotoController', () => {
     await controller.update(request, response);
 
     expect(upload.calledOnceWith(courtId, buffer, 'image/jpeg')).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('court-photo-upload-success', {
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', {
       breadcrumbs: [...breadcrumbs, { href: '#', text: 'Court photo confirm update' }],
-      courtId,
-      courtName,
+      subjectId: courtId,
+      subjectName: courtName,
+      pageTitle: 'Photo updated',
+      successPanelTitle: `Photo for ${courtName} has been successfully updated`,
     });
   });
 
@@ -242,10 +244,12 @@ describe('CourtPhotoController', () => {
     await controller.delete(requestMock(), response);
 
     expect(deletePhoto.calledOnceWith(courtId)).toBe(true);
-    expect(response.render).toHaveBeenCalledWith('court-photo-delete-success', {
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', {
       breadcrumbs: [...breadcrumbs, { href: '#', text: 'Court photo confirm delete' }],
-      courtId,
-      courtName,
+      subjectId: courtId,
+      subjectName: courtName,
+      pageTitle: 'Photo deleted',
+      successPanelTitle: `Photo for ${courtName} has been successfully deleted`,
     });
   });
 

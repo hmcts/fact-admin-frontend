@@ -254,20 +254,26 @@ describe('CourtOpeningHoursController', () => {
     await controller.postAdd(request, response);
 
     const expectedViewModel = {
-      ...viewModel,
+      subjectId: courtId,
+      subjectName: viewModel.courtName,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Opening hours saved' },
       ],
+      pageTitle: 'Opening hours saved',
+      successPanelTitle: 'Opening hours saved',
+      successPanelBody: 'Opening hours for Reading Crown Court have been successfully updated.',
+      continueUpdatingHref: `/courts/${courtId}/edit/court-opening-hours`,
+      continueUpdatingText: 'Back to opening hours',
     };
 
     expect(save.firstCall.args[2]).toMatchObject({
       openingHourTypeId: '33333333-3333-4333-8333-333333333333',
       sameTime: 'yes',
     });
-    expect(response.render).toHaveBeenCalledWith('court-opening-hours-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', expectedViewModel);
   });
 
   test('renders save success when saving edit succeeds', async () => {
@@ -292,18 +298,24 @@ describe('CourtOpeningHoursController', () => {
     await controller.postEdit(request, response);
 
     const expectedViewModel = {
-      ...viewModel,
+      subjectId: courtId,
+      subjectName: viewModel.courtName,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Opening hours saved' },
       ],
+      pageTitle: 'Opening hours saved',
+      successPanelTitle: 'Opening hours saved',
+      successPanelBody: 'Opening hours for Reading Crown Court have been successfully updated.',
+      continueUpdatingHref: `/courts/${courtId}/edit/court-opening-hours`,
+      continueUpdatingText: 'Back to opening hours',
     };
 
     expect(save.firstCall.args[0]).toBe(courtId);
     expect(save.firstCall.args[1]).toBe(openingHoursId);
-    expect(response.render).toHaveBeenCalledWith('court-opening-hours-save-success', expectedViewModel);
+    expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', expectedViewModel);
   });
 
   test('renders generic not found when saving edit returns 404', async () => {
@@ -376,17 +388,23 @@ describe('CourtOpeningHoursController', () => {
     };
 
     const expectedSuccessViewModel = {
-      ...successViewModel,
+      subjectId: courtId,
+      subjectName: successViewModel.courtName,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${successViewModel.courtName}` },
         { href: `/courts/${courtId}/edit/court-opening-hours`, text: 'Court opening hours' },
         { href: '#', text: 'Opening hours deleted' },
       ],
+      pageTitle: 'Opening hours deleted',
+      successPanelTitle: 'Opening hours deleted: Court open.',
+      successPanelBody: 'You have removed this opening hour for Reading Crown Court.',
+      continueUpdatingHref: `/courts/${courtId}/edit/court-opening-hours`,
+      continueUpdatingText: 'Back to opening hours',
     };
 
     expect(deleteResponse.render).toHaveBeenCalledWith('court-opening-hours-delete', expectedDeleteViewModel);
-    expect(successResponse.render).toHaveBeenCalledWith('court-opening-hours-delete-success', expectedSuccessViewModel);
+    expect(successResponse.render).toHaveBeenCalledWith('common-edit-success.njk', expectedSuccessViewModel);
   });
 
   test('renders generic not found when opening hours to delete no longer exist', async () => {

@@ -61,14 +61,17 @@ export default class CourtWarningNoticeController extends BaseController {
       return this.renderStatus(res, saveResult.status, 'court-not-found');
     }
 
+    const courtName = saveResult.viewModel.courtName;
+
     return res.render('common-edit-success.njk', {
-      ...saveResult.viewModel,
+      subjectId: saveResult.viewModel.courtId,
+      subjectName: courtName,
       pageTitle: 'Warning notice saved',
       successPanelTitle: 'Warning notice saved',
-      successPanelBody: `Warning notice for ${saveResult.viewModel.courtName} has been successfully updated.`,
-      continueUpdatingHref: `/courts/${courtId}/edit/warning-notice`,
+      successPanelBody: `Warning notice for ${courtName} has been successfully updated.`,
+      continueUpdatingHref: `/courts/${saveResult.viewModel.courtId}/edit/warning-notice`,
       continueUpdatingText: 'Back to warning notice',
-      breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Warning notice saved'),
+      breadcrumbs: this.buildWarningNoticeBreadcrumbs(saveResult.viewModel.courtId, courtName, 'Warning notice saved'),
     });
   }
 

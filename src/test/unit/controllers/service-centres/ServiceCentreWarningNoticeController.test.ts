@@ -199,7 +199,7 @@ describe('ServiceCentreWarningNoticeController', () => {
         match((viewModel: Record<string, unknown>) => {
           return (
             viewModel.pageTitle === 'Warning notice saved - Reading Service Centre' &&
-            viewModel.courtId === SERVICE_CENTRE_ID
+            viewModel.subjectId === SERVICE_CENTRE_ID
           );
         })
       );
