@@ -11,7 +11,9 @@ export type GeneralViewModel = Partial<CourtEntity> & {
   regions?: Region[];
 };
 
-const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
+const VALID_COURT_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
+const COURT_NAME_ALLOWED_CHARACTERS_ERROR =
+  'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class CourtGeneralService {
   public constructor(
@@ -105,9 +107,7 @@ export class CourtGeneralService {
     }
     // if it's been specified, regardless of other errors, ensure it's content is valid
     if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(
-        'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
-      );
+      nameErrors.push(COURT_NAME_ALLOWED_CHARACTERS_ERROR);
     }
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
