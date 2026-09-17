@@ -207,10 +207,10 @@ describe('Information for professionals page', () => {
       'DX code 2: Because you provided an explanation in Welsh, the English translation is now mandatory'
     );
     expect(response.text).toContain(
-      'Fax number 1: Because you provided an description in English, the Welsh translation is now mandatory'
+      'Fax number 1: Because you provided a description in English, the Welsh translation is now mandatory'
     );
     expect(response.text).toContain(
-      'Fax number 2: Because you provided an description in Welsh, the English translation is now mandatory'
+      'Fax number 2: Because you provided a description in Welsh, the English translation is now mandatory'
     );
     expect(saveStub.notCalled).toBe(true);
   });

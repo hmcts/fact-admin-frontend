@@ -5,6 +5,17 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
+import {
+  CONTACT_TYPE_REQUIRED_MESSAGE,
+  COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
+  COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
+  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  MAX_EXPLANATION_LENGTH,
+  WELSH_TRANSLATION_REQUIRED_MESSAGE,
+} from '../../utils/constants/messageConstants';
+import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
 import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
 
@@ -86,10 +97,6 @@ type ApiValidationMapping = {
   formField: keyof CourtContactFormErrors;
   href: string;
 };
-
-const explanationPattern = /^[A-Za-z0-9 '\-()&+]*$/;
-const welshExplanationPattern = /^[\p{L}\p{N} '\-()&+]*$/u;
-const maxExplanationLength = 250;
 
 const courtApi = new CourtApi();
 const referenceDataApi = new ReferenceDataApi();
@@ -209,7 +216,7 @@ export class CourtContactService {
     const errorSummary: CourtContactValidationError[] = [];
 
     if (!selectedContactTypeId) {
-      formErrors.contactType = 'Select a contact type';
+      formErrors.contactType = CONTACT_TYPE_REQUIRED_MESSAGE;
       errorSummary.push({ href: '#contact-type', text: formErrors.contactType });
     }
 
@@ -219,35 +226,31 @@ export class CourtContactService {
     const contactExplanationCy = formValues.contactExplanationCy;
 
     if (contactExplanation) {
-      if (contactExplanation.length > maxExplanationLength) {
-        formErrors.contactExplanation = 'Explanation must be 250 characters or fewer';
+      if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
+        formErrors.contactExplanation = COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-      } else if (!explanationPattern.test(contactExplanation)) {
-        formErrors.contactExplanation =
-          'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+      } else if (!ENGLISH_TEXT_REGEX.test(contactExplanation)) {
+        formErrors.contactExplanation = COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 
       if (!contactExplanationCy) {
-        formErrors.contactExplanationCy =
-          'Because you provided an explanation in English, the Welsh translation is now mandatory';
+        formErrors.contactExplanationCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       }
     }
 
     if (contactExplanationCy) {
       if (!contactExplanation) {
-        formErrors.contactExplanation =
-          'Because you provided an explanation in Welsh, the English translation is now mandatory';
+        formErrors.contactExplanation = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
         errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
       }
 
-      if (contactExplanationCy.length > maxExplanationLength) {
-        formErrors.contactExplanationCy = 'Welsh translation must be 250 characters or fewer';
+      if (contactExplanationCy.length > MAX_EXPLANATION_LENGTH) {
+        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      } else if (!welshExplanationPattern.test(contactExplanationCy)) {
-        formErrors.contactExplanationCy =
-          'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+      } else if (!WELSH_TEXT_REGEX.test(contactExplanationCy)) {
+        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE;
         errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
       }
     }

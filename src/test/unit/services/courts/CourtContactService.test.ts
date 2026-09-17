@@ -103,7 +103,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
     const result = await new CourtContactService().submitContactDetailFlow({
       body: {
-        'contact-explanation': 'Invalid/',
+        'contact-explanation': 'Invalid|',
         'contact-methods': ['email'],
         'contact-email': 'enquiries@example.test',
         'contact-type': contactTypeId,
@@ -392,7 +392,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
 
     const welshOnly = service.validate(
       {
-        'contact-explanation-cy': 'Annilys/',
+        'contact-explanation-cy': 'Annilys|',
         'contact-methods': ['email'],
         'contact-email': 'enquiries@example.test',
         'contact-type': contactTypeId,

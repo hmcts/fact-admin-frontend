@@ -4,6 +4,15 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
+import {
+  COURT_NAME_LENGTH_ERROR,
+  COURT_NAME_MAX_LENGTH,
+  COURT_NAME_MESSAGE,
+  COURT_NAME_MIN_LENGTH,
+  COURT_REGION_MESSAGE,
+  VALID_COURT_NAME_REGEX_MESSAGE,
+} from '../../utils/constants/messageConstants';
+import { VALID_COURT_NAME_REGEX } from '../../utils/constants/regexConstants';
 
 type AddCourtForm = {
   name?: string;
@@ -27,8 +36,6 @@ type AddCourtResult =
       pageTitle: string;
     }
   | HttpStatusCode;
-
-const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class AddCourtService {
   public constructor(
@@ -63,14 +70,12 @@ export class AddCourtService {
 
     const nameErrors: string[] = [];
     if (!name || name.length === 0) {
-      nameErrors.push('Enter a name for the court');
-    } else if (name.length < 5 || name.length > 200) {
-      nameErrors.push('Court name should be between 5 and 200 characters');
+      nameErrors.push(COURT_NAME_MESSAGE);
+    } else if (name.length < COURT_NAME_MIN_LENGTH || name.length > COURT_NAME_MAX_LENGTH) {
+      nameErrors.push(COURT_NAME_LENGTH_ERROR);
     }
     if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(
-        'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
-      );
+      nameErrors.push(VALID_COURT_NAME_REGEX_MESSAGE);
     }
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
@@ -78,7 +83,7 @@ export class AddCourtService {
 
     const regionErrors: string[] = [];
     if (!form.regionId || form.regionId.trim().length === 0) {
-      regionErrors.push('Select a region for the court');
+      regionErrors.push(COURT_REGION_MESSAGE);
     }
     if (regionErrors.length > 0) {
       errors.regionId = regionErrors;
