@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, test } from '@jest/globals';
 import { HttpStatusCode } from 'axios';
 import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
@@ -608,8 +609,8 @@ describe('ServiceCentreContactController', () => {
         match((viewModel: Record<string, unknown>) => {
           return (
             viewModel.pageTitle === 'Contact details deleted: General enquiries' &&
-            viewModel.courtId === SERVICE_CENTRE_ID &&
-            viewModel.courtName === 'Reading Service Centre'
+            viewModel.subjectId === SERVICE_CENTRE_ID &&
+            viewModel.subjectName === 'Reading Service Centre'
           );
         })
       );

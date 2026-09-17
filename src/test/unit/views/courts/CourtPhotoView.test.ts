@@ -81,9 +81,11 @@ describe('Court Photo View', () => {
   });
 
   test('describes a successful upload as an update in the page title', () => {
-    const html = env.render('court-photo-upload-success.njk', {
+    const html = env.render('common-edit-success.njk', {
       courtId,
       courtName,
+      pageTitle: 'Photo updated',
+      successPanelTitle: `Photo for ${courtName} has been successfully updated`,
       pagePath: `/courts/${courtId}/edit/photo/upload`,
     });
 

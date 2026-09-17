@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
 import ServiceCentreAddressController from '../../../../main/controllers/service-centres/ServiceCentreAddressController';
+import { SubjectType } from '../../../../main/schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../../../../main/services/service-centres/ServiceCentreAddressService';
 import * as addressValidation from '../../../../main/utils/addressValidation';
 import { mockRequest } from '../../mocks/mockRequest';
@@ -933,11 +934,12 @@ describe('ServiceCentreAddressController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'service-centre-address-edit-success',
+        'common-edit-success.njk',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.serviceCentreId === SERVICE_CENTRE_ID &&
-            viewModel.serviceCentreName === 'Reading Service Centre' &&
+            viewModel.subjectId === SERVICE_CENTRE_ID &&
+            viewModel.subjectName === 'Reading Service Centre' &&
+            viewModel.subjectType === SubjectType.SERVICE_CENTRE &&
             viewModel.pageTitle === 'Address saved - Reading Service Centre'
           );
         })
@@ -1198,7 +1200,7 @@ describe('ServiceCentreAddressController', () => {
       },
     });
 
-    responseMock.expects('render').once().withArgs('service-centre-address-edit-success', match.object);
+    responseMock.expects('render').once().withArgs('common-edit-success.njk', match.object);
 
     try {
       await controller.updateAddress(request, response);
@@ -1532,11 +1534,12 @@ describe('ServiceCentreAddressController', () => {
       .expects('render')
       .once()
       .withArgs(
-        'service-centre-address-delete-success',
+        'common-edit-success.njk',
         match((viewModel: Record<string, unknown>) => {
           return (
-            viewModel.serviceCentreId === SERVICE_CENTRE_ID &&
-            viewModel.serviceCentreName === 'Reading Service Centre' &&
+            viewModel.subjectId === SERVICE_CENTRE_ID &&
+            viewModel.subjectName === 'Reading Service Centre' &&
+            viewModel.subjectType === SubjectType.SERVICE_CENTRE &&
             viewModel.pageTitle === 'Address deleted - Reading Service Centre'
           );
         })

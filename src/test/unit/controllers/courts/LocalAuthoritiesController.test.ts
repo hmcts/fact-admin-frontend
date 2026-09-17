@@ -49,7 +49,7 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities', {
+      .withArgs('court-local-authorities', {
         ...viewModel,
         breadcrumbs: [
           { href: '/', text: 'Home' },
@@ -159,9 +159,11 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities-success', {
-        courtId: COURT_ID,
-        courtName: 'Reading Crown Court',
+      .withArgs('common-edit-success.njk', {
+        subjectId: COURT_ID,
+        subjectName: 'Reading Crown Court',
+        pageTitle: 'Local authorities saved - Reading Crown Court',
+        successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
@@ -291,9 +293,11 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities-success', {
-        courtId: COURT_ID,
-        courtName: 'Reading Crown Court',
+      .withArgs('common-edit-success.njk', {
+        subjectId: COURT_ID,
+        subjectName: 'Reading Crown Court',
+        pageTitle: 'Local authorities saved - Reading Crown Court',
+        successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
@@ -334,9 +338,11 @@ describe('CourtLocalAuthoritiesController', () => {
     responseMock
       .expects('render')
       .once()
-      .withArgs('local-authorities-success', {
-        courtId: COURT_ID,
-        courtName: 'Reading Crown Court',
+      .withArgs('common-edit-success.njk', {
+        subjectId: COURT_ID,
+        subjectName: 'Reading Crown Court',
+        pageTitle: 'Local authorities saved - Reading Crown Court',
+        successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
         breadcrumbs: [
           { href: '/', text: 'Home' },
           { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },

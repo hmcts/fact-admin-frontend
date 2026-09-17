@@ -33,7 +33,7 @@ export default class CourtLocalAuthoritiesController extends BaseController {
       return;
     }
 
-    return res.render('local-authorities', {
+    return res.render('court-local-authorities', {
       ...viewModel,
       breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(resolvedCourtId, viewModel.courtName),
     });
@@ -67,14 +67,16 @@ export default class CourtLocalAuthoritiesController extends BaseController {
       return this.renderError(res, HttpStatusCode.BadRequest);
     }
 
-    return res.render('local-authorities-success', {
+    return res.render('common-edit-success.njk', {
       breadcrumbs: this.buildLocalAuthoritiesBreadcrumbs(
         resolvedCourtId,
         saveResult.courtName,
         'Local authorities saved'
       ),
-      courtId: resolvedCourtId,
-      courtName: saveResult.courtName,
+      subjectId: resolvedCourtId,
+      subjectName: saveResult.courtName,
+      pageTitle: `Local authorities saved - ${saveResult.courtName}`,
+      successPanelTitle: `Local authority settings for ${saveResult.courtName} have been successfully updated`,
     });
   }
 

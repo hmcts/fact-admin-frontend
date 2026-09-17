@@ -4,7 +4,7 @@ describe('Counter Service Opening Hours View', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
 
   test('renders list page with edit controls for admin users', () => {
-    const html = env.render('counter-service-opening-hours.njk', {
+    const html = env.render('court-counter-service-opening-hours.njk', {
       counterServiceOpeningHours: [
         {
           appointmentNeeded: 'No',
@@ -28,7 +28,7 @@ describe('Counter Service Opening Hours View', () => {
   });
 
   test('renders list page as view-only for viewer users', () => {
-    const html = env.render('counter-service-opening-hours.njk', {
+    const html = env.render('court-counter-service-opening-hours.njk', {
       counterServiceOpeningHours: [
         {
           appointmentNeeded: 'No',
@@ -49,7 +49,7 @@ describe('Counter Service Opening Hours View', () => {
   });
 
   test('renders edit page with save button and save action for admin users', () => {
-    const html = env.render('counter-service-opening-hours-edit.njk', {
+    const html = env.render('court-counter-service-opening-hours-edit.njk', {
       counterServiceId: 'counter-service-id',
       courtId,
       days: [
@@ -82,7 +82,7 @@ describe('Counter Service Opening Hours View', () => {
   });
 
   test('renders edit page as view-only for viewer users', () => {
-    const html = env.render('counter-service-opening-hours-edit.njk', {
+    const html = env.render('court-counter-service-opening-hours-edit.njk', {
       counterServiceId: 'counter-service-id',
       courtId,
       days: [],
@@ -105,7 +105,7 @@ describe('Counter Service Opening Hours View', () => {
   });
 
   test('renders validation summary and field messages on edit page', () => {
-    const html = env.render('counter-service-opening-hours-edit.njk', {
+    const html = env.render('court-counter-service-opening-hours-edit.njk', {
       courtId,
       days: [],
       errors: {

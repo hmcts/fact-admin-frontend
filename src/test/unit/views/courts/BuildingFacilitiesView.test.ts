@@ -4,7 +4,7 @@ describe('Building Facilities Views', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
 
   test('renders edit view with waiting area and children radios selected', () => {
-    const html = env.render('building-facilities-edit.njk', {
+    const html = env.render('court-building-facilities-edit.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/building-facilities`,
       pageTitle: 'Building Facilities - Reading Crown Court',
@@ -29,7 +29,7 @@ describe('Building Facilities Views', () => {
   });
 
   test('renders edit view with no waiting area pre-selection when model value is undefined', () => {
-    const html = env.render('building-facilities-edit.njk', {
+    const html = env.render('court-building-facilities-edit.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/building-facilities`,
       pageTitle: 'Building Facilities - Reading Crown Court',
@@ -44,7 +44,7 @@ describe('Building Facilities Views', () => {
   });
 
   test('renders building facilities read-only for viewer users', () => {
-    const html = env.render('building-facilities-edit.njk', {
+    const html = env.render('court-building-facilities-edit.njk', {
       courtId,
       isViewer: true,
       model: {
@@ -60,7 +60,7 @@ describe('Building Facilities Views', () => {
   });
 
   test('renders waiting area No selected when posted value is string false', () => {
-    const html = env.render('building-facilities-edit.njk', {
+    const html = env.render('court-building-facilities-edit.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/building-facilities`,
       pageTitle: 'Building Facilities - Reading Crown Court',
@@ -75,7 +75,7 @@ describe('Building Facilities Views', () => {
   });
 
   test('renders children waiting area No selected when posted value is string false', () => {
-    const html = env.render('building-facilities-edit.njk', {
+    const html = env.render('court-building-facilities-edit.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/building-facilities`,
       pageTitle: 'Building Facilities - Reading Crown Court',
@@ -92,8 +92,8 @@ describe('Building Facilities Views', () => {
 
   test('renders success view with next-action links', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId,
-      courtName: 'Reading Crown Court',
+      subjectId: courtId,
+      subjectName: 'Reading Crown Court',
       pageTitle: 'Building Facilities saved - Reading Crown Court',
       successPanelTitle: 'Building Facilities details saved',
       successPanelBody: 'Building Facilities details for Reading Crown Court have been saved successfully.',

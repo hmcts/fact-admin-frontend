@@ -57,7 +57,7 @@ describe('Delete confirmation cancel links', () => {
       cancelHref: `/service-centres/${serviceCentreId}/edit/contact-details`,
     },
     {
-      view: 'counter-service-opening-hours-delete.njk',
+      view: 'court-counter-service-opening-hours-delete.njk',
       model: { assistanceAvailable: 'Forms', counterServiceId: itemId, courtId, courtName: 'Reading Crown Court' },
       cancelHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
     },

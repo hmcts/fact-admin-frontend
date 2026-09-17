@@ -96,7 +96,7 @@ export default class CourtPhotoController extends BaseController {
       });
     }
 
-    return res.render('court-photo-upload-success', {
+    return res.render('common-edit-success.njk', {
       breadcrumbs: buildSectionBreadcrumbs(
         courtId,
         updatedModel.courtName,
@@ -104,8 +104,10 @@ export default class CourtPhotoController extends BaseController {
         'photo',
         'Court photo confirm update'
       ),
-      courtId,
-      courtName: updatedModel.courtName,
+      subjectId: courtId,
+      subjectName: updatedModel.courtName,
+      pageTitle: 'Photo updated',
+      successPanelTitle: `Photo for ${updatedModel.courtName} has been successfully updated`,
     });
   }
 
@@ -149,10 +151,12 @@ export default class CourtPhotoController extends BaseController {
       return this.renderStatus(res, response, 'court-not-found');
     }
 
-    res.render('court-photo-delete-success', {
+    res.render('common-edit-success.njk', {
       breadcrumbs: buildSectionBreadcrumbs(courtId, courtName, 'Photo', 'photo', 'Court photo confirm delete'),
-      courtId,
-      courtName,
+      subjectId: courtId,
+      subjectName: courtName,
+      pageTitle: 'Photo deleted',
+      successPanelTitle: `Photo for ${courtName} has been successfully deleted`,
     });
   }
 

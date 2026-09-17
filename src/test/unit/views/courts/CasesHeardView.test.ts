@@ -2,7 +2,7 @@ import { env } from '../../../../testUtils/nunjucksHelper';
 
 describe('Cases Heard View', () => {
   test('renders the cases heard page heading and checkbox list', () => {
-    const html = env.render('cases-heard.njk', {
+    const html = env.render('court-cases-heard.njk', {
       areasOfLawError: undefined,
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',
@@ -47,8 +47,8 @@ describe('Cases Heard View', () => {
 
   test('renders the cases heard success page', () => {
     const html = env.render('common-edit-success.njk', {
-      courtId: '11111111-1111-4111-8111-111111111111',
-      courtName: 'Reading Crown Court',
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      subjectName: 'Reading Crown Court',
       pageTitle: 'Cases heard saved - Reading Crown Court',
       successPanelTitle: 'Cases heard saved',
       successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
@@ -66,7 +66,7 @@ describe('Cases Heard View', () => {
   });
 
   test('renders cases heard read-only for viewer users', () => {
-    const html = env.render('cases-heard.njk', {
+    const html = env.render('court-cases-heard.njk', {
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',
       errorSummary: [],
@@ -82,7 +82,7 @@ describe('Cases Heard View', () => {
   });
 
   test('renders the cases heard confirm page', () => {
-    const html = env.render('cases-heard-confirm.njk', {
+    const html = env.render('court-cases-heard-confirm.njk', {
       cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit/cases-heard',
       courtId: '11111111-1111-4111-8111-111111111111',
       courtName: 'Reading Crown Court',

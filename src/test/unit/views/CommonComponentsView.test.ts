@@ -16,20 +16,6 @@ describe('Common Components View', () => {
     expect(html).toContain('href="/courts/court-id/edit/address">Cancel</a>');
   });
 
-  test('renders a success panel with title and text', () => {
-    const html = env.renderString(
-      `
-      {% from "macros/common-components.njk" import successPanel %}
-      {{ successPanel("Court updated", "The court details have been saved successfully.") }}
-    `,
-      {}
-    );
-
-    expect(html).toContain('govuk-panel govuk-panel--confirmation');
-    expect(html).toContain('Court updated');
-    expect(html).toContain('The court details have been saved successfully.');
-  });
-
   test('renders address block as a single row including optional fields', () => {
     const html = env.renderString(
       `
@@ -86,5 +72,61 @@ describe('Common Components View', () => {
     );
 
     expect(html.trim()).toBe(expectedLabel);
+  });
+
+  test('renders contact details block for list rows', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import contactDetailsBlock %}
+      {{ contactDetailsBlock(contact) }}
+    `,
+      {
+        contact: {
+          email: 'enquiries@example.test',
+          phoneNumber: '01234 567890',
+        },
+      }
+    );
+
+    expect(html).toContain('Telephone');
+    expect(html).toContain('01234 567890');
+    expect(html).toContain('Email');
+    expect(html).toContain('enquiries@example.test');
+  });
+
+  test('renders contact details block for inline summary rows', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import contactDetailsBlock %}
+      {{ contactDetailsBlock(contact, { inline: true, includeExplanation: true }) }}
+    `,
+      {
+        contact: {
+          email: 'enquiries@example.test',
+          explanation: 'General enquiries only',
+          phoneNumber: '01234 567890',
+        },
+      }
+    );
+
+    expect(html).toContain('General enquiries only<br>Phone: 01234 567890<br>Email: enquiries@example.test');
+  });
+
+  test('supports ignored fields in model driven error summary', () => {
+    const html = env.renderString(
+      `
+      {% from "macros/common-components.njk" import modelDrivenErrorSummary %}
+      {{ modelDrivenErrorSummary(errors, { ignoreFields: ["timestamp"] }) }}
+    `,
+      {
+        errors: {
+          name: ['Name is required'],
+          timestamp: ['Timestamp is invalid'],
+        },
+      }
+    );
+
+    expect(html).toContain('Name is required');
+    expect(html).not.toContain('Timestamp is invalid');
   });
 });

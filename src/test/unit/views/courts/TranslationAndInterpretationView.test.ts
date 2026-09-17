@@ -5,7 +5,7 @@ describe('Translation and Interpretation View', () => {
   const pagePath = `/courts/${courtId}/edit/translation-and-interpretation`;
 
   test('renders the empty form with unchecked contact methods', () => {
-    const html = env.render('translation-and-interpretation.njk', {
+    const html = env.render('court-translation-and-interpretation.njk', {
       courtId,
       email: '',
       emailSelected: false,
@@ -26,7 +26,7 @@ describe('Translation and Interpretation View', () => {
   });
 
   test('renders existing email and phone number as checked contact methods', () => {
-    const html = env.render('translation-and-interpretation.njk', {
+    const html = env.render('court-translation-and-interpretation.njk', {
       courtId,
       email: 'translations@example.com',
       emailSelected: true,
@@ -42,7 +42,7 @@ describe('Translation and Interpretation View', () => {
   });
 
   test('renders validation errors', () => {
-    const html = env.render('translation-and-interpretation.njk', {
+    const html = env.render('court-translation-and-interpretation.njk', {
       courtId,
       email: 'invalid',
       emailSelected: true,
@@ -57,7 +57,7 @@ describe('Translation and Interpretation View', () => {
   });
 
   test('renders translation details read-only for viewer users', () => {
-    const html = env.render('translation-and-interpretation.njk', {
+    const html = env.render('court-translation-and-interpretation.njk', {
       courtId,
       email: 'translations@example.com',
       emailSelected: true,

@@ -93,7 +93,7 @@ describe('CourtAccessibilityController', () => {
       await controller.renderEditView(req, res);
 
       expect(res.render).toHaveBeenCalledWith(
-        'accessibility-edit',
+        'court-accessibility-edit',
         expect.objectContaining({
           courtId: req.params.courtId,
           model: expect.any(Object),
@@ -167,7 +167,7 @@ describe('CourtAccessibilityController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'common-edit-success',
         expect.objectContaining({
-          courtId: req.params.courtId,
+          subjectId: req.params.courtId,
           pageTitle: 'Accessibility saved - Court A',
         })
       );
@@ -185,7 +185,7 @@ describe('CourtAccessibilityController', () => {
       await controller.updateCourt(req, res);
 
       expect(res.render).toHaveBeenCalledWith(
-        'accessibility-edit',
+        'court-accessibility-edit',
         expect.objectContaining({
           pageTitle: 'Error: Accessibility - Court A',
         })
