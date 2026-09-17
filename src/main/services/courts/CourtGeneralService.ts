@@ -4,6 +4,7 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
+
 import { getCourtNameValidationErrors } from './courtNameValidation';
 
 export type GeneralViewModel = Partial<CourtEntity> & {

@@ -19,4 +19,3 @@ export const getCourtNameValidationErrors = (name?: string): string[] => {
 
   return nameErrors;
 };
-
