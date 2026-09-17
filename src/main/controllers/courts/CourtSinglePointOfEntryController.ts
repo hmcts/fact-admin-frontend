@@ -35,7 +35,7 @@ export default class CourtSinglePointOfEntryController extends BaseController {
         ...viewModel,
         breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(courtId, viewModel.courtName),
       },
-      'single-point-of-entry',
+      'court-single-point-of-entry',
       'court-not-found'
     );
   }
@@ -65,14 +65,16 @@ export default class CourtSinglePointOfEntryController extends BaseController {
       return this.renderStatus(res, HttpStatusCode.BadRequest, 'court-not-found');
     }
 
-    return res.render('single-point-of-entry-success', {
+    return res.render('common-edit-success.njk', {
       breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(
         courtId,
         saveResult.courtName,
         'Single points of entry saved'
       ),
-      courtId,
-      courtName: saveResult.courtName,
+      subjectId: courtId,
+      subjectName: saveResult.courtName,
+      pageTitle: `Single points of entry saved - ${saveResult.courtName}`,
+      successPanelTitle: `Single points of entry settings for ${saveResult.courtName} have been successfully updated`,
     });
   }
 

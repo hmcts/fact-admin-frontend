@@ -8,7 +8,7 @@ describe('Local Authorities View', () => {
   const divorceAreaOfLawId = '44444444-4444-4444-8444-444444444444';
 
   test('renders local authorities form with tabs for enabled cases and sorted local authority names', () => {
-    const html = env.render('local-authorities.njk', {
+    const html = env.render('court-local-authorities.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/local-authorities`,
       pageTitle: `Local Authorities - ${courtName}`,
@@ -47,7 +47,7 @@ describe('Local Authorities View', () => {
   });
 
   test('renders availability warning and does not render editable form for non-family courts', () => {
-    const html = env.render('local-authorities.njk', {
+    const html = env.render('court-local-authorities.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/local-authorities`,
       pageTitle: `Local Authorities - ${courtName}`,
@@ -67,7 +67,7 @@ describe('Local Authorities View', () => {
   });
 
   test('renders availability warning and does not render editable form when no eligible cases are heard', () => {
-    const html = env.render('local-authorities.njk', {
+    const html = env.render('court-local-authorities.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/local-authorities`,
       pageTitle: `Local Authorities - ${courtName}`,
@@ -84,7 +84,7 @@ describe('Local Authorities View', () => {
   });
 
   test('renders error summary when model errors are provided', () => {
-    const html = env.render('local-authorities.njk', {
+    const html = env.render('court-local-authorities.njk', {
       courtId,
       pagePath: `/courts/${courtId}/edit/local-authorities`,
       pageTitle: `Local Authorities - ${courtName}`,
@@ -106,9 +106,11 @@ describe('Local Authorities View', () => {
   });
 
   test('renders local authorities success panel content', () => {
-    const html = env.render('local-authorities-success.njk', {
+    const html = env.render('common-edit-success.njk', {
       courtId,
       courtName,
+      pageTitle: `Local authorities saved - ${courtName}`,
+      successPanelTitle: `Local authority settings for ${courtName} have been successfully updated`,
       pagePath: `/courts/${courtId}/edit/local-authorities/success`,
     });
 
@@ -118,9 +120,11 @@ describe('Local Authorities View', () => {
   });
 
   test('renders local authorities success page navigation links', () => {
-    const html = env.render('local-authorities-success.njk', {
-      courtId,
-      courtName,
+    const html = env.render('common-edit-success.njk', {
+      subjectId: courtId,
+      subjectName: courtName,
+      pageTitle: `Local authorities saved - ${courtName}`,
+      successPanelTitle: `Local authority settings for ${courtName} have been successfully updated`,
       pagePath: `/courts/${courtId}/edit/local-authorities/success`,
     });
 

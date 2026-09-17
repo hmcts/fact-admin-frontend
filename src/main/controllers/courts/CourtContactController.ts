@@ -237,8 +237,8 @@ export default class CourtContactController extends BaseController {
     const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
     return res.render('common-edit-success', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Contact details deleted'),
-      courtId: resolvedCourtId,
-      courtName: courtResponse.name,
+      subjectId: resolvedCourtId,
+      subjectName: courtResponse.name,
       continueUpdatingHref: `/courts/${resolvedCourtId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
       pageTitle: `Contact details deleted: ${contactDescription}`,
@@ -327,8 +327,8 @@ export default class CourtContactController extends BaseController {
 
     return res.render('common-edit-success', {
       breadcrumbs: this.buildContactDetailsBreadcrumbs(options.courtId, options.courtName, 'Contact details saved'),
-      courtId: options.courtId,
-      courtName: options.courtName,
+      subjectId: options.courtId,
+      subjectName: options.courtName,
       continueUpdatingHref: `/courts/${options.courtId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
       pageTitle: `Contact details ${actionLabel}: ${contactDescription}`,

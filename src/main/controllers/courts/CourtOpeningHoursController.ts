@@ -136,12 +136,21 @@ export default class CourtOpeningHoursController extends BaseController {
 
     const viewModel = await this.courtOpeningHoursService.delete(courtId, openingHoursId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel, 'Opening hours deleted'),
-      'court-opening-hours-delete-success',
-      'not-found'
-    );
+    if (typeof viewModel === 'number') {
+      this.renderStatus(res, viewModel, 'not-found');
+      return;
+    }
+
+    res.render('common-edit-success.njk', {
+      subjectId: viewModel.courtId,
+      subjectName: viewModel.courtName,
+      breadcrumbs: this.buildOpeningHoursBreadcrumbs(viewModel.courtId, viewModel.courtName, 'Opening hours deleted'),
+      pageTitle: 'Opening hours deleted',
+      successPanelTitle: `Opening hours deleted: ${viewModel.openingHourType}.`,
+      successPanelBody: `You have removed this opening hour for ${viewModel.courtName}.`,
+      continueUpdatingHref: `/courts/${courtId}/edit/court-opening-hours`,
+      continueUpdatingText: 'Back to opening hours',
+    });
   }
 
   private async save(req: Request, res: Response, isEdit = false): Promise<void> {
@@ -172,9 +181,17 @@ export default class CourtOpeningHoursController extends BaseController {
       return this.renderStatus(res, saveResult.status, openingHoursId ? 'not-found' : 'court-not-found');
     }
 
-    return res.render('court-opening-hours-save-success', {
-      ...saveResult.viewModel,
-      breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Opening hours saved'),
+    const courtName = saveResult.viewModel.courtName;
+
+    return res.render('common-edit-success.njk', {
+      subjectId: saveResult.viewModel.courtId,
+      subjectName: courtName,
+      breadcrumbs: this.buildOpeningHoursBreadcrumbs(saveResult.viewModel.courtId, courtName, 'Opening hours saved'),
+      pageTitle: 'Opening hours saved',
+      successPanelTitle: 'Opening hours saved',
+      successPanelBody: `Opening hours for ${courtName} have been successfully updated.`,
+      continueUpdatingHref: `/courts/${saveResult.viewModel.courtId}/edit/court-opening-hours`,
+      continueUpdatingText: 'Back to opening hours',
     });
   }
 

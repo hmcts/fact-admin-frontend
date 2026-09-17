@@ -270,7 +270,7 @@ describe('ServiceCentreCasesHeardController', () => {
         match((viewModel: Record<string, unknown>) => {
           return (
             viewModel.pageTitle === 'Cases heard saved - Reading Service Centre' &&
-            viewModel.courtId === SERVICE_CENTRE_ID
+            viewModel.subjectId === SERVICE_CENTRE_ID
           );
         })
       );
