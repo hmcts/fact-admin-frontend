@@ -4,16 +4,13 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
+import { getCourtNameValidationErrors } from './courtNameValidation';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
   originalName?: string;
   regions?: Region[];
 };
-
-const VALID_COURT_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
-const COURT_NAME_ALLOWED_CHARACTERS_ERROR =
-  'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export class CourtGeneralService {
   public constructor(
@@ -96,19 +93,7 @@ export class CourtGeneralService {
 
   private validateCourtEntity(model: GeneralViewModel): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
-    const name = model.name?.trim();
-
-    const nameErrors: string[] = [];
-    // Make sure we have a name and that it's within length limits
-    if (!name || name.length === 0) {
-      nameErrors.push('Enter a name for the court');
-    } else if (name.length < 5 || name.length > 200) {
-      nameErrors.push('Court name should be between 5 and 200 characters');
-    }
-    // if it's been specified, regardless of other errors, ensure it's content is valid
-    if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(COURT_NAME_ALLOWED_CHARACTERS_ERROR);
-    }
+    const nameErrors = getCourtNameValidationErrors(model.name);
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }
