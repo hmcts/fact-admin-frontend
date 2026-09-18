@@ -21,13 +21,13 @@ export default class ResourcesController extends BaseController {
       return;
     }
 
-    return this.serveFileStream(`/courts/${courtId}/v1/photo/image`, res);
+    return this.serveFileStream(`/resources/v1/court-photo/${courtId}`, res);;
   }
 
   @route('/csv')
   @GET()
   public async csv(req: Request, res: Response): Promise<void> {
-    return this.serveFileStream('/csv/', res);
+    return this.serveFileStream('/resources/v1/csv', res);
   }
 
   private async serveFileStream(url: string, res: Response): Promise<void> {
