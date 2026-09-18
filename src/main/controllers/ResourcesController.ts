@@ -21,7 +21,7 @@ export default class ResourcesController extends BaseController {
       return;
     }
 
-    return this.serveFileStream(`/resources/v1/court-photo/${courtId}`, res);;
+    return this.serveFileStream(`/resources/v1/court-photo/${courtId}`, res);
   }
 
   @route('/csv')
