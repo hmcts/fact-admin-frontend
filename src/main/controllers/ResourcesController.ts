@@ -24,12 +24,6 @@ export default class ResourcesController extends BaseController {
     return this.serveFileStream(`/resources/v1/court-photo/${courtId}`, res);
   }
 
-  @route('/csv')
-  @GET()
-  public async csv(req: Request, res: Response): Promise<void> {
-    return this.serveFileStream('/resources/v1/csv', res);
-  }
-
   private async serveFileStream(url: string, res: Response): Promise<void> {
     const result = await this.operationsApi.getFileStream(url);
 
