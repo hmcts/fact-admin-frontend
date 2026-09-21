@@ -5,6 +5,8 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 
+import { getCourtNameValidationErrors } from './courtNameValidation';
+
 type AddCourtForm = {
   name?: string;
   regionId?: string;
@@ -27,8 +29,6 @@ type AddCourtResult =
       pageTitle: string;
     }
   | HttpStatusCode;
-
-const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
 
 export class AddCourtService {
   public constructor(
@@ -59,19 +59,7 @@ export class AddCourtService {
    */
   public validate(form: AddCourtForm): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
-    const name = form.name?.trim();
-
-    const nameErrors: string[] = [];
-    if (!name || name.length === 0) {
-      nameErrors.push('Enter a name for the court');
-    } else if (name.length < 5 || name.length > 200) {
-      nameErrors.push('Court name should be between 5 and 200 characters');
-    }
-    if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(
-        'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
-      );
-    }
+    const nameErrors = getCourtNameValidationErrors(form.name);
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }
