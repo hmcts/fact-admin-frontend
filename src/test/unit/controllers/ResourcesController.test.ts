@@ -60,7 +60,7 @@ describe('ResourcesController', () => {
 
     await controller.img(request, response);
 
-    assert.calledOnceWithExactly(getFileStreamStub,'/resources/v1/court-photo/11111111-1111-4111-8111-111111111111');
+    assert.calledOnceWithExactly(getFileStreamStub, '/resources/v1/court-photo/11111111-1111-4111-8111-111111111111');
     assert.calledOnceWithExactly(stream.on, 'error', match.func);
     assert.calledOnceWithExactly(stream.pipe, response);
     responseMock.verify();
