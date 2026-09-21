@@ -7,6 +7,7 @@ import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../sc
 import {
   WeekdayConfig,
   formatTime,
+  mapSelectedDayOpeningTimes,
   normalizeSelectedValues,
   toErrorSummary,
   validateWeekdayOpeningTimes,
@@ -391,21 +392,7 @@ export class CourtOpeningHoursService {
       ];
     }
 
-    return form.selectedDays
-      .map(day => days.find(dayConfig => dayConfig.value === day))
-      .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
-      .map(dayConfig => ({
-        dayOfWeek: dayConfig.value,
-        openingTime: formatTime(
-          form[`${dayConfig.idPrefix}OpeningHour`] as string,
-          form[`${dayConfig.idPrefix}OpeningMinute`] as string
-        ),
-        closingTime: formatTime(
-          form[`${dayConfig.idPrefix}ClosingHour`] as string,
-          form[`${dayConfig.idPrefix}ClosingMinute`] as string
-        ),
-      }))
-      .concat(unsupportedExistingDetails);
+    return mapSelectedDayOpeningTimes(form, days).concat(unsupportedExistingDetails);
   }
 
   private getUnsupportedOpeningTimesDetails(openingHours?: CourtOpeningHours): OpeningTimesDetail[] {

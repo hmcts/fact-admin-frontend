@@ -10,6 +10,12 @@ export type WeekdayConfig = {
   value: string;
 };
 
+export type OpeningTimesDetailLike = {
+  dayOfWeek: string;
+  openingTime: string;
+  closingTime: string;
+};
+
 export type TimeValidationMessages = {
   sameTimeField: string;
   sameTimeError: string;
@@ -75,6 +81,25 @@ export const toErrorSummary = (errors: Record<string, string>): { href: string; 
 
 export const formatTime = (hour: string, minute: string): string =>
   `${hour.trim().padStart(2, '0')}:${minute.trim().padStart(2, '0')}`;
+
+export const mapSelectedDayOpeningTimes = (
+  form: OpeningHoursLikeForm,
+  days: WeekdayConfig[]
+): OpeningTimesDetailLike[] =>
+  normalizeSelectedValues(form.selectedDays)
+    .map(day => days.find(dayConfig => dayConfig.value === day))
+    .filter((dayConfig): dayConfig is WeekdayConfig => Boolean(dayConfig))
+    .map(dayConfig => ({
+      dayOfWeek: dayConfig.value,
+      openingTime: formatTime(
+        form[`${dayConfig.idPrefix}OpeningHour`] as string,
+        form[`${dayConfig.idPrefix}OpeningMinute`] as string
+      ),
+      closingTime: formatTime(
+        form[`${dayConfig.idPrefix}ClosingHour`] as string,
+        form[`${dayConfig.idPrefix}ClosingMinute`] as string
+      ),
+    }));
 
 const validateTimeGroup = (
   errors: Record<string, string>,
