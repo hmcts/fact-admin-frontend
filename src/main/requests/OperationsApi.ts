@@ -205,6 +205,12 @@ export class OperationsApi {
     }
   }
 
+  /**
+   * Request to data API to retrieve a file stream for download
+   *
+   * @param location the endpoint path to request the file stream from
+   * @returns a FileStreamResult containing the stream and headers, or an HttpStatusCode on error
+   */
   public async getFileStream(location: string): Promise<FileStreamResult | HttpStatusCode> {
     try {
       const response = await dataApi.get(location, {
