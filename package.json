@@ -97,7 +97,7 @@
     "html-webpack-plugin": "5.6.8",
     "jest": "30.5.1",
     "jest-html-reporter": "4.4.2",
-    "lighthouse": "13.4.1",
+    "lighthouse": "13.5.0",
     "mini-css-extract-plugin": "2.10.2",
     "odhin-reports-playwright": "1.2.2",
     "pa11y": "10.0.0",
