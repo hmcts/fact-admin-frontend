@@ -3,11 +3,15 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
 
-type Day = {
-  idPrefix: string;
-  name: string;
-  value: string;
-};
+import {
+  WeekdayConfig,
+  formatTime,
+  normalizeSelectedValues,
+  toErrorSummary,
+  validateWeekdayOpeningTimes,
+} from './validation/openingHoursValidation';
+
+type Day = WeekdayConfig;
 
 export type CounterServiceOpeningHoursForm = {
   assistWith: string[];
@@ -244,11 +248,7 @@ export class CounterServiceOpeningHoursService {
   }
 
   public getSelectedDays(value: unknown): string[] {
-    if (Array.isArray(value)) {
-      return value.filter((selectedValue): selectedValue is string => typeof selectedValue === 'string');
-    }
-
-    return typeof value === 'string' ? [value] : [];
+    return normalizeSelectedValues(value);
   }
 
   private async getEditPageBase(
@@ -286,7 +286,28 @@ export class CounterServiceOpeningHoursService {
   }
 
   private validate(form: CounterServiceOpeningHoursForm): Record<string, string> {
-    const errors: Record<string, string> = {};
+    const errors = validateWeekdayOpeningTimes(
+      form,
+      days,
+      {
+        sameTimeField: 'sameTimeYes',
+        sameTimeError: 'Select whether the counter opens and closes at the same time Monday to Friday',
+        selectedDaysField: 'selectedDays',
+        selectedDaysError: 'Select at least one day',
+        missingTimePartError: label => `Enter the ${label}`,
+        invalidTimePartError: (label, maximum) => {
+          const sentenceLabel = `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
+          return `${sentenceLabel} must be between 0 and ${maximum}`;
+        },
+        openingAfterClosingError: 'The opening time cannot be after the closing time',
+        closingBeforeOpeningError: 'The closing time cannot be before the opening time',
+        openingEqualsClosingError: 'The opening time cannot be the same as the closing time',
+        closingEqualsOpeningError: 'The closing time cannot be the same as the opening time',
+      },
+      {
+        sameTimePartLabel: timePart => timePart,
+      }
+    );
 
     const assistWith = this.getSelectedDays(form.assistWith);
     if (assistWith.length === 0) {
@@ -304,82 +325,7 @@ export class CounterServiceOpeningHoursService {
       errors.appointmentContact = 'Enter a valid contact email address';
     }
 
-    if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
-      errors.sameTimeYes = 'Select whether the counter opens and closes at the same time Monday to Friday';
-      return errors;
-    }
-
-    if (form.sameTime === 'yes') {
-      this.validateTimeGroup(errors, form, 'same');
-      return errors;
-    }
-
-    if (form.selectedDays.length === 0) {
-      errors.selectedDays = 'Select at least one day';
-      return errors;
-    }
-
-    form.selectedDays.forEach(day => {
-      const dayConfig = days.find(config => config.value === day);
-      if (dayConfig) {
-        this.validateTimeGroup(errors, form, dayConfig.idPrefix, dayConfig.name);
-      }
-    });
-
     return errors;
-  }
-
-  private validateTimeGroup(
-    errors: Record<string, string>,
-    form: CounterServiceOpeningHoursForm,
-    prefix: string,
-    labelPrefix = ''
-  ): void {
-    const openingHourKey = `${prefix}OpeningHour`;
-    const openingMinuteKey = `${prefix}OpeningMinute`;
-    const closingHourKey = `${prefix}ClosingHour`;
-    const closingMinuteKey = `${prefix}ClosingMinute`;
-    const fieldLabel = (timePart: string): string => (labelPrefix ? `${labelPrefix} ${timePart}` : timePart);
-
-    this.validateTimePart(errors, form[openingHourKey], openingHourKey, fieldLabel('opening hour'), 23);
-    this.validateTimePart(errors, form[openingMinuteKey], openingMinuteKey, fieldLabel('opening minute'), 59);
-    this.validateTimePart(errors, form[closingHourKey], closingHourKey, fieldLabel('closing hour'), 23);
-    this.validateTimePart(errors, form[closingMinuteKey], closingMinuteKey, fieldLabel('closing minute'), 59);
-
-    if (errors[openingHourKey] || errors[openingMinuteKey] || errors[closingHourKey] || errors[closingMinuteKey]) {
-      return;
-    }
-
-    const openingTime = this.toMinutes(form[openingHourKey] as string, form[openingMinuteKey] as string);
-    const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
-
-    if (openingTime > closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be after the closing time';
-      errors[closingHourKey] = 'The closing time cannot be before the opening time';
-    } else if (openingTime === closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
-      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
-    }
-  }
-
-  private validateTimePart(
-    errors: Record<string, string>,
-    value: string | string[] | undefined,
-    key: string,
-    label: string,
-    maximum: number
-  ): void {
-    const valueText = typeof value === 'string' ? value.trim() : '';
-
-    if (!valueText) {
-      errors[key] = `Enter the ${label}`;
-      return;
-    }
-
-    if (!/^\d{1,2}$/.test(valueText) || Number(valueText) > maximum) {
-      const sentenceLabel = `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
-      errors[key] = `${sentenceLabel} must be between 0 and ${maximum}`;
-    }
   }
 
   private toOpeningTimesDetails(form: CounterServiceOpeningHoursForm): OpeningTimeDetails[] {
@@ -387,8 +333,8 @@ export class CounterServiceOpeningHoursService {
       return [
         {
           dayOfWeek: 'EVERYDAY',
-          openingTime: this.formatTime(form.sameOpeningHour as string, form.sameOpeningMinute as string),
-          closingTime: this.formatTime(form.sameClosingHour as string, form.sameClosingMinute as string),
+          openingTime: formatTime(form.sameOpeningHour as string, form.sameOpeningMinute as string),
+          closingTime: formatTime(form.sameClosingHour as string, form.sameClosingMinute as string),
         },
       ];
     }
@@ -398,11 +344,11 @@ export class CounterServiceOpeningHoursService {
       .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
       .map(dayConfig => ({
         dayOfWeek: dayConfig.value,
-        openingTime: this.formatTime(
+        openingTime: formatTime(
           form[`${dayConfig.idPrefix}OpeningHour`] as string,
           form[`${dayConfig.idPrefix}OpeningMinute`] as string
         ),
-        closingTime: this.formatTime(
+        closingTime: formatTime(
           form[`${dayConfig.idPrefix}ClosingHour`] as string,
           form[`${dayConfig.idPrefix}ClosingMinute`] as string
         ),
@@ -451,7 +397,7 @@ export class CounterServiceOpeningHoursService {
   }
 
   private toErrorSummary(errors: Record<string, string>): CounterServiceEditError[] {
-    return Object.entries(errors).map(([field, text]) => ({ href: `#${field}`, text }));
+    return toErrorSummary(errors);
   }
 
   private formatAssistance(counterService: CounterServiceOpeningHours): string {
@@ -486,14 +432,6 @@ export class CounterServiceOpeningHoursService {
     const period = hourNum >= 12 ? 'pm' : 'am';
     const displayHour = hourNum % 12 === 0 ? 12 : hourNum % 12;
     return minute === '00' ? `${displayHour}${period}` : `${displayHour}:${minute}${period}`;
-  }
-
-  private toMinutes(hour: string, minute: string): number {
-    return Number(hour) * 60 + Number(minute);
-  }
-
-  private formatTime(hour: string, minute: string): string {
-    return `${hour.trim().padStart(2, '0')}:${minute.trim().padStart(2, '0')}`;
   }
 
   private isHttpStatusCode(response: unknown): response is HttpStatusCode {

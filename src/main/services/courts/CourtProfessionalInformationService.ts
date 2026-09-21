@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtProfessionalInformation } from '../../schemas/courtProfessionalInformationSchema';
+import { collectValidationErrors } from '../../utils/validation';
 
 type CourtCodeField = 'magistrateCourtCode' | 'familyCourtCode' | 'tribunalCode' | 'countyCourtCode' | 'crownCourtCode';
 
@@ -67,6 +68,43 @@ export type FamilyCourtRemovalConfirmation = {
 type RepeatableApiError = {
   href: string;
   label: string;
+};
+
+type RepeatableValidationMessages = {
+  codeMissingEnglishDescription: (displayIndex: number) => string;
+  codeMissingWelshDescription: (displayIndex: number) => string;
+  englishDescriptionNeedsWelsh: (displayIndex: number) => string;
+  welshDescriptionNeedsEnglish: (displayIndex: number) => string;
+  invalidCode: (displayIndex: number) => string;
+  codeTooLong: (displayIndex: number, maxLength: number) => string;
+  englishDescriptionTooLong: (displayIndex: number, maxLength: number) => string;
+  englishDescriptionInvalidCharacters: (displayIndex: number) => string;
+  welshDescriptionTooLong: (displayIndex: number, maxLength: number) => string;
+  welshDescriptionInvalidCharacters: (displayIndex: number) => string;
+};
+
+type RepeatableValidationConfig = {
+  codeFieldId: string;
+  englishDescriptionFieldId: string;
+  welshDescriptionFieldId: string;
+  codePattern: RegExp;
+  codeMaxLength?: number;
+  descriptionMaxLength: number;
+  messages: RepeatableValidationMessages;
+};
+
+type RepeatableEntryContext = {
+  code: string;
+  description: string;
+  descriptionCy: string;
+  displayIndex: number;
+  formIndex: number;
+};
+
+type RepeatableEntryRule = {
+  fieldId: (context: RepeatableEntryContext) => string;
+  message: (context: RepeatableEntryContext) => string;
+  when: (context: RepeatableEntryContext) => boolean;
 };
 
 export const courtTypeOptions: CourtTypeOption[] = [
@@ -313,177 +351,214 @@ export class CourtProfessionalInformationService {
     errors: ProfessionalInformationError[]
   ) {
     for (const option of courtTypeOptions) {
-      if (!viewModel.selectedCourtTypes.includes(option.value)) {
-        continue;
-      }
-
       const code = viewModel.selectedCourtTypeCodes[option.codeField].trim();
-      if (!code) {
-        errors.push({
-          href: `#${option.codeField}`,
-          text: `Enter a ${option.label.toLowerCase()} code`,
-        });
-      } else if (!integerPattern.test(code)) {
-        errors.push({
-          href: `#${option.codeField}`,
-          text: `Enter a ${option.label.toLowerCase()} code using numbers only`,
-        });
-      }
+      errors.push(
+        ...collectValidationErrors(undefined, [
+          {
+            createError: () => ({
+              href: `#${option.codeField}`,
+              text: `Enter a ${option.label.toLowerCase()} code`,
+            }),
+            when: () => viewModel.selectedCourtTypes.includes(option.value) && !code,
+          },
+          {
+            createError: () => ({
+              href: `#${option.codeField}`,
+              text: `Enter a ${option.label.toLowerCase()} code using numbers only`,
+            }),
+            when: () =>
+              viewModel.selectedCourtTypes.includes(option.value) && Boolean(code) && !integerPattern.test(code),
+          },
+        ])
+      );
     }
   }
 
   private validateInterviewRooms(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
-    if (viewModel.interviewRooms === true) {
-      if (!viewModel.interviewRoomCount.trim()) {
-        errors.push({
-          href: '#interviewRoomCount',
-          text: 'Enter the number of interview rooms',
-        });
-      } else if (!integerPattern.test(viewModel.interviewRoomCount.trim())) {
-        errors.push({
-          href: '#interviewRoomCount',
-          text: 'Enter the number of interview rooms using numbers only',
-        });
-      } else {
-        const interviewRoomCount = Number(viewModel.interviewRoomCount.trim());
-        if (interviewRoomCount < 1 || interviewRoomCount > 150) {
-          errors.push({
+    const roomCountText = viewModel.interviewRoomCount.trim();
+    const roomCountNumber = Number(roomCountText);
+
+    errors.push(
+      ...collectValidationErrors(undefined, [
+        {
+          createError: () => ({ href: '#interviewRoomCount', text: 'Enter the number of interview rooms' }),
+          when: () => viewModel.interviewRooms === true && !roomCountText,
+        },
+        {
+          createError: () => ({
             href: '#interviewRoomCount',
-            text: interviewRoomCountError,
-          });
-        }
-      }
-    }
+            text: 'Enter the number of interview rooms using numbers only',
+          }),
+          when: () =>
+            viewModel.interviewRooms === true && Boolean(roomCountText) && !integerPattern.test(roomCountText),
+        },
+        {
+          createError: () => ({ href: '#interviewRoomCount', text: interviewRoomCountError }),
+          when: () =>
+            viewModel.interviewRooms === true &&
+            Boolean(roomCountText) &&
+            integerPattern.test(roomCountText) &&
+            (roomCountNumber < 1 || roomCountNumber > 150),
+        },
+      ])
+    );
   }
 
   private validateFaxNumbers(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
-    viewModel.faxNumbers.forEach((faxNumber, index) => {
-      const formIndex = faxNumber.formIndex ?? index;
-      const code = faxNumber.code?.trim() ?? '';
-      const description = faxNumber.description?.trim() ?? '';
-      const descriptionCy = faxNumber.descriptionCy?.trim() ?? '';
-      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
-      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
-      if (description && !code) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a description without a fax number, please add a number or remove the description`,
-        });
-      }
-      if (descriptionCy && !code) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
-        });
-      } else if (code && !phoneNumberPattern.test(code)) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${faxNumberValidationError}`,
-        });
-      }
-      if (hasEnglishDescriptionOnly) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Because you provided an description in English, the Welsh translation is now mandatory`,
-        });
-      }
-      if (hasWelshDescriptionOnly) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: Because you provided an description in Welsh, the English translation is now mandatory`,
-        });
-      }
-      if (description.length > repeatableDescriptionMaxLength) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
-        });
-      } else if (description && !englishTextPattern.test(description)) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: ${dxValidationError}`,
-        });
-      }
-      if (descriptionCy.length > repeatableDescriptionMaxLength) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${repeatableDescriptionMaxLength} characters or fewer`,
-        });
-      } else if (descriptionCy && !welshTextPattern.test(descriptionCy)) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: ${dxValidationError}`,
-        });
-      }
+    this.validateRepeatableEntries(viewModel.faxNumbers, errors, {
+      codeFieldId: 'faxNumber',
+      englishDescriptionFieldId: 'faxNumberDescription',
+      welshDescriptionFieldId: 'faxNumberDescriptionCy',
+      codePattern: phoneNumberPattern,
+      descriptionMaxLength: repeatableDescriptionMaxLength,
+      messages: {
+        codeMissingEnglishDescription: displayIndex =>
+          `Fax number ${displayIndex}: You have entered a description without a fax number, please add a number or remove the description`,
+        codeMissingWelshDescription: displayIndex =>
+          `Fax number ${displayIndex}: You have entered a Welsh description without a fax number, please add a number or remove the description`,
+        englishDescriptionNeedsWelsh: displayIndex =>
+          `Fax number ${displayIndex}: Because you provided an description in English, the Welsh translation is now mandatory`,
+        welshDescriptionNeedsEnglish: displayIndex =>
+          `Fax number ${displayIndex}: Because you provided an description in Welsh, the English translation is now mandatory`,
+        invalidCode: displayIndex => `Fax number ${displayIndex}: ${faxNumberValidationError}`,
+        codeTooLong: () => '',
+        englishDescriptionTooLong: (displayIndex, maxLength) =>
+          `Fax number ${displayIndex} description: Fax description must be ${maxLength} characters or fewer`,
+        englishDescriptionInvalidCharacters: displayIndex =>
+          `Fax number ${displayIndex} description: ${dxValidationError}`,
+        welshDescriptionTooLong: (displayIndex, maxLength) =>
+          `Fax number ${displayIndex} Welsh description: Fax description must be ${maxLength} characters or fewer`,
+        welshDescriptionInvalidCharacters: displayIndex =>
+          `Fax number ${displayIndex} Welsh description: ${dxValidationError}`,
+      },
     });
   }
 
   private validateDxCodes(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
-    viewModel.dxCodes.forEach((dxCode, index) => {
-      const formIndex = dxCode.formIndex ?? index;
-      const code = dxCode.code?.trim() ?? '';
-      const description = dxCode.description?.trim() ?? '';
-      const descriptionCy = dxCode.descriptionCy?.trim() ?? '';
-      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
-      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
-      if (description && !code) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
-        });
-      }
-      if (descriptionCy && !code) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation`,
-        });
-      }
-      if (hasEnglishDescriptionOnly) {
-        errors.push({
-          href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1}: Because you provided an explanation in English, the Welsh translation is now mandatory`,
-        });
-      }
-      if (hasWelshDescriptionOnly) {
-        errors.push({
-          href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1}: Because you provided an explanation in Welsh, the English translation is now mandatory`,
-        });
-      }
-      if (code.length > dxCodeMaxLength) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: DX code must be ${dxCodeMaxLength} characters or fewer`,
-        });
-      } else if (code && !englishTextPattern.test(code)) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${dxValidationError}`,
-        });
-      }
-      if (description.length > repeatableDescriptionMaxLength) {
-        errors.push({
-          href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1} explanation: DX explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
-        });
-      } else if (description && !englishTextPattern.test(description)) {
-        errors.push({
-          href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1} explanation: ${dxValidationError}`,
-        });
-      }
-      if (descriptionCy.length > repeatableDescriptionMaxLength) {
-        errors.push({
-          href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} Welsh explanation: DX Welsh explanation must be ${repeatableDescriptionMaxLength} characters or fewer`,
-        });
-      } else if (descriptionCy && !welshTextPattern.test(descriptionCy)) {
-        errors.push({
-          href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} Welsh explanation: ${dxValidationError}`,
-        });
-      }
+    this.validateRepeatableEntries(viewModel.dxCodes, errors, {
+      codeFieldId: 'dxCode',
+      englishDescriptionFieldId: 'dxCodeDescription',
+      welshDescriptionFieldId: 'dxCodeDescriptionCy',
+      codePattern: englishTextPattern,
+      codeMaxLength: dxCodeMaxLength,
+      descriptionMaxLength: repeatableDescriptionMaxLength,
+      messages: {
+        codeMissingEnglishDescription: displayIndex =>
+          `DX code ${displayIndex}: You have entered a DX code explanation without a DX code, please add a code or remove the explanation`,
+        codeMissingWelshDescription: displayIndex =>
+          `DX code ${displayIndex}: You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation`,
+        englishDescriptionNeedsWelsh: displayIndex =>
+          `DX code ${displayIndex}: Because you provided an explanation in English, the Welsh translation is now mandatory`,
+        welshDescriptionNeedsEnglish: displayIndex =>
+          `DX code ${displayIndex}: Because you provided an explanation in Welsh, the English translation is now mandatory`,
+        invalidCode: displayIndex => `DX code ${displayIndex}: ${dxValidationError}`,
+        codeTooLong: (displayIndex, maxLength) =>
+          `DX code ${displayIndex}: DX code must be ${maxLength} characters or fewer`,
+        englishDescriptionTooLong: (displayIndex, maxLength) =>
+          `DX code ${displayIndex} explanation: DX explanation must be ${maxLength} characters or fewer`,
+        englishDescriptionInvalidCharacters: displayIndex =>
+          `DX code ${displayIndex} explanation: ${dxValidationError}`,
+        welshDescriptionTooLong: (displayIndex, maxLength) =>
+          `DX code ${displayIndex} Welsh explanation: DX Welsh explanation must be ${maxLength} characters or fewer`,
+        welshDescriptionInvalidCharacters: displayIndex =>
+          `DX code ${displayIndex} Welsh explanation: ${dxValidationError}`,
+      },
     });
+  }
+
+  private validateRepeatableEntries(
+    entries: ProfessionalInformationEntry[],
+    errors: ProfessionalInformationError[],
+    config: RepeatableValidationConfig
+  ): void {
+    const rules = this.getRepeatableEntryRules(config);
+
+    entries.forEach((entry, index) => {
+      const context: RepeatableEntryContext = {
+        code: entry.code?.trim() ?? '',
+        description: entry.description?.trim() ?? '',
+        descriptionCy: entry.descriptionCy?.trim() ?? '',
+        formIndex: entry.formIndex ?? index,
+        displayIndex: (entry.formIndex ?? index) + 1,
+      };
+
+      rules.forEach(rule => {
+        if (!rule.when(context)) {
+          return;
+        }
+
+        errors.push({
+          href: `#${rule.fieldId(context)}`,
+          text: rule.message(context),
+        });
+      });
+    });
+  }
+
+  private getRepeatableEntryRules(config: RepeatableValidationConfig): RepeatableEntryRule[] {
+    const codeLengthRule: RepeatableEntryRule | undefined = config.codeMaxLength
+      ? {
+          fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+          message: context => config.messages.codeTooLong(context.displayIndex, config.codeMaxLength as number),
+          when: context => context.code.length > (config.codeMaxLength as number),
+        }
+      : undefined;
+
+    return [
+      {
+        fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+        message: context => config.messages.codeMissingEnglishDescription(context.displayIndex),
+        when: context => Boolean(context.description) && !context.code,
+      },
+      {
+        fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+        message: context => config.messages.codeMissingWelshDescription(context.displayIndex),
+        when: context => Boolean(context.descriptionCy) && !context.code,
+      },
+      {
+        fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.englishDescriptionNeedsWelsh(context.displayIndex),
+        when: context => Boolean(context.description) && !context.descriptionCy,
+      },
+      {
+        fieldId: context => `${config.englishDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.welshDescriptionNeedsEnglish(context.displayIndex),
+        when: context => Boolean(context.descriptionCy) && !context.description,
+      },
+      ...(codeLengthRule ? [codeLengthRule] : []),
+      {
+        fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+        message: context => config.messages.invalidCode(context.displayIndex),
+        when: context => Boolean(context.code) && !config.codePattern.test(context.code),
+      },
+      {
+        fieldId: context => `${config.englishDescriptionFieldId}-${context.formIndex}`,
+        message: context =>
+          config.messages.englishDescriptionTooLong(context.displayIndex, config.descriptionMaxLength),
+        when: context => context.description.length > config.descriptionMaxLength,
+      },
+      {
+        fieldId: context => `${config.englishDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.englishDescriptionInvalidCharacters(context.displayIndex),
+        when: context =>
+          context.description.length <= config.descriptionMaxLength &&
+          Boolean(context.description) &&
+          !englishTextPattern.test(context.description),
+      },
+      {
+        fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.welshDescriptionTooLong(context.displayIndex, config.descriptionMaxLength),
+        when: context => context.descriptionCy.length > config.descriptionMaxLength,
+      },
+      {
+        fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.welshDescriptionInvalidCharacters(context.displayIndex),
+        when: context =>
+          context.descriptionCy.length <= config.descriptionMaxLength &&
+          Boolean(context.descriptionCy) &&
+          !welshTextPattern.test(context.descriptionCy),
+      },
+    ];
   }
 
   private toPayload(viewModel: ProfessionalInformationViewModel): CourtProfessionalInformation {
