@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 import moment from 'moment-timezone';
 
 const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const UK_TIME_ZONE = 'Europe/London';
 
 /**
@@ -40,7 +41,7 @@ export function parseOptionalString(value: unknown): string | undefined {
  * Checks whether a value is a UUID in the format expected by the API.
  */
 export function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  return UUID_REGEX.test(value);
 }
 
 export const parseBoolean = (value: unknown): boolean | undefined => {
