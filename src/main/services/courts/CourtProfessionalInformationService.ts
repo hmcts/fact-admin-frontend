@@ -3,6 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtProfessionalInformation } from '../../schemas/courtProfessionalInformationSchema';
 import {
+  COURT_CODE_MAX_DIGITS,
   DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE,
   DX_CODE_MAX_LENGTH,
@@ -339,6 +340,11 @@ export class CourtProfessionalInformationService {
         errors.push({
           href: `#${option.codeField}`,
           text: `Enter a ${option.label.toLowerCase()} code using numbers only`,
+        });
+      } else if (code.length > COURT_CODE_MAX_DIGITS) {
+        errors.push({
+          href: `#${option.codeField}`,
+          text: `${option.codeLabel} must be at most 6 digits`,
         });
       }
     }

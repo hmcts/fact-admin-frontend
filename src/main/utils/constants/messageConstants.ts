@@ -230,6 +230,7 @@ export const OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
 
 // Court professional information service
 export const MAX_REPEATABLE_ENTRIES = 5;
+export const COURT_CODE_MAX_DIGITS = 6;
 export const DX_CODE_MAX_LENGTH = 200;
 export const REPEATABLE_DESCRIPTION_MAX_LENGTH = 250;
 export const INTERVIEW_ROOM_COUNT_REQUIRED_ERROR = 'Enter the number of interview rooms';
