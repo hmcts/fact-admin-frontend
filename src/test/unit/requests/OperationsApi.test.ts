@@ -1,3 +1,5 @@
+import { Readable } from 'node:stream';
+
 import { HttpStatusCode } from 'axios';
 import sinon, { restore, stub } from 'sinon';
 
@@ -719,6 +721,88 @@ describe('OperationsApi', () => {
     expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error removing locks for user:', {
       name: 'Error',
       message: 'Unexpected clear locks error',
+    });
+  });
+
+  it('returns file stream result with download headers when request succeeds', async () => {
+    const location = '/downloads/report.csv';
+    const stream = new Readable({ read() {} });
+
+    getStub.withArgs(location, { responseType: 'stream' }).resolves({
+      data: stream,
+      headers: {
+        'content-type': 'text/csv',
+        'content-disposition': 'attachment; filename="report.csv"',
+        'content-length': '1024',
+      },
+    });
+
+    const response = await operationsApi.getFileStream(location);
+
+    expect(response).toEqual({
+      stream,
+      headers: {
+        contentType: 'text/csv',
+        contentDisposition: 'attachment; filename="report.csv"',
+        contentLength: '1024',
+      },
+    });
+  });
+
+  it('returns file stream result when optional headers are missing', async () => {
+    const location = '/downloads/minimal';
+    const stream = new Readable({ read() {} });
+
+    getStub.withArgs(location, { responseType: 'stream' }).resolves({
+      data: stream,
+      headers: {
+        'content-type': 'application/octet-stream',
+      },
+    });
+
+    const response = await operationsApi.getFileStream(location);
+
+    expect(response).toEqual({
+      stream,
+      headers: {
+        contentType: 'application/octet-stream',
+        contentDisposition: undefined,
+        contentLength: undefined,
+      },
+    });
+  });
+
+  it('returns axios status and logs when getFileStream endpoint errors', async () => {
+    const location = '/downloads/missing';
+
+    getStub.withArgs(location, { responseType: 'stream' }).rejects({
+      isAxiosError: true,
+      response: {
+        status: HttpStatusCode.NotFound,
+      },
+    });
+
+    const response = await operationsApi.getFileStream(location);
+
+    expect(response).toBe(HttpStatusCode.NotFound);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith(
+      'Error fetching download stream:',
+      expectedAxiosError(HttpStatusCode.NotFound)
+    );
+  });
+
+  it('returns internal server error and logs when getFileStream throws non-axios error', async () => {
+    const location = '/downloads/unexpected';
+    const nonAxiosError = new Error('Unexpected download error');
+
+    getStub.withArgs(location, { responseType: 'stream' }).rejects(nonAxiosError);
+
+    const response = await operationsApi.getFileStream(location);
+
+    expect(response).toBe(HttpStatusCode.InternalServerError);
+    expect(mockDataApiLogger.error).toHaveBeenCalledWith('Error fetching download stream:', {
+      name: 'Error',
+      message: 'Unexpected download error',
     });
   });
 });

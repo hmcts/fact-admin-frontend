@@ -1,3 +1,5 @@
+import { Readable } from 'node:stream';
+
 import { Logger } from '@hmcts/nodejs-logging';
 import { HttpStatusCode, isAxiosError } from 'axios';
 
@@ -18,6 +20,15 @@ import { dataApi } from './utils/axiosConfig';
 import { toSafeErrorDetails } from './utils/safeErrorDetails';
 
 const logger = Logger.getLogger('app');
+
+export type FileStreamResult = {
+  stream: Readable;
+  headers: {
+    contentType?: string;
+    contentDisposition?: string;
+    contentLength?: string;
+  };
+};
 
 export class OperationsApi {
   /**
@@ -190,6 +201,32 @@ export class OperationsApi {
       return (await dataApi.delete(`/user/v1/${userId}/locks`)).status;
     } catch (error: unknown) {
       logger.error('Error removing locks for user:', toSafeErrorDetails(error));
+      return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
+    }
+  }
+
+  /**
+   * Request to data API to retrieve a file stream for download
+   *
+   * @param location the endpoint path to request the file stream from
+   * @returns a FileStreamResult containing the stream and headers, or an HttpStatusCode on error
+   */
+  public async getFileStream(location: string): Promise<FileStreamResult | HttpStatusCode> {
+    try {
+      const response = await dataApi.get(location, {
+        responseType: 'stream',
+      });
+
+      return {
+        stream: response.data as Readable,
+        headers: {
+          contentType: response.headers['content-type'] as string,
+          contentDisposition: response.headers['content-disposition'],
+          contentLength: response.headers['content-length'] as string,
+        },
+      };
+    } catch (error: unknown) {
+      logger.error('Error fetching download stream:', toSafeErrorDetails(error));
       return isAxiosError(error) && error.response?.status ? error.response.status : HttpStatusCode.InternalServerError;
     }
   }

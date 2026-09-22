@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 
 import { loadControllers, scopePerRequest } from 'awilix-express';
 import * as bodyParser from 'body-parser';
@@ -49,6 +49,7 @@ const adminRoutes = [
   '/courts',
   '/favourites',
   '/service-centres',
+  '/res',
 ];
 const superAdminRoutes = ['/audits', '/users'];
 const viewerGetRoutes = [
