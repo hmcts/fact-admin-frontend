@@ -361,7 +361,7 @@ export const COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE =
   'Select what hearing enhancement equipment is available';
 
 // Address validation
-export const ADDRESS_LINE_MAX_LENGTH = 255;
+export const ADDRESS_LINE_MAX_LENGTH = 250;
 export const TOWN_CITY_MAX_LENGTH = 100;
 export const COUNTY_MAX_LENGTH = 100;
 export const ADDRESS_LINE_1_REQUIRED_MESSAGE = 'Enter address line 1, typically the building and street';

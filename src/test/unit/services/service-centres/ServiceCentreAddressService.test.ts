@@ -153,7 +153,7 @@ describe('ServiceCentreAddressService', () => {
             'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           addressLine2: [
-            'Address line 2 must be 255 characters or less',
+            'Address line 2 must be 250 characters or less',
             'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           county: [
