@@ -9,8 +9,7 @@ import {
   COURT_OPEN_MESSAGE,
   COURT_REGION_MESSAGE,
 } from '../../utils/constants/messageConstants';
-
-import { getCourtNameValidationErrors } from './courtNameValidation';
+import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;

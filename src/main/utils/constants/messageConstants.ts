@@ -135,8 +135,8 @@ export const UK_TIME_ZONE = 'Europe/London';
 export const COURT_NAME_MIN_LENGTH = 5;
 export const COURT_NAME_MAX_LENGTH = 200;
 export const COURT_NAME_LENGTH_ERROR = `Court name should be between ${COURT_NAME_MIN_LENGTH} and ${COURT_NAME_MAX_LENGTH} characters`;
-export const VALID_COURT_NAME_REGEX_MESSAGE =
-  'Court name must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const COURT_NAME_ALLOWED_CHARACTERS_ERROR =
+  'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const COURT_NAME_MESSAGE = 'Enter a name for the court';
 export const COURT_REGION_MESSAGE = 'Select a region for the court';
 export const COURT_OPEN_MESSAGE = 'Select whether the court is open or closed';
@@ -289,8 +289,8 @@ export const SERVICE_CENTRE_NAME_MIN_LENGTH = 5;
 export const SERVICE_CENTRE_NAME_MAX_LENGTH = 200;
 export const SERVICE_CENTRE_NAME_MESSAGE = 'Enter a name for the service centre';
 export const SERVICE_CENTRE_NAME_LENGTH_ERROR = `Service centre name should be between ${SERVICE_CENTRE_NAME_MIN_LENGTH} and ${SERVICE_CENTRE_NAME_MAX_LENGTH} characters`;
-export const VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE =
-  'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+export const SERVICE_CENTRE_NAME_ALLOWED_CHARACTERS_ERROR =
+  'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const SERVICE_CENTRE_REGION_MESSAGE = 'Select a region for the service centre';
 export const SERVICE_CENTRE_REGION_INVALID_MESSAGE = 'Please specify the region for this service centre';
 export const SERVICE_CENTRE_SERVICE_AREA_MESSAGE = 'Please specify the service areas of the service centre';

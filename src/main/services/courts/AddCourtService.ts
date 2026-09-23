@@ -4,11 +4,8 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
-import {
-  COURT_REGION_MESSAGE,
-} from '../../utils/constants/messageConstants';
-
-import { getCourtNameValidationErrors } from './courtNameValidation';
+import { COURT_REGION_MESSAGE } from '../../utils/constants/messageConstants';
+import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
 
 type AddCourtForm = {
   name?: string;
@@ -63,15 +60,6 @@ export class AddCourtService {
   public validate(form: AddCourtForm): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
     const nameErrors = getCourtNameValidationErrors(form.name);
-
-    // if (!name || name.length === 0) {
-    //   nameErrors.push(COURT_NAME_MESSAGE);
-    // } else if (name.length < COURT_NAME_MIN_LENGTH || name.length > COURT_NAME_MAX_LENGTH) {
-    //   nameErrors.push(COURT_NAME_LENGTH_ERROR);
-    // }
-    // if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-    //   nameErrors.push(VALID_COURT_NAME_REGEX_MESSAGE);
-    // }
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }

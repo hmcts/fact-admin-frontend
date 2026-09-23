@@ -7,16 +7,11 @@ import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import {
-  SERVICE_CENTRE_NAME_LENGTH_ERROR,
-  SERVICE_CENTRE_NAME_MAX_LENGTH,
-  SERVICE_CENTRE_NAME_MESSAGE,
-  SERVICE_CENTRE_NAME_MIN_LENGTH,
   SERVICE_CENTRE_OPEN_MESSAGE,
   SERVICE_CENTRE_REGION_INVALID_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
-  VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/constants/regexConstants';
+import { getServiceCentreNameValidationErrors } from '../../utils/subjectNameValidation';
 
 type ServiceAreaCheckboxItem = {
   checked: boolean;
@@ -230,18 +225,7 @@ export class ServiceCentreGeneralService {
   }): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
 
-    const nameErrors: string[] = [];
-    if (!model.name || model.name.trim().length === 0) {
-      nameErrors.push(SERVICE_CENTRE_NAME_MESSAGE);
-    } else if (
-      model.name.length < SERVICE_CENTRE_NAME_MIN_LENGTH ||
-      model.name.length > SERVICE_CENTRE_NAME_MAX_LENGTH
-    ) {
-      nameErrors.push(SERVICE_CENTRE_NAME_LENGTH_ERROR);
-    }
-    if (model.name && !VALID_SERVICE_CENTRE_NAME_REGEX.test(model.name)) {
-      nameErrors.push(VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE);
-    }
+    const nameErrors = getServiceCentreNameValidationErrors(model.name);
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }

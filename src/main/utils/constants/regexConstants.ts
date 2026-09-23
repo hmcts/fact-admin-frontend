@@ -8,7 +8,7 @@ export const PARTIAL_COURT_NAME_REGEX = /^[A-Za-z&'()\- ]*$/;
 export const SEARCH_REGEX = /^[A-Za-z0-9._+\-@]*$/;
 
 // Add court service
-export const VALID_COURT_NAME_REGEX = /^[A-Z&'()\- ]+$/i;
+export const VALID_COURT_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
 
 //Court address service
 export const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
@@ -32,7 +32,7 @@ export const ENGLISH_WARNING_NOTICE_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+\s]+$/;
 export const WELSH_WARNING_NOTICE_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+\s]+$/u;
 
 // Add service centre service
-export const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
+export const VALID_SERVICE_CENTRE_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
 
 // Favourite controller
 export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;

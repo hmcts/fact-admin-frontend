@@ -6,15 +6,10 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import {
-  SERVICE_CENTRE_NAME_LENGTH_ERROR,
-  SERVICE_CENTRE_NAME_MAX_LENGTH,
-  SERVICE_CENTRE_NAME_MESSAGE,
-  SERVICE_CENTRE_NAME_MIN_LENGTH,
   SERVICE_CENTRE_REGION_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
-  VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { VALID_SERVICE_CENTRE_NAME_REGEX } from '../../utils/constants/regexConstants';
+import { getServiceCentreNameValidationErrors } from '../../utils/subjectNameValidation';
 
 type AddServiceCentreForm = {
   name?: string;
@@ -74,15 +69,7 @@ export class AddServiceCentreService {
     const errors: Record<string, string[]> = {};
     const name = form.name?.trim();
 
-    const nameErrors: string[] = [];
-    if (!name || name.length === 0) {
-      nameErrors.push(SERVICE_CENTRE_NAME_MESSAGE);
-    } else if (name.length < SERVICE_CENTRE_NAME_MIN_LENGTH || name.length > SERVICE_CENTRE_NAME_MAX_LENGTH) {
-      nameErrors.push(SERVICE_CENTRE_NAME_LENGTH_ERROR);
-    }
-    if (name && !VALID_SERVICE_CENTRE_NAME_REGEX.test(name)) {
-      nameErrors.push(VALID_SERVICE_CENTRE_NAME_REGEX_MESSAGE);
-    }
+    const nameErrors = getServiceCentreNameValidationErrors(name);
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }
