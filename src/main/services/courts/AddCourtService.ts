@@ -5,14 +5,10 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import {
-  COURT_NAME_LENGTH_ERROR,
-  COURT_NAME_MAX_LENGTH,
-  COURT_NAME_MESSAGE,
-  COURT_NAME_MIN_LENGTH,
   COURT_REGION_MESSAGE,
-  VALID_COURT_NAME_REGEX_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { VALID_COURT_NAME_REGEX } from '../../utils/constants/regexConstants';
+
+import { getCourtNameValidationErrors } from './courtNameValidation';
 
 type AddCourtForm = {
   name?: string;
@@ -66,17 +62,16 @@ export class AddCourtService {
    */
   public validate(form: AddCourtForm): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
-    const name = form.name?.trim();
+    const nameErrors = getCourtNameValidationErrors(form.name);
 
-    const nameErrors: string[] = [];
-    if (!name || name.length === 0) {
-      nameErrors.push(COURT_NAME_MESSAGE);
-    } else if (name.length < COURT_NAME_MIN_LENGTH || name.length > COURT_NAME_MAX_LENGTH) {
-      nameErrors.push(COURT_NAME_LENGTH_ERROR);
-    }
-    if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(VALID_COURT_NAME_REGEX_MESSAGE);
-    }
+    // if (!name || name.length === 0) {
+    //   nameErrors.push(COURT_NAME_MESSAGE);
+    // } else if (name.length < COURT_NAME_MIN_LENGTH || name.length > COURT_NAME_MAX_LENGTH) {
+    //   nameErrors.push(COURT_NAME_LENGTH_ERROR);
+    // }
+    // if (name && !VALID_COURT_NAME_REGEX.test(name)) {
+    //   nameErrors.push(VALID_COURT_NAME_REGEX_MESSAGE);
+    // }
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }

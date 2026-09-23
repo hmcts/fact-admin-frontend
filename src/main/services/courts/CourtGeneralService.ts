@@ -6,15 +6,11 @@ import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
 import {
   COURT_ALREADY_EXISTS_MESSAGE,
-  COURT_NAME_LENGTH_ERROR,
-  COURT_NAME_MAX_LENGTH,
-  COURT_NAME_MESSAGE,
-  COURT_NAME_MIN_LENGTH,
   COURT_OPEN_MESSAGE,
   COURT_REGION_MESSAGE,
-  VALID_COURT_NAME_REGEX_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { VALID_COURT_NAME_REGEX } from '../../utils/constants/regexConstants';
+
+import { getCourtNameValidationErrors } from './courtNameValidation';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
@@ -103,19 +99,7 @@ export class CourtGeneralService {
 
   private validateCourtEntity(model: GeneralViewModel): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
-    const name = model.name?.trim();
-
-    const nameErrors: string[] = [];
-    // Make sure we have a name and that it's within length limits
-    if (!name || name.length === 0) {
-      nameErrors.push(COURT_NAME_MESSAGE);
-    } else if (name.length < COURT_NAME_MIN_LENGTH || name.length > COURT_NAME_MAX_LENGTH) {
-      nameErrors.push(COURT_NAME_LENGTH_ERROR);
-    }
-    // if it's been specified, regardless of other errors, ensure it's content is valid
-    if (name && !VALID_COURT_NAME_REGEX.test(name)) {
-      nameErrors.push(VALID_COURT_NAME_REGEX_MESSAGE);
-    }
+    const nameErrors = getCourtNameValidationErrors(model.name);
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }

@@ -9,15 +9,13 @@ export const courtPhotoSchema = z
     updatedByUserId: z.uuid().optional().nullable(),
   })
   .transform(courtPhoto => ({
-    fileLink: addCacheBuster(courtPhoto.fileLink),
+    fileLink: replaceFileLink(courtPhoto.fileLink, courtPhoto.courtId),
   }));
 
-function addCacheBuster(fileLink: string | null | undefined): string | undefined {
-  if (!fileLink) {
+function replaceFileLink(fileLink: string | null | undefined, courtId: string | null | undefined): string | undefined {
+  if (!fileLink || !courtId) {
     return undefined;
   }
 
-  const url = new URL(fileLink);
-  url.searchParams.set('cacheBust', crypto.randomUUID());
-  return url.toString();
+  return `/res/img/${courtId}?cacheBust=${crypto.randomUUID()}`;
 }

@@ -2566,7 +2566,7 @@ describe('CourtApi', () => {
 
     const response = await courtApi.getCourtPhotoFileLink(courtId);
 
-    expect(response).toMatch(new RegExp(`^${fileLink}\\?`));
+    expect(response).toMatch(new RegExp(`^/res/img/${courtId}\\?`));
   });
 
   it('returns not found when getting court photo fails with a 404', async () => {
@@ -2594,7 +2594,7 @@ describe('CourtApi', () => {
 
     const response = await courtApi.updateCourtPhoto(courtId, Buffer.from('photo'), 'image/jpeg');
 
-    expect(response).toMatch(new RegExp(`^${fileLink}\\?`));
+    expect(response).toMatch(new RegExp(`^/res/img/${courtId}\\?`));
   });
 
   it('returns a validation map when updating court photo returns a 400', async () => {
