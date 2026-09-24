@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { UpdateBuildingFacilitiesRequest } from '../../requests/types/UpdateBuildingFacilitiesRequest';
 import { BuildingFacilities } from '../../schemas/buildingFacilitiesSchema';
-import { validateBooleanField } from '../../utils/validation';
+import { validateRequiredBooleanFields } from '../../utils/validation';
 
 export type FacilityModel = Partial<BuildingFacilities> & { errors?: Record<string, string[]> } & { name?: string };
 
@@ -56,52 +56,39 @@ export class CourtBuildingFacilitiesService {
   }
 
   private validate(model: FacilityModel): Record<string, string[]> | undefined {
-    const errors: Record<string, string[]> = {};
-    const fields = [
+    const errors = validateRequiredBooleanFields(model, [
       {
         key: 'parking',
-        value: model.parking,
+        value: currentModel => currentModel.parking,
         message: 'Select whether the parking is available',
       },
       {
         key: 'waitingArea',
-        value: model.waitingArea,
+        value: currentModel => currentModel.waitingArea,
         message: 'Select whether the waiting area is available',
       },
       {
         key: 'quietRoom',
-        value: model.quietRoom,
+        value: currentModel => currentModel.quietRoom,
         message: 'Select whether the quiet room is available',
       },
       {
         key: 'babyChanging',
-        value: model.babyChanging,
+        value: currentModel => currentModel.babyChanging,
         message: 'Select whether the baby changing is available',
       },
       {
         key: 'wifi',
-        value: model.wifi,
+        value: currentModel => currentModel.wifi,
         message: 'Select whether the wifi is available',
       },
-    ];
-
-    fields.forEach(({ key, value, message }) => {
-      const fieldErrors = validateBooleanField(value, message);
-      if (fieldErrors) {
-        errors[key] = fieldErrors;
-      }
-    });
-
-    if (model.waitingArea === true) {
-      const childrenAreaErrors = validateBooleanField(
-        model.waitingAreaChildren,
-        'Select if a separate waiting area is available for children'
-      );
-
-      if (childrenAreaErrors) {
-        errors.waitingAreaChildren = childrenAreaErrors;
-      }
-    }
+      {
+        key: 'waitingAreaChildren',
+        value: currentModel => currentModel.waitingAreaChildren,
+        message: 'Select if a separate waiting area is available for children',
+        when: currentModel => currentModel.waitingArea === true,
+      },
+    ]);
 
     return Object.keys(errors).length > 0 ? errors : undefined;
   }
