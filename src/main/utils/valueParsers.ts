@@ -1,9 +1,10 @@
 import { HttpStatusCode } from 'axios';
 import moment from 'moment-timezone';
 
-const ISO_DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
+import { UI_DATE_FORMAT, UK_TIME_ZONE } from './constants/messageConstants';
+import { ISO_DATE_REGEX } from './constants/regexConstants';
+
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const UK_TIME_ZONE = 'Europe/London';
 
 /**
  * Parses an integer-like value, falling back when the value is invalid.
@@ -124,7 +125,7 @@ export function parseDate(value: string | undefined): Date {
  *
  * Returns the original value when parsing fails.
  */
-export function toUkDateTimeString(value: string, format = 'DD/MM/YYYY HH:mm:ss.SSS'): string {
+export function toUkDateTimeString(value: string, format = UI_DATE_FORMAT): string {
   const parsedUtc = moment.utc(value, moment.ISO_8601, true);
   return parsedUtc.isValid() ? parsedUtc.tz(UK_TIME_ZONE).format(format) : value;
 }

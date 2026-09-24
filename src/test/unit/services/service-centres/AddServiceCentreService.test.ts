@@ -70,7 +70,7 @@ describe('AddServiceCentreService', () => {
     expect(service.validate({ name: 'A#', regionId: regions[0].id, serviceAreaIds: [serviceAreas[0].id] })).toEqual({
       name: [
         'Service centre name should be between 5 and 200 characters',
-        'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+        'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
       ],
     });
   });

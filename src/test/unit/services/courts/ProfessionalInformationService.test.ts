@@ -397,9 +397,9 @@ describe('CourtProfessionalInformationService', () => {
           'dxCodeDescription-1':
             'DX code 2: Because you provided an explanation in Welsh, the English translation is now mandatory',
           'faxNumberDescription-0':
-            'Fax number 1: Because you provided an description in Welsh, the English translation is now mandatory',
+            'Fax number 1: Because you provided a description in Welsh, the English translation is now mandatory',
           'faxNumberDescriptionCy-1':
-            'Fax number 2: Because you provided an description in English, the Welsh translation is now mandatory',
+            'Fax number 2: Because you provided a description in English, the Welsh translation is now mandatory',
         },
       },
     });
@@ -833,7 +833,7 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#faxNumberDescriptionCy-4',
-            text: 'Fax number 5: Because you provided an description in English, the Welsh translation is now mandatory',
+            text: 'Fax number 5: Because you provided a description in English, the Welsh translation is now mandatory',
           },
         ],
       },
@@ -1039,5 +1039,43 @@ describe('CourtProfessionalInformationService', () => {
     expect(serviceTestAccess.toOptionalNumber(123)).toBe(123);
     expect(serviceTestAccess.toOptionalNumber('123')).toBe(123);
     expect(serviceTestAccess.toOptionalNumber('')).toBeNull();
+  });
+
+  test('returns validation error when selected court code exceeds 6 digits', async () => {
+    const courtApi = buildCourtApi() as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
+      courtTypes: ['magistrates'],
+      magistrateCourtCode: '324343253253252',
+    });
+
+    expect(result).toMatchObject({
+      status: 'validationError',
+      viewModel: {
+        fieldErrors: {
+          magistrateCourtCode: 'Magistrates court code must be at most 6 digits',
+        },
+      },
+    });
+
+    expect(courtApi.saveCourtProfessionalInformation).not.toHaveBeenCalled();
+  });
+
+  test('accepts selected court code at 6 digits', async () => {
+    const courtApi = buildCourtApi({
+      getCourtProfessionalInformation: jest.fn().mockResolvedValue(null),
+    }) as never as {
+      saveCourtProfessionalInformation: jest.Mock;
+    };
+
+    const result = await new CourtProfessionalInformationService(courtApi as never).save(courtId, {
+      courtTypes: ['magistrates'],
+      magistrateCourtCode: '123456',
+    });
+
+    expect(result).toMatchObject({ status: 'saved' });
+    expect(courtApi.saveCourtProfessionalInformation).toHaveBeenCalled();
   });
 });

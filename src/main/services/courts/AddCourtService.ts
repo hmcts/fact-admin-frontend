@@ -4,8 +4,8 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
-
-import { getCourtNameValidationErrors } from './courtNameValidation';
+import { COURT_REGION_MESSAGE } from '../../utils/constants/messageConstants';
+import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
 
 type AddCourtForm = {
   name?: string;
@@ -66,7 +66,7 @@ export class AddCourtService {
 
     const regionErrors: string[] = [];
     if (!form.regionId || form.regionId.trim().length === 0) {
-      regionErrors.push('Select a region for the court');
+      regionErrors.push(COURT_REGION_MESSAGE);
     }
     if (regionErrors.length > 0) {
       errors.regionId = regionErrors;

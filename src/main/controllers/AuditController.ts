@@ -8,6 +8,7 @@ import { Logger } from '../modules/logging';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { AuditFilterCategoriesService } from '../services/AuditFilterCategoriesService';
 import { AuditListViewModel, AuditService } from '../services/AuditService';
+import { UI_DATE_FORMAT } from '../utils/constants/messageConstants';
 import {
   isUuid,
   parseDate,
@@ -23,8 +24,6 @@ import BaseController from './BaseController';
 import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 const logger = Logger.getLogger('audit-controller');
-
-const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
 
 @route('/audits')
 export default class AuditController extends BaseController {
@@ -164,7 +163,7 @@ export default class AuditController extends BaseController {
    * Builds the download URL that emulates the current query parameters, so that the user can
    * download the same set of audits that they are currently viewing.
    *
-   * @param query
+   * @param filters
    * @private
    */
   private buildDownloadUrl(filters: GetAuditsParams): string {

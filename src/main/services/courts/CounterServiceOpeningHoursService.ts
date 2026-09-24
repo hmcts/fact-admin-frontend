@@ -2,12 +2,20 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
-
-type Day = {
-  idPrefix: string;
-  name: string;
-  value: string;
-};
+import {
+  COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
+  COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+  OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
+  OPENING_HOUR_DAYS,
+  OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+  OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+  OpeningHourDay,
+} from '../../utils/constants/messageConstants';
+import { EMAIL_REGEX } from '../../utils/constants/regexConstants';
 
 export type CounterServiceOpeningHoursForm = {
   assistWith: string[];
@@ -44,7 +52,7 @@ export type CounterServiceListViewModel = {
 export type CounterServiceEditViewModel = {
   courtId: string;
   courtName: string;
-  days: Day[];
+  days: OpeningHourDay[];
   errors: Record<string, string>;
   errorSummary: CounterServiceEditError[];
   form: CounterServiceOpeningHoursForm;
@@ -71,16 +79,6 @@ export type CounterServiceSuccessViewModel = {
   courtName: string;
   assistanceAvailable: string;
 };
-
-const days: Day[] = [
-  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
-  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
-  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
-  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
-  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
-];
-
-const EMAIL_PATTERN = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 export class CounterServiceOpeningHoursService {
   public constructor(private readonly courtApi = new CourtApi()) {}
@@ -276,7 +274,7 @@ export class CounterServiceOpeningHoursService {
     return {
       courtId,
       courtName: courtResponse.name,
-      days,
+      days: [...OPENING_HOUR_DAYS],
       errors: {},
       errorSummary: [],
       form,
@@ -290,22 +288,19 @@ export class CounterServiceOpeningHoursService {
 
     const assistWith = this.getSelectedDays(form.assistWith);
     if (assistWith.length === 0) {
-      errors.assistWith = 'Select what the counter can assist with';
+      errors.assistWith = COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE;
     }
 
     if (!form.appointmentNeeded) {
-      errors.appointmentNeeded = 'Select yes if an appointment is needed';
+      errors.appointmentNeeded = COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE;
     }
 
-    if (
-      form.appointmentNeeded === 'yes' &&
-      (!form.appointmentContact || !EMAIL_PATTERN.test(form.appointmentContact))
-    ) {
-      errors.appointmentContact = 'Enter a valid contact email address';
+    if (form.appointmentNeeded === 'yes' && (!form.appointmentContact || !EMAIL_REGEX.test(form.appointmentContact))) {
+      errors.appointmentContact = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;
     }
 
     if (form.sameTime !== 'yes' && form.sameTime !== 'no') {
-      errors.sameTimeYes = 'Select whether the counter opens and closes at the same time Monday to Friday';
+      errors.sameTimeYes = COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE;
       return errors;
     }
 
@@ -315,12 +310,12 @@ export class CounterServiceOpeningHoursService {
     }
 
     if (form.selectedDays.length === 0) {
-      errors.selectedDays = 'Select at least one day';
+      errors.selectedDays = OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE;
       return errors;
     }
 
     form.selectedDays.forEach(day => {
-      const dayConfig = days.find(config => config.value === day);
+      const dayConfig = OPENING_HOUR_DAYS.find(config => config.value === day);
       if (dayConfig) {
         this.validateTimeGroup(errors, form, dayConfig.idPrefix, dayConfig.name);
       }
@@ -354,11 +349,11 @@ export class CounterServiceOpeningHoursService {
     const closingTime = this.toMinutes(form[closingHourKey] as string, form[closingMinuteKey] as string);
 
     if (openingTime > closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be after the closing time';
-      errors[closingHourKey] = 'The closing time cannot be before the opening time';
+      errors[openingHourKey] = OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE;
     } else if (openingTime === closingTime) {
-      errors[openingHourKey] = 'The opening time cannot be the same as the closing time';
-      errors[closingHourKey] = 'The closing time cannot be the same as the opening time';
+      errors[openingHourKey] = OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE;
+      errors[closingHourKey] = OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE;
     }
   }
 
@@ -394,8 +389,8 @@ export class CounterServiceOpeningHoursService {
     }
 
     return form.selectedDays
-      .map(day => days.find(dayConfig => dayConfig.value === day))
-      .filter((dayConfig): dayConfig is Day => Boolean(dayConfig))
+      .map(day => OPENING_HOUR_DAYS.find(dayConfig => dayConfig.value === day))
+      .filter((dayConfig): dayConfig is OpeningHourDay => Boolean(dayConfig))
       .map(dayConfig => ({
         dayOfWeek: dayConfig.value,
         openingTime: this.formatTime(
