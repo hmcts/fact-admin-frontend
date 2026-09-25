@@ -237,8 +237,7 @@ export const INTERVIEW_ROOM_COUNT_REQUIRED_ERROR = 'Enter the number of intervie
 export const INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR = 'Enter the number of interview rooms using numbers only';
 export const FAX_NUMBER_VALIDATION_ERROR =
   'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
-export const GBS_VALIDATION_ERROR =
-  'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
+export const GBS_VALIDATION_ERROR = 'GBS code must only include letters and numbers';
 export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms between 1 and 150, or select No';
 export const DX_VALIDATION_ERROR =
   'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
