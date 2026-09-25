@@ -288,7 +288,7 @@ describe('CourtProfessionalInformationService', () => {
             'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
           'faxNumber-1':
             'Fax number 2: You have entered a description without a fax number, please add a number or remove the description',
-          gbs: 'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          gbs: 'GBS code must only include letters and numbers',
           interviewRoomCount: 'Enter a number of interview rooms between 1 and 150, or select No',
         },
       },
@@ -597,7 +597,7 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#gbs',
-            text: 'GBS code must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'GBS code must only include letters and numbers',
           },
           { href: '#someUnknownField', text: 'Unknown field error' },
           { href: '', text: 'Generic error message' },
