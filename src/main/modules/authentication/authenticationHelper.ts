@@ -22,13 +22,11 @@ export function getFactUserId(req: Request): string | undefined {
 }
 
 export function isAdmin(req: Request): boolean {
-  const role = getFactUser(req)?.role;
-  return role === 'Admin' || role === 'SuperAdmin';
+  return isSuperAdmin(req) || getFactUser(req)?.role === 'Admin';
 }
 
 export function isSuperAdmin(req: Request): boolean {
-  const role = getFactUser(req)?.role;
-  return role === 'SuperAdmin';
+  return getFactUser(req)?.role === 'SuperAdmin';
 }
 
 export function isViewer(req: Request): boolean {
