@@ -13,7 +13,7 @@ import {
 } from '../../utils/addressValidation';
 import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
-  SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE,
+  POSTCODE_ERROR_MESSAGES,
   SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { buildOsAddressOptions } from '../../utils/osAddressOptions';
@@ -81,7 +81,7 @@ export class ServiceCentreAddressService {
       if (result.has('message')) {
         return {
           status: 'invalid',
-          error: result.get('message') ?? SERVICE_CENTRE_ADDRESS_OPTIONS_FETCH_ERROR_MESSAGE,
+          error: POSTCODE_ERROR_MESSAGES.postcodeNotFound,
         };
       }
       return HttpStatusCode.BadRequest;

@@ -19,6 +19,7 @@ import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
   EPIM_ID_MAX_LENGTH_MESSAGE,
   EPIM_ID_REGEX_MESSAGE,
+  POSTCODE_ERROR_MESSAGES,
 } from '../../utils/constants/messageConstants';
 import { VALID_EPIM_ID_REGEX } from '../../utils/constants/regexConstants';
 import { buildOsAddressOptions } from '../../utils/osAddressOptions';
@@ -81,7 +82,7 @@ export class CourtAddressService {
     }
     if (result instanceof Map) {
       if (result.has('message')) {
-        return { status: 'invalid', error: result.get('message') as string };
+        return { status: 'invalid', error: POSTCODE_ERROR_MESSAGES.postcodeNotFound };
       } else {
         return HttpStatusCode.BadRequest;
       }
