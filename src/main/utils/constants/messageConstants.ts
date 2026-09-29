@@ -383,6 +383,7 @@ export const COUNTY_INVALID_CHARACTERS_MESSAGE =
 export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
   blankPostcode: 'Enter a postcode',
   invalidPostcode: 'Postcode format is invalid',
+  postcodeNotFound: 'Postcode not found',
   northernIrelandPostcode: 'Northern Ireland postcodes are not supported for this service',
   guernseyPostcode: 'Guernsey postcodes are not supported for this service',
   jerseyPostcode: 'Jersey postcodes are not supported for this service',
