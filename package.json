@@ -121,6 +121,9 @@
     "@opentelemetry/exporter-prometheus": "0.222.0",
     "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.11.0",
     "@opentelemetry/sdk-node": "0.222.0",
+    "ip-address": "10.7.2",
+    "joi": "17.13.7",
+    "moment": "2.31.0",
     "qs": "6.16.0"
   },
   "packageManager": "yarn@4.18.0"
