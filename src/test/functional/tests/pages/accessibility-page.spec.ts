@@ -28,8 +28,8 @@ test.describe('Accessibility Page Tests', () => {
       await accessibilityPage.goto(createdCourt.id);
 
       await accessibilityPage.selectNo('accessibleParking');
-      await accessibilityPage.fillAccessibleToiletDescription('Accessible toilet is on the ground floor.');
-      await accessibilityPage.fillAccessibleToiletDescriptionCy('Mae toiled hygyrch ar lawr gwaelod.');
+      await accessibilityPage.fillAccessibleToiletDescription('Accessible toilet is on the ground floor');
+      await accessibilityPage.fillAccessibleToiletDescriptionCy('Mae toiled hygyrch ar lawr gwaelod');
       await accessibilityPage.selectYes('accessibleEntrance');
       await accessibilityPage.selectHearingOption('infraredAndHearingLoop');
       await accessibilityPage.selectNo('lift');
@@ -53,8 +53,8 @@ test.describe('Accessibility Page Tests', () => {
       await accessibilityPage.goto(createdCourt.id);
 
       await accessibilityPage.selectYes('accessibleParking');
-      await accessibilityPage.fillAccessibleToiletDescription('Accessible toilet is on the ground floor.');
-      await accessibilityPage.fillAccessibleToiletDescriptionCy('Mae toiled hygyrch ar lawr gwaelod.');
+      await accessibilityPage.fillAccessibleToiletDescription('Accessible toilet is on the ground floor');
+      await accessibilityPage.fillAccessibleToiletDescriptionCy('Mae toiled hygyrch ar lawr gwaelod');
       await accessibilityPage.selectYes('accessibleEntrance');
       await accessibilityPage.selectHearingOption('infrared');
       await accessibilityPage.selectYes('lift');
