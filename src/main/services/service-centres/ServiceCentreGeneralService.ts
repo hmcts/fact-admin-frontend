@@ -6,8 +6,12 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
-
-const VALID_SERVICE_CENTRE_NAME_REGEX = /^[A-Za-z0-9'()\- ]+$/;
+import {
+  SERVICE_CENTRE_OPEN_MESSAGE,
+  SERVICE_CENTRE_REGION_INVALID_MESSAGE,
+  SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
+} from '../../utils/constants/messageConstants';
+import { getServiceCentreNameValidationErrors } from '../../utils/subjectNameValidation';
 
 type ServiceAreaCheckboxItem = {
   checked: boolean;
@@ -221,31 +225,21 @@ export class ServiceCentreGeneralService {
   }): Record<string, string[]> | undefined {
     const errors: Record<string, string[]> = {};
 
-    const nameErrors: string[] = [];
-    if (!model.name || model.name.trim().length === 0) {
-      nameErrors.push('Enter a name for the service centre');
-    } else if (model.name.length < 5 || model.name.length > 200) {
-      nameErrors.push('Service centre name should be between 5 and 200 characters');
-    }
-    if (model.name && !VALID_SERVICE_CENTRE_NAME_REGEX.test(model.name)) {
-      nameErrors.push(
-        'Service centre name must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses'
-      );
-    }
+    const nameErrors = getServiceCentreNameValidationErrors(model.name);
     if (nameErrors.length > 0) {
       errors.name = nameErrors;
     }
 
     if (model.open === undefined || model.open === null) {
-      errors.open = ['Select whether the service centre is open or closed'];
+      errors.open = [SERVICE_CENTRE_OPEN_MESSAGE];
     }
 
     if (!model.serviceAreaIds || model.serviceAreaIds.length === 0) {
-      errors.serviceAreaIds = ['Please specify the service areas of the service centre'];
+      errors.serviceAreaIds = [SERVICE_CENTRE_SERVICE_AREA_MESSAGE];
     }
 
     if (!model.regionId || model.regionId.length === 0 || !model.regionIds.includes(model.regionId)) {
-      errors.regionId = ['Please specify the region for this service centre'];
+      errors.regionId = [SERVICE_CENTRE_REGION_INVALID_MESSAGE];
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;

@@ -74,7 +74,7 @@ describe('CourtBuildingFacilitiesService', () => {
         waitingArea: ['Select whether the waiting area is available'],
         quietRoom: ['Select whether the quiet room is available'],
         babyChanging: ['Select whether the baby changing is available'],
-        wifi: ['Select whether the wifi is available'],
+        wifi: ['Select whether the WiFi is available'],
       },
     });
   });

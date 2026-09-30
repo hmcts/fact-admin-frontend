@@ -104,15 +104,19 @@ describe('CourtAddressService', () => {
     ]);
   });
 
-  test('returns invalid response when postcode search API returns a message map', async () => {
+  test('returns a user-friendly error without exposing the postcode search API message', async () => {
     jest
       .spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode')
-      .mockResolvedValue(new Map([['message', 'Postcode is invalid']]));
+      .mockResolvedValue(
+        new Map([
+          ['message', 'OS rejected postcode with status 400, feign.FeignException$BadRequest: internal details'],
+        ])
+      );
 
     const service = new CourtAddressService();
     const result = await service.retrieveAddressOptions('BAD');
 
-    expect(result).toEqual({ status: 'invalid', error: 'Postcode is invalid' });
+    expect(result).toEqual({ status: 'invalid', error: 'Postcode not found' });
   });
 
   test('returns bad request when postcode search API returns map without message', async () => {
@@ -228,7 +232,7 @@ describe('CourtAddressService', () => {
             'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           addressLine2: [
-            'Address line 2 must be 255 characters or less',
+            'Address line 2 must be 250 characters or less',
             'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           county: [

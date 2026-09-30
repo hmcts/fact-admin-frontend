@@ -204,7 +204,7 @@ test.describe(
 
         await expect(warningNoticePage.mainContent.content).toContainText('There is a problem');
         await expect(warningNoticePage.mainContent.content).toContainText(
-          'Because you provided an explanation in English, the Welsh translation is now mandatory'
+          'Because you provided a warning notice in English, the Welsh translation is now mandatory'
         );
         await axeUtils.audit();
       });

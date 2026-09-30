@@ -119,12 +119,12 @@ describe('CourtWarningNoticeService', () => {
           warningNoticeCy: undefined,
         },
         errors: {
-          warningNoticeCy: 'Because you provided an explanation in English, the Welsh translation is now mandatory',
+          warningNoticeCy: 'Because you provided a warning notice in English, the Welsh translation is now mandatory',
         },
         errorSummary: [
           {
             href: '#warningNoticeCy',
-            text: 'Because you provided an explanation in English, the Welsh translation is now mandatory',
+            text: 'Because you provided a warning notice in English, the Welsh translation is now mandatory',
           },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
@@ -151,12 +151,12 @@ describe('CourtWarningNoticeService', () => {
           warningNoticeCy: 'Rhybudd yn unig',
         },
         errors: {
-          warningNotice: 'Because you provided an explanation in Welsh, the English translation is now mandatory',
+          warningNotice: 'Because you provided a warning notice in Welsh, the English translation is now mandatory',
         },
         errorSummary: [
           {
             href: '#warningNotice',
-            text: 'Because you provided an explanation in Welsh, the English translation is now mandatory',
+            text: 'Because you provided a warning notice in Welsh, the English translation is now mandatory',
           },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',

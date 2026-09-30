@@ -3,6 +3,18 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../schemas/openingHoursSchema';
+import {
+  ALLOWED_OPENING_HOUR_TYPES,
+  OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+  OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
+  OPENING_HOUR_DAYS,
+  OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+  OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+  OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE,
+  OPENING_HOUR_TYPE_REQUIRED_MESSAGE,
+} from '../../utils/constants/messageConstants';
 
 import {
   WeekdayConfig,
@@ -76,25 +88,8 @@ export type SaveOpeningHoursResult =
   | { type: 'validation_error'; viewModel: OpeningHoursEditViewModel }
   | { status: HttpStatusCode; type: 'status' };
 
-const allowedOpeningHourTypes = [
-  'Bailiff office open',
-  'County Court open',
-  'Court open',
-  'Crown Court open',
-  'Family Court open',
-  "Magistrates' Court open",
-  'Telephone enquiries answered',
-  'Telephone payments accepted',
-  'Tribunal open',
-];
-
-const days: Day[] = [
-  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
-  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
-  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
-  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
-  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
-];
+const allowedOpeningHourTypes: readonly string[] = ALLOWED_OPENING_HOUR_TYPES;
+const days: Day[] = [...OPENING_HOUR_DAYS];
 
 export class CourtOpeningHoursService {
   public constructor(
@@ -341,14 +336,13 @@ export class CourtOpeningHoursService {
     const errors: Record<string, string> = {};
 
     if (!form.openingHourTypeId) {
-      errors.openingHourTypeId = 'Select an opening hours type';
+      errors.openingHourTypeId = OPENING_HOUR_TYPE_REQUIRED_MESSAGE;
     } else if (
       existingOpeningHours.some(
         existing => existing.openingHourTypeId === form.openingHourTypeId && existing.id !== openingHoursId
       )
     ) {
-      errors.openingHourTypeId =
-        'A court can only have one opening hour per opening hour type. Please edit the other opening hour first.';
+      errors.openingHourTypeId = OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE;
     }
 
     return {
@@ -358,15 +352,15 @@ export class CourtOpeningHoursService {
         days,
         {
           sameTimeField: 'sameTimeYes',
-          sameTimeError: 'Select whether the court opens and closes at the same time Monday to Friday',
+          sameTimeError: OPENING_HOUR_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
           selectedDaysField: 'selectedDays',
-          selectedDaysError: 'Select at least one day',
+          selectedDaysError: OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
           missingTimePartError: label => `Enter the ${label.toLowerCase()}`,
           invalidTimePartError: (label, maximum) => `${label} must be between 0 and ${maximum}`,
-          openingAfterClosingError: 'The opening time cannot be after the closing time',
-          closingBeforeOpeningError: 'The closing time cannot be before the opening time',
-          openingEqualsClosingError: 'The opening time cannot be the same as the closing time',
-          closingEqualsOpeningError: 'The closing time cannot be the same as the opening time',
+          openingAfterClosingError: OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+          closingBeforeOpeningError: OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+          openingEqualsClosingError: OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+          closingEqualsOpeningError: OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
         },
         {
           sameTimePartLabel: timePart => `${timePart.charAt(0).toUpperCase()}${timePart.slice(1)}`,

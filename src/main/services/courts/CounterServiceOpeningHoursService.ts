@@ -2,6 +2,19 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
+import {
+  COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
+  COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
+  COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
+  OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+  OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
+  OPENING_HOUR_DAYS,
+  OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+  OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+} from '../../utils/constants/messageConstants';
+import { EMAIL_REGEX } from '../../utils/constants/regexConstants';
 
 import {
   WeekdayConfig,
@@ -77,15 +90,7 @@ export type CounterServiceSuccessViewModel = {
   assistanceAvailable: string;
 };
 
-const days: Day[] = [
-  { idPrefix: 'monday', name: 'Monday', value: 'MONDAY' },
-  { idPrefix: 'tuesday', name: 'Tuesday', value: 'TUESDAY' },
-  { idPrefix: 'wednesday', name: 'Wednesday', value: 'WEDNESDAY' },
-  { idPrefix: 'thursday', name: 'Thursday', value: 'THURSDAY' },
-  { idPrefix: 'friday', name: 'Friday', value: 'FRIDAY' },
-];
-
-const EMAIL_PATTERN = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+const days: Day[] = [...OPENING_HOUR_DAYS];
 
 export class CounterServiceOpeningHoursService {
   public constructor(private readonly courtApi = new CourtApi()) {}
@@ -292,18 +297,18 @@ export class CounterServiceOpeningHoursService {
       days,
       {
         sameTimeField: 'sameTimeYes',
-        sameTimeError: 'Select whether the counter opens and closes at the same time Monday to Friday',
+        sameTimeError: COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
         selectedDaysField: 'selectedDays',
-        selectedDaysError: 'Select at least one day',
+        selectedDaysError: OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
         missingTimePartError: label => `Enter the ${label}`,
         invalidTimePartError: (label, maximum) => {
           const sentenceLabel = `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
           return `${sentenceLabel} must be between 0 and ${maximum}`;
         },
-        openingAfterClosingError: 'The opening time cannot be after the closing time',
-        closingBeforeOpeningError: 'The closing time cannot be before the opening time',
-        openingEqualsClosingError: 'The opening time cannot be the same as the closing time',
-        closingEqualsOpeningError: 'The closing time cannot be the same as the opening time',
+        openingAfterClosingError: OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
+        closingBeforeOpeningError: OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
+        openingEqualsClosingError: OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+        closingEqualsOpeningError: OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
       },
       {
         sameTimePartLabel: timePart => timePart,
@@ -312,18 +317,15 @@ export class CounterServiceOpeningHoursService {
 
     const assistWith = this.getSelectedDays(form.assistWith);
     if (assistWith.length === 0) {
-      errors.assistWith = 'Select what the counter can assist with';
+      errors.assistWith = COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE;
     }
 
     if (!form.appointmentNeeded) {
-      errors.appointmentNeeded = 'Select yes if an appointment is needed';
+      errors.appointmentNeeded = COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE;
     }
 
-    if (
-      form.appointmentNeeded === 'yes' &&
-      (!form.appointmentContact || !EMAIL_PATTERN.test(form.appointmentContact))
-    ) {
-      errors.appointmentContact = 'Enter a valid contact email address';
+    if (form.appointmentNeeded === 'yes' && (!form.appointmentContact || !EMAIL_REGEX.test(form.appointmentContact))) {
+      errors.appointmentContact = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;
     }
 
     return errors;

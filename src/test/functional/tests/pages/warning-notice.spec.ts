@@ -68,10 +68,10 @@ test.describe('Warning Notice Page Tests', () => {
 
       await expect(warningNoticePage.errorSummary).toContainText('There is a problem');
       await expect(warningNoticePage.errorSummary).toContainText(
-        'Because you provided an explanation in English, the Welsh translation is now mandatory'
+        'Because you provided a warning notice in English, the Welsh translation is now mandatory'
       );
       await expect(warningNoticePage.mainContent.content).toContainText(
-        'Because you provided an explanation in English, the Welsh translation is now mandatory'
+        'Because you provided a warning notice in English, the Welsh translation is now mandatory'
       );
     });
   });

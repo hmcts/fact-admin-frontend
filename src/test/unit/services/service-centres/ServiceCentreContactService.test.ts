@@ -232,7 +232,7 @@ describe('ServiceCentreContactService', () => {
 
     const englishInvalid = await service.submitContactDetailFlow({
       body: {
-        'contact-explanation': 'Invalid/',
+        'contact-explanation': 'Invalid|',
         'contact-methods': ['email'],
         'contact-email': 'enquiries@example.test',
         'contact-type': contactTypeId,
@@ -260,7 +260,7 @@ describe('ServiceCentreContactService', () => {
     const welshInvalid = await service.submitContactDetailFlow({
       body: {
         'contact-explanation': '',
-        'contact-explanation-cy': 'Annilys/',
+        'contact-explanation-cy': 'Annilys|',
         'contact-methods': ['email'],
         'contact-email': 'enquiries@example.test',
         'contact-type': contactTypeId,

@@ -337,8 +337,8 @@ test.describe(
             validEmailForTest(`${Date.now()}-en-invalid-char`)
           );
 
-          // `!` is not allowed by explanationPattern.
-          await serviceCentreContactDetailsPage.explanationInput.fill('General enquiries!');
+          // `|` is not allowed by the centralized explanation regex.
+          await serviceCentreContactDetailsPage.explanationInput.fill('General enquiries|');
           // Provide valid Welsh to avoid cross-field mandatory errors.
           await serviceCentreContactDetailsPage.explanationCyInput.fill('Esboniad Cymraeg dilys');
           await serviceCentreContactDetailsPage.save();
@@ -370,8 +370,8 @@ test.describe(
 
           // Provide valid English to avoid cross-field mandatory errors.
           await serviceCentreContactDetailsPage.explanationInput.fill('Valid English explanation');
-          // `!` is not allowed by explanationPattern.
-          await serviceCentreContactDetailsPage.explanationCyInput.fill('Ymholiadau!');
+          // `|` is not allowed by the centralized explanation regex.
+          await serviceCentreContactDetailsPage.explanationCyInput.fill('Ymholiadau|');
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =

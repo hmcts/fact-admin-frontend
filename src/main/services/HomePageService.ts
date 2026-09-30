@@ -6,6 +6,13 @@ import { UserApi } from '../requests/UserApi';
 import { PagedLocations } from '../schemas/courtListSchema';
 import { FavouriteStatus, PagedFavourites } from '../schemas/favouriteSchema';
 import { Region } from '../schemas/regionSchema';
+import {
+  HOME_PAGE_COURTS_LOAD_ERROR_MESSAGE,
+  HOME_PAGE_FAVOURITES_ERROR_MESSAGE,
+  HOME_PAGE_FAVOURITE_STATUS_ERROR_MESSAGE,
+  HOME_PAGE_REGIONS_AND_COURTS_LOAD_ERROR_MESSAGE,
+  HOME_PAGE_REGIONS_LOAD_ERROR_MESSAGE,
+} from '../utils/constants/messageConstants';
 
 import { HomePageFiltersService } from './HomePageFiltersService';
 import { HomePageViewService, buildFavouriteKey } from './HomePageViewService';
@@ -64,7 +71,7 @@ export class HomePageService {
     return {
       courtFavouriteStatusErrorMessage: Array.isArray(favouriteStatusesResponse)
         ? undefined
-        : 'There was a problem loading favourite status.',
+        : HOME_PAGE_FAVOURITE_STATUS_ERROR_MESSAGE,
       courtTableHead: this.homePageViewService.buildCourtTableHead(effectiveFilters),
       courtTableRows: this.homePageViewService.buildCourtTableRows(
         effectiveFilters,
@@ -80,7 +87,7 @@ export class HomePageService {
         resolvedFavourites.page,
         isReviewMode
       ),
-      favouritesErrorMessage: resolvedFavourites.error ? 'There was a problem loading favourites.' : undefined,
+      favouritesErrorMessage: resolvedFavourites.error ? HOME_PAGE_FAVOURITES_ERROR_MESSAGE : undefined,
       favouritesPagination: this.homePageViewService.buildFavouritesPagination(
         resolvedFavourites.page,
         effectiveFilters
@@ -117,15 +124,15 @@ export class HomePageService {
     const hasCourtsError = !this.isPagedCourts(courtsResponse);
 
     if (hasRegionError && hasCourtsError) {
-      return 'There was a problem loading regions and courts, tribunals and service centres.';
+      return HOME_PAGE_REGIONS_AND_COURTS_LOAD_ERROR_MESSAGE;
     }
 
     if (hasRegionError) {
-      return 'There was a problem loading regions.';
+      return HOME_PAGE_REGIONS_LOAD_ERROR_MESSAGE;
     }
 
     if (hasCourtsError) {
-      return 'There was a problem loading courts, tribunals and service centres.';
+      return HOME_PAGE_COURTS_LOAD_ERROR_MESSAGE;
     }
 
     return undefined;

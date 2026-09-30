@@ -3,6 +3,14 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { UpdateBuildingFacilitiesRequest } from '../../requests/types/UpdateBuildingFacilitiesRequest';
 import { BuildingFacilities } from '../../schemas/buildingFacilitiesSchema';
+import {
+  COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE,
+  COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE,
+  COURT_BUILDING_FACILITIES_QUIET_ROOM_REQUIRED_MESSAGE,
+  COURT_BUILDING_FACILITIES_WAITING_AREA_CHILDREN_REQUIRED_MESSAGE,
+  COURT_BUILDING_FACILITIES_WAITING_AREA_REQUIRED_MESSAGE,
+  COURT_BUILDING_FACILITIES_WIFI_REQUIRED_MESSAGE,
+} from '../../utils/constants/messageConstants';
 import { validateRequiredBooleanFields } from '../../utils/validation';
 
 export type FacilityModel = Partial<BuildingFacilities> & { errors?: Record<string, string[]> } & { name?: string };
@@ -60,32 +68,32 @@ export class CourtBuildingFacilitiesService {
       {
         key: 'parking',
         value: currentModel => currentModel.parking,
-        message: 'Select whether the parking is available',
+        message: COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE,
       },
       {
         key: 'waitingArea',
         value: currentModel => currentModel.waitingArea,
-        message: 'Select whether the waiting area is available',
+        message: COURT_BUILDING_FACILITIES_WAITING_AREA_REQUIRED_MESSAGE,
       },
       {
         key: 'quietRoom',
         value: currentModel => currentModel.quietRoom,
-        message: 'Select whether the quiet room is available',
+        message: COURT_BUILDING_FACILITIES_QUIET_ROOM_REQUIRED_MESSAGE,
       },
       {
         key: 'babyChanging',
         value: currentModel => currentModel.babyChanging,
-        message: 'Select whether the baby changing is available',
+        message: COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE,
       },
       {
         key: 'wifi',
         value: currentModel => currentModel.wifi,
-        message: 'Select whether the wifi is available',
+        message: COURT_BUILDING_FACILITIES_WIFI_REQUIRED_MESSAGE,
       },
       {
         key: 'waitingAreaChildren',
         value: currentModel => currentModel.waitingAreaChildren,
-        message: 'Select if a separate waiting area is available for children',
+        message: COURT_BUILDING_FACILITIES_WAITING_AREA_CHILDREN_REQUIRED_MESSAGE,
         when: currentModel => currentModel.waitingArea === true,
       },
     ]);

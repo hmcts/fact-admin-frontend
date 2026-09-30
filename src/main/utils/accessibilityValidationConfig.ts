@@ -1,17 +1,34 @@
 // eslint-disable-next-line import/namespace
 import type { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
 
+import {
+  COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_INVALID_NUMBER_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MAX_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MIN_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_SUPPORT_PHONE_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_INVALID_NUMBER_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MAX_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MIN_MESSAGE,
+  COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_PARKING_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_PHONE_NUMBER_INVALID_MESSAGE,
+  COURT_ACCESSIBILITY_QUIET_ROOM_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE,
+  COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE,
+  COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE,
+  COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE,
+  MAX_LIFT_DOOR_WIDTH_CM,
+  MAX_LIFT_WEIGHT_LIMIT_KG,
+  MIN_LIFT_DOOR_WIDTH_CM,
+  MIN_LIFT_WEIGHT_LIMIT_KG,
+} from './constants/messageConstants';
+import { PHONE_NUMBER_REGEX, TOILET_DESC_REGEX, TOILET_DESC_REGEX_WELSH } from './constants/regexConstants';
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
-
-// Regex constants
-export const UK_PHONE_REGEX = /^((\+44|)[0-9 ]{10,20})$/; // kept same regex in backend ideally it should be 10-12 digit though
-export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-;.]+$/;
-export const TOILET_DESC_REGEX_WELSH = /^[\p{L}0-9 ()':,\-;.]+$/u;
-
-const MIN_LIFT_DOOR_WIDTH_CM = 1;
-const MAX_LIFT_DOOR_WIDTH_CM = 1000;
-const MIN_LIFT_DOOR_LIMIT_KG = 1;
-const MAX_LIFT_DOOR_LIMIT_KG = 10000;
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
 const isInvalidNumber = (value: number | null | undefined): boolean => typeof value === 'number' && Number.isNaN(value);
@@ -27,70 +44,72 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     // Boolean fields
     {
       key: 'accessibleParking',
-      validate: m => validateBooleanField(m.accessibleParking, 'Select whether accessible parking is available'),
+      validate: m => validateBooleanField(m.accessibleParking, COURT_ACCESSIBILITY_PARKING_REQUIRED_MESSAGE),
     },
     {
       key: 'accessibleEntrance',
-      validate: m =>
-        validateBooleanField(
-          m.accessibleEntrance,
-          'Select whether there is step free access from the street to the courtrooms'
-        ),
+      validate: m => validateBooleanField(m.accessibleEntrance, COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE),
     },
     {
       key: 'lift',
-      validate: m => validateBooleanField(m.lift, 'Select whether a lift is available'),
+      validate: m => validateBooleanField(m.lift, COURT_ACCESSIBILITY_LIFT_REQUIRED_MESSAGE),
     },
     {
       key: 'quietRoom',
-      validate: m => validateBooleanField(m.quietRoom, 'Select whether a quiet room is available'),
+      validate: m => validateBooleanField(m.quietRoom, COURT_ACCESSIBILITY_QUIET_ROOM_REQUIRED_MESSAGE),
     },
 
     // Lift conditionals
     {
       key: 'liftDoorWidth',
-      validate: m => (m.lift && isMissing(m.liftDoorWidth) ? ['Enter the lift door width'] : undefined),
+      validate: m =>
+        m.lift && isMissing(m.liftDoorWidth) ? [COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_REQUIRED_MESSAGE] : undefined,
     },
     {
       key: 'liftDoorWidth',
       validate: m =>
-        m.lift && isInvalidNumber(m.liftDoorWidth) ? ['Lift door width must be a valid number'] : undefined,
+        m.lift && isInvalidNumber(m.liftDoorWidth)
+          ? [COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_INVALID_NUMBER_MESSAGE]
+          : undefined,
     },
     {
       key: 'liftDoorWidth',
       validate: m =>
         m.lift && isBelowMin(m.liftDoorWidth, MIN_LIFT_DOOR_WIDTH_CM)
-          ? ['Lift door width needs to be over 1cm']
+          ? [COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MIN_MESSAGE]
           : undefined,
     },
     {
       key: 'liftDoorWidth',
       validate: m =>
         m.lift && isAboveMax(m.liftDoorWidth, MAX_LIFT_DOOR_WIDTH_CM)
-          ? ['Lift door width needs to be under 1000cm']
-          : undefined,
-    },
-    {
-      key: 'liftDoorLimit',
-      validate: m => (m.lift && isMissing(m.liftDoorLimit) ? ['Enter the lift weight limit'] : undefined),
-    },
-    {
-      key: 'liftDoorLimit',
-      validate: m =>
-        m.lift && isInvalidNumber(m.liftDoorLimit) ? ['Lift weight limit must be a valid number'] : undefined,
-    },
-    {
-      key: 'liftDoorLimit',
-      validate: m =>
-        m.lift && isBelowMin(m.liftDoorLimit, MIN_LIFT_DOOR_LIMIT_KG)
-          ? ['Lift weight limit should be at least 1kg']
+          ? [COURT_ACCESSIBILITY_LIFT_DOOR_WIDTH_MAX_MESSAGE]
           : undefined,
     },
     {
       key: 'liftDoorLimit',
       validate: m =>
-        m.lift && isAboveMax(m.liftDoorLimit, MAX_LIFT_DOOR_LIMIT_KG)
-          ? ['Lift weight limit should be at most 10000kg']
+        m.lift && isMissing(m.liftDoorLimit) ? [COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_REQUIRED_MESSAGE] : undefined,
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isInvalidNumber(m.liftDoorLimit)
+          ? [COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_INVALID_NUMBER_MESSAGE]
+          : undefined,
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isBelowMin(m.liftDoorLimit, MIN_LIFT_WEIGHT_LIMIT_KG)
+          ? [COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MIN_MESSAGE]
+          : undefined,
+    },
+    {
+      key: 'liftDoorLimit',
+      validate: m =>
+        m.lift && isAboveMax(m.liftDoorLimit, MAX_LIFT_WEIGHT_LIMIT_KG)
+          ? [COURT_ACCESSIBILITY_LIFT_WEIGHT_LIMIT_MAX_MESSAGE]
           : undefined,
     },
 
@@ -99,7 +118,7 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
       key: 'accessibleEntrancePhoneNumber',
       validate: m =>
         m.accessibleEntrance === false && !m.accessibleEntrancePhoneNumber?.trim()
-          ? ['Enter a phone number for the accessible entrance']
+          ? [COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE]
           : undefined,
     },
 
@@ -108,40 +127,26 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
       key: 'liftSupportPhoneNumber',
       validate: m =>
         m.lift === false && !m.liftSupportPhoneNumber?.trim()
-          ? ['Enter telephone number for organising support at court']
+          ? [COURT_ACCESSIBILITY_LIFT_SUPPORT_PHONE_REQUIRED_MESSAGE]
           : undefined,
     },
 
     // Phone pattern
-    patternRule(
-      'accessibleParkingPhoneNumber',
-      UK_PHONE_REGEX,
-      'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
-    ),
-    patternRule(
-      'accessibleEntrancePhoneNumber',
-      UK_PHONE_REGEX,
-      'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
-    ),
-    patternRule(
-      'liftSupportPhoneNumber',
-      UK_PHONE_REGEX,
-      'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
-    ),
+    patternRule('accessibleParkingPhoneNumber', PHONE_NUMBER_REGEX, COURT_ACCESSIBILITY_PHONE_NUMBER_INVALID_MESSAGE),
+    patternRule('accessibleEntrancePhoneNumber', PHONE_NUMBER_REGEX, COURT_ACCESSIBILITY_PHONE_NUMBER_INVALID_MESSAGE),
+    patternRule('liftSupportPhoneNumber', PHONE_NUMBER_REGEX, COURT_ACCESSIBILITY_PHONE_NUMBER_INVALID_MESSAGE),
 
     // Accessible toilet description (required)
     {
       key: 'accessibleToiletDescription',
       validate: m =>
-        !m.accessibleToiletDescription?.trim()
-          ? ['Enter a description of the accessible toilet facilities']
-          : undefined,
+        !m.accessibleToiletDescription?.trim() ? [COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE] : undefined,
     },
     {
       key: 'accessibleToiletDescriptionCy',
       validate: m =>
         !m.accessibleToiletDescriptionCy?.trim()
-          ? ['Enter a Welsh description of the accessible toilet facilities']
+          ? [COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE]
           : undefined,
     },
 
@@ -149,19 +154,19 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     patternRule(
       'accessibleToiletDescription',
       TOILET_DESC_REGEX,
-      'Accessible toilet description in English must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+      COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE
     ),
     patternRule(
       'accessibleToiletDescriptionCy',
       TOILET_DESC_REGEX_WELSH,
-      'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+      COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE
     ),
 
     // Hearing equipment
     {
       key: 'hearingEnhancementEquipment',
       validate: m =>
-        !m.hearingEnhancementEquipment ? ['Select what hearing enhancement equipment is available'] : undefined,
+        !m.hearingEnhancementEquipment ? [COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE] : undefined,
     },
   ];
 

@@ -105,7 +105,7 @@ describe('Warning notice page', () => {
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('There is a problem');
     expect(response.text).toContain(
-      'Because you provided an explanation in English, the Welsh translation is now mandatory'
+      'Because you provided a warning notice in English, the Welsh translation is now mandatory'
     );
     expect(updateCourtStub.notCalled).toBe(true);
   });

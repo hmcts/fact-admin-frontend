@@ -92,10 +92,14 @@ describe('ServiceCentreAddressService', () => {
     ]);
   });
 
-  test('retrieveAddressOptions returns invalid payload for map message and bad request fallback', async () => {
+  test('retrieveAddressOptions hides API messages and returns bad request fallback', async () => {
     const getAddressesForPostcode = jest
       .spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode')
-      .mockResolvedValueOnce(new Map([['message', 'Postcode is invalid']]))
+      .mockResolvedValueOnce(
+        new Map([
+          ['message', 'OS rejected postcode with status 400, feign.FeignException$BadRequest: internal details'],
+        ])
+      )
       .mockResolvedValueOnce(new Map([['postcode', 'BAD']]))
       .mockResolvedValueOnce(HttpStatusCode.InternalServerError);
 
@@ -103,7 +107,7 @@ describe('ServiceCentreAddressService', () => {
 
     await expect(service.retrieveAddressOptions('BAD')).resolves.toEqual({
       status: 'invalid',
-      error: 'Postcode is invalid',
+      error: 'Postcode not found',
     });
     await expect(service.retrieveAddressOptions('BAD')).resolves.toBe(HttpStatusCode.BadRequest);
     await expect(service.retrieveAddressOptions('BAD')).resolves.toBe(HttpStatusCode.InternalServerError);
@@ -153,7 +157,7 @@ describe('ServiceCentreAddressService', () => {
             'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           addressLine2: [
-            'Address line 2 must be 255 characters or less',
+            'Address line 2 must be 250 characters or less',
             'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
           ],
           county: [

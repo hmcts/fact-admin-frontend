@@ -1,10 +1,17 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
+import {
+  ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
+  WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  WARNING_NOTICE_MAX_LENGTH,
+  WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+  WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+  WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
+} from '../../utils/constants/messageConstants';
+import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
 import { isHttpStatusCode } from '../../utils/valueParsers';
-
-const englishWarningFormatRegex = /^[A-Za-z0-9.,!?:;'"()\-/&@+\s]+$/;
-const welshWarningFormatRegex = /^[\p{L}0-9.,!?:;'"()\-/&@+\s]+$/u;
 
 export type WarningNoticeForm = {
   warningNotice?: string;
@@ -121,29 +128,27 @@ export class CourtWarningNoticeService {
 
     const { warningNotice, warningNoticeCy } = form;
     if (warningNotice && !warningNoticeCy) {
-      errors.warningNoticeCy = 'Because you provided an explanation in English, the Welsh translation is now mandatory';
+      errors.warningNoticeCy = WELSH_WARNING_NOTICE_REQUIRED_MESSAGE;
     }
 
     if (warningNoticeCy && !warningNotice) {
-      errors.warningNotice = 'Because you provided an explanation in Welsh, the English translation is now mandatory';
+      errors.warningNotice = ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE;
     }
 
-    if (warningNotice && warningNotice.length > 250) {
-      errors.warningNotice = 'Warning notice must be 250 characters or less';
+    if (warningNotice && warningNotice.length > WARNING_NOTICE_MAX_LENGTH) {
+      errors.warningNotice = WARNING_NOTICE_MAX_LENGTH_MESSAGE;
     }
 
-    if (warningNoticeCy && warningNoticeCy.length > 250) {
-      errors.warningNoticeCy = 'Welsh warning notice must be 250 characters or less';
+    if (warningNoticeCy && warningNoticeCy.length > WARNING_NOTICE_MAX_LENGTH) {
+      errors.warningNoticeCy = WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE;
     }
 
-    if (warningNotice && !englishWarningFormatRegex.test(warningNotice)) {
-      errors.warningNotice =
-        'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+    if (warningNotice && !ENGLISH_WARNING_NOTICE_REGEX.test(warningNotice)) {
+      errors.warningNotice = WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
     }
 
-    if (warningNoticeCy && !welshWarningFormatRegex.test(warningNoticeCy)) {
-      errors.warningNoticeCy =
-        'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
+    if (warningNoticeCy && !WELSH_WARNING_NOTICE_REGEX.test(warningNoticeCy)) {
+      errors.warningNoticeCy = WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
     }
 
     return errors;

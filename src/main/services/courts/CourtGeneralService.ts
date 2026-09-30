@@ -4,8 +4,12 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
-
-import { getCourtNameValidationErrors } from './courtNameValidation';
+import {
+  COURT_ALREADY_EXISTS_MESSAGE,
+  COURT_OPEN_MESSAGE,
+  COURT_REGION_MESSAGE,
+} from '../../utils/constants/messageConstants';
+import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
@@ -67,7 +71,7 @@ export class CourtGeneralService {
       return {
         ...courtEntity,
         errors: {
-          name: [`A court with the entered name already exists: '${duplicateCourt.name}'`],
+          name: [`${COURT_ALREADY_EXISTS_MESSAGE}: '${duplicateCourt.name}'`],
         },
       };
     }
@@ -78,7 +82,7 @@ export class CourtGeneralService {
       return result;
     }
 
-    // if it's a Map, it's [validation ]errors from the API
+    // if it's a Map, it's [validation] errors from the API
     if (result instanceof Map) {
       // convert the mapped errors into our expected error format
       const errors: Record<string, string[]> = {};
@@ -102,7 +106,7 @@ export class CourtGeneralService {
     // region just has to be selected
     const regionErrors: string[] = [];
     if (!model.regionId || model.regionId.trim().length === 0) {
-      regionErrors.push('Select a region for the court');
+      regionErrors.push(COURT_REGION_MESSAGE);
     }
     if (regionErrors.length > 0) {
       errors.regionId = regionErrors;
@@ -111,7 +115,7 @@ export class CourtGeneralService {
     // in case someone manages to post without open being set to true or false, we should catch that too
     const openErrors: string[] = [];
     if (model.open === undefined || model.open === null) {
-      openErrors.push('Select whether the court is open or closed');
+      openErrors.push(COURT_OPEN_MESSAGE);
     }
     if (openErrors.length > 0) {
       errors.open = openErrors;
