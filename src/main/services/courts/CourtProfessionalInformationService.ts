@@ -23,6 +23,7 @@ import {
   REPEATABLE_DESCRIPTION_MAX_LENGTH,
 } from '../../utils/constants/messageConstants';
 import {
+  GBS_CODE_REGEX,
   INTEGER_REGEX,
   PHONE_NUMBER_REGEX,
   PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
@@ -307,7 +308,7 @@ export class CourtProfessionalInformationService {
 
     this.validateCourtTypeOptions(viewModel, errors);
 
-    if (viewModel.gbs.trim() && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(viewModel.gbs.trim())) {
+    if (viewModel.gbs.trim() && !GBS_CODE_REGEX.test(viewModel.gbs.trim())) {
       errors.push({
         href: '#gbs',
         text: GBS_VALIDATION_ERROR,
