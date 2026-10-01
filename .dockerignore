@@ -9,6 +9,7 @@
 !version
 !.yarn/**
 !.yarnrc.yml
+!app
 !public
 !tsconfig.json
 !tsconfig.*.json
