@@ -18,19 +18,31 @@
     "REDIS_PORT": "6379",
     "REDIS_LOCAL": "true"
   },
-  "forwardPorts": [3355],
+  "forwardPorts": [3355, 9323, 8000],
   "portsAttributes": {
     "3355": {
       "label": "FaCT Admin Frontend",
       "protocol": "https",
       "onAutoForward": "notify"
+    },
+    "9323": {
+      "label": "Odhin Reports Frontend",
+      "protocol": "http",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "Copilot CLI OAuth",
+      "protocol": "http",
+      "onAutoForward": "notify"
     }
   },
   "mounts": [
     "source=fact-admin-frontend-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=fact-admin-frontend-copilot,target=/home/node/.copilot,type=volume"
+    "source=fact-admin-frontend-copilot,target=/home/node/.copilot,type=volume",
+    "source=${localWorkspaceFolder}/.devcontainer/.env,target=${containerWorkspaceFolder}/.env,type=bind"
   ],
-  "postCreateCommand": "sudo chown node:node node_modules /home/node/.copilot && yarn install",
+  "initializeCommand": "[ ! -f .devcontainer/.env ] && sed 's|://localhost|://host.docker.internal|g' .env > .devcontainer/.env || true",
+  "postCreateCommand": "sudo chown node:node node_modules /home/node/.copilot && PUPPETEER_SKIP_DOWNLOAD=true yarn install && yarn playwright install",
   "customizations": {
     "jetbrains": {
       "backend": "IntelliJ"

@@ -5,13 +5,9 @@ USER root
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    libfreetype6 \
-    libxext6 \
-    libxi6 \
-    libxrender1 \
-    libxtst6 \
     sudo \
+    ca-certificates \
+  && npx playwright install-deps \
   && rm -rf /var/lib/apt/lists/* \
   && echo "node ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/node \
   && chmod 0440 /etc/sudoers.d/node \

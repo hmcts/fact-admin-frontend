@@ -7,11 +7,9 @@
 !package.json
 !yarn.lock
 !version
+!.yarn
 !.yarn/**
 !.yarnrc.yml
-!app
-!public
-!.yarn
 !tsconfig.json
 !tsconfig.*.json
 !webpack/**
