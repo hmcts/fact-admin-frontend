@@ -2,9 +2,6 @@ node_modules/
 .nyc_output
 .sass-cache
 *.css
-!app
-!public
-!.yarn
 .idea/
 *.iml
 

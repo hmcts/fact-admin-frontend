@@ -9,7 +9,9 @@
 !version
 !.yarn/**
 !.yarnrc.yml
-
+!app
+!public
+!.yarn
 !tsconfig.json
 !tsconfig.*.json
 !webpack/**
