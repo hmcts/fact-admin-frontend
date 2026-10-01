@@ -10,6 +10,7 @@
 !.yarn
 !.yarn/**
 !.yarnrc.yml
+!app
 !tsconfig.json
 !tsconfig.*.json
 !webpack/**
