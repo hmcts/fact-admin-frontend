@@ -28,6 +28,7 @@ import {
   PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
   PROFESSIONAL_INFO_WELSH_TEXT_REGEX,
 } from '../../utils/constants/regexConstants';
+import { collectValidationErrors } from '../../utils/validation';
 
 type CourtCodeField = 'magistrateCourtCode' | 'familyCourtCode' | 'tribunalCode' | 'countyCourtCode' | 'crownCourtCode';
 
@@ -93,6 +94,43 @@ export type FamilyCourtRemovalConfirmation = {
 type RepeatableApiError = {
   href: string;
   label: string;
+};
+
+type RepeatableValidationMessages = {
+  codeMissingEnglishDescription: (displayIndex: number) => string;
+  codeMissingWelshDescription: (displayIndex: number) => string;
+  englishDescriptionNeedsWelsh: (displayIndex: number) => string;
+  welshDescriptionNeedsEnglish: (displayIndex: number) => string;
+  invalidCode: (displayIndex: number) => string;
+  codeTooLong: (displayIndex: number, maxLength: number) => string;
+  englishDescriptionTooLong: (displayIndex: number, maxLength: number) => string;
+  englishDescriptionInvalidCharacters: (displayIndex: number) => string;
+  welshDescriptionTooLong: (displayIndex: number, maxLength: number) => string;
+  welshDescriptionInvalidCharacters: (displayIndex: number) => string;
+};
+
+type RepeatableValidationConfig = {
+  codeFieldId: string;
+  englishDescriptionFieldId: string;
+  welshDescriptionFieldId: string;
+  codePattern: RegExp;
+  codeMaxLength?: number;
+  descriptionMaxLength: number;
+  messages: RepeatableValidationMessages;
+};
+
+type RepeatableEntryContext = {
+  code: string;
+  description: string;
+  descriptionCy: string;
+  displayIndex: number;
+  formIndex: number;
+};
+
+type RepeatableEntryRule = {
+  fieldId: (context: RepeatableEntryContext) => string;
+  message: (context: RepeatableEntryContext) => string;
+  when: (context: RepeatableEntryContext) => boolean;
 };
 
 export const courtTypeOptions: CourtTypeOption[] = [
@@ -326,182 +364,223 @@ export class CourtProfessionalInformationService {
     errors: ProfessionalInformationError[]
   ) {
     for (const option of courtTypeOptions) {
-      if (!viewModel.selectedCourtTypes.includes(option.value)) {
-        continue;
-      }
-
       const code = viewModel.selectedCourtTypeCodes[option.codeField].trim();
-      if (!code) {
-        errors.push({
-          href: `#${option.codeField}`,
-          text: `Enter a ${option.label.toLowerCase()} code`,
-        });
-      } else if (!INTEGER_REGEX.test(code)) {
-        errors.push({
-          href: `#${option.codeField}`,
-          text: `Enter a ${option.label.toLowerCase()} code using numbers only`,
-        });
-      } else if (code.length > COURT_CODE_MAX_DIGITS) {
-        errors.push({
-          href: `#${option.codeField}`,
-          text: `${option.codeLabel} must be at most 6 digits`,
-        });
-      }
+      errors.push(
+        ...collectValidationErrors(undefined, [
+          {
+            createError: () => ({
+              href: `#${option.codeField}`,
+              text: `Enter a ${option.label.toLowerCase()} code`,
+            }),
+            when: () => viewModel.selectedCourtTypes.includes(option.value) && !code,
+          },
+          {
+            createError: () => ({
+              href: `#${option.codeField}`,
+              text: `Enter a ${option.label.toLowerCase()} code using numbers only`,
+            }),
+            when: () =>
+              viewModel.selectedCourtTypes.includes(option.value) && Boolean(code) && !INTEGER_REGEX.test(code),
+          },
+          {
+            createError: () => ({
+              href: `#${option.codeField}`,
+              text: `${option.codeLabel} must be at most ${COURT_CODE_MAX_DIGITS} digits`,
+            }),
+            when: () =>
+              viewModel.selectedCourtTypes.includes(option.value) &&
+              INTEGER_REGEX.test(code) &&
+              code.length > COURT_CODE_MAX_DIGITS,
+          },
+        ])
+      );
     }
   }
 
   private validateInterviewRooms(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
-    if (viewModel.interviewRooms === true) {
-      if (!viewModel.interviewRoomCount.trim()) {
-        errors.push({
-          href: '#interviewRoomCount',
-          text: INTERVIEW_ROOM_COUNT_REQUIRED_ERROR,
-        });
-      } else if (!INTEGER_REGEX.test(viewModel.interviewRoomCount.trim())) {
-        errors.push({
-          href: '#interviewRoomCount',
-          text: INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR,
-        });
-      } else {
-        const interviewRoomCount = Number(viewModel.interviewRoomCount.trim());
-        if (interviewRoomCount < 1 || interviewRoomCount > 150) {
-          errors.push({
+    const roomCountText = viewModel.interviewRoomCount.trim();
+    const roomCountNumber = Number(roomCountText);
+
+    errors.push(
+      ...collectValidationErrors(undefined, [
+        {
+          createError: () => ({ href: '#interviewRoomCount', text: INTERVIEW_ROOM_COUNT_REQUIRED_ERROR }),
+          when: () => viewModel.interviewRooms === true && !roomCountText,
+        },
+        {
+          createError: () => ({
             href: '#interviewRoomCount',
-            text: INTERVIEW_ROOM_COUNT_ERROR,
-          });
-        }
-      }
-    }
+            text: INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR,
+          }),
+          when: () => viewModel.interviewRooms === true && Boolean(roomCountText) && !INTEGER_REGEX.test(roomCountText),
+        },
+        {
+          createError: () => ({ href: '#interviewRoomCount', text: INTERVIEW_ROOM_COUNT_ERROR }),
+          when: () =>
+            viewModel.interviewRooms === true &&
+            Boolean(roomCountText) &&
+            INTEGER_REGEX.test(roomCountText) &&
+            (roomCountNumber < 1 || roomCountNumber > 150),
+        },
+      ])
+    );
   }
 
   private validateFaxNumbers(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
-    viewModel.faxNumbers.forEach((faxNumber, index) => {
-      const formIndex = faxNumber.formIndex ?? index;
-      const code = faxNumber.code?.trim() ?? '';
-      const description = faxNumber.description?.trim() ?? '';
-      const descriptionCy = faxNumber.descriptionCy?.trim() ?? '';
-      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
-      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
-      if (description && !code) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE}`,
-        });
-      }
-      if (descriptionCy && !code) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_WELSH_DESCRIPTION_WITHOUT_NUMBER_MESSAGE}`,
-        });
-      } else if (code && !PHONE_NUMBER_REGEX.test(code)) {
-        errors.push({
-          href: `#faxNumber-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_VALIDATION_ERROR}`,
-        });
-      }
-      if (hasEnglishDescriptionOnly) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
-        });
-      }
-      if (hasWelshDescriptionOnly) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1}: ${FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
-        });
-      }
-      if (description.length > REPEATABLE_DESCRIPTION_MAX_LENGTH) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: Fax description must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
-        });
-      } else if (description && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(description)) {
-        errors.push({
-          href: `#faxNumberDescription-${formIndex}`,
-          text: `Fax number ${formIndex + 1} description: ${DX_VALIDATION_ERROR}`,
-        });
-      }
-      if (descriptionCy.length > REPEATABLE_DESCRIPTION_MAX_LENGTH) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: Fax description must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
-        });
-      } else if (descriptionCy && !PROFESSIONAL_INFO_WELSH_TEXT_REGEX.test(descriptionCy)) {
-        errors.push({
-          href: `#faxNumberDescriptionCy-${formIndex}`,
-          text: `Fax number ${formIndex + 1} Welsh description: ${DX_VALIDATION_ERROR}`,
-        });
-      }
+    this.validateRepeatableEntries(viewModel.faxNumbers, errors, {
+      codeFieldId: 'faxNumber',
+      englishDescriptionFieldId: 'faxNumberDescription',
+      welshDescriptionFieldId: 'faxNumberDescriptionCy',
+      codePattern: PHONE_NUMBER_REGEX,
+      descriptionMaxLength: REPEATABLE_DESCRIPTION_MAX_LENGTH,
+      messages: {
+        codeMissingEnglishDescription: displayIndex =>
+          `Fax number ${displayIndex}: ${FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE}`,
+        codeMissingWelshDescription: displayIndex =>
+          `Fax number ${displayIndex}: ${FAX_NUMBER_WELSH_DESCRIPTION_WITHOUT_NUMBER_MESSAGE}`,
+        englishDescriptionNeedsWelsh: displayIndex =>
+          `Fax number ${displayIndex}: ${FAX_NUMBER_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
+        welshDescriptionNeedsEnglish: displayIndex =>
+          `Fax number ${displayIndex}: ${FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
+        invalidCode: displayIndex => `Fax number ${displayIndex}: ${FAX_NUMBER_VALIDATION_ERROR}`,
+        codeTooLong: () => '',
+        englishDescriptionTooLong: (displayIndex, maxLength) =>
+          `Fax number ${displayIndex} description: Fax description must be ${maxLength} characters or fewer`,
+        englishDescriptionInvalidCharacters: displayIndex =>
+          `Fax number ${displayIndex} description: ${DX_VALIDATION_ERROR}`,
+        welshDescriptionTooLong: (displayIndex, maxLength) =>
+          `Fax number ${displayIndex} Welsh description: Fax description must be ${maxLength} characters or fewer`,
+        welshDescriptionInvalidCharacters: displayIndex =>
+          `Fax number ${displayIndex} Welsh description: ${DX_VALIDATION_ERROR}`,
+      },
     });
   }
 
   private validateDxCodes(viewModel: ProfessionalInformationViewModel, errors: ProfessionalInformationError[]) {
-    viewModel.dxCodes.forEach((dxCode, index) => {
-      const formIndex = dxCode.formIndex ?? index;
-      const code = dxCode.code?.trim() ?? '';
-      const description = dxCode.description?.trim() ?? '';
-      const descriptionCy = dxCode.descriptionCy?.trim() ?? '';
-      const hasEnglishDescriptionOnly = Boolean(description) && !descriptionCy;
-      const hasWelshDescriptionOnly = Boolean(descriptionCy) && !description;
-      if (description && !code) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE}`,
-        });
-      }
-      if (descriptionCy && !code) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE}`,
-        });
-      }
-      if (hasEnglishDescriptionOnly) {
-        errors.push({
-          href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
-        });
-      }
-      if (hasWelshDescriptionOnly) {
-        errors.push({
-          href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
-        });
-      }
-      if (code.length > DX_CODE_MAX_LENGTH) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: DX code must be ${DX_CODE_MAX_LENGTH} characters or fewer`,
-        });
-      } else if (code && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(code)) {
-        errors.push({
-          href: `#dxCode-${formIndex}`,
-          text: `DX code ${formIndex + 1}: ${DX_VALIDATION_ERROR}`,
-        });
-      }
-      if (description.length > REPEATABLE_DESCRIPTION_MAX_LENGTH) {
-        errors.push({
-          href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1} explanation: DX explanation must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
-        });
-      } else if (description && !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(description)) {
-        errors.push({
-          href: `#dxCodeDescription-${formIndex}`,
-          text: `DX code ${formIndex + 1} explanation: ${DX_VALIDATION_ERROR}`,
-        });
-      }
-      if (descriptionCy.length > REPEATABLE_DESCRIPTION_MAX_LENGTH) {
-        errors.push({
-          href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} Welsh explanation: DX Welsh explanation must be ${REPEATABLE_DESCRIPTION_MAX_LENGTH} characters or fewer`,
-        });
-      } else if (descriptionCy && !PROFESSIONAL_INFO_WELSH_TEXT_REGEX.test(descriptionCy)) {
-        errors.push({
-          href: `#dxCodeDescriptionCy-${formIndex}`,
-          text: `DX code ${formIndex + 1} Welsh explanation: ${DX_VALIDATION_ERROR}`,
-        });
-      }
+    this.validateRepeatableEntries(viewModel.dxCodes, errors, {
+      codeFieldId: 'dxCode',
+      englishDescriptionFieldId: 'dxCodeDescription',
+      welshDescriptionFieldId: 'dxCodeDescriptionCy',
+      codePattern: PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
+      codeMaxLength: DX_CODE_MAX_LENGTH,
+      descriptionMaxLength: REPEATABLE_DESCRIPTION_MAX_LENGTH,
+      messages: {
+        codeMissingEnglishDescription: displayIndex =>
+          `DX code ${displayIndex}: ${DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE}`,
+        codeMissingWelshDescription: displayIndex =>
+          `DX code ${displayIndex}: ${DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE}`,
+        englishDescriptionNeedsWelsh: displayIndex =>
+          `DX code ${displayIndex}: ${DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
+        welshDescriptionNeedsEnglish: displayIndex =>
+          `DX code ${displayIndex}: ${DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
+        invalidCode: displayIndex => `DX code ${displayIndex}: ${DX_VALIDATION_ERROR}`,
+        codeTooLong: (displayIndex, maxLength) =>
+          `DX code ${displayIndex}: DX code must be ${maxLength} characters or fewer`,
+        englishDescriptionTooLong: (displayIndex, maxLength) =>
+          `DX code ${displayIndex} explanation: DX explanation must be ${maxLength} characters or fewer`,
+        englishDescriptionInvalidCharacters: displayIndex =>
+          `DX code ${displayIndex} explanation: ${DX_VALIDATION_ERROR}`,
+        welshDescriptionTooLong: (displayIndex, maxLength) =>
+          `DX code ${displayIndex} Welsh explanation: DX Welsh explanation must be ${maxLength} characters or fewer`,
+        welshDescriptionInvalidCharacters: displayIndex =>
+          `DX code ${displayIndex} Welsh explanation: ${DX_VALIDATION_ERROR}`,
+      },
     });
+  }
+
+  private validateRepeatableEntries(
+    entries: ProfessionalInformationEntry[],
+    errors: ProfessionalInformationError[],
+    config: RepeatableValidationConfig
+  ): void {
+    const rules = this.getRepeatableEntryRules(config);
+
+    entries.forEach((entry, index) => {
+      const context: RepeatableEntryContext = {
+        code: entry.code?.trim() ?? '',
+        description: entry.description?.trim() ?? '',
+        descriptionCy: entry.descriptionCy?.trim() ?? '',
+        formIndex: entry.formIndex ?? index,
+        displayIndex: (entry.formIndex ?? index) + 1,
+      };
+
+      rules.forEach(rule => {
+        if (!rule.when(context)) {
+          return;
+        }
+
+        errors.push({
+          href: `#${rule.fieldId(context)}`,
+          text: rule.message(context),
+        });
+      });
+    });
+  }
+
+  private getRepeatableEntryRules(config: RepeatableValidationConfig): RepeatableEntryRule[] {
+    const codeLengthRule: RepeatableEntryRule | undefined = config.codeMaxLength
+      ? {
+          fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+          message: context => config.messages.codeTooLong(context.displayIndex, config.codeMaxLength as number),
+          when: context => context.code.length > (config.codeMaxLength as number),
+        }
+      : undefined;
+
+    return [
+      {
+        fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+        message: context => config.messages.codeMissingEnglishDescription(context.displayIndex),
+        when: context => Boolean(context.description) && !context.code,
+      },
+      {
+        fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+        message: context => config.messages.codeMissingWelshDescription(context.displayIndex),
+        when: context => Boolean(context.descriptionCy) && !context.code,
+      },
+      {
+        fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.englishDescriptionNeedsWelsh(context.displayIndex),
+        when: context => Boolean(context.description) && !context.descriptionCy,
+      },
+      {
+        fieldId: context => `${config.englishDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.welshDescriptionNeedsEnglish(context.displayIndex),
+        when: context => Boolean(context.descriptionCy) && !context.description,
+      },
+      ...(codeLengthRule ? [codeLengthRule] : []),
+      {
+        fieldId: context => `${config.codeFieldId}-${context.formIndex}`,
+        message: context => config.messages.invalidCode(context.displayIndex),
+        when: context => Boolean(context.code) && !config.codePattern.test(context.code),
+      },
+      {
+        fieldId: context => `${config.englishDescriptionFieldId}-${context.formIndex}`,
+        message: context =>
+          config.messages.englishDescriptionTooLong(context.displayIndex, config.descriptionMaxLength),
+        when: context => context.description.length > config.descriptionMaxLength,
+      },
+      {
+        fieldId: context => `${config.englishDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.englishDescriptionInvalidCharacters(context.displayIndex),
+        when: context =>
+          context.description.length <= config.descriptionMaxLength &&
+          Boolean(context.description) &&
+          !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(context.description),
+      },
+      {
+        fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.welshDescriptionTooLong(context.displayIndex, config.descriptionMaxLength),
+        when: context => context.descriptionCy.length > config.descriptionMaxLength,
+      },
+      {
+        fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
+        message: context => config.messages.welshDescriptionInvalidCharacters(context.displayIndex),
+        when: context =>
+          context.descriptionCy.length <= config.descriptionMaxLength &&
+          Boolean(context.descriptionCy) &&
+          !PROFESSIONAL_INFO_WELSH_TEXT_REGEX.test(context.descriptionCy),
+      },
+    ];
   }
 
   private toPayload(viewModel: ProfessionalInformationViewModel): CourtProfessionalInformation {

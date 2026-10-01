@@ -22,7 +22,8 @@
     "test:functional:no-performance": "NODE_OPTIONS=--no-deprecation yarn playwright test --grep-invert='@smoke|@performance'",
     "test:performance": "yarn playwright test --grep='@performance'",
     "test:a11y": "echo 'a11y tests run as part of test:functional' && exit 0",
-    "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y"
+    "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
+    "playwright:report": "yarn playwright show-report test-results/odhin-report --host 0.0.0.0"
   },
   "dependencies": {
     "@azure/identity": "4.13.3",
@@ -118,9 +119,13 @@
     "webpack-dev-middleware": "8.3.0"
   },
   "resolutions": {
+    "@grpc/grpc-js": "1.14.5",
     "@opentelemetry/exporter-prometheus": "0.222.0",
     "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.11.0",
     "@opentelemetry/sdk-node": "0.222.0",
+    "ip-address": "10.7.2",
+    "joi": "17.13.7",
+    "moment": "2.31.0",
     "qs": "6.16.0"
   },
   "packageManager": "yarn@4.18.0"
