@@ -4,6 +4,7 @@ node_modules/
 *.css
 !app
 !public
+!yarn
 .idea/
 *.iml
 
