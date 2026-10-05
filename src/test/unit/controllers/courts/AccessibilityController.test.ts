@@ -50,15 +50,33 @@ describe('CourtAccessibilityController', () => {
   type MockResponse = Response & {
     status: jest.Mock;
     render: jest.Mock;
+    redirect: jest.Mock;
   };
 
-  const mockReq = (params: Request['params'], body: Request['body'] = {}): Request =>
-    ({ params, body }) as unknown as Request;
+  const redisClientMock = {
+    set: jest.fn(),
+    getDel: jest.fn(),
+  };
+
+  const mockApp = {
+    locals: {
+      redisClient: redisClientMock,
+    },
+  } as Partial<Request['app']>;
+
+  const mockReq = (
+    params: Request['params'],
+    body: Request['body'] = {},
+    query: Request['query'] = {},
+    app: Partial<Request['app']> = mockApp,
+    path?: Request['path']
+  ): Request => ({ params, body, query, app, path }) as unknown as Request;
 
   const mockRes = (): MockResponse => {
     const res = {
       status: jest.fn(),
       render: jest.fn(),
+      redirect: jest.fn(),
     } as unknown as MockResponse;
 
     res.status.mockReturnValue(res);
@@ -173,21 +191,52 @@ describe('CourtAccessibilityController', () => {
       );
     });
 
-    it('re-renders edit view when save returns validation errors', async () => {
+    it('redirects to the error view when save returns validation errors', async () => {
       saveMock.mockResolvedValueOnce({
         name: 'Court A',
         errors: { hearingEnhancementEquipment: ['Select what hearing enhancement equipment is available'] },
       });
 
-      const req = mockReq({ courtId: '11111111-1111-1111-1111-111111111111' }, {});
+      const req = mockReq(
+        { courtId: '11111111-1111-1111-1111-111111111111' },
+        {},
+        { token: '12345' },
+        mockApp,
+        '/accessibility/success'
+      );
       const res = mockRes();
 
       await controller.updateCourt(req, res);
 
+      expect(res.redirect).toHaveBeenCalledWith(303, expect.stringContaining('/accessibility/error?token='));
+    });
+
+    it('renders the error view when save returns validation errors', async () => {
+      redisClientMock.getDel.mockResolvedValueOnce(
+        JSON.stringify({
+          name: 'Court A',
+          errors: { hearingEnhancementEquipment: ['Select what hearing enhancement equipment is available'] },
+        })
+      );
+
+      const req = mockReq(
+        { courtId: '11111111-1111-1111-1111-111111111111' },
+        {},
+        { token: '12345' },
+        mockApp,
+        '/accessibility/error'
+      );
+      const res = mockRes();
+
+      await controller.renderErrorView(req, res);
+
       expect(res.render).toHaveBeenCalledWith(
         'court-accessibility-edit',
         expect.objectContaining({
-          pageTitle: 'Error: Accessibility - Court A',
+          model: {
+            name: 'Court A',
+            errors: { hearingEnhancementEquipment: ['Select what hearing enhancement equipment is available'] },
+          },
         })
       );
     });

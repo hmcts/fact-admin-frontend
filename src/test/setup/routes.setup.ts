@@ -7,6 +7,7 @@ jest.mock('redis', () => ({
     connect: jest.fn().mockResolvedValue(undefined),
     del: jest.fn().mockResolvedValue(undefined),
     get: jest.fn().mockResolvedValue(null),
+    getDel: jest.fn().mockResolvedValue(null),
     on: jest.fn(),
     ping: jest.fn().mockResolvedValue('PONG'),
     set: jest.fn().mockResolvedValue(undefined),

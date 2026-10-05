@@ -65,4 +65,8 @@ export class AccessibilityPage extends Base {
   buildAccessibilitySuccessUrl(courtId: string): string {
     return config.urls.homePageUrl + `/courts/${courtId}/edit/accessibility/success`;
   }
+
+  buildAccessibilityErrorUrl(courtId: string): RegExp {
+    return new RegExp(config.urls.homePageUrl + String.raw`/courts/${courtId}/edit/accessibility/error\?token=.+`);
+  }
 }

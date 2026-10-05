@@ -42,7 +42,7 @@ export default class CourtAccessibilityController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const { liftDoorWidth, liftDoorLimit, model } = this.buildAccessibilityModel(req, resolvedCourtId);
+    const { liftDoorLimit, liftDoorWidth, model } = this.buildAccessibilityModel(req, resolvedCourtId);
 
     const updateResponse = await this.accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
     if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
@@ -50,15 +50,20 @@ export default class CourtAccessibilityController extends BaseController {
     }
 
     if (updateResponse.errors) {
-      const updatedLiftDoorLimit = Number.isNaN(updateResponse.liftDoorLimit) ? liftDoorLimit : model.liftDoorLimit;
-      const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
+      const updatedLiftDoorLimit = Number.isNaN(updateResponse.liftDoorLimit)
+        ? liftDoorLimit
+        : updateResponse.liftDoorLimit;
+      const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth)
+        ? liftDoorWidth
+        : updateResponse.liftDoorWidth;
 
-      return res.render('court-accessibility-edit', {
-        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
-        courtId: resolvedCourtId,
-        model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
-        pageTitle: `Error: Accessibility - ${updateResponse.name}`,
-      });
+      this.redirectWithModel<AccessibilityModel & { liftDoorWidth: unknown; liftDoorLimit: unknown }>(
+        req,
+        res,
+        { ...updateResponse, liftDoorLimit: updatedLiftDoorLimit, liftDoorWidth: updatedLiftDoorWidth },
+        'error'
+      );
+      return;
     }
 
     return res.render('common-edit-success', {
@@ -69,6 +74,45 @@ export default class CourtAccessibilityController extends BaseController {
       successPanelBody: `Accessibility details saved for ${updateResponse.name}`,
       subjectName: updateResponse.name,
     });
+  }
+
+  @route('/error')
+  @GET()
+  public async renderErrorView(req: Request, res: Response): Promise<void> {
+    const resolvedCourtId = this.getUuidRouteParam(req, 'courtId');
+    if (!resolvedCourtId) {
+      return this.renderCourtNotFound(res);
+    }
+
+    const token = typeof req.query.token === 'string' ? req.query.token : undefined;
+
+    if (!token) {
+      this.renderError(res, 400);
+      return;
+    }
+
+    const key = `error-payload:${token}`;
+
+    const storedPayload = await req.app.locals.redisClient.getDel(key);
+
+    if (!storedPayload) {
+      this.renderError(res, 500);
+      return;
+    }
+
+    const updateResponse = JSON.parse(storedPayload) as AccessibilityModel;
+
+    if (updateResponse) {
+      res.render('court-accessibility-edit', {
+        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
+        courtId: resolvedCourtId,
+        model: updateResponse,
+        pageTitle: `Error: Accessibility - ${updateResponse.name}`,
+      });
+      return;
+    }
+
+    this.renderError(res, 500);
   }
 
   private buildAccessibilityModel(req: Request, resolvedCourtId: string) {
@@ -114,7 +158,7 @@ export default class CourtAccessibilityController extends BaseController {
         typeof liftSupportPhoneNumber === 'string' && parseBoolean(lift) === false ? liftSupportPhoneNumber : undefined,
       quietRoom: parseBoolean(quietRoom),
     };
-    return { liftDoorWidth, liftDoorLimit, model };
+    return { liftDoorWidth: liftDoorWidth as number, liftDoorLimit: liftDoorLimit as number, model };
   }
 
   private buildAccessibilityBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {

@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
@@ -67,5 +69,20 @@ export default abstract class BaseController {
     }
 
     res.render(template, result as object);
+  }
+
+  protected redirectWithModel<T>(req: Request, res: Response, model: T, page: string): void {
+    const token = randomUUID();
+    const key = `${page}-payload:${token}`;
+    const path = req.path.lastIndexOf('/') > 0 ? req.path.substring(0, req.path.lastIndexOf('/')) : req.path;
+
+    req.app.locals.redisClient.set(key, JSON.stringify(model), {
+      expiration: {
+        type: 'EX',
+        value: 60,
+      },
+    });
+
+    res.redirect(303, `${path}/${page}?token=${encodeURIComponent(token)}`);
   }
 }

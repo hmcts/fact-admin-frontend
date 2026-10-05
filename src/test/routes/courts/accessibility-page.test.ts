@@ -102,7 +102,7 @@ describe('Accessibility page', () => {
     );
   });
 
-  test('renders validation errors on invalid POST payload', async () => {
+  test('redirects to error page on invalid POST payload', async () => {
     stub(CourtApi.prototype, 'getCourtById').resolves({ id: courtId, name: 'Reading Crown Court' } as never);
     const updateAccessibilityStub = stub(CourtApi.prototype, 'updateAccessibility');
 
@@ -117,12 +117,43 @@ describe('Accessibility page', () => {
       quietRoom: 'true',
     });
 
+    expect(response.status).toBe(HttpStatusCode.SeeOther);
+    expect(updateAccessibilityStub.notCalled).toBe(true);
+  });
+
+  test('renders accessibility validation errors retrieved from Redis', async () => {
+    const token = 'accessibility-error-token';
+    const storedModel = {
+      courtId,
+      name: 'Reading Crown Court',
+      accessibleParking: true,
+      accessibleToiletDescription: '',
+      accessibleToiletDescriptionCy: 'Toiled hygyrch ger y dderbynfa',
+      accessibleEntrance: true,
+      hearingEnhancementEquipment: 'infraredAndHearingLoop',
+      lift: true,
+      liftDoorWidth: '',
+      liftDoorLimit: '',
+      quietRoom: true,
+      errors: {
+        accessibleToiletDescription: ['Enter accessible toilet details'],
+        liftDoorWidth: ['Enter the lift door width'],
+        liftDoorLimit: ['Enter the lift weight limit'],
+      },
+    };
+
+    const getDelStub = stub(app.locals.redisClient, 'getDel').resolves(JSON.stringify(storedModel));
+
+    const response = await request(app).get(
+      `/courts/${courtId}/edit/accessibility/error?token=${encodeURIComponent(token)}`
+    );
+
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('There is a problem');
+    expect(response.text).toContain('Error: Accessibility - Reading Crown Court');
+    expect(response.text).toContain('Enter accessible toilet details');
     expect(response.text).toContain('Enter the lift door width');
     expect(response.text).toContain('Enter the lift weight limit');
-    expect(response.text).toContain('Enter a description of the accessible toilet facilities');
-    expect(updateAccessibilityStub.notCalled).toBe(true);
+    expect(getDelStub.calledOnceWithExactly(`error-payload:${token}`)).toBe(true);
   });
 
   test('renders court not found for invalid court id on POST', async () => {

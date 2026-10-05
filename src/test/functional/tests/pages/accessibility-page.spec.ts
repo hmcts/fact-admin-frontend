@@ -63,7 +63,7 @@ test.describe('Accessibility Page Tests', () => {
       await accessibilityPage.selectYes('quietRoom');
       await accessibilityPage.save();
 
-      await expect(accessibilityPage.page).toHaveURL(accessibilityPage.buildAccessibilitySuccessUrl(createdCourt.id));
+      await expect(accessibilityPage.page).toHaveURL(accessibilityPage.buildAccessibilityErrorUrl(createdCourt.id));
       await expect(accessibilityPage.errorSummary).toContainText('There is a problem');
       await expect(accessibilityPage.errorSummary).toContainText('Lift door width must be a valid number');
       await expect(accessibilityPage.errorSummary).toContainText('Enter the lift weight limit');
