@@ -95,6 +95,9 @@ export class CourtWarningNoticeService {
     if (updateResponse instanceof Map) {
       const apiErrors: Record<string, string> = {};
       for (const [key, value] of updateResponse) {
+        if (key === 'timestamp') {
+          continue;
+        }
         apiErrors[key] = value;
       }
       return {
