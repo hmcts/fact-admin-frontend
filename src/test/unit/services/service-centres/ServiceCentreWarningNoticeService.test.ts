@@ -28,7 +28,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     );
 
     expect(result.type).toBe('validation-error');
-    expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 250 characters or fewer');
+    expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 700 characters or fewer');
     expect(getServiceCentreByIdStub.calledOnce).toBe(true);
     expect(updateServiceCentreStub.notCalled).toBe(true);
   });
