@@ -6,21 +6,6 @@ import CourtCasesHeardController from '../../../../main/controllers/courts/Court
 import { CourtApi } from '../../../../main/requests/CourtApi';
 import { CourtCasesHeardService } from '../../../../main/services/courts/CourtCasesHeardService';
 import { mockRequest } from '../../mocks/mockRequest';
-
-const buildCasesHeardBreadcrumbs = (courtId: string, courtName: string, currentPage?: string) => {
-  const breadcrumbs = [
-    { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: `Edit ${courtName}` },
-    { href: `/courts/${courtId}/edit/cases-heard`, text: 'Cases heard' },
-  ];
-
-  if (currentPage) {
-    breadcrumbs.push({ href: '#', text: currentPage });
-  }
-
-  return breadcrumbs;
-};
-
 describe('CourtCasesHeardController', () => {
   let courtApi = new CourtApi();
   let casesHeardService = new CourtCasesHeardService(courtApi);
@@ -93,7 +78,6 @@ describe('CourtCasesHeardController', () => {
       .once()
       .withArgs('court-cases-heard', {
         ...viewModel,
-        breadcrumbs: buildCasesHeardBreadcrumbs('11111111-1111-4111-8111-111111111111', 'Reading Crown Court'),
       });
 
     try {
@@ -228,21 +212,13 @@ describe('CourtCasesHeardController', () => {
     } as never);
     const updateCourtAreasOfLawStub = stub(courtApi, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success', {
-        subjectId: '11111111-1111-4111-8111-111111111111',
-        pageTitle: 'Cases heard saved - Reading Crown Court',
-        successPanelTitle: 'Cases heard saved',
-        successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
-        subjectName: 'Reading Crown Court',
-        breadcrumbs: buildCasesHeardBreadcrumbs(
-          '11111111-1111-4111-8111-111111111111',
-          'Reading Crown Court',
-          'Cases heard saved'
-        ),
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success', {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      pageTitle: 'Cases heard saved - Reading Crown Court',
+      successPanelTitle: 'Cases heard saved',
+      successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
+      subjectName: 'Reading Crown Court',
+    });
 
     try {
       await controller.postSuccess(request, response);
@@ -350,11 +326,6 @@ describe('CourtCasesHeardController', () => {
         message:
           'You are removing the cases heard type of Adoption. This is being used by the local authorities admin page. If you remove this it will remove the local authority config. Do you want to remove this?',
         selectedAreasOfLaw: ['22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'],
-        breadcrumbs: buildCasesHeardBreadcrumbs(
-          'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-          'Reading Crown Court',
-          'Cases heard confirm update'
-        ),
       });
 
     try {
@@ -394,11 +365,6 @@ describe('CourtCasesHeardController', () => {
         message:
           'You are removing the cases heard types: Adoption, Children. These are being used by the local authorities admin page. If you remove them it will remove the local authority config. Do you want to remove them?',
         selectedAreasOfLaw: ['22222222-2222-4222-8222-222222222222'],
-        breadcrumbs: buildCasesHeardBreadcrumbs(
-          'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-          'Reading Crown Court',
-          'Cases heard confirm update'
-        ),
       });
 
     try {
@@ -433,11 +399,6 @@ describe('CourtCasesHeardController', () => {
       .expects('render')
       .once()
       .withArgs('court-cases-heard-confirm', {
-        breadcrumbs: buildCasesHeardBreadcrumbs(
-          'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-          'Reading Crown Court',
-          'Cases heard confirm update'
-        ),
         cancelHref: '/courts/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/edit/cases-heard',
         courtId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         courtName: 'Reading Crown Court',
@@ -473,21 +434,13 @@ describe('CourtCasesHeardController', () => {
     } as never);
     const updateCourtAreasOfLawStub = stub(courtApi, 'updateCourtAreasOfLaw').resolves(HttpStatusCode.Ok);
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success', {
-        subjectId: '11111111-1111-4111-8111-111111111111',
-        pageTitle: 'Cases heard saved - Reading Crown Court',
-        successPanelTitle: 'Cases heard saved',
-        successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
-        subjectName: 'Reading Crown Court',
-        breadcrumbs: buildCasesHeardBreadcrumbs(
-          '11111111-1111-4111-8111-111111111111',
-          'Reading Crown Court',
-          'Cases heard saved'
-        ),
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success', {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      pageTitle: 'Cases heard saved - Reading Crown Court',
+      successPanelTitle: 'Cases heard saved',
+      successPanelBody: 'Cases heard for Reading Crown Court have been saved successfully.',
+      subjectName: 'Reading Crown Court',
+    });
 
     try {
       await controller.postSuccess(request, response);
@@ -552,7 +505,6 @@ describe('CourtCasesHeardController', () => {
         ],
         pageTitle: 'Error: Cases heard - Reading Crown Court',
         rightColumnAreasOfLawItems: [],
-        breadcrumbs: buildCasesHeardBreadcrumbs('11111111-1111-4111-8111-111111111111', 'Reading Crown Court'),
       });
 
     try {

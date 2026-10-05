@@ -5,7 +5,6 @@ import { Request, Response } from 'express';
 import { SubjectType } from '../../schemas/subjectTypeSchema';
 import { ServiceCentreWarningNoticeService } from '../../services/service-centres/ServiceCentreWarningNoticeService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/service-centres/:serviceCentreId/edit/warning-notice')
 export default class ServiceCentreWarningNoticeController extends BaseController {
@@ -27,7 +26,6 @@ export default class ServiceCentreWarningNoticeController extends BaseController
     }
 
     res.render('service-centre-warning-notice-edit', {
-      breadcrumbs: this.buildSectionBreadcrumbs(serviceCentreId, viewModel.name, 'Warning notice'),
       model: viewModel,
       pageTitle: viewModel.pageTitle,
     });
@@ -51,7 +49,6 @@ export default class ServiceCentreWarningNoticeController extends BaseController
     if (saveResult.type === 'validation-error') {
       res.status(HttpStatusCode.BadRequest);
       res.render('service-centre-warning-notice-edit', {
-        breadcrumbs: this.buildSectionBreadcrumbs(serviceCentreId, saveResult.viewModel.name, 'Warning notice'),
         model: saveResult.viewModel,
         pageTitle: saveResult.viewModel.pageTitle,
       });
@@ -64,12 +61,6 @@ export default class ServiceCentreWarningNoticeController extends BaseController
     }
 
     res.render('common-edit-success', {
-      breadcrumbs: this.buildSectionBreadcrumbs(
-        serviceCentreId,
-        saveResult.viewModel.name,
-        'Warning notice',
-        'Warning notice saved'
-      ),
       continueUpdatingHref: `/service-centres/${serviceCentreId}/edit`,
       continueUpdatingText: `Continue updating ${saveResult.viewModel.name}`,
       subjectId: serviceCentreId,
@@ -79,21 +70,5 @@ export default class ServiceCentreWarningNoticeController extends BaseController
       successPanelBody: `Warning notice for ${saveResult.viewModel.name} has been saved successfully.`,
       successPanelTitle: 'Warning notice saved',
     });
-  }
-
-  private buildSectionBreadcrumbs(
-    serviceCentreId: string,
-    serviceCentreName: string,
-    section: string,
-    currentPage?: string
-  ) {
-    return buildSectionBreadcrumbs(
-      serviceCentreId,
-      serviceCentreName,
-      section,
-      section.toLowerCase().replaceAll(' ', '-'),
-      currentPage,
-      SubjectType.SERVICE_CENTRE
-    );
   }
 }

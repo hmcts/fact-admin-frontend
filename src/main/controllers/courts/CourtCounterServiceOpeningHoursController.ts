@@ -8,7 +8,6 @@ import {
 } from '../../services/courts/CounterServiceOpeningHoursService';
 import { parseOptionalString } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/counter-service-opening-hours')
 export default class CourtCounterServiceOpeningHoursController extends BaseController {
@@ -27,12 +26,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
 
     const viewModel = await this.counterServiceOpeningHoursService.getListPage(courtId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel),
-      'court-counter-service-opening-hours',
-      'court-not-found'
-    );
+    this.renderResponse(res, viewModel, 'court-counter-service-opening-hours', 'court-not-found');
   }
 
   @route('/add')
@@ -47,12 +41,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
 
     const viewModel = await this.counterServiceOpeningHoursService.getEditPage(courtId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
-      'court-counter-service-opening-hours-edit',
-      'court-not-found'
-    );
+    this.renderResponse(res, viewModel, 'court-counter-service-opening-hours-edit', 'court-not-found');
   }
 
   @route('/edit/:counterServiceId')
@@ -73,12 +62,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
 
     const viewModel = await this.counterServiceOpeningHoursService.getEditPage(courtId, counterServiceId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
-      'court-counter-service-opening-hours-edit',
-      'not-found'
-    );
+    this.renderResponse(res, viewModel, 'court-counter-service-opening-hours-edit', 'not-found');
   }
 
   @route('/save')
@@ -118,12 +102,7 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
             cancelHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
           };
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, deleteViewModel, 'Delete opening hours'),
-      'court-counter-service-opening-hours-delete',
-      'not-found'
-    );
+    this.renderResponse(res, deleteViewModel, 'court-counter-service-opening-hours-delete', 'not-found');
   }
 
   @route('/delete/success/:counterServiceId')
@@ -152,7 +131,6 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     res.render('common-edit-success.njk', {
       subjectId: viewModel.courtId,
       subjectName: viewModel.courtName,
-      breadcrumbs: this.buildCounterServiceBreadcrumbs(viewModel.courtId, viewModel.courtName, 'Opening hours deleted'),
       pageTitle: 'Counter service opening hours deleted',
       successPanelTitle: `Opening hours deleted ${viewModel.assistanceAvailable}.`,
       successPanelBody: `You have removed this counter service opening hour for ${viewModel.courtName}.`,
@@ -181,7 +159,6 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('court-counter-service-opening-hours-edit', {
         ...saveResult.viewModel,
-        breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Edit opening hours'),
       });
     }
 
@@ -195,11 +172,6 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
     res.render('common-edit-success.njk', {
       subjectId: saveResult.viewModel.courtId,
       subjectName: courtName,
-      breadcrumbs: this.buildCounterServiceBreadcrumbs(
-        saveResult.viewModel.courtId,
-        courtName,
-        'Counter service opening hours saved'
-      ),
       pageTitle: 'Counter service opening hours saved',
       successPanelTitle: 'Counter service opening hours saved',
       successPanelBody: `Counter service opening hours for ${courtName} have been successfully updated.`,
@@ -217,30 +189,5 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
       sameTime: parseOptionalString(body.sameTime),
       selectedDays: this.counterServiceOpeningHoursService.getSelectedDays(body.selectedDays),
     } as CounterServiceOpeningHoursForm;
-  }
-
-  private buildCounterServiceBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(
-      courtId,
-      courtName,
-      'Counter service opening hours',
-      'counter-service-opening-hours',
-      currentPage
-    );
-  }
-
-  private withBreadcrumbs<T extends { courtName: string }>(
-    courtId: string,
-    viewModel: T | HttpStatusCode,
-    currentPage?: string
-  ): T | HttpStatusCode {
-    if (typeof viewModel === 'number') {
-      return viewModel;
-    }
-
-    return {
-      ...viewModel,
-      breadcrumbs: this.buildCounterServiceBreadcrumbs(courtId, viewModel.courtName, currentPage),
-    };
   }
 }

@@ -5,7 +5,6 @@ import { AccessibilityModel, CourtAccessibilityService } from '../../services/co
 import { isHearingEnhancementEquipment } from '../../utils/mapper';
 import { parseBoolean, parseLiftMetric } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/accessibility')
 export default class CourtAccessibilityController extends BaseController {
@@ -27,7 +26,6 @@ export default class CourtAccessibilityController extends BaseController {
     }
 
     return res.render('court-accessibility-edit', {
-      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model,
       pageTitle: `Accessibility - ${model.name}`,
@@ -54,7 +52,6 @@ export default class CourtAccessibilityController extends BaseController {
       const updatedLiftDoorWidth = Number.isNaN(updateResponse.liftDoorWidth) ? liftDoorWidth : model.liftDoorWidth;
 
       return res.render('court-accessibility-edit', {
-        breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: { ...updateResponse, liftDoorWidth: updatedLiftDoorWidth, liftDoorLimit: updatedLiftDoorLimit },
         pageTitle: `Error: Accessibility - ${updateResponse.name}`,
@@ -62,7 +59,6 @@ export default class CourtAccessibilityController extends BaseController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildAccessibilityBreadcrumbs(resolvedCourtId, updateResponse.name!, 'Accessibility saved'),
       subjectId: resolvedCourtId,
       pageTitle: `Accessibility saved - ${updateResponse.name}`,
       successPanelTitle: 'Accessibility details saved',
@@ -115,9 +111,5 @@ export default class CourtAccessibilityController extends BaseController {
       quietRoom: parseBoolean(quietRoom),
     };
     return { liftDoorWidth, liftDoorLimit, model };
-  }
-
-  private buildAccessibilityBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Accessibility', 'accessibility', currentPage);
   }
 }

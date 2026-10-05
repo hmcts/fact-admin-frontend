@@ -6,8 +6,6 @@ import { Logger } from '../../modules/logging';
 import { CourtSinglePointOfEntryService } from '../../services/courts/CourtSinglePointOfEntryService';
 import { isUuid, parseBoolean } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-
 const logger = Logger.getLogger('app');
 const singlePointOfEntryFieldPrefix = 'singlePointOfEntry.';
 
@@ -33,7 +31,6 @@ export default class CourtSinglePointOfEntryController extends BaseController {
       res,
       {
         ...viewModel,
-        breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(courtId, viewModel.courtName),
       },
       'court-single-point-of-entry',
       'court-not-found'
@@ -66,20 +63,11 @@ export default class CourtSinglePointOfEntryController extends BaseController {
     }
 
     return res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildSinglePointOfEntryBreadcrumbs(
-        courtId,
-        saveResult.courtName,
-        'Single points of entry saved'
-      ),
       subjectId: courtId,
       subjectName: saveResult.courtName,
       pageTitle: `Single points of entry saved - ${saveResult.courtName}`,
       successPanelTitle: `Single points of entry settings for ${saveResult.courtName} have been successfully updated`,
     });
-  }
-
-  private buildSinglePointOfEntryBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Single points of entry', 'single-point-of-entry', currentPage);
   }
 
   private parseServiceSelections(body: Request['body']): Record<string, boolean> | undefined {

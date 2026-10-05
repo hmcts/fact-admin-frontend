@@ -47,10 +47,6 @@ describe('UsersController', () => {
       .once()
       .withArgs('users', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Users' },
-        ],
       });
 
     await controller.get(request, response);

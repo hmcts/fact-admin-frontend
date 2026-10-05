@@ -7,8 +7,6 @@ import {
   FamilyCourtRemovalConfirmation,
 } from '../../services/courts/CourtProfessionalInformationService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-
 type HiddenInput = {
   name: string;
   value: string;
@@ -34,7 +32,6 @@ export default class CourtProfessionalInformationController extends BaseControll
 
     res.render('court-professional-information', {
       ...viewModel,
-      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, viewModel.courtName),
     });
   }
 
@@ -69,16 +66,10 @@ export default class CourtProfessionalInformationController extends BaseControll
       res.status(HttpStatusCode.BadRequest);
       return res.render('court-professional-information', {
         ...saveResponse.viewModel,
-        breadcrumbs: this.buildProfessionalInformationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
       });
     }
 
     res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
-        courtId,
-        saveResponse.viewModel.courtName,
-        'Information for professionals saved'
-      ),
       subjectId: courtId,
       subjectName: saveResponse.viewModel.courtName,
       pageTitle: `Information for professionals saved - ${saveResponse.viewModel.courtName}`,
@@ -94,11 +85,6 @@ export default class CourtProfessionalInformationController extends BaseControll
     body: Request['body']
   ): void {
     res.render('court-professional-information-confirm', {
-      breadcrumbs: this.buildProfessionalInformationBreadcrumbs(
-        courtId,
-        confirmation.courtName,
-        'Information for professionals confirm update'
-      ),
       cancelHref: `/courts/${courtId}/edit/information-for-professionals`,
       courtId,
       courtName: confirmation.courtName,
@@ -137,15 +123,5 @@ export default class CourtProfessionalInformationController extends BaseControll
         name,
         value: entry,
       }));
-  }
-
-  private buildProfessionalInformationBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(
-      courtId,
-      courtName,
-      'Information for professionals',
-      'information-for-professionals',
-      currentPage
-    );
   }
 }

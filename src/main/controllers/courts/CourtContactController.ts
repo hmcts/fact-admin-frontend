@@ -6,7 +6,6 @@ import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { CourtContactFormHeading, CourtContactService } from '../../services/courts/CourtContactService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/contact-details')
 export default class CourtContactController extends BaseController {
@@ -32,7 +31,6 @@ export default class CourtContactController extends BaseController {
     }
 
     return res.render('court-contact-list', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name),
       courtContactDetails: courtContactDetailsResponse,
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
@@ -59,7 +57,6 @@ export default class CourtContactController extends BaseController {
     }
 
     return res.render('court-contact-form', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Add contact details'),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
@@ -104,7 +101,6 @@ export default class CourtContactController extends BaseController {
     }
 
     return res.render('court-contact-form', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Edit contact details'),
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
@@ -189,7 +185,6 @@ export default class CourtContactController extends BaseController {
     const contactDescription = await this.courtContactService.resolveContactDetailDescription(contactDetailResponse);
 
     return res.render('court-contact-delete', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Delete contact details'),
       cancelHref: `/courts/${resolvedCourtId}/edit/contact-details`,
       courtId: resolvedCourtId,
       courtName: courtResponse.name,
@@ -236,7 +231,6 @@ export default class CourtContactController extends BaseController {
     }
     const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(resolvedCourtId, courtResponse.name, 'Contact details deleted'),
       subjectId: resolvedCourtId,
       subjectName: courtResponse.name,
       continueUpdatingHref: `/courts/${resolvedCourtId}/edit/contact-details`,
@@ -307,11 +301,6 @@ export default class CourtContactController extends BaseController {
       res.status(HttpStatusCode.BadRequest);
       return res.render('court-contact-form', {
         ...submitFlowOutcome.formViewModel,
-        breadcrumbs: this.buildContactDetailsBreadcrumbs(
-          options.courtId,
-          options.courtName,
-          options.formHeading === 'Add contact details' ? 'Add contact details' : 'Edit contact details'
-        ),
       });
     }
 
@@ -326,7 +315,6 @@ export default class CourtContactController extends BaseController {
     const detail = this.detailsGenerator(req.body, 'contact-email', 'contact-telephone');
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(options.courtId, options.courtName, 'Contact details saved'),
       subjectId: options.courtId,
       subjectName: options.courtName,
       continueUpdatingHref: `/courts/${options.courtId}/edit/contact-details`,
@@ -345,9 +333,5 @@ export default class CourtContactController extends BaseController {
     }
 
     return courtResponse;
-  }
-
-  private buildContactDetailsBreadcrumbs(courtId: string, courtName: string, currentPageText?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Contact details', 'contact-details', currentPageText);
   }
 }

@@ -48,6 +48,7 @@ const mockContainerEnableFor = jest.fn((expressApp: Express): void => {
 const mockCsrfProtectionEnableFor = jest.fn();
 const mockHelmetEnableFor = jest.fn();
 const mockLockingEnableFor = jest.fn();
+const mockPageDataEnableFor = jest.fn();
 const mockPropertiesVolumeEnableFor = jest.fn();
 const mockRedisEnableFor = jest.fn();
 const mockRequestLoggingEnableFor = jest.fn();
@@ -74,6 +75,7 @@ jest.mock('../../main/modules/helmet', () => ({
 
 jest.mock('../../main/modules/locking', () => ({
   LockingInterceptor: jest.fn().mockImplementation(() => ({ enableFor: mockLockingEnableFor })),
+  PageDataInterceptor: jest.fn().mockImplementation(() => ({ enableFor: mockPageDataEnableFor })),
 }));
 
 const mockViewEngine = jest.fn(
@@ -172,6 +174,7 @@ describe('app', () => {
     expect(mockRequestLoggingEnableFor).toHaveBeenCalledWith(app);
     expect(mockAuthenticationEnableFor).toHaveBeenCalledWith(app);
     expect(mockCsrfProtectionEnableFor).toHaveBeenCalledWith(app);
+    expect(mockPageDataEnableFor).toHaveBeenCalledWith(app);
     expect(mockLockingEnableFor).toHaveBeenCalledWith(app);
     expect(mockScopePerRequest).toHaveBeenCalledWith(app.locals.container);
     expect(mockLoadControllers).toHaveBeenCalledTimes(2);

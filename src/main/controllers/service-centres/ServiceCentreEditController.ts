@@ -10,7 +10,6 @@ import { LockService } from '../../services/LockService';
 import { parseNumber } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
 import { LocationApprovalController } from '../LocationApprovalController';
-import { buildEditBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/service-centres/:serviceCentreId/edit')
 export class ServiceCentreEditController extends BaseController {
@@ -35,7 +34,6 @@ export class ServiceCentreEditController extends BaseController {
     const lockService = new LockService(operationsApi);
     return new LocationApprovalController(
       {
-        buildBreadcrumbs: buildEditBreadcrumbs,
         editView: 'service-centre-edit',
         getAdditionalEditViewModel: async (req, serviceCentreId) => {
           if (isViewer(req)) {

@@ -38,23 +38,15 @@ describe('CourtTranslationAndInterpretationController', () => {
       phoneNumber: '+441234 567890',
     });
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('court-translation-and-interpretation', {
-        courtId,
-        courtName: 'Reading Crown Court',
-        email: 'translations@example.com',
-        emailSelected: true,
-        errorSummary: [],
-        phoneNumber: '+441234 567890',
-        phoneNumberSelected: true,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
-          { href: `/courts/${courtId}/edit/translation-and-interpretation`, text: 'Translation and interpretation' },
-        ],
-      });
+    responseMock.expects('render').once().withArgs('court-translation-and-interpretation', {
+      courtId,
+      courtName: 'Reading Crown Court',
+      email: 'translations@example.com',
+      emailSelected: true,
+      errorSummary: [],
+      phoneNumber: '+441234 567890',
+      phoneNumberSelected: true,
+    });
 
     try {
       await controller.get(request, response);
@@ -172,22 +164,13 @@ describe('CourtTranslationAndInterpretationController', () => {
     } as never);
     const saveTranslationServicesStub = stub(courtApi, 'saveTranslationServices').resolves(HttpStatusCode.NoContent);
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success.njk', {
-        subjectId: courtId,
-        subjectName: 'Reading Crown Court',
-        pageTitle: 'Translation and interpretation saved - Reading Crown Court',
-        successPanelTitle: 'Translation and interpretation saved',
-        successPanelBody: 'Translation and interpretation contact for Reading Crown Court has been saved successfully.',
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
-          { href: `/courts/${courtId}/edit/translation-and-interpretation`, text: 'Translation and interpretation' },
-          { href: '#', text: 'Translation and interpretation saved' },
-        ],
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success.njk', {
+      subjectId: courtId,
+      subjectName: 'Reading Crown Court',
+      pageTitle: 'Translation and interpretation saved - Reading Crown Court',
+      successPanelTitle: 'Translation and interpretation saved',
+      successPanelBody: 'Translation and interpretation contact for Reading Crown Court has been saved successfully.',
+    });
 
     try {
       await controller.postSuccess(request, response);

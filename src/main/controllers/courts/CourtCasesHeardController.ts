@@ -4,8 +4,6 @@ import { Request, Response } from 'express';
 
 import { CourtCasesHeardService } from '../../services/courts/CourtCasesHeardService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-
 type Confirmations = {
   Adoption: boolean;
   Children: boolean;
@@ -34,7 +32,6 @@ export default class CourtCasesHeardController extends BaseController {
 
     return res.render('court-cases-heard', {
       ...viewModel,
-      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, viewModel.courtName),
     });
   }
 
@@ -67,7 +64,6 @@ export default class CourtCasesHeardController extends BaseController {
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('court-cases-heard', {
         ...saveResult.viewModel,
-        breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, saveResult.viewModel.courtName),
       });
     }
 
@@ -76,11 +72,6 @@ export default class CourtCasesHeardController extends BaseController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildCasesHeardBreadcrumbs(
-        resolvedCourtId,
-        saveResult.viewModel.courtName,
-        'Cases heard saved'
-      ),
       subjectId: resolvedCourtId,
       pageTitle: `Cases heard saved - ${saveResult.viewModel.courtName}`,
       successPanelTitle: 'Cases heard saved',
@@ -109,16 +100,11 @@ export default class CourtCasesHeardController extends BaseController {
     }
 
     return res.render('court-cases-heard-confirm', {
-      breadcrumbs: this.buildCasesHeardBreadcrumbs(resolvedCourtId, courtName, 'Cases heard confirm update'),
       cancelHref: `/courts/${resolvedCourtId}/edit/cases-heard`,
       courtId: resolvedCourtId,
       courtName,
       selectedAreasOfLaw,
       message,
     });
-  }
-
-  private buildCasesHeardBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Cases heard', 'cases-heard', currentPage);
   }
 }

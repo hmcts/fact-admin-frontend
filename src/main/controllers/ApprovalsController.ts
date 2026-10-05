@@ -7,7 +7,6 @@ import { ApprovalService } from '../services/ApprovalService';
 import { parseString } from '../utils/valueParsers';
 
 import BaseController from './BaseController';
-import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/approvals')
 export default class ApprovalsController extends BaseController {
@@ -28,7 +27,6 @@ export default class ApprovalsController extends BaseController {
 
     return res.render('approvals', {
       ...viewModel,
-      breadcrumbs: buildPageBreadcrumbs('Approvals tracker'),
     });
   }
 
@@ -52,11 +50,6 @@ export default class ApprovalsController extends BaseController {
 
     return res.render('approval-undo-confirm', {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '/approvals', text: 'Approvals tracker' },
-        { href: '#', text: 'Undo approval' },
-      ],
     });
   }
 
@@ -79,11 +72,6 @@ export default class ApprovalsController extends BaseController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '/approvals', text: 'Approvals tracker' },
-        { href: '#', text: 'Approval undone' },
-      ],
       continueUpdatingHref: '/approvals',
       continueUpdatingText: 'Back to Approval tracker',
       homeText: 'Back to Courts, tribunals and service centres list',

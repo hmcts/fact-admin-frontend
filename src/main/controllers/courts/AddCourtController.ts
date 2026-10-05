@@ -20,10 +20,6 @@ export default class AddCourtController extends BaseController {
 
     return res.render('add-court', {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '#', text: 'Add new court' },
-      ],
     });
   }
 
@@ -41,10 +37,6 @@ export default class AddCourtController extends BaseController {
     if ('errors' in createResult) {
       return res.render('add-court', {
         ...createResult,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Add new court' },
-        ],
       });
     }
 
@@ -54,11 +46,6 @@ export default class AddCourtController extends BaseController {
 
     return res.render('add-court-success', {
       ...createResult,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${createResult.courtId}/edit`, text: createResult.courtName },
-        { href: '#', text: 'Addresses' },
-      ],
     });
   }
 }

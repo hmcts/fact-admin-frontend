@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import { UsersPageService } from '../services/UsersPageService';
 
 import BaseController from './BaseController';
-import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
 
 @route('/users')
 export default class UsersController extends BaseController {
@@ -19,7 +18,6 @@ export default class UsersController extends BaseController {
 
     res.render('users', {
       ...viewModel,
-      breadcrumbs: buildPageBreadcrumbs('Users'),
     });
   }
 }

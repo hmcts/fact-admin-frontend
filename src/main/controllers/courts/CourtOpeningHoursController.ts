@@ -5,7 +5,6 @@ import { Request, Response } from 'express';
 import { CourtOpeningHoursService, OpeningHoursForm } from '../../services/courts/CourtOpeningHoursService';
 import { parseOptionalString } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/court-opening-hours')
 export default class CourtOpeningHoursController extends BaseController {
@@ -24,7 +23,7 @@ export default class CourtOpeningHoursController extends BaseController {
 
     const viewModel = await this.courtOpeningHoursService.getListPage(courtId);
 
-    this.renderResponse(res, this.withBreadcrumbs(courtId, viewModel), 'court-opening-hours', 'court-not-found');
+    this.renderResponse(res, viewModel, 'court-opening-hours', 'court-not-found');
   }
 
   @route('/add')
@@ -39,12 +38,7 @@ export default class CourtOpeningHoursController extends BaseController {
 
     const viewModel = await this.courtOpeningHoursService.getEditPage(courtId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
-      'court-opening-hours-edit',
-      'court-not-found'
-    );
+    this.renderResponse(res, viewModel, 'court-opening-hours-edit', 'court-not-found');
   }
 
   @route('/edit/:openingHoursId')
@@ -65,12 +59,7 @@ export default class CourtOpeningHoursController extends BaseController {
 
     const viewModel = await this.courtOpeningHoursService.getEditPage(courtId, openingHoursId);
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel, 'Edit opening hours'),
-      'court-opening-hours-edit',
-      'not-found'
-    );
+    this.renderResponse(res, viewModel, 'court-opening-hours-edit', 'not-found');
   }
 
   @route('/save')
@@ -110,12 +99,7 @@ export default class CourtOpeningHoursController extends BaseController {
             cancelHref: `/courts/${courtId}/edit/court-opening-hours`,
           };
 
-    this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, deleteViewModel, 'Delete opening hours'),
-      'court-opening-hours-delete',
-      'not-found'
-    );
+    this.renderResponse(res, deleteViewModel, 'court-opening-hours-delete', 'not-found');
   }
 
   @route('/delete/success/:openingHoursId')
@@ -144,7 +128,6 @@ export default class CourtOpeningHoursController extends BaseController {
     res.render('common-edit-success.njk', {
       subjectId: viewModel.courtId,
       subjectName: viewModel.courtName,
-      breadcrumbs: this.buildOpeningHoursBreadcrumbs(viewModel.courtId, viewModel.courtName, 'Opening hours deleted'),
       pageTitle: 'Opening hours deleted',
       successPanelTitle: `Opening hours deleted: ${viewModel.openingHourType}.`,
       successPanelBody: `You have removed this opening hour for ${viewModel.courtName}.`,
@@ -173,7 +156,6 @@ export default class CourtOpeningHoursController extends BaseController {
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('court-opening-hours-edit', {
         ...saveResult.viewModel,
-        breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, saveResult.viewModel.courtName, 'Edit opening hours'),
       });
     }
 
@@ -186,7 +168,6 @@ export default class CourtOpeningHoursController extends BaseController {
     return res.render('common-edit-success.njk', {
       subjectId: saveResult.viewModel.courtId,
       subjectName: courtName,
-      breadcrumbs: this.buildOpeningHoursBreadcrumbs(saveResult.viewModel.courtId, courtName, 'Opening hours saved'),
       pageTitle: 'Opening hours saved',
       successPanelTitle: 'Opening hours saved',
       successPanelBody: `Opening hours for ${courtName} have been successfully updated.`,
@@ -202,24 +183,5 @@ export default class CourtOpeningHoursController extends BaseController {
       sameTime: parseOptionalString(body.sameTime),
       selectedDays: this.courtOpeningHoursService.getSelectedDays(body.selectedDays),
     } as OpeningHoursForm;
-  }
-
-  private buildOpeningHoursBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Court opening hours', 'court-opening-hours', currentPage);
-  }
-
-  private withBreadcrumbs<T extends { courtName: string }>(
-    courtId: string,
-    viewModel: T | HttpStatusCode,
-    currentPage?: string
-  ): T | HttpStatusCode {
-    if (typeof viewModel === 'number') {
-      return viewModel;
-    }
-
-    return {
-      ...viewModel,
-      breadcrumbs: this.buildOpeningHoursBreadcrumbs(courtId, viewModel.courtName, currentPage),
-    };
   }
 }

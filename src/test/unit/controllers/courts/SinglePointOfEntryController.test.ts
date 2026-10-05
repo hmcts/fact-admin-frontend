@@ -13,12 +13,6 @@ const CHECKED_BODY = { [`singlePointOfEntry.${CHILDREN_AREA_ID}`]: ['false', 'tr
 const UNCHECKED_BODY = { [`singlePointOfEntry.${CHILDREN_AREA_ID}`]: 'false' };
 const SUCCESS_RESULT = { status: 'saved' as const, courtName: 'Reading Crown Court' };
 
-const expectedBreadcrumbs = [
-  { href: '/', text: 'Home' },
-  { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
-  { href: `/courts/${COURT_ID}/edit/single-point-of-entry`, text: 'Single points of entry' },
-];
-
 function buildRequest(params: Request['params'] = { courtId: COURT_ID }, body: unknown = CHECKED_BODY): Request {
   const request = mockRequest({});
   request.params = params;
@@ -114,7 +108,6 @@ describe('CourtSinglePointOfEntryController', () => {
         .once()
         .withArgs('court-single-point-of-entry', {
           ...viewModel,
-          breadcrumbs: expectedBreadcrumbs,
         });
 
       await controller.renderSinglePointOfEntryView(request, response);
@@ -167,16 +160,12 @@ describe('CourtSinglePointOfEntryController', () => {
       SUCCESS_RESULT,
       async ({ controller, request, response, stub: updateStub }) => {
         const responseMock = mock(response);
-        responseMock
-          .expects('render')
-          .once()
-          .withArgs('common-edit-success.njk', {
-            breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
-            subjectId: COURT_ID,
-            subjectName: 'Reading Crown Court',
-            pageTitle: 'Single points of entry saved - Reading Crown Court',
-            successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
-          });
+        responseMock.expects('render').once().withArgs('common-edit-success.njk', {
+          subjectId: COURT_ID,
+          subjectName: 'Reading Crown Court',
+          pageTitle: 'Single points of entry saved - Reading Crown Court',
+          successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
+        });
 
         await controller.updateSinglePointOfEntry(request, response);
 
@@ -192,16 +181,12 @@ describe('CourtSinglePointOfEntryController', () => {
       SUCCESS_RESULT,
       async ({ controller, request, response, stub: updateStub }) => {
         const responseMock = mock(response);
-        responseMock
-          .expects('render')
-          .once()
-          .withArgs('common-edit-success.njk', {
-            breadcrumbs: [...expectedBreadcrumbs, { href: '#', text: 'Single points of entry saved' }],
-            subjectId: COURT_ID,
-            subjectName: 'Reading Crown Court',
-            pageTitle: 'Single points of entry saved - Reading Crown Court',
-            successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
-          });
+        responseMock.expects('render').once().withArgs('common-edit-success.njk', {
+          subjectId: COURT_ID,
+          subjectName: 'Reading Crown Court',
+          pageTitle: 'Single points of entry saved - Reading Crown Court',
+          successPanelTitle: 'Single points of entry settings for Reading Crown Court have been successfully updated',
+        });
 
         await controller.updateSinglePointOfEntry(request, response);
 

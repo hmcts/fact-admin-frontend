@@ -32,10 +32,6 @@ describe('AddServiceCentreController', () => {
       .once()
       .withArgs('add-service-centre', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Add new service centre' },
-        ],
       });
 
     try {
@@ -95,10 +91,6 @@ describe('AddServiceCentreController', () => {
       .once()
       .withArgs('add-service-centre', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Add new service centre' },
-        ],
       });
 
     try {
@@ -169,14 +161,6 @@ describe('AddServiceCentreController', () => {
       .once()
       .withArgs('add-service-centre-success', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/service-centres/11111111-1111-4111-8111-111111111111/edit',
-            text: 'National Business Centre',
-          },
-          { href: '#', text: 'Addresses' },
-        ],
       });
 
     try {
@@ -217,10 +201,6 @@ describe('AddServiceCentreController', () => {
       .once()
       .withArgs('add-service-centre', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Add new service centre' },
-        ],
       });
 
     try {

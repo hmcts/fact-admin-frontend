@@ -12,7 +12,7 @@ jest.mock('../../../../main/modules/authentication/authenticationHelper', () => 
   isSuperAdmin: jest.fn(),
 }));
 
-import { LockingInterceptor } from '../../../../main/modules/locking';
+import { LockingInterceptor, PageDataInterceptor } from '../../../../main/modules/locking';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../../../../main/modules/authentication/authenticationHelper';
 
 describe('LockingInterceptor', () => {
@@ -48,6 +48,16 @@ describe('LockingInterceptor', () => {
     ) => Promise<void>;
   };
 
+  const createPageDataMiddleware = () => {
+    const app = { use: jest.fn() } as unknown as express.Express;
+    new PageDataInterceptor().enableFor(app);
+    return (app.use as unknown as jest.Mock).mock.calls[0][0] as (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => void;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     getFactUserIdMock.mockReturnValue('22222222-2222-4222-8222-222222222222');
@@ -74,6 +84,34 @@ describe('LockingInterceptor', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(dataApi.acquireLock).not.toHaveBeenCalled();
     expect(dataApi.clearUserLocks).not.toHaveBeenCalled();
+  });
+
+  test('builds breadcrumbs from the request path and render model', () => {
+    const middleware = createPageDataMiddleware();
+    const req = { path: `/courts/${subjectId}/edit/general` } as express.Request;
+    const res = createResponse();
+    const render = res.render as unknown as jest.Mock;
+
+    middleware(req, res, jest.fn());
+    res.render('court-general-edit', {
+      breadcrumbs: [{ href: '#', text: 'Ignored controller breadcrumb' }],
+      model: { name: 'Reading Crown Court' },
+      pageTitle: 'General',
+    });
+
+    expect(res.locals.breadcrumbs).toEqual([
+      { href: '/', text: 'Home' },
+      { href: `/courts/${subjectId}/edit`, text: 'Edit Reading Crown Court' },
+      { href: `/courts/${subjectId}/edit/general`, text: 'General' },
+    ]);
+    expect(render).toHaveBeenCalledWith(
+      'court-general-edit',
+      {
+        model: { name: 'Reading Crown Court' },
+        pageTitle: 'General',
+      },
+      undefined
+    );
   });
 
   test('clears user locks for non-lockable paths and calls next', async () => {
@@ -126,6 +164,7 @@ describe('LockingInterceptor', () => {
       path: `/courts/${subjectId}/edit/address`,
     } as express.Request;
     const res = createResponse();
+    const render = res.render as unknown as jest.Mock;
     const next = jest.fn();
 
     await middleware(req, res, next);
@@ -138,7 +177,7 @@ describe('LockingInterceptor', () => {
     );
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
-    expect(res.render).not.toHaveBeenCalled();
+    expect(render).not.toHaveBeenCalled();
     expect(res.locals.timeoutDialogConfig).toBeUndefined();
     expect(logger.warnEvent).not.toHaveBeenCalled();
     expect(logger.errorEvent).not.toHaveBeenCalled();
@@ -155,13 +194,14 @@ describe('LockingInterceptor', () => {
       const middleware = createMiddleware(dataApi);
       const req = { path } as express.Request;
       const res = createResponse();
+      const render = res.render as unknown as jest.Mock;
       const next = jest.fn();
 
       await middleware(req, res, next);
 
       expect(dataApi.clearUserLocks).toHaveBeenCalledWith('22222222-2222-4222-8222-222222222222');
       expect(dataApi.acquireLock).not.toHaveBeenCalled();
-      expect(res.render).not.toHaveBeenCalled();
+      expect(render).not.toHaveBeenCalled();
       expect(next).toHaveBeenCalledTimes(1);
     }
   );
@@ -175,12 +215,13 @@ describe('LockingInterceptor', () => {
     const middleware = createMiddleware(dataApi);
     const req = { path: `/courts/${subjectId}/edit/not-a-page` } as express.Request;
     const res = createResponse();
+    const render = res.render as unknown as jest.Mock;
     const next = jest.fn();
 
     await middleware(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest);
-    expect(res.render).toHaveBeenCalledWith('lock-failed', {
+    expect(render).toHaveBeenCalledWith('lock-failed', {
       subject: 'court',
       page: 'not a page',
     });
@@ -211,6 +252,7 @@ describe('LockingInterceptor', () => {
     const middleware = createMiddleware(dataApi);
     const req = { path: `/courts/${subjectId}/edit/address` } as express.Request;
     const res = createResponse();
+    const render = res.render as unknown as jest.Mock;
     const next = jest.fn();
 
     await middleware(req, res, next);
@@ -222,7 +264,7 @@ describe('LockingInterceptor', () => {
       '22222222-2222-4222-8222-222222222222'
     );
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Conflict);
-    expect(res.render).toHaveBeenCalledWith(
+    expect(render).toHaveBeenCalledWith(
       'lock-exists',
       expect.objectContaining({
         subject: 'court',
@@ -245,12 +287,13 @@ describe('LockingInterceptor', () => {
     const middleware = createMiddleware(dataApi);
     const req = { path: `/courts/${subjectId}/edit/address` } as express.Request;
     const res = createResponse();
+    const render = res.render as unknown as jest.Mock;
     const next = jest.fn();
 
     await middleware(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest);
-    expect(res.render).toHaveBeenCalledWith('lock-failed', {
+    expect(render).toHaveBeenCalledWith('lock-failed', {
       subject: 'court',
       page: 'address',
     });

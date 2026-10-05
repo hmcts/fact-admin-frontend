@@ -51,11 +51,6 @@ describe('CourtLocalAuthoritiesController', () => {
       .once()
       .withArgs('court-local-authorities', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Court' },
-          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
-        ],
       });
 
     try {
@@ -156,21 +151,12 @@ describe('CourtLocalAuthoritiesController', () => {
       courtName: 'Reading Crown Court',
     });
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success.njk', {
-        subjectId: COURT_ID,
-        subjectName: 'Reading Crown Court',
-        pageTitle: 'Local authorities saved - Reading Crown Court',
-        successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
-          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
-          { href: '#', text: 'Local authorities saved' },
-        ],
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success.njk', {
+      subjectId: COURT_ID,
+      subjectName: 'Reading Crown Court',
+      pageTitle: 'Local authorities saved - Reading Crown Court',
+      successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
+    });
 
     try {
       await controller.updateLocalAuthorities(request, response);
@@ -290,21 +276,12 @@ describe('CourtLocalAuthoritiesController', () => {
       courtName: 'Reading Crown Court',
     });
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success.njk', {
-        subjectId: COURT_ID,
-        subjectName: 'Reading Crown Court',
-        pageTitle: 'Local authorities saved - Reading Crown Court',
-        successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
-          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
-          { href: '#', text: 'Local authorities saved' },
-        ],
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success.njk', {
+      subjectId: COURT_ID,
+      subjectName: 'Reading Crown Court',
+      pageTitle: 'Local authorities saved - Reading Crown Court',
+      successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
+    });
 
     try {
       await controller.updateLocalAuthorities(request, response);
@@ -335,21 +312,12 @@ describe('CourtLocalAuthoritiesController', () => {
       courtName: 'Reading Crown Court',
     });
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success.njk', {
-        subjectId: COURT_ID,
-        subjectName: 'Reading Crown Court',
-        pageTitle: 'Local authorities saved - Reading Crown Court',
-        successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${COURT_ID}/edit`, text: 'Edit Reading Crown Court' },
-          { href: `/courts/${COURT_ID}/edit/local-authorities`, text: 'Local authorities' },
-          { href: '#', text: 'Local authorities saved' },
-        ],
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success.njk', {
+      subjectId: COURT_ID,
+      subjectName: 'Reading Crown Court',
+      pageTitle: 'Local authorities saved - Reading Crown Court',
+      successPanelTitle: 'Local authority settings for Reading Crown Court have been successfully updated',
+    });
 
     try {
       await controller.updateLocalAuthorities(request, response);

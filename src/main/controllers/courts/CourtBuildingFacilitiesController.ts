@@ -5,7 +5,6 @@ import { CourtBuildingFacilitiesService, FacilityModel } from '../../services/co
 import { addFoodAndDrink, mapFoodAndDrink } from '../../utils/mapper';
 import { parseBoolean } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/building-facilities')
 export default class CourtBuildingFacilitiesController extends BaseController {
@@ -27,7 +26,6 @@ export default class CourtBuildingFacilitiesController extends BaseController {
     }
     const result = addFoodAndDrink(model);
     res.render('court-building-facilities-edit', {
-      breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, model.name!),
       courtId: resolvedCourtId,
       model: result,
       pageTitle: `Building Facilities - ${model.name}`,
@@ -66,7 +64,6 @@ export default class CourtBuildingFacilitiesController extends BaseController {
 
     if (updateResponse.errors) {
       res.render('court-building-facilities-edit', {
-        breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(resolvedCourtId, updateResponse.name!),
         courtId: resolvedCourtId,
         model: addFoodAndDrink(updateResponse),
         pageTitle: `Error: Building Facilities - ${updateResponse.name}`,
@@ -75,20 +72,11 @@ export default class CourtBuildingFacilitiesController extends BaseController {
     }
 
     res.render('common-edit-success', {
-      breadcrumbs: this.buildBuildingFacilitiesBreadcrumbs(
-        resolvedCourtId,
-        updateResponse.name!,
-        'Building facilities saved'
-      ),
       subjectId: resolvedCourtId,
       pageTitle: `Building Facilities saved - ${updateResponse.name}`,
       successPanelTitle: 'Building Facilities details saved',
       successPanelBody: `Building Facilities details for ${updateResponse.name} have been saved successfully.`,
       subjectName: updateResponse.name,
     });
-  }
-
-  private buildBuildingFacilitiesBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Building facilities', 'building-facilities', currentPage);
   }
 }

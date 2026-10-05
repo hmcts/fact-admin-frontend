@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 
 import { CourtTranslationAndInterpretationService } from '../../services/courts/CourtTranslationAndInterpretationService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/translation-and-interpretation')
 export default class CourtTranslationAndInterpretationController extends BaseController {
@@ -28,7 +27,6 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
 
     return res.render('court-translation-and-interpretation', {
       ...viewModel,
-      breadcrumbs: this.buildTranslationBreadcrumbs(courtId, viewModel.courtName),
     });
   }
 
@@ -51,31 +49,15 @@ export default class CourtTranslationAndInterpretationController extends BaseCon
       res.status(HttpStatusCode.BadRequest);
       return res.render('court-translation-and-interpretation', {
         ...saveResponse.viewModel,
-        breadcrumbs: this.buildTranslationBreadcrumbs(courtId, saveResponse.viewModel.courtName),
       });
     }
 
     return res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildTranslationBreadcrumbs(
-        courtId,
-        saveResponse.viewModel.courtName,
-        'Translation and interpretation saved'
-      ),
       subjectId: courtId,
       subjectName: saveResponse.viewModel.courtName,
       pageTitle: `Translation and interpretation saved - ${saveResponse.viewModel.courtName}`,
       successPanelTitle: 'Translation and interpretation saved',
       successPanelBody: `Translation and interpretation contact for ${saveResponse.viewModel.courtName} has been saved successfully.`,
     });
-  }
-
-  private buildTranslationBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(
-      courtId,
-      courtName,
-      'Translation and interpretation',
-      'translation-and-interpretation',
-      currentPage
-    );
   }
 }

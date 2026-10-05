@@ -21,8 +21,6 @@ import {
 } from '../utils/valueParsers';
 
 import BaseController from './BaseController';
-import { buildPageBreadcrumbs } from './helpers/breadcrumbs';
-
 const logger = Logger.getLogger('audit-controller');
 
 @route('/audits')
@@ -50,7 +48,6 @@ export default class AuditController extends BaseController {
 
     res.render('audit-list', {
       ...viewModel,
-      breadcrumbs: buildPageBreadcrumbs('Audits'),
       filterCategories,
       basePagerUrl,
       downloadUrl: viewModel.errors || viewModel.audits.content.length === 0 ? undefined : downloadUrl,
@@ -117,11 +114,6 @@ export default class AuditController extends BaseController {
 
     res.render('audit-detail', {
       audit,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '/audits', text: 'Audits' },
-        { href: '#', text: 'Audit detail' },
-      ],
       pageTitle: 'Audit Detail',
     });
   }

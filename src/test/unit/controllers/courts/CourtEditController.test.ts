@@ -50,10 +50,6 @@ describe('CourtEditController', () => {
       .once()
       .withArgs('court-edit', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
-        ],
       });
 
     try {
@@ -160,14 +156,6 @@ describe('CourtEditController', () => {
     expect(response.render).toHaveBeenCalledWith(
       'approval-confirm',
       expect.objectContaining({
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/courts/11111111-1111-4111-8111-111111111111/edit',
-            text: 'Edit Reading Crown Court',
-          },
-          { href: '#', text: 'Approve data' },
-        ],
         cancelHref: '/courts/11111111-1111-4111-8111-111111111111/edit',
         name: 'Reading Crown Court',
         pagePath: '/courts/11111111-1111-4111-8111-111111111111/edit/approve',
@@ -206,14 +194,6 @@ describe('CourtEditController', () => {
     expect(response.render).toHaveBeenCalledWith(
       'common-edit-success',
       expect.objectContaining({
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/courts/11111111-1111-4111-8111-111111111111/edit',
-            text: 'Edit Reading Crown Court',
-          },
-          { href: '#', text: 'Approval saved' },
-        ],
         pageTitle: 'Approval saved - Reading Crown Court',
       })
     );

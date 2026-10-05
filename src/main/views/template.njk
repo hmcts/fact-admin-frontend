@@ -1,6 +1,6 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
-{% from "macros/Breadcrumb.macro.njk" import appBreadcrumb %}
+{% from "macros/Breadcrumb.macro.njk" import appBreadcrumb with context %}
 {% from "macros/timeout-dialog.njk" import hmrcTimeoutDialog %}
 
 {% block head %}
@@ -89,7 +89,7 @@
 
 {% block beforeContent %}
   {% if breadcrumbs and breadcrumbs.length %}
-    {{ appBreadcrumb(breadcrumbs) }}
+    {{ appBreadcrumb() }}
   {% endif %}
 {% endblock %}
 

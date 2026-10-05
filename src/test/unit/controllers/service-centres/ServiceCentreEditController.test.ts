@@ -37,26 +37,16 @@ describe('ServiceCentreEditController', () => {
 
     const getLocksStub = stub(operationsApi, 'getLocks').resolves([]);
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('service-centre-edit', {
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-            text: 'Edit National Business Centre',
-          },
-        ],
-        pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-        pageTitle: 'Editing - National Business Centre',
-        serviceCentreId: '22222222-2222-4222-8222-222222222222',
-        serviceCentreName: 'National Business Centre',
-        showApproveData: false,
-        approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
-        serviceCentreLocks: [],
-        timeoutMins: undefined,
-      });
+    responseMock.expects('render').once().withArgs('service-centre-edit', {
+      pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+      pageTitle: 'Editing - National Business Centre',
+      serviceCentreId: '22222222-2222-4222-8222-222222222222',
+      serviceCentreName: 'National Business Centre',
+      showApproveData: false,
+      approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
+      serviceCentreLocks: [],
+      timeoutMins: undefined,
+    });
 
     await controller.get(request, response);
     assert.calledOnce(getLocksStub);
@@ -113,26 +103,16 @@ describe('ServiceCentreEditController', () => {
     ]);
     const getLocksStub = stub(OperationsApi.prototype, 'getLocks');
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('service-centre-edit', {
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-            text: 'Edit National Business Centre',
-          },
-        ],
-        pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-        pageTitle: 'Reviewing - National Business Centre',
-        serviceCentreId: '22222222-2222-4222-8222-222222222222',
-        serviceCentreName: 'National Business Centre',
-        showApproveData: true,
-        approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
-        serviceCentreLocks: [],
-        timeoutMins: undefined,
-      });
+    responseMock.expects('render').once().withArgs('service-centre-edit', {
+      pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
+      pageTitle: 'Reviewing - National Business Centre',
+      serviceCentreId: '22222222-2222-4222-8222-222222222222',
+      serviceCentreName: 'National Business Centre',
+      showApproveData: true,
+      approvePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
+      serviceCentreLocks: [],
+      timeoutMins: undefined,
+    });
 
     await controller.get(request, response);
     assert.calledOnce(getApprovalsStub);
@@ -249,14 +229,6 @@ describe('ServiceCentreEditController', () => {
     expect(response.render).toHaveBeenCalledWith(
       'approval-confirm',
       expect.objectContaining({
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-            text: 'Edit National Business Centre',
-          },
-          { href: '#', text: 'Approve data' },
-        ],
         cancelHref: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
         name: 'National Business Centre',
         pagePath: '/service-centres/22222222-2222-4222-8222-222222222222/edit/approve',
@@ -290,14 +262,6 @@ describe('ServiceCentreEditController', () => {
     expect(response.render).toHaveBeenCalledWith(
       'common-edit-success',
       expect.objectContaining({
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          {
-            href: '/service-centres/22222222-2222-4222-8222-222222222222/edit',
-            text: 'Edit National Business Centre',
-          },
-          { href: '#', text: 'Approval saved' },
-        ],
         pageTitle: 'Approval saved - National Business Centre',
       })
     );

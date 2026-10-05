@@ -7,7 +7,6 @@ import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import { SubjectType } from '../../schemas/subjectTypeSchema';
 import { ServiceCentreContactService } from '../../services/service-centres/ServiceCentreContactService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/service-centres/:serviceCentreId/edit/contact-details')
 export default class ServiceCentreContactController extends BaseController {
@@ -35,7 +34,6 @@ export default class ServiceCentreContactController extends BaseController {
     }
 
     res.render('service-centre-contact-list', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(serviceCentreId, serviceCentreResponse.name),
       pageTitle: `Manage Contact details - ${serviceCentreResponse.name}`,
       serviceCentreContactDetails: serviceCentreContactDetailsResponse,
       serviceCentreId,
@@ -63,11 +61,6 @@ export default class ServiceCentreContactController extends BaseController {
     }
 
     res.render('service-centre-contact-form', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(
-        serviceCentreId,
-        serviceCentreResponse.name,
-        'Add contact details'
-      ),
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/add/success`,
       formHeading: 'Add contact details',
@@ -117,11 +110,6 @@ export default class ServiceCentreContactController extends BaseController {
     }
 
     res.render('service-centre-contact-form', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(
-        serviceCentreId,
-        serviceCentreResponse.name,
-        'Edit contact details'
-      ),
       contactDescriptionTypeItems: contactDescriptionTypesResponse,
       contactDetailId,
       formAction: `/service-centres/${serviceCentreId}/edit/contact-details/edit/${contactDetailId}/success`,
@@ -209,11 +197,6 @@ export default class ServiceCentreContactController extends BaseController {
       await this.serviceCentreContactService.resolveContactDetailDescription(contactDetailResponse);
 
     res.render('service-centre-contact-delete', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(
-        serviceCentreId,
-        serviceCentreResponse.name,
-        'Delete contact details'
-      ),
       cancelHref: `/service-centres/${serviceCentreId}/edit/contact-details`,
       contactDetail: {
         ...contactDetailResponse,
@@ -265,11 +248,6 @@ export default class ServiceCentreContactController extends BaseController {
 
     const detail = this.detailsGenerator(contactDetailResponse, 'email', 'phoneNumber');
     res.render('common-edit-success', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(
-        serviceCentreId,
-        serviceCentreResponse.name,
-        'Contact details deleted'
-      ),
       continueUpdatingHref: `/service-centres/${serviceCentreId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
       subjectId: serviceCentreId,
@@ -305,11 +283,6 @@ export default class ServiceCentreContactController extends BaseController {
       res.status(HttpStatusCode.BadRequest);
       res.render('service-centre-contact-form', {
         ...submitFlowOutcome.formViewModel,
-        breadcrumbs: this.buildContactDetailsBreadcrumbs(
-          options.serviceCentreId,
-          options.serviceCentreName,
-          options.formHeading === 'Add contact details' ? 'Add contact details' : 'Edit contact details'
-        ),
       });
       return;
     }
@@ -326,11 +299,6 @@ export default class ServiceCentreContactController extends BaseController {
     const detail = this.detailsGenerator(req.body, 'contact-email', 'contact-telephone');
 
     res.render('common-edit-success', {
-      breadcrumbs: this.buildContactDetailsBreadcrumbs(
-        options.serviceCentreId,
-        options.serviceCentreName,
-        'Contact details saved'
-      ),
       continueUpdatingHref: `/service-centres/${options.serviceCentreId}/edit/contact-details`,
       continueUpdatingText: 'Back to contact details',
       subjectId: options.serviceCentreId,
@@ -400,20 +368,5 @@ export default class ServiceCentreContactController extends BaseController {
       detail = contactDetailResponse[email];
     }
     return detail;
-  }
-
-  private buildContactDetailsBreadcrumbs(
-    serviceCentreSchemaId: string,
-    serviceCentreSchemaName: string,
-    currentPageText?: string
-  ) {
-    return buildSectionBreadcrumbs(
-      serviceCentreSchemaId,
-      serviceCentreSchemaName,
-      'Contact details',
-      'contact-details',
-      currentPageText,
-      SubjectType.SERVICE_CENTRE
-    );
   }
 }

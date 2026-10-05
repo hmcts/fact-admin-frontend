@@ -5,7 +5,6 @@ import { Request, Response } from 'express';
 import { CourtWarningNoticeService, WarningNoticeForm } from '../../services/courts/CourtWarningNoticeService';
 import { parseOptionalString } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/warning-notice')
 export default class CourtWarningNoticeController extends BaseController {
@@ -24,12 +23,7 @@ export default class CourtWarningNoticeController extends BaseController {
 
     const viewModel = await this.warningNoticeService.getWarningNoticePage(courtId);
 
-    return this.renderResponse(
-      res,
-      this.withBreadcrumbs(courtId, viewModel),
-      'court-warning-notice-edit',
-      'court-not-found'
-    );
+    return this.renderResponse(res, viewModel, 'court-warning-notice-edit', 'court-not-found');
   }
 
   @route('/success')
@@ -53,7 +47,6 @@ export default class CourtWarningNoticeController extends BaseController {
     if (saveResult.type === 'validation_error') {
       return res.status(HttpStatusCode.BadRequest).render('court-warning-notice-edit', {
         ...saveResult.viewModel,
-        breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, saveResult.viewModel.courtName),
       });
     }
 
@@ -71,26 +64,6 @@ export default class CourtWarningNoticeController extends BaseController {
       successPanelBody: `Warning notice for ${courtName} has been successfully updated.`,
       continueUpdatingHref: `/courts/${saveResult.viewModel.courtId}/edit/warning-notice`,
       continueUpdatingText: 'Back to warning notice',
-      breadcrumbs: this.buildWarningNoticeBreadcrumbs(saveResult.viewModel.courtId, courtName, 'Warning notice saved'),
     });
-  }
-
-  private buildWarningNoticeBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Warning notice', 'warning-notice', currentPage);
-  }
-
-  private withBreadcrumbs<T extends { courtName: string }>(
-    courtId: string,
-    viewModel: T | HttpStatusCode,
-    currentPage?: string
-  ): T | HttpStatusCode {
-    if (typeof viewModel === 'number') {
-      return viewModel;
-    }
-
-    return {
-      ...viewModel,
-      breadcrumbs: this.buildWarningNoticeBreadcrumbs(courtId, viewModel.courtName, currentPage),
-    };
   }
 }

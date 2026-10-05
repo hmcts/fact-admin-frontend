@@ -5,11 +5,6 @@ import { LocationApprovalController } from '../../../main/controllers/LocationAp
 import { mockRequest } from '../mocks/mockRequest';
 
 type TestOptionsOverrides = {
-  buildBreadcrumbs?: (
-    locationId: string,
-    locationName: string,
-    subjectType: 'COURT' | 'SERVICE_CENTRE'
-  ) => { href: string; text: string }[];
   getAdditionalEditViewModel?: (req: Request, locationId: string) => Promise<Record<string, unknown> | HttpStatusCode>;
   getLocation?: (locationId: string) => Promise<{ name: string } | HttpStatusCode>;
 };
@@ -18,13 +13,9 @@ describe('LocationApprovalController', () => {
   const locationId = '11111111-1111-4111-8111-111111111111';
   const locationName = 'Reading Crown Court';
 
-  test('renders edit view with additional view model and breadcrumb data', async () => {
+  test('renders edit view with additional view model', async () => {
     const getLocation = jest.fn().mockResolvedValue({ name: locationName });
     const getAdditionalEditViewModel = jest.fn().mockResolvedValue({ timeoutMins: 5 });
-    const buildBreadcrumbs = jest.fn().mockReturnValue([
-      { href: '/', text: 'Home' },
-      { href: `/courts/${locationId}/edit`, text: `Edit ${locationName}` },
-    ]);
     const approvalService = createApprovalService({
       getEditApprovalAction: jest.fn().mockResolvedValue({
         approvePath: `/courts/${locationId}/edit/approve`,
@@ -32,7 +23,6 @@ describe('LocationApprovalController', () => {
       }),
     });
     const controller = createController(approvalService, {
-      buildBreadcrumbs,
       getAdditionalEditViewModel,
       getLocation,
     });
@@ -53,16 +43,11 @@ describe('LocationApprovalController', () => {
       approvePath: `/courts/${locationId}/edit/approve`,
       showApproveData: true,
       timeoutMins: 5,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${locationId}/edit`, text: `Edit ${locationName}` },
-      ],
       courtId: locationId,
       courtName: locationName,
       pagePath: `/courts/${locationId}/edit`,
       pageTitle: `Editing - ${locationName}`,
     });
-    expect(buildBreadcrumbs).toHaveBeenCalledWith(locationId, locationName, 'COURT');
   });
 
   test('renders configured not found view when locationId is invalid', async () => {
@@ -319,7 +304,6 @@ function createController(
 ): LocationApprovalController {
   return new LocationApprovalController(
     {
-      buildBreadcrumbs: overrides.buildBreadcrumbs,
       editView: 'court-edit',
       getAdditionalEditViewModel: overrides.getAdditionalEditViewModel,
       getLocation: overrides.getLocation ?? jest.fn().mockResolvedValue({ name: 'Reading Crown Court' }),

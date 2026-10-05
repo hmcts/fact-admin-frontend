@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 
 import { CourtGeneralService, GeneralViewModel } from '../../services/courts/CourtGeneralService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit/general')
 export default class CourtGeneralController extends BaseController {
@@ -25,7 +24,6 @@ export default class CourtGeneralController extends BaseController {
     }
 
     res.render('court-general-edit', {
-      breadcrumbs: this.buildSectionBreadcrumbs(resolvedCourtId, model.name!, 'General'),
       model,
       pageTitle: `General - ${model.name}`,
     });
@@ -68,11 +66,6 @@ export default class CourtGeneralController extends BaseController {
 
     if (updateResponse.errors) {
       res.render('court-general-edit', {
-        breadcrumbs: this.buildSectionBreadcrumbs(
-          resolvedCourtId,
-          updateResponse.originalName! ?? updateResponse.name,
-          'General'
-        ),
         model: updateResponse,
         pageTitle: `Error: General - ${updateResponse.originalName ?? updateResponse.name}`,
       });
@@ -80,27 +73,11 @@ export default class CourtGeneralController extends BaseController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildSectionBreadcrumbs(
-        resolvedCourtId,
-        updateResponse.name ?? model.name!,
-        'General',
-        'General saved'
-      ),
       subjectId: resolvedCourtId,
       pageTitle: `General saved - ${updateResponse.name}`,
       successPanelTitle: 'General details saved',
       successPanelBody: `General details for ${updateResponse.name} have been saved successfully.`,
       subjectName: updateResponse.name ?? model.name,
     });
-  }
-
-  private buildSectionBreadcrumbs(courtId: string, courtName: string, section: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(
-      courtId,
-      courtName,
-      section,
-      section.toLowerCase().replaceAll(' ', '-'),
-      currentPage
-    );
   }
 }

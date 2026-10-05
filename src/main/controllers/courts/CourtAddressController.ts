@@ -10,8 +10,6 @@ import { CourtAddressService, SaveCourtAddressResponse } from '../../services/co
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
 import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController, { type NotFoundTemplate } from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-
 const logger = Logger.getLogger('app');
 @route('/courts/:courtId/edit/address')
 export class CourtAddressController extends BaseController {
@@ -49,9 +47,9 @@ export class CourtAddressController extends BaseController {
     courtAddresses.sort((a, b) => (addressTypeRank[a.addressType] ?? 99) - (addressTypeRank[b.addressType] ?? 99));
 
     res.render('court-address-list', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string),
       courtAddresses,
       courtId,
+      courtName,
       pageTitle: 'Manage Addresses',
     });
   }
@@ -71,7 +69,6 @@ export class CourtAddressController extends BaseController {
     }
 
     res.render('court-address-find', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       pageTitle: 'Find Address',
       courtId,
     });
@@ -101,7 +98,6 @@ export class CourtAddressController extends BaseController {
     }
 
     res.render('court-address-find', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       postcode: (courtAddressResponse as CourtAddress).postcode,
       courtId,
       addressId,
@@ -126,7 +122,6 @@ export class CourtAddressController extends BaseController {
     const postcode = req.query?.postcode as string;
     if (!isValidPostcode(postcode)) {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
         error: validatePostcodeField(postcode),
@@ -141,7 +136,6 @@ export class CourtAddressController extends BaseController {
 
     if (postcodeSearchResponse['status'] === 'invalid') {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
@@ -150,7 +144,6 @@ export class CourtAddressController extends BaseController {
     }
 
     res.render('court-address-select', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
@@ -178,7 +171,6 @@ export class CourtAddressController extends BaseController {
     const postcode = req.query?.postcode as string;
     if (!isValidPostcode(postcode)) {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
@@ -194,7 +186,6 @@ export class CourtAddressController extends BaseController {
 
     if (postcodeSearchResponse['status'] === 'invalid') {
       res.render('court-address-find', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
@@ -204,7 +195,6 @@ export class CourtAddressController extends BaseController {
     }
 
     res.render('court-address-select', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       addresses: postcodeSearchResponse,
       postcode,
       courtId,
@@ -291,7 +281,6 @@ export class CourtAddressController extends BaseController {
     const address = addressOptionData ? this.buildAddressData(addressOptionData) : (courtAddress ?? {});
 
     res.render('court-address-edit', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
       address,
       courtTypes,
       areasOfLaw,
@@ -386,7 +375,6 @@ export class CourtAddressController extends BaseController {
   private renderAddressSavedSuccess(res: Response, courtId: string, saveResult: SaveCourtAddressResponse): void {
     const successMessage = `Addresses for ${saveResult['courtName']} have been successfully updated.`;
     res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, saveResult['courtName'], 'Address saved'),
       subjectName: saveResult['courtName'],
       subjectId: courtId,
       pageTitle: 'Address Saved',
@@ -424,7 +412,6 @@ export class CourtAddressController extends BaseController {
       : context.courtAddress;
 
     res.render('court-address-edit', {
-      breadcrumbs: this.buildAddressBreadcrumbs(context.courtId, context.courtName, 'Edit address'),
       address,
       courtTypes,
       areasOfLaw,
@@ -460,7 +447,6 @@ export class CourtAddressController extends BaseController {
     }
 
     res.render('court-address-delete', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Delete address'),
       address: courtAddressResponse,
       cancelHref: `/courts/${courtId}/edit/address`,
       courtName,
@@ -491,7 +477,6 @@ export class CourtAddressController extends BaseController {
     // if we failed to delete the address, re-render the screen and show the error message
     if (deleteResult['status'] === 'invalid') {
       res.render('court-address-delete', {
-        breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Delete address'),
         address: deleteResult['address'],
         cancelHref: `/courts/${courtId}/edit/address`,
         courtName: deleteResult['courtName'],
@@ -504,7 +489,6 @@ export class CourtAddressController extends BaseController {
     // The only other option is 'deleted'
     const address = deleteResult['address'] as CourtAddress;
     res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildAddressBreadcrumbs(courtId, deleteResult['courtName'], 'Address deleted'),
       subjectName: deleteResult['courtName'],
       subjectId: courtId,
       pageTitle: 'Address Deleted',
@@ -537,7 +521,7 @@ export class CourtAddressController extends BaseController {
     try {
       return await this.courtAddressService.retrieveCourtName(courtId);
     } catch (error) {
-      logger.warn('Unable to resolve court name for breadcrumbs:', error);
+      logger.warn('Unable to resolve court name for page rendering:', error);
       return HttpStatusCode.NotFound;
     }
   }
@@ -597,9 +581,5 @@ export class CourtAddressController extends BaseController {
     const county = address.county ? `${address.county}, ` : '';
     const postcode = address.postcode ?? '';
     return `${line1}, ${line2}${townCity}, ${county}${postcode}`;
-  }
-
-  private buildAddressBreadcrumbs(courtId: string, courtName: string, currentPage?: string) {
-    return buildSectionBreadcrumbs(courtId, courtName, 'Addresses', 'address', currentPage);
   }
 }

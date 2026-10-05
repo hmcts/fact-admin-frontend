@@ -23,7 +23,7 @@ import {
 import { Container } from './modules/awilix';
 import { CsrfProtection } from './modules/csrf';
 import { Helmet } from './modules/helmet';
-import { LockingInterceptor } from './modules/locking';
+import { LockingInterceptor, PageDataInterceptor } from './modules/locking';
 import { Logger } from './modules/logging';
 import { Nunjucks } from './modules/nunjucks';
 import { PropertiesVolume } from './modules/properties-volume';
@@ -148,6 +148,7 @@ if (config.get<boolean>('useCSRFProtection')) {
 }
 
 // add our custom page locking interceptor
+new PageDataInterceptor().enableFor(app);
 new LockingInterceptor().enableFor(app);
 
 app.use(loadControllers('controllers/**/*.+(ts|js)', { cwd: __dirname }));

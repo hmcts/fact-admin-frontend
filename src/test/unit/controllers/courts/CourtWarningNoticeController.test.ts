@@ -51,11 +51,6 @@ describe('CourtWarningNoticeController', () => {
 
     const expectedViewModel = {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/warning-notice`, text: 'Warning notice' },
-      ],
     };
 
     expect(getPage.calledWith(courtId)).toBe(true);
@@ -136,11 +131,6 @@ describe('CourtWarningNoticeController', () => {
 
     const expectedViewModel = {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/warning-notice`, text: 'Warning notice' },
-      ],
     };
 
     expect(save.firstCall.args[0]).toBe(courtId);
@@ -179,12 +169,6 @@ describe('CourtWarningNoticeController', () => {
       successPanelBody: `Warning notice for ${viewModel.courtName} has been successfully updated.`,
       continueUpdatingHref: `/courts/${courtId}/edit/warning-notice`,
       continueUpdatingText: 'Back to warning notice',
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/warning-notice`, text: 'Warning notice' },
-        { href: '#', text: 'Warning notice saved' },
-      ],
     };
 
     expect(save.firstCall.args[0]).toBe(courtId);

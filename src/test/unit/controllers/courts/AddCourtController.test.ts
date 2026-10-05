@@ -31,10 +31,6 @@ describe('AddCourtController', () => {
       .once()
       .withArgs('add-court', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Add new court' },
-        ],
       });
 
     try {
@@ -93,10 +89,6 @@ describe('AddCourtController', () => {
       .once()
       .withArgs('add-court', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '#', text: 'Add new court' },
-        ],
       });
 
     try {
@@ -131,11 +123,6 @@ describe('AddCourtController', () => {
       .once()
       .withArgs('add-court-success', {
         ...viewModel,
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Reading Crown Court' },
-          { href: '#', text: 'Addresses' },
-        ],
       });
 
     try {

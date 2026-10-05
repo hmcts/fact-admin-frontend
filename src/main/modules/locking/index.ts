@@ -8,6 +8,8 @@ import { isUuid } from '../../utils/valueParsers';
 import { getFactUserId, isAdmin, isSuperAdmin } from '../authentication/authenticationHelper';
 import { Logger } from '../logging';
 
+import { buildBreadcrumbs } from './breadcrumbs';
+
 let operationsApiInstance: OperationsApiType | undefined;
 
 const LOCK_REQUIREMENTS_REGEX = /^\/(courts|service-centres)\/([^/]+)\/edit\/([^/]+)(?:\/.*)?$/;
@@ -21,8 +23,37 @@ type LockRequirements = {
   pageKey: string;
 };
 
+type RenderCallback = (err: Error, html: string) => void;
 type OperationsApiProvider = () => Promise<OperationsApiType>;
 type LockingLogger = Pick<ReturnType<typeof Logger.getLogger>, 'errorEvent' | 'infoEvent' | 'warnEvent'>;
+
+export class PageDataInterceptor {
+  public enableFor(app: express.Express): void {
+    app.use(this.handleRequest.bind(this));
+  }
+
+  private handleRequest(req: express.Request, res: express.Response, next: express.NextFunction): void {
+    const render = res.render.bind(res);
+
+    res.render = ((
+      view: string,
+      optionsOrCallback?: Record<string, unknown> | RenderCallback,
+      callback?: RenderCallback
+    ): void => {
+      if (!optionsOrCallback || typeof optionsOrCallback === 'function') {
+        return render(view, optionsOrCallback);
+      }
+
+      const renderOptions = { ...optionsOrCallback };
+      delete renderOptions.breadcrumbs;
+      res.locals.breadcrumbs = buildBreadcrumbs(req, view, renderOptions);
+
+      return render(view, renderOptions, callback);
+    }) as express.Response['render'];
+
+    next();
+  }
+}
 
 export class LockingInterceptor {
   public constructor(

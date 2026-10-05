@@ -21,12 +21,6 @@ describe('CourtPhotoController', () => {
     courtName,
     fileLink: 'https://example.com/photo.jpg',
   };
-  const breadcrumbs = [
-    { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: `Edit ${courtName}` },
-    { href: `/courts/${courtId}/edit/photo`, text: 'Photo' },
-  ];
-
   afterEach(() => {
     restore();
   });
@@ -54,7 +48,6 @@ describe('CourtPhotoController', () => {
 
     expect(retrieve.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo', {
-      breadcrumbs,
       courtId,
       model,
     });
@@ -98,7 +91,6 @@ describe('CourtPhotoController', () => {
 
     expect(upload.notCalled).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo', {
-      breadcrumbs,
       courtId,
       model: {
         ...model,
@@ -166,7 +158,6 @@ describe('CourtPhotoController', () => {
 
     expect(upload.calledOnceWith(courtId, buffer, 'image/png')).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo', {
-      breadcrumbs,
       courtId,
       model: updatedModel,
     });
@@ -184,7 +175,6 @@ describe('CourtPhotoController', () => {
 
     expect(upload.calledOnceWith(courtId, buffer, 'image/jpeg')).toBe(true);
     expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', {
-      breadcrumbs: [...breadcrumbs, { href: '#', text: 'Court photo confirm update' }],
       subjectId: courtId,
       subjectName: courtName,
       pageTitle: 'Photo updated',
@@ -228,7 +218,6 @@ describe('CourtPhotoController', () => {
 
     expect(retrieveCourtName.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('court-photo-delete-confirm', {
-      breadcrumbs: [...breadcrumbs, { href: '#', text: 'Court photo confirm delete' }],
       cancelHref: `/courts/${courtId}/edit/photo`,
       courtId,
       courtName,
@@ -245,7 +234,6 @@ describe('CourtPhotoController', () => {
 
     expect(deletePhoto.calledOnceWith(courtId)).toBe(true);
     expect(response.render).toHaveBeenCalledWith('common-edit-success.njk', {
-      breadcrumbs: [...breadcrumbs, { href: '#', text: 'Court photo confirm delete' }],
       subjectId: courtId,
       subjectName: courtName,
       pageTitle: 'Photo deleted',

@@ -47,10 +47,6 @@ describe('ApprovalsController', () => {
     expect(approvalService.getApprovalsTracker).toHaveBeenCalledWith({ name: 'Reading', status: 'approved' });
     expect(res.render).toHaveBeenCalledWith('approvals', {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '#', text: 'Approvals tracker' },
-      ],
     });
   });
 
@@ -105,11 +101,6 @@ describe('ApprovalsController', () => {
     expect(approvalService.getUndoApproval).toHaveBeenCalledWith(approvalId);
     expect(res.render).toHaveBeenCalledWith('approval-undo-confirm', {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '/approvals', text: 'Approvals tracker' },
-        { href: '#', text: 'Undo approval' },
-      ],
     });
   });
 
@@ -138,11 +129,6 @@ describe('ApprovalsController', () => {
 
     expect(approvalService.undoApproval).toHaveBeenCalledWith(approvalId);
     expect(res.render).toHaveBeenCalledWith('common-edit-success', {
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: '/approvals', text: 'Approvals tracker' },
-        { href: '#', text: 'Approval undone' },
-      ],
       continueUpdatingHref: '/approvals',
       continueUpdatingText: 'Back to Approval tracker',
       homeText: 'Back to Courts, tribunals and service centres list',

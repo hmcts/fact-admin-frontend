@@ -5,7 +5,6 @@ import { Request, Response } from 'express';
 import { SubjectType } from '../../schemas/subjectTypeSchema';
 import { ServiceCentreGeneralService } from '../../services/service-centres/ServiceCentreGeneralService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/service-centres/:serviceCentreId/edit/general')
 export default class ServiceCentreGeneralController extends BaseController {
@@ -27,7 +26,6 @@ export default class ServiceCentreGeneralController extends BaseController {
     }
 
     res.render('service-centre-general-edit', {
-      breadcrumbs: this.buildSectionBreadcrumbs(serviceCentreId, viewModel.name!, 'General'),
       model: viewModel,
       pageTitle: viewModel.pageTitle,
     });
@@ -53,7 +51,6 @@ export default class ServiceCentreGeneralController extends BaseController {
     if (saveResult.type === 'validation-error') {
       res.status(HttpStatusCode.BadRequest);
       res.render('service-centre-general-edit', {
-        breadcrumbs: this.buildSectionBreadcrumbs(serviceCentreId, saveResult.viewModel.name!, 'General'),
         model: saveResult.viewModel,
         pageTitle: saveResult.viewModel.pageTitle,
       });
@@ -66,12 +63,6 @@ export default class ServiceCentreGeneralController extends BaseController {
     }
 
     res.render('common-edit-success', {
-      breadcrumbs: this.buildSectionBreadcrumbs(
-        serviceCentreId,
-        saveResult.viewModel.name!,
-        'General',
-        'General saved'
-      ),
       continueUpdatingHref: `/service-centres/${serviceCentreId}/edit`,
       continueUpdatingText: `Continue updating ${saveResult.viewModel.name}`,
       subjectId: serviceCentreId,
@@ -103,21 +94,5 @@ export default class ServiceCentreGeneralController extends BaseController {
     }
 
     return [];
-  }
-
-  private buildSectionBreadcrumbs(
-    serviceCentreId: string,
-    serviceCentreName: string,
-    section: string,
-    currentPage?: string
-  ) {
-    return buildSectionBreadcrumbs(
-      serviceCentreId,
-      serviceCentreName,
-      section,
-      section.toLowerCase().replaceAll(' ', '-'),
-      currentPage,
-      SubjectType.SERVICE_CENTRE
-    );
   }
 }

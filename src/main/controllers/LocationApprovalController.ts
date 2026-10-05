@@ -3,12 +3,9 @@ import { Request, Response } from 'express';
 
 import { canApprove, getFactUserId, isViewer } from '../modules/authentication/authenticationHelper';
 import { ApprovalSubjectType } from '../schemas/approvalSchema';
-import { Subject } from '../schemas/subjectTypeSchema';
 import { ApprovalService, ApproveDataViewModel } from '../services/ApprovalService';
 
 import BaseController, { type NotFoundTemplate } from './BaseController';
-import { BreadcrumbItem } from './helpers/breadcrumbs';
-
 type Location = {
   name: string;
 };
@@ -16,7 +13,6 @@ type Location = {
 type AdditionalEditViewModel = Record<string, unknown>;
 
 type LocationApprovalControllerOptions = {
-  buildBreadcrumbs?: (locationId: string, locationName: string, subjectType: Subject) => BreadcrumbItem[];
   editView: string;
   getAdditionalEditViewModel?: (req: Request, locationId: string) => Promise<AdditionalEditViewModel | HttpStatusCode>;
   getLocation: (locationId: string) => Promise<Location | HttpStatusCode>;
@@ -72,9 +68,6 @@ export class LocationApprovalController extends BaseController {
     return res.render(this.options.editView, {
       ...approvalAction,
       ...additionalViewModel,
-      ...(this.options.buildBreadcrumbs
-        ? { breadcrumbs: this.options.buildBreadcrumbs(locationId, location.name, this.options.subjectType) }
-        : {}),
       [this.options.locationIdViewKey]: locationId,
       [this.options.locationNameViewKey]: location.name,
       pagePath: editPath,
@@ -95,12 +88,6 @@ export class LocationApprovalController extends BaseController {
 
     return res.render('approval-confirm', {
       ...approveData,
-      breadcrumbs: this.buildApprovalBreadcrumbs(
-        approveData.subjectId,
-        approveData.name,
-        this.options.subjectType,
-        'Approve data'
-      ),
       cancelHref: approveData.editPath,
       pagePath: `${approveData.editPath}/approve`,
     });
@@ -141,7 +128,6 @@ export class LocationApprovalController extends BaseController {
     }
 
     return res.render('common-edit-success', {
-      breadcrumbs: this.buildApprovalBreadcrumbs(locationId, location.name, this.options.subjectType, 'Approval saved'),
       continueUpdatingHref: approveData.editPath,
       continueUpdatingText: `Back to ${isViewer(req) ? 'Reviewing' : 'Editing'} - ${location.name}`,
       homeText: 'Back to Courts, tribunals and service centres list',
@@ -178,16 +164,6 @@ export class LocationApprovalController extends BaseController {
 
   private getEditPath(locationId: string): string {
     return `/${this.options.routeSegment}/${locationId}/edit`;
-  }
-
-  private buildApprovalBreadcrumbs(
-    locationId: string,
-    locationName: string,
-    subjectType: Subject,
-    currentPage: string
-  ): BreadcrumbItem[] {
-    const breadcrumbs = this.options.buildBreadcrumbs?.(locationId, locationName, subjectType) ?? [];
-    return [...breadcrumbs, { href: '#', text: currentPage }];
   }
 
   private renderLocationResponseError(location: Location | HttpStatusCode, res: Response): location is HttpStatusCode {

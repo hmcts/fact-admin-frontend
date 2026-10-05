@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 
 import { AddServiceCentreService } from '../../services/service-centres/AddServiceCentreService';
 import BaseController from '../BaseController';
-import { buildPageBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/add-service-centre')
 export default class AddServiceCentreController extends BaseController {
@@ -22,7 +21,6 @@ export default class AddServiceCentreController extends BaseController {
 
     res.render('add-service-centre', {
       ...viewModel,
-      breadcrumbs: buildPageBreadcrumbs('Add new service centre'),
     });
   }
 
@@ -42,21 +40,12 @@ export default class AddServiceCentreController extends BaseController {
     if (!('serviceCentreId' in createResult)) {
       res.render('add-service-centre', {
         ...createResult,
-        breadcrumbs: buildPageBreadcrumbs('Add new service centre'),
       });
       return;
     }
 
     res.render('add-service-centre-success', {
       ...createResult,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        {
-          href: `/service-centres/${createResult.serviceCentreId}/edit`,
-          text: createResult.serviceCentreName,
-        },
-        { href: '#', text: 'Addresses' },
-      ],
     });
   }
 

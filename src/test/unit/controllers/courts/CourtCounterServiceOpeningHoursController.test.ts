@@ -47,11 +47,6 @@ describe('CourtCounterServiceOpeningHoursController', () => {
 
     const expectedViewModel = {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-      ],
     };
 
     expect(getListPage.calledWith(courtId)).toBe(true);
@@ -124,12 +119,6 @@ describe('CourtCounterServiceOpeningHoursController', () => {
 
     const expectedViewModel = {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-        { href: '#', text: 'Edit opening hours' },
-      ],
     };
 
     expect(getEditPage.calledWith(courtId)).toBe(true);
@@ -243,12 +232,6 @@ describe('CourtCounterServiceOpeningHoursController', () => {
 
     const expectedViewModel = {
       ...viewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-        { href: '#', text: 'Edit opening hours' },
-      ],
     };
 
     expect(save.firstCall.args[0]).toBe(courtId);
@@ -291,12 +274,6 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     const expectedViewModel = {
       subjectId: courtId,
       subjectName: viewModel.courtName,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-        { href: '#', text: 'Counter service opening hours saved' },
-      ],
       pageTitle: 'Counter service opening hours saved',
       successPanelTitle: 'Counter service opening hours saved',
       successPanelBody: 'Counter service opening hours for Reading Crown Court have been successfully updated.',
@@ -337,12 +314,6 @@ describe('CourtCounterServiceOpeningHoursController', () => {
     const expectedViewModel = {
       subjectId: courtId,
       subjectName: viewModel.courtName,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-        { href: '#', text: 'Counter service opening hours saved' },
-      ],
       pageTitle: 'Counter service opening hours saved',
       successPanelTitle: 'Counter service opening hours saved',
       successPanelBody: 'Counter service opening hours for Reading Crown Court have been successfully updated.',
@@ -415,24 +386,12 @@ describe('CourtCounterServiceOpeningHoursController', () => {
 
     const expectedDeleteViewModel = {
       ...deleteViewModel,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${deleteViewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-        { href: '#', text: 'Delete opening hours' },
-      ],
       cancelHref: `/courts/${courtId}/edit/counter-service-opening-hours`,
     };
 
     const expectedSuccessViewModel = {
       subjectId: courtId,
       subjectName: successViewModel.courtName,
-      breadcrumbs: [
-        { href: '/', text: 'Home' },
-        { href: `/courts/${courtId}/edit`, text: `Edit ${successViewModel.courtName}` },
-        { href: `/courts/${courtId}/edit/counter-service-opening-hours`, text: 'Counter service opening hours' },
-        { href: '#', text: 'Opening hours deleted' },
-      ],
       pageTitle: 'Counter service opening hours deleted',
       successPanelTitle: 'Opening hours deleted Forms.',
       successPanelBody: 'You have removed this counter service opening hour for Reading Crown Court.',

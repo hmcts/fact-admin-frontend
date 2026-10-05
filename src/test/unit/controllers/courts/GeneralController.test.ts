@@ -31,11 +31,6 @@ describe('CourtGeneralController', () => {
       .expects('render')
       .once()
       .withArgs('court-general-edit', {
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
-        ],
         model: {
           id: '11111111-1111-4111-8111-111111111111',
           name: 'Reading Crown Court',
@@ -210,18 +205,10 @@ describe('CourtGeneralController', () => {
     };
     const saveStub = stub(generalService, 'save').resolves(saveResult);
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('court-general-edit', {
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit bob' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
-        ],
-        model: saveResult,
-        pageTitle: 'Error: General - bob',
-      });
+    responseMock.expects('render').once().withArgs('court-general-edit', {
+      model: saveResult,
+      pageTitle: 'Error: General - bob',
+    });
 
     try {
       await controller.updateCourt(request, response);
@@ -249,22 +236,13 @@ describe('CourtGeneralController', () => {
       name: 'Reading Crown Court',
     });
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('common-edit-success', {
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit', text: 'Edit Reading Crown Court' },
-          { href: '/courts/11111111-1111-4111-8111-111111111111/edit/general', text: 'General' },
-          { href: '#', text: 'General saved' },
-        ],
-        subjectId: '11111111-1111-4111-8111-111111111111',
-        pageTitle: 'General saved - Reading Crown Court',
-        successPanelTitle: 'General details saved',
-        successPanelBody: 'General details for Reading Crown Court have been saved successfully.',
-        subjectName: 'Reading Crown Court',
-      });
+    responseMock.expects('render').once().withArgs('common-edit-success', {
+      subjectId: '11111111-1111-4111-8111-111111111111',
+      pageTitle: 'General saved - Reading Crown Court',
+      successPanelTitle: 'General details saved',
+      successPanelBody: 'General details for Reading Crown Court have been saved successfully.',
+      subjectName: 'Reading Crown Court',
+    });
 
     try {
       await controller.updateCourt(request, response);
@@ -299,18 +277,10 @@ describe('CourtGeneralController', () => {
 
     const saveStub = stub(generalService, 'save').resolves(saveResult);
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs('court-general-edit', {
-        breadcrumbs: [
-          { href: '/', text: 'Home' },
-          { href: `/courts/${courtId}/edit`, text: 'Edit Reading Crown Court' },
-          { href: `/courts/${courtId}/edit/general`, text: 'General' },
-        ],
-        model: saveResult,
-        pageTitle: 'Error: General - Reading Crown Court',
-      });
+    responseMock.expects('render').once().withArgs('court-general-edit', {
+      model: saveResult,
+      pageTitle: 'Error: General - Reading Crown Court',
+    });
 
     try {
       await controller.updateCourt(request, response);

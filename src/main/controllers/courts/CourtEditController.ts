@@ -10,7 +10,6 @@ import { LockService } from '../../services/LockService';
 import { parseNumber } from '../../utils/valueParsers';
 import BaseController from '../BaseController';
 import { LocationApprovalController } from '../LocationApprovalController';
-import { buildEditBreadcrumbs } from '../helpers/breadcrumbs';
 
 @route('/courts/:courtId/edit')
 export class CourtEditController extends BaseController {
@@ -33,7 +32,6 @@ export class CourtEditController extends BaseController {
 
     return new LocationApprovalController(
       {
-        buildBreadcrumbs: buildEditBreadcrumbs,
         editView: 'court-edit',
         getAdditionalEditViewModel: async (req, courtId) => {
           if (isViewer(req)) {

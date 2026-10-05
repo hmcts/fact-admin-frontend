@@ -9,21 +9,6 @@ import { mockRequest } from '../../mocks/mockRequest';
 
 const courtId = '11111111-1111-4111-8111-111111111111';
 const courtName = 'Reading Crown Court';
-
-const buildProfessionalInformationBreadcrumbs = (resolvedCourtName: string, currentPage?: string) => {
-  const breadcrumbs = [
-    { href: '/', text: 'Home' },
-    { href: `/courts/${courtId}/edit`, text: `Edit ${resolvedCourtName}` },
-    { href: `/courts/${courtId}/edit/information-for-professionals`, text: 'Information for professionals' },
-  ];
-
-  if (currentPage) {
-    breadcrumbs.push({ href: '#', text: currentPage });
-  }
-
-  return breadcrumbs;
-};
-
 type MockProfessionalInformationService = Pick<
   CourtProfessionalInformationService,
   'getViewModel' | 'requiresFamilyCourtRemovalConfirmation' | 'save'
@@ -76,7 +61,6 @@ describe('CourtProfessionalInformationController', () => {
       .once()
       .withArgs('court-professional-information', {
         ...viewModel,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
 
     await controller.get(buildRequest({ courtId }), response);
@@ -272,7 +256,6 @@ describe('CourtProfessionalInformationController', () => {
         pageTitle: `Information for professionals saved - ${courtName}`,
         successPanelTitle: 'Information for professionals saved',
         successPanelBody: `Information for professionals for ${courtName} has been saved successfully.`,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName, 'Information for professionals saved'),
       });
 
     await controller.postSuccess(buildRequest({ courtId }, { courtTypes: ['family'] }), response);
@@ -309,7 +292,6 @@ describe('CourtProfessionalInformationController', () => {
         pageTitle: `Information for professionals saved - ${courtName}`,
         successPanelTitle: 'Information for professionals saved',
         successPanelBody: `Information for professionals for ${courtName} has been saved successfully.`,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName, 'Information for professionals saved'),
       });
 
     await controller.postSuccess(buildRequest({ courtId: [courtId] }, body), response);
@@ -341,7 +323,6 @@ describe('CourtProfessionalInformationController', () => {
       .once()
       .withArgs('court-professional-information', {
         ...viewModel,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
 
     await controller.postSuccess(buildRequest({ courtId }, { confirmFamilyCourtRemoval: 'true' }), response);
@@ -376,7 +357,6 @@ describe('CourtProfessionalInformationController', () => {
       .once()
       .withArgs('court-professional-information', {
         ...viewModel,
-        breadcrumbs: buildProfessionalInformationBreadcrumbs(courtName),
       });
 
     await controller.postSuccess(buildRequest({ courtId }), response);

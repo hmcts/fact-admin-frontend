@@ -5,8 +5,6 @@ import { Request, Response } from 'express';
 import { Logger } from '../../modules/logging';
 import { CourtPhotoService } from '../../services/courts/CourtPhotoService';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-
 const logger = Logger.getLogger('app');
 
 @route('/courts/:courtId/edit/photo')
@@ -28,7 +26,6 @@ export default class CourtPhotoController extends BaseController {
     }
 
     res.render('court-photo', {
-      breadcrumbs: buildSectionBreadcrumbs(courtId, model.courtName, 'Photo', 'photo'),
       courtId,
       model,
     });
@@ -50,7 +47,6 @@ export default class CourtPhotoController extends BaseController {
     // Handle middleware-captured multer errors first (file too big, basically)
     if (req.uploadError) {
       return res.render('court-photo', {
-        breadcrumbs: buildSectionBreadcrumbs(courtId, model.courtName, 'Photo', 'photo'),
         courtId,
         model: {
           ...model,
@@ -62,7 +58,6 @@ export default class CourtPhotoController extends BaseController {
     const file = req.file;
     if (!file) {
       return res.render('court-photo', {
-        breadcrumbs: buildSectionBreadcrumbs(courtId, model.courtName, 'Photo', 'photo'),
         courtId,
         model: {
           ...model,
@@ -73,7 +68,6 @@ export default class CourtPhotoController extends BaseController {
 
     if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
       return res.render('court-photo', {
-        breadcrumbs: buildSectionBreadcrumbs(courtId, model.courtName, 'Photo', 'photo'),
         courtId,
         model: {
           ...model,
@@ -90,20 +84,12 @@ export default class CourtPhotoController extends BaseController {
 
     if (updatedModel.errors) {
       return res.render('court-photo', {
-        breadcrumbs: buildSectionBreadcrumbs(courtId, updatedModel.courtName, 'Photo', 'photo'),
         courtId,
         model: updatedModel,
       });
     }
 
     return res.render('common-edit-success.njk', {
-      breadcrumbs: buildSectionBreadcrumbs(
-        courtId,
-        updatedModel.courtName,
-        'Photo',
-        'photo',
-        'Court photo confirm update'
-      ),
       subjectId: courtId,
       subjectName: updatedModel.courtName,
       pageTitle: 'Photo updated',
@@ -125,7 +111,6 @@ export default class CourtPhotoController extends BaseController {
     }
 
     res.render('court-photo-delete-confirm', {
-      breadcrumbs: buildSectionBreadcrumbs(courtId, courtName, 'Photo', 'photo', 'Court photo confirm delete'),
       cancelHref: `/courts/${courtId}/edit/photo`,
       courtId,
       courtName,
@@ -152,7 +137,6 @@ export default class CourtPhotoController extends BaseController {
     }
 
     res.render('common-edit-success.njk', {
-      breadcrumbs: buildSectionBreadcrumbs(courtId, courtName, 'Photo', 'photo', 'Court photo confirm delete'),
       subjectId: courtId,
       subjectName: courtName,
       pageTitle: 'Photo deleted',
@@ -164,7 +148,7 @@ export default class CourtPhotoController extends BaseController {
     try {
       return await this.courtPhotoService.retrieveCourtName(courtId);
     } catch (error) {
-      logger.warn('Unable to resolve court name for breadcrumbs:', error);
+      logger.warn('Unable to resolve court name for page rendering:', error);
       return HttpStatusCode.NotFound;
     }
   }

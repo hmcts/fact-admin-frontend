@@ -159,26 +159,7 @@ describe('ServiceCentreContactController', () => {
       contactTelephone: '',
     });
 
-    responseMock
-      .expects('render')
-      .once()
-      .withArgs(
-        'service-centre-contact-form',
-        match({
-          breadcrumbs: [
-            { href: '/', text: 'Home' },
-            {
-              href: `/service-centres/${SERVICE_CENTRE_ID}/edit`,
-              text: 'Edit Reading Service Centre',
-            },
-            {
-              href: `/service-centres/${SERVICE_CENTRE_ID}/edit/contact-details`,
-              text: 'Contact details',
-            },
-            { href: '#', text: 'Add contact details' },
-          ],
-        })
-      );
+    responseMock.expects('render').once().withArgs('service-centre-contact-form', match({}));
 
     try {
       await controller.renderAdd(request, response);
@@ -557,10 +538,7 @@ describe('ServiceCentreContactController', () => {
       .withArgs(
         'service-centre-contact-form',
         match((viewModel: Record<string, unknown>) => {
-          return (
-            Array.isArray(viewModel.breadcrumbs) &&
-            (viewModel.breadcrumbs as { text: string }[]).some(b => b.text === 'Edit contact details')
-          );
+          return viewModel.pageTitle === 'Error: Edit contact details - Reading Service Centre';
         })
       );
 

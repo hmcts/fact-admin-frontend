@@ -10,8 +10,6 @@ import { ServiceCentreAddressService } from '../../services/service-centres/Serv
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
 import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController from '../BaseController';
-import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
-
 const logger = Logger.getLogger('app');
 
 @route('/service-centres/:serviceCentreId/edit/address')
@@ -42,7 +40,6 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('service-centre-address-list', {
       pageTitle: `Address - ${serviceCentreName}`,
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, undefined, isNewSC),
       serviceCentreAddresses: addressesResponse,
       serviceCentreId,
       serviceCentreName,
@@ -68,12 +65,6 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('service-centre-address-find', {
       pageTitle: 'Find Address',
-      breadcrumbs: this.buildAddressBreadcrumbs(
-        serviceCentreId,
-        serviceCentreName,
-        'Find address by postcode',
-        isNewSC
-      ),
       serviceCentreName,
       serviceCentreId,
       isNewSC,
@@ -103,7 +94,6 @@ export default class ServiceCentreAddressController extends BaseController {
     res.render('service-centre-address-find', {
       addressId,
       pageTitle: 'Find Address',
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
       serviceCentreName,
       serviceCentreId,
       postcode: addressResponse.postcode,
@@ -131,12 +121,6 @@ export default class ServiceCentreAddressController extends BaseController {
       res.render('service-centre-address-find', {
         error: validatePostcodeField(postcode),
         pageTitle: 'Find Address',
-        breadcrumbs: this.buildAddressBreadcrumbs(
-          serviceCentreId,
-          serviceCentreName,
-          'Find address by postcode',
-          isNewSC
-        ),
         serviceCentreName,
         serviceCentreId,
         postcode,
@@ -154,12 +138,6 @@ export default class ServiceCentreAddressController extends BaseController {
       res.render('service-centre-address-find', {
         error: searchResponse.error,
         pageTitle: 'Find Address',
-        breadcrumbs: this.buildAddressBreadcrumbs(
-          serviceCentreId,
-          serviceCentreName,
-          'Find address by postcode',
-          isNewSC
-        ),
         serviceCentreName,
         serviceCentreId,
         postcode,
@@ -170,12 +148,6 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('service-centre-address-select', {
       addresses: searchResponse,
-      breadcrumbs: this.buildAddressBreadcrumbs(
-        serviceCentreId,
-        serviceCentreName,
-        'Find address by postcode',
-        isNewSC
-      ),
       serviceCentreName,
       pageTitle: 'Select Address',
       postcode,
@@ -205,7 +177,6 @@ export default class ServiceCentreAddressController extends BaseController {
         addressId,
         error: validatePostcodeField(postcode),
         pageTitle: 'Find Address',
-        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
         serviceCentreName,
         serviceCentreId,
         postcode,
@@ -222,7 +193,6 @@ export default class ServiceCentreAddressController extends BaseController {
       res.render('service-centre-address-find', {
         addressId,
         error: searchResponse.error,
-        breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
         serviceCentreName,
         serviceCentreId,
         postcode,
@@ -233,7 +203,6 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('service-centre-address-select', {
       addresses: searchResponse,
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
       serviceCentreName,
       addressId,
       pageTitle: 'Select Address',
@@ -309,7 +278,6 @@ export default class ServiceCentreAddressController extends BaseController {
 
     const successMessage = `Addresses for ${saveResult.serviceCentreName} have been successfully updated.`;
     res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
       subjectId: serviceCentreId,
       subjectName: saveResult.serviceCentreName,
       subjectType: SubjectType.SERVICE_CENTRE,
@@ -384,7 +352,6 @@ export default class ServiceCentreAddressController extends BaseController {
     }
 
     res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, saveResult.serviceCentreName, 'Address saved'),
       subjectId: serviceCentreId,
       subjectName: saveResult.serviceCentreName,
       subjectType: SubjectType.SERVICE_CENTRE,
@@ -418,7 +385,6 @@ export default class ServiceCentreAddressController extends BaseController {
 
     res.render('service-centre-address-delete', {
       address: addressResponse,
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Delete address'),
       cancelHref: `/service-centres/${serviceCentreId}/edit/address`,
       pageTitle: `Delete address - ${serviceCentreName}`,
       serviceCentreName,
@@ -441,7 +407,6 @@ export default class ServiceCentreAddressController extends BaseController {
     }
 
     res.render('common-edit-success.njk', {
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, deleteResult.serviceCentreName, 'Address deleted'),
       subjectId: serviceCentreId,
       subjectName: deleteResult.serviceCentreName,
       subjectType: SubjectType.SERVICE_CENTRE,
@@ -468,7 +433,6 @@ export default class ServiceCentreAddressController extends BaseController {
       address,
       addressId,
       pageTitle: 'Address',
-      breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Edit address', isNewSC),
       serviceCentreName,
       serviceCentreId,
       isNewSC,
@@ -538,34 +502,12 @@ export default class ServiceCentreAddressController extends BaseController {
     try {
       response = await this.serviceCentreAddressService.retrieveServiceCentreName(serviceCentreId);
     } catch (error) {
-      logger.warn('Unable to resolve service-centre name for breadcrumbs:', error);
+      logger.warn('Unable to resolve service-centre name for page rendering:', error);
     }
     if (typeof response === 'number') {
       this.renderStatus(res, response, 'service-centre-not-found');
       return undefined;
     }
     return response;
-  }
-
-  private buildAddressBreadcrumbs(
-    serviceCentreId: string,
-    serviceCentreName: string,
-    currentPage?: string,
-    isNewSC: boolean = false
-  ) {
-    const breadcrumbs = buildSectionBreadcrumbs(
-      serviceCentreId,
-      serviceCentreName,
-      'Addresses',
-      'address',
-      currentPage,
-      SubjectType.SERVICE_CENTRE
-    );
-
-    if (isNewSC) {
-      breadcrumbs[2].href += '?isNewSC=true';
-    }
-
-    return breadcrumbs;
   }
 }
