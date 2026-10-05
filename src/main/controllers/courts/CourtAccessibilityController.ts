@@ -42,7 +42,7 @@ export default class CourtAccessibilityController extends BaseController {
       return this.renderCourtNotFound(res);
     }
 
-    const { liftDoorLimit, liftDoorWidth, model } = this.buildAccessibilityModel(req, resolvedCourtId);
+    const { liftDoorWidth, liftDoorLimit, model } = this.buildAccessibilityModel(req, resolvedCourtId);
 
     const updateResponse = await this.accessibilityService.save(resolvedCourtId, model as AccessibilityModel);
     if (this.renderStatusResponse(res, updateResponse, 'court-not-found')) {
@@ -57,7 +57,7 @@ export default class CourtAccessibilityController extends BaseController {
         ? liftDoorWidth
         : updateResponse.liftDoorWidth;
 
-      this.redirectWithModel<AccessibilityModel & { liftDoorWidth: unknown; liftDoorLimit: unknown }>(
+      this.redirectWithModel<AccessibilityModel>(
         req,
         res,
         { ...updateResponse, liftDoorLimit: updatedLiftDoorLimit, liftDoorWidth: updatedLiftDoorWidth },
