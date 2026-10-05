@@ -272,7 +272,7 @@ export const TELEPHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a telephone number';
 export const TELEPHONE_NUMBER_INVALID_MESSAGE = 'Enter a telephone number in the correct format';
 
 // Court warning notice service
-export const WARNING_NOTICE_MAX_LENGTH = 700;
+export const WARNING_NOTICE_MAX_LENGTH = 250;
 export const WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Welsh warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =

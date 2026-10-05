@@ -1,7 +1,7 @@
 import { env } from '../../../../testUtils/nunjucksHelper';
 
 describe('Service Centre Warning Notice View', () => {
-  test('renders warning notice form with 250 char limit', () => {
+  test('renders warning notice form with 700 char limit', () => {
     const html = env.render('service-centre-warning-notice-edit.njk', {
       model: {
         id: '11111111-1111-4111-8111-111111111111',
@@ -13,8 +13,8 @@ describe('Service Centre Warning Notice View', () => {
     });
 
     expect(html).toContain('Warning notice');
-    expect(html).toContain('This is limited to 250 characters');
-    expect(html).toContain('maxlength="250"');
+    expect(html).toContain('This is limited to 700 characters');
+    expect(html).toContain('maxlength="700"');
     expect(html).toContain('/service-centres/11111111-1111-4111-8111-111111111111/edit/warning-notice/success');
   });
 });
