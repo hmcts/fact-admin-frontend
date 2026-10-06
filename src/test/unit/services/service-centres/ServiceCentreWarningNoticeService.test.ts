@@ -12,7 +12,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     restore();
   });
 
-  test('returns validation error when warning notice exceeds 250 chars', async () => {
+  test('returns validation error when warning notice exceeds 700 chars', async () => {
     const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
