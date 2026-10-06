@@ -385,4 +385,41 @@ describe('CourtWarningNoticeService', () => {
     );
     expect(result.type).toBe('success');
   });
+
+  test('ignores timestamp returned in API validation errors from updateCourt', async () => {
+    const { updateCourt, service } = buildService({
+      updateCourt: jest.fn().mockResolvedValue(
+        new Map([
+          ['warningNotice', 'Warning notice is invalid'],
+          ['timestamp', '2024-06-01T12:00:00Z'],
+        ])
+      ),
+    });
+
+    const form: WarningNoticeForm = {
+      warningNotice: 'Fire alarm out of service',
+      warningNoticeCy: 'Larwm tân allan o wasanaeth',
+    };
+
+    const result = await service.save(courtId, form);
+
+    expect(updateCourt).toHaveBeenCalled();
+    expect(result).not.toHaveProperty('viewModel.errors.timestamp');
+    expect(result).toEqual({
+      type: 'validation_error',
+      viewModel: {
+        courtId,
+        courtName: 'Reading Crown Court',
+        form: {
+          warningNotice: 'Fire alarm out of service',
+          warningNoticeCy: 'Larwm tân allan o wasanaeth',
+        },
+        errors: {
+          warningNotice: 'Warning notice is invalid',
+        },
+        errorSummary: [{ href: '#warningNotice', text: 'Warning notice is invalid' }],
+        pageTitle: 'Error: Warning notice - Reading Crown Court',
+      },
+    });
+  });
 });
