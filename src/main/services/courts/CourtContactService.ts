@@ -16,30 +16,26 @@ import {
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
-import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
+import {
+  ContactApiFieldMapping,
+  ContactDescriptionTypeItem,
+  ContactFormErrors,
+  ContactFormValues,
+  ContactValidationError,
+  buildContactDescriptionTypeItems,
+  buildContactFormValues,
+  emptyContactFormValues,
+  mapContactApiValidationErrors,
+  parseSelectedContactMethods,
+  validateContactDetailsMethods,
+  validateContactExplanationFields,
+} from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
+import { ContactSubmitFlowOutcome, runContactWorkflow } from '../shared/ContactWorkflow';
 
-export type CourtContactFormValues = {
-  contactEmail: string;
-  contactExplanation: string;
-  contactExplanationCy: string;
-  contactMethods: string[];
-  contactTelephone: string;
-};
-
-export type CourtContactValidationError = {
-  href: string;
-  text: string;
-};
-
-export type CourtContactFormErrors = {
-  contactEmail?: string;
-  contactExplanation?: string;
-  contactExplanationCy?: string;
-  contactMethods?: string;
-  contactTelephone?: string;
-  contactType?: string;
-};
+export type CourtContactFormValues = ContactFormValues;
+export type CourtContactValidationError = ContactValidationError;
+export type CourtContactFormErrors = ContactFormErrors;
 
 export type CourtContactSubmission = {
   errorSummary: CourtContactValidationError[];
@@ -49,11 +45,7 @@ export type CourtContactSubmission = {
   selectedContactTypeId: string;
 };
 
-export type CourtContactDescriptionTypeItem = {
-  value: string;
-  text: string;
-  selected?: boolean;
-};
+export type CourtContactDescriptionTypeItem = ContactDescriptionTypeItem;
 
 export type CourtContactFormHeading = 'Add contact details' | 'Edit contact details';
 
@@ -66,19 +58,7 @@ export type CourtContactSubmitFlowOptions = {
   contactDetailId?: string;
 };
 
-export type CourtContactSubmitFlowOutcome =
-  | {
-      type: 'validation-error';
-      formViewModel: CourtContactFormViewModel;
-    }
-  | {
-      type: 'save-error';
-      status: HttpStatusCode;
-    }
-  | {
-      type: 'saved';
-      successPanelBody: string;
-    };
+export type CourtContactSubmitFlowOutcome = ContactSubmitFlowOutcome<CourtContactFormViewModel>;
 
 export type CourtContactFormViewModel = {
   courtId: string;
@@ -91,11 +71,6 @@ export type CourtContactFormViewModel = {
   formHeading: CourtContactFormHeading;
   formValues: CourtContactFormValues;
   pageTitle: string;
-};
-
-type ApiValidationMapping = {
-  formField: keyof CourtContactFormErrors;
-  href: string;
 };
 
 const courtApi = new CourtApi();
@@ -156,35 +131,19 @@ export class CourtContactService {
       return contactDescriptionTypesResponse;
     }
 
-    return this.buildContactDescriptionTypeItems(contactDescriptionTypesResponse, selectedId);
+    return buildContactDescriptionTypeItems(contactDescriptionTypesResponse, selectedId);
   }
 
   public getEmptyFormValues(): CourtContactFormValues {
-    return {
-      contactEmail: '',
-      contactExplanation: '',
-      contactExplanationCy: '',
-      contactMethods: [],
-      contactTelephone: '',
-    };
+    return emptyContactFormValues();
   }
 
   public buildFormValues(contactDetail: CourtContactDetail): CourtContactFormValues {
-    const contactMethods = [contactDetail.email ? 'email' : null, contactDetail.phoneNumber ? 'phone' : null].filter(
-      (value): value is string => Boolean(value)
-    );
-
-    return {
-      contactEmail: contactDetail.email ?? '',
-      contactExplanation: contactDetail.explanation ?? '',
-      contactExplanationCy: contactDetail.explanationCy ?? '',
-      contactMethods,
-      contactTelephone: contactDetail.phoneNumber ?? '',
-    };
+    return buildContactFormValues(contactDetail);
   }
 
   public buildContactPayload(body: Record<string, unknown>, courtId: string): SaveCourtContactDetailRequest {
-    const selectedContactMethods = this.parseSelectedContactMethods(body);
+    const selectedContactMethods = parseSelectedContactMethods(body['contact-methods']);
     const includesEmail = selectedContactMethods.includes('email');
     const includesPhone = selectedContactMethods.includes('phone');
 
@@ -199,7 +158,7 @@ export class CourtContactService {
   }
 
   public validate(body: Record<string, unknown>, courtId: string): CourtContactSubmission {
-    const selectedContactMethods = this.parseSelectedContactMethods(body);
+    const selectedContactMethods = parseSelectedContactMethods(body['contact-methods']);
     const selectedContactTypeId = parseString(body['contact-type']);
     const contactEmail = parseString(body['contact-email']);
     const contactTelephone = parseString(body['contact-telephone']);
@@ -222,38 +181,17 @@ export class CourtContactService {
 
     validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
-    const contactExplanation = formValues.contactExplanation;
-    const contactExplanationCy = formValues.contactExplanationCy;
-
-    if (contactExplanation) {
-      if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
-        formErrors.contactExplanation = COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE;
-        errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-      } else if (!ENGLISH_TEXT_REGEX.test(contactExplanation)) {
-        formErrors.contactExplanation = COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE;
-        errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-      }
-
-      if (!contactExplanationCy) {
-        formErrors.contactExplanationCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
-        errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      }
-    }
-
-    if (contactExplanationCy) {
-      if (!contactExplanation) {
-        formErrors.contactExplanation = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
-        errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-      }
-
-      if (contactExplanationCy.length > MAX_EXPLANATION_LENGTH) {
-        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE;
-        errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      } else if (!WELSH_TEXT_REGEX.test(contactExplanationCy)) {
-        formErrors.contactExplanationCy = COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE;
-        errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-      }
-    }
+    validateContactExplanationFields(formValues, formErrors, errorSummary, {
+      englishInvalidCharacters: COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+      englishPattern: ENGLISH_TEXT_REGEX,
+      englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+      englishTooLong: COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
+      maximumLength: MAX_EXPLANATION_LENGTH,
+      welshInvalidCharacters: COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+      welshPattern: WELSH_TEXT_REGEX,
+      welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
+      welshTooLong: COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
+    });
 
     return {
       errorSummary,
@@ -278,60 +216,22 @@ export class CourtContactService {
 
   public async submitContactDetailFlow(options: CourtContactSubmitFlowOptions): Promise<CourtContactSubmitFlowOutcome> {
     const submission = this.validate(options.body, options.courtId);
-
-    if (submission.errorSummary.length) {
-      const contactDescriptionTypeItems = await this.getContactDescriptionTypeItems(submission.selectedContactTypeId);
-      if (typeof contactDescriptionTypeItems === 'number') {
+    return runContactWorkflow<CourtContactSubmission, CourtContactDescriptionTypeItem, CourtContactFormViewModel>({
+      buildValidationViewModel: (currentSubmission, items) =>
+        this.buildValidationFormViewModel(options, currentSubmission, items),
+      getContactDescriptionTypeItems: selectedId => this.getContactDescriptionTypeItems(selectedId),
+      mergeApiErrors: (currentSubmission, apiErrors) => {
+        const backendErrors = this.mapApiValidationErrors(apiErrors);
         return {
-          status: contactDescriptionTypeItems,
-          type: 'save-error',
+          ...currentSubmission,
+          errorSummary: backendErrors.errorSummary,
+          formErrors: { ...currentSubmission.formErrors, ...backendErrors.formErrors },
         };
-      }
-
-      return {
-        formViewModel: this.buildValidationFormViewModel(options, submission, contactDescriptionTypeItems),
-        type: 'validation-error',
-      };
-    }
-
-    const saveResult = await this.saveContactDetail(options.courtId, submission.payload, options.contactDetailId);
-    if (saveResult instanceof Map) {
-      const contactDescriptionTypeItems = await this.getContactDescriptionTypeItems(submission.selectedContactTypeId);
-      if (typeof contactDescriptionTypeItems === 'number') {
-        return {
-          status: contactDescriptionTypeItems,
-          type: 'save-error',
-        };
-      }
-
-      const backendErrors = this.mapApiValidationErrors(saveResult);
-      return {
-        formViewModel: this.buildValidationFormViewModel(
-          options,
-          {
-            ...submission,
-            errorSummary: backendErrors.errorSummary,
-            formErrors: {
-              ...submission.formErrors,
-              ...backendErrors.formErrors,
-            },
-          },
-          contactDescriptionTypeItems
-        ),
-        type: 'validation-error',
-      };
-    }
-
-    const saveErrorOutcome = this.toSaveErrorOutcome(saveResult);
-    if (saveErrorOutcome) {
-      return saveErrorOutcome;
-    }
-
-    const successPanelBody = await this.resolveContactTypeName(submission.payload.courtContactDescriptionId);
-    return {
-      successPanelBody,
-      type: 'saved',
-    };
+      },
+      resolveSuccessPanelBody: () => this.resolveContactTypeName(submission.payload.courtContactDescriptionId),
+      save: () => this.saveContactDetail(options.courtId, submission.payload, options.contactDetailId),
+      submission,
+    });
   }
 
   public async deleteContactDetail(courtId: string, contactDetailId: string): Promise<HttpStatusCode> {
@@ -361,24 +261,6 @@ export class CourtContactService {
     return [HttpStatusCode.Ok, HttpStatusCode.Created, HttpStatusCode.NoContent].includes(status);
   }
 
-  private parseSelectedContactMethods(body: Record<string, unknown>): string[] {
-    return [body['contact-methods']].flat().filter(Boolean) as string[];
-  }
-
-  private buildContactDescriptionTypeItems(
-    types: { id: string; name: string }[],
-    selectedId?: string
-  ): CourtContactDescriptionTypeItem[] {
-    return [
-      { text: 'Select', value: '' },
-      ...types.map(type => ({
-        selected: selectedId === type.id,
-        text: type.name,
-        value: type.id,
-      })),
-    ];
-  }
-
   private buildValidationFormViewModel(
     options: CourtContactSubmitFlowOptions,
     submission: CourtContactSubmission,
@@ -398,33 +280,11 @@ export class CourtContactService {
     };
   }
 
-  private toSaveErrorOutcome(
-    saveResult: HttpStatusCode | undefined
-  ): Extract<CourtContactSubmitFlowOutcome, { type: 'save-error' }> | undefined {
-    if (!saveResult) {
-      return {
-        status: HttpStatusCode.InternalServerError,
-        type: 'save-error',
-      };
-    }
-
-    if (!this.isSuccessfulContactSave(saveResult)) {
-      return {
-        status: saveResult,
-        type: 'save-error',
-      };
-    }
-
-    return undefined;
-  }
-
   private mapApiValidationErrors(apiErrors: Map<string, string>): {
     errorSummary: CourtContactValidationError[];
     formErrors: CourtContactFormErrors;
   } {
-    const formErrors: CourtContactFormErrors = {};
-    const errorSummary: CourtContactValidationError[] = [];
-    const fieldMappings: Record<string, ApiValidationMapping> = {
+    const fieldMappings: Record<string, ContactApiFieldMapping<CourtContactFormErrors>> = {
       courtContactDescriptionId: { formField: 'contactType', href: '#contact-type' },
       email: { formField: 'contactEmail', href: '#contact-email' },
       phoneNumber: { formField: 'contactTelephone', href: '#contact-telephone' },
@@ -432,17 +292,6 @@ export class CourtContactService {
       explanationCy: { formField: 'contactExplanationCy', href: '#contact-explanation-cy' },
     };
 
-    for (const [field, message] of apiErrors.entries()) {
-      const mapping = fieldMappings[field];
-      if (!mapping) {
-        errorSummary.push({ href: '#main-content', text: '' });
-        continue;
-      }
-
-      formErrors[mapping.formField] = message;
-      errorSummary.push({ href: mapping.href, text: message });
-    }
-
-    return { errorSummary, formErrors };
+    return mapContactApiValidationErrors(apiErrors, fieldMappings, { unknownErrorText: () => '' });
   }
 }

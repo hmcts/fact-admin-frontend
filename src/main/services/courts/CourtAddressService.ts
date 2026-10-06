@@ -1,16 +1,9 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
-import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtAddress, CourtAddressType } from '../../schemas/courtAddressSchema';
-import { OsAddressOption } from '../../schemas/osDataSchema';
-import {
-  validateAddressLine1Field,
-  validateAddressLine2Field,
-  validateCountyField,
-  validatePostcodeField,
-  validateTownCityField,
-} from '../../utils/addressValidation';
+import { validateCoreAddressFields } from '../../utils/addressValidation';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE,
   COURT_ADDRESS_COURT_TYPES_REQUIRED_MESSAGE,
@@ -19,11 +12,10 @@ import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
   EPIM_ID_MAX_LENGTH_MESSAGE,
   EPIM_ID_REGEX_MESSAGE,
-  POSTCODE_ERROR_MESSAGES,
 } from '../../utils/constants/messageConstants';
 import { VALID_EPIM_ID_REGEX } from '../../utils/constants/regexConstants';
-import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
+import { AddressLookupResponse, AddressLookupService } from '../shared/AddressLookupService';
 
 export type SaveCourtAddressResponse =
   | {
@@ -38,13 +30,7 @@ export type SaveCourtAddressResponse =
     }
   | HttpStatusCode;
 
-export type RetrieveAddressOptionsResponse =
-  | OsAddressOption[]
-  | {
-      status: 'invalid';
-      error: string;
-    }
-  | HttpStatusCode;
+export type RetrieveAddressOptionsResponse = AddressLookupResponse;
 
 export type DeleteCourtAddressResponse =
   | {
@@ -60,9 +46,10 @@ export type DeleteCourtAddressResponse =
   | HttpStatusCode;
 
 const courtApi = new CourtApi();
-const referenceDataApi = new ReferenceDataApi();
 
 export class CourtAddressService {
+  public constructor(private readonly addressLookupService = new AddressLookupService()) {}
+
   public async list(courtId: string): Promise<CourtAddress[] | HttpStatusCode> {
     return courtApi.getCourtAddressDetails(courtId);
   }
@@ -76,19 +63,7 @@ export class CourtAddressService {
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await referenceDataApi.getAddressesForPostcode(postcode);
-    if (typeof result === 'number') {
-      return result;
-    }
-    if (result instanceof Map) {
-      if (result.has('message')) {
-        return { status: 'invalid', error: POSTCODE_ERROR_MESSAGES.postcodeNotFound };
-      } else {
-        return HttpStatusCode.BadRequest;
-      }
-    }
-
-    return buildOsAddressOptions(result, postcode);
+    return this.addressLookupService.retrieveOptions(postcode);
   }
 
   public async save(
@@ -157,15 +132,7 @@ export class CourtAddressService {
     result: Map<string, string>,
     address: Partial<CourtAddress>
   ): SaveCourtAddressResponse {
-    // convert the mapped errors into our expected error format
-    const errors: Record<string, string[]> = {};
-    for (const [key, value] of result) {
-      // ignore the timestamp entry when decanting error responses
-      if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-        continue;
-      }
-      errors[key] = [value];
-    }
+    const errors = toValidationErrorRecord(result, { ignoredKeys: ['timestamp'] });
     return { status: 'invalid', address: { ...address, errors } };
   }
 
@@ -232,18 +199,9 @@ export class CourtAddressService {
     aolSelected: boolean,
     courtTypesSelected: boolean
   ): Record<string, string[]> | undefined {
-    const errors: Record<string, string[]> = {};
+    const errors = validateCoreAddressFields(address);
 
     addError(errors, 'addressType', this.validateAddressType(address, existingAddresses));
-    addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));
-    addError(errors, 'addressLine2', validateAddressLine2Field(address.addressLine2 ?? undefined));
-    addError(errors, 'townCity', validateTownCityField(address.townCity));
-    addError(errors, 'county', validateCountyField(address.county ?? undefined));
-
-    const postcodeValidation = validatePostcodeField(address.postcode);
-    if (postcodeValidation) {
-      addError(errors, 'postcode', [postcodeValidation]);
-    }
 
     addError(errors, 'epimId', this.validateEpimId(address));
 

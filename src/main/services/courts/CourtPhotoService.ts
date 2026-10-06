@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 
 export type CourtPhotoViewModel = {
   fileLink?: string;
@@ -33,16 +34,10 @@ export class CourtPhotoService {
 
     // if it's a Map, it's validation errors from the API
     if (uploadResponse instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      // convert the mapped errors into our expected error format
-      for (const [key, value] of uploadResponse) {
-        // ignore the timestamp entry when decanting error responses
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        const field = key.toLowerCase() === 'file' ? 'photo' : key;
-        errors[field] = [value];
-      }
+      const errors = toValidationErrorRecord(uploadResponse, {
+        ignoredKeys: ['timestamp'],
+        mapKey: key => (key.toLowerCase() === 'file' ? 'photo' : key),
+      });
       return this.buildResponseWithExistingLink(courtResponse, errors);
     }
 

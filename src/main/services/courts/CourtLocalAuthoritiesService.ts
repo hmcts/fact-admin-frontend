@@ -7,6 +7,7 @@ import {
   CourtLocalAuthoritiesList,
   LocalAuthoritySelection,
 } from '../../schemas/courtLocalAuthoritiesSchema';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 
 type CasesHeard = {
   Adoption: boolean;
@@ -112,15 +113,7 @@ export class CourtLocalAuthoritiesService {
 
     // if it's a Map, it's errors from the API
     if (updateResponse instanceof Map) {
-      // convert the mapped errors into our expected error format
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of updateResponse) {
-        // ignore the timestamp entry when decanting error responses
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
+      const errors = toValidationErrorRecord(updateResponse, { ignoredKeys: ['timestamp'] });
 
       return {
         status: 'invalid',

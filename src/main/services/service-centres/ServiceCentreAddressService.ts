@@ -2,22 +2,15 @@ import { HttpStatusCode } from 'axios';
 
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
-import { OsAddressOption } from '../../schemas/osDataSchema';
 import { ServiceCentreAddress } from '../../schemas/serviceCentreAddressSchema';
-import {
-  validateAddressLine1Field,
-  validateAddressLine2Field,
-  validateCountyField,
-  validatePostcodeField,
-  validateTownCityField,
-} from '../../utils/addressValidation';
+import { validateCoreAddressFields } from '../../utils/addressValidation';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
-  POSTCODE_ERROR_MESSAGES,
   SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 import { addError } from '../../utils/validation';
+import { AddressLookupResponse, AddressLookupService } from '../shared/AddressLookupService';
 
 export type SaveServiceCentreAddressResponse =
   | {
@@ -40,18 +33,13 @@ export type DeleteServiceCentreAddressResponse =
     }
   | HttpStatusCode;
 
-export type RetrieveAddressOptionsResponse =
-  | OsAddressOption[]
-  | {
-      status: 'invalid';
-      error: string;
-    }
-  | HttpStatusCode;
+export type RetrieveAddressOptionsResponse = AddressLookupResponse;
 
 export class ServiceCentreAddressService {
   public constructor(
     private readonly serviceCentreApi = new ServiceCentreApi(),
-    private readonly referenceDataApi = new ReferenceDataApi()
+    referenceDataApi = new ReferenceDataApi(),
+    private readonly addressLookupService = new AddressLookupService(referenceDataApi)
   ) {}
 
   public async list(serviceCentreId: string): Promise<ServiceCentreAddress[] | HttpStatusCode> {
@@ -72,22 +60,7 @@ export class ServiceCentreAddressService {
   }
 
   public async retrieveAddressOptions(postcode: string): Promise<RetrieveAddressOptionsResponse> {
-    const result = await this.referenceDataApi.getAddressesForPostcode(postcode);
-    if (typeof result === 'number') {
-      return result;
-    }
-
-    if (result instanceof Map) {
-      if (result.has('message')) {
-        return {
-          status: 'invalid',
-          error: POSTCODE_ERROR_MESSAGES.postcodeNotFound,
-        };
-      }
-      return HttpStatusCode.BadRequest;
-    }
-
-    return buildOsAddressOptions(result, postcode);
+    return this.addressLookupService.retrieveOptions(postcode);
   }
 
   public async save(
@@ -148,13 +121,7 @@ export class ServiceCentreAddressService {
     result: Map<string, string>,
     address: Partial<ServiceCentreAddress>
   ): SaveServiceCentreAddressResponse {
-    const errors: Record<string, string[]> = {};
-    for (const [key, value] of result) {
-      if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-        continue;
-      }
-      errors[key] = [value];
-    }
+    const errors = toValidationErrorRecord(result, { ignoredKeys: ['timestamp'] });
     return { status: 'invalid', address: { ...address, errors } };
   }
 
@@ -187,7 +154,7 @@ export class ServiceCentreAddressService {
     existingAddresses: ServiceCentreAddress[],
     addressId?: string
   ): Record<string, string[]> | undefined {
-    const errors: Record<string, string[]> = {};
+    const errors = validateCoreAddressFields(address);
 
     if (!addressId && existingAddresses.length > 0) {
       addError(errors, 'message', [SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE]);
@@ -195,16 +162,6 @@ export class ServiceCentreAddressService {
 
     if (!address.addressType) {
       addError(errors, 'addressType', [COURT_ADDRESS_TYPE_REQUIRED_MESSAGE]);
-    }
-
-    addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));
-    addError(errors, 'addressLine2', validateAddressLine2Field(address.addressLine2 ?? undefined));
-    addError(errors, 'townCity', validateTownCityField(address.townCity));
-    addError(errors, 'county', validateCountyField(address.county ?? undefined));
-
-    const postcodeValidation = validatePostcodeField(address.postcode);
-    if (postcodeValidation) {
-      addError(errors, 'postcode', [postcodeValidation]);
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;

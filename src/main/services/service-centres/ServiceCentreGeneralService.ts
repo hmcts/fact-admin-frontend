@@ -6,12 +6,15 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   SERVICE_CENTRE_OPEN_MESSAGE,
   SERVICE_CENTRE_REGION_INVALID_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
 } from '../../utils/constants/messageConstants';
+import { sortAndSplitIntoColumns } from '../../utils/formHelpers';
 import { getServiceCentreNameValidationErrors } from '../../utils/subjectNameValidation';
+import { LocationNameService } from '../shared/LocationNameService';
 
 type ServiceAreaCheckboxItem = {
   checked: boolean;
@@ -48,9 +51,10 @@ export type ServiceCentreGeneralSaveResult =
 
 export class ServiceCentreGeneralService {
   public constructor(
-    private readonly courtApi = new CourtApi(),
+    courtApi = new CourtApi(),
     private readonly serviceCentreApi = new ServiceCentreApi(),
-    private readonly referenceDataApi = new ReferenceDataApi()
+    private readonly referenceDataApi = new ReferenceDataApi(),
+    private readonly locationNameService = new LocationNameService(courtApi, serviceCentreApi)
   ) {}
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreGeneralViewModel | HttpStatusCode> {
@@ -117,10 +121,10 @@ export class ServiceCentreGeneralService {
       };
     }
 
-    const duplicateLocationResult = await this.checkDuplicateLocationName(
-      updatedServiceCentre.name,
-      updatedServiceCentre.id
-    );
+    const duplicateLocationResult = await this.locationNameService.findDuplicate(updatedServiceCentre.name, {
+      id: updatedServiceCentre.id,
+      type: 'serviceCentre',
+    });
     if (typeof duplicateLocationResult === 'number') {
       if (duplicateLocationResult !== HttpStatusCode.NotFound) {
         return { status: duplicateLocationResult, type: 'status' };
@@ -130,7 +134,7 @@ export class ServiceCentreGeneralService {
         type: 'validation-error',
         viewModel: this.toViewModel(updatedServiceCentre, serviceAreasResponse, regions, {
           name: [
-            `A ${duplicateLocationResult.type} with the entered name already exists: '${duplicateLocationResult.name}'`,
+            `A ${duplicateLocationResult.type === 'serviceCentre' ? 'service centre' : 'court'} with the entered name already exists: '${duplicateLocationResult.name}'`,
           ],
         }),
       };
@@ -142,13 +146,7 @@ export class ServiceCentreGeneralService {
     }
 
     if (updateResponse instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of updateResponse) {
-        if (key === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
+      const errors = toValidationErrorRecord(updateResponse, { ignoredKeys: ['timestamp'] });
 
       return {
         type: 'validation-error',
@@ -162,29 +160,6 @@ export class ServiceCentreGeneralService {
     };
   }
 
-  private async checkDuplicateLocationName(
-    name: string,
-    serviceCentreId: string
-  ): Promise<{ name: string; type: 'court' | 'service centre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.courtApi.getCourtByName(name);
-    if (typeof duplicateCourt !== 'number') {
-      return { name: duplicateCourt.name, type: 'court' };
-    }
-    if (duplicateCourt !== HttpStatusCode.NotFound) {
-      return duplicateCourt;
-    }
-
-    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
-    if (typeof duplicateServiceCentre !== 'number') {
-      if (duplicateServiceCentre.id !== serviceCentreId) {
-        return { name: duplicateServiceCentre.name, type: 'service centre' };
-      }
-      return HttpStatusCode.NotFound;
-    }
-
-    return duplicateServiceCentre;
-  }
-
   private toViewModel(
     serviceCentre: Pick<ServiceCentre, 'id' | 'name' | 'open' | 'serviceAreaIds' | 'regionId'>,
     serviceAreas: ServiceArea[],
@@ -193,23 +168,21 @@ export class ServiceCentreGeneralService {
   ): ServiceCentreGeneralViewModel {
     const selectedServiceAreaIds = serviceCentre.serviceAreaIds ?? [];
     const selectedIds = new Set(selectedServiceAreaIds);
-    const items = serviceAreas
-      .map(serviceArea => ({
-        checked: selectedIds.has(serviceArea.id),
-        text: serviceArea.name,
-        value: serviceArea.id,
-      }))
-      .sort((left, right) => left.text.localeCompare(right.text));
-    const midpoint = Math.ceil(items.length / 2);
+    const items = serviceAreas.map(serviceArea => ({
+      checked: selectedIds.has(serviceArea.id),
+      text: serviceArea.name,
+      value: serviceArea.id,
+    }));
+    const columns = sortAndSplitIntoColumns(items, item => item.text);
 
     return {
       errors,
       id: serviceCentre.id,
-      leftColumnServiceAreaItems: items.slice(0, midpoint),
+      leftColumnServiceAreaItems: columns.left,
       name: serviceCentre.name,
       open: serviceCentre.open,
       pageTitle: errors ? `Error: General - ${serviceCentre.name}` : `General - ${serviceCentre.name}`,
-      rightColumnServiceAreaItems: items.slice(midpoint),
+      rightColumnServiceAreaItems: columns.right,
       serviceAreaIds: selectedServiceAreaIds,
       regions,
       regionId: serviceCentre.regionId ?? undefined,

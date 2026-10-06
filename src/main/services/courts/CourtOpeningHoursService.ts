@@ -3,6 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { CourtOpeningHours, OpeningHourType, OpeningTimesDetail } from '../../schemas/openingHoursSchema';
+import { isHttpStatusCode, isSuccessfulHttpStatus } from '../../utils/apiResponses';
 import {
   ALLOWED_OPENING_HOUR_TYPES,
   OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
@@ -15,15 +16,15 @@ import {
   OPENING_HOUR_TYPE_ALREADY_EXISTS_MESSAGE,
   OPENING_HOUR_TYPE_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
-
+import { normaliseSelectedValues, toErrorSummary } from '../../utils/formHelpers';
 import {
   WeekdayConfig,
   formatTime,
+  isNoOpeningHoursResponse,
   mapSelectedDayOpeningTimes,
-  normalizeSelectedValues,
-  toErrorSummary,
+  populateOpeningTimeFields,
   validateWeekdayOpeningTimes,
-} from './validation/openingHoursValidation';
+} from '../../utils/openingHours';
 
 type Day = WeekdayConfig;
 
@@ -98,20 +99,20 @@ export class CourtOpeningHoursService {
   ) {}
 
   public getSelectedDays(value: unknown): string[] {
-    return normalizeSelectedValues(value);
+    return normaliseSelectedValues(value);
   }
 
   public async getListPage(courtId: string): Promise<OpeningHoursListViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const openingHoursResponse = await this.courtApi.getCourtOpeningHours(courtId);
 
-    if (this.isHttpStatusCode(openingHoursResponse)) {
-      return this.isNoOpeningHoursResponse(openingHoursResponse)
+    if (isHttpStatusCode(openingHoursResponse)) {
+      return isNoOpeningHoursResponse(openingHoursResponse)
         ? {
             courtId,
             courtName: courtResponse.name,
@@ -149,21 +150,16 @@ export class CourtOpeningHoursService {
   ): Promise<SaveOpeningHoursResult> {
     const baseModel = await this.getEditPageBase(courtId, openingHoursId, form);
 
-    if (this.isHttpStatusCode(baseModel)) {
+    if (isHttpStatusCode(baseModel)) {
       return { status: baseModel, type: 'status' };
     }
 
     const existingOpeningHoursResponse = await this.courtApi.getCourtOpeningHours(courtId);
-    if (
-      this.isHttpStatusCode(existingOpeningHoursResponse) &&
-      !this.isNoOpeningHoursResponse(existingOpeningHoursResponse)
-    ) {
+    if (isHttpStatusCode(existingOpeningHoursResponse) && !isNoOpeningHoursResponse(existingOpeningHoursResponse)) {
       return { status: existingOpeningHoursResponse, type: 'status' };
     }
 
-    const existingOpeningHours = this.isHttpStatusCode(existingOpeningHoursResponse)
-      ? []
-      : existingOpeningHoursResponse;
+    const existingOpeningHours = isHttpStatusCode(existingOpeningHoursResponse) ? [] : existingOpeningHoursResponse;
     const errors = this.validate(form, existingOpeningHours, openingHoursId);
 
     if (Object.keys(errors).length > 0) {
@@ -172,7 +168,7 @@ export class CourtOpeningHoursService {
         viewModel: {
           ...baseModel,
           errors,
-          errorSummary: this.toErrorSummary(errors),
+          errorSummary: toErrorSummary(errors),
           pageTitle: `Error: Edit opening hours - ${baseModel.courtName}`,
         },
       };
@@ -189,7 +185,7 @@ export class CourtOpeningHoursService {
       openingTimesDetails: this.toOpeningTimesDetails(form, existingOpeningHoursRecord),
     });
 
-    if (this.isSuccessfulStatus(saveResponse)) {
+    if (isSuccessfulHttpStatus(saveResponse)) {
       return {
         type: 'success',
         viewModel: {
@@ -200,7 +196,7 @@ export class CourtOpeningHoursService {
       };
     }
 
-    if (this.isHttpStatusCode(saveResponse)) {
+    if (isHttpStatusCode(saveResponse)) {
       return { status: saveResponse, type: 'status' };
     }
 
@@ -223,12 +219,12 @@ export class CourtOpeningHoursService {
     openingHoursId: string
   ): Promise<OpeningHoursDeleteViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const openingHoursResponse = await this.courtApi.getCourtOpeningHoursById(courtId, openingHoursId);
-    if (this.isHttpStatusCode(openingHoursResponse)) {
+    if (isHttpStatusCode(openingHoursResponse)) {
       return openingHoursResponse;
     }
 
@@ -246,7 +242,7 @@ export class CourtOpeningHoursService {
 
   public async delete(courtId: string, openingHoursId: string): Promise<OpeningHoursSuccessViewModel | HttpStatusCode> {
     const deleteViewModel = await this.getDeletePage(courtId, openingHoursId);
-    if (this.isHttpStatusCode(deleteViewModel)) {
+    if (isHttpStatusCode(deleteViewModel)) {
       return deleteViewModel;
     }
 
@@ -269,19 +265,19 @@ export class CourtOpeningHoursService {
   ): Promise<OpeningHoursEditViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const openingHourTypesResponse = await this.referenceDataApi.getOpeningHourTypes();
-    if (this.isHttpStatusCode(openingHourTypesResponse)) {
+    if (isHttpStatusCode(openingHourTypesResponse)) {
       return openingHourTypesResponse;
     }
 
     let openingHours: CourtOpeningHours | undefined;
     if (openingHoursId) {
       const openingHoursResponse = await this.courtApi.getCourtOpeningHoursById(courtId, openingHoursId);
-      if (this.isHttpStatusCode(openingHoursResponse)) {
+      if (isHttpStatusCode(openingHoursResponse)) {
         return openingHoursResponse;
       }
       openingHours = openingHoursResponse;
@@ -412,7 +408,7 @@ export class CourtOpeningHoursService {
     const everyday = openingHours.openingTimesDetails.find(detail => detail.dayOfWeek === 'EVERYDAY');
     if (everyday) {
       form.sameTime = 'yes';
-      this.assignTimeFields(form, 'same', everyday);
+      populateOpeningTimeFields(form, 'same', everyday, { transformHour: this.stripLeadingZero });
       return form;
     }
 
@@ -421,25 +417,11 @@ export class CourtOpeningHoursService {
     openingHours.openingTimesDetails.forEach(detail => {
       const dayConfig = days.find(day => day.value === detail.dayOfWeek);
       if (dayConfig) {
-        this.assignTimeFields(form, dayConfig.idPrefix, detail);
+        populateOpeningTimeFields(form, dayConfig.idPrefix, detail, { transformHour: this.stripLeadingZero });
       }
     });
 
     return form;
-  }
-
-  private assignTimeFields(form: OpeningHoursForm, prefix: string, detail: OpeningTimesDetail): void {
-    const [openingHour, openingMinute] = detail.openingTime.split(':');
-    const [closingHour, closingMinute] = detail.closingTime.split(':');
-
-    form[`${prefix}OpeningHour`] = this.stripLeadingZero(openingHour);
-    form[`${prefix}OpeningMinute`] = openingMinute;
-    form[`${prefix}ClosingHour`] = this.stripLeadingZero(closingHour);
-    form[`${prefix}ClosingMinute`] = closingMinute;
-  }
-
-  private toErrorSummary(errors: Record<string, string>): OpeningHoursError[] {
-    return toErrorSummary(errors);
   }
 
   private formatOpeningTimes(openingTimesDetails: OpeningTimesDetail[]): string {
@@ -463,7 +445,7 @@ export class CourtOpeningHoursService {
   private async getOpeningHourTypesById(): Promise<Map<string, string>> {
     const openingHourTypesResponse = await this.referenceDataApi.getOpeningHourTypes();
 
-    if (this.isHttpStatusCode(openingHourTypesResponse)) {
+    if (isHttpStatusCode(openingHourTypesResponse)) {
       return new Map();
     }
 
@@ -485,21 +467,7 @@ export class CourtOpeningHoursService {
     return time.split(':').slice(0, 2).join(':');
   }
 
-  private stripLeadingZero(value: string): string {
+  private readonly stripLeadingZero = (value: string): string => {
     return String(Number(value));
-  }
-
-  private isHttpStatusCode(response: unknown): response is HttpStatusCode {
-    return typeof response === 'number';
-  }
-
-  private isSuccessfulStatus(response: unknown): response is HttpStatusCode {
-    return (
-      this.isHttpStatusCode(response) && response >= HttpStatusCode.Ok && response < HttpStatusCode.MultipleChoices
-    );
-  }
-
-  private isNoOpeningHoursResponse(status: HttpStatusCode): boolean {
-    return status === HttpStatusCode.NoContent || status === HttpStatusCode.NotFound;
-  }
+  };
 }

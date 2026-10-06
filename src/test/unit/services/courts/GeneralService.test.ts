@@ -180,7 +180,11 @@ describe('CourtGeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new CourtGeneralService(requests as never, requests as never);
+    const locationNameService = {
+      findDuplicate: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    };
+
+    const service = new CourtGeneralService(requests as never, requests as never, locationNameService as never);
 
     const result = await service.save({
       id: courtEntity.id,
@@ -197,7 +201,6 @@ describe('CourtGeneralService', () => {
       open: false,
       regionId: '33333333-3333-4333-8333-333333333333',
     });
-    expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Court Name');
     expect(result).toEqual({
       ...courtEntity,
       name: 'Updated Court Name',
@@ -216,7 +219,11 @@ describe('CourtGeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new CourtGeneralService(requests as never, requests as never);
+    const locationNameService = {
+      findDuplicate: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    };
+
+    const service = new CourtGeneralService(requests as never, requests as never, locationNameService as never);
 
     await service.save({
       id: courtEntity.id,
@@ -225,7 +232,10 @@ describe('CourtGeneralService', () => {
       regionId: courtEntity.regionId,
     });
 
-    expect(requests.getCourtByName).toHaveBeenCalledWith('Updated Court Name');
+    expect(locationNameService.findDuplicate).toHaveBeenCalledWith('Updated Court Name', {
+      id: courtEntity.id,
+      type: 'court',
+    });
     expect(requests.updateCourt).toHaveBeenCalledWith({
       ...courtEntity,
       regions,
@@ -268,7 +278,11 @@ describe('CourtGeneralService', () => {
       getCourtByName: jest.fn().mockResolvedValue(courtEntity),
     };
 
-    const service = new CourtGeneralService(requests as never, requests as never);
+    const locationNameService = {
+      findDuplicate: jest.fn().mockResolvedValue(HttpStatusCode.NotFound),
+    };
+
+    const service = new CourtGeneralService(requests as never, requests as never, locationNameService as never);
 
     const result = await service.save({
       id: courtEntity.id,

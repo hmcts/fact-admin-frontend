@@ -1,6 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
+import { isHttpStatusCode, toSingleValidationErrorRecord } from '../../utils/apiResponses';
+import { validateBilingualTextPair } from '../../utils/bilingualTextValidation';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
@@ -11,7 +13,7 @@ import {
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
-import { isHttpStatusCode } from '../../utils/valueParsers';
+import { toErrorSummary } from '../../utils/formHelpers';
 
 export type WarningNoticeForm = {
   warningNotice?: string;
@@ -77,7 +79,7 @@ export class CourtWarningNoticeService {
           courtName: courtResponse.name,
           form,
           errors,
-          errorSummary: this.toErrorSummary(errors),
+          errorSummary: toErrorSummary(errors),
           pageTitle: `Error: Warning notice - ${courtResponse.name}`,
         },
       };
@@ -93,10 +95,7 @@ export class CourtWarningNoticeService {
     const updateResponse = await this.courtApi.updateCourt(payload);
 
     if (updateResponse instanceof Map) {
-      const apiErrors: Record<string, string> = {};
-      for (const [key, value] of updateResponse) {
-        apiErrors[key] = value;
-      }
+      const apiErrors = toSingleValidationErrorRecord(updateResponse);
       return {
         type: 'validation_error',
         viewModel: {
@@ -104,7 +103,7 @@ export class CourtWarningNoticeService {
           courtName: courtResponse.name,
           form,
           errors: apiErrors,
-          errorSummary: this.toErrorSummary(apiErrors),
+          errorSummary: toErrorSummary(apiErrors),
           pageTitle: `Error: Warning notice - ${courtResponse.name}`,
         },
       };
@@ -124,37 +123,21 @@ export class CourtWarningNoticeService {
   }
 
   private validate(form: WarningNoticeForm): Record<string, string> {
-    const errors: Record<string, string> = {};
-
     const { warningNotice, warningNoticeCy } = form;
-    if (warningNotice && !warningNoticeCy) {
-      errors.warningNoticeCy = WELSH_WARNING_NOTICE_REQUIRED_MESSAGE;
-    }
-
-    if (warningNoticeCy && !warningNotice) {
-      errors.warningNotice = ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE;
-    }
-
-    if (warningNotice && warningNotice.length > WARNING_NOTICE_MAX_LENGTH) {
-      errors.warningNotice = WARNING_NOTICE_MAX_LENGTH_MESSAGE;
-    }
-
-    if (warningNoticeCy && warningNoticeCy.length > WARNING_NOTICE_MAX_LENGTH) {
-      errors.warningNoticeCy = WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE;
-    }
-
-    if (warningNotice && !ENGLISH_WARNING_NOTICE_REGEX.test(warningNotice)) {
-      errors.warningNotice = WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
-    }
-
-    if (warningNoticeCy && !WELSH_WARNING_NOTICE_REGEX.test(warningNoticeCy)) {
-      errors.warningNoticeCy = WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE;
-    }
-
-    return errors;
-  }
-
-  private toErrorSummary(errors: Record<string, string>): { href: string; text: string }[] {
-    return Object.entries(errors).map(([field, text]) => ({ href: `#${field}`, text }));
+    return validateBilingualTextPair(warningNotice, warningNoticeCy, {
+      englishKey: 'warningNotice',
+      englishPattern: ENGLISH_WARNING_NOTICE_REGEX,
+      maximumLength: WARNING_NOTICE_MAX_LENGTH,
+      messages: {
+        englishInvalidCharacters: WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+        englishMaximumLength: WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+        englishRequired: ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
+        welshInvalidCharacters: WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+        welshMaximumLength: WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
+        welshRequired: WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
+      },
+      welshKey: 'warningNoticeCy',
+      welshPattern: WELSH_WARNING_NOTICE_REGEX,
+    });
   }
 }

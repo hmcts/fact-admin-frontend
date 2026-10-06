@@ -12,10 +12,14 @@ import {
   SORT_ORDER_WITHOUT_SORT_BY_ERROR,
   USERS_PAGE_SEARCH_VALIDATION_ERROR,
   VALID_SORT_BY_LAST_LOGIN_VALUES,
-  VALID_SORT_ORDER_VALUES,
 } from '../utils/constants/messageConstants';
 import { SEARCH_REGEX } from '../utils/constants/regexConstants';
-import { parseNumber, parseOptionalString, parseString } from '../utils/valueParsers';
+import {
+  parseClampedNumber,
+  validateIntegerQueryParameter,
+  validateSortParameters,
+} from '../utils/listFilterValidation';
+import { parseOptionalString, parseString } from '../utils/valueParsers';
 
 import { UsersPageFilters, UsersPageValidationError } from './types/UsersPage.types';
 
@@ -26,8 +30,8 @@ export class UsersPageFiltersService {
     const rawSortOrder = parseOptionalString(query.sortOrder);
 
     return {
-      pageNumber: Math.min(parseNumber(query.pageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),
-      pageSize: Math.min(parseNumber(query.pageSize, DEFAULT_PAGE_SIZE), MAX_PAGE_PARAM),
+      pageNumber: parseClampedNumber(query.pageNumber, DEFAULT_PAGE_NUMBER, MAX_PAGE_PARAM),
+      pageSize: parseClampedNumber(query.pageSize, DEFAULT_PAGE_SIZE, MAX_PAGE_PARAM),
       rawPageNumber: parseOptionalString(query.pageNumber),
       rawPageSize: parseOptionalString(query.pageSize),
       rawSearch: parseOptionalString(query.search),
@@ -49,38 +53,36 @@ export class UsersPageFiltersService {
       });
     }
 
-    if (filters.rawPageSize !== undefined) {
-      const pageSize = Number(filters.rawPageSize);
-      if (!Number.isInteger(pageSize) || pageSize <= 0) {
-        errors.push({ href: '#main-content', text: PAGE_SIZE_MIN_ERROR });
-      } else if (pageSize > MAX_PAGE_PARAM) {
-        errors.push({ href: '#main-content', text: PAGE_SIZE_MAX_ERROR });
-      }
+    const pageSizeError = validateIntegerQueryParameter(filters.rawPageSize, {
+      href: '#main-content',
+      maximum: MAX_PAGE_PARAM,
+      maximumError: PAGE_SIZE_MAX_ERROR,
+      minimum: 1,
+      minimumError: PAGE_SIZE_MIN_ERROR,
+    });
+    if (pageSizeError) {
+      errors.push(pageSizeError);
     }
 
-    if (filters.rawPageNumber !== undefined) {
-      const pageNumber = Number(filters.rawPageNumber);
-      if (!Number.isInteger(pageNumber) || pageNumber < 0) {
-        errors.push({ href: '#main-content', text: PAGE_NUMBER_MIN_ERROR });
-      } else if (pageNumber > MAX_PAGE_PARAM) {
-        errors.push({ href: '#main-content', text: PAGE_NUMBER_MAX_ERROR });
-      }
+    const pageNumberError = validateIntegerQueryParameter(filters.rawPageNumber, {
+      href: '#main-content',
+      maximum: MAX_PAGE_PARAM,
+      maximumError: PAGE_NUMBER_MAX_ERROR,
+      minimum: 0,
+      minimumError: PAGE_NUMBER_MIN_ERROR,
+    });
+    if (pageNumberError) {
+      errors.push(pageNumberError);
     }
 
-    if (filters.rawSortOrder !== undefined && filters.rawSortBy === undefined) {
-      errors.push({ href: '#main-content', text: SORT_ORDER_WITHOUT_SORT_BY_ERROR });
-    }
-
-    if (filters.rawSortBy !== undefined && filters.rawSortBy !== 'lastLogin') {
-      errors.push({
-        href: '#main-content',
-        text: `sortBy must be one of: ${VALID_SORT_BY_LAST_LOGIN_VALUES.join(', ')}`,
-      });
-    }
-
-    if (filters.rawSortOrder !== undefined && !VALID_SORT_ORDER_VALUES.includes(filters.rawSortOrder as never)) {
-      errors.push({ href: '#main-content', text: `sortOrder must be one of: ${VALID_SORT_ORDER_VALUES.join(', ')}` });
-    }
+    errors.push(
+      ...validateSortParameters(
+        filters.rawSortBy,
+        filters.rawSortOrder,
+        VALID_SORT_BY_LAST_LOGIN_VALUES,
+        SORT_ORDER_WITHOUT_SORT_BY_ERROR
+      )
+    );
 
     return errors;
   }

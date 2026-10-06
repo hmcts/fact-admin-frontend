@@ -5,11 +5,14 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   SERVICE_CENTRE_REGION_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
 } from '../../utils/constants/messageConstants';
+import { sortAndSplitIntoColumns } from '../../utils/formHelpers';
 import { getServiceCentreNameValidationErrors } from '../../utils/subjectNameValidation';
+import { LocationNameService } from '../shared/LocationNameService';
 
 type AddServiceCentreForm = {
   name?: string;
@@ -45,9 +48,10 @@ type AddServiceCentreResult = AddServiceCentrePageModel | AddServiceCentreSucces
 
 export class AddServiceCentreService {
   public constructor(
-    private readonly courtApi = new CourtApi(),
+    courtApi = new CourtApi(),
     private readonly serviceCentreApi = new ServiceCentreApi(),
-    private readonly referenceDataApi = new ReferenceDataApi()
+    private readonly referenceDataApi = new ReferenceDataApi(),
+    private readonly locationNameService = new LocationNameService(courtApi, serviceCentreApi)
   ) {}
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {
@@ -103,7 +107,7 @@ export class AddServiceCentreService {
 
     const name = trimmedForm.name as string;
     const regionId = trimmedForm.regionId as string;
-    const duplicateLocationStatus = await this.checkDuplicateLocationName(name);
+    const duplicateLocationStatus = await this.locationNameService.findDuplicate(name);
     if (duplicateLocationStatus !== HttpStatusCode.NotFound) {
       if (typeof duplicateLocationStatus === 'number') {
         return duplicateLocationStatus;
@@ -127,13 +131,7 @@ export class AddServiceCentreService {
     }
 
     if (createResponse instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of createResponse) {
-        if (key === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
+      const errors = toValidationErrorRecord(createResponse, { ignoredKeys: ['timestamp'] });
       return this.buildViewModelWithErrors(trimmedForm, modelData.regions, modelData.serviceAreas, errors);
     }
 
@@ -144,25 +142,6 @@ export class AddServiceCentreService {
       serviceCentreId: createResponse.id,
       serviceCentreName: createResponse.name,
     };
-  }
-
-  private async checkDuplicateLocationName(
-    name: string
-  ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.courtApi.getCourtByName(name);
-    if (typeof duplicateCourt !== 'number') {
-      return { name: duplicateCourt.name, type: 'court' };
-    }
-    if (duplicateCourt !== HttpStatusCode.NotFound) {
-      return duplicateCourt;
-    }
-
-    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
-    if (typeof duplicateServiceCentre !== 'number') {
-      return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
-    }
-
-    return duplicateServiceCentre;
   }
 
   private async getViewModelWithErrors(
@@ -216,18 +195,16 @@ export class AddServiceCentreService {
     rightColumnServiceAreaItems: ServiceAreaCheckboxItem[];
   } {
     const selectedServiceAreaIdSet = new Set(selectedServiceAreaIds);
-    const serviceAreaItems = serviceAreas
-      .map(serviceArea => ({
-        checked: selectedServiceAreaIdSet.has(serviceArea.id),
-        text: serviceArea.name,
-        value: serviceArea.id,
-      }))
-      .sort((left, right) => left.text.localeCompare(right.text));
-    const midpoint = Math.ceil(serviceAreaItems.length / 2);
+    const serviceAreaItems = serviceAreas.map(serviceArea => ({
+      checked: selectedServiceAreaIdSet.has(serviceArea.id),
+      text: serviceArea.name,
+      value: serviceArea.id,
+    }));
+    const columns = sortAndSplitIntoColumns(serviceAreaItems, item => item.text);
 
     return {
-      leftColumnServiceAreaItems: serviceAreaItems.slice(0, midpoint),
-      rightColumnServiceAreaItems: serviceAreaItems.slice(midpoint),
+      leftColumnServiceAreaItems: columns.left,
+      rightColumnServiceAreaItems: columns.right,
     };
   }
 }

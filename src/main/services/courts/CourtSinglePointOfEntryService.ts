@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtSinglePointOfEntryList } from '../../schemas/courtSinglePointOfEntrySchema';
+import { toValidationErrorRecord } from '../../utils/apiResponses';
 import { SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES } from '../../utils/constants/messageConstants';
 
 export type SinglePointOfEntryServiceSelection = {
@@ -129,10 +130,6 @@ export class CourtSinglePointOfEntryService {
   }
 
   private toValidationErrors(apiErrors: Map<string, string>): Record<string, string[]> {
-    return Object.fromEntries(
-      [...apiErrors.entries()]
-        .filter(([key]) => key.toLowerCase() !== 'timestamp')
-        .map(([key, message]) => [key, [message]])
-    );
+    return toValidationErrorRecord(apiErrors, { ignoredKeys: ['timestamp'] });
   }
 }
