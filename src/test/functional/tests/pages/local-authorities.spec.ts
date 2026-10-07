@@ -11,7 +11,7 @@ test.describe('Local Authorities Page Tests', () => {
       await withCreatedCourt(playwright, 'Local Authorities Functional Test', {}, async ({ createdCourt }) => {
         await localAuthoritiesPage.goto(createdCourt.id);
 
-        await expect(localAuthoritiesPage.warningText).toContainText('If you set a local authority for a court');
+        await expect(localAuthoritiesPage.warningText).toContainText('Assigning a local authority will restrict citizen search results');
         const breadcrumb = localAuthoritiesPage.page.getByLabel('Breadcrumb');
         await expect(breadcrumb.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
         await expect(breadcrumb.getByRole('link', { name: createdCourt.name })).toHaveAttribute(

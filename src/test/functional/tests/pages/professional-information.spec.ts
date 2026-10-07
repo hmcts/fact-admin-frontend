@@ -51,11 +51,11 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.heading).toContainText('Information for professionals');
         await expect(professionalInformationPage.mainContent.content).toContainText('Court Types and Codes');
         await expect(professionalInformationPage.mainContent.content).toContainText('GBS code');
-        await expect(professionalInformationPage.mainContent.content).toContainText('DX codes');
+        await expect(professionalInformationPage.mainContent.content).toContainText('Document exchange (DX) codes');
         await expect(professionalInformationPage.mainContent.content).toContainText('Fax numbers');
         await expect(professionalInformationPage.mainContent.content).toContainText('Facilities');
         await expect(professionalInformationPage.mainContent.content).toContainText('Professional schemes');
-        await expect(professionalInformationPage.mainContent.content).toContainText('GBS code (optional)');
+        await expect(professionalInformationPage.mainContent.content).toContainText('Government Banking Solution (GBS) code (optional)');
         await expect(professionalInformationPage.warningText).toContainText(
           "If you have set up local authority config, and you remove the court type of 'Family court' here"
         );
