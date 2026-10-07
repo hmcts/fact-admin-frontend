@@ -115,6 +115,7 @@ export const HOME_PAGE_COURTS_LOAD_ERROR_MESSAGE = 'There was a problem loading 
 
 // Home page view service
 export const HOME_PAGE_TITLE = 'Courts, tribunals and service centres';
+export const HOME_PAGE_SEARCH_RESULTS_TITLE = `Search results: ${HOME_PAGE_TITLE}`;
 export const DEFAULT_RESULTS_MESSAGE = 'No courts, tribunals or service centres found.';
 export const SORT_ICON_PATHS = {
   ascending: '<path d="M6.5625 15.5L11 6.63125L15.4375 15.5H6.5625Z" fill="currentColor"/>',

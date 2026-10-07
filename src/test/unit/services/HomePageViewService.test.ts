@@ -384,4 +384,65 @@ describe('HomePageViewService', () => {
 
     expect(pagination.items.filter(item => item.ellipsis)).toHaveLength(2);
   });
+
+  test('announces search results in the page title when a search filter is active', () => {
+    const page = {
+      content: [court],
+      page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
+    } as PagedLocations;
+
+    expect(service.buildPageTitle(page, false, filters)).toBe('Courts, tribunals and service centres');
+    expect(service.buildPageTitle(page, false, { ...filters, partialCourtName: 'london' })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageTitle(page, false, { ...filters, regionId: '33333333-3333-4333-8333-333333333333' })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageTitle(page, false, { ...filters, includeClosed: true })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageTitle(page, false, { ...filters, onlyServiceCentres: true })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+  });
+
+  test('keeps the error prefix and pagination suffix on the search results title', () => {
+    const page = {
+      content: [court],
+      page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
+    } as PagedLocations;
+
+    expect(service.buildPageTitle(page, true, { ...filters, partialCourtName: 'london' })).toBe(
+      'Error: Search results: Courts, tribunals and service centres (page 2 of 2)'
+    );
+  });
+
+  test('treats whitespace-only search filters as inactive', () => {
+    expect(service.hasActiveSearchFilters(undefined)).toBe(false);
+    expect(service.hasActiveSearchFilters(filters)).toBe(false);
+    expect(service.hasActiveSearchFilters({ ...filters, partialCourtName: '   ' })).toBe(false);
+    expect(service.hasActiveSearchFilters({ ...filters, regionId: '  ' })).toBe(false);
+    expect(service.hasActiveSearchFilters({ ...filters, partialCourtName: 'london' })).toBe(true);
+  });
+
+  test('adds focus restoration hooks to the favourite toggle', () => {
+    const rows = service.buildCourtTableRows(
+      filters,
+      { content: [court], page: {} } as PagedLocations,
+      false,
+      new Map()
+    );
+
+    expect(rows[0][0].html).toContain('data-favourite-form');
+    expect(rows[0][0].html).toContain(`data-favourite-button="courts-court-${court.id}"`);
+  });
+
+  test('keys the favourites tab toggle to the favourites table', () => {
+    const rows = service.buildFavouriteTableRows(filters, {
+      content: [serviceCentre],
+      page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
+    } as PagedLocations);
+
+    expect(rows[0][0].html).toContain(`data-favourite-button="favourites-service_centre-${serviceCentre.id}"`);
+  });
 });

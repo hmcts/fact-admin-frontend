@@ -98,7 +98,7 @@ export class HomePageService {
       pageTitle:
         effectiveFilters.activeTab === 'favourites'
           ? this.homePageViewService.buildFavouritesPageTitle(resolvedFavourites.page)
-          : this.homePageViewService.buildPageTitle(courtsPage, validationErrors.length > 0),
+          : this.homePageViewService.buildPageTitle(courtsPage, validationErrors.length > 0, effectiveFilters),
       pagination: this.homePageViewService.buildPagination(courtsPage, filters),
       partialCourtNameError,
       regionOptions: this.homePageViewService.buildRegionOptions(regions, filters.regionId),

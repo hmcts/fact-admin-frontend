@@ -42,6 +42,8 @@ describe('Home View', () => {
     expect(html).toContain('Only show service centres');
     expect(html).toContain('No courts, tribunals or service centres found.');
     expect(html).toContain('No courts, tribunals or service centres match the current filters.');
+    expect(html).toContain('data-favourite-focus-fallback="courts"');
+    expect(html).toContain('data-favourite-focus-fallback="favourites"');
   });
 
   test('renders error summary and pagination when provided', () => {

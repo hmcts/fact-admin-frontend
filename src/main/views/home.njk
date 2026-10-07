@@ -102,7 +102,7 @@
           </div>
         </form>
 
-        <p class="govuk-body">{{ resultsMessage }}</p>
+        <p class="govuk-body" data-favourite-focus-fallback="courts" tabindex="-1">{{ resultsMessage }}</p>
         {% if courtTableRows.length %}
           {{ govukTable({
             classes: "homepage-courts-table",
@@ -128,7 +128,7 @@
         {% if favouritesErrorMessage %}
           <p class="govuk-error-message">{{ favouritesErrorMessage }}</p>
         {% else %}
-          <p class="govuk-body">{{ favouritesResultsMessage }}</p>
+          <p class="govuk-body" data-favourite-focus-fallback="favourites" tabindex="-1">{{ favouritesResultsMessage }}</p>
           {% if favouriteTableRows.length %}
             {{ govukTable({
               classes: "homepage-courts-table homepage-favourites-table",

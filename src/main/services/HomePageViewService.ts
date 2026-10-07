@@ -4,6 +4,7 @@ import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_RESULTS_MESSAGE,
+  HOME_PAGE_SEARCH_RESULTS_TITLE,
   HOME_PAGE_TITLE,
   PUBLIC_FRONTEND_URL,
   SORT_ICON_PATHS,
@@ -137,15 +138,35 @@ export class HomePageViewService {
 
   /**
    * Builds the page title, including validation and pagination context when needed.
+   *
+   * When any search filter is active the title announces search results, so screen reader
+   * users get a clear signal that the page content has changed after a search.
    */
-  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean): string {
+  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean, filters?: HomePageFilters): string {
     const titlePrefix = hasValidationErrors ? 'Error: ' : '';
+    const baseTitle = this.hasActiveSearchFilters(filters) ? HOME_PAGE_SEARCH_RESULTS_TITLE : HOME_PAGE_TITLE;
 
     if ((courtsPage.page.totalPages ?? 0) > 1) {
-      return `${titlePrefix}${HOME_PAGE_TITLE} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
+      return `${titlePrefix}${baseTitle} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
     }
 
-    return `${titlePrefix}${HOME_PAGE_TITLE}`;
+    return `${titlePrefix}${baseTitle}`;
+  }
+
+  /**
+   * Reports whether the user has narrowed the results with any of the search filters.
+   */
+  public hasActiveSearchFilters(filters?: HomePageFilters): boolean {
+    if (!filters) {
+      return false;
+    }
+
+    return (
+      (filters.partialCourtName ?? '').trim().length > 0 ||
+      (filters.regionId ?? '').trim().length > 0 ||
+      filters.includeClosed === true ||
+      filters.onlyServiceCentres === true
+    );
   }
 
   public buildFavouritesPageTitle(favouritesPage: PagedLocations): string {
@@ -394,14 +415,16 @@ export class HomePageViewService {
     const escapedName = this.escapeHtml(location.name);
     const escapedReturnPath = this.escapeHtml(returnPath);
     const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
+    // Stable across the add/remove toggle so focus can be restored to the same button after reload.
+    const focusKey = this.escapeHtml(`${table}-${location.locationType.toLowerCase()}-${location.id}`);
 
     return {
       classes: 'homepage-courts-table__favourite',
       html: [
         '<div class="favourite-location">',
-        `<form class="favourite-location__form" method="post" action="${action}">`,
+        `<form class="favourite-location__form" method="post" action="${action}" data-favourite-form>`,
         `<input type="hidden" name="returnPath" value="${escapedReturnPath}">`,
-        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}">`,
+        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}" data-favourite-button="${focusKey}">`,
         '<svg class="favourite-location__star" aria-hidden="true" focusable="false" viewBox="0 0 24 24">',
         '<path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.42l-5.8 3.05L7.31 14l-4.7-4.58 6.49-.94L12 2.6z"/>',
         '</svg>',

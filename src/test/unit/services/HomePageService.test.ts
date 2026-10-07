@@ -388,7 +388,7 @@ describe('HomePageService', () => {
     });
 
     expect(viewModel.includeStatusColumn).toBe(true);
-    expect(viewModel.pageTitle).toBe('Courts, tribunals and service centres (page 5 of 10)');
+    expect(viewModel.pageTitle).toBe('Search results: Courts, tribunals and service centres (page 5 of 10)');
     expect(viewModel.pagination).toEqual({
       currentPage: 4,
       items: [
