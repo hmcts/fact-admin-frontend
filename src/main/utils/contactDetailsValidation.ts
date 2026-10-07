@@ -1,3 +1,4 @@
+import { toValidationErrorEntries } from './apiResponses';
 import {
   CONTACT_METHOD_REQUIRED_MESSAGE,
   EMAIL_INVALID_MESSAGE,
@@ -162,18 +163,13 @@ export const mapContactApiValidationErrors = <TFormErrors extends ContactFormErr
   apiErrors: ReadonlyMap<string, string>,
   fieldMappings: Record<string, ContactApiFieldMapping<TFormErrors>>,
   options: {
-    ignoredKeys?: readonly string[];
     unknownErrorText?: (message: string) => string;
   } = {}
 ): { errorSummary: ContactValidationError[]; formErrors: TFormErrors } => {
   const formErrors = {} as TFormErrors;
   const errorSummary: ContactValidationError[] = [];
-  const ignoredKeys = new Set((options.ignoredKeys ?? []).map(key => key.toLowerCase()));
 
-  for (const [field, message] of apiErrors) {
-    if (ignoredKeys.has(field.toLowerCase())) {
-      continue;
-    }
+  for (const [field, message] of toValidationErrorEntries(apiErrors)) {
     const mapping = fieldMappings[field];
     if (!mapping) {
       errorSummary.push({ href: '#main-content', text: options.unknownErrorText?.(message) ?? message });

@@ -122,7 +122,7 @@ export class AddCourtService {
     }
 
     if (createResponse instanceof Map) {
-      const errors = toValidationErrorRecord(createResponse, { ignoredKeys: ['timestamp'] });
+      const errors = toValidationErrorRecord(createResponse);
       return this.buildViewModelWithErrors(trimmedForm, regions, errors);
     }
 

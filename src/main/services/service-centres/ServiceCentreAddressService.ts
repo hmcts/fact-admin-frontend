@@ -121,7 +121,7 @@ export class ServiceCentreAddressService {
     result: Map<string, string>,
     address: Partial<ServiceCentreAddress>
   ): SaveServiceCentreAddressResponse {
-    const errors = toValidationErrorRecord(result, { ignoredKeys: ['timestamp'] });
+    const errors = toValidationErrorRecord(result);
     return { status: 'invalid', address: { ...address, errors } };
   }
 

@@ -295,6 +295,6 @@ export class ServiceCentreContactService {
       phoneNumber: { formField: 'contactTelephone', href: '#contact-telephone' },
     };
 
-    return mapContactApiValidationErrors(apiErrors, fieldMappings, { ignoredKeys: ['timestamp'] });
+    return mapContactApiValidationErrors(apiErrors, fieldMappings);
   }
 }

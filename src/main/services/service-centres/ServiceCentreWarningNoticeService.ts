@@ -153,6 +153,6 @@ export class ServiceCentreWarningNoticeService {
   }
 
   private mapApiValidationErrors(apiErrors: Map<string, string>): Record<string, string[]> {
-    return toValidationErrorRecord(apiErrors, { ignoredKeys: ['timestamp'] });
+    return toValidationErrorRecord(apiErrors);
   }
 }

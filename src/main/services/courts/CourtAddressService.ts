@@ -132,7 +132,7 @@ export class CourtAddressService {
     result: Map<string, string>,
     address: Partial<CourtAddress>
   ): SaveCourtAddressResponse {
-    const errors = toValidationErrorRecord(result, { ignoredKeys: ['timestamp'] });
+    const errors = toValidationErrorRecord(result);
     return { status: 'invalid', address: { ...address, errors } };
   }
 

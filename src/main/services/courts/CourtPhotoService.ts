@@ -35,7 +35,6 @@ export class CourtPhotoService {
     // if it's a Map, it's validation errors from the API
     if (uploadResponse instanceof Map) {
       const errors = toValidationErrorRecord(uploadResponse, {
-        ignoredKeys: ['timestamp'],
         mapKey: key => (key.toLowerCase() === 'file' ? 'photo' : key),
       });
       return this.buildResponseWithExistingLink(courtResponse, errors);

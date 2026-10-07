@@ -146,7 +146,7 @@ export class ServiceCentreGeneralService {
     }
 
     if (updateResponse instanceof Map) {
-      const errors = toValidationErrorRecord(updateResponse, { ignoredKeys: ['timestamp'] });
+      const errors = toValidationErrorRecord(updateResponse);
 
       return {
         type: 'validation-error',

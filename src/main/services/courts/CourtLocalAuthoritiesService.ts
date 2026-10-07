@@ -113,7 +113,7 @@ export class CourtLocalAuthoritiesService {
 
     // if it's a Map, it's errors from the API
     if (updateResponse instanceof Map) {
-      const errors = toValidationErrorRecord(updateResponse, { ignoredKeys: ['timestamp'] });
+      const errors = toValidationErrorRecord(updateResponse);
 
       return {
         status: 'invalid',

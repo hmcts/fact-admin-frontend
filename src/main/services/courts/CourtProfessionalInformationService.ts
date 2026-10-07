@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtProfessionalInformation } from '../../schemas/courtProfessionalInformationSchema';
-import { isHttpStatusCode } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorEntries } from '../../utils/apiResponses';
 import {
   COURT_CODE_MAX_DIGITS,
   DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
@@ -653,17 +653,15 @@ export class CourtProfessionalInformationService {
     errors: Map<string, string>,
     viewModel: ProfessionalInformationViewModel
   ): ProfessionalInformationError[] {
-    return [...errors]
-      .filter(([field]) => field.toLowerCase() !== 'timestamp')
-      .map(([field, text]) => {
-        const repeatableError = this.repeatableApiError(field, viewModel);
-        const href = repeatableError?.href ?? this.apiErrorHref(field, text);
-        const errorText = this.apiErrorText(field, text, href);
-        return {
-          href,
-          text: repeatableError ? `${repeatableError.label}: ${errorText}` : errorText,
-        };
-      });
+    return toValidationErrorEntries(errors).map(([field, text]) => {
+      const repeatableError = this.repeatableApiError(field, viewModel);
+      const href = repeatableError?.href ?? this.apiErrorHref(field, text);
+      const errorText = this.apiErrorText(field, text, href);
+      return {
+        href,
+        text: repeatableError ? `${repeatableError.label}: ${errorText}` : errorText,
+      };
+    });
   }
 
   private apiErrorHref(field: string, text: string): string {

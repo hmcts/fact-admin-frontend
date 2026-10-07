@@ -1,6 +1,11 @@
 import { HttpStatusCode } from 'axios';
 
-import { isHttpStatusCode, isSuccessfulHttpStatus, toValidationErrorRecord } from '../../../main/utils/apiResponses';
+import {
+  isHttpStatusCode,
+  isSuccessfulHttpStatus,
+  toValidationErrorEntries,
+  toValidationErrorRecord,
+} from '../../../main/utils/apiResponses';
 
 describe('apiResponses', () => {
   test('recognises numeric HTTP status values', () => {
@@ -14,7 +19,7 @@ describe('apiResponses', () => {
     expect(isSuccessfulHttpStatus(HttpStatusCode.MultipleChoices)).toBe(false);
   });
 
-  test('converts API validation errors and supports ignored and remapped fields', () => {
+  test('converts API validation errors, ignores timestamps by default, and supports remapped fields', () => {
     const errors = new Map([
       ['timestamp', 'ignored'],
       ['FILE', 'invalid'],
@@ -23,9 +28,19 @@ describe('apiResponses', () => {
 
     expect(
       toValidationErrorRecord(errors, {
-        ignoredKeys: ['Timestamp'],
         mapKey: key => (key.toLowerCase() === 'file' ? 'photo' : key),
       })
     ).toEqual({ name: ['required'], photo: ['invalid'] });
+  });
+
+  test('normalises API validation errors for specialised adapters', () => {
+    const errors = new Map([
+      ['Timestamp', 'ignored'],
+      ['phoneNumber', 'invalid'],
+    ]);
+
+    expect(toValidationErrorEntries(errors, { mapKey: key => key.toLowerCase() })).toEqual([
+      ['phonenumber', 'invalid'],
+    ]);
   });
 });
