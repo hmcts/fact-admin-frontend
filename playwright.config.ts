@@ -262,7 +262,7 @@ const config = defineConfig({
   ...CommonConfig.recommended,
   reporter: resolveReporters(),
   workers: resolveWorkerCount(),
-  timeout: 120 * 1000,
+  timeout: 20 * 1000,
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
