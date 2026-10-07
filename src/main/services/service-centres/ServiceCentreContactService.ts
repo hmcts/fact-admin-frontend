@@ -5,6 +5,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
+import { isHttpStatusCode } from '../../utils/apiResponses';
 import {
   CONTACT_TYPE_REQUIRED_MESSAGE,
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
@@ -91,7 +92,7 @@ export class ServiceCentreContactService {
       this.referenceDataApi.getContactDescriptionTypes(),
     ]);
 
-    if (typeof contactDetailsResponse === 'number') {
+    if (isHttpStatusCode(contactDetailsResponse)) {
       return contactDetailsResponse;
     }
 
@@ -119,7 +120,7 @@ export class ServiceCentreContactService {
     contactDetailId: string
   ): Promise<ServiceCentreContactDetail | undefined | HttpStatusCode> {
     const contactDetailsResponse = await this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
-    if (typeof contactDetailsResponse === 'number') {
+    if (isHttpStatusCode(contactDetailsResponse)) {
       return contactDetailsResponse;
     }
 
@@ -130,7 +131,7 @@ export class ServiceCentreContactService {
     selectedId?: string
   ): Promise<ServiceCentreContactDescriptionTypeItem[] | HttpStatusCode> {
     const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
-    if (typeof contactDescriptionTypesResponse === 'number') {
+    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
       return contactDescriptionTypesResponse;
     }
 
@@ -188,7 +189,7 @@ export class ServiceCentreContactService {
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
     const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
-    if (typeof contactDescriptionTypesResponse === 'number') {
+    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
       return 'Contact details';
     }
 

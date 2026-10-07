@@ -1,5 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
+import { isHttpStatusCode } from '../../utils/apiResponses';
+
 export type ContactSubmissionLike = {
   errorSummary: { href: string; text: string }[];
   selectedContactTypeId: string;
@@ -55,7 +57,7 @@ async function buildValidationOutcome<TSubmission extends ContactSubmissionLike,
   }
 
   const items = await options.getContactDescriptionTypeItems(submission.selectedContactTypeId);
-  if (typeof items === 'number') {
+  if (isHttpStatusCode(items)) {
     return { status: items, type: 'save-error' };
   }
 

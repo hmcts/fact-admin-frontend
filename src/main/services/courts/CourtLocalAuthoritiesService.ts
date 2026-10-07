@@ -7,7 +7,7 @@ import {
   CourtLocalAuthoritiesList,
   LocalAuthoritySelection,
 } from '../../schemas/courtLocalAuthoritiesSchema';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 
 type CasesHeard = {
   Adoption: boolean;
@@ -50,13 +50,13 @@ export class CourtLocalAuthoritiesService {
 
   public async retrieve(courtId: string): Promise<LocalAuthoritiesViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     // we need to pull professional information to determine if this court has the family court type
     const professionalInformationResponse = await this.courtApi.getCourtProfessionalInformation(courtId);
-    if (typeof professionalInformationResponse === 'number') {
+    if (isHttpStatusCode(professionalInformationResponse)) {
       if (professionalInformationResponse !== HttpStatusCode.NotFound) {
         return professionalInformationResponse;
       }
@@ -68,13 +68,13 @@ export class CourtLocalAuthoritiesService {
 
     // we need the cases heard in order to determine which areas of family law are handled
     const casesHeardResponse = await this.courtApi.getCourtAreasOfLaw(courtId);
-    if (typeof casesHeardResponse === 'number') {
+    if (isHttpStatusCode(casesHeardResponse)) {
       return casesHeardResponse;
     }
 
     // and we'll need whatever configuration is currently in place
     const courtLocalAuthoritiesResponse = await this.courtApi.getCourtLocalAuthorities(courtId);
-    if (typeof courtLocalAuthoritiesResponse === 'number') {
+    if (isHttpStatusCode(courtLocalAuthoritiesResponse)) {
       return courtLocalAuthoritiesResponse;
     }
 
@@ -98,7 +98,7 @@ export class CourtLocalAuthoritiesService {
   ): Promise<LocalAuthoritiesSaveModel | HttpStatusCode> {
     // retrieve the court as we'll need its name
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -107,7 +107,7 @@ export class CourtLocalAuthoritiesService {
       .filter((selection): selection is CourtLocalAuthorities => !!selection);
 
     const updateResponse = await this.courtApi.updateCourtLocalAuthorities(courtId, updatePayload);
-    if (typeof updateResponse === 'number' && updateResponse !== HttpStatusCode.Ok) {
+    if (isHttpStatusCode(updateResponse) && updateResponse !== HttpStatusCode.Ok) {
       return updateResponse;
     }
 

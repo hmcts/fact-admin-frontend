@@ -4,7 +4,7 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { ServiceCentreAddress } from '../../schemas/serviceCentreAddressSchema';
 import { validateCoreAddressFields } from '../../utils/addressValidation';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_ADDRESS_TYPE_REQUIRED_MESSAGE,
   SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE,
@@ -52,7 +52,7 @@ export class ServiceCentreAddressService {
 
   public async retrieveServiceCentreName(serviceCentreId: string): Promise<string | HttpStatusCode> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
     }
 
@@ -70,7 +70,7 @@ export class ServiceCentreAddressService {
     isNewSC: boolean = false
   ): Promise<SaveServiceCentreAddressResponse> {
     const existingAddresses = await this.list(serviceCentreId);
-    if (typeof existingAddresses === 'number') {
+    if (isHttpStatusCode(existingAddresses)) {
       return existingAddresses;
     }
 
@@ -80,7 +80,7 @@ export class ServiceCentreAddressService {
     }
 
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
     }
 
@@ -88,7 +88,7 @@ export class ServiceCentreAddressService {
       ? await this.serviceCentreApi.updateServiceCentreAddress(address, serviceCentreId, addressId)
       : await this.serviceCentreApi.saveServiceCentreAddress(address, serviceCentreId);
 
-    if (typeof result === 'number') {
+    if (isHttpStatusCode(result)) {
       return result;
     }
 
@@ -103,7 +103,7 @@ export class ServiceCentreAddressService {
         open: true,
       });
 
-      if (typeof openServiceCentreResponse === 'number') {
+      if (isHttpStatusCode(openServiceCentreResponse)) {
         return openServiceCentreResponse;
       }
 
@@ -127,12 +127,12 @@ export class ServiceCentreAddressService {
 
   public async delete(serviceCentreId: string, addressId: string): Promise<DeleteServiceCentreAddressResponse> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
     }
 
     const addressResponse = await this.list(serviceCentreId);
-    if (typeof addressResponse === 'number') {
+    if (isHttpStatusCode(addressResponse)) {
       return addressResponse;
     }
 

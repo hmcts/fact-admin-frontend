@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import { validateBilingualTextPair } from '../../utils/bilingualTextValidation';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
@@ -38,7 +38,7 @@ export class ServiceCentreWarningNoticeService {
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreWarningNoticeViewModel | HttpStatusCode> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
     }
 
@@ -56,7 +56,7 @@ export class ServiceCentreWarningNoticeService {
     warningNoticeCyInput: string | undefined
   ): Promise<SaveServiceCentreWarningNoticeResult> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return { status: serviceCentreResponse, type: 'status' };
     }
 
@@ -82,7 +82,7 @@ export class ServiceCentreWarningNoticeService {
       warningNoticeCy: warningNoticeCy.length > 0 ? warningNoticeCy : null,
     });
 
-    if (typeof updateResult === 'number') {
+    if (isHttpStatusCode(updateResult)) {
       return { status: updateResult, type: 'status' };
     }
 

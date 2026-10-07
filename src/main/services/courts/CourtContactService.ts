@@ -5,6 +5,7 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtContactDetailRequest';
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
+import { isHttpStatusCode } from '../../utils/apiResponses';
 import {
   CONTACT_TYPE_REQUIRED_MESSAGE,
   COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
@@ -93,7 +94,7 @@ export class CourtContactService {
       courtApi.getCourtContactDetails(courtId),
       referenceDataApi.getContactDescriptionTypes(),
     ]);
-    if (typeof courtContactDetailsResponse === 'number') {
+    if (isHttpStatusCode(courtContactDetailsResponse)) {
       return courtContactDetailsResponse;
     }
 
@@ -116,7 +117,7 @@ export class CourtContactService {
     contactDetailId: string
   ): Promise<CourtContactDetail | undefined | number> {
     const courtContactDetailsResponse = await courtApi.getCourtContactDetails(courtId);
-    if (typeof courtContactDetailsResponse === 'number') {
+    if (isHttpStatusCode(courtContactDetailsResponse)) {
       return courtContactDetailsResponse;
     }
 
@@ -127,7 +128,7 @@ export class CourtContactService {
     selectedId?: string
   ): Promise<CourtContactDescriptionTypeItem[] | HttpStatusCode> {
     const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
-    if (typeof contactDescriptionTypesResponse === 'number') {
+    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
       return contactDescriptionTypesResponse;
     }
 
@@ -240,7 +241,7 @@ export class CourtContactService {
 
   public async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
     const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
-    if (typeof contactDescriptionTypesResponse === 'number') {
+    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
       return 'Contact details';
     }
 

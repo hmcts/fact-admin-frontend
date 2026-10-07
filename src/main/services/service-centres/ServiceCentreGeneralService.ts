@@ -6,7 +6,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   SERVICE_CENTRE_OPEN_MESSAGE,
   SERVICE_CENTRE_REGION_INVALID_MESSAGE,
@@ -59,17 +59,17 @@ export class ServiceCentreGeneralService {
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreGeneralViewModel | HttpStatusCode> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
     }
 
     const serviceAreasResponse = await this.referenceDataApi.getServiceAreas();
-    if (typeof serviceAreasResponse === 'number') {
+    if (isHttpStatusCode(serviceAreasResponse)) {
       return serviceAreasResponse;
     }
 
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
@@ -84,17 +84,17 @@ export class ServiceCentreGeneralService {
     regionId?: string;
   }): Promise<ServiceCentreGeneralSaveResult> {
     const existingServiceCentre = await this.serviceCentreApi.getServiceCentreById(model.id);
-    if (typeof existingServiceCentre === 'number') {
+    if (isHttpStatusCode(existingServiceCentre)) {
       return { status: existingServiceCentre, type: 'status' };
     }
 
     const serviceAreasResponse = await this.referenceDataApi.getServiceAreas();
-    if (typeof serviceAreasResponse === 'number') {
+    if (isHttpStatusCode(serviceAreasResponse)) {
       return { status: serviceAreasResponse, type: 'status' };
     }
 
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return { status: regions, type: 'status' };
     }
 
@@ -125,7 +125,7 @@ export class ServiceCentreGeneralService {
       id: updatedServiceCentre.id,
       type: 'serviceCentre',
     });
-    if (typeof duplicateLocationResult === 'number') {
+    if (isHttpStatusCode(duplicateLocationResult)) {
       if (duplicateLocationResult !== HttpStatusCode.NotFound) {
         return { status: duplicateLocationResult, type: 'status' };
       }
@@ -141,7 +141,7 @@ export class ServiceCentreGeneralService {
     }
 
     const updateResponse = await this.serviceCentreApi.updateServiceCentre(updatedServiceCentre);
-    if (typeof updateResponse === 'number') {
+    if (isHttpStatusCode(updateResponse)) {
       return { status: updateResponse, type: 'status' };
     }
 

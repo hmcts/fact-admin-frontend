@@ -4,7 +4,7 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import { COURT_REGION_MESSAGE } from '../../utils/constants/messageConstants';
 import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
 import { LocationNameService } from '../shared/LocationNameService';
@@ -45,7 +45,7 @@ export class AddCourtService {
    */
   public async getViewModel(form: AddCourtForm = {}): Promise<AddCourtPageModel | HttpStatusCode> {
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
@@ -93,7 +93,7 @@ export class AddCourtService {
     }
 
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
@@ -101,7 +101,7 @@ export class AddCourtService {
     const regionId = trimmedForm.regionId as string;
     const duplicateLocationStatus = await this.locationNameService.findDuplicate(name);
     if (duplicateLocationStatus !== HttpStatusCode.NotFound) {
-      if (typeof duplicateLocationStatus === 'number') {
+      if (isHttpStatusCode(duplicateLocationStatus)) {
         return duplicateLocationStatus;
       }
 
@@ -117,7 +117,7 @@ export class AddCourtService {
       regionId,
     });
 
-    if (typeof createResponse === 'number') {
+    if (isHttpStatusCode(createResponse)) {
       return createResponse;
     }
 
@@ -143,7 +143,7 @@ export class AddCourtService {
     errors: Record<string, string[]>
   ): Promise<AddCourtPageModel | HttpStatusCode> {
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 

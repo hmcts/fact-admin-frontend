@@ -5,7 +5,7 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_ALREADY_EXISTS_MESSAGE,
   COURT_OPEN_MESSAGE,
@@ -29,12 +29,12 @@ export class CourtGeneralService {
 
   public async retrieve(courtId: string): Promise<GeneralViewModel | HttpStatusCode> {
     const courtEntity = await this.courtApi.getCourtById(courtId);
-    if (typeof courtEntity === 'number') {
+    if (isHttpStatusCode(courtEntity)) {
       return courtEntity;
     }
 
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
@@ -44,7 +44,7 @@ export class CourtGeneralService {
   public async save(model: GeneralViewModel): Promise<GeneralViewModel | HttpStatusCode> {
     // grab a fresh copy of the model (use the service as we want the regions)
     const courtEntity = await this.retrieve(model.id as string);
-    if (typeof courtEntity === 'number') {
+    if (isHttpStatusCode(courtEntity)) {
       return courtEntity;
     }
     const originalName = courtEntity.name;
@@ -70,7 +70,7 @@ export class CourtGeneralService {
       id: courtEntity.id as string,
       type: 'court',
     });
-    if (typeof duplicateCourt === 'number') {
+    if (isHttpStatusCode(duplicateCourt)) {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;
       }
@@ -85,7 +85,7 @@ export class CourtGeneralService {
 
     // persist to the API
     const result = await this.courtApi.updateCourt(courtEntity as CourtEntity);
-    if (typeof result === 'number') {
+    if (isHttpStatusCode(result)) {
       return result;
     }
 

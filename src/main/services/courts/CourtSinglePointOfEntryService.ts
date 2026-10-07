@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtSinglePointOfEntryList } from '../../schemas/courtSinglePointOfEntrySchema';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import { SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES } from '../../utils/constants/messageConstants';
 
 export type SinglePointOfEntryServiceSelection = {
@@ -29,12 +29,12 @@ export class CourtSinglePointOfEntryService {
 
   public async retrieve(courtId: string): Promise<SinglePointOfEntryViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const singlePointOfEntryResponse = await this.courtApi.getCourtSinglePointOfEntry(courtId);
-    if (typeof singlePointOfEntryResponse === 'number') {
+    if (isHttpStatusCode(singlePointOfEntryResponse)) {
       return singlePointOfEntryResponse;
     }
 
@@ -51,12 +51,12 @@ export class CourtSinglePointOfEntryService {
     serviceSelections: Record<string, boolean>
   ): Promise<SinglePointOfEntrySaveModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const existingSinglePointOfEntryResponse = await this.courtApi.getCourtSinglePointOfEntry(courtId);
-    if (typeof existingSinglePointOfEntryResponse === 'number') {
+    if (isHttpStatusCode(existingSinglePointOfEntryResponse)) {
       return existingSinglePointOfEntryResponse;
     }
 
@@ -68,7 +68,7 @@ export class CourtSinglePointOfEntryService {
       courtId,
       this.applySelections(existingSinglePointOfEntryResponse, serviceSelections)
     );
-    if (typeof updateResponse === 'number' && updateResponse !== HttpStatusCode.Ok) {
+    if (isHttpStatusCode(updateResponse) && updateResponse !== HttpStatusCode.Ok) {
       return updateResponse;
     }
 

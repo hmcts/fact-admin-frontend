@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { OsAddressOption } from '../../schemas/osDataSchema';
+import { isHttpStatusCode } from '../../utils/apiResponses';
 import { POSTCODE_ERROR_MESSAGES } from '../../utils/constants/messageConstants';
 import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 
@@ -18,7 +19,7 @@ export class AddressLookupService {
 
   public async retrieveOptions(postcode: string): Promise<AddressLookupResponse> {
     const result = await this.referenceDataApi.getAddressesForPostcode(postcode);
-    if (typeof result === 'number') {
+    if (isHttpStatusCode(result)) {
       return result;
     }
     if (result instanceof Map) {

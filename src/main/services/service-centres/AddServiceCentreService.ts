@@ -5,7 +5,7 @@ import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
 import { ServiceArea } from '../../schemas/serviceAreaSchema';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   SERVICE_CENTRE_REGION_MESSAGE,
   SERVICE_CENTRE_SERVICE_AREA_MESSAGE,
@@ -56,7 +56,7 @@ export class AddServiceCentreService {
 
   public async getViewModel(form: AddServiceCentreForm = {}): Promise<AddServiceCentrePageModel | HttpStatusCode> {
     const modelData = await this.getModelData();
-    if (typeof modelData === 'number') {
+    if (isHttpStatusCode(modelData)) {
       return modelData;
     }
 
@@ -101,7 +101,7 @@ export class AddServiceCentreService {
     }
 
     const modelData = await this.getModelData();
-    if (typeof modelData === 'number') {
+    if (isHttpStatusCode(modelData)) {
       return modelData;
     }
 
@@ -109,7 +109,7 @@ export class AddServiceCentreService {
     const regionId = trimmedForm.regionId as string;
     const duplicateLocationStatus = await this.locationNameService.findDuplicate(name);
     if (duplicateLocationStatus !== HttpStatusCode.NotFound) {
-      if (typeof duplicateLocationStatus === 'number') {
+      if (isHttpStatusCode(duplicateLocationStatus)) {
         return duplicateLocationStatus;
       }
 
@@ -126,7 +126,7 @@ export class AddServiceCentreService {
       serviceAreaIds: trimmedForm.serviceAreaIds,
     });
 
-    if (typeof createResponse === 'number') {
+    if (isHttpStatusCode(createResponse)) {
       return createResponse;
     }
 
@@ -149,7 +149,7 @@ export class AddServiceCentreService {
     errors: Record<string, string[]>
   ): Promise<AddServiceCentrePageModel | HttpStatusCode> {
     const modelData = await this.getModelData();
-    if (typeof modelData === 'number') {
+    if (isHttpStatusCode(modelData)) {
       return modelData;
     }
 
@@ -158,12 +158,12 @@ export class AddServiceCentreService {
 
   private async getModelData(): Promise<{ regions: Region[]; serviceAreas: ServiceArea[] } | HttpStatusCode> {
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
     const serviceAreas = await this.referenceDataApi.getServiceAreas();
-    if (typeof serviceAreas === 'number') {
+    if (isHttpStatusCode(serviceAreas)) {
       return serviceAreas;
     }
 

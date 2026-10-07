@@ -3,6 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { OperationsApi } from '../requests/OperationsApi';
 import { Lock, PATH_TO_PAGE_MAP } from '../schemas/lockSchema';
 import { Subject } from '../schemas/subjectTypeSchema';
+import { isHttpStatusCode } from '../utils/apiResponses';
 
 // page string -> path string
 const PAGE_TO_PATH_MAP = Object.fromEntries(
@@ -19,7 +20,7 @@ export class LockService {
 
   public async getLocks(subject: Subject, subjectId: string): Promise<LocksViewModel | HttpStatusCode> {
     const locks = await this.operationsApi.getLocks(subject, subjectId);
-    if (typeof locks === 'number') {
+    if (isHttpStatusCode(locks)) {
       return locks;
     }
 

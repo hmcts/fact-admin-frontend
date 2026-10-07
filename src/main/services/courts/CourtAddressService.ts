@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtAddress, CourtAddressType } from '../../schemas/courtAddressSchema';
 import { validateCoreAddressFields } from '../../utils/addressValidation';
-import { toValidationErrorRecord } from '../../utils/apiResponses';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_ADDRESS_AREAS_OF_LAW_COUNT_MESSAGE,
   COURT_ADDRESS_COURT_TYPES_REQUIRED_MESSAGE,
@@ -74,7 +74,7 @@ export class CourtAddressService {
     addressId?: string
   ): Promise<SaveCourtAddressResponse> {
     const existingAddresses = await this.list(courtId);
-    if (typeof existingAddresses === 'number') {
+    if (isHttpStatusCode(existingAddresses)) {
       return existingAddresses;
     }
 
@@ -86,7 +86,7 @@ export class CourtAddressService {
 
     // retrieve the court as we'll need its name
     const courtResponse = await courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -97,7 +97,7 @@ export class CourtAddressService {
       : await courtApi.saveCourtAddress(address, courtId);
 
     // if it's a number, it's an HttpResponseCode and likely not good
-    if (typeof result === 'number') {
+    if (isHttpStatusCode(result)) {
       return result;
     }
 
@@ -113,7 +113,7 @@ export class CourtAddressService {
         open: true,
       });
 
-      if (typeof openCourtResponse === 'number') {
+      if (isHttpStatusCode(openCourtResponse)) {
         return openCourtResponse;
       }
 
@@ -139,13 +139,13 @@ export class CourtAddressService {
   public async delete(courtId: string, addressId: string): Promise<DeleteCourtAddressResponse> {
     // retrieve the court as we'll need its name
     const courtResponse = await courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     // retrieve the address as we'll need it
     const courtAddressResponse = await courtApi.getCourtAddressDetails(courtId);
-    if (typeof courtAddressResponse === 'number') {
+    if (isHttpStatusCode(courtAddressResponse)) {
       return courtAddressResponse;
     }
 
@@ -175,7 +175,7 @@ export class CourtAddressService {
 
   public async retrieveCourtName(courtId: string): Promise<string | HttpStatusCode> {
     const courtResponse = await courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
     return courtResponse.name;

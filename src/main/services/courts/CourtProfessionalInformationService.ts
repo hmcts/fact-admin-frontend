@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtProfessionalInformation } from '../../schemas/courtProfessionalInformationSchema';
+import { isHttpStatusCode } from '../../utils/apiResponses';
 import {
   COURT_CODE_MAX_DIGITS,
   DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
@@ -171,12 +172,12 @@ export class CourtProfessionalInformationService {
 
   public async getViewModel(courtId: string): Promise<ProfessionalInformationViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const professionalInformationResponse = await this.courtApi.getCourtProfessionalInformation(courtId);
-    if (typeof professionalInformationResponse === 'number') {
+    if (isHttpStatusCode(professionalInformationResponse)) {
       if (professionalInformationResponse !== HttpStatusCode.NotFound) {
         return professionalInformationResponse;
       }
@@ -188,7 +189,7 @@ export class CourtProfessionalInformationService {
 
   public async save(courtId: string, form: ProfessionalInformationForm): Promise<SaveProfessionalInformationResult> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -203,7 +204,7 @@ export class CourtProfessionalInformationService {
 
     const saveResponse = await this.courtApi.saveCourtProfessionalInformation(courtId, this.toPayload(viewModel));
 
-    if (typeof saveResponse === 'number') {
+    if (isHttpStatusCode(saveResponse)) {
       return saveResponse;
     }
 
@@ -225,12 +226,12 @@ export class CourtProfessionalInformationService {
     form: ProfessionalInformationForm
   ): Promise<FamilyCourtRemovalConfirmation | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const professionalInformationResponse = await this.courtApi.getCourtProfessionalInformation(courtId);
-    if (typeof professionalInformationResponse === 'number') {
+    if (isHttpStatusCode(professionalInformationResponse)) {
       if (professionalInformationResponse !== HttpStatusCode.NotFound) {
         return professionalInformationResponse;
       }
@@ -250,7 +251,7 @@ export class CourtProfessionalInformationService {
     }
 
     const localAuthoritiesResponse = await this.courtApi.getCourtLocalAuthorities(courtId);
-    if (typeof localAuthoritiesResponse === 'number') {
+    if (isHttpStatusCode(localAuthoritiesResponse)) {
       if (localAuthoritiesResponse !== HttpStatusCode.NotFound) {
         return localAuthoritiesResponse;
       }
