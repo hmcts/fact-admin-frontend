@@ -126,7 +126,7 @@
     "@opentelemetry/instrumentation-pg": "0.74.0",
     "proxy-addr": "2.0.8",
     "@opentelemetry/sdk-node": "0.222.0",
-    "ip-address": "10.7.2",
+    "ip-address": "10.7.3",
     "moment": "2.31.0",
     "qs": "6.16.0"
   },
