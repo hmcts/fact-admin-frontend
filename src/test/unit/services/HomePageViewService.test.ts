@@ -436,6 +436,18 @@ describe('HomePageViewService', () => {
     expect(rows[0][0].html).toContain(`data-focus-restore="favourite-courts-court-${court.id}"`);
   });
 
+  test('autofocuses the favourite control requested by the redirect', () => {
+    const focusTarget = `favourite-courts-court-${court.id}`;
+    const rows = service.buildCourtTableRows(
+      { ...filters, focusTarget },
+      { content: [court], page: {} } as PagedLocations,
+      false,
+      new Map()
+    );
+
+    expect(rows[0][0].html).toContain(`data-focus-restore="${focusTarget}" autofocus`);
+  });
+
   test('keys the favourites tab toggle to the favourites table', () => {
     const rows = service.buildFavouriteTableRows(filters, {
       content: [serviceCentre],
@@ -450,5 +462,11 @@ describe('HomePageViewService', () => {
 
     expect(head[1].html).toContain('data-focus-restore="sort-name"');
     expect(head[2].html).toContain('data-focus-restore="sort-lastUpdated"');
+  });
+
+  test('autofocuses the sortable header requested by the redirect', () => {
+    const head = service.buildCourtTableHead({ ...filters, focusTarget: 'sort-name' });
+
+    expect(head[1].html).toContain('data-focus-restore="sort-name" autofocus');
   });
 });

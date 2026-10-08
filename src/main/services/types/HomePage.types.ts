@@ -14,6 +14,7 @@ export type HomePageTableCell = {
 export type HomePageFilters = {
   activeTab?: 'courts' | 'favourites';
   favouritesPageNumber?: number;
+  focusTarget?: string;
   includeClosed: boolean;
   onlyServiceCentres: boolean;
   pageNumber: number;
