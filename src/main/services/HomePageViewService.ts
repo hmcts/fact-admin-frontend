@@ -393,7 +393,9 @@ export class HomePageViewService {
     const tooltipId = `favourite-tooltip-${table}-${location.locationType.toLowerCase()}-${location.id}`;
     const escapedName = this.escapeHtml(location.name);
     const escapedReturnPath = this.escapeHtml(returnPath);
-    const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
+    const accessibleLabel = favourite
+      ? `Remove from favourites - ${escapedName}`
+      : `Add to favourites - ${escapedName}`;
 
     return {
       classes: 'homepage-courts-table__favourite',
@@ -407,7 +409,7 @@ export class HomePageViewService {
         '</svg>',
         `<span class="govuk-visually-hidden">${accessibleLabel}</span>`,
         '</button>',
-        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip">${tooltip}</span>`,
+        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip" aria-hidden="true">${tooltip}</span>`,
         '</form>',
         '</div>',
       ].join(''),

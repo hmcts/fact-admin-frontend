@@ -137,14 +137,14 @@ describe('HomePageViewService', () => {
     expect(rows[0][0].html).toContain(`aria-describedby="favourite-tooltip-courts-court-${court.id}"`);
     expect(rows[0][0].html).toContain('Add to favourites');
     expect(rows[0][0].html).toContain(`action="/favourites/COURT/${court.id}"`);
-    expect(rows[0][0].html).toContain(`Add ${court.name} to favourites`);
+    expect(rows[0][0].html).toContain(`Add to favourites - ${court.name}`);
     expect(rows[0][0].html).toContain('aria-hidden="true" focusable="false"');
     expect(rows[0][0].html).toContain(
-      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip">Add to favourites`
+      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip" aria-hidden="true">Add to favourites`
     );
     expect(rows[1][0].html).toContain('aria-pressed="true"');
     expect(rows[1][0].html).toContain('Remove from favourites');
-    expect(rows[1][0].html).toContain(`Remove ${serviceCentre.name} from favourites`);
+    expect(rows[1][0].html).toContain(`Remove from favourites - ${serviceCentre.name}`);
     expect(rows[1][0].html).toContain(`action="/favourites/SERVICE_CENTRE/${serviceCentre.id}/remove"`);
     expect(rows[0][0].html).not.toContain(`favourite-tooltip-courts-service_centre-${serviceCentre.id}`);
     expect(rows[0][0].classes).toBe('homepage-courts-table__favourite');

@@ -122,12 +122,12 @@ export class HomePage extends Base {
   }
 
   async addFavourite(locationName: string): Promise<void> {
-    await this.table.getByRole('button', { exact: true, name: `Add ${locationName} to favourites` }).click();
+    await this.table.getByRole('button', { exact: true, name: `Add to favourites - ${locationName}` }).click();
   }
 
   async removeFavourite(locationName: string, fromFavouritesTab = false): Promise<void> {
     const table = fromFavouritesTab ? this.favouritesTable : this.table;
-    await table.getByRole('button', { exact: true, name: `Remove ${locationName} from favourites` }).click();
+    await table.getByRole('button', { exact: true, name: `Remove from favourites - ${locationName}` }).click();
   }
 
   async expectFavouriteButtonState(locationName: string, favourite: boolean): Promise<void> {
@@ -144,6 +144,7 @@ export class HomePage extends Base {
     }
     const tooltip = this.page.locator(`#${tooltipId}`);
 
+    await expect(tooltip).toHaveAttribute('aria-hidden', 'true');
     await button.hover();
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText(action);
@@ -172,7 +173,7 @@ export class HomePage extends Base {
   }
 
   getFavouriteButton(locationName: string, favourite: boolean, fromFavouritesTab = false): Locator {
-    const action = favourite ? `Remove ${locationName} from favourites` : `Add ${locationName} to favourites`;
+    const action = favourite ? `Remove from favourites - ${locationName}` : `Add to favourites - ${locationName}`;
     const table = fromFavouritesTab ? this.favouritesTable : this.table;
     return table.getByRole('button', { exact: true, name: action });
   }
