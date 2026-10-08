@@ -271,7 +271,7 @@ export const TELEPHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a telephone number';
 export const TELEPHONE_NUMBER_INVALID_MESSAGE = 'Enter a telephone number in the correct format';
 
 // Court warning notice service
-export const WARNING_NOTICE_MAX_LENGTH = 250;
+export const WARNING_NOTICE_MAX_LENGTH = 700;
 export const WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Welsh warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
@@ -303,9 +303,6 @@ export const SERVICE_CENTRE_SINGLE_ADDRESS_ONLY_MESSAGE =
 // Service centre cases heard service
 export const SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE =
   'Select at least one type of case heard at this service centre.';
-
-// Service centre warning notice service
-export const MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH = 700;
 
 // Audit controller
 export const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';

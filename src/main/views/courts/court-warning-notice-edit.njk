@@ -21,7 +21,7 @@
 
       <h1 class="govuk-heading-l">Warning notice</h1>
 
-      <p class="govuk-body">Use this field to display a temporary notice of building closure or temporary disruption to court services. This is limited to 250 characters.</p>
+      <p class="govuk-body">Use this field to display a temporary notice of building closure or temporary disruption to court services. This is limited to 700 characters.</p>
 
       <form method="post" action="/courts/{{ courtId }}/edit/warning-notice/success" novalidate>
         {{ csrfProtection(csrfToken) }}
@@ -40,7 +40,7 @@
           hint: {
             text: "For example: The court is temporarily closed due to maintenance."
           },
-          maxLength: 250,
+          maxLength: 700,
           rows: 3,
           errorMessage: {
             text: errors.warningNotice
@@ -59,7 +59,7 @@
           hint: {
             text: "For example: Mae'r llys ar gau dros dro oherwydd gwaith cynnal a chadw."
           },
-          maxLength: 250,
+          maxLength: 700,
           rows: 3,
           errorMessage: {
             text: errors.warningNoticeCy
