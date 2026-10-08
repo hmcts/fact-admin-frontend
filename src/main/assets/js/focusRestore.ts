@@ -97,10 +97,15 @@ const restoreFocus = (): void => {
   // the focus restored for the control that initiated this navigation.
   if (typeof window.requestAnimationFrame === 'function') {
     window.requestAnimationFrame(() => target.focus());
-    return;
+  } else {
+    target.focus();
   }
 
-  target.focus();
+  // A full locations-page reload can finish component setup after the first animation frame.
+  // Run once more after all resources and browser focus processing have completed.
+  if (document.readyState !== 'complete' && typeof window.addEventListener === 'function') {
+    window.addEventListener('load', () => target.focus(), { once: true });
+  }
 };
 
 /**

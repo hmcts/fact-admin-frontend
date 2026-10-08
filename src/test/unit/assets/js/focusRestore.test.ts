@@ -143,6 +143,27 @@ describe('focusRestore', () => {
     expect(target.focus).toHaveBeenCalled();
   });
 
+  test('restores focus again after page load completes', () => {
+    const target = buildControl('sort-name');
+    setupDom([target]);
+    Object.defineProperty(document, 'readyState', { configurable: true, value: 'loading' });
+    setupStorage({}, false, 'https://fact-admin.local/?focus=sort-name#courts');
+    const loadListeners: (() => void)[] = [];
+    const addEventListener = jest.fn().mockImplementation((eventName: string, listener: () => void) => {
+      if (eventName === 'load') {
+        loadListeners.push(listener);
+      }
+    });
+    (window as unknown as { addEventListener: typeof addEventListener }).addEventListener = addEventListener;
+
+    initFocusRestore();
+    target.focus.mockClear();
+    loadListeners.forEach(listener => listener());
+
+    expect(addEventListener).toHaveBeenCalledWith('load', expect.any(Function), { once: true });
+    expect(target.focus).toHaveBeenCalled();
+  });
+
   test('restores focus to the sort link after the table reloads', () => {
     const sortLink = buildControl('sort-name');
     setupDom([sortLink]);
