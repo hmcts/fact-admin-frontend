@@ -60,8 +60,12 @@ describe('HomePageViewService', () => {
       text: 'Favourite',
     });
     expect(head[1].attributes).toEqual({ 'aria-sort': 'none' });
+    expect(head[1].html).toContain('<button type="button" class="table-sort-button"');
+    expect(head[1].html).toContain('data-table-sort-key="name"');
     expect(head[1].html).toContain('sortBy=name&sortOrder=asc');
+    expect(head[1].html).not.toContain('<a ');
     expect(head[2].attributes).toEqual({ 'aria-sort': 'descending' });
+    expect(head[2].html).toContain('data-table-sort-key="lastUpdated"');
     expect(head[2].html).toContain('sortBy=lastUpdated&sortOrder=asc');
     expect(head[3]).toEqual({ text: 'Status' });
     expect(head[4]).toEqual({ classes: 'homepage-courts-table__actions', text: 'Actions' });

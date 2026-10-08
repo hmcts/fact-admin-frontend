@@ -354,9 +354,9 @@ export class HomePageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}">${label}${this.getSortIconSvg(
+      html: `<button type="button" class="table-sort-button" data-table-sort-key="${sortBy}" data-table-sort-url="${this.buildSortHref(filters, sortBy)}">${label}${this.getSortIconSvg(
         ariaSort
-      )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
+      )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></button>`,
     };
   }
 

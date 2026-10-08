@@ -7,6 +7,7 @@ import { initDisplayedElementFilters } from './displayedElementFilter';
 import { initFactHeaderSignOutLink } from './factHeaderSignOut';
 import { initLoadingRedirects } from './loadingRedirect';
 import { initProfessionalInformationRepeatableFields } from './professionalInformation';
+import { initTableSortButtons } from './tableSort';
 import { initTimeoutDialog } from './timeoutDialog';
 
 gds.initAll();
@@ -16,4 +17,5 @@ initDisplayedElementFilters();
 initLoadingRedirects();
 initProfessionalInformationRepeatableFields();
 initFactHeaderSignOutLink();
+initTableSortButtons();
 initTimeoutDialog();
