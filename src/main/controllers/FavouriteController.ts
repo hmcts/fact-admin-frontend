@@ -109,8 +109,18 @@ function hasValidReturnParameters(query: URLSearchParams): boolean {
   const sortBy = query.get('sortBy');
   const sortOrder = query.get('sortOrder');
   return (
+    isValidFocusTarget(query.get('focus')) &&
     (sortBy === null || sortBy === 'name' || sortBy === 'lastUpdated') &&
     (sortOrder === null || ((sortOrder === 'asc' || sortOrder === 'desc') && sortBy !== null))
+  );
+}
+
+function isValidFocusTarget(value: string | null): boolean {
+  return (
+    value === null ||
+    value === 'sort-name' ||
+    value === 'sort-lastUpdated' ||
+    /^favourite-(courts|favourites)-(court|service_centre)-[0-9a-f-]{36}$/i.test(value)
   );
 }
 

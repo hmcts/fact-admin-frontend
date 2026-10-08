@@ -315,6 +315,7 @@ export const UI_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss.SSS';
 export const SAFE_ORIGIN = 'https://fact-admin.local';
 export const SAFE_RETURN_KEYS = new Set([
   'favouritesPageNumber',
+  'focus',
   'includeClosed',
   'onlyServiceCentres',
   'pageNumber',

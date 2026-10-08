@@ -20,6 +20,25 @@ describe('FavouriteController', () => {
     expect(res.redirect).toHaveBeenCalledWith(303, '/?partialCourtName=London&pageNumber=2#courts');
   });
 
+  test('preserves a valid focus target through the favourite redirect', async () => {
+    const requests = { addFavourite: jest.fn().mockResolvedValue(HttpStatusCode.Created) };
+    const controller = new FavouriteController(requests as never);
+    const req = {
+      body: {
+        returnPath: '/?pageNumber=0&focus=favourite-courts-court-11111111-1111-4111-8111-111111111111#courts',
+      },
+      params: { subjectId, subjectType: 'COURT' },
+    };
+    const res = response();
+
+    await controller.add(req as never, res as never);
+
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/?pageNumber=0&focus=favourite-courts-court-11111111-1111-4111-8111-111111111111#courts'
+    );
+  });
+
   test('removes a favourite and preserves the Favourites page', async () => {
     const requests = { removeFavourite: jest.fn().mockResolvedValue(HttpStatusCode.NoContent) };
     const controller = new FavouriteController(requests as never);
@@ -102,9 +121,14 @@ describe('FavouriteController', () => {
     ['/?includeClosed=yes', '/'],
     ['/?sortOrder=desc', '/'],
     ['/?sortBy=rating', '/'],
+    ['/?focus=not-a-control', '/'],
     ['/?pageNumber=1&pageNumber=2', '/'],
     ['/?tab=favourites#unknown', '/'],
     ['/?tab=favourites&favouritesPageNumber=1#favourites', '/?tab=favourites&favouritesPageNumber=1#favourites'],
+    [
+      '/?focus=favourite-courts-court-11111111-1111-4111-8111-111111111111#courts',
+      '/?focus=favourite-courts-court-11111111-1111-4111-8111-111111111111#courts',
+    ],
   ])('normalises safe return path %s', (input, expected) => {
     expect(getSafeReturnPath(input)).toBe(expected);
   });

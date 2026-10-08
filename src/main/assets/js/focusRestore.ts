@@ -10,6 +10,7 @@
  * Controls opt in by carrying a unique [data-focus-restore] key.
  */
 const FOCUS_STORAGE_KEY = 'fact-focus-restore';
+const FOCUS_QUERY_PARAMETER = 'focus';
 
 const FAVOURITE_KEY_PREFIX = 'favourite-';
 
@@ -28,6 +29,24 @@ const takeFocusKey = (): string | null => {
   try {
     const key = window.sessionStorage.getItem(FOCUS_STORAGE_KEY);
     window.sessionStorage.removeItem(FOCUS_STORAGE_KEY);
+    return key;
+  } catch {
+    return null;
+  }
+};
+
+const takeFocusKeyFromUrl = (): string | null => {
+  try {
+    const url = new URL(window.location.href);
+    const key = url.searchParams.get(FOCUS_QUERY_PARAMETER);
+
+    if (!key) {
+      return null;
+    }
+
+    url.searchParams.delete(FOCUS_QUERY_PARAMETER);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
     return key;
   } catch {
     return null;
@@ -61,7 +80,7 @@ const findFavouriteFallback = (key: string): HTMLElement | null => {
  * Moves focus back to the control the user last activated, if it is still on the page.
  */
 const restoreFocus = (): void => {
-  const key = takeFocusKey();
+  const key = takeFocusKeyFromUrl() ?? takeFocusKey();
 
   if (!key) {
     return;

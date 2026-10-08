@@ -31,7 +31,7 @@ describe('focusRestore', () => {
     return { querySelector };
   };
 
-  const setupStorage = (store: Record<string, string>, throwOnAccess = false) => {
+  const setupStorage = (store: Record<string, string>, throwOnAccess = false, href = 'https://fact-admin.local/') => {
     const sessionStorage = {
       getItem: jest.fn().mockImplementation((key: string) => {
         if (throwOnAccess) {
@@ -52,7 +52,11 @@ describe('focusRestore', () => {
       }),
     };
 
-    (globalThis as { window: Window }).window = { sessionStorage } as unknown as Window;
+    (globalThis as { window: Window }).window = {
+      history: { replaceState: jest.fn() },
+      location: { href },
+      sessionStorage,
+    } as unknown as Window;
 
     return sessionStorage;
   };
@@ -108,6 +112,17 @@ describe('focusRestore', () => {
     expect(target.focus).toHaveBeenCalled();
     expect(other.focus).not.toHaveBeenCalled();
     expect(sessionStorage.removeItem).toHaveBeenCalledWith('fact-focus-restore');
+  });
+
+  test('restores focus from the redirect URL and removes the focus parameter', () => {
+    const target = buildControl('favourite-courts-court-abc');
+    setupDom([target]);
+    setupStorage({}, false, 'https://fact-admin.local/?focus=favourite-courts-court-abc#courts');
+
+    initFocusRestore();
+
+    expect(target.focus).toHaveBeenCalled();
+    expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/#courts');
   });
 
   test('restores focus to the sort link after the table reloads', () => {

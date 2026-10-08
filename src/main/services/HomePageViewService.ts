@@ -51,7 +51,10 @@ export class HomePageViewService {
         ? this.buildFavouriteCell(
             court,
             favouriteStatuses.get(buildFavouriteKey(court.locationType, court.id)) ?? false,
-            `${this.buildHref(filters, {})}#courts`,
+            this.buildFocusHref(
+              `${this.buildHref(filters, {})}#courts`,
+              `favourite-courts-${court.locationType.toLowerCase()}-${court.id}`
+            ),
             'courts'
           )
         : { classes: 'homepage-courts-table__favourite', html: '' },
@@ -79,10 +82,16 @@ export class HomePageViewService {
     favouritesPage: PagedLocations,
     isReviewMode = false
   ): HomePageTableCell[][] {
-    const returnPath = this.buildFavouritesHref(filters, favouritesPage.page.number);
-
     return favouritesPage.content.map(location => [
-      this.buildFavouriteCell(location, true, returnPath, 'favourites'),
+      this.buildFavouriteCell(
+        location,
+        true,
+        this.buildFocusHref(
+          this.buildFavouritesHref(filters, favouritesPage.page.number),
+          `favourite-favourites-${location.locationType.toLowerCase()}-${location.id}`
+        ),
+        'favourites'
+      ),
       { text: location.name },
       { text: this.formatDate(location.lastUpdatedAt) },
       {
@@ -301,11 +310,14 @@ export class HomePageViewService {
    * Builds a homepage URL for a sortable column, toggling sort order when the column is already active.
    */
   private buildSortHref(filters: HomePageFilters, sortBy: 'lastUpdated' | 'name'): string {
-    return this.buildHref(filters, {
-      pageNumber: DEFAULT_PAGE_NUMBER,
-      sortBy,
-      sortOrder: filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc',
-    });
+    return this.buildFocusHref(
+      this.buildHref(filters, {
+        pageNumber: DEFAULT_PAGE_NUMBER,
+        sortBy,
+        sortOrder: filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc',
+      }),
+      `sort-${sortBy}`
+    );
   }
 
   /**
@@ -313,6 +325,17 @@ export class HomePageViewService {
    */
   private buildHref(filters: HomePageFilters, overrides: HomePageHrefOverrides): string {
     return `/?${this.buildCourtQuery(filters, overrides).toString()}`;
+  }
+
+  private buildFocusHref(href: string, focusTarget: string): string {
+    const [pathAndQuery, hash = ''] = href.split('#');
+    const queryIndex = pathAndQuery.indexOf('?');
+    const path = queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex);
+    const query = new URLSearchParams(queryIndex === -1 ? '' : pathAndQuery.slice(queryIndex + 1));
+
+    query.set('focus', focusTarget);
+
+    return `${path}?${query.toString()}${hash ? `#${hash}` : ''}`;
   }
 
   private buildCourtQuery(filters: HomePageFilters, overrides: HomePageHrefOverrides): URLSearchParams {
