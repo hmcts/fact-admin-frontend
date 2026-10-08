@@ -10472,7 +10472,7 @@ __metadata:
     moment: "npm:2.31.0"
     multer: "npm:2.4.0"
     nunjucks: "npm:3.2.4"
-    odhin-reports-playwright: "npm:1.2.2"
+    odhin-reports-playwright: "npm:1.3.0"
     pa11y: "npm:10.0.0"
     playwright: "npm:1.63.0"
     playwright-core: "npm:1.63.0"
@@ -14468,9 +14468,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"odhin-reports-playwright@npm:1.2.2":
-  version: 1.2.2
-  resolution: "odhin-reports-playwright@npm:1.2.2"
+"odhin-reports-playwright@npm:1.3.0":
+  version: 1.3.0
+  resolution: "odhin-reports-playwright@npm:1.3.0"
   dependencies:
     ansi-to-html: "npm:^0.7.2"
     autoprefixer: "npm:^10.4.14"
@@ -14492,11 +14492,12 @@ __metadata:
     prismjs: "npm:^1.29.0"
     serve-static: "npm:^1.15.0"
     static-server: "npm:^2.2.1"
+    terser: "npm:^5.51.2"
     tunnel: "npm:^0.0.6"
     typescript: "npm:^5.1.6"
     xhr2: "npm:^0.2.1"
     xmlhttprequest: "npm:^1.8.0"
-  checksum: 10/1e2682cd095affd0dd0ecaf236c954a79741aa6361b92e0fc34b9ed92efaba42135855625187ef3ef4f36e78d2674fc95e2aea427543b0d1ed71255487d912a8
+  checksum: 10/758a7ad3628d4e73f2d0483d155c901b32c509932876078a5820d83426a90d2caa9b9d1a159159d2867d807e0e3e833b58a820b7c8f4202b09d91de5990478ef
   languageName: node
   linkType: hard
 
@@ -16989,7 +16990,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser@npm:^5.51.0":
+"terser@npm:^5.51.0, terser@npm:^5.51.2":
   version: 5.51.2
   resolution: "terser@npm:5.51.2"
   dependencies:
