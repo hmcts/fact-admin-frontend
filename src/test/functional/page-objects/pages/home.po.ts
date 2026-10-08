@@ -152,15 +152,21 @@ export class HomePage extends Base {
   async expectFavouriteStarAppearance(
     locationName: string,
     favourite: boolean,
-    fromFavouritesTab = false
+    fromFavouritesTab = false,
+    expectFocused = false
   ): Promise<void> {
     const button = this.getFavouriteButton(locationName, favourite, fromFavouritesTab);
     const star = button.locator('.favourite-location__star');
 
     await expect(star).toHaveCSS('stroke', 'rgb(11, 12, 12)');
-    await expect(star).toHaveCSS('fill', favourite ? 'rgb(11, 12, 12)' : 'rgba(0, 0, 0, 0)');
+    await expect(star).toHaveCSS('fill', expectFocused || !favourite ? 'rgba(0, 0, 0, 0)' : 'rgb(11, 12, 12)');
 
-    await button.focus();
+    if (expectFocused) {
+      await expect(button).toBeFocused();
+    } else {
+      await button.focus();
+    }
+
     await expect(button).toBeFocused();
     await expect(button).toHaveCSS('background-color', 'rgb(255, 221, 0)');
     await expect(star).toHaveCSS('fill', 'rgba(0, 0, 0, 0)');
