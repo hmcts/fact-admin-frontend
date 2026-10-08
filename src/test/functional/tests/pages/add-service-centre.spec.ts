@@ -88,7 +88,9 @@ test.describe(
 
           await addServiceCentrePage.goto();
           await addServiceCentrePage.createServiceCentre(serviceCentreName);
-          await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
+          await expect(addServiceCentrePage.loadingStatus).toHaveText(
+            'New service centre has been created, loading address page'
+          );
 
           await addServiceCentrePage.goto();
           await addServiceCentrePage.createServiceCentre(serviceCentreName);
@@ -139,7 +141,9 @@ test.describe(
           await addServiceCentrePage.goto();
           await addServiceCentrePage.createServiceCentre(serviceCentreName);
 
-          await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
+          await expect(addServiceCentrePage.loadingStatus).toHaveText(
+            'New service centre has been created, loading address page'
+          );
           await addServiceCentrePage.continueToAddress();
 
           await expect(addServiceCentrePage.heading).toContainText('Address');
@@ -165,7 +169,9 @@ test.describe(
           await addServiceCentrePage.goto();
           await addServiceCentrePage.createServiceCentre(serviceCentreName);
 
-          await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
+          await expect(addServiceCentrePage.loadingStatus).toHaveText(
+            'New service centre has been created, loading address page'
+          );
           await addServiceCentrePage.continueToAddress();
           await expect(addServiceCentrePage.heading).toContainText('Address');
 
@@ -188,7 +194,9 @@ test.describe(
         await addServiceCentrePage.goto();
         await addServiceCentrePage.createServiceCentre(serviceCentreName);
 
-        await expect(addServiceCentrePage.loadingStatus).toContainText('New service centre has been created');
+        await expect(addServiceCentrePage.loadingStatus).toHaveText(
+          'New service centre has been created, loading address page'
+        );
         const redirectStart = Date.now();
         await expect(addServiceCentrePage.page).toHaveURL(/\/service-centres\/[^/]+\/edit\/address\?isNewSC=true$/, {
           timeout: 9000,
