@@ -375,7 +375,7 @@ export class HomePageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}">${label}${this.getSortIconSvg(
+      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}" data-focus-restore="sort-${sortBy}">${label}${this.getSortIconSvg(
         ariaSort
       )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
     };
@@ -416,15 +416,15 @@ export class HomePageViewService {
     const escapedReturnPath = this.escapeHtml(returnPath);
     const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
     // Stable across the add/remove toggle so focus can be restored to the same button after reload.
-    const focusKey = this.escapeHtml(`${table}-${location.locationType.toLowerCase()}-${location.id}`);
+    const focusKey = this.escapeHtml(`favourite-${table}-${location.locationType.toLowerCase()}-${location.id}`);
 
     return {
       classes: 'homepage-courts-table__favourite',
       html: [
         '<div class="favourite-location">',
-        `<form class="favourite-location__form" method="post" action="${action}" data-favourite-form>`,
+        `<form class="favourite-location__form" method="post" action="${action}">`,
         `<input type="hidden" name="returnPath" value="${escapedReturnPath}">`,
-        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}" data-favourite-button="${focusKey}">`,
+        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}" data-focus-restore="${focusKey}">`,
         '<svg class="favourite-location__star" aria-hidden="true" focusable="false" viewBox="0 0 24 24">',
         '<path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.42l-5.8 3.05L7.31 14l-4.7-4.58 6.49-.94L12 2.6z"/>',
         '</svg>',

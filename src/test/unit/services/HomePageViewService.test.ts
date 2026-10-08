@@ -433,8 +433,7 @@ describe('HomePageViewService', () => {
       new Map()
     );
 
-    expect(rows[0][0].html).toContain('data-favourite-form');
-    expect(rows[0][0].html).toContain(`data-favourite-button="courts-court-${court.id}"`);
+    expect(rows[0][0].html).toContain(`data-focus-restore="favourite-courts-court-${court.id}"`);
   });
 
   test('keys the favourites tab toggle to the favourites table', () => {
@@ -443,6 +442,13 @@ describe('HomePageViewService', () => {
       page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
     } as PagedLocations);
 
-    expect(rows[0][0].html).toContain(`data-favourite-button="favourites-service_centre-${serviceCentre.id}"`);
+    expect(rows[0][0].html).toContain(`data-focus-restore="favourite-favourites-service_centre-${serviceCentre.id}"`);
+  });
+
+  test('adds focus restoration hooks to the sortable column headers', () => {
+    const head = service.buildCourtTableHead(filters);
+
+    expect(head[1].html).toContain('data-focus-restore="sort-name"');
+    expect(head[2].html).toContain('data-focus-restore="sort-lastUpdated"');
   });
 });
