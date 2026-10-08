@@ -87,7 +87,20 @@ const restoreFocus = (): void => {
   }
 
   const target = findControl(key) ?? findFavouriteFallback(key);
-  target?.focus();
+
+  if (!target) {
+    return;
+  }
+
+  // GOV.UK Tabs processes the #courts/#favourites hash during page setup. Defer until the next
+  // animation frame so its focus handling and the browser's autofocus processing cannot override
+  // the focus restored for the control that initiated this navigation.
+  if (typeof window.requestAnimationFrame === 'function') {
+    window.requestAnimationFrame(() => target.focus());
+    return;
+  }
+
+  target.focus();
 };
 
 /**

@@ -125,6 +125,24 @@ describe('focusRestore', () => {
     expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/#courts');
   });
 
+  test('defers focus restoration until the next animation frame', () => {
+    const target = buildControl('sort-name');
+    setupDom([target]);
+    setupStorage({}, false, 'https://fact-admin.local/?focus=sort-name#courts');
+    const requestAnimationFrame = jest.fn().mockImplementation((callback: FrameRequestCallback) => {
+      expect(target.focus).not.toHaveBeenCalled();
+      callback(0);
+      return 1;
+    });
+    (window as unknown as { requestAnimationFrame: typeof requestAnimationFrame }).requestAnimationFrame =
+      requestAnimationFrame;
+
+    initFocusRestore();
+
+    expect(requestAnimationFrame).toHaveBeenCalled();
+    expect(target.focus).toHaveBeenCalled();
+  });
+
   test('restores focus to the sort link after the table reloads', () => {
     const sortLink = buildControl('sort-name');
     setupDom([sortLink]);
