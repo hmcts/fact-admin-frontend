@@ -302,6 +302,10 @@
   color: #fff;
 }
 
+.sign-out-link:focus{
+  color: #000;
+}
+
 .fact-tag-max-width--unlimited {
   max-width: unset !important;
 }
