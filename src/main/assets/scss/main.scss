@@ -178,15 +178,43 @@
   display: block;
 }
 
-// Users table can extend beyond the standard GOV.UK content width.
-.users-table-wrapper {
+// Wide tables scroll within their own region so the page itself never scrolls horizontally on reflow.
+.app-table-scroll {
+  max-width: 100%;
   overflow-x: auto;
+  @include govuk-frontend.govuk-responsive-margin(6, 'bottom');
+
+  .govuk-table {
+    margin-bottom: 0;
+  }
+
+  &:focus {
+    outline: govuk-frontend.$govuk-focus-width solid govuk-frontend.$govuk-focus-colour;
+    outline-offset: 0;
+  }
 }
 
+// govuk-fieldset__legend uses display: table, which grows to fit nowrap visually-hidden text and
+// widens the page on small viewports; block keeps the 1px visually-hidden box.
+.govuk-fieldset__legend.govuk-visually-hidden {
+  display: block;
+}
+
+// Users table can extend beyond the standard GOV.UK content width.
 @media (min-width: 1020px) {
   .users-table-wrapper {
     max-width: 1200px;
     width: calc(100vw - ((100vw - 960px) / 2) - 60px);
+  }
+
+  // Extend the audit results to the same right edge as the users table. The negative right margin keeps
+  // the float layout intact, so the filters column keeps its normal one-third width.
+  .audit-list-results {
+    $audit-results-width: max(66.6667%, min(900px, calc(50vw + 120px)));
+
+    width: $audit-results-width;
+    // 66% (not 66.6667%) leaves sub-pixel slack so the float never wraps under the filters.
+    margin-right: calc(66% - #{$audit-results-width});
   }
 }
 

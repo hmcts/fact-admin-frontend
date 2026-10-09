@@ -1,0 +1,12 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{#
+  Wraps govukTable in a keyboard-focusable scroll region so wide tables scroll
+  within themselves instead of making the whole page scroll horizontally on reflow.
+#}
+{% macro appTable(params, label) %}
+  {% set regionLabel = label or (params.caption if params.caption else "Table") %}
+  <div class="app-table-scroll" role="region" aria-label="{{ regionLabel }}" tabindex="0">
+    {{ govukTable(params) }}
+  </div>
+{% endmacro %}

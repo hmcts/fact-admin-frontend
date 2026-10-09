@@ -34,6 +34,7 @@ describe('Users View', () => {
     expect(html).toContain('Audit');
     expect(html).toContain('Search by email or SSO ID');
     expect(html).toContain('users-table-wrapper');
+    expect(html).toContain('<div class="app-table-scroll" role="region" aria-label="Users" tabindex="0">');
     expect(html).toContain('Email');
     expect(html).toContain('SSO ID');
     expect(html).toContain('Last login');

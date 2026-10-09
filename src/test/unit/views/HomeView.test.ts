@@ -88,6 +88,9 @@ describe('Home View', () => {
     expect(html).toContain('Enter a court name');
     expect(html).toContain('There was a problem loading courts, tribunals and service centres.');
     expect(html).toContain('href="/?pageNumber=1"');
+    expect(html).toContain(
+      '<div class="app-table-scroll" role="region" aria-label="Courts, tribunals and service centres" tabindex="0">'
+    );
   });
 
   test('renders the active Favourites table and its independent error', () => {

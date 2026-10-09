@@ -2,7 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/table.njk" import appTable %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "macros/Breadcrumb.macro.njk" import appBreadcrumb %}
 
@@ -146,12 +146,12 @@
       }), approvalTableHead) %}
     {% endif %}
 
-    {{ govukTable({
+    {{ appTable({
       classes: "approvals-table",
       firstCellIsHeader: false,
       head: approvalTableHead,
       rows: approvalTableRows
-    }) }}
+    }, "Approvals") }}
       {% else %}
         <p class="govuk-body">No approvals found.</p>
       {% endif %}
