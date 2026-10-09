@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
@@ -11,10 +12,16 @@
   <div data-professional-information-list="{{ type }}" data-professional-information-max="5">
     {% for entry in entries %}
       {% set index = loop.index0 %}
-      <div class="professional-information-repeatable" data-professional-information-item>
-        {% if not loop.first and not isViewer %}
-          <p class="govuk-body govuk-!-margin-bottom-1" data-professional-information-heading>{{ heading }} {{ loop.index }} (optional)</p>
-        {% endif %}
+      {% call govukFieldset({
+        classes: "professional-information-repeatable",
+        attributes: {
+          "data-professional-information-item": ""
+        },
+        legend: {
+          text: heading + " " + loop.index + " (optional)",
+          classes: "govuk-!-margin-bottom-1"
+        }
+      }) %}
 
         {{ govukInput({
           label: {
@@ -72,7 +79,7 @@
             {{ removeButtonText }} {{ loop.index }}
           </button>
         {% endif %}
-      </div>
+      {% endcall %}
     {% endfor %}
   </div>
 
