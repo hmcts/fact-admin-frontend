@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 
 export type CourtPhotoViewModel = {
   fileLink?: string;
@@ -14,7 +15,7 @@ export class CourtPhotoService {
 
   public async retrieve(courtId: string): Promise<CourtPhotoViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
     return this.buildResponseWithExistingLink(courtResponse);
@@ -22,27 +23,20 @@ export class CourtPhotoService {
 
   public async upload(courtId: string, file: Buffer, mimeType: string): Promise<CourtPhotoViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const uploadResponse = await this.courtApi.updateCourtPhoto(courtId, file, mimeType);
-    if (typeof uploadResponse === 'number') {
+    if (isHttpStatusCode(uploadResponse)) {
       return uploadResponse;
     }
 
     // if it's a Map, it's validation errors from the API
     if (uploadResponse instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      // convert the mapped errors into our expected error format
-      for (const [key, value] of uploadResponse) {
-        // ignore the timestamp entry when decanting error responses
-        if (typeof key === 'string' && key.toLowerCase() === 'timestamp') {
-          continue;
-        }
-        const field = key.toLowerCase() === 'file' ? 'photo' : key;
-        errors[field] = [value];
-      }
+      const errors = toValidationErrorRecord(uploadResponse, {
+        mapKey: key => (key.toLowerCase() === 'file' ? 'photo' : key),
+      });
       return this.buildResponseWithExistingLink(courtResponse, errors);
     }
 
@@ -58,7 +52,7 @@ export class CourtPhotoService {
 
   public async retrieveCourtName(courtId: string): Promise<string | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
     return courtResponse.name;
@@ -69,7 +63,7 @@ export class CourtPhotoService {
     errors?: Record<string, string[]>
   ): Promise<CourtPhotoViewModel | HttpStatusCode> {
     let fileLink = await this.courtApi.getCourtPhotoFileLink(court.id);
-    if (typeof fileLink === 'number') {
+    if (isHttpStatusCode(fileLink)) {
       if (fileLink === HttpStatusCode.NotFound) {
         fileLink = undefined;
       } else {

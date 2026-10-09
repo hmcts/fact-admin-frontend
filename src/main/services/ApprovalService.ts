@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { OperationsApi } from '../requests/OperationsApi';
 import { ApprovalStatus, ApprovalSubjectType } from '../schemas/approvalSchema';
+import { isHttpStatusCode } from '../utils/apiResponses';
 import { APPROVAL_DATE_FORMAT } from '../utils/constants/messageConstants';
 import { toUkDateTimeString } from '../utils/valueParsers';
 
@@ -53,7 +54,7 @@ export class ApprovalService {
   ): Promise<ApprovalTrackerViewModel | HttpStatusCode> {
     const approvalsResponse = await this.operationsApi.getApprovals();
 
-    if (typeof approvalsResponse === 'number') {
+    if (isHttpStatusCode(approvalsResponse)) {
       return approvalsResponse;
     }
 
@@ -83,7 +84,7 @@ export class ApprovalService {
   public async getUndoApproval(approvalId: string): Promise<UndoApprovalViewModel | HttpStatusCode> {
     const approval = await this.findApprovedApproval(approvalId);
 
-    if (typeof approval === 'number') {
+    if (isHttpStatusCode(approval)) {
       return approval;
     }
 
@@ -97,7 +98,7 @@ export class ApprovalService {
   public async undoApproval(approvalId: string): Promise<UndoApprovalViewModel | HttpStatusCode> {
     const undoApproval = await this.getUndoApproval(approvalId);
 
-    if (typeof undoApproval === 'number') {
+    if (isHttpStatusCode(undoApproval)) {
       return undoApproval;
     }
 
@@ -123,7 +124,7 @@ export class ApprovalService {
 
     const approval = await this.findApprovalBySubject(subjectId, subjectType);
 
-    if (typeof approval === 'number') {
+    if (isHttpStatusCode(approval)) {
       return approval;
     }
 
@@ -141,7 +142,7 @@ export class ApprovalService {
   ): Promise<ApproveDataViewModel | HttpStatusCode> {
     const approval = await this.findApprovalBySubject(subjectId, subjectType);
 
-    if (typeof approval === 'number') {
+    if (isHttpStatusCode(approval)) {
       return approval;
     }
 
@@ -167,7 +168,7 @@ export class ApprovalService {
   ): Promise<ApproveDataViewModel | HttpStatusCode> {
     const approveData = await this.getApproveData(subjectId, subjectType, name, editPath);
 
-    if (typeof approveData === 'number') {
+    if (isHttpStatusCode(approveData)) {
       return approveData;
     }
 
@@ -185,7 +186,7 @@ export class ApprovalService {
   private async findApprovedApproval(approvalId: string): Promise<ApprovalStatus | HttpStatusCode> {
     const approvalsResponse = await this.operationsApi.getApprovals();
 
-    if (typeof approvalsResponse === 'number') {
+    if (isHttpStatusCode(approvalsResponse)) {
       return approvalsResponse;
     }
 
@@ -201,7 +202,7 @@ export class ApprovalService {
   ): Promise<ApprovalStatus | HttpStatusCode> {
     const approvalsResponse = await this.operationsApi.getApprovals();
 
-    if (typeof approvalsResponse === 'number') {
+    if (isHttpStatusCode(approvalsResponse)) {
       return approvalsResponse;
     }
 

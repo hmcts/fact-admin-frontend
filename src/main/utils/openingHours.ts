@@ -1,3 +1,7 @@
+import { HttpStatusCode } from 'axios';
+
+import { normaliseSelectedValues } from './formHelpers';
+
 export type OpeningHoursLikeForm = {
   sameTime?: string;
   selectedDays?: string[];
@@ -16,6 +20,10 @@ export type OpeningTimesDetailLike = {
   closingTime: string;
 };
 
+export type PopulateOpeningTimeFieldsOptions = {
+  transformHour?: (hour: string) => string;
+};
+
 export type TimeValidationMessages = {
   sameTimeField: string;
   sameTimeError: string;
@@ -32,14 +40,6 @@ export type TimeValidationMessages = {
 export type TimeValidationLabels = {
   sameTimePartLabel: (timePart: string) => string;
   dayTimePartLabel?: (dayName: string, timePart: string) => string;
-};
-
-export const normalizeSelectedValues = (value: unknown): string[] => {
-  if (Array.isArray(value)) {
-    return value.filter((selectedValue): selectedValue is string => typeof selectedValue === 'string');
-  }
-
-  return typeof value === 'string' ? [value] : [];
 };
 
 export const validateWeekdayOpeningTimes = (
@@ -76,9 +76,6 @@ export const validateWeekdayOpeningTimes = (
   return errors;
 };
 
-export const toErrorSummary = (errors: Record<string, string>): { href: string; text: string }[] =>
-  Object.entries(errors).map(([field, text]) => ({ href: `#${field}`, text }));
-
 export const formatTime = (hour: string, minute: string): string =>
   `${hour.trim().padStart(2, '0')}:${minute.trim().padStart(2, '0')}`;
 
@@ -86,7 +83,7 @@ export const mapSelectedDayOpeningTimes = (
   form: OpeningHoursLikeForm,
   days: WeekdayConfig[]
 ): OpeningTimesDetailLike[] =>
-  normalizeSelectedValues(form.selectedDays)
+  normaliseSelectedValues(form.selectedDays)
     .map(day => days.find(dayConfig => dayConfig.value === day))
     .filter((dayConfig): dayConfig is WeekdayConfig => Boolean(dayConfig))
     .map(dayConfig => ({
@@ -100,6 +97,26 @@ export const mapSelectedDayOpeningTimes = (
         form[`${dayConfig.idPrefix}ClosingMinute`] as string
       ),
     }));
+
+export function populateOpeningTimeFields(
+  form: OpeningHoursLikeForm,
+  prefix: string,
+  detail: OpeningTimesDetailLike,
+  options: PopulateOpeningTimeFieldsOptions = {}
+): void {
+  const transformHour = options.transformHour ?? (hour => hour);
+  const [openingHour, openingMinute] = detail.openingTime.split(':');
+  const [closingHour, closingMinute] = detail.closingTime.split(':');
+
+  form[`${prefix}OpeningHour`] = transformHour(openingHour);
+  form[`${prefix}OpeningMinute`] = openingMinute;
+  form[`${prefix}ClosingHour`] = transformHour(closingHour);
+  form[`${prefix}ClosingMinute`] = closingMinute;
+}
+
+export function isNoOpeningHoursResponse(status: HttpStatusCode): boolean {
+  return status === HttpStatusCode.NoContent || status === HttpStatusCode.NotFound;
+}
 
 const validateTimeGroup = (
   errors: Record<string, string>,

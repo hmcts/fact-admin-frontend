@@ -4,8 +4,10 @@ import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { Region } from '../../schemas/regionSchema';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import { COURT_REGION_MESSAGE } from '../../utils/constants/messageConstants';
 import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
+import { LocationNameService } from '../shared/LocationNameService';
 
 type AddCourtForm = {
   name?: string;
@@ -33,8 +35,9 @@ type AddCourtResult =
 export class AddCourtService {
   public constructor(
     private readonly courtApi = new CourtApi(),
-    private readonly serviceCentreApi = new ServiceCentreApi(),
-    private readonly referenceDataApi = new ReferenceDataApi()
+    serviceCentreApi = new ServiceCentreApi(),
+    private readonly referenceDataApi = new ReferenceDataApi(),
+    private readonly locationNameService = new LocationNameService(courtApi, serviceCentreApi)
   ) {}
 
   /**
@@ -42,7 +45,7 @@ export class AddCourtService {
    */
   public async getViewModel(form: AddCourtForm = {}): Promise<AddCourtPageModel | HttpStatusCode> {
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
@@ -90,15 +93,15 @@ export class AddCourtService {
     }
 
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
     const name = trimmedForm.name as string;
     const regionId = trimmedForm.regionId as string;
-    const duplicateLocationStatus = await this.checkDuplicateLocationName(name);
+    const duplicateLocationStatus = await this.locationNameService.findDuplicate(name);
     if (duplicateLocationStatus !== HttpStatusCode.NotFound) {
-      if (typeof duplicateLocationStatus === 'number') {
+      if (isHttpStatusCode(duplicateLocationStatus)) {
         return duplicateLocationStatus;
       }
 
@@ -114,18 +117,12 @@ export class AddCourtService {
       regionId,
     });
 
-    if (typeof createResponse === 'number') {
+    if (isHttpStatusCode(createResponse)) {
       return createResponse;
     }
 
     if (createResponse instanceof Map) {
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of createResponse) {
-        if (key === 'timestamp') {
-          continue;
-        }
-        errors[key] = [value];
-      }
+      const errors = toValidationErrorRecord(createResponse);
       return this.buildViewModelWithErrors(trimmedForm, regions, errors);
     }
 
@@ -138,25 +135,6 @@ export class AddCourtService {
     };
   }
 
-  private async checkDuplicateLocationName(
-    name: string
-  ): Promise<{ name: string; type: 'court' | 'serviceCentre' } | HttpStatusCode.NotFound | HttpStatusCode> {
-    const duplicateCourt = await this.courtApi.getCourtByName(name);
-    if (typeof duplicateCourt !== 'number') {
-      return { name: duplicateCourt.name, type: 'court' };
-    }
-    if (duplicateCourt !== HttpStatusCode.NotFound) {
-      return duplicateCourt;
-    }
-
-    const duplicateServiceCentre = await this.serviceCentreApi.getServiceCentreByName(name);
-    if (typeof duplicateServiceCentre !== 'number') {
-      return { name: duplicateServiceCentre.name, type: 'serviceCentre' };
-    }
-
-    return duplicateServiceCentre;
-  }
-
   /**
    * Rebuilds the page model with validation errors while preserving the submitted values.
    */
@@ -165,7 +143,7 @@ export class AddCourtService {
     errors: Record<string, string[]>
   ): Promise<AddCourtPageModel | HttpStatusCode> {
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 

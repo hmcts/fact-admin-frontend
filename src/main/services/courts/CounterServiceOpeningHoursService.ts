@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { CounterServiceOpeningHours, OpeningTimeDetails } from '../../schemas/counterServiceOpeningHoursSchema';
+import { isHttpStatusCode, isSuccessfulHttpStatus } from '../../utils/apiResponses';
 import {
   COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
   COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
@@ -15,15 +16,15 @@ import {
   OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { EMAIL_REGEX } from '../../utils/constants/regexConstants';
-
+import { normaliseSelectedValues, toErrorSummary } from '../../utils/formHelpers';
 import {
   WeekdayConfig,
   formatTime,
+  isNoOpeningHoursResponse,
   mapSelectedDayOpeningTimes,
-  normalizeSelectedValues,
-  toErrorSummary,
+  populateOpeningTimeFields,
   validateWeekdayOpeningTimes,
-} from './validation/openingHoursValidation';
+} from '../../utils/openingHours';
 
 type Day = WeekdayConfig;
 
@@ -98,14 +99,14 @@ export class CounterServiceOpeningHoursService {
   public async getListPage(courtId: string): Promise<CounterServiceListViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const counterServiceResponse = await this.courtApi.getCounterServiceOpeningHours(courtId);
 
-    if (this.isHttpStatusCode(counterServiceResponse)) {
-      return this.isNoOpeningHoursResponse(counterServiceResponse)
+    if (isHttpStatusCode(counterServiceResponse)) {
+      return isNoOpeningHoursResponse(counterServiceResponse)
         ? {
             courtId,
             courtName: courtResponse.name,
@@ -142,7 +143,7 @@ export class CounterServiceOpeningHoursService {
   ): Promise<SaveCounterServiceOpeningHoursResult> {
     const baseModel = await this.getEditPageBase(courtId, counterServiceId, form);
 
-    if (this.isHttpStatusCode(baseModel)) {
+    if (isHttpStatusCode(baseModel)) {
       return { status: baseModel, type: 'status' };
     }
 
@@ -154,7 +155,7 @@ export class CounterServiceOpeningHoursService {
         viewModel: {
           ...baseModel,
           errors,
-          errorSummary: this.toErrorSummary(errors),
+          errorSummary: toErrorSummary(errors),
           pageTitle: `Error: Edit counter service details and opening hours - ${baseModel.courtName}`,
         },
       };
@@ -176,7 +177,7 @@ export class CounterServiceOpeningHoursService {
 
     const saveResponse = await this.courtApi.saveCounterServiceOpeningHours(courtId, payload);
 
-    if (this.isSuccessfulStatus(saveResponse)) {
+    if (isSuccessfulHttpStatus(saveResponse)) {
       return {
         type: 'success',
         viewModel: {
@@ -187,7 +188,7 @@ export class CounterServiceOpeningHoursService {
       };
     }
 
-    if (this.isHttpStatusCode(saveResponse)) {
+    if (isHttpStatusCode(saveResponse)) {
       return { status: saveResponse, type: 'status' };
     }
 
@@ -211,12 +212,12 @@ export class CounterServiceOpeningHoursService {
   ): Promise<CounterServiceDeleteViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const counterServiceResponse = await this.courtApi.getCounterServiceOpeningHoursById(courtId, counterServiceId);
-    if (this.isHttpStatusCode(counterServiceResponse)) {
+    if (isHttpStatusCode(counterServiceResponse)) {
       return counterServiceResponse;
     }
 
@@ -236,7 +237,7 @@ export class CounterServiceOpeningHoursService {
   ): Promise<CounterServiceSuccessViewModel | HttpStatusCode> {
     const deleteViewModel = await this.getDeletePage(courtId, counterServiceId);
 
-    if (this.isHttpStatusCode(deleteViewModel)) {
+    if (isHttpStatusCode(deleteViewModel)) {
       return deleteViewModel;
     }
 
@@ -254,7 +255,7 @@ export class CounterServiceOpeningHoursService {
   }
 
   public getSelectedDays(value: unknown): string[] {
-    return normalizeSelectedValues(value);
+    return normaliseSelectedValues(value);
   }
 
   private async getEditPageBase(
@@ -264,14 +265,14 @@ export class CounterServiceOpeningHoursService {
   ): Promise<CounterServiceEditViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     let existingRecord: CounterServiceOpeningHours | undefined;
     if (counterServiceId) {
       const counterServiceResponse = await this.courtApi.getCounterServiceOpeningHoursById(courtId, counterServiceId);
-      if (this.isHttpStatusCode(counterServiceResponse)) {
+      if (isHttpStatusCode(counterServiceResponse)) {
         return counterServiceResponse;
       }
       existingRecord = counterServiceResponse;
@@ -369,25 +370,15 @@ export class CounterServiceOpeningHoursService {
 
     if (sameTime === 'yes') {
       const everyDay = existingRecord.openingTimesDetails[0];
-      form.sameOpeningHour = everyDay.openingTime.split(':')[0];
-      form.sameOpeningMinute = everyDay.openingTime.split(':')[1];
-      form.sameClosingHour = everyDay.closingTime.split(':')[0];
-      form.sameClosingMinute = everyDay.closingTime.split(':')[1];
+      populateOpeningTimeFields(form, 'same', everyDay);
     } else {
       existingRecord.openingTimesDetails.forEach(detail => {
         const prefix = detail.dayOfWeek.toLowerCase();
-        form[`${prefix}OpeningHour`] = detail.openingTime.split(':')[0];
-        form[`${prefix}OpeningMinute`] = detail.openingTime.split(':')[1];
-        form[`${prefix}ClosingHour`] = detail.closingTime.split(':')[0];
-        form[`${prefix}ClosingMinute`] = detail.closingTime.split(':')[1];
+        populateOpeningTimeFields(form, prefix, detail);
       });
     }
 
     return form;
-  }
-
-  private toErrorSummary(errors: Record<string, string>): CounterServiceEditError[] {
-    return toErrorSummary(errors);
   }
 
   private formatAssistance(counterService: CounterServiceOpeningHours): string {
@@ -422,19 +413,5 @@ export class CounterServiceOpeningHoursService {
     const period = hourNum >= 12 ? 'pm' : 'am';
     const displayHour = hourNum % 12 === 0 ? 12 : hourNum % 12;
     return minute === '00' ? `${displayHour}${period}` : `${displayHour}:${minute}${period}`;
-  }
-
-  private isHttpStatusCode(response: unknown): response is HttpStatusCode {
-    return typeof response === 'number';
-  }
-
-  private isSuccessfulStatus(response: unknown): response is HttpStatusCode {
-    return (
-      this.isHttpStatusCode(response) && response >= HttpStatusCode.Ok && response < HttpStatusCode.MultipleChoices
-    );
-  }
-
-  private isNoOpeningHoursResponse(status: HttpStatusCode): boolean {
-    return status === HttpStatusCode.NoContent || status === HttpStatusCode.NotFound;
   }
 }

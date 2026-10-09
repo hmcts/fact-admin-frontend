@@ -6,14 +6,14 @@ import {
   DEFAULT_RESULTS_MESSAGE,
   HOME_PAGE_TITLE,
   PUBLIC_FRONTEND_URL,
-  SORT_ICON_PATHS,
 } from '../utils/constants/messageConstants';
+import { buildPagination as buildSharedPagination } from '../utils/pagination';
+import { buildSortIconSvg } from '../utils/viewHelpers';
 
 import {
   HomePageFilters,
   HomePageHrefOverrides,
   HomePagePagination,
-  HomePagePaginationLink,
   HomePageRegionOption,
   HomePageTableCell,
   HomePageTableHeadCell,
@@ -97,41 +97,20 @@ export class HomePageViewService {
   public buildPagination(courtsPage: PagedLocations, filters: HomePageFilters): HomePagePagination {
     const totalPages = courtsPage.page.totalPages ?? 0;
     const currentPage = courtsPage.page.number ?? filters.pageNumber;
-    const items = this.buildPaginationItems(totalPages, currentPage, filters);
 
     return {
       currentPage,
-      items,
-      next:
-        currentPage < totalPages - 1 ? { href: this.buildHref(filters, { pageNumber: currentPage + 1 }) } : undefined,
-      previous: currentPage > 0 ? { href: this.buildHref(filters, { pageNumber: currentPage - 1 }) } : undefined,
-      totalPages,
+      ...buildSharedPagination(totalPages, currentPage, pageNumber => this.buildHref(filters, { pageNumber })),
     };
   }
 
   public buildFavouritesPagination(favouritesPage: PagedLocations, filters: HomePageFilters): HomePagePagination {
     const totalPages = favouritesPage.page.totalPages ?? 0;
     const currentPage = favouritesPage.page.number ?? filters.favouritesPageNumber ?? DEFAULT_PAGE_NUMBER;
-    const pageIndexes = this.getVisiblePageIndexes(totalPages, currentPage);
-    const items: HomePagePaginationLink[] = [];
-
-    pageIndexes.forEach((pageIndex, index) => {
-      if (index > 0 && pageIndex - pageIndexes[index - 1] > 1) {
-        items.push({ ellipsis: true, href: '', number: -1 });
-      }
-      items.push({
-        current: pageIndex === currentPage,
-        href: this.buildFavouritesHref(filters, pageIndex),
-        number: pageIndex + 1,
-      });
-    });
 
     return {
       currentPage,
-      items: totalPages > 1 ? items : [],
-      next: currentPage < totalPages - 1 ? { href: this.buildFavouritesHref(filters, currentPage + 1) } : undefined,
-      previous: currentPage > 0 ? { href: this.buildFavouritesHref(filters, currentPage - 1) } : undefined,
-      totalPages,
+      ...buildSharedPagination(totalPages, currentPage, pageNumber => this.buildFavouritesHref(filters, pageNumber)),
     };
   }
 
@@ -208,72 +187,6 @@ export class HomePageViewService {
         value: region.id,
       })),
     ];
-  }
-
-  /**
-   * Builds the condensed GOV.UK pagination item list with ellipses where ranges are skipped.
-   */
-  private buildPaginationItems(
-    totalPages: number,
-    currentPage: number,
-    filters: HomePageFilters
-  ): HomePagePaginationLink[] {
-    if (totalPages <= 1) {
-      return [];
-    }
-
-    return this.buildPaginationItemsFromIndexes(
-      this.getVisiblePageIndexes(totalPages, currentPage),
-      currentPage,
-      filters
-    );
-  }
-
-  /**
-   * Returns the sorted page indexes that should be visible in the condensed pagination control.
-   */
-  private getVisiblePageIndexes(totalPages: number, currentPage: number): number[] {
-    const pageIndexes = new Set<number>([0, totalPages - 1, currentPage]);
-
-    if (currentPage > 0) {
-      pageIndexes.add(currentPage - 1);
-    }
-    if (currentPage < totalPages - 1) {
-      pageIndexes.add(currentPage + 1);
-    }
-
-    return Array.from(pageIndexes)
-      .filter(index => index >= 0 && index < totalPages)
-      .sort((left, right) => left - right);
-  }
-
-  /**
-   * Maps visible page indexes into GOV.UK pagination items, inserting ellipses where ranges are skipped.
-   */
-  private buildPaginationItemsFromIndexes(
-    pageIndexes: number[],
-    currentPage: number,
-    filters: HomePageFilters
-  ): HomePagePaginationLink[] {
-    const items: HomePagePaginationLink[] = [];
-
-    pageIndexes.forEach((pageIndex, index) => {
-      if (index > 0 && pageIndex - pageIndexes[index - 1] > 1) {
-        items.push({
-          ellipsis: true,
-          href: '',
-          number: -1,
-        });
-      }
-
-      items.push({
-        current: pageIndex === currentPage,
-        href: this.buildHref(filters, { pageNumber: pageIndex }),
-        number: pageIndex + 1,
-      });
-    });
-
-    return items;
   }
 
   /**
@@ -354,21 +267,10 @@ export class HomePageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}">${label}${this.getSortIconSvg(
+      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}">${label}${buildSortIconSvg(
         ariaSort
       )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
     };
-  }
-
-  /**
-   * Returns the inline SVG used to represent the current sort state.
-   */
-  private getSortIconSvg(ariaSort: 'ascending' | 'descending' | 'none'): string {
-    return [
-      '<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">',
-      SORT_ICON_PATHS[ariaSort],
-      '</svg>',
-    ].join('');
   }
 
   /**
