@@ -156,7 +156,7 @@ export class CounterServiceOpeningHoursService {
           ...baseModel,
           errors,
           errorSummary: toErrorSummary(errors),
-          pageTitle: `Error: Edit counter service opening hours - ${baseModel.courtName}`,
+          pageTitle: `Error: Edit counter service details and opening hours - ${baseModel.courtName}`,
         },
       };
     }
@@ -288,7 +288,7 @@ export class CounterServiceOpeningHoursService {
       errorSummary: [],
       form,
       counterServiceId,
-      pageTitle: `Edit counter service opening hours - ${courtResponse.name}`,
+      pageTitle: `Edit counter service details and opening hours - ${courtResponse.name}`,
     };
   }
 
