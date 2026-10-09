@@ -171,10 +171,10 @@
           items: courtTypeItems
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">GBS code (optional)</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Government Banking Solution (GBS) code (optional)</h2>
         {{ govukInput({
           label: {
-            text: "GBS code (optional)",
+            text: "Government Banking Solution (GBS) code (optional)",
             classes: "govuk-visually-hidden"
           },
           hint: {
@@ -189,7 +189,7 @@
           } if fieldErrors.gbs else null
         }) }}
 
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">DX codes</h2>
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Document exchange (DX) codes</h2>
         {{ repeatableSection(
           "dxCode",
           "DX code",
@@ -238,12 +238,10 @@
               text: "Yes",
               checked: interviewRooms === true,
               conditional: {
-                html: '<fieldset class="govuk-fieldset">' +
-                  '<legend class="govuk-fieldset__legend govuk-!-margin-bottom-1">Enter the amount</legend>' +
-                  govukInput({
+                html: govukInput({
                     label: {
-                      text: "Enter the amount",
-                      classes: "govuk-visually-hidden"
+                      text: "Enter the number of interview rooms",
+                      classes: "govuk-!-margin-bottom-1"
                     },
                     classes: "govuk-input--width-10",
                     id: "interviewRoomCount",
@@ -255,7 +253,7 @@
                   }) +
                   govukInput({
                     label: {
-                      text: "Phone number to book it (optional)",
+                      text: "Phone number to book interview rooms (optional)",
                       classes: "govuk-!-margin-bottom-1"
                     },
                     classes: "govuk-input--width-20",
@@ -265,8 +263,7 @@
                     errorMessage: {
                       text: fieldErrors.interviewPhoneNumber
                     } if fieldErrors.interviewPhoneNumber else null
-                  }) +
-                  '</fieldset>'
+                  })
               }
             },
             {

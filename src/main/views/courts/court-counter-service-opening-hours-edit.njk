@@ -88,7 +88,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">{{ "View counter service opening hours" if isViewer else "Edit counter service opening hours" }}</h1>
+      <h1 class="govuk-heading-l">{{ "View counter service details and opening hours" if isViewer else "Edit counter service details and opening hours" }}</h1>
       <h2 class="govuk-heading-m">Counter service details</h2>
 
       {% set appointmentContact %}
@@ -151,7 +151,7 @@
           name: "assistWith",
           fieldset: {
             legend: {
-              text: "Select what the counter can assist with?"
+              text: "What can the counter assist with?"
             }
           },
           hint: {
@@ -209,7 +209,7 @@
           } if errors and errors.appointmentNeeded else null
         }) }}
 
-        <h3 class="govuk-heading-s">Enter opening hours</h3>
+        <h3 class="govuk-heading-s">Counter opening hours</h3>
 
         {{ govukRadios({
           idPrefix: "sameTime",

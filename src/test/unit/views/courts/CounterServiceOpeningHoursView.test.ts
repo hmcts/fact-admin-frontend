@@ -72,11 +72,11 @@ describe('Counter Service Opening Hours View', () => {
       pageTitle: 'Counter service opening hours',
     });
 
-    expect(html).toContain('Edit counter service opening hours');
+    expect(html).toContain('Edit counter service details and opening hours');
     expect(html).toContain(`action="/courts/${courtId}/edit/counter-service-opening-hours/save/counter-service-id"`);
     expect(html).toContain('class="govuk-button"');
     expect(html).toContain('Save');
-    expect(html).toContain('Select what the counter can assist with?');
+    expect(html).toContain('What can the counter assist with?');
     expect(html).toContain('Is an appointment needed?');
     expect(html).toContain('Does the counter open and close at the same time Monday to Friday?');
     expect(html).toContain('id="sameOpeningTimeContext">Opening time</p>');
@@ -111,7 +111,7 @@ describe('Counter Service Opening Hours View', () => {
       pageTitle: 'Counter service opening hours',
     });
 
-    expect(html).toContain('View counter service opening hours');
+    expect(html).toContain('View counter service details and opening hours');
     expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
     expect(html).not.toContain('>Save<');
   });
