@@ -36,6 +36,7 @@ describe('Home View', () => {
     });
 
     expect(html).toContain('Courts, tribunals and service centres');
+    expect(html).toMatch(/<h2[^>]*>Filters<\/h2>/);
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
     expect(html).toContain('Search courts, tribunals and service centres');
