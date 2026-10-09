@@ -128,10 +128,10 @@ describe('ServiceCentreWarningNoticeController', () => {
       viewModel: {
         id: SERVICE_CENTRE_ID,
         name: 'Reading Service Centre',
-        warningNotice: 'x'.repeat(251),
+        warningNotice: 'x'.repeat(701),
         pageTitle: 'Error: Warning notice - Reading Service Centre',
         errors: {
-          warningNotice: ['Warning notice must be 250 characters or fewer'],
+          warningNotice: ['Warning notice must be 700 characters or fewer'],
         },
       },
     });

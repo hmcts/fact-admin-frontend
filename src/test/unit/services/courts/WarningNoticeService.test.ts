@@ -167,8 +167,8 @@ describe('CourtWarningNoticeService', () => {
 
   test('returns validation_error when warning notices exceed max length', async () => {
     const { updateCourt, service } = buildService();
-    const longText = 'a'.repeat(251);
-    const longWelshText = 'b'.repeat(251);
+    const longText = 'a'.repeat(701);
+    const longWelshText = 'b'.repeat(701);
 
     const result = await service.save(courtId, {
       warningNotice: longText,
@@ -185,12 +185,12 @@ describe('CourtWarningNoticeService', () => {
           warningNoticeCy: longWelshText,
         },
         errors: {
-          warningNotice: 'Warning notice must be 250 characters or less',
-          warningNoticeCy: 'Welsh warning notice must be 250 characters or less',
+          warningNotice: 'Warning notice must be 700 characters or less',
+          warningNoticeCy: 'Welsh warning notice must be 700 characters or less',
         },
         errorSummary: [
-          { href: '#warningNotice', text: 'Warning notice must be 250 characters or less' },
-          { href: '#warningNoticeCy', text: 'Welsh warning notice must be 250 characters or less' },
+          { href: '#warningNotice', text: 'Warning notice must be 700 characters or less' },
+          { href: '#warningNoticeCy', text: 'Welsh warning notice must be 700 characters or less' },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
       },
@@ -384,5 +384,42 @@ describe('CourtWarningNoticeService', () => {
       })
     );
     expect(result.type).toBe('success');
+  });
+
+  test('ignores timestamp returned in API validation errors from updateCourt', async () => {
+    const { updateCourt, service } = buildService({
+      updateCourt: jest.fn().mockResolvedValue(
+        new Map([
+          ['warningNotice', 'Warning notice is invalid'],
+          ['timestamp', '2024-06-01T12:00:00Z'],
+        ])
+      ),
+    });
+
+    const form: WarningNoticeForm = {
+      warningNotice: 'Fire alarm out of service',
+      warningNoticeCy: 'Larwm tân allan o wasanaeth',
+    };
+
+    const result = await service.save(courtId, form);
+
+    expect(updateCourt).toHaveBeenCalled();
+    expect(result).not.toHaveProperty('viewModel.errors.timestamp');
+    expect(result).toEqual({
+      type: 'validation_error',
+      viewModel: {
+        courtId,
+        courtName: 'Reading Crown Court',
+        form: {
+          warningNotice: 'Fire alarm out of service',
+          warningNoticeCy: 'Larwm tân allan o wasanaeth',
+        },
+        errors: {
+          warningNotice: 'Warning notice is invalid',
+        },
+        errorSummary: [{ href: '#warningNotice', text: 'Warning notice is invalid' }],
+        pageTitle: 'Error: Warning notice - Reading Crown Court',
+      },
+    });
   });
 });

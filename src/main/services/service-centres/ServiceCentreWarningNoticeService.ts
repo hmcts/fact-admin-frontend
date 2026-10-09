@@ -3,7 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
-  MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
+  WARNING_NOTICE_MAX_LENGTH,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
@@ -135,8 +135,8 @@ export class ServiceCentreWarningNoticeService {
   private validateWarningNotice(warningNotice: string, welsh: boolean): string | undefined {
     const insert = welsh ? 'in Welsh ' : '';
     const warningFormatRegex = welsh ? WELSH_WARNING_NOTICE_REGEX : ENGLISH_WARNING_NOTICE_REGEX;
-    if (warningNotice.length > MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH) {
-      return `Warning notice ${insert}must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`;
+    if (warningNotice.length > WARNING_NOTICE_MAX_LENGTH) {
+      return `Warning notice ${insert}must be ${WARNING_NOTICE_MAX_LENGTH} characters or fewer`;
     } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {
       return `Warning notice ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses`;
     }
