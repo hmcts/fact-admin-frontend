@@ -120,12 +120,12 @@
   },
   "resolutions": {
     "@grpc/grpc-js": "1.14.5",
-    "@opentelemetry/exporter-prometheus": "0.222.0",
-    "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.11.0",
+    "@opentelemetry/exporter-prometheus": "0.223.0",
+    "@opentelemetry/core@npm:2.7.1": "npm:@opentelemetry/core@2.12.0",
     "@opentelemetry/instrumentation-mysql": "0.68.0",
     "@opentelemetry/instrumentation-pg": "0.74.0",
     "proxy-addr": "2.0.8",
-    "@opentelemetry/sdk-node": "0.222.0",
+    "@opentelemetry/sdk-node": "0.223.0",
     "ip-address": "10.7.3",
     "moment": "2.31.0",
     "qs": "6.16.0"
