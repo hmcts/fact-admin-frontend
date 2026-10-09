@@ -110,7 +110,7 @@
     "sass-loader": "17.0.1",
     "sinon": "22.1.0",
     "style-loader": "4.0.0",
-    "stylelint": "17.15.0",
+    "stylelint": "17.16.0",
     "supertest": "7.3.1",
     "ts-jest": "29.4.14",
     "ts-loader": "9.6.2",
