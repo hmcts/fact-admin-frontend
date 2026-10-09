@@ -29,6 +29,8 @@ export class HomePage extends Base {
   public readonly paginationPreviousLink: Locator;
   public readonly partialCourtNameInput: Locator;
   public readonly resultsMessage: Locator;
+  public readonly sortByLastUpdatedButton: Locator;
+  public readonly sortByNameButton: Locator;
   public readonly statusColumnHeader: Locator;
   public readonly tableHeaders: Locator;
   public readonly table: Locator;
@@ -55,6 +57,8 @@ export class HomePage extends Base {
     this.statusColumnHeader = this.page.getByRole('columnheader', { name: 'Status' });
     this.tableHeaders = this.page.locator('#courts table.homepage-courts-table thead th');
     this.table = this.page.locator('#courts table.homepage-courts-table');
+    this.sortByLastUpdatedButton = this.tableHeaders.getByRole('button', { name: /Last updated/ });
+    this.sortByNameButton = this.tableHeaders.getByRole('button', { name: /Name/ });
     this.tabs = this.page.locator('.homepage-tabs');
   }
 
@@ -118,12 +122,12 @@ export class HomePage extends Base {
   }
 
   async addFavourite(locationName: string): Promise<void> {
-    await this.table.getByRole('button', { exact: true, name: `Add ${locationName} to favourites` }).click();
+    await this.table.getByRole('button', { exact: true, name: `Add to favourites - ${locationName}` }).click();
   }
 
   async removeFavourite(locationName: string, fromFavouritesTab = false): Promise<void> {
     const table = fromFavouritesTab ? this.favouritesTable : this.table;
-    await table.getByRole('button', { exact: true, name: `Remove ${locationName} from favourites` }).click();
+    await table.getByRole('button', { exact: true, name: `Remove from favourites - ${locationName}` }).click();
   }
 
   async expectFavouriteButtonState(locationName: string, favourite: boolean): Promise<void> {
@@ -140,6 +144,7 @@ export class HomePage extends Base {
     }
     const tooltip = this.page.locator(`#${tooltipId}`);
 
+    await expect(tooltip).toHaveAttribute('aria-hidden', 'true');
     await button.hover();
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText(action);
@@ -168,7 +173,7 @@ export class HomePage extends Base {
   }
 
   getFavouriteButton(locationName: string, favourite: boolean, fromFavouritesTab = false): Locator {
-    const action = favourite ? `Remove ${locationName} from favourites` : `Add ${locationName} to favourites`;
+    const action = favourite ? `Remove from favourites - ${locationName}` : `Add to favourites - ${locationName}`;
     const table = fromFavouritesTab ? this.favouritesTable : this.table;
     return table.getByRole('button', { exact: true, name: action });
   }
@@ -202,11 +207,11 @@ export class HomePage extends Base {
   }
 
   async clickSortByName(): Promise<void> {
-    await this.tableHeaders.getByRole('link', { name: /Name/ }).click();
+    await this.sortByNameButton.click();
   }
 
   async clickSortByLastUpdated(): Promise<void> {
-    await this.tableHeaders.getByRole('link', { name: /Last updated/ }).click();
+    await this.sortByLastUpdatedButton.click();
   }
 
   async getCourtNames(): Promise<string[]> {

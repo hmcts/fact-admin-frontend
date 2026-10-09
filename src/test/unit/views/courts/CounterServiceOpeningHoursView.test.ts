@@ -79,6 +79,18 @@ describe('Counter Service Opening Hours View', () => {
     expect(html).toContain('What can the counter assist with?');
     expect(html).toContain('Is an appointment needed?');
     expect(html).toContain('Does the counter open and close at the same time Monday to Friday?');
+    expect(html).toContain('id="sameOpeningTimeContext">Opening time</p>');
+    expect(html).toMatch(/id="sameOpeningHour"[^>]*aria-describedby="sameOpeningTimeContext"/);
+    expect(html).toMatch(/id="sameOpeningMinute"[^>]*aria-describedby="sameOpeningTimeContext"/);
+    expect(html).toContain('id="sameClosingTimeContext">Closing time</p>');
+    expect(html).toMatch(/id="sameClosingHour"[^>]*aria-describedby="sameClosingTimeContext"/);
+    expect(html).toMatch(/id="sameClosingMinute"[^>]*aria-describedby="sameClosingTimeContext"/);
+    expect(html).toContain('id="mondayOpeningTimeContext">Opening time</p>');
+    expect(html).toMatch(/id="mondayOpeningHour"[^>]*aria-describedby="mondayOpeningTimeContext"/);
+    expect(html).toMatch(/id="mondayOpeningMinute"[^>]*aria-describedby="mondayOpeningTimeContext"/);
+    expect(html).toContain('id="mondayClosingTimeContext">Closing time</p>');
+    expect(html).toMatch(/id="mondayClosingHour"[^>]*aria-describedby="mondayClosingTimeContext"/);
+    expect(html).toMatch(/id="mondayClosingMinute"[^>]*aria-describedby="mondayClosingTimeContext"/);
   });
 
   test('renders edit page as view-only for viewer users', () => {

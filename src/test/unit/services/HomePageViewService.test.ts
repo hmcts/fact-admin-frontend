@@ -60,8 +60,12 @@ describe('HomePageViewService', () => {
       text: 'Favourite',
     });
     expect(head[1].attributes).toEqual({ 'aria-sort': 'none' });
+    expect(head[1].html).toContain('<button type="button" class="table-sort-button"');
+    expect(head[1].html).toContain('data-table-sort-key="name"');
     expect(head[1].html).toContain('sortBy=name&sortOrder=asc');
+    expect(head[1].html).not.toContain('<a ');
     expect(head[2].attributes).toEqual({ 'aria-sort': 'descending' });
+    expect(head[2].html).toContain('data-table-sort-key="lastUpdated"');
     expect(head[2].html).toContain('sortBy=lastUpdated&sortOrder=asc');
     expect(head[3]).toEqual({ text: 'Status' });
     expect(head[4]).toEqual({ classes: 'homepage-courts-table__actions', text: 'Actions' });
@@ -133,14 +137,14 @@ describe('HomePageViewService', () => {
     expect(rows[0][0].html).toContain(`aria-describedby="favourite-tooltip-courts-court-${court.id}"`);
     expect(rows[0][0].html).toContain('Add to favourites');
     expect(rows[0][0].html).toContain(`action="/favourites/COURT/${court.id}"`);
-    expect(rows[0][0].html).toContain(`Add ${court.name} to favourites`);
+    expect(rows[0][0].html).toContain(`Add to favourites - ${court.name}`);
     expect(rows[0][0].html).toContain('aria-hidden="true" focusable="false"');
     expect(rows[0][0].html).toContain(
-      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip">Add to favourites`
+      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip" aria-hidden="true">Add to favourites`
     );
     expect(rows[1][0].html).toContain('aria-pressed="true"');
     expect(rows[1][0].html).toContain('Remove from favourites');
-    expect(rows[1][0].html).toContain(`Remove ${serviceCentre.name} from favourites`);
+    expect(rows[1][0].html).toContain(`Remove from favourites - ${serviceCentre.name}`);
     expect(rows[1][0].html).toContain(`action="/favourites/SERVICE_CENTRE/${serviceCentre.id}/remove"`);
     expect(rows[0][0].html).not.toContain(`favourite-tooltip-courts-service_centre-${serviceCentre.id}`);
     expect(rows[0][0].classes).toBe('homepage-courts-table__favourite');

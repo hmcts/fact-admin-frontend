@@ -26,7 +26,7 @@ test.describe(
         const star = homePage.getFavouriteButton(createdCourt.name, false);
 
         await expect(homePage.table.getByRole('columnheader', { name: 'Favourite' })).toBeVisible();
-        await expect(star).toHaveAccessibleName(`Add ${createdCourt.name} to favourites`);
+        await expect(star).toHaveAccessibleName(`Add to favourites - ${createdCourt.name}`);
         await expect(star).toHaveAttribute('aria-pressed', 'false');
         await star.focus();
         await expect(star).toBeFocused();
@@ -34,14 +34,14 @@ test.describe(
         await star.press('Enter');
         await homePage.expectFavouriteButtonState(createdCourt.name, true);
         await expect(homePage.getFavouriteButton(createdCourt.name, true)).toHaveAccessibleName(
-          `Remove ${createdCourt.name} from favourites`
+          `Remove from favourites - ${createdCourt.name}`
         );
 
         await homePage.openFavouritesTab();
         await homePage.expectFavouriteVisible(createdCourt.name);
         const favouriteStar = homePage.getFavouriteButton(createdCourt.name, true, true);
         await expect(homePage.favouritesTable.getByRole('columnheader', { name: 'Favourite' })).toBeVisible();
-        await expect(favouriteStar).toHaveAccessibleName(`Remove ${createdCourt.name} from favourites`);
+        await expect(favouriteStar).toHaveAccessibleName(`Remove from favourites - ${createdCourt.name}`);
         await expect(favouriteStar).toHaveAttribute('aria-pressed', 'true');
         await favouriteStar.focus();
         await expect(favouriteStar).toBeFocused();
