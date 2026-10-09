@@ -69,7 +69,7 @@
       <h1 class="govuk-heading-l">Local Authorities</h1>
 
       {{ govukWarningText({
-        text: "If you set a local authority for a court, when a user searches for a postcode within that local authority, it will show them the closest court to the entered postcode that has the local authority selected. This will affect users search results."
+        text: "Assigning a local authority will restrict citizen search results to only show this court when searching within that specific local authority."
       }) }}
 
       {%- if not courtTypes.family or (not casesHeard.Adoption and not casesHeard.Children and not casesHeard.Divorce) %}
