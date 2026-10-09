@@ -40,6 +40,7 @@ export class HomePageFiltersService {
     return {
       activeTab: query.tab === 'favourites' ? 'favourites' : 'courts',
       favouritesPageNumber: Math.min(parseNumber(query.favouritesPageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),
+      focusTarget: parseOptionalString(query.focus),
       includeClosed: query.includeClosed === 'true' || query.includeClosed === 'on',
       onlyServiceCentres: query.onlyServiceCentres === 'true' || query.onlyServiceCentres === 'on',
       pageNumber: Math.min(parseNumber(query.pageNumber, DEFAULT_PAGE_NUMBER), MAX_PAGE_PARAM),

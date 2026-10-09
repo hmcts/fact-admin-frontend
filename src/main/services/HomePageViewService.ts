@@ -4,6 +4,7 @@ import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_RESULTS_MESSAGE,
+  HOME_PAGE_SEARCH_RESULTS_TITLE,
   HOME_PAGE_TITLE,
   PUBLIC_FRONTEND_URL,
   SORT_ICON_PATHS,
@@ -50,8 +51,12 @@ export class HomePageViewService {
         ? this.buildFavouriteCell(
             court,
             favouriteStatuses.get(buildFavouriteKey(court.locationType, court.id)) ?? false,
-            `${this.buildHref(filters, {})}#courts`,
-            'courts'
+            this.buildFocusHref(
+              `${this.buildHref(filters, {})}#courts`,
+              `favourite-courts-${court.locationType.toLowerCase()}-${court.id}`
+            ),
+            'courts',
+            filters.focusTarget
           )
         : { classes: 'homepage-courts-table__favourite', html: '' },
       { text: court.name },
@@ -78,10 +83,17 @@ export class HomePageViewService {
     favouritesPage: PagedLocations,
     isReviewMode = false
   ): HomePageTableCell[][] {
-    const returnPath = this.buildFavouritesHref(filters, favouritesPage.page.number);
-
     return favouritesPage.content.map(location => [
-      this.buildFavouriteCell(location, true, returnPath, 'favourites'),
+      this.buildFavouriteCell(
+        location,
+        true,
+        this.buildFocusHref(
+          this.buildFavouritesHref(filters, favouritesPage.page.number),
+          `favourite-favourites-${location.locationType.toLowerCase()}-${location.id}`
+        ),
+        'favourites',
+        filters.focusTarget
+      ),
       { text: location.name },
       { text: this.formatDate(location.lastUpdatedAt) },
       {
@@ -137,15 +149,35 @@ export class HomePageViewService {
 
   /**
    * Builds the page title, including validation and pagination context when needed.
+   *
+   * When any search filter is active the title announces search results, so screen reader
+   * users get a clear signal that the page content has changed after a search.
    */
-  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean): string {
+  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean, filters?: HomePageFilters): string {
     const titlePrefix = hasValidationErrors ? 'Error: ' : '';
+    const baseTitle = this.hasActiveSearchFilters(filters) ? HOME_PAGE_SEARCH_RESULTS_TITLE : HOME_PAGE_TITLE;
 
     if ((courtsPage.page.totalPages ?? 0) > 1) {
-      return `${titlePrefix}${HOME_PAGE_TITLE} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
+      return `${titlePrefix}${baseTitle} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
     }
 
-    return `${titlePrefix}${HOME_PAGE_TITLE}`;
+    return `${titlePrefix}${baseTitle}`;
+  }
+
+  /**
+   * Reports whether the user has narrowed the results with any of the search filters.
+   */
+  public hasActiveSearchFilters(filters?: HomePageFilters): boolean {
+    if (!filters) {
+      return false;
+    }
+
+    return (
+      (filters.partialCourtName ?? '').trim().length > 0 ||
+      (filters.regionId ?? '').trim().length > 0 ||
+      filters.includeClosed === true ||
+      filters.onlyServiceCentres === true
+    );
   }
 
   public buildFavouritesPageTitle(favouritesPage: PagedLocations): string {
@@ -280,11 +312,14 @@ export class HomePageViewService {
    * Builds a homepage URL for a sortable column, toggling sort order when the column is already active.
    */
   private buildSortHref(filters: HomePageFilters, sortBy: 'lastUpdated' | 'name'): string {
-    return this.buildHref(filters, {
-      pageNumber: DEFAULT_PAGE_NUMBER,
-      sortBy,
-      sortOrder: filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc',
-    });
+    return this.buildFocusHref(
+      this.buildHref(filters, {
+        pageNumber: DEFAULT_PAGE_NUMBER,
+        sortBy,
+        sortOrder: filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc',
+      }),
+      `sort-${sortBy}`
+    );
   }
 
   /**
@@ -292,6 +327,17 @@ export class HomePageViewService {
    */
   private buildHref(filters: HomePageFilters, overrides: HomePageHrefOverrides): string {
     return `/?${this.buildCourtQuery(filters, overrides).toString()}`;
+  }
+
+  private buildFocusHref(href: string, focusTarget: string): string {
+    const [pathAndQuery, hash = ''] = href.split('#');
+    const queryIndex = pathAndQuery.indexOf('?');
+    const path = queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex);
+    const query = new URLSearchParams(queryIndex === -1 ? '' : pathAndQuery.slice(queryIndex + 1));
+
+    query.set('focus', focusTarget);
+
+    return `${path}?${query.toString()}${hash ? `#${hash}` : ''}`;
   }
 
   private buildCourtQuery(filters: HomePageFilters, overrides: HomePageHrefOverrides): URLSearchParams {
@@ -354,7 +400,7 @@ export class HomePageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}">${label}${this.getSortIconSvg(
+      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}" data-focus-restore="sort-${sortBy}"${filters.focusTarget === `sort-${sortBy}` ? ' autofocus' : ''}>${label}${this.getSortIconSvg(
         ariaSort
       )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
     };
@@ -386,7 +432,8 @@ export class HomePageViewService {
     location: LocationListItem,
     favourite: boolean,
     returnPath: string,
-    table: 'courts' | 'favourites'
+    table: 'courts' | 'favourites',
+    focusTarget?: string
   ): HomePageTableCell {
     const tooltip = favourite ? 'Remove from favourites' : 'Add to favourites';
     const action = `/favourites/${location.locationType}/${location.id}${favourite ? '/remove' : ''}`;
@@ -394,6 +441,8 @@ export class HomePageViewService {
     const escapedName = this.escapeHtml(location.name);
     const escapedReturnPath = this.escapeHtml(returnPath);
     const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
+    // Stable across the add/remove toggle so focus can be restored to the same button after reload.
+    const focusKey = this.escapeHtml(`favourite-${table}-${location.locationType.toLowerCase()}-${location.id}`);
 
     return {
       classes: 'homepage-courts-table__favourite',
@@ -401,7 +450,7 @@ export class HomePageViewService {
         '<div class="favourite-location">',
         `<form class="favourite-location__form" method="post" action="${action}">`,
         `<input type="hidden" name="returnPath" value="${escapedReturnPath}">`,
-        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}">`,
+        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}" data-focus-restore="${focusKey}"${focusTarget === focusKey ? ' autofocus' : ''}>`,
         '<svg class="favourite-location__star" aria-hidden="true" focusable="false" viewBox="0 0 24 24">',
         '<path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.42l-5.8 3.05L7.31 14l-4.7-4.58 6.49-.94L12 2.6z"/>',
         '</svg>',
