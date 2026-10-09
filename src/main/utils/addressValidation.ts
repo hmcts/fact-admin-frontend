@@ -18,6 +18,31 @@ import {
   TOWN_CITY_REQUIRED_MESSAGE,
 } from './constants/messageConstants';
 import { JURISDICTION_ERROR_REGEXES, VALID_ADDRESS_LINE_REGEX, VALID_POSTCODE_REGEX } from './constants/regexConstants';
+import { addError } from './validation';
+
+export type AddressFields = {
+  addressLine1?: string;
+  addressLine2?: string | null;
+  county?: string | null;
+  postcode?: string;
+  townCity?: string;
+};
+
+export const validateCoreAddressFields = (address: AddressFields): Record<string, string[]> => {
+  const errors: Record<string, string[]> = {};
+
+  addError(errors, 'addressLine1', validateAddressLine1Field(address.addressLine1));
+  addError(errors, 'addressLine2', validateAddressLine2Field(address.addressLine2 ?? undefined));
+  addError(errors, 'townCity', validateTownCityField(address.townCity));
+  addError(errors, 'county', validateCountyField(address.county ?? undefined));
+
+  const postcodeError = validatePostcodeField(address.postcode);
+  if (postcodeError) {
+    addError(errors, 'postcode', [postcodeError]);
+  }
+
+  return errors;
+};
 
 export const isValidPostcode = (value: string): boolean => {
   return validatePostcodeField(value) === undefined;

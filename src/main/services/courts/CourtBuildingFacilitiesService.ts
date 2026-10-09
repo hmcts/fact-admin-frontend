@@ -3,6 +3,7 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { UpdateBuildingFacilitiesRequest } from '../../requests/types/UpdateBuildingFacilitiesRequest';
 import { BuildingFacilities } from '../../schemas/buildingFacilitiesSchema';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_BUILDING_FACILITIES_BABY_CHANGING_REQUIRED_MESSAGE,
   COURT_BUILDING_FACILITIES_PARKING_REQUIRED_MESSAGE,
@@ -21,18 +22,18 @@ export class CourtBuildingFacilitiesService {
   public async retrieve(courtId: string): Promise<Partial<FacilityModel> | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
     const courtFacility = await this.courtApi.getBuildingFacilities(courtId);
-    if (typeof courtFacility === 'number') {
+    if (isHttpStatusCode(courtFacility)) {
       return courtFacility;
     }
     return { ...courtFacility, name: courtResponse.name };
   }
   public async save(courtId: string, model: FacilityModel): Promise<FacilityModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
-    if (this.isHttpStatusCode(courtResponse)) {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -45,17 +46,14 @@ export class CourtBuildingFacilitiesService {
     // persist to the API
 
     const result = await this.courtApi.updateBuildingFacilities(courtId, <UpdateBuildingFacilitiesRequest>model);
-    if (typeof result === 'number') {
+    if (isHttpStatusCode(result)) {
       return result;
     }
 
     // if it's a Map, it's [validation ]errors from the API
     if (result instanceof Map) {
       // convert the mapped errors into our expected error format
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of result) {
-        errors[key] = [value];
-      }
+      const errors = toValidationErrorRecord(result);
       return { ...model, errors, name: courtResponse.name };
     }
 
@@ -99,8 +97,5 @@ export class CourtBuildingFacilitiesService {
     ]);
 
     return Object.keys(errors).length > 0 ? errors : undefined;
-  }
-  private isHttpStatusCode(response: unknown): response is HttpStatusCode {
-    return typeof response === 'number';
   }
 }

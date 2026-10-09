@@ -1,6 +1,8 @@
 import { HttpStatusCode } from 'axios';
 
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
+import { validateBilingualTextPair } from '../../utils/bilingualTextValidation';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
   MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
@@ -36,7 +38,7 @@ export class ServiceCentreWarningNoticeService {
 
   public async retrieve(serviceCentreId: string): Promise<ServiceCentreWarningNoticeViewModel | HttpStatusCode> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return serviceCentreResponse;
     }
 
@@ -54,7 +56,7 @@ export class ServiceCentreWarningNoticeService {
     warningNoticeCyInput: string | undefined
   ): Promise<SaveServiceCentreWarningNoticeResult> {
     const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-    if (typeof serviceCentreResponse === 'number') {
+    if (isHttpStatusCode(serviceCentreResponse)) {
       return { status: serviceCentreResponse, type: 'status' };
     }
 
@@ -80,7 +82,7 @@ export class ServiceCentreWarningNoticeService {
       warningNoticeCy: warningNoticeCy.length > 0 ? warningNoticeCy : null,
     });
 
-    if (typeof updateResult === 'number') {
+    if (isHttpStatusCode(updateResult)) {
       return { status: updateResult, type: 'status' };
     }
 
@@ -109,38 +111,28 @@ export class ServiceCentreWarningNoticeService {
   }
 
   private validateWarningNotices(warningNotice: string, warningNoticeCy: string): Record<string, string[]> | undefined {
-    const errors: Record<string, string[]> = {};
+    const errors = validateBilingualTextPair(warningNotice, warningNoticeCy, {
+      englishKey: 'warningNotice',
+      englishPattern: ENGLISH_WARNING_NOTICE_REGEX,
+      maximumLength: MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
+      messages: {
+        englishInvalidCharacters:
+          'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+        englishMaximumLength: `Warning notice must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`,
+        englishRequired: ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
+        welshInvalidCharacters:
+          'Warning notice in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+        welshMaximumLength: `Warning notice in Welsh must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`,
+        welshRequired: WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
+      },
+      validatePatternWhenTooLong: false,
+      welshKey: 'warningNoticeCy',
+      welshPattern: WELSH_WARNING_NOTICE_REGEX,
+    });
 
-    const warningNoticeError = this.validateWarningNotice(warningNotice, false);
-    if (warningNoticeError) {
-      errors.warningNotice = [warningNoticeError];
-    }
-
-    if (warningNoticeCy.length > 0 && warningNotice.length === 0) {
-      errors.warningNotice = [ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE];
-    }
-
-    const warningNoticeCyError = this.validateWarningNotice(warningNoticeCy, true);
-    if (warningNoticeCyError) {
-      errors.warningNoticeCy = [warningNoticeCyError];
-    }
-
-    if (warningNotice.length > 0 && warningNoticeCy.length === 0) {
-      errors.warningNoticeCy = [WELSH_WARNING_NOTICE_REQUIRED_MESSAGE];
-    }
-
-    return Object.keys(errors).length > 0 ? errors : undefined;
-  }
-
-  private validateWarningNotice(warningNotice: string, welsh: boolean): string | undefined {
-    const insert = welsh ? 'in Welsh ' : '';
-    const warningFormatRegex = welsh ? WELSH_WARNING_NOTICE_REGEX : ENGLISH_WARNING_NOTICE_REGEX;
-    if (warningNotice.length > MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH) {
-      return `Warning notice ${insert}must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`;
-    } else if (warningNotice.trim().length > 0 && !warningFormatRegex.test(warningNotice)) {
-      return `Warning notice ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses`;
-    }
-    return undefined;
+    return Object.keys(errors).length > 0
+      ? Object.fromEntries(Object.entries(errors).map(([key, message]) => [key, [message]]))
+      : undefined;
   }
 
   private toViewModel(
@@ -161,15 +153,6 @@ export class ServiceCentreWarningNoticeService {
   }
 
   private mapApiValidationErrors(apiErrors: Map<string, string>): Record<string, string[]> {
-    const errors: Record<string, string[]> = {};
-
-    for (const [key, value] of apiErrors) {
-      if (key === 'timestamp') {
-        continue;
-      }
-      errors[key] = [value];
-    }
-
-    return errors;
+    return toValidationErrorRecord(apiErrors);
   }
 }

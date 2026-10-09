@@ -5,6 +5,7 @@ import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { SaveServiceCentreContactDetailRequest } from '../../requests/types/SaveServiceCentreContactDetailRequest';
 import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
+import { isHttpStatusCode } from '../../utils/apiResponses';
 import {
   CONTACT_TYPE_REQUIRED_MESSAGE,
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
@@ -12,36 +13,27 @@ import {
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
-import { validateContactDetailsMethods } from '../../utils/contactDetailsValidation';
+import {
+  ContactApiFieldMapping,
+  ContactDescriptionTypeItem,
+  ContactFormErrors,
+  ContactFormValues,
+  ContactValidationError,
+  buildContactDescriptionTypeItems,
+  buildContactFormValues,
+  emptyContactFormValues,
+  mapContactApiValidationErrors,
+  parseSelectedContactMethods,
+  validateContactDetailsMethods,
+  validateContactExplanationFields,
+} from '../../utils/contactDetailsValidation';
 import { parseString } from '../../utils/valueParsers';
+import { ContactSubmitFlowOutcome, runContactWorkflow } from '../shared/ContactWorkflow';
 
-export type ServiceCentreContactFormValues = {
-  contactEmail: string;
-  contactExplanation: string;
-  contactExplanationCy: string;
-  contactMethods: string[];
-  contactTelephone: string;
-};
-
-export type ServiceCentreContactValidationError = {
-  href: string;
-  text: string;
-};
-
-export type ServiceCentreContactFormErrors = {
-  contactEmail?: string;
-  contactExplanation?: string;
-  contactExplanationCy?: string;
-  contactMethods?: string;
-  contactTelephone?: string;
-  contactType?: string;
-};
-
-export type ServiceCentreContactDescriptionTypeItem = {
-  value: string;
-  text: string;
-  selected?: boolean;
-};
+export type ServiceCentreContactFormValues = ContactFormValues;
+export type ServiceCentreContactValidationError = ContactValidationError;
+export type ServiceCentreContactFormErrors = ContactFormErrors;
+export type ServiceCentreContactDescriptionTypeItem = ContactDescriptionTypeItem;
 
 export type ServiceCentreContactFormHeading = 'Add contact details' | 'Edit contact details';
 
@@ -75,19 +67,7 @@ type ServiceCentreContactSubmitFlowOptions = {
   serviceCentreName: string;
 };
 
-export type ServiceCentreContactSubmitFlowOutcome =
-  | {
-      type: 'validation-error';
-      formViewModel: ServiceCentreContactFormViewModel;
-    }
-  | {
-      type: 'save-error';
-      status: HttpStatusCode;
-    }
-  | {
-      type: 'saved';
-      successPanelBody: string;
-    };
+export type ServiceCentreContactSubmitFlowOutcome = ContactSubmitFlowOutcome<ServiceCentreContactFormViewModel>;
 
 export class ServiceCentreContactService {
   public constructor(
@@ -112,7 +92,7 @@ export class ServiceCentreContactService {
       this.referenceDataApi.getContactDescriptionTypes(),
     ]);
 
-    if (typeof contactDetailsResponse === 'number') {
+    if (isHttpStatusCode(contactDetailsResponse)) {
       return contactDetailsResponse;
     }
 
@@ -140,7 +120,7 @@ export class ServiceCentreContactService {
     contactDetailId: string
   ): Promise<ServiceCentreContactDetail | undefined | HttpStatusCode> {
     const contactDetailsResponse = await this.serviceCentreApi.getServiceCentreContactDetails(serviceCentreId);
-    if (typeof contactDetailsResponse === 'number') {
+    if (isHttpStatusCode(contactDetailsResponse)) {
       return contactDetailsResponse;
     }
 
@@ -151,99 +131,45 @@ export class ServiceCentreContactService {
     selectedId?: string
   ): Promise<ServiceCentreContactDescriptionTypeItem[] | HttpStatusCode> {
     const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
-    if (typeof contactDescriptionTypesResponse === 'number') {
+    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
       return contactDescriptionTypesResponse;
     }
 
-    return [
-      { text: 'Select', value: '' },
-      ...contactDescriptionTypesResponse.map(type => ({
-        selected: selectedId === type.id,
-        text: type.name,
-        value: type.id,
-      })),
-    ];
+    return buildContactDescriptionTypeItems(contactDescriptionTypesResponse, selectedId);
   }
 
   public getEmptyFormValues(): ServiceCentreContactFormValues {
-    return {
-      contactEmail: '',
-      contactExplanation: '',
-      contactExplanationCy: '',
-      contactMethods: [],
-      contactTelephone: '',
-    };
+    return emptyContactFormValues();
   }
 
   public buildFormValues(contactDetail: ServiceCentreContactDetail): ServiceCentreContactFormValues {
-    const contactMethods = [contactDetail.email ? 'email' : null, contactDetail.phoneNumber ? 'phone' : null].filter(
-      (value): value is string => Boolean(value)
-    );
-
-    return {
-      contactEmail: contactDetail.email ?? '',
-      contactExplanation: contactDetail.explanation ?? '',
-      contactExplanationCy: contactDetail.explanationCy ?? '',
-      contactMethods,
-      contactTelephone: contactDetail.phoneNumber ?? '',
-    };
+    return buildContactFormValues(contactDetail);
   }
 
   public async submitContactDetailFlow(
     options: ServiceCentreContactSubmitFlowOptions
   ): Promise<ServiceCentreContactSubmitFlowOutcome> {
     const submission = this.validate(options.body, options.serviceCentreId);
-
-    if (submission.errorSummary.length) {
-      const contactDescriptionTypeItems = await this.getContactDescriptionTypeItems(submission.selectedContactTypeId);
-      if (typeof contactDescriptionTypeItems === 'number') {
-        return { status: contactDescriptionTypeItems, type: 'save-error' };
-      }
-
-      return {
-        formViewModel: this.buildValidationFormViewModel(options, submission, contactDescriptionTypeItems),
-        type: 'validation-error',
-      };
-    }
-
-    const saveResult = await this.saveContactDetail(
-      options.serviceCentreId,
-      submission.payload,
-      options.contactDetailId
-    );
-    if (saveResult instanceof Map) {
-      const contactDescriptionTypeItems = await this.getContactDescriptionTypeItems(submission.selectedContactTypeId);
-      if (typeof contactDescriptionTypeItems === 'number') {
-        return { status: contactDescriptionTypeItems, type: 'save-error' };
-      }
-
-      const backendErrors = this.mapApiValidationErrors(saveResult);
-      return {
-        formViewModel: this.buildValidationFormViewModel(
-          options,
-          {
-            ...submission,
-            errorSummary: backendErrors.errorSummary,
-            formErrors: {
-              ...submission.formErrors,
-              ...backendErrors.formErrors,
-            },
-          },
-          contactDescriptionTypeItems
-        ),
-        type: 'validation-error',
-      };
-    }
-
-    if (!saveResult || ![HttpStatusCode.Ok, HttpStatusCode.Created, HttpStatusCode.NoContent].includes(saveResult)) {
-      return { status: saveResult ?? HttpStatusCode.InternalServerError, type: 'save-error' };
-    }
-
-    const successPanelBody = await this.resolveContactTypeName(submission.payload.serviceCentreContactDescriptionId);
-    return {
-      successPanelBody,
-      type: 'saved',
-    };
+    return runContactWorkflow<
+      ServiceCentreContactSubmission,
+      ServiceCentreContactDescriptionTypeItem,
+      ServiceCentreContactFormViewModel
+    >({
+      buildValidationViewModel: (currentSubmission, items) =>
+        this.buildValidationFormViewModel(options, currentSubmission, items),
+      getContactDescriptionTypeItems: selectedId => this.getContactDescriptionTypeItems(selectedId),
+      mergeApiErrors: (currentSubmission, apiErrors) => {
+        const backendErrors = this.mapApiValidationErrors(apiErrors);
+        return {
+          ...currentSubmission,
+          errorSummary: backendErrors.errorSummary,
+          formErrors: { ...currentSubmission.formErrors, ...backendErrors.formErrors },
+        };
+      },
+      resolveSuccessPanelBody: () => this.resolveContactTypeName(submission.payload.serviceCentreContactDescriptionId),
+      save: () => this.saveContactDetail(options.serviceCentreId, submission.payload, options.contactDetailId),
+      submission,
+    });
   }
 
   public async deleteContactDetail(serviceCentreId: string, contactDetailId: string): Promise<HttpStatusCode> {
@@ -263,7 +189,7 @@ export class ServiceCentreContactService {
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
     const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
-    if (typeof contactDescriptionTypesResponse === 'number') {
+    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
       return 'Contact details';
     }
 
@@ -272,7 +198,7 @@ export class ServiceCentreContactService {
   }
 
   private validate(body: Record<string, unknown>, serviceCentreId: string): ServiceCentreContactSubmission {
-    const selectedContactMethods = [body['contact-methods']].flat().filter(Boolean) as string[];
+    const selectedContactMethods = parseSelectedContactMethods(body['contact-methods']);
     const selectedContactTypeId = parseString(body['contact-type']);
     const contactEmail = parseString(body['contact-email']);
     const contactTelephone = parseString(body['contact-telephone']);
@@ -295,7 +221,19 @@ export class ServiceCentreContactService {
 
     validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
-    this.validateContactExplanationFields(formValues, formErrors, errorSummary);
+    validateContactExplanationFields(formValues, formErrors, errorSummary, {
+      englishInvalidCharacters:
+        'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
+      englishPattern: ENGLISH_TEXT_REGEX,
+      englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+      englishTooLong: 'Explanation must be 250 characters or fewer',
+      maximumLength: MAX_EXPLANATION_LENGTH,
+      welshInvalidCharacters:
+        'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
+      welshPattern: WELSH_TEXT_REGEX,
+      welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
+      welshTooLong: 'Explanation in Welsh must be 250 characters or fewer',
+    });
 
     return {
       errorSummary,
@@ -311,45 +249,6 @@ export class ServiceCentreContactService {
       },
       selectedContactTypeId,
     };
-  }
-
-  private validateContactExplanationFields(
-    formValues: ServiceCentreContactFormValues,
-    formErrors: ServiceCentreContactFormErrors,
-    errorSummary: ServiceCentreContactValidationError[]
-  ) {
-    const contactExplanationValidity = this.validateContactExplanation(formValues.contactExplanation, false);
-    if (contactExplanationValidity) {
-      formErrors.contactExplanation = contactExplanationValidity;
-      errorSummary.push({ href: '#contact-explanation', text: contactExplanationValidity });
-    }
-
-    const contactExplanationCyValidity = this.validateContactExplanation(formValues.contactExplanationCy, true);
-    if (contactExplanationCyValidity) {
-      formErrors.contactExplanationCy = contactExplanationCyValidity;
-      errorSummary.push({ href: '#contact-explanation-cy', text: contactExplanationCyValidity });
-    }
-
-    if (formValues.contactExplanation.length > 0 && formValues.contactExplanationCy.length === 0) {
-      formErrors.contactExplanationCy = WELSH_TRANSLATION_REQUIRED_MESSAGE;
-      errorSummary.push({ href: '#contact-explanation-cy', text: formErrors.contactExplanationCy });
-    }
-
-    if (formValues.contactExplanationCy.length > 0 && formValues.contactExplanation.length === 0) {
-      formErrors.contactExplanation = ENGLISH_TRANSLATION_REQUIRED_MESSAGE;
-      errorSummary.push({ href: '#contact-explanation', text: formErrors.contactExplanation });
-    }
-  }
-
-  private validateContactExplanation(contactExplanation: string, welsh: boolean) {
-    const insert = welsh ? 'in Welsh ' : '';
-    const pattern = welsh ? WELSH_TEXT_REGEX : ENGLISH_TEXT_REGEX;
-    if (contactExplanation.length > MAX_EXPLANATION_LENGTH) {
-      return `Explanation ${insert}must be 250 characters or fewer`;
-    } else if (contactExplanation && !pattern.test(contactExplanation)) {
-      return `Explanation ${insert}must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs`;
-    }
-    return undefined;
   }
 
   private async saveContactDetail(
@@ -387,9 +286,7 @@ export class ServiceCentreContactService {
     errorSummary: ServiceCentreContactValidationError[];
     formErrors: ServiceCentreContactFormErrors;
   } {
-    const formErrors: ServiceCentreContactFormErrors = {};
-    const errorSummary: ServiceCentreContactValidationError[] = [];
-    const fieldMappings: Record<string, { formField: keyof ServiceCentreContactFormErrors; href: string }> = {
+    const fieldMappings: Record<string, ContactApiFieldMapping<ServiceCentreContactFormErrors>> = {
       serviceCentreContactDescriptionId: { formField: 'contactType', href: '#contact-type' },
       courtContactDescriptionId: { formField: 'contactType', href: '#contact-type' },
       email: { formField: 'contactEmail', href: '#contact-email' },
@@ -398,20 +295,6 @@ export class ServiceCentreContactService {
       phoneNumber: { formField: 'contactTelephone', href: '#contact-telephone' },
     };
 
-    for (const [field, message] of apiErrors.entries()) {
-      if (field.toLowerCase() === 'timestamp') {
-        continue;
-      }
-      const mapping = fieldMappings[field];
-      if (!mapping) {
-        errorSummary.push({ href: '#main-content', text: message });
-        continue;
-      }
-
-      formErrors[mapping.formField] = message;
-      errorSummary.push({ href: mapping.href, text: message });
-    }
-
-    return { errorSummary, formErrors };
+    return mapContactApiValidationErrors(apiErrors, fieldMappings);
   }
 }
