@@ -14,6 +14,7 @@ export type HomePageTableCell = {
 export type HomePageFilters = {
   activeTab?: 'courts' | 'favourites';
   favouritesPageNumber?: number;
+  focusTarget?: string;
   includeClosed: boolean;
   onlyServiceCentres: boolean;
   pageNumber: number;
@@ -72,6 +73,7 @@ export type HomePageViewModel = {
   favouritesErrorMessage?: string;
   favouritesPagination: HomePagePagination;
   favouritesResultsMessage: string;
+  pageHeading: string;
   pageTitle: string;
   partialCourtNameError?: string;
   pagination: HomePagePagination;

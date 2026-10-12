@@ -2438,13 +2438,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:1.14.5":
-  version: 1.14.5
-  resolution: "@grpc/grpc-js@npm:1.14.5"
+"@grpc/grpc-js@npm:1.14.6":
+  version: 1.14.6
+  resolution: "@grpc/grpc-js@npm:1.14.6"
   dependencies:
     "@grpc/proto-loader": "npm:^0.8.0"
     "@js-sdsl/ordered-map": "npm:^4.4.2"
-  checksum: 10/3be7fe0105c94e83e8a18b895fd534290cf3a26712940e95e0149b869da775a59551dafd60fd6c17213d3032b83fbfa64c6c2c9a0f569f6ef5968607174b7d79
+  checksum: 10/cd1bf7fc031139f383fc7d6b45238608144ab673684602705537242023b2c51eb3382ae0b76c8d5533724848e8e63a196874ee74f05aff8b60dc2fe9aedf84a2
   languageName: node
   linkType: hard
 
@@ -5798,10 +5798,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:4.17.25":
-  version: 4.17.25
-  resolution: "@types/lodash@npm:4.17.25"
-  checksum: 10/f786e05664439cc8d327fd97c62c060d81b3c4ed52127d01fbc926139e1a669c1554bf3cd0dbb43f8fcc7d9b5c6c23c543cc36de8dc815c9f289ea852b26ebd6
+"@types/lodash@npm:4.17.26":
+  version: 4.17.26
+  resolution: "@types/lodash@npm:4.17.26"
+  checksum: 10/49620ccc6e8c03e0f7589be3d21ead40409fb6a2c4808170e57f35cd4523d146ebf6ecbd97a266d767a71e98417fce215740690f4f131be060d1a534cac09b84
   languageName: node
   linkType: hard
 
@@ -9821,9 +9821,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:29.16.6":
-  version: 29.16.6
-  resolution: "eslint-plugin-jest@npm:29.16.6"
+"eslint-plugin-jest@npm:29.16.11":
+  version: 29.16.11
+  resolution: "eslint-plugin-jest@npm:29.16.11"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.0.0"
   peerDependencies:
@@ -9838,7 +9838,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/080eb1b22e583c06ac881963f7cf8aa52448ef015d743fd7fe519853ff7a6ebac05d55001f64e4d7298af006d5d7e636186e83a6850695b3f901d7e62acfe77b
+  checksum: 10/1efe501224f60bb8636a51e7d788af5745bd8b9076f5d051fb43d401990c4db78b6649e6a9c2bc91358592ba0e7ec2e6aeac0f8e78ff1afee1ee1e1cafb6811f
   languageName: node
   linkType: hard
 
@@ -10336,7 +10336,7 @@ __metadata:
     "@types/express": "npm:5.0.6"
     "@types/govuk-frontend": "npm:5.12.0"
     "@types/jest": "npm:30.0.0"
-    "@types/lodash": "npm:4.17.25"
+    "@types/lodash": "npm:4.17.26"
     "@types/moment-timezone": "npm:0.5.30"
     "@types/multer": "npm:2.3.0"
     "@types/node": "npm:22.20.5"
@@ -10363,7 +10363,7 @@ __metadata:
     eslint: "npm:9.39.5"
     eslint-config-prettier: "npm:10.1.8"
     eslint-plugin-import: "npm:2.32.0"
-    eslint-plugin-jest: "npm:29.16.6"
+    eslint-plugin-jest: "npm:29.16.11"
     express: "npm:5.2.1"
     express-openid-connect: "npm:3.4.0"
     express-rate-limit: "npm:8.7.1"
