@@ -46,6 +46,38 @@ describe('Home View', () => {
     expect(html).toContain('data-favourite-focus-fallback="favourites"');
   });
 
+  test('renders the search results title as the main heading', () => {
+    const html = env.render('home.njk', {
+      courtTableHead: [],
+      courtTableRows: [],
+      errorSummary: [],
+      favouriteTableHead: [],
+      favouriteTableRows: [],
+      favouritesPagination: { currentPage: 0, items: [], totalPages: 0 },
+      favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
+      filters: {
+        activeTab: 'courts',
+        favouritesPageNumber: 0,
+        includeClosed: false,
+        onlyServiceCentres: false,
+        pageNumber: 0,
+        pageSize: 25,
+        partialCourtName: 'London',
+        regionId: '',
+        sortBy: '',
+        sortOrder: 'asc',
+      },
+      includeStatusColumn: false,
+      pagePath: '/',
+      pageTitle: 'Search results: Courts, tribunals and service centres',
+      pagination: { currentPage: 0, items: [], totalPages: 0 },
+      regionOptions: [{ selected: true, text: 'All regions', value: '' }],
+      resultsMessage: 'No courts, tribunals or service centres found.',
+    });
+
+    expect(html).toContain('<h1 class="govuk-heading-xl">Search results: Courts, tribunals and service centres</h1>');
+  });
+
   test('renders error summary and pagination when provided', () => {
     const html = env.render('home.njk', {
       courtTableHead: [{ text: 'Name' }, { text: 'Actions' }],
