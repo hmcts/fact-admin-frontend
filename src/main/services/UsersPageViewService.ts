@@ -1,17 +1,13 @@
 import { PagedUsers } from '../schemas/userListSchema';
 import type { User } from '../schemas/userSchema';
-import {
-  DEFAULT_PAGE_NUMBER,
-  DEFAULT_PAGE_SIZE,
-  SORT_ICON_PATHS,
-  UK_TIME_ZONE,
-} from '../utils/constants/messageConstants';
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, UK_TIME_ZONE } from '../utils/constants/messageConstants';
+import { buildPagination as buildSharedPagination } from '../utils/pagination';
+import { buildSortIconSvg } from '../utils/viewHelpers';
 
 import {
   UsersPageFilters,
   UsersPageHrefOverrides,
   UsersPagePagination,
-  UsersPagePaginationLink,
   UsersPageTableCell,
   UsersPageTableHeadCell,
 } from './types/UsersPage.types';
@@ -35,11 +31,7 @@ export class UsersPageViewService {
     const currentPage = usersPage.page.number ?? filters.pageNumber;
 
     return {
-      items: this.buildPaginationItems(totalPages, currentPage, filters),
-      next:
-        currentPage < totalPages - 1 ? { href: this.buildHref(filters, { pageNumber: currentPage + 1 }) } : undefined,
-      previous: currentPage > 0 ? { href: this.buildHref(filters, { pageNumber: currentPage - 1 }) } : undefined,
-      totalPages,
+      ...buildSharedPagination(totalPages, currentPage, pageNumber => this.buildHref(filters, { pageNumber })),
     };
   }
 
@@ -63,63 +55,6 @@ export class UsersPageViewService {
     return `Showing ${(usersPage.page.number ?? DEFAULT_PAGE_NUMBER) * (usersPage.page.size ?? DEFAULT_PAGE_SIZE) + 1} to ${(usersPage.page.number ?? DEFAULT_PAGE_NUMBER) * (usersPage.page.size ?? DEFAULT_PAGE_SIZE) + usersPage.content.length} of ${totalElements} users`;
   }
 
-  private buildPaginationItems(
-    totalPages: number,
-    currentPage: number,
-    filters: UsersPageFilters
-  ): UsersPagePaginationLink[] {
-    if (totalPages <= 1) {
-      return [];
-    }
-
-    return this.buildPaginationItemsFromIndexes(
-      this.getVisiblePageIndexes(totalPages, currentPage),
-      currentPage,
-      filters
-    );
-  }
-
-  private getVisiblePageIndexes(totalPages: number, currentPage: number): number[] {
-    const pageIndexes = new Set<number>([0, totalPages - 1, currentPage]);
-
-    if (currentPage > 0) {
-      pageIndexes.add(currentPage - 1);
-    }
-    if (currentPage < totalPages - 1) {
-      pageIndexes.add(currentPage + 1);
-    }
-
-    return Array.from(pageIndexes)
-      .filter(index => index >= 0 && index < totalPages)
-      .sort((left, right) => left - right);
-  }
-
-  private buildPaginationItemsFromIndexes(
-    pageIndexes: number[],
-    currentPage: number,
-    filters: UsersPageFilters
-  ): UsersPagePaginationLink[] {
-    const items: UsersPagePaginationLink[] = [];
-
-    pageIndexes.forEach((pageIndex, index) => {
-      if (index > 0 && pageIndex - pageIndexes[index - 1] > 1) {
-        items.push({
-          ellipsis: true,
-          href: '',
-          number: -1,
-        });
-      }
-
-      items.push({
-        current: pageIndex === currentPage,
-        href: this.buildHref(filters, { pageNumber: pageIndex }),
-        number: pageIndex + 1,
-      });
-    });
-
-    return items;
-  }
-
   private buildSortableHeadItem(label: string, filters: UsersPageFilters): UsersPageTableHeadCell {
     const isCurrentSort = filters.sortBy === 'lastLogin';
     const sortOrder = filters.sortOrder === 'desc' ? 'descending' : 'ascending';
@@ -134,7 +69,7 @@ export class UsersPageViewService {
         pageNumber: DEFAULT_PAGE_NUMBER,
         sortBy: 'lastLogin',
         sortOrder: isCurrentSort && filters.sortOrder === 'asc' ? 'desc' : 'asc',
-      })}">${label}${this.getSortIconSvg(ariaSort)}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
+      })}">${label}${buildSortIconSvg(ariaSort)}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
     };
   }
 
@@ -158,14 +93,6 @@ export class UsersPageViewService {
     query.set('pageNumber', pageNumber.toString());
 
     return `/users?${query.toString()}`;
-  }
-
-  private getSortIconSvg(ariaSort: 'ascending' | 'descending' | 'none'): string {
-    return [
-      '<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">',
-      SORT_ICON_PATHS[ariaSort],
-      '</svg>',
-    ].join('');
   }
 
   private formatDateTime(date: string): string {

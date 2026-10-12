@@ -1,4 +1,8 @@
-import { isValidPostcode, validatePostcodeField } from '../../../main/utils/addressValidation';
+import {
+  isValidPostcode,
+  validateCoreAddressFields,
+  validatePostcodeField,
+} from '../../../main/utils/addressValidation';
 import { POSTCODE_ERROR_MESSAGES } from '../../../main/utils/constants/messageConstants';
 
 describe('AddressValidation', () => {
@@ -11,5 +15,13 @@ describe('AddressValidation', () => {
     expect(validatePostcodeField('IM1 1AA')).toBe(POSTCODE_ERROR_MESSAGES.isleOfManPostcode);
     expect(isValidPostcode('SW1A 1AA')).toBe(true);
     expect(isValidPostcode('GY1 1AA')).toBe(false);
+  });
+
+  test('validates common address fields', () => {
+    expect(validateCoreAddressFields({})).toEqual({
+      addressLine1: ['Enter address line 1, typically the building and street'],
+      postcode: ['Enter a postcode'],
+      townCity: ['Enter a town or city'],
+    });
   });
 });
