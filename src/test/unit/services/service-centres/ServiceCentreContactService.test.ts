@@ -393,6 +393,7 @@ describe('ServiceCentreContactService', () => {
       new Map([
         ['email', 'Email already exists'],
         ['unknownField', 'Unexpected error'],
+        ['timestamp', '2026-10-07T11:08:00Z'],
       ]) as never
     );
     jest
@@ -419,6 +420,10 @@ describe('ServiceCentreContactService', () => {
 
     expect(result.formViewModel.formErrors.contactEmail).toBe('Email already exists');
     expect(result.formViewModel.errorSummary).toContainEqual({ href: '#main-content', text: 'Unexpected error' });
+    expect(result.formViewModel.errorSummary).not.toContainEqual({
+      href: '#main-content',
+      text: '2026-10-07T11:08:00Z',
+    });
   });
 
   test('submitContactDetailFlow returns save-error when type lookup fails after backend validation map', async () => {

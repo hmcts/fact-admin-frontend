@@ -5,6 +5,7 @@ import request from 'supertest';
 import { app } from '../../../main/app';
 import { CourtApi } from '../../../main/requests/CourtApi';
 import { ReferenceDataApi } from '../../../main/requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -124,6 +125,7 @@ describe('General page', () => {
       { id: '22222222-2222-4222-8222-222222222222', name: 'South East' },
     ] as never);
     stub(CourtApi.prototype, 'getCourtByName').resolves(HttpStatusCode.NotFound);
+    stub(ServiceCentreApi.prototype, 'getServiceCentreByName').resolves(HttpStatusCode.NotFound);
     const updateCourtStub = stub(CourtApi.prototype, 'updateCourt').resolves({
       id: COURT_ID,
       name: 'Updated Reading Crown Court',

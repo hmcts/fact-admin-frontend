@@ -9,6 +9,7 @@ import {
   FACILITY_LABELS,
   PUBLIC_FRONTEND_URL,
 } from '../utils/constants/messageConstants';
+import { serialiseCsv } from '../utils/csv';
 
 export type CsvDownload = {
   csv: string;
@@ -43,7 +44,7 @@ export class DownloadCsvService {
   public buildCsv(locations: AllLocationDetails[]): string {
     const rows = [CSV_HEADERS, ...locations.map(location => this.buildLocationRow(location))];
 
-    return rows.map(row => row.map((value: string) => this.escapeCsvValue(value)).join(',')).join('\n');
+    return serialiseCsv(rows);
   }
 
   /**
@@ -290,19 +291,6 @@ export class DownloadCsvService {
     const year = parts.find(part => part.type === 'year')?.value;
 
     return `${year}-${month}-${day}`;
-  }
-
-  /**
-   * Escapes a CSV value when it contains commas, quotes, or new lines.
-   */
-  private escapeCsvValue(value: string): string {
-    const normalizedValue = value.replaceAll('\r\n', '\n');
-
-    if (!/[",\n]/.test(normalizedValue)) {
-      return normalizedValue;
-    }
-
-    return `"${normalizedValue.replaceAll('"', '""')}"`;
   }
 
   /**

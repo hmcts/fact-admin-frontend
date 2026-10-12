@@ -3,6 +3,11 @@ import { HttpStatusCode } from 'axios';
 import { CourtApi } from '../../requests/CourtApi';
 import { CourtAreaOfLawSelection } from '../../schemas/areaOfLawSchema';
 import { AREA_OF_LAW_VALIDATION_MESSAGE } from '../../utils/constants/messageConstants';
+import {
+  BaseCasesHeardService,
+  BaseSaveCasesHeardResult,
+  CasesHeardViewContext,
+} from '../shared/BaseCasesHeardService';
 
 export type CasesHeardViewModel = {
   areasOfLawError?: string;
@@ -24,143 +29,43 @@ export type CasesHeardSuccessViewModel = {
   courtName: string;
 };
 
-export type SaveCasesHeardResult =
-  | { type: 'success'; viewModel: CasesHeardSuccessViewModel }
-  | { status: HttpStatusCode; type: 'status' }
-  | { type: 'validation_error'; viewModel: CasesHeardViewModel };
+export type SaveCasesHeardResult = BaseSaveCasesHeardResult<CasesHeardViewModel, CasesHeardSuccessViewModel>;
 
-/**
- * Builds and validates the cases-heard page state independently of HTTP concerns.
- */
-export class CourtCasesHeardService {
-  public constructor(private readonly courtApi = new CourtApi()) {}
-
-  /**
-   * Normalises the incoming checkbox values into a string array.
-   */
-  public getSelectedAreasOfLaw(value: unknown): string[] {
-    if (Array.isArray(value)) {
-      return value.filter((selectedValue): selectedValue is string => typeof selectedValue === 'string');
-    }
-
-    return typeof value === 'string' ? value.split(',') : [];
+export class CourtCasesHeardService extends BaseCasesHeardService<CasesHeardViewModel, CasesHeardSuccessViewModel> {
+  public constructor(private readonly courtApi = new CourtApi()) {
+    super(AREA_OF_LAW_VALIDATION_MESSAGE);
   }
 
-  /**
-   * Applies the minimum-one validation rule for the page.
-   */
-  public validateSelectedAreasOfLaw(selectedAreasOfLaw: string[]): string | undefined {
-    return selectedAreasOfLaw.length === 0 ? AREA_OF_LAW_VALIDATION_MESSAGE : undefined;
+  protected getSubject(courtId: string): Promise<{ name: string } | HttpStatusCode> {
+    return this.courtApi.getCourtById(courtId);
   }
 
-  /**
-   * Loads the court and areas-of-law data needed to render the form.
-   */
-  public async getCasesHeardPage(
-    courtId: string,
-    selectedAreasOfLaw?: string[],
-    areasOfLawError?: string
-  ): Promise<CasesHeardViewModel | HttpStatusCode> {
-    const courtResponse = await this.courtApi.getCourtById(courtId);
-
-    if (this.isHttpStatusCode(courtResponse)) {
-      return courtResponse;
-    }
-
-    return this.getCasesHeardViewModel(courtId, courtResponse.name, selectedAreasOfLaw, areasOfLawError);
+  protected getAreasOfLaw(courtId: string): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
+    return this.courtApi.getCourtAreasOfLaw(courtId);
   }
 
-  /**
-   * Validates and saves the cases-heard selection for a court.
-   */
-  public async saveCasesHeard(courtId: string, selectedAreasOfLaw: string[]): Promise<SaveCasesHeardResult> {
-    const courtResponse = await this.courtApi.getCourtById(courtId);
-
-    if (this.isHttpStatusCode(courtResponse)) {
-      return { status: courtResponse, type: 'status' };
-    }
-
-    const areasOfLawError = this.validateSelectedAreasOfLaw(selectedAreasOfLaw);
-
-    if (areasOfLawError) {
-      const viewModel = await this.getCasesHeardViewModel(
-        courtId,
-        courtResponse.name,
-        selectedAreasOfLaw,
-        areasOfLawError
-      );
-
-      return this.isHttpStatusCode(viewModel)
-        ? { status: viewModel, type: 'status' }
-        : { type: 'validation_error', viewModel };
-    }
-
-    const updateResponse = await this.courtApi.updateCourtAreasOfLaw({
-      areasOfLaw: selectedAreasOfLaw,
-      courtId,
-    });
-
-    return updateResponse >= HttpStatusCode.Ok && updateResponse < HttpStatusCode.MultipleChoices
-      ? {
-          type: 'success',
-          viewModel: {
-            courtId,
-            courtName: courtResponse.name,
-          },
-        }
-      : { status: updateResponse, type: 'status' };
+  protected updateAreasOfLaw(courtId: string, selectedAreasOfLaw: string[]): Promise<HttpStatusCode> {
+    return this.courtApi.updateCourtAreasOfLaw({ areasOfLaw: selectedAreasOfLaw, courtId });
   }
 
-  /**
-   * Builds the full cases-heard view model from the court areas-of-law response.
-   */
-  private async getCasesHeardViewModel(
-    courtId: string,
-    courtName: string,
-    selectedAreasOfLaw?: string[],
-    areasOfLawError?: string
-  ): Promise<CasesHeardViewModel | HttpStatusCode> {
-    const courtAreasOfLawResponse = await this.courtApi.getCourtAreasOfLaw(courtId);
-
-    if (this.isHttpStatusCode(courtAreasOfLawResponse)) {
-      return courtAreasOfLawResponse;
-    }
-
-    const selectedAreasOfLawSet = selectedAreasOfLaw === undefined ? null : new Set(selectedAreasOfLaw);
-    const areasOfLawItems = courtAreasOfLawResponse.map((selection: CourtAreaOfLawSelection) => {
-      const value = selection.areaOfLawType.id || selection.areaOfLawType.name;
-
-      return {
-        checked: selectedAreasOfLawSet ? selectedAreasOfLawSet.has(value) : selection.selected,
-        text: selection.areaOfLawType.name,
-        value,
-      };
-    });
-    const sortedAreasOfLawItems = [...areasOfLawItems].sort((left, right) => left.text.localeCompare(right.text));
-    // Split the checkbox list evenly for the two-column layout in the page template.
-    const midpoint = Math.ceil(sortedAreasOfLawItems.length / 2);
-
-    const adoption = sortedAreasOfLawItems.find(item => item.text === 'Adoption' && item.checked)?.value;
-    const children = sortedAreasOfLawItems.find(item => item.text === 'Children' && item.checked)?.value;
-    const divorce = sortedAreasOfLawItems.find(item => item.text === 'Divorce' && item.checked)?.value;
-
+  protected buildViewModel(context: CasesHeardViewContext): CasesHeardViewModel {
     return {
-      areasOfLawError,
-      courtId,
-      courtName,
-      errorSummary: areasOfLawError ? [{ href: '#areas-of-law-group', text: areasOfLawError }] : [],
-      leftColumnAreasOfLawItems: sortedAreasOfLawItems.slice(0, midpoint),
-      pageTitle: areasOfLawError ? `Error: Cases heard - ${courtName}` : `Cases heard - ${courtName}`,
-      rightColumnAreasOfLawItems: sortedAreasOfLawItems.slice(midpoint),
+      areasOfLawError: context.error,
+      courtId: context.id,
+      courtName: context.name,
+      errorSummary: context.error ? [{ href: '#areas-of-law-group', text: context.error }] : [],
+      leftColumnAreasOfLawItems: context.leftItems,
+      pageTitle: context.error ? `Error: Cases heard - ${context.name}` : `Cases heard - ${context.name}`,
+      rightColumnAreasOfLawItems: context.rightItems,
       confirmRemovalAreasOfLaw: {
-        adoption,
-        children,
-        divorce,
+        adoption: context.allItems.find(item => item.text === 'Adoption' && item.checked)?.value,
+        children: context.allItems.find(item => item.text === 'Children' && item.checked)?.value,
+        divorce: context.allItems.find(item => item.text === 'Divorce' && item.checked)?.value,
       },
     };
   }
 
-  private isHttpStatusCode(response: unknown): response is HttpStatusCode {
-    return typeof response === 'number';
+  protected buildSuccessViewModel(courtId: string, courtName: string): CasesHeardSuccessViewModel {
+    return { courtId, courtName };
   }
 }
