@@ -180,6 +180,8 @@
 
 // Wide tables scroll within their own region so the page itself never scrolls horizontally on reflow.
 .app-table-scroll {
+  // Contain absolutely positioned visually-hidden text within the scroll region
+  position: relative;
   max-width: 100%;
   overflow-x: auto;
   @include govuk-frontend.govuk-responsive-margin(6, 'bottom');
