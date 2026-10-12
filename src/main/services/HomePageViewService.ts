@@ -134,13 +134,17 @@ export class HomePageViewService {
    */
   public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean, filters?: HomePageFilters): string {
     const titlePrefix = hasValidationErrors ? 'Error: ' : '';
-    const baseTitle = this.hasActiveSearchFilters(filters) ? HOME_PAGE_SEARCH_RESULTS_TITLE : HOME_PAGE_TITLE;
+    const baseTitle = this.buildPageHeading(filters);
 
     if ((courtsPage.page.totalPages ?? 0) > 1) {
       return `${titlePrefix}${baseTitle} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
     }
 
     return `${titlePrefix}${baseTitle}`;
+  }
+
+  public buildPageHeading(filters?: HomePageFilters): string {
+    return this.hasActiveSearchFilters(filters) ? HOME_PAGE_SEARCH_RESULTS_TITLE : HOME_PAGE_TITLE;
   }
 
   /**

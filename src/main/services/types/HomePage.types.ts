@@ -73,6 +73,7 @@ export type HomePageViewModel = {
   favouritesErrorMessage?: string;
   favouritesPagination: HomePagePagination;
   favouritesResultsMessage: string;
+  pageHeading: string;
   pageTitle: string;
   partialCourtNameError?: string;
   pagination: HomePagePagination;

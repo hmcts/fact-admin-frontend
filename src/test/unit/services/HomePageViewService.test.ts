@@ -406,7 +406,7 @@ describe('HomePageViewService', () => {
     );
   });
 
-  test('keeps the error prefix and pagination suffix on the search results title', () => {
+  test('keeps the error prefix and pagination suffix only on the browser title', () => {
     const page = {
       content: [court],
       page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
@@ -415,6 +415,10 @@ describe('HomePageViewService', () => {
     expect(service.buildPageTitle(page, true, { ...filters, partialCourtName: 'london' })).toBe(
       'Error: Search results: Courts, tribunals and service centres (page 2 of 2)'
     );
+    expect(service.buildPageHeading({ ...filters, partialCourtName: 'london' })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageHeading(filters)).toBe('Courts, tribunals and service centres');
   });
 
   test('treats whitespace-only search filters as inactive', () => {

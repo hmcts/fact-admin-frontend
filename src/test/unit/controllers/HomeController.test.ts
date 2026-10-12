@@ -47,6 +47,7 @@ describe('HomeController', () => {
         items: [],
         totalPages: 0,
       },
+      pageHeading: 'Courts, tribunals and service centres',
       pageTitle: 'Courts, tribunals and service centres',
       partialCourtNameError: undefined,
       regionOptions: [],

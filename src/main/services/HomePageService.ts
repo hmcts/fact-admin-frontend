@@ -95,6 +95,7 @@ export class HomePageService {
       favouritesResultsMessage: this.homePageViewService.buildFavouritesResultsMessage(resolvedFavourites.page),
       filters: effectiveFilters,
       includeStatusColumn: filters.includeClosed,
+      pageHeading: this.homePageViewService.buildPageHeading(effectiveFilters),
       pageTitle:
         effectiveFilters.activeTab === 'favourites'
           ? this.homePageViewService.buildFavouritesPageTitle(resolvedFavourites.page)
