@@ -103,7 +103,7 @@ test.describe(
           await homePage.addFavourite(court.name);
           await expect(homePage.page).toHaveURL(/partialCourtName=.*#courts$/);
           await homePage.expectFavouriteButtonState(court.name, true);
-          await homePage.expectFavouriteStarAppearance(court.name, true);
+          await homePage.expectFavouriteStarAppearance(court.name, true, false, true);
           await homePage.expectFavouriteTooltip(court.name, true);
 
           await homePage.addFavourite(serviceCentre.name);

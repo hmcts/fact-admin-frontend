@@ -5,6 +5,7 @@ import * as gds from 'govuk-frontend';
 
 import { initDisplayedElementFilters } from './displayedElementFilter';
 import { initFactHeaderSignOutLink } from './factHeaderSignOut';
+import { initFocusRestore } from './focusRestore';
 import { initLoadingRedirects } from './loadingRedirect';
 import { initProfessionalInformationRepeatableFields } from './professionalInformation';
 import { initTableSortButtons } from './tableSort';
@@ -19,3 +20,4 @@ initProfessionalInformationRepeatableFields();
 initFactHeaderSignOutLink();
 initTableSortButtons();
 initTimeoutDialog();
+initFocusRestore();

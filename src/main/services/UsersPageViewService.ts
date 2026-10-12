@@ -72,7 +72,7 @@ export class UsersPageViewService {
           sortBy: 'lastLogin',
           sortOrder: isCurrentSort && filters.sortOrder === 'asc' ? 'desc' : 'asc',
         }
-      )}">${label}${buildSortIconSvg(ariaSort)}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></button>`,
+      )}" data-focus-restore="sort-lastLogin">${label}${buildSortIconSvg(ariaSort)}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></button>`,
     };
   }
 

@@ -120,7 +120,7 @@ describe('UsersPageService', () => {
     expect(viewModel.userTableHead[2]).toEqual({
       attributes: { 'aria-sort': 'descending' },
       html: expect.stringMatching(
-        /<button type="button" class="table-sort-button" data-table-sort-key="lastLogin" data-table-sort-url=".*sortOrder=asc.*">.*sort ascending.*<\/button>/
+        /<button type="button" class="table-sort-button" data-table-sort-key="lastLogin" data-table-sort-url=".*sortOrder=asc.*" data-focus-restore="sort-lastLogin">.*sort ascending.*<\/button>/
       ),
     });
   });
