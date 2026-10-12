@@ -158,6 +158,7 @@ describe('Authentication routing', () => {
         sortOrder: 'asc',
       },
       includeStatusColumn: false,
+      pageHeading: 'Courts, tribunals and service centres',
       pageTitle: 'Courts, tribunals and service centres',
       pagination: { currentPage: 0, items: [], totalPages: 0 },
       regionOptions: [],

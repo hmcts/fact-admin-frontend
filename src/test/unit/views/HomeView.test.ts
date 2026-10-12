@@ -24,6 +24,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
+      pageHeading: 'Courts, tribunals and service centres',
       pageTitle: 'Courts, tribunals and service centres',
       pagination: {
         currentPage: 0,
@@ -37,12 +38,52 @@ describe('Home View', () => {
 
     expect(html).toContain('Courts, tribunals and service centres');
     expect(html).toMatch(/<h2[^>]*>Filters<\/h2>/);
+    expect(html).toContain('<h1 class="govuk-heading-xl">Courts, tribunals and service centres</h1>');
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
     expect(html).toContain('Search courts, tribunals and service centres');
     expect(html).toContain('Only show service centres');
     expect(html).toContain('No courts, tribunals or service centres found.');
     expect(html).toContain('No courts, tribunals or service centres match the current filters.');
+    expect(html).toContain('data-favourite-focus-fallback="courts"');
+    expect(html).toContain('data-favourite-focus-fallback="favourites"');
+  });
+
+  test.each([
+    ['Courts, tribunals and service centres', ''],
+    ['Search results: Courts, tribunals and service centres', 'London'],
+  ])('renders "%s" as the main heading without browser title pagination', (pageHeading, partialCourtName) => {
+    const html = env.render('home.njk', {
+      courtTableHead: [],
+      courtTableRows: [],
+      errorSummary: [],
+      favouriteTableHead: [],
+      favouriteTableRows: [],
+      favouritesPagination: { currentPage: 0, items: [], totalPages: 0 },
+      favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
+      filters: {
+        activeTab: 'courts',
+        favouritesPageNumber: 0,
+        includeClosed: false,
+        onlyServiceCentres: false,
+        pageNumber: 0,
+        pageSize: 25,
+        partialCourtName,
+        regionId: '',
+        sortBy: '',
+        sortOrder: 'asc',
+      },
+      includeStatusColumn: false,
+      pagePath: '/',
+      pageHeading,
+      pageTitle: `${pageHeading} (page 1 of 7)`,
+      pagination: { currentPage: 0, items: [], totalPages: 0 },
+      regionOptions: [{ selected: true, text: 'All regions', value: '' }],
+      resultsMessage: 'No courts, tribunals or service centres found.',
+    });
+
+    expect(html).toContain(`<h1 class="govuk-heading-xl">${pageHeading}</h1>`);
+    expect(html).toMatch(new RegExp(`<title>\\s*${pageHeading} \\(page 1 of 7\\)\\s*</title>`));
   });
 
   test('renders error summary and pagination when provided', () => {
@@ -69,6 +110,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
+      pageHeading: 'Search results: Courts, tribunals and service centres',
       pageTitle: 'Courts, tribunals and service centres',
       pagination: {
         currentPage: 0,
@@ -117,6 +159,7 @@ describe('Home View', () => {
       },
       includeStatusColumn: false,
       pagePath: '/',
+      pageHeading: 'Courts, tribunals and service centres',
       pageTitle: 'Favourites',
       pagination: { currentPage: 0, items: [], totalPages: 0 },
       regionOptions: [],

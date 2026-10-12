@@ -14,7 +14,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">Courts, tribunals and service centres</h1>
+      <h1 class="govuk-heading-xl">{{ pageHeading }}</h1>
 
       {% if errorSummary.length %}
         {{ govukErrorSummary({
@@ -103,7 +103,7 @@
           </div>
         </form>
 
-        <p class="govuk-body">{{ resultsMessage }}</p>
+        <p class="govuk-body" data-favourite-focus-fallback="courts" tabindex="-1">{{ resultsMessage }}</p>
         {% if courtTableRows.length %}
           {{ appTable({
             classes: "homepage-courts-table",
@@ -129,7 +129,7 @@
         {% if favouritesErrorMessage %}
           <p class="govuk-error-message">{{ favouritesErrorMessage }}</p>
         {% else %}
-          <p class="govuk-body">{{ favouritesResultsMessage }}</p>
+          <p class="govuk-body" data-favourite-focus-fallback="favourites" tabindex="-1">{{ favouritesResultsMessage }}</p>
           {% if favouriteTableRows.length %}
             {{ appTable({
               classes: "homepage-courts-table homepage-favourites-table",

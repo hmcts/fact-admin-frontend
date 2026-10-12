@@ -44,6 +44,7 @@ export class HomePageFiltersService {
     return {
       activeTab: query.tab === 'favourites' ? 'favourites' : 'courts',
       favouritesPageNumber: parseClampedNumber(query.favouritesPageNumber, DEFAULT_PAGE_NUMBER, MAX_PAGE_PARAM),
+      focusTarget: parseOptionalString(query.focus),
       includeClosed: query.includeClosed === 'true' || query.includeClosed === 'on',
       onlyServiceCentres: query.onlyServiceCentres === 'true' || query.onlyServiceCentres === 'on',
       pageNumber: parseClampedNumber(query.pageNumber, DEFAULT_PAGE_NUMBER, MAX_PAGE_PARAM),
