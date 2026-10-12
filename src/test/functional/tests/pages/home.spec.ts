@@ -131,6 +131,36 @@ test.describe(
       );
     });
 
+    test('keeps favourite tooltips hoverable and dismissible with Escape', async ({ homePage, playwright }) => {
+      await withTestCourtPrefix(playwright, 'Home Favourite Tooltip Test', async ({ apiContext, courtNamePrefix }) => {
+        const court = await createTestCourt(apiContext, {
+          courtName: `${courtNamePrefix} Court`,
+          open: true,
+        });
+
+        await homePage.searchForCourt(court.name);
+        const button = homePage.getFavouriteButton(court.name, false);
+        const tooltipId = await button.getAttribute('aria-describedby');
+        expect(tooltipId).toBeTruthy();
+        const tooltip = homePage.page.locator(`#${tooltipId}`);
+
+        await button.hover();
+        await expect(tooltip).toBeVisible();
+        await tooltip.hover();
+        await expect(tooltip).toBeVisible();
+
+        await button.focus();
+        await homePage.page.keyboard.press('Escape');
+        await expect(button).toBeFocused();
+        await expect(tooltip).toBeHidden();
+
+        await homePage.page.mouse.move(0, 0);
+        await button.blur();
+        await button.focus();
+        await expect(tooltip).toBeVisible();
+      });
+    });
+
     test("does not expose one user's favourites to another user", async ({ browser, homePage, playwright }) => {
       await withTestCourtPrefix(
         playwright,
