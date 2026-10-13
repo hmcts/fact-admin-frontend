@@ -8,6 +8,7 @@ import { initFactHeaderSignOutLink } from './factHeaderSignOut';
 import { initFocusRestore } from './focusRestore';
 import { initLoadingRedirects } from './loadingRedirect';
 import { initProfessionalInformationRepeatableFields } from './professionalInformation';
+import { initTableSortButtons } from './tableSort';
 import { initTimeoutDialog } from './timeoutDialog';
 
 gds.initAll();
@@ -17,5 +18,6 @@ initDisplayedElementFilters();
 initLoadingRedirects();
 initProfessionalInformationRepeatableFields();
 initFactHeaderSignOutLink();
+initTableSortButtons();
 initTimeoutDialog();
 initFocusRestore();

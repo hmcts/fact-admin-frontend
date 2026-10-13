@@ -317,9 +317,12 @@ export class HomePageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}" data-focus-restore="sort-${sortBy}"${filters.focusTarget === `sort-${sortBy}` ? ' autofocus' : ''}>${label}${buildSortIconSvg(
+      html: `<button type="button" class="table-sort-button" data-table-sort-key="${sortBy}" data-table-sort-url="${this.buildSortHref(
+        filters,
+        sortBy
+      )}" data-focus-restore="sort-${sortBy}"${filters.focusTarget === `sort-${sortBy}` ? ' autofocus' : ''}>${label}${buildSortIconSvg(
         ariaSort
-      )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
+      )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></button>`,
     };
   }
 
@@ -346,7 +349,9 @@ export class HomePageViewService {
     const tooltipId = `favourite-tooltip-${table}-${location.locationType.toLowerCase()}-${location.id}`;
     const escapedName = this.escapeHtml(location.name);
     const escapedReturnPath = this.escapeHtml(returnPath);
-    const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
+    const accessibleLabel = favourite
+      ? `Remove from favourites - ${escapedName}`
+      : `Add to favourites - ${escapedName}`;
     // Stable across the add/remove toggle so focus can be restored to the same button after reload.
     const focusKey = this.escapeHtml(`favourite-${table}-${location.locationType.toLowerCase()}-${location.id}`);
 
@@ -362,7 +367,7 @@ export class HomePageViewService {
         '</svg>',
         `<span class="govuk-visually-hidden">${accessibleLabel}</span>`,
         '</button>',
-        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip">${tooltip}</span>`,
+        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip" aria-hidden="true">${tooltip}</span>`,
         '</form>',
         '</div>',
       ].join(''),

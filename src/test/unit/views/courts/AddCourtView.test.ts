@@ -58,7 +58,10 @@ describe('Add Court View', () => {
       'New court has been created, you will be redirected to the edit address page shortly. If you do not add an address the court will be marked as closed.'
     );
     expect(html).toContain('hods-loading-spinner');
-    expect(html).toContain('role="status"');
+    expect(html).toContain(
+      '<span class="govuk-visually-hidden" role="status" aria-live="polite">New court has been created, loading address page</span>'
+    );
+    expect(html).not.toContain('<div class="hods-loading-spinner" role="status"');
     expect(html).toContain(`data-redirect-url="/courts/${courtId}/edit/address"`);
     expect(html).toContain('data-redirect-delay="7000"');
     expect(html).toContain('Continue to add an address for Reading Crown Court');

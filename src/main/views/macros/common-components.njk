@@ -102,13 +102,14 @@
 {% endmacro %}
 
 {# shared redirection success panel #}
-{% macro renderRedirectSuccess(redirectUrl, spinnerMessage, continueText, redirectDelay='7000') %}
+{% macro renderRedirectSuccess(redirectUrl, spinnerMessage, statusMessage, continueText, redirectDelay='7000') %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <div class="hods-loading-spinner" role="status" data-redirect-url="{{ redirectUrl }}" data-redirect-delay="{{ redirectDelay }}">
+      <div class="hods-loading-spinner" data-redirect-url="{{ redirectUrl }}" data-redirect-delay="{{ redirectDelay }}">
         <div class="hods-loading-spinner__spinner"></div>
         <div class="hods-loading-spinner__content">
           <h1 class="govuk-heading-m">{{ spinnerMessage }}</h1>
+          <span class="govuk-visually-hidden" role="status" aria-live="polite">{{ statusMessage }}</span>
         </div>
       </div>
       <p class="govuk-body">
@@ -117,4 +118,3 @@
     </div>
   </div>
 {% endmacro %}
-

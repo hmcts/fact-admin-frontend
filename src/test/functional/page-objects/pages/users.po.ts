@@ -9,6 +9,7 @@ export class UsersPage extends Base {
   public readonly paginationNextLink: Locator;
   public readonly resultsMessage: Locator;
   public readonly searchInput: Locator;
+  public readonly sortByLastLoginButton: Locator;
   public readonly table: Locator;
   public readonly tableHeaders: Locator;
   public readonly tableRows: Locator;
@@ -23,6 +24,7 @@ export class UsersPage extends Base {
     this.table = this.page.locator('table.homepage-courts-table');
     this.tableHeaders = this.page.locator('table.homepage-courts-table thead th');
     this.tableRows = this.page.locator('table.homepage-courts-table tbody tr');
+    this.sortByLastLoginButton = this.tableHeaders.getByRole('button', { name: /Last login/ });
   }
 
   async goto(): Promise<void> {
@@ -43,7 +45,7 @@ export class UsersPage extends Base {
   }
 
   async clickSortByLastLogin(): Promise<void> {
-    await this.tableHeaders.getByRole('link', { name: /Last login/ }).click();
+    await this.sortByLastLoginButton.click();
   }
 
   async expectTableHeadings(): Promise<void> {
