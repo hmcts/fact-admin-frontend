@@ -65,11 +65,14 @@ export class UsersPageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildHref(filters, {
-        pageNumber: DEFAULT_PAGE_NUMBER,
-        sortBy: 'lastLogin',
-        sortOrder: isCurrentSort && filters.sortOrder === 'asc' ? 'desc' : 'asc',
-      })}">${label}${buildSortIconSvg(ariaSort)}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
+      html: `<button type="button" class="table-sort-button" data-table-sort-key="lastLogin" data-table-sort-url="${this.buildHref(
+        filters,
+        {
+          pageNumber: DEFAULT_PAGE_NUMBER,
+          sortBy: 'lastLogin',
+          sortOrder: isCurrentSort && filters.sortOrder === 'asc' ? 'desc' : 'asc',
+        }
+      )}" data-focus-restore="sort-lastLogin">${label}${buildSortIconSvg(ariaSort)}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></button>`,
     };
   }
 

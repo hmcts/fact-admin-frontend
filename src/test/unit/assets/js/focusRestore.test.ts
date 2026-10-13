@@ -89,7 +89,7 @@ describe('focusRestore', () => {
     expect(sessionStorage.setItem).toHaveBeenCalledWith('fact-focus-restore', 'favourite-courts-court-abc');
   });
 
-  test('stores the key of an activated sort link', () => {
+  test('stores the key of an activated sort button', () => {
     const listeners: Record<string, () => void> = {};
     const control = buildControl('sort-lastUpdated', listeners);
     setupDom([control]);
@@ -164,7 +164,7 @@ describe('focusRestore', () => {
     expect(target.focus).toHaveBeenCalled();
   });
 
-  test('restores focus to the sort link after the table reloads', () => {
+  test('restores focus to the sort button after the table reloads', () => {
     const sortLink = buildControl('sort-name');
     setupDom([sortLink]);
     setupStorage({ 'fact-focus-restore': 'sort-name' });

@@ -21,7 +21,8 @@
     {% endfor %}
   {% endset %}
   <div{% if classes %} class="{{ classes }}"{% endif %}>
-    <p class="govuk-body govuk-!-margin-bottom-2">{{ title }}</p>
+    {% set contextId = prefix + kind + "TimeContext" %}
+    <p class="govuk-body govuk-!-margin-bottom-2" id="{{ contextId }}">{{ title }}</p>
     {{ govukDateInput({
       id: prefix + kind + "Time",
       items: [
@@ -31,6 +32,9 @@
           label: "Hour",
           classes: "govuk-input--width-2",
           inputmode: "numeric",
+          attributes: {
+            "aria-describedby": contextId
+          },
           value: form[prefix + kind + "Hour"]
         },
         {
@@ -39,6 +43,9 @@
           label: "Minute",
           classes: "govuk-input--width-2",
           inputmode: "numeric",
+          attributes: {
+            "aria-describedby": contextId
+          },
           value: form[prefix + kind + "Minute"]
         }
       ],

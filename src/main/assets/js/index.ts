@@ -9,6 +9,7 @@ import { initFavouriteTooltips } from './favouriteTooltips';
 import { initFocusRestore } from './focusRestore';
 import { initLoadingRedirects } from './loadingRedirect';
 import { initProfessionalInformationRepeatableFields } from './professionalInformation';
+import { initTableSortButtons } from './tableSort';
 import { initTimeoutDialog } from './timeoutDialog';
 
 gds.initAll();
@@ -19,5 +20,6 @@ initFavouriteTooltips();
 initLoadingRedirects();
 initProfessionalInformationRepeatableFields();
 initFactHeaderSignOutLink();
+initTableSortButtons();
 initTimeoutDialog();
 initFocusRestore();

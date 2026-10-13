@@ -1,8 +1,8 @@
 /**
  * Restores keyboard focus after an action reloads the locations page.
  *
- * Toggling a favourite submits a form, and sorting a column follows a link. Both cause a full
- * page load, which resets focus to the top of the document, before the skip link. That
+ * Toggling a favourite submits a form, and sorting a column navigates to a new URL. Both cause
+ * a full page load, which resets focus to the top of the document, before the skip link. That
  * unexpected jump is disorientating for keyboard-only and screen reader users, so the key of
  * the control that was activated is held in session storage and focus is moved back to the
  * matching control once the new page has loaded.
