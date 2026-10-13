@@ -42,7 +42,9 @@ describe('Home View', () => {
     expect(html).toContain(
       '<a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline" href="/download">Download all court, tribunal and service centre data (CSV)</a>'
     );
-    expect(html.indexOf('Download all court, tribunal and service centre data (CSV)')).toBeLessThan(html.indexOf('govuk-tabs homepage-tabs'));
+    expect(html.indexOf('Download all court, tribunal and service centre data (CSV)')).toBeLessThan(
+      html.indexOf('govuk-tabs homepage-tabs')
+    );
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
     expect(html).toContain('Search courts, tribunals and service centres');
