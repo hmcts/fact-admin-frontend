@@ -131,6 +131,12 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.errorSummary).toContainText(
           'Enter a number of interview rooms between 1 and 150, or select No'
         );
+        await expect(professionalInformationPage.dxCodeGroup(0).locator('#dxCodeDescription-0')).toHaveValue(
+          'Central DX explanation'
+        );
+        await expect(professionalInformationPage.faxNumberGroup(0).locator('#faxNumberDescription-0')).toHaveValue(
+          'Crown court fax'
+        );
       }
     );
   });
@@ -143,6 +149,8 @@ test.describe('Information for Professionals Page Tests', () => {
       async ({ createdCourt }) => {
         await professionalInformationPage.goto(createdCourt.id);
 
+        await expect(professionalInformationPage.dxCodeGroup(0)).toBeVisible();
+        await expect(professionalInformationPage.faxNumberGroup(0)).toBeVisible();
         await expect(professionalInformationPage.removeDxCodeButton(0)).toHaveCount(0);
         await expect(professionalInformationPage.removeFaxNumberButton(0)).toHaveCount(0);
 
@@ -161,6 +169,18 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.removeFaxNumberButton(1)).toHaveClass(/govuk-button--warning/);
         await expect(professionalInformationPage.addDxCodeButton).toBeHidden();
         await expect(professionalInformationPage.addFaxNumberButton).toBeHidden();
+        for (let index = 0; index < 5; index++) {
+          const dxGroup = professionalInformationPage.dxCodeGroup(index);
+          const faxGroup = professionalInformationPage.faxNumberGroup(index);
+          await expect(dxGroup).toBeVisible();
+          await expect(faxGroup).toBeVisible();
+          await expect(dxGroup.locator('input')).toHaveCount(3);
+          await expect(faxGroup.locator('input')).toHaveCount(3);
+          for (const suffix of ['', 'Description', 'DescriptionCy']) {
+            await expect(dxGroup.locator(`#dxCode${suffix}-${index}`)).toBeVisible();
+            await expect(faxGroup.locator(`#faxNumber${suffix}-${index}`)).toBeVisible();
+          }
+        }
 
         await professionalInformationPage.dxCodeInput(1).fill('DX 12345');
         await professionalInformationPage.faxNumberInput(1).fill('01273 800 900');
@@ -171,6 +191,16 @@ test.describe('Information for Professionals Page Tests', () => {
         await expect(professionalInformationPage.faxNumberInputs).toHaveCount(4);
         await expect(professionalInformationPage.addDxCodeButton).toBeVisible();
         await expect(professionalInformationPage.addFaxNumberButton).toBeVisible();
+        await expect(professionalInformationPage.dxCodeGroup(4)).toHaveCount(0);
+        await expect(professionalInformationPage.faxNumberGroup(4)).toHaveCount(0);
+        for (let index = 0; index < 4; index++) {
+          await expect(professionalInformationPage.dxCodeGroup(index).locator(`#dxCode-${index}`)).toBeVisible();
+          await expect(professionalInformationPage.faxNumberGroup(index).locator(`#faxNumber-${index}`)).toBeVisible();
+        }
+        await professionalInformationPage.addDxCodes(5);
+        await professionalInformationPage.addFaxNumbers(5);
+        await expect(professionalInformationPage.dxCodeGroup(4).locator('#dxCode-4')).toBeVisible();
+        await expect(professionalInformationPage.faxNumberGroup(4).locator('#faxNumber-4')).toBeVisible();
       }
     );
   });
@@ -213,6 +243,14 @@ test.describe('Information for Professionals Page Tests', () => {
         await professionalInformationPage.faxNumberInput(0).fill('01273 800 900');
         await professionalInformationPage.faxNumberDescriptionInput(0).fill('Crown court fax');
         await professionalInformationPage.faxNumberDescriptionCyInput(0).fill('Disgrifiad ffacs y llys');
+        await professionalInformationPage.addDxCodes(2);
+        await professionalInformationPage.addFaxNumbers(2);
+        await professionalInformationPage.dxCodeInput(1).fill('DX 67890');
+        await professionalInformationPage.dxCodeDescriptionInput(1).fill('Additional DX code');
+        await professionalInformationPage.dxCodeDescriptionCyInput(1).fill('Esboniad DX ychwanegol');
+        await professionalInformationPage.faxNumberInput(1).fill('01273 800 901');
+        await professionalInformationPage.faxNumberDescriptionInput(1).fill('Additional fax');
+        await professionalInformationPage.faxNumberDescriptionCyInput(1).fill('Disgrifiad ffacs ychwanegol');
         await professionalInformationPage.selectRadio('interviewRooms', 'Yes');
         await professionalInformationPage.page.locator('#interviewRoomCount').fill('2');
         await professionalInformationPage.page.locator('#interviewPhoneNumber').fill('020 7450 4000');
@@ -241,6 +279,18 @@ test.describe('Information for Professionals Page Tests', () => {
 
         await professionalInformationPage.goto(createdCourt.id);
 
+        for (let index = 0; index < 2; index++) {
+          const dxGroup = professionalInformationPage.dxCodeGroup(index);
+          const faxGroup = professionalInformationPage.faxNumberGroup(index);
+          await expect(dxGroup).toBeVisible();
+          await expect(faxGroup).toBeVisible();
+          await expect(dxGroup.locator('input')).toHaveCount(3);
+          await expect(faxGroup.locator('input')).toHaveCount(3);
+        }
+        await expect(professionalInformationPage.dxCodeGroup(1).locator('#dxCode-1')).toHaveValue('DX 67890');
+        await expect(professionalInformationPage.faxNumberGroup(1).locator('#faxNumber-1')).toHaveValue(
+          '01273 800 901'
+        );
         await expect(professionalInformationPage.page.getByRole('checkbox', { name: 'County court' })).toBeChecked();
         await expect(professionalInformationPage.page.getByRole('checkbox', { name: 'Crown court' })).toBeChecked();
         await expect(professionalInformationPage.codeInput('countyCourtCode')).toHaveValue('123');

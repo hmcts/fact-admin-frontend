@@ -189,11 +189,11 @@ function removeRepeatableItem(
 
 function buildRepeatableItem(list: HTMLElement, type: RepeatableType, index: number): HTMLElement {
   const config = repeatableConfigs[type];
-  const item = document.createElement('div');
-  item.className = 'professional-information-repeatable';
+  const item = document.createElement('fieldset');
+  item.className = 'govuk-fieldset professional-information-repeatable';
   item.dataset.professionalInformationItem = '';
   item.dataset.professionalInformationType = type;
-  item.append(buildHeading(config.heading, index));
+  item.append(buildLegend(config.heading, index));
   item.append(
     ...config.fields.map(field => buildInput(list, field, index)),
     buildRemoveButton(config.removeText, index)
@@ -201,12 +201,11 @@ function buildRepeatableItem(list: HTMLElement, type: RepeatableType, index: num
   return item;
 }
 
-function buildHeading(text: string, index: number): HTMLParagraphElement {
-  const heading = document.createElement('p');
-  heading.className = 'govuk-body govuk-!-margin-bottom-1';
-  heading.dataset.professionalInformationHeading = '';
-  heading.textContent = `${text} ${index + 1} (optional)`;
-  return heading;
+function buildLegend(text: string, index: number): HTMLLegendElement {
+  const legend = document.createElement('legend');
+  legend.className = 'govuk-fieldset__legend govuk-!-margin-bottom-1';
+  legend.textContent = `${text} ${index + 1} (optional)`;
+  return legend;
 }
 
 function buildInput(list: HTMLElement, field: RepeatableFieldConfig, index: number): HTMLElement {
@@ -258,9 +257,9 @@ function reindexRepeatableItems(list: HTMLElement, type: RepeatableType): void {
   const config = repeatableConfigs[type];
 
   getRepeatableItems(list).forEach((item, index) => {
-    const heading = item.querySelector('[data-professional-information-heading]');
-    if (heading) {
-      heading.textContent = `${config.heading} ${index + 1} (optional)`;
+    const legend = item.querySelector('legend');
+    if (legend) {
+      legend.textContent = `${config.heading} ${index + 1} (optional)`;
     }
 
     config.fields.forEach(field => updateInput(item, list, field, index));

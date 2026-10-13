@@ -36,6 +36,8 @@ describe('Home View', () => {
       resultsMessage: 'No courts, tribunals or service centres found.',
     });
 
+    expect(html).toContain('Courts, tribunals and service centres');
+    expect(html).toMatch(/<h2[^>]*>Filters<\/h2>/);
     expect(html).toContain('<h1 class="govuk-heading-xl">Courts, tribunals and service centres</h1>');
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
@@ -128,6 +130,9 @@ describe('Home View', () => {
     expect(html).toContain('Enter a court name');
     expect(html).toContain('There was a problem loading courts, tribunals and service centres.');
     expect(html).toContain('href="/?pageNumber=1"');
+    expect(html).toContain(
+      '<div class="app-table-scroll" role="region" aria-label="Courts, tribunals and service centres" tabindex="0">'
+    );
   });
 
   test('renders the active Favourites table and its independent error', () => {
