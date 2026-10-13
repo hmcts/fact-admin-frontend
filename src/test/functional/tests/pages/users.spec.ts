@@ -79,19 +79,18 @@ test.describe(
     test('orders by last login using API query params', async ({ usersPage }) => {
       await usersPage.goto();
 
-      await usersPage.clickSortByLastLogin();
+      await usersPage.sortByLastLoginButton.press('Space');
       await expect(usersPage.page).toHaveURL(/sortBy=lastLogin/);
       await expect(usersPage.page).toHaveURL(/sortOrder=asc/);
-      await expect(usersPage.tableHeaders.getByRole('link', { name: /Last login/ })).toHaveAttribute(
-        'href',
-        /sortOrder=desc/
-      );
+      await expect(usersPage.sortByLastLoginButton).toHaveAttribute('data-table-sort-url', /sortOrder=desc/);
       await expect(usersPage.tableHeaders.filter({ hasText: 'Last login' })).toHaveAttribute('aria-sort', 'ascending');
+      await expect(usersPage.sortByLastLoginButton).toBeFocused();
 
       await usersPage.clickSortByLastLogin();
       await expect(usersPage.page).toHaveURL(/sortBy=lastLogin/);
       await expect(usersPage.page).toHaveURL(/sortOrder=desc/);
       await expect(usersPage.tableHeaders.filter({ hasText: 'Last login' })).toHaveAttribute('aria-sort', 'descending');
+      await expect(usersPage.sortByLastLoginButton).toBeFocused();
     });
 
     test('clear filters resets search and sort state', async ({ usersPage }) => {

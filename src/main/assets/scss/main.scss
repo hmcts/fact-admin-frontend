@@ -76,8 +76,8 @@
   white-space: nowrap;
 }
 
-.homepage-courts-table [aria-sort] .homepage-sort-link,
-.homepage-courts-table [aria-sort] .homepage-sort-link:hover {
+.homepage-courts-table [aria-sort] .table-sort-button,
+.homepage-courts-table [aria-sort] .table-sort-button:hover {
   display: inline-flex;
   position: relative;
   margin: 0;
@@ -85,6 +85,7 @@
   border-width: 0;
   background-color: transparent;
   box-shadow: 0 0 0 0;
+  cursor: pointer;
   font-family: inherit;
   font-size: 1em;
   text-align: inherit;
@@ -94,7 +95,7 @@
   text-decoration: none;
 }
 
-.homepage-courts-table [aria-sort] .homepage-sort-link:focus {
+.homepage-courts-table [aria-sort] .table-sort-button:focus {
   outline: 3px solid transparent;
   color: #0b0c0c;
   background-color: #ffdd00;

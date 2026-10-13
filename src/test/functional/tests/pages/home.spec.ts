@@ -471,12 +471,14 @@ test.describe(
         await createOpenTestCourts(apiContext, [charlieCourtName, alphaCourtName, bravoCourtName]);
 
         await homePage.searchForCourt(courtNamePrefix);
-        await homePage.clickSortByName();
+        await homePage.sortByNameButton.press('Space');
         await expect(homePage.page).toHaveURL(/sortBy=name&sortOrder=asc/);
+        await expect(homePage.sortByNameButton).toBeFocused();
         await expect.poll(() => homePage.getCourtNames()).toEqual([alphaCourtName, bravoCourtName, charlieCourtName]);
 
         await homePage.clickSortByName();
         await expect(homePage.page).toHaveURL(/sortBy=name&sortOrder=desc/);
+        await expect(homePage.sortByNameButton).toBeFocused();
         await expect.poll(() => homePage.getCourtNames()).toEqual([charlieCourtName, bravoCourtName, alphaCourtName]);
       });
     });
@@ -498,10 +500,12 @@ test.describe(
         await homePage.searchForCourt(courtNamePrefix);
         await homePage.clickSortByLastUpdated();
         await expect(homePage.page).toHaveURL(/sortBy=lastUpdated&sortOrder=asc/);
+        await expect(homePage.sortByLastUpdatedButton).toBeFocused();
         await expect.poll(() => homePage.getCourtNames()).toEqual([olderCourtName, newerCourtName]);
 
         await homePage.clickSortByLastUpdated();
         await expect(homePage.page).toHaveURL(/sortBy=lastUpdated&sortOrder=desc/);
+        await expect(homePage.sortByLastUpdatedButton).toBeFocused();
         await expect.poll(() => homePage.getCourtNames()).toEqual([newerCourtName, olderCourtName]);
       });
     });
