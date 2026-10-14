@@ -74,7 +74,7 @@ describe('Court Contact View', () => {
     expect(html).toContain('Contact type');
     expect(html).toContain('Explanation (optional)');
     expect(html).toContain('Explanation in Welsh (optional)');
-    expect(html).toContain('Select all that apply');
+    expect(html).toContain('Select contact details type');
     expect(html).toContain(`action="/courts/${courtId}/edit/contact-details/add/success"`);
     expect(html).toContain('class="govuk-button"');
     expect(html).toContain('Save');

@@ -55,14 +55,14 @@ describe('Counter service opening hours routes', () => {
       errors: {},
       errorSummary: [],
       form: { assistWith: [], selectedDays: [], sameTime: undefined },
-      pageTitle: 'Edit counter service opening hours - Newcastle Crown Court',
+      pageTitle: 'Edit counter service details and opening hours - Newcastle Crown Court',
     });
 
     const response = await request(app).get(`/courts/${courtId}/edit/counter-service-opening-hours/add`);
 
     expect(response.status).toBe(HttpStatusCode.Ok);
-    expect(response.text).toContain('Edit counter service opening hours');
-    expect(response.text).toContain('Select what the counter can assist with?');
+    expect(response.text).toContain('Edit counter service details and opening hours');
+    expect(response.text).toContain('What can the counter assist with?');
     expect(response.text).toContain('Is an appointment needed?');
     expect(response.text).toContain('Does the counter open and close at the same time Monday to Friday?');
     expect(response.text).toContain('id="sameTimeYes"');
@@ -87,7 +87,7 @@ describe('Counter service opening hours routes', () => {
           { href: '#sameOpeningMinute', text: 'Opening minute must be between 0 and 59' },
         ],
         form: { assistWith: [], selectedDays: [], sameTime: 'yes' },
-        pageTitle: 'Error: Edit counter service opening hours - Newcastle Crown Court',
+        pageTitle: 'Error: Edit counter service details and opening hours - Newcastle Crown Court',
       },
     });
 

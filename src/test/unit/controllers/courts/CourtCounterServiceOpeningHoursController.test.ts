@@ -116,7 +116,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
       errors: {},
       errorSummary: [],
       form: { assistWith: [], selectedDays: [] },
-      pageTitle: 'Edit counter service opening hours - Reading Crown Court',
+      pageTitle: 'Edit counter service details and opening hours - Reading Crown Court',
     };
     const getEditPage = stub(counterServiceOpeningHoursService, 'getEditPage').resolves(viewModel);
 
@@ -232,7 +232,7 @@ describe('CourtCounterServiceOpeningHoursController', () => {
       errors: { mondayOpeningHour: 'Enter the monday opening hour' },
       errorSummary: [{ href: '#mondayOpeningHour', text: 'Enter the monday opening hour' }],
       form: { assistWit: ['forms'], selectedDays: ['MONDAY'], sameTime: 'no' },
-      pageTitle: 'Error: Edit counter service opening hours - Reading Crown Court',
+      pageTitle: 'Error: Edit counter service details and opening hours - Reading Crown Court',
     };
     const save = stub(counterServiceOpeningHoursService, 'save').resolves({
       type: 'validation_error',

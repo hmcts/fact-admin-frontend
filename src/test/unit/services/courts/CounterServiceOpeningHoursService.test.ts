@@ -131,7 +131,7 @@ describe('CounterServiceOpeningHoursService', () => {
       errors: {},
       errorSummary: [],
       form: { assistWith: [], selectedDays: [] },
-      pageTitle: 'Edit counter service opening hours - Reading Crown Court',
+      pageTitle: 'Edit counter service details and opening hours - Reading Crown Court',
     });
   });
 

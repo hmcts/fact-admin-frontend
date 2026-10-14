@@ -58,7 +58,7 @@ describe('Local Authorities View', () => {
 
     expect(html).toContain('<h1 class="govuk-heading-l">Local Authorities</h1>');
     expect(html).toContain(
-      'If you set a local authority for a court, when a user searches for a postcode within that local authority'
+      'Assigning a local authority will restrict citizen search results to only show this court when searching within that specific local authority.'
     );
     expect(html).toContain(
       "Local authority is only available for courts with the 'Info for professionals - Court type' as Family court"

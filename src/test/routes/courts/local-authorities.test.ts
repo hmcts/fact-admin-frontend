@@ -57,7 +57,7 @@ describe('Local authorities routes', () => {
 
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Local Authorities');
-    expect(response.text).toContain('If you set a local authority for a court');
+    expect(response.text).toContain('Assigning a local authority will restrict citizen search results');
     expect(response.text).toContain('Reading Borough Council');
     expect(response.text).toContain('Wokingham Borough Council');
     expect(response.text).toContain(`<form method="post" action="/courts/${courtId}/edit/local-authorities/success">`);

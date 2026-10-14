@@ -52,7 +52,7 @@ describe('Professional Information View', () => {
     expect(html).toContain('Add another Fax number');
     expect(html).not.toContain('Remove Fax number 1');
     expect(html).toContain('Does this location have any interview rooms?');
-    expect(html).toContain('Phone number to book it');
+    expect(html).toContain('Phone number to book interview rooms');
     expect(html).toContain('Professional schemes');
     expect(html).toContain('Save');
   });
