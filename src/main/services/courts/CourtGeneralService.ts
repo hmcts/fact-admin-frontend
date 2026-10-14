@@ -2,14 +2,17 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
+import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { Region } from '../../schemas/regionSchema';
+import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiResponses';
 import {
   COURT_ALREADY_EXISTS_MESSAGE,
   COURT_OPEN_MESSAGE,
   COURT_REGION_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { getCourtNameValidationErrors } from '../../utils/subjectNameValidation';
+import { LocationNameService } from '../shared/LocationNameService';
 
 export type GeneralViewModel = Partial<CourtEntity> & {
   errors?: Record<string, string[]>;
@@ -20,17 +23,18 @@ export type GeneralViewModel = Partial<CourtEntity> & {
 export class CourtGeneralService {
   public constructor(
     private readonly courtApi = new CourtApi(),
-    private readonly referenceDataApi = new ReferenceDataApi()
+    private readonly referenceDataApi = new ReferenceDataApi(),
+    private readonly locationNameService = new LocationNameService(courtApi, new ServiceCentreApi())
   ) {}
 
   public async retrieve(courtId: string): Promise<GeneralViewModel | HttpStatusCode> {
     const courtEntity = await this.courtApi.getCourtById(courtId);
-    if (typeof courtEntity === 'number') {
+    if (isHttpStatusCode(courtEntity)) {
       return courtEntity;
     }
 
     const regions = await this.referenceDataApi.getRegions();
-    if (typeof regions === 'number') {
+    if (isHttpStatusCode(regions)) {
       return regions;
     }
 
@@ -40,7 +44,7 @@ export class CourtGeneralService {
   public async save(model: GeneralViewModel): Promise<GeneralViewModel | HttpStatusCode> {
     // grab a fresh copy of the model (use the service as we want the regions)
     const courtEntity = await this.retrieve(model.id as string);
-    if (typeof courtEntity === 'number') {
+    if (isHttpStatusCode(courtEntity)) {
       return courtEntity;
     }
     const originalName = courtEntity.name;
@@ -62,8 +66,11 @@ export class CourtGeneralService {
     }
 
     // ensure that if we already have a court with this exact name, that it's this court
-    const duplicateCourt = await this.courtApi.getCourtByName(courtEntity.name);
-    if (typeof duplicateCourt === 'number') {
+    const duplicateCourt = await this.locationNameService.findDuplicate(trimmedName as string, {
+      id: courtEntity.id as string,
+      type: 'court',
+    });
+    if (isHttpStatusCode(duplicateCourt)) {
       if (duplicateCourt !== HttpStatusCode.NotFound) {
         return duplicateCourt;
       }
@@ -78,17 +85,13 @@ export class CourtGeneralService {
 
     // persist to the API
     const result = await this.courtApi.updateCourt(courtEntity as CourtEntity);
-    if (typeof result === 'number') {
+    if (isHttpStatusCode(result)) {
       return result;
     }
 
     // if it's a Map, it's [validation] errors from the API
     if (result instanceof Map) {
-      // convert the mapped errors into our expected error format
-      const errors: Record<string, string[]> = {};
-      for (const [key, value] of result) {
-        errors[key] = [value];
-      }
+      const errors = toValidationErrorRecord(result);
       return { ...courtEntity, errors };
     }
 

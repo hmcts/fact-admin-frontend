@@ -105,7 +105,7 @@ test.describe(
 
         await addCourtPage.goto();
         await addCourtPage.createCourt(courtName);
-        await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+        await expect(addCourtPage.loadingStatus).toHaveText('New court has been created, loading address page');
 
         await addCourtPage.goto();
         await addCourtPage.createCourt(courtName);
@@ -131,7 +131,7 @@ test.describe(
           await addCourtPage.goto();
           await addCourtPage.createCourt(courtName);
 
-          await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+          await expect(addCourtPage.loadingStatus).toHaveText('New court has been created, loading address page');
           await addCourtPage.continueToAddress();
 
           await expect(courtAddressListPage.heading).toContainText('Addresses');
@@ -152,7 +152,7 @@ test.describe(
         await addCourtPage.goto();
         await addCourtPage.createCourt(courtName);
 
-        await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+        await expect(addCourtPage.loadingStatus).toHaveText('New court has been created, loading address page');
         await addCourtPage.continueToAddress();
         await expect(courtAddressListPage.heading).toContainText('Addresses');
 
@@ -180,7 +180,7 @@ test.describe(
           await addCourtPage.goto();
           await addCourtPage.createCourt(courtName);
 
-          await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+          await expect(addCourtPage.loadingStatus).toHaveText('New court has been created, loading address page');
 
           const addressHref = await addCourtPage.continueToAddressLink.getAttribute('href');
           const createdCourtId = addressHref?.match(/\/courts\/([^/]+)\/edit\/address/)?.[1];
@@ -220,7 +220,7 @@ test.describe(
         await addCourtPage.goto();
         await addCourtPage.createCourt(courtName);
 
-        await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+        await expect(addCourtPage.loadingStatus).toHaveText('New court has been created, loading address page');
         const redirectStart = Date.now();
         await expect(addCourtPage.page).toHaveURL(/\/courts\/[^/]+\/edit\/address$/, { timeout: 9000 });
         expect(Date.now() - redirectStart).toBeGreaterThanOrEqual(6900);

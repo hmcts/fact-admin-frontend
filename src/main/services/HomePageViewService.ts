@@ -4,16 +4,17 @@ import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_PAGE_SIZE,
   DEFAULT_RESULTS_MESSAGE,
+  HOME_PAGE_SEARCH_RESULTS_TITLE,
   HOME_PAGE_TITLE,
   PUBLIC_FRONTEND_URL,
-  SORT_ICON_PATHS,
 } from '../utils/constants/messageConstants';
+import { buildPagination as buildSharedPagination } from '../utils/pagination';
+import { buildSortIconSvg } from '../utils/viewHelpers';
 
 import {
   HomePageFilters,
   HomePageHrefOverrides,
   HomePagePagination,
-  HomePagePaginationLink,
   HomePageRegionOption,
   HomePageTableCell,
   HomePageTableHeadCell,
@@ -50,8 +51,12 @@ export class HomePageViewService {
         ? this.buildFavouriteCell(
             court,
             favouriteStatuses.get(buildFavouriteKey(court.locationType, court.id)) ?? false,
-            `${this.buildHref(filters, {})}#courts`,
-            'courts'
+            this.buildFocusHref(
+              `${this.buildHref(filters, {})}#courts`,
+              `favourite-courts-${court.locationType.toLowerCase()}-${court.id}`
+            ),
+            'courts',
+            filters.focusTarget
           )
         : { classes: 'homepage-courts-table__favourite', html: '' },
       { text: court.name },
@@ -78,10 +83,17 @@ export class HomePageViewService {
     favouritesPage: PagedLocations,
     isReviewMode = false
   ): HomePageTableCell[][] {
-    const returnPath = this.buildFavouritesHref(filters, favouritesPage.page.number);
-
     return favouritesPage.content.map(location => [
-      this.buildFavouriteCell(location, true, returnPath, 'favourites'),
+      this.buildFavouriteCell(
+        location,
+        true,
+        this.buildFocusHref(
+          this.buildFavouritesHref(filters, favouritesPage.page.number),
+          `favourite-favourites-${location.locationType.toLowerCase()}-${location.id}`
+        ),
+        'favourites',
+        filters.focusTarget
+      ),
       { text: location.name },
       { text: this.formatDate(location.lastUpdatedAt) },
       {
@@ -97,55 +109,58 @@ export class HomePageViewService {
   public buildPagination(courtsPage: PagedLocations, filters: HomePageFilters): HomePagePagination {
     const totalPages = courtsPage.page.totalPages ?? 0;
     const currentPage = courtsPage.page.number ?? filters.pageNumber;
-    const items = this.buildPaginationItems(totalPages, currentPage, filters);
 
     return {
       currentPage,
-      items,
-      next:
-        currentPage < totalPages - 1 ? { href: this.buildHref(filters, { pageNumber: currentPage + 1 }) } : undefined,
-      previous: currentPage > 0 ? { href: this.buildHref(filters, { pageNumber: currentPage - 1 }) } : undefined,
-      totalPages,
+      ...buildSharedPagination(totalPages, currentPage, pageNumber => this.buildHref(filters, { pageNumber })),
     };
   }
 
   public buildFavouritesPagination(favouritesPage: PagedLocations, filters: HomePageFilters): HomePagePagination {
     const totalPages = favouritesPage.page.totalPages ?? 0;
     const currentPage = favouritesPage.page.number ?? filters.favouritesPageNumber ?? DEFAULT_PAGE_NUMBER;
-    const pageIndexes = this.getVisiblePageIndexes(totalPages, currentPage);
-    const items: HomePagePaginationLink[] = [];
-
-    pageIndexes.forEach((pageIndex, index) => {
-      if (index > 0 && pageIndex - pageIndexes[index - 1] > 1) {
-        items.push({ ellipsis: true, href: '', number: -1 });
-      }
-      items.push({
-        current: pageIndex === currentPage,
-        href: this.buildFavouritesHref(filters, pageIndex),
-        number: pageIndex + 1,
-      });
-    });
 
     return {
       currentPage,
-      items: totalPages > 1 ? items : [],
-      next: currentPage < totalPages - 1 ? { href: this.buildFavouritesHref(filters, currentPage + 1) } : undefined,
-      previous: currentPage > 0 ? { href: this.buildFavouritesHref(filters, currentPage - 1) } : undefined,
-      totalPages,
+      ...buildSharedPagination(totalPages, currentPage, pageNumber => this.buildFavouritesHref(filters, pageNumber)),
     };
   }
 
   /**
    * Builds the page title, including validation and pagination context when needed.
+   *
+   * When any search filter is active the title announces search results, so screen reader
+   * users get a clear signal that the page content has changed after a search.
    */
-  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean): string {
+  public buildPageTitle(courtsPage: PagedLocations, hasValidationErrors: boolean, filters?: HomePageFilters): string {
     const titlePrefix = hasValidationErrors ? 'Error: ' : '';
+    const baseTitle = this.buildPageHeading(filters);
 
     if ((courtsPage.page.totalPages ?? 0) > 1) {
-      return `${titlePrefix}${HOME_PAGE_TITLE} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
+      return `${titlePrefix}${baseTitle} (page ${(courtsPage.page.number ?? DEFAULT_PAGE_NUMBER) + 1} of ${courtsPage.page.totalPages})`;
     }
 
-    return `${titlePrefix}${HOME_PAGE_TITLE}`;
+    return `${titlePrefix}${baseTitle}`;
+  }
+
+  public buildPageHeading(filters?: HomePageFilters): string {
+    return this.hasActiveSearchFilters(filters) ? HOME_PAGE_SEARCH_RESULTS_TITLE : HOME_PAGE_TITLE;
+  }
+
+  /**
+   * Reports whether the user has narrowed the results with any of the search filters.
+   */
+  public hasActiveSearchFilters(filters?: HomePageFilters): boolean {
+    if (!filters) {
+      return false;
+    }
+
+    return (
+      (filters.partialCourtName ?? '').trim().length > 0 ||
+      (filters.regionId ?? '').trim().length > 0 ||
+      filters.includeClosed === true ||
+      filters.onlyServiceCentres === true
+    );
   }
 
   public buildFavouritesPageTitle(favouritesPage: PagedLocations): string {
@@ -211,80 +226,17 @@ export class HomePageViewService {
   }
 
   /**
-   * Builds the condensed GOV.UK pagination item list with ellipses where ranges are skipped.
-   */
-  private buildPaginationItems(
-    totalPages: number,
-    currentPage: number,
-    filters: HomePageFilters
-  ): HomePagePaginationLink[] {
-    if (totalPages <= 1) {
-      return [];
-    }
-
-    return this.buildPaginationItemsFromIndexes(
-      this.getVisiblePageIndexes(totalPages, currentPage),
-      currentPage,
-      filters
-    );
-  }
-
-  /**
-   * Returns the sorted page indexes that should be visible in the condensed pagination control.
-   */
-  private getVisiblePageIndexes(totalPages: number, currentPage: number): number[] {
-    const pageIndexes = new Set<number>([0, totalPages - 1, currentPage]);
-
-    if (currentPage > 0) {
-      pageIndexes.add(currentPage - 1);
-    }
-    if (currentPage < totalPages - 1) {
-      pageIndexes.add(currentPage + 1);
-    }
-
-    return Array.from(pageIndexes)
-      .filter(index => index >= 0 && index < totalPages)
-      .sort((left, right) => left - right);
-  }
-
-  /**
-   * Maps visible page indexes into GOV.UK pagination items, inserting ellipses where ranges are skipped.
-   */
-  private buildPaginationItemsFromIndexes(
-    pageIndexes: number[],
-    currentPage: number,
-    filters: HomePageFilters
-  ): HomePagePaginationLink[] {
-    const items: HomePagePaginationLink[] = [];
-
-    pageIndexes.forEach((pageIndex, index) => {
-      if (index > 0 && pageIndex - pageIndexes[index - 1] > 1) {
-        items.push({
-          ellipsis: true,
-          href: '',
-          number: -1,
-        });
-      }
-
-      items.push({
-        current: pageIndex === currentPage,
-        href: this.buildHref(filters, { pageNumber: pageIndex }),
-        number: pageIndex + 1,
-      });
-    });
-
-    return items;
-  }
-
-  /**
    * Builds a homepage URL for a sortable column, toggling sort order when the column is already active.
    */
   private buildSortHref(filters: HomePageFilters, sortBy: 'lastUpdated' | 'name'): string {
-    return this.buildHref(filters, {
-      pageNumber: DEFAULT_PAGE_NUMBER,
-      sortBy,
-      sortOrder: filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc',
-    });
+    return this.buildFocusHref(
+      this.buildHref(filters, {
+        pageNumber: DEFAULT_PAGE_NUMBER,
+        sortBy,
+        sortOrder: filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc',
+      }),
+      `sort-${sortBy}`
+    );
   }
 
   /**
@@ -292,6 +244,17 @@ export class HomePageViewService {
    */
   private buildHref(filters: HomePageFilters, overrides: HomePageHrefOverrides): string {
     return `/?${this.buildCourtQuery(filters, overrides).toString()}`;
+  }
+
+  private buildFocusHref(href: string, focusTarget: string): string {
+    const [pathAndQuery, hash = ''] = href.split('#');
+    const queryIndex = pathAndQuery.indexOf('?');
+    const path = queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex);
+    const query = new URLSearchParams(queryIndex === -1 ? '' : pathAndQuery.slice(queryIndex + 1));
+
+    query.set('focus', focusTarget);
+
+    return `${path}?${query.toString()}${hash ? `#${hash}` : ''}`;
   }
 
   private buildCourtQuery(filters: HomePageFilters, overrides: HomePageHrefOverrides): URLSearchParams {
@@ -354,21 +317,13 @@ export class HomePageViewService {
       attributes: {
         'aria-sort': ariaSort,
       },
-      html: `<a class="homepage-sort-link govuk-link govuk-link--no-visited-state" href="${this.buildSortHref(filters, sortBy)}">${label}${this.getSortIconSvg(
+      html: `<button type="button" class="table-sort-button" data-table-sort-key="${sortBy}" data-table-sort-url="${this.buildSortHref(
+        filters,
+        sortBy
+      )}" data-focus-restore="sort-${sortBy}"${filters.focusTarget === `sort-${sortBy}` ? ' autofocus' : ''}>${label}${buildSortIconSvg(
         ariaSort
-      )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></a>`,
+      )}<span class="govuk-visually-hidden">, sort ${nextSortOrder}</span></button>`,
     };
-  }
-
-  /**
-   * Returns the inline SVG used to represent the current sort state.
-   */
-  private getSortIconSvg(ariaSort: 'ascending' | 'descending' | 'none'): string {
-    return [
-      '<svg class="homepage-sort-icon" width="22" height="22" focusable="false" aria-hidden="true" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">',
-      SORT_ICON_PATHS[ariaSort],
-      '</svg>',
-    ].join('');
   }
 
   /**
@@ -386,14 +341,19 @@ export class HomePageViewService {
     location: LocationListItem,
     favourite: boolean,
     returnPath: string,
-    table: 'courts' | 'favourites'
+    table: 'courts' | 'favourites',
+    focusTarget?: string
   ): HomePageTableCell {
     const tooltip = favourite ? 'Remove from favourites' : 'Add to favourites';
     const action = `/favourites/${location.locationType}/${location.id}${favourite ? '/remove' : ''}`;
     const tooltipId = `favourite-tooltip-${table}-${location.locationType.toLowerCase()}-${location.id}`;
     const escapedName = this.escapeHtml(location.name);
     const escapedReturnPath = this.escapeHtml(returnPath);
-    const accessibleLabel = favourite ? `Remove ${escapedName} from favourites` : `Add ${escapedName} to favourites`;
+    const accessibleLabel = favourite
+      ? `Remove from favourites - ${escapedName}`
+      : `Add to favourites - ${escapedName}`;
+    // Stable across the add/remove toggle so focus can be restored to the same button after reload.
+    const focusKey = this.escapeHtml(`favourite-${table}-${location.locationType.toLowerCase()}-${location.id}`);
 
     return {
       classes: 'homepage-courts-table__favourite',
@@ -401,13 +361,13 @@ export class HomePageViewService {
         '<div class="favourite-location">',
         `<form class="favourite-location__form" method="post" action="${action}">`,
         `<input type="hidden" name="returnPath" value="${escapedReturnPath}">`,
-        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}">`,
+        `<button class="favourite-location__button" type="submit" aria-pressed="${favourite}" aria-describedby="${tooltipId}" data-focus-restore="${focusKey}"${focusTarget === focusKey ? ' autofocus' : ''}>`,
         '<svg class="favourite-location__star" aria-hidden="true" focusable="false" viewBox="0 0 24 24">',
         '<path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.42l-5.8 3.05L7.31 14l-4.7-4.58 6.49-.94L12 2.6z"/>',
         '</svg>',
         `<span class="govuk-visually-hidden">${accessibleLabel}</span>`,
         '</button>',
-        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip">${tooltip}</span>`,
+        `<span class="favourite-location__tooltip" id="${tooltipId}" role="tooltip" aria-hidden="true">${tooltip}</span>`,
         '</form>',
         '</div>',
       ].join(''),

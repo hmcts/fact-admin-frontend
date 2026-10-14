@@ -79,7 +79,10 @@ describe('Add Service Centre View', () => {
       'New service centre has been created, you will be redirected to the edit address page shortly. If you do not add an address, this service centre will be marked as closed.'
     );
     expect(html).toContain('hods-loading-spinner');
-    expect(html).toContain('role="status"');
+    expect(html).toContain(
+      '<span class="govuk-visually-hidden" role="status" aria-live="polite">New service centre has been created, loading address page</span>'
+    );
+    expect(html).not.toContain('<div class="hods-loading-spinner" role="status"');
     expect(html).toContain(`data-redirect-url="/service-centres/${serviceCentreId}/edit/address"`);
     expect(html).toContain('Continue to add an address for National Business Centre');
   });

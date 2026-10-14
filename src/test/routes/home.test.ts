@@ -40,6 +40,7 @@ function stubHomePage(): void {
     favouritesResultsMessage: 'No favourite courts, tribunals or service centres found.',
     filters,
     includeStatusColumn: false,
+    pageHeading: 'Courts, tribunals and service centres',
     pageTitle: 'Courts, tribunals and service centres',
     pagination: {
       currentPage: 0,

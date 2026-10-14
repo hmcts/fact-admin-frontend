@@ -3,6 +3,11 @@ import { HttpStatusCode } from 'axios';
 import { ServiceCentreApi } from '../../requests/ServiceCentreApi';
 import { CourtAreaOfLawSelection } from '../../schemas/areaOfLawSchema';
 import { SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE } from '../../utils/constants/messageConstants';
+import {
+  BaseCasesHeardService,
+  BaseSaveCasesHeardResult,
+  CasesHeardViewContext,
+} from '../shared/BaseCasesHeardService';
 
 export type ServiceCentreCasesHeardViewModel = {
   areasOfLawError?: string;
@@ -19,124 +24,47 @@ export type ServiceCentreCasesHeardSuccessViewModel = {
   serviceCentreName: string;
 };
 
-export type SaveServiceCentreCasesHeardResult =
-  | { type: 'success'; viewModel: ServiceCentreCasesHeardSuccessViewModel }
-  | { status: HttpStatusCode; type: 'status' }
-  | { type: 'validation_error'; viewModel: ServiceCentreCasesHeardViewModel };
+export type SaveServiceCentreCasesHeardResult = BaseSaveCasesHeardResult<
+  ServiceCentreCasesHeardViewModel,
+  ServiceCentreCasesHeardSuccessViewModel
+>;
 
-export class ServiceCentreCasesHeardService {
-  public constructor(private readonly serviceCentreApi = new ServiceCentreApi()) {}
-
-  public getSelectedAreasOfLaw(value: unknown): string[] {
-    if (Array.isArray(value)) {
-      return value.filter((selectedValue): selectedValue is string => typeof selectedValue === 'string');
-    }
-
-    return typeof value === 'string' ? value.split(',') : [];
+export class ServiceCentreCasesHeardService extends BaseCasesHeardService<
+  ServiceCentreCasesHeardViewModel,
+  ServiceCentreCasesHeardSuccessViewModel
+> {
+  public constructor(private readonly serviceCentreApi = new ServiceCentreApi()) {
+    super(SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE);
   }
 
-  public validateSelectedAreasOfLaw(selectedAreasOfLaw: string[]): string | undefined {
-    return selectedAreasOfLaw.length === 0 ? SERVICE_CENTRE_AREAS_OF_LAW_VALIDATION_MESSAGE : undefined;
+  protected getSubject(serviceCentreId: string): Promise<{ name: string } | HttpStatusCode> {
+    return this.serviceCentreApi.getServiceCentreById(serviceCentreId);
   }
 
-  public async getCasesHeardPage(
-    serviceCentreId: string,
-    selectedAreasOfLaw?: string[],
-    areasOfLawError?: string
-  ): Promise<ServiceCentreCasesHeardViewModel | HttpStatusCode> {
-    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-
-    if (this.isHttpStatusCode(serviceCentreResponse)) {
-      return serviceCentreResponse;
-    }
-
-    return this.getCasesHeardViewModel(
-      serviceCentreId,
-      serviceCentreResponse.name,
-      selectedAreasOfLaw,
-      areasOfLawError
-    );
+  protected getAreasOfLaw(serviceCentreId: string): Promise<CourtAreaOfLawSelection[] | HttpStatusCode> {
+    return this.serviceCentreApi.getServiceCentreAreasOfLaw(serviceCentreId);
   }
 
-  public async saveCasesHeard(
-    serviceCentreId: string,
-    selectedAreasOfLaw: string[]
-  ): Promise<SaveServiceCentreCasesHeardResult> {
-    const serviceCentreResponse = await this.serviceCentreApi.getServiceCentreById(serviceCentreId);
-
-    if (this.isHttpStatusCode(serviceCentreResponse)) {
-      return { status: serviceCentreResponse, type: 'status' };
-    }
-
-    const areasOfLawError = this.validateSelectedAreasOfLaw(selectedAreasOfLaw);
-
-    if (areasOfLawError) {
-      const viewModel = await this.getCasesHeardViewModel(
-        serviceCentreId,
-        serviceCentreResponse.name,
-        selectedAreasOfLaw,
-        areasOfLawError
-      );
-
-      return this.isHttpStatusCode(viewModel)
-        ? { status: viewModel, type: 'status' }
-        : { type: 'validation_error', viewModel };
-    }
-
-    const updateResponse = await this.serviceCentreApi.updateServiceCentreAreasOfLaw({
-      areasOfLaw: selectedAreasOfLaw,
-      serviceCentreId,
-    });
-
-    return updateResponse >= HttpStatusCode.Ok && updateResponse < HttpStatusCode.MultipleChoices
-      ? {
-          type: 'success',
-          viewModel: {
-            serviceCentreId,
-            serviceCentreName: serviceCentreResponse.name,
-          },
-        }
-      : { status: updateResponse, type: 'status' };
+  protected updateAreasOfLaw(serviceCentreId: string, selectedAreasOfLaw: string[]): Promise<HttpStatusCode> {
+    return this.serviceCentreApi.updateServiceCentreAreasOfLaw({ areasOfLaw: selectedAreasOfLaw, serviceCentreId });
   }
 
-  private async getCasesHeardViewModel(
-    serviceCentreId: string,
-    serviceCentreName: string,
-    selectedAreasOfLaw?: string[],
-    areasOfLawError?: string
-  ): Promise<ServiceCentreCasesHeardViewModel | HttpStatusCode> {
-    const areasOfLawResponse = await this.serviceCentreApi.getServiceCentreAreasOfLaw(serviceCentreId);
-
-    if (this.isHttpStatusCode(areasOfLawResponse)) {
-      return areasOfLawResponse;
-    }
-
-    const selectedAreasOfLawSet = selectedAreasOfLaw === undefined ? null : new Set(selectedAreasOfLaw);
-    const areasOfLawItems = areasOfLawResponse.map((selection: CourtAreaOfLawSelection) => {
-      const value = selection.areaOfLawType.id || selection.areaOfLawType.name;
-
-      return {
-        checked: selectedAreasOfLawSet ? selectedAreasOfLawSet.has(value) : selection.selected,
-        text: selection.areaOfLawType.name,
-        value,
-      };
-    });
-
-    const sortedAreasOfLawItems = [...areasOfLawItems].sort((left, right) => left.text.localeCompare(right.text));
-    const midpoint = Math.ceil(sortedAreasOfLawItems.length / 2);
-
+  protected buildViewModel(context: CasesHeardViewContext): ServiceCentreCasesHeardViewModel {
     return {
-      areasOfLawError,
-      errorSummary: areasOfLawError ? [{ href: '#areas-of-law-group', text: areasOfLawError }] : [],
-      leftColumnAreasOfLawItems: sortedAreasOfLawItems.slice(0, midpoint),
-      pageTitle: areasOfLawError ? `Error: Cases heard - ${serviceCentreName}` : `Cases heard - ${serviceCentreName}`,
-      rightColumnAreasOfLawItems: sortedAreasOfLawItems.slice(midpoint),
-      serviceCentreId,
-      serviceCentreName,
+      areasOfLawError: context.error,
+      errorSummary: context.error ? [{ href: '#areas-of-law-group', text: context.error }] : [],
+      leftColumnAreasOfLawItems: context.leftItems,
+      pageTitle: context.error ? `Error: Cases heard - ${context.name}` : `Cases heard - ${context.name}`,
+      rightColumnAreasOfLawItems: context.rightItems,
+      serviceCentreId: context.id,
+      serviceCentreName: context.name,
     };
   }
 
-  private isHttpStatusCode(response: unknown): response is HttpStatusCode {
-    return typeof response === 'number';
+  protected buildSuccessViewModel(
+    serviceCentreId: string,
+    serviceCentreName: string
+  ): ServiceCentreCasesHeardSuccessViewModel {
+    return { serviceCentreId, serviceCentreName };
   }
 }

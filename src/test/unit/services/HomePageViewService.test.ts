@@ -60,8 +60,16 @@ describe('HomePageViewService', () => {
       text: 'Favourite',
     });
     expect(head[1].attributes).toEqual({ 'aria-sort': 'none' });
+    expect(head[1].html).toContain('<button type="button" class="table-sort-button"');
+    expect(head[1].html).toContain('data-table-sort-key="name"');
+    expect(head[1].html).toContain('data-focus-restore="sort-name"');
+    expect(head[1].html).toContain('focus=sort-name');
     expect(head[1].html).toContain('sortBy=name&sortOrder=asc');
+    expect(head[1].html).not.toContain('<a ');
     expect(head[2].attributes).toEqual({ 'aria-sort': 'descending' });
+    expect(head[2].html).toContain('data-table-sort-key="lastUpdated"');
+    expect(head[2].html).toContain('data-focus-restore="sort-lastUpdated"');
+    expect(head[2].html).toContain('focus=sort-lastUpdated');
     expect(head[2].html).toContain('sortBy=lastUpdated&sortOrder=asc');
     expect(head[3]).toEqual({ text: 'Status' });
     expect(head[4]).toEqual({ classes: 'homepage-courts-table__actions', text: 'Actions' });
@@ -133,14 +141,14 @@ describe('HomePageViewService', () => {
     expect(rows[0][0].html).toContain(`aria-describedby="favourite-tooltip-courts-court-${court.id}"`);
     expect(rows[0][0].html).toContain('Add to favourites');
     expect(rows[0][0].html).toContain(`action="/favourites/COURT/${court.id}"`);
-    expect(rows[0][0].html).toContain(`Add ${court.name} to favourites`);
+    expect(rows[0][0].html).toContain(`Add to favourites - ${court.name}`);
     expect(rows[0][0].html).toContain('aria-hidden="true" focusable="false"');
     expect(rows[0][0].html).toContain(
-      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip">Add to favourites`
+      `id="favourite-tooltip-courts-court-${court.id}" role="tooltip" aria-hidden="true">Add to favourites`
     );
     expect(rows[1][0].html).toContain('aria-pressed="true"');
     expect(rows[1][0].html).toContain('Remove from favourites');
-    expect(rows[1][0].html).toContain(`Remove ${serviceCentre.name} from favourites`);
+    expect(rows[1][0].html).toContain(`Remove from favourites - ${serviceCentre.name}`);
     expect(rows[1][0].html).toContain(`action="/favourites/SERVICE_CENTRE/${serviceCentre.id}/remove"`);
     expect(rows[0][0].html).not.toContain(`favourite-tooltip-courts-service_centre-${serviceCentre.id}`);
     expect(rows[0][0].classes).toBe('homepage-courts-table__favourite');
@@ -383,5 +391,94 @@ describe('HomePageViewService', () => {
     );
 
     expect(pagination.items.filter(item => item.ellipsis)).toHaveLength(2);
+  });
+
+  test('announces search results in the page title when a search filter is active', () => {
+    const page = {
+      content: [court],
+      page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
+    } as PagedLocations;
+
+    expect(service.buildPageTitle(page, false, filters)).toBe('Courts, tribunals and service centres');
+    expect(service.buildPageTitle(page, false, { ...filters, partialCourtName: 'london' })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageTitle(page, false, { ...filters, regionId: '33333333-3333-4333-8333-333333333333' })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageTitle(page, false, { ...filters, includeClosed: true })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageTitle(page, false, { ...filters, onlyServiceCentres: true })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+  });
+
+  test('keeps the error prefix and pagination suffix only on the browser title', () => {
+    const page = {
+      content: [court],
+      page: { number: 1, size: 25, totalElements: 30, totalPages: 2 },
+    } as PagedLocations;
+
+    expect(service.buildPageTitle(page, true, { ...filters, partialCourtName: 'london' })).toBe(
+      'Error: Search results: Courts, tribunals and service centres (page 2 of 2)'
+    );
+    expect(service.buildPageHeading({ ...filters, partialCourtName: 'london' })).toBe(
+      'Search results: Courts, tribunals and service centres'
+    );
+    expect(service.buildPageHeading(filters)).toBe('Courts, tribunals and service centres');
+  });
+
+  test('treats whitespace-only search filters as inactive', () => {
+    expect(service.hasActiveSearchFilters(undefined)).toBe(false);
+    expect(service.hasActiveSearchFilters(filters)).toBe(false);
+    expect(service.hasActiveSearchFilters({ ...filters, partialCourtName: '   ' })).toBe(false);
+    expect(service.hasActiveSearchFilters({ ...filters, regionId: '  ' })).toBe(false);
+    expect(service.hasActiveSearchFilters({ ...filters, partialCourtName: 'london' })).toBe(true);
+  });
+
+  test('adds focus restoration hooks to the favourite toggle', () => {
+    const rows = service.buildCourtTableRows(
+      filters,
+      { content: [court], page: {} } as PagedLocations,
+      false,
+      new Map()
+    );
+
+    expect(rows[0][0].html).toContain(`data-focus-restore="favourite-courts-court-${court.id}"`);
+  });
+
+  test('autofocuses the favourite control requested by the redirect', () => {
+    const focusTarget = `favourite-courts-court-${court.id}`;
+    const rows = service.buildCourtTableRows(
+      { ...filters, focusTarget },
+      { content: [court], page: {} } as PagedLocations,
+      false,
+      new Map()
+    );
+
+    expect(rows[0][0].html).toContain(`data-focus-restore="${focusTarget}" autofocus`);
+  });
+
+  test('keys the favourites tab toggle to the favourites table', () => {
+    const rows = service.buildFavouriteTableRows(filters, {
+      content: [serviceCentre],
+      page: { number: 0, size: 25, totalElements: 1, totalPages: 1 },
+    } as PagedLocations);
+
+    expect(rows[0][0].html).toContain(`data-focus-restore="favourite-favourites-service_centre-${serviceCentre.id}"`);
+  });
+
+  test('adds focus restoration hooks to the sortable column headers', () => {
+    const head = service.buildCourtTableHead(filters);
+
+    expect(head[1].html).toContain('data-focus-restore="sort-name"');
+    expect(head[2].html).toContain('data-focus-restore="sort-lastUpdated"');
+  });
+
+  test('autofocuses the sortable header requested by the redirect', () => {
+    const head = service.buildCourtTableHead({ ...filters, focusTarget: 'sort-name' });
+
+    expect(head[1].html).toContain('data-focus-restore="sort-name" autofocus');
   });
 });

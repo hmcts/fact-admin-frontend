@@ -11,6 +11,7 @@ import { OperationsApi } from '../requests/OperationsApi';
 import { GetAuditsParams } from '../requests/types/GetAuditsParams';
 import { Audit, AuditSubjectOptionsMap, PagedAudits } from '../schemas/auditSchema';
 import { SubjectType } from '../schemas/subjectTypeSchema';
+import { isHttpStatusCode } from '../utils/apiResponses';
 import {
   CSV_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
@@ -29,6 +30,7 @@ import {
   TO_DATE_BEFORE_FROM_DATE_MESSAGE,
 } from '../utils/constants/messageConstants';
 import { EMAIL_PARTIAL_REGEX } from '../utils/constants/regexConstants';
+import { serialiseCsvRow } from '../utils/csv';
 
 const logger = Logger.getLogger('audit-service');
 
@@ -51,7 +53,7 @@ export class AuditService {
 
   public async retrieve(auditId: string): Promise<Audit | HttpStatusCode> {
     const auditSubjectResponse = await this.operationsApi.getAuditSubjectOptionsMap();
-    if (this.isHttpStatusCode(auditSubjectResponse)) {
+    if (isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
 
@@ -59,7 +61,7 @@ export class AuditService {
     // purposes and this is the only way to get it
     const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
     const audit = await this.operationsApi.getAuditById(auditId);
-    if (this.isHttpStatusCode(audit)) {
+    if (isHttpStatusCode(audit)) {
       return audit;
     }
 
@@ -71,7 +73,7 @@ export class AuditService {
     // call is a view model that will be displayed to the user regardless of the success
     // of the query. In order to build a query, they'll need this data.
     const auditSubjectResponse = await this.operationsApi.getAuditSubjectOptionsMap();
-    if (this.isHttpStatusCode(auditSubjectResponse)) {
+    if (isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
     const nestedSubjectMap = this.toNestedAuditSubjectOptionsMap(auditSubjectResponse);
@@ -85,7 +87,7 @@ export class AuditService {
 
     const audits = await this.operationsApi.getAudits(queryParams);
 
-    if (this.isHttpStatusCode(audits)) {
+    if (isHttpStatusCode(audits)) {
       return audits;
     }
 
@@ -112,7 +114,7 @@ export class AuditService {
    */
   public async generateCsv(filters: GetAuditsParams): Promise<AuditCsvFile | HttpStatusCode> {
     const auditSubjectResponse = await this.operationsApi.getAuditSubjectOptionsMap();
-    if (this.isHttpStatusCode(auditSubjectResponse)) {
+    if (isHttpStatusCode(auditSubjectResponse)) {
       return auditSubjectResponse;
     }
 
@@ -128,7 +130,12 @@ export class AuditService {
 
     try {
       // write the header
-      stream.write(['Created At', 'User', 'Action', 'location', 'Changes'].map(this.csvEscape).join(',') + '\n');
+      stream.write(
+        serialiseCsvRow(['Created At', 'User', 'Action', 'location', 'Changes'], {
+          alwaysQuote: true,
+          normaliseLineEndings: false,
+        }) + '\n'
+      );
 
       // Pull at most MAX_CSV_PAGES pages from API in chunks of CSV_PAGE_SIZE and write to the file stream.
       // This is done in a loop until all pages are retrieved.
@@ -139,21 +146,23 @@ export class AuditService {
           pageSize: CSV_PAGE_SIZE,
         });
 
-        if (this.isHttpStatusCode(response)) {
+        if (isHttpStatusCode(response)) {
           stream.end();
           return response;
         }
 
         for (const audit of response.content) {
-          const row = [
-            audit.createdAt ?? '',
-            audit.user?.email ?? '<unknown>',
-            audit.actionType ?? '',
-            (nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>') + `: ${audit.actionEntity}`,
-            JSON.stringify(audit.actionDataDiff ?? ''),
-          ]
-            .map(this.csvEscape)
-            .join(',');
+          const row = serialiseCsvRow(
+            [
+              audit.createdAt ?? '',
+              audit.user?.email ?? '<unknown>',
+              audit.actionType ?? '',
+              (nestedSubjectMap.get(audit.subjectType)?.get(audit.subjectId) ?? '<deleted>') +
+                `: ${audit.actionEntity}`,
+              JSON.stringify(audit.actionDataDiff ?? ''),
+            ],
+            { alwaysQuote: true, normaliseLineEndings: false }
+          );
 
           stream.write(`${row}\n`);
         }
@@ -179,10 +188,6 @@ export class AuditService {
 
       return HttpStatusCode.InternalServerError;
     }
-  }
-
-  private csvEscape(s = ''): string {
-    return `"${s.replaceAll('"', '""')}"`;
   }
 
   private async safeUnlink(filePath: string): Promise<void> {
@@ -275,12 +280,6 @@ export class AuditService {
     if (fromDateErrors.length) {
       errors.fromDate = fromDateErrors;
     }
-  }
-
-  private isHttpStatusCode(
-    audits: PagedAudits | AuditSubjectOptionsMap | Audit | HttpStatusCode
-  ): audits is HttpStatusCode {
-    return typeof audits === 'number';
   }
 
   /**

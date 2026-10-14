@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 
 import { CourtApi } from '../../requests/CourtApi';
 import { TranslationServices } from '../../schemas/translationServicesSchema';
+import { isHttpStatusCode } from '../../utils/apiResponses';
 import {
   EMAIL_INVALID_MESSAGE,
   EMAIL_REQUIRED_MESSAGE,
@@ -50,13 +51,13 @@ export class CourtTranslationAndInterpretationService {
   public async getViewModel(courtId: string): Promise<TranslationAndInterpretationViewModel | HttpStatusCode> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
     const translationServicesResponse = await this.courtApi.getTranslationServices(courtId);
 
-    if (typeof translationServicesResponse === 'number') {
+    if (isHttpStatusCode(translationServicesResponse)) {
       return translationServicesResponse;
     }
 
@@ -69,7 +70,7 @@ export class CourtTranslationAndInterpretationService {
   ): Promise<SaveTranslationAndInterpretationResult> {
     const courtResponse = await this.courtApi.getCourtById(courtId);
 
-    if (typeof courtResponse === 'number') {
+    if (isHttpStatusCode(courtResponse)) {
       return courtResponse;
     }
 
@@ -94,7 +95,7 @@ export class CourtTranslationAndInterpretationService {
       phoneNumber: viewModel.phoneNumber,
     });
 
-    if (typeof saveResponse === 'number' && saveResponse !== HttpStatusCode.NoContent) {
+    if (isHttpStatusCode(saveResponse) && saveResponse !== HttpStatusCode.NoContent) {
       return saveResponse;
     }
 

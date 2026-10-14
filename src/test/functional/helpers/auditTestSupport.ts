@@ -55,7 +55,7 @@ export async function seedAuditTrailViaUi({
     await addCourtPage.goto();
     await addCourtPage.createCourt(originalCourtName);
 
-    await expect(addCourtPage.loadingStatus).toContainText('New court has been created');
+    await expect(addCourtPage.loadingStatus).toHaveText('New court has been created, loading address page');
     await expect(addCourtPage.page).toHaveURL(/\/courts\/[^/]+\/edit\/address$/, { timeout: 9000 });
 
     const courtId = getCourtIdFromAddressUrl(addCourtPage.page.url());
