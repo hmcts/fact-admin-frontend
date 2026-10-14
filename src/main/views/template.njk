@@ -27,7 +27,6 @@
 
 {% block govukHeader %}
   {% set isCourtsPage = pagePath == "/" %}
-  {% set isDownloadPage = pagePath.startsWith("/download") %}
   {% set isAddCourtPage = pagePath.startsWith("/add-court") %}
   {% set isAddServiceCentrePage = pagePath.startsWith("/add-service-centre") %}
   {% set isApprovalsPage = pagePath.startsWith("/approvals") %}
@@ -49,11 +48,6 @@
         text: "Locations",
         current: isCourtsPage
       },
-      {
-        href: "/download",
-        text: "Download csv",
-        current: isDownloadPage
-      } if not isViewer else false,
       {
         href: "/add-court",
         text: "Add new court",

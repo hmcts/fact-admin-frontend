@@ -64,7 +64,7 @@ describe('Authentication routing', () => {
     expect(response.text).toContain(
       'The service is currently unavailable while updates are taking place. It will be available again soon.'
     );
-    expect(response.text).not.toContain('Download csv');
+    expect(response.text).not.toContain('Download all court, tribunal and service centre data (CSV)');
   });
 
   test('allows admin users to access the application when maintenance mode is false', async () => {
@@ -169,7 +169,7 @@ describe('Authentication routing', () => {
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Locations');
-    expect(response.text).not.toContain('Download csv');
+    expect(response.text).not.toContain('Download all court data (CSV)');
     expect(response.text).not.toContain('Approvals tracker');
   });
 

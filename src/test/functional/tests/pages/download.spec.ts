@@ -27,7 +27,7 @@ test.describe(
           });
 
           const downloadPromise = homePage.page.waitForEvent('download');
-          await homePage.downloadNavigationLink.click();
+          await homePage.downloadLink.click();
           const download = await downloadPromise;
 
           await expect(download.suggestedFilename()).toMatch(/^courts-\d{4}-\d{2}-\d{2}\.csv$/);
