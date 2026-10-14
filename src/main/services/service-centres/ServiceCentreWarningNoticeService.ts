@@ -5,7 +5,7 @@ import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiRespon
 import { validateBilingualTextPair } from '../../utils/bilingualTextValidation';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
-  MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
+  WARNING_NOTICE_MAX_LENGTH,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
@@ -114,15 +114,15 @@ export class ServiceCentreWarningNoticeService {
     const errors = validateBilingualTextPair(warningNotice, warningNoticeCy, {
       englishKey: 'warningNotice',
       englishPattern: ENGLISH_WARNING_NOTICE_REGEX,
-      maximumLength: MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH,
+      maximumLength: WARNING_NOTICE_MAX_LENGTH,
       messages: {
         englishInvalidCharacters:
           'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
-        englishMaximumLength: `Warning notice must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`,
+        englishMaximumLength: `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or fewer`,
         englishRequired: ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
         welshInvalidCharacters:
           'Warning notice in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
-        welshMaximumLength: `Warning notice in Welsh must be ${MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH} characters or fewer`,
+        welshMaximumLength: `Warning notice in Welsh must be ${WARNING_NOTICE_MAX_LENGTH} characters or fewer`,
         welshRequired: WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
       },
       validatePatternWhenTooLong: false,

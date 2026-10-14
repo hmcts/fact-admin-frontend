@@ -16,7 +16,7 @@
       {% endif %}
 
       <h1 class="govuk-heading-l">Warning notice</h1>
-      <p class="govuk-body">Use this field to display text relevant for this service centre only. This is limited to 250 characters</p>
+      <p class="govuk-body">Use this field to display text relevant for this service centre only. This is limited to 700 characters</p>
 
       <form method="post" action="/service-centres/{{ model.id }}/edit/warning-notice/success">
         {{ csrfProtection(csrfToken) }}
@@ -30,7 +30,7 @@
               classes: "govuk-label--m"
             },
             attributes: {
-              maxlength: 250
+              maxlength: 700
             },
             rows: 5,
             value: model.warningNotice,
@@ -46,7 +46,7 @@
               classes: "govuk-label--m"
             },
             attributes: {
-              maxlength: 250
+              maxlength: 700
             },
             rows: 5,
             value: model.warningNoticeCy,

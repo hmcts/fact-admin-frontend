@@ -3,7 +3,7 @@ import { restore, stub } from 'sinon';
 
 import { ServiceCentreApi } from '../../../../main/requests/ServiceCentreApi';
 import { ServiceCentreWarningNoticeService } from '../../../../main/services/service-centres/ServiceCentreWarningNoticeService';
-import { MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH } from '../../../../main/utils/constants/messageConstants';
+import { WARNING_NOTICE_MAX_LENGTH } from '../../../../main/utils/constants/messageConstants';
 
 describe('ServiceCentreWarningNoticeService', () => {
   const serviceCentreId = '22222222-2222-4222-8222-222222222222';
@@ -12,7 +12,7 @@ describe('ServiceCentreWarningNoticeService', () => {
     restore();
   });
 
-  test('returns validation error when warning notice exceeds 250 chars', async () => {
+  test('returns validation error when warning notice exceeds 700 chars', async () => {
     const getServiceCentreByIdStub = stub(ServiceCentreApi.prototype, 'getServiceCentreById').resolves({
       id: serviceCentreId,
       name: 'Reading Service Centre',
@@ -21,14 +21,10 @@ describe('ServiceCentreWarningNoticeService', () => {
     const updateServiceCentreStub = stub(ServiceCentreApi.prototype, 'updateServiceCentre');
 
     const service = new ServiceCentreWarningNoticeService();
-    const result = await service.save(
-      serviceCentreId,
-      'a'.repeat(MAX_SERVICE_CENTRE_WARNING_NOTICE_LENGTH + 1),
-      'test'
-    );
+    const result = await service.save(serviceCentreId, 'a'.repeat(WARNING_NOTICE_MAX_LENGTH + 1), 'test');
 
     expect(result.type).toBe('validation-error');
-    expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 250 characters or fewer');
+    expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe('Warning notice must be 700 characters or fewer');
     expect(getServiceCentreByIdStub.calledOnce).toBe(true);
     expect(updateServiceCentreStub.notCalled).toBe(true);
   });
