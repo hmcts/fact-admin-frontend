@@ -68,7 +68,7 @@ describe('Home page', () => {
     expect(response.text).toContain('govuk-tabs homepage-tabs');
     expect(response.text).toContain('Favourites');
     expect(response.text).toContain('Apply filters');
-    expect(response.text).toContain('Download csv');
+    expect(response.text).toContain('Download all court, tribunal and service centre data (CSV)');
     expect(response.text).toContain('Add new court');
     expect(response.text).toContain('Add new service centre');
     expect(response.text).toContain('Approvals tracker');

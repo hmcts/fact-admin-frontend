@@ -174,9 +174,22 @@
   text-align: center;
 }
 
-.favourite-location__button:hover + .favourite-location__tooltip,
+.favourite-location__form:hover .favourite-location__tooltip,
 .favourite-location__button:focus + .favourite-location__tooltip {
   display: block;
+}
+
+.favourite-location__tooltip::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 7px;
+  content: '';
+}
+
+.favourite-location__form.favourite-location__form--tooltip-dismissed .favourite-location__tooltip {
+  display: none;
 }
 
 // Users table can extend beyond the standard GOV.UK content width.
