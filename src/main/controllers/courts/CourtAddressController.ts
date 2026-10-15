@@ -241,10 +241,7 @@ export class CourtAddressController extends BaseController {
     if (!this.validateServiceResponse(courtName, res, 'not-found')) {
       return;
     }
-    const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId);
-
-    const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
-    const ctSelected = ((req.body.courtTypes as string) ?? '').toLowerCase() === 'yes';
+    const [courtAddress, aolSelected, ctSelected] = this.buildCourtAddressFromRequestBody(req.body, courtId);
 
     const saveResult = await this.courtAddressService.save(courtAddress, courtId, aolSelected, ctSelected);
     // handles HttpResponseCode responses
@@ -355,10 +352,7 @@ export class CourtAddressController extends BaseController {
     if (!this.validateServiceResponse(courtName, res, 'not-found')) {
       return;
     }
-    const courtAddress = this.buildCourtAddressFromRequestBody(req.body, courtId, addressId);
-
-    const aolSelected = ((req.body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
-    const ctSelected = ((req.body.courtTypes as string) ?? '').toLowerCase() === 'yes';
+    const [courtAddress, aolSelected, ctSelected] = this.buildCourtAddressFromRequestBody(req.body, courtId, addressId);
 
     const saveResult = await this.courtAddressService.save(courtAddress, courtId, aolSelected, ctSelected, addressId);
     // handles HttpResponseCode responses
@@ -546,13 +540,16 @@ export class CourtAddressController extends BaseController {
     body: Request['body'],
     courtId: string,
     addressId?: string
-  ): Partial<CourtAddress> {
+  ): [courtAddress: Partial<CourtAddress>, aolSelected: boolean, ctSelected: boolean] {
     // The identifiers belong to the OS result selected on the previous page. If the
     // postcode has since been edited, do not send stale selection data to the API.
     const selectionMatchesPostcode =
       normalisePostcode(body.postcode) === normalisePostcode(body.osAddressSelectionPostcode);
 
-    return {
+    const aolSelected = ((body.areasOfLaw as string) ?? '').toLowerCase() === 'yes';
+    const ctSelected = ((body.courtTypes as string) ?? '').toLowerCase() === 'yes';
+
+    const courtAddress = {
       id: addressId,
       courtId,
       addressLine1: body.addressLine1,
@@ -565,9 +562,11 @@ export class CourtAddressController extends BaseController {
       osAddressUprn: selectionMatchesPostcode ? body.osAddressUprn : undefined,
       osAddressLpiKey: selectionMatchesPostcode ? body.osAddressLpiKey : undefined,
       addressType: body.addressType,
-      areasOfLaw: body['areas-of-law'] ? [body['areas-of-law']].flat() : undefined,
-      courtTypes: body['court-types'] ? [body['court-types']].flat() : undefined,
+      areasOfLaw: aolSelected ? [body['areas-of-law']].flat() : undefined,
+      courtTypes: ctSelected ? [body['court-types']].flat() : undefined,
     };
+
+    return [courtAddress, aolSelected, ctSelected];
   }
 
   private buildAddressData(addressOptionData: string, existingAddress?: CourtAddress): Partial<CourtAddress> {
