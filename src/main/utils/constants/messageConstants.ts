@@ -183,7 +183,7 @@ export const EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
 export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
 export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a phone number in the correct format';
-export const CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = 'Explanation must be 250 characters or fewer';
+export const CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = `Explanation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
 export const CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
   'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 export const WELSH_TRANSLATION_REQUIRED_MESSAGE =
