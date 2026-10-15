@@ -770,7 +770,7 @@ describe('CourtAddressController', () => {
           courtId: COURT_ID,
           county: undefined,
           epimId: 'EPIM-22',
-          areasOfLaw: [AREA_OF_LAW_ID],
+          areasOfLaw: undefined,
           courtTypes: [COURT_TYPE_ID],
         },
         COURT_ID,
