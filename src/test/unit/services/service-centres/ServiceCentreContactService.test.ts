@@ -308,10 +308,10 @@ describe('ServiceCentreContactService', () => {
       'Because you provided an explanation in Welsh, the English translation is now mandatory'
     );
     expect(welshInvalid.formViewModel.formErrors.contactExplanationCy).toBe(
-      'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+      'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
     );
     expect(welshTooLong.formViewModel.formErrors.contactExplanationCy).toBe(
-      'Explanation in Welsh must be 250 characters or fewer'
+      'Welsh translation must be 250 characters or fewer'
     );
   });
 

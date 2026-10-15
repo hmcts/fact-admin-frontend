@@ -7,7 +7,11 @@ import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDe
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import { isHttpStatusCode } from '../../utils/apiResponses';
 import {
+  CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
   CONTACT_TYPE_REQUIRED_MESSAGE,
+  CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
+  CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
   ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   MAX_EXPLANATION_LENGTH,
   WELSH_TRANSLATION_REQUIRED_MESSAGE,
@@ -222,17 +226,15 @@ export class ServiceCentreContactService {
     validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
     validateContactExplanationFields(formValues, formErrors, errorSummary, {
-      englishInvalidCharacters:
-        'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
+      englishInvalidCharacters: CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
       englishPattern: ENGLISH_TEXT_REGEX,
       englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-      englishTooLong: 'Explanation must be 250 characters or fewer',
+      englishTooLong: CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
       maximumLength: MAX_EXPLANATION_LENGTH,
-      welshInvalidCharacters:
-        'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
+      welshInvalidCharacters: CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
       welshPattern: WELSH_TEXT_REGEX,
       welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
-      welshTooLong: 'Explanation in Welsh must be 250 characters or fewer',
+      welshTooLong: CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
     });
 
     return {
