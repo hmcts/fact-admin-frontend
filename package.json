@@ -128,7 +128,7 @@
     "@opentelemetry/sdk-node": "0.223.0",
     "ip-address": "10.7.4",
     "moment": "2.31.0",
-    "qs": "6.16.0"
+    "qs": "6.16.1"
   },
   "packageManager": "yarn@4.18.1"
 }
