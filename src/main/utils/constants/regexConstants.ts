@@ -39,8 +39,8 @@ export const VALID_SERVICE_CENTRE_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
 export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 
 // Court accessibility validation Config
-export const TOILET_DESC_REGEX = /^[A-Za-z0-9 ()':,\-&]+$/;
-export const TOILET_DESC_REGEX_WELSH = /^[\p{L}0-9 ()':,\-&]+$/u;
+export const TOILET_DESC_REGEX = /^[A-Za-z '\-&()]+$/;
+export const TOILET_DESC_REGEX_WELSH = /^[\p{L}\p{M} '\-&()]+$/u;
 
 // Address validation
 export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
