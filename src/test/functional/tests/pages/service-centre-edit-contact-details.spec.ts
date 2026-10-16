@@ -313,7 +313,7 @@ test.describe(
           await serviceCentreContactDetailsPage.explanationCyInput.fill(tooLongExplanation);
           await serviceCentreContactDetailsPage.save();
 
-          const expectedError = 'Explanation in Welsh must be 250 characters or fewer';
+          const expectedError = 'Welsh translation must be 250 characters or fewer';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
@@ -375,7 +375,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+            'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);

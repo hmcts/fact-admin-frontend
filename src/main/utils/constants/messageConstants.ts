@@ -183,16 +183,16 @@ export const EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
 export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
 export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a phone number in the correct format';
-export const COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = 'Explanation must be 250 characters or fewer';
-export const COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
+export const CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = `Explanation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
+export const CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
   'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 export const WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in Welsh, the English translation is now mandatory';
-export const COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = 'Welsh translation must be 250 characters or fewer';
-export const COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
-  'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+export const CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = `Welsh translation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
+export const CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
+  'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
 // Court opening hours service
 export const ALLOWED_OPENING_HOUR_TYPES = [

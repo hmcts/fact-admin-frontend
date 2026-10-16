@@ -403,7 +403,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
       'Because you provided an explanation in Welsh, the English translation is now mandatory'
     );
     expect(welshOnly.formErrors.contactExplanationCy).toBe(
-      'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+      'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
     );
 
     const welshTooLong = service.validate(
