@@ -375,7 +375,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+            'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
