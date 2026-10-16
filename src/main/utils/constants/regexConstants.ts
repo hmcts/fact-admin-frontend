@@ -19,8 +19,8 @@ export const EMAIL_REGEX =
 
 // Court contact details service
 export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
-export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,!?:;'"()\-/&@+]+$/;
-export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,!?:;'"()\-/&@+]+$/u;
+export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 '\-()&+]+$/;
+export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 '\-()&+]+$/u;
 
 // Court professional information service
 export const INTEGER_REGEX = /^\d+$/;
