@@ -190,9 +190,10 @@ export const WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in Welsh, the English translation is now mandatory';
-export const CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = 'Welsh translation must be 250 characters or fewer';
+export const CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE =
+  `Welsh translation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
 export const CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
-  'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+  'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
 // Court opening hours service
 export const ALLOWED_OPENING_HOUR_TYPES = [
