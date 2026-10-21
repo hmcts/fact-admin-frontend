@@ -1,5 +1,5 @@
 # ---- Base image ----
-FROM hmctsprod.azurecr.io/base/node:22-alpine@sha256:fec7a28bb5228829fd60f8623557cacbe3a1f843f421b95e16ec075e70bf6d49 as base
+FROM hmctsprod.azurecr.io/base/node:24-alpine@sha256:a727a2b7d510a6ac7dae811b2e235c54d3485080e61cf77c2a92927a1c0b4a9b AS base
 USER root
 RUN corepack enable
 WORKDIR /opt/app
