@@ -6,7 +6,7 @@
 
 Running the application requires the following tools to be installed in your environment:
 
-- [Node.js](https://nodejs.org/) **22.x** (minimum `>=22.22.0`)
+- [Node.js](https://nodejs.org/) **24.x** (minimum `>=24.15.0`)
 - [Yarn](https://yarnpkg.com/) **4.x**
 - [Docker](https://www.docker.com) (used locally for Redis)
 

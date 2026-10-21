@@ -1,5 +1,5 @@
-# node:22.23.2-bookworm
-FROM node@sha256:dd5847a04b0deee391fa145f1f4c6d214196668b6bcc7988ebed67249f226844
+# node:24.22.0-bookworm
+FROM node@sha256:14078204b6bb268c107ceff6d3c43f45a888105e5c2b18b14c32b3409d93a1b0
 
 USER root
 
