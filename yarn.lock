@@ -5,39 +5,40 @@ __metadata:
   version: 10
   cacheKey: 10
 
-"@ai-sdk/gateway@npm:3.0.185":
-  version: 3.0.185
-  resolution: "@ai-sdk/gateway@npm:3.0.185"
+"@ai-sdk/gateway@npm:4.0.107":
+  version: 4.0.107
+  resolution: "@ai-sdk/gateway@npm:4.0.107"
   dependencies:
-    "@ai-sdk/provider": "npm:3.0.15"
-    "@ai-sdk/provider-utils": "npm:4.0.50"
+    "@ai-sdk/provider": "npm:4.0.24"
+    "@ai-sdk/provider-utils": "npm:5.0.56"
     "@vercel/oidc": "npm:3.2.0"
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
-  checksum: 10/a7bf7cff904e69de2c7fd6079203a4c5e62f5e738f2babebdaf91375f369b6a96ab0e51b3c58912af0696a18bb68fb5a8d12fd6ba6735fb27017c0a7ea46c4ac
+  checksum: 10/e66d864a9376bcb069c9e4ef3f9b9760aaa54c848eeb987e427f267da99fa3efa5b9d76a1ab1ee32e7bb7406219d1d0dd1bd3a0c68907fbb79b21106924968e7
   languageName: node
   linkType: hard
 
-"@ai-sdk/provider-utils@npm:4.0.50":
-  version: 4.0.50
-  resolution: "@ai-sdk/provider-utils@npm:4.0.50"
+"@ai-sdk/provider-utils@npm:5.0.56":
+  version: 5.0.56
+  resolution: "@ai-sdk/provider-utils@npm:5.0.56"
   dependencies:
-    "@ai-sdk/provider": "npm:3.0.15"
+    "@ai-sdk/provider": "npm:4.0.24"
     "@standard-schema/spec": "npm:^1.1.0"
+    "@workflow/serde": "npm:4.1.0"
     eventsource-parser: "npm:^3.0.8"
-    undici: "npm:^6.28.0"
+    undici: "npm:^7.29.0"
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
-  checksum: 10/0955d4b8a140eb6087574d7f3f1eefc6678f1fd0edf64815c0a55889b2864985b5ab20ce0089b7fbca82081f995acd41bec57425c9a31d5fc6e28d8c72549656
+  checksum: 10/d66ee68bff08bc50d3737b2c5e2f99e51e56819f6fff6f2317d5e1ef17f59b76c63ad7c55308f704e5f5db8d5d145762dd2f8efdcb98d2d952d503122a5e700c
   languageName: node
   linkType: hard
 
-"@ai-sdk/provider@npm:3.0.15":
-  version: 3.0.15
-  resolution: "@ai-sdk/provider@npm:3.0.15"
+"@ai-sdk/provider@npm:4.0.24":
+  version: 4.0.24
+  resolution: "@ai-sdk/provider@npm:4.0.24"
   dependencies:
     json-schema: "npm:^0.4.0"
-  checksum: 10/3efa96a4e59edef46a871d4c392c1c8351bd134e401c9e80bb72c128f92730402ca54512ab8b7aa336a6c9c8c2bfbb35c30f0ee06253a1c8f0b3b2754a466969
+  checksum: 10/99be5514812d3bcbe5a7993e85ce5661d2bec213ab78b518cf308b9c6851b696019d5c6d49c7a000524e7c2f97a27eb75406fb0b9500f6ed7bd2dee44ff3de79
   languageName: node
   linkType: hard
 
@@ -5839,12 +5840,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.20.5":
-  version: 22.20.5
-  resolution: "@types/node@npm:22.20.5"
+"@types/node@npm:^24.19.2":
+  version: 24.19.2
+  resolution: "@types/node@npm:24.19.2"
   dependencies:
-    undici-types: "npm:~6.21.0"
-  checksum: 10/a223a73e00e948b751b00144523674ecc73e7a3f14f48a0f3a6fca40745ff548a8b0ff5baca090d45ae8b61481cc56c1158db4df312970baeb6fc1b81fc511a1
+    undici-types: "npm:>=7.24.0 <7.24.7"
+  checksum: 10/5bc31df093f2866db0a2f9df0a1e99c2a46c3154ca2dc62ee14bde7af216d6361e4737e1023880921007ccb326b8559980e239e18a6fa927cda507da9383225c
   languageName: node
   linkType: hard
 
@@ -6737,6 +6738,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@workflow/serde@npm:4.1.0":
+  version: 4.1.0
+  resolution: "@workflow/serde@npm:4.1.0"
+  checksum: 10/eb07267e28d75ca86e8bb4186326b25e6bc50b78d324abdf3fbd8723c33b157655c0e30261f8f4e5c7a0fc68bf1182f263d2dbd85aa43e3cbab5825c462e88a3
+  languageName: node
+  linkType: hard
+
 "@xmldom/xmldom@npm:0.9.10":
   version: 0.9.10
   resolution: "@xmldom/xmldom@npm:0.9.10"
@@ -6869,17 +6877,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ai@npm:^6.0.43":
-  version: 6.0.272
-  resolution: "ai@npm:6.0.272"
+"ai@npm:7.0.132":
+  version: 7.0.132
+  resolution: "ai@npm:7.0.132"
   dependencies:
-    "@ai-sdk/gateway": "npm:3.0.185"
-    "@ai-sdk/provider": "npm:3.0.15"
-    "@ai-sdk/provider-utils": "npm:4.0.50"
-    "@opentelemetry/api": "npm:^1.9.0"
+    "@ai-sdk/gateway": "npm:4.0.107"
+    "@ai-sdk/provider": "npm:4.0.24"
+    "@ai-sdk/provider-utils": "npm:5.0.56"
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
-  checksum: 10/f835ce78bac013d2d8fa870446f149e4c851bd0bde4978d207c6a7862f98ec8a589ed36badfbb53f5d816beaf1e0f42521bd61020d5135ec49d6bfe23343f1ff
+  checksum: 10/db3b78fb72e702dd8096aec61ae79540dbb4e5fbd6ae6a0179c04a4f1a7b265a64a6ceffddb9e375ba04c1130f9fa3e9fc3decb64d572a9f87918263e06c5ace
   languageName: node
   linkType: hard
 
@@ -8328,9 +8335,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:4.2.0":
-  version: 4.2.0
-  resolution: "codeceptjs@npm:4.2.0"
+"codeceptjs@npm:4.2.1":
+  version: 4.2.1
+  resolution: "codeceptjs@npm:4.2.1"
   dependencies:
     "@codeceptjs/configure": "npm:^4.0.0-beta.4"
     "@codeceptjs/helper": "npm:2.0.4"
@@ -8340,7 +8347,7 @@ __metadata:
     "@modelcontextprotocol/sdk": "npm:^1.26.0"
     "@xmldom/xmldom": "npm:0.9.10"
     acorn: "npm:8.15.0"
-    ai: "npm:^6.0.43"
+    ai: "npm:7.0.132"
     arrify: "npm:3.0.0"
     axios: "npm:1.16.1"
     chalk: "npm:4.1.2"
@@ -8387,7 +8394,7 @@ __metadata:
     codeceptjs: bin/codecept.js
     codeceptjs-mcp: bin/mcp-server.js
     codeceptq: bin/codeceptq.js
-  checksum: 10/46b34aeae62dbf67e2a8e226f017793671846ac014c64729c4ac1f0895296ee8d93c2b7657cf9a08147bba76e616ae4f3877312b28b915e6a162745a16e79fd3
+  checksum: 10/74c4d15c9fc552b5947220ad9cc58e82caf46b93c746894bc7c7f7cc241b070463a16b506138756ac45323f6a94cd6c80dc50a3b211e3fe2ba37a3dc339c5004
   languageName: node
   linkType: hard
 
@@ -10339,7 +10346,7 @@ __metadata:
     "@types/lodash": "npm:4.17.26"
     "@types/moment-timezone": "npm:0.5.30"
     "@types/multer": "npm:2.3.0"
-    "@types/node": "npm:22.20.5"
+    "@types/node": "npm:^24.19.2"
     "@types/nunjucks": "npm:3.2.6"
     "@types/pa11y": "npm:5.3.7"
     "@types/supertest": "npm:7.2.1"
@@ -10352,7 +10359,7 @@ __metadata:
     axios: "npm:1.20.0"
     babel-jest: "npm:30.5.2"
     chai: "npm:6.3.0"
-    codeceptjs: "npm:4.2.0"
+    codeceptjs: "npm:4.2.1"
     config: "npm:5.0.1"
     cookie-parser: "npm:1.4.7"
     copy-webpack-plugin: "npm:14.0.0"
@@ -10385,9 +10392,9 @@ __metadata:
     playwright: "npm:1.63.0"
     playwright-core: "npm:1.63.0"
     playwright-lighthouse: "npm:4.0.0"
-    prettier: "npm:3.9.9"
+    prettier: "npm:3.9.10"
     redis: "npm:6.3.0"
-    sass: "npm:1.105.1"
+    sass: "npm:1.105.2"
     sass-loader: "npm:17.0.1"
     sinon: "npm:22.1.0"
     style-loader: "npm:4.0.0"
@@ -15128,12 +15135,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.9.9":
-  version: 3.9.9
-  resolution: "prettier@npm:3.9.9"
+"prettier@npm:3.9.10":
+  version: 3.9.10
+  resolution: "prettier@npm:3.9.10"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10/3d11a8095a7db50f0fbc8086ad96be676401154b63a2e9023e1274893457dccab19a9c211f4fb2cae7244e800bea2d5185d9bb6fc510f48a53017815e47d4e6d
+  checksum: 10/5d0118add4b44eb9d50c114f5c525451cc92be9da300ad0552787472535a3f23884baed3223d9b577bb7d1152eb58aeccfcc2b4541c0cf2274c0b4d328e36834
   languageName: node
   linkType: hard
 
@@ -15400,13 +15407,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.16.0":
-  version: 6.16.0
-  resolution: "qs@npm:6.16.0"
+"qs@npm:6.16.1":
+  version: 6.16.1
+  resolution: "qs@npm:6.16.1"
   dependencies:
     es-define-property: "npm:^1.0.1"
     side-channel: "npm:^1.1.1"
-  checksum: 10/7fbf9c2eb9c9bbd8997700caecc4b057ac259635873deefd5027fb26d06d79426cf468da55da87ffd147a24e93d3641352d8ac6664bd84688ad5b2f0b8d04828
+  checksum: 10/e33e0a5ceecb7bef81ea1f855365482045f55ba55278f40b8dbf9ee18eae8ef82d44246fe4e4009d6b6f102cbf2885a34b88c4272536cd628cde40b4ac9912c2
   languageName: node
   linkType: hard
 
@@ -15945,9 +15952,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.105.1":
-  version: 1.105.1
-  resolution: "sass@npm:1.105.1"
+"sass@npm:1.105.2":
+  version: 1.105.2
+  resolution: "sass@npm:1.105.2"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^5.0.0"
@@ -15958,7 +15965,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10/772b8943117cb9badaa1a3d3dda888acc456de859820ab7ac401d03e095f8d88de1e6a39dc969baa850efbbc6ed1a5e4eeb288d0ae4d0d7d99b6efffcf9ec050
+  checksum: 10/56171caf55cefcfa1fe7b17c993ac2255054e0f13e40cac222bae43d927519c8d6b32773ebf80ead1f1823ffaf5cb878561d9700962d912e0a477a042e71a4ab
   languageName: node
   linkType: hard
 
@@ -17450,13 +17457,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.21.0":
-  version: 6.21.0
-  resolution: "undici-types@npm:6.21.0"
-  checksum: 10/ec8f41aa4359d50f9b59fa61fe3efce3477cc681908c8f84354d8567bb3701fafdddf36ef6bff307024d3feb42c837cf6f670314ba37fc8145e219560e473d14
-  languageName: node
-  linkType: hard
-
 "undici@npm:^6.25.0":
   version: 6.25.0
   resolution: "undici@npm:6.25.0"
@@ -17464,17 +17464,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^6.28.0":
-  version: 6.28.0
-  resolution: "undici@npm:6.28.0"
-  checksum: 10/672a7a53bd1f6c80edb73b357ab36e98ef9e474024c442aab2b8ea2bc32f1103cab05525c78661ae724f3e1340e23d03efb9730fba28e76218ab0ec52e15d75a
-  languageName: node
-  linkType: hard
-
 "undici@npm:^7.19.0":
   version: 7.25.0
   resolution: "undici@npm:7.25.0"
   checksum: 10/038d3568c72bb976e3cc389284f7f1cc64cd70d578300e4676a449fbcb624a35fe99ac127b5f3729f18b8246d6c090444ab61b1b67736bb88f52a3e913d76bf8
+  languageName: node
+  linkType: hard
+
+"undici@npm:^7.29.0":
+  version: 7.30.0
+  resolution: "undici@npm:7.30.0"
+  checksum: 10/eb9e4bb5f1b4c35cb934c0d04fe676b62c3be06fb3be4a256ff73699bd77abc3d41f262597a4debd41f334c95ca3ea6e763268c3768882c3fc88a5d33234b8f6
   languageName: node
   linkType: hard
 

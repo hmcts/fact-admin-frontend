@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": ">=22.22.0"
+    "node": ">=24.15.0"
   },
   "scripts": {
     "start": "NODE_ENV=production ts-node --transpile-only -r tsconfig-paths/register src/main/server.ts",
@@ -76,7 +76,7 @@
     "@types/lodash": "4.17.26",
     "@types/moment-timezone": "0.5.30",
     "@types/multer": "2.3.0",
-    "@types/node": "22.20.5",
+    "@types/node": "^24.19.2",
     "@types/nunjucks": "3.2.6",
     "@types/pa11y": "5.3.7",
     "@types/supertest": "7.2.1",
@@ -84,7 +84,7 @@
     "@typescript-eslint/parser": "8.71.1",
     "babel-jest": "30.5.2",
     "chai": "6.3.0",
-    "codeceptjs": "4.2.0",
+    "codeceptjs": "4.2.1",
     "copy-webpack-plugin": "14.0.0",
     "css-loader": "7.1.5",
     "debug": "4.4.3",
@@ -105,8 +105,8 @@
     "playwright": "1.63.0",
     "playwright-core": "1.63.0",
     "playwright-lighthouse": "4.0.0",
-    "prettier": "3.9.9",
-    "sass": "1.105.1",
+    "prettier": "3.9.10",
+    "sass": "1.105.2",
     "sass-loader": "17.0.1",
     "sinon": "22.1.0",
     "style-loader": "4.0.0",
@@ -128,7 +128,7 @@
     "@opentelemetry/sdk-node": "0.223.0",
     "ip-address": "10.7.4",
     "moment": "2.31.0",
-    "qs": "6.16.0"
+    "qs": "6.16.1"
   },
   "packageManager": "yarn@4.18.1"
 }

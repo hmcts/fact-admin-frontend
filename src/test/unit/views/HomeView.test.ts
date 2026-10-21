@@ -36,9 +36,16 @@ describe('Home View', () => {
       resultsMessage: 'No courts, tribunals or service centres found.',
     });
 
-    expect(html).toContain('Courts, tribunals and service centres');
+    expect(html).toContain(
+      '<h1 class="govuk-heading-xl govuk-!-margin-bottom-6">Courts, tribunals and service centres</h1>'
+    );
+    expect(html).toContain(
+      '<a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline" href="/download">Download all court, tribunal and service centre data (CSV)</a>'
+    );
+    expect(html.indexOf('Download all court, tribunal and service centre data (CSV)')).toBeLessThan(
+      html.indexOf('govuk-tabs homepage-tabs')
+    );
     expect(html).toMatch(/<h2[^>]*>Filters<\/h2>/);
-    expect(html).toContain('<h1 class="govuk-heading-xl">Courts, tribunals and service centres</h1>');
     expect(html).toContain('Apply filters');
     expect(html).toContain('Clear filters');
     expect(html).toContain('Search courts, tribunals and service centres');
@@ -82,7 +89,7 @@ describe('Home View', () => {
       resultsMessage: 'No courts, tribunals or service centres found.',
     });
 
-    expect(html).toContain(`<h1 class="govuk-heading-xl">${pageHeading}</h1>`);
+    expect(html).toContain(`<h1 class="govuk-heading-xl govuk-!-margin-bottom-6">${pageHeading}</h1>`);
     expect(html).toMatch(new RegExp(`<title>\\s*${pageHeading} \\(page 1 of 7\\)\\s*</title>`));
   });
 

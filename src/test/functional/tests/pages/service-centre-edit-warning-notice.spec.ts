@@ -62,7 +62,7 @@ test.describe(
       );
     });
 
-    test('ensure it is not possible to put more than 250 characters into the warning notice edit field', async ({
+    test('ensure it is not possible to put more than 700 characters into the warning notice edit field', async ({
       serviceCentreWarningNoticePage,
       playwright,
     }) => {
@@ -72,8 +72,8 @@ test.describe(
         { open: true },
         async ({ createdServiceCentre }) => {
           await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
-          await serviceCentreWarningNoticePage.warningNoticeInput.fill('a'.repeat(251));
-          await serviceCentreWarningNoticePage.warningNoticeCyInput.fill('a'.repeat(251));
+          await serviceCentreWarningNoticePage.warningNoticeInput.fill('a'.repeat(701));
+          await serviceCentreWarningNoticePage.warningNoticeCyInput.fill('a'.repeat(701));
           await serviceCentreWarningNoticePage.save();
 
           await expect(serviceCentreWarningNoticePage.successPanel).toContainText('Warning notice saved');
@@ -82,7 +82,7 @@ test.describe(
           );
 
           await serviceCentreWarningNoticePage.goto(createdServiceCentre.id);
-          await expect(serviceCentreWarningNoticePage.warningNoticeInput).toHaveValue('a'.repeat(250));
+          await expect(serviceCentreWarningNoticePage.warningNoticeInput).toHaveValue('a'.repeat(700));
         }
       );
     });

@@ -16,7 +16,7 @@ export class HomePage extends Base {
   public readonly applyFiltersButton: Locator;
   public readonly clearFiltersButton: Locator;
   public readonly courtsTab: Locator;
-  public readonly downloadNavigationLink: Locator;
+  public readonly downloadLink: Locator;
   public readonly favouritesPaginationNextLink: Locator;
   public readonly favouritesPaginationPreviousLink: Locator;
   public readonly favouritesTab: Locator;
@@ -41,7 +41,9 @@ export class HomePage extends Base {
     this.applyFiltersButton = this.page.getByRole('button', { name: 'Apply filters' });
     this.clearFiltersButton = this.page.getByRole('button', { name: 'Clear filters' });
     this.courtsTab = this.page.getByRole('tab', { name: 'Courts' });
-    this.downloadNavigationLink = this.page.getByRole('link', { name: 'Download csv' });
+    this.downloadLink = this.page.getByRole('link', {
+      name: 'Download all court, tribunal and service centre data (CSV)',
+    });
     this.favouritesPaginationNextLink = this.page.locator('#favourites').getByRole('link', { name: 'Next' });
     this.favouritesPaginationPreviousLink = this.page.locator('#favourites').getByRole('link', { name: 'Previous' });
     this.favouritesTab = this.page.getByRole('tab', { name: 'Favourites' });

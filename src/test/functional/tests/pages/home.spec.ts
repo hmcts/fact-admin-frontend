@@ -65,13 +65,21 @@ test.describe(
       await expect(homePage.courtsTab).toHaveAttribute('aria-selected', 'true');
       await expect(homePage.favouritesTab).toHaveAttribute('aria-selected', 'false');
       await expect(homePage.tableHeaders).toHaveText(['Favourite', /Name/, /Last updated/, 'Actions']);
+      await expect(homePage.downloadLink).toBeVisible();
+      await expect(homePage.downloadLink).toHaveClass(
+        'govuk-link govuk-link--no-visited-state govuk-link--no-underline'
+      );
+      await expect(
+        homePage.header.navigationLinks.filter({
+          hasText: 'Download all court, tribunal and service centre data (CSV)',
+        })
+      ).toHaveCount(0);
       const favouriteHeader = homePage.table.getByRole('columnheader', { exact: true, name: 'Favourite' });
       const nameHeader = homePage.tableHeaders.nth(1);
       expect(await favouriteHeader.evaluate(element => getComputedStyle(element).verticalAlign)).toBe(
         await nameHeader.evaluate(element => getComputedStyle(element).verticalAlign)
       );
       await homePage.header.expectNavigationLink('Locations');
-      await homePage.header.expectNavigationLink('Download csv');
       await homePage.header.expectNavigationLink('Add new court');
       await homePage.header.expectNavigationLink('Add new service centre');
       await expect(homePage.regionSelect).toBeVisible();
@@ -129,6 +137,36 @@ test.describe(
           await homePage.expectFavouriteVisible(serviceCentre.name);
         }
       );
+    });
+
+    test('keeps favourite tooltips hoverable and dismissible with Escape', async ({ homePage, playwright }) => {
+      await withTestCourtPrefix(playwright, 'Home Favourite Tooltip Test', async ({ apiContext, courtNamePrefix }) => {
+        const court = await createTestCourt(apiContext, {
+          courtName: `${courtNamePrefix} Court`,
+          open: true,
+        });
+
+        await homePage.searchForCourt(court.name);
+        const button = homePage.getFavouriteButton(court.name, false);
+        const tooltipId = await button.getAttribute('aria-describedby');
+        expect(tooltipId).toBeTruthy();
+        const tooltip = homePage.page.locator(`#${tooltipId}`);
+
+        await button.hover();
+        await expect(tooltip).toBeVisible();
+        await tooltip.hover();
+        await expect(tooltip).toBeVisible();
+
+        await button.focus();
+        await homePage.page.keyboard.press('Escape');
+        await expect(button).toBeFocused();
+        await expect(tooltip).toBeHidden();
+
+        await homePage.page.mouse.move(0, 0);
+        await button.blur();
+        await button.focus();
+        await expect(tooltip).toBeVisible();
+      });
     });
 
     test("does not expose one user's favourites to another user", async ({ browser, homePage, playwright }) => {
@@ -192,7 +230,6 @@ test.describe(
       test('shows super admin navigation links', async ({ homePage }) => {
         await homePage.expectVisibleElements();
         await homePage.header.expectNavigationLink('Locations');
-        await homePage.header.expectNavigationLink('Download csv');
         await homePage.header.expectNavigationLink('Add new court');
         await homePage.header.expectNavigationLink('Add new service centre');
         await homePage.header.expectNavigationLink('Audit');
@@ -206,7 +243,6 @@ test.describe(
       test('does not show super admin navigation links', async ({ homePage }) => {
         await homePage.expectVisibleElements();
         await homePage.header.expectNavigationLink('Locations');
-        await homePage.header.expectNavigationLink('Download csv');
         await homePage.header.expectNavigationLink('Add new court');
         await homePage.header.expectNavigationLink('Add new service centre');
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Audit' })).toHaveCount(0);

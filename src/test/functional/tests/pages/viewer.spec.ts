@@ -17,7 +17,7 @@ test.describe(
         await homePage.expectCourtVisible(createdCourt.name);
 
         await homePage.header.expectNavigationLink('Locations');
-        await expect(homePage.header.navigationLinks.filter({ hasText: 'Download csv' })).toHaveCount(0);
+        await expect(homePage.downloadLink).toHaveCount(0);
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Add new court' })).toHaveCount(0);
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Add new service centre' })).toHaveCount(0);
         await expect(homePage.header.navigationLinks.filter({ hasText: 'Approvals tracker' })).toHaveCount(0);

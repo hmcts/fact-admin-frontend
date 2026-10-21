@@ -167,8 +167,8 @@ describe('CourtWarningNoticeService', () => {
 
   test('returns validation_error when warning notices exceed max length', async () => {
     const { updateCourt, service } = buildService();
-    const longText = 'a'.repeat(251);
-    const longWelshText = 'b'.repeat(251);
+    const longText = 'a'.repeat(701);
+    const longWelshText = 'b'.repeat(701);
 
     const result = await service.save(courtId, {
       warningNotice: longText,
@@ -185,12 +185,12 @@ describe('CourtWarningNoticeService', () => {
           warningNoticeCy: longWelshText,
         },
         errors: {
-          warningNotice: 'Warning notice must be 250 characters or less',
-          warningNoticeCy: 'Welsh warning notice must be 250 characters or less',
+          warningNotice: 'Warning notice must be 700 characters or less',
+          warningNoticeCy: 'Welsh warning notice must be 700 characters or less',
         },
         errorSummary: [
-          { href: '#warningNotice', text: 'Warning notice must be 250 characters or less' },
-          { href: '#warningNoticeCy', text: 'Welsh warning notice must be 250 characters or less' },
+          { href: '#warningNotice', text: 'Warning notice must be 700 characters or less' },
+          { href: '#warningNoticeCy', text: 'Welsh warning notice must be 700 characters or less' },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
       },
