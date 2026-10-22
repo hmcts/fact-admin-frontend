@@ -5,7 +5,7 @@
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/table.njk" import appTable %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
 {% from "moj/components/filter/macro.njk" import mojFilter %}
@@ -210,7 +210,7 @@
 
     {% set auditTableRows = (auditTableRows.push([
       {
-        text: audit.user.email if audit.user else "<unkown>"
+        html: ((audit.user.email | escape) | replace("@", "<wbr>@")) if audit.user else ("<unkown>" | escape)
       },
       {
         html: tagHtml
@@ -277,9 +277,9 @@
       {% endif %}
     </div>
 
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-two-thirds audit-list-results">
        {% if auditTableRows.length %}
-          {{ govukTable({
+          {{ appTable({
             firstCellIsHeader: false,
             captionClasses: "govuk-table__caption--m",
             head: [
@@ -303,7 +303,7 @@
               }
             ],
             rows: auditTableRows
-          }) }}
+          }, "Audit log") }}
 
           {%- if audits.page.totalPages > 1 %}
             {{ createPager(basePagerUrl, audits.page) }}

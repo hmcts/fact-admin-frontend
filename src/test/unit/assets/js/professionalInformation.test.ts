@@ -130,8 +130,8 @@ class MockElement {
     if (selector === '[data-professional-information-list]') {
       return this.dataset.professionalInformationList !== undefined;
     }
-    if (selector === '[data-professional-information-heading]') {
-      return this.dataset.professionalInformationHeading !== undefined;
+    if (selector === 'legend') {
+      return this.tagName === 'legend';
     }
     if (selector === '.govuk-hint') {
       return this.className.split(' ').includes('govuk-hint');
@@ -194,25 +194,34 @@ function buildInput(name: string): MockElement {
 }
 
 function buildRepeatableItem(prefix: string, index: number): MockElement {
-  const item = new MockElement('div');
+  const item = new MockElement('fieldset');
+  item.className = 'govuk-fieldset professional-information-repeatable';
   item.dataset.professionalInformationItem = '';
-  item.append(buildInput(`${prefix}-${index}`), buildInput(`${prefix}Description-${index}`));
+  const legend = new MockElement('legend');
+  legend.className = 'govuk-fieldset__legend govuk-!-margin-bottom-1';
+  legend.textContent = `${prefix === 'dxCode' ? 'DX code' : 'Fax number'} ${index + 1} (optional)`;
+  item.append(
+    legend,
+    buildInput(`${prefix}-${index}`),
+    buildInput(`${prefix}Description-${index}`),
+    buildInput(`${prefix}DescriptionCy-${index}`)
+  );
   return item;
 }
 
-function buildDocument(): {
+function buildDocument(type: 'dxCode' | 'faxNumber' = 'dxCode'): {
   addButton: MockElement;
   document: MockElement;
   list: MockElement;
 } {
   const document = new MockElement('document');
   const list = new MockElement('div');
-  list.dataset.professionalInformationList = 'dxCode';
+  list.dataset.professionalInformationList = type;
   list.dataset.professionalInformationMax = '5';
-  list.append(buildRepeatableItem('dxCode', 0));
+  list.append(buildRepeatableItem(type, 0));
 
   const addButton = new MockElement('button');
-  addButton.dataset.professionalInformationAdd = 'dxCode';
+  addButton.dataset.professionalInformationAdd = type;
 
   document.append(list, addButton);
   return { addButton, document, list };
@@ -244,9 +253,7 @@ describe('professionalInformation repeatable fields', () => {
     mockDom.addButton.click();
 
     const addedItem = mockDom.list.querySelectorAll('[data-professional-information-item]')[1];
-    expect(addedItem.querySelector('[data-professional-information-heading]')?.textContent).toBe(
-      'DX code 2 (optional)'
-    );
+    expect(addedItem.querySelector('legend')?.textContent).toBe('DX code 2 (optional)');
     expect(addedItem.querySelector('input')?.name).toBe('dxCode-1');
     expect(addedItem.querySelector('input')?.attributes['aria-describedby']).toBe('dxCode-1-hint');
     expect(addedItem.querySelector('[data-professional-information-remove]')?.textContent).toBe('Remove DX code 2');
@@ -275,14 +282,60 @@ describe('professionalInformation repeatable fields', () => {
 
     const remainingItems = mockDom.list.querySelectorAll('[data-professional-information-item]');
     expect(remainingItems).toHaveLength(2);
-    expect(remainingItems[1].querySelector('[data-professional-information-heading]')?.textContent).toBe(
-      'DX code 2 (optional)'
-    );
+    expect(remainingItems[1].querySelector('legend')?.textContent).toBe('DX code 2 (optional)');
     expect(remainingItems[1].querySelector('input')?.name).toBe('dxCode-1');
     expect(remainingItems[1].querySelector('input')?.attributes['aria-describedby']).toBe('dxCode-1-hint');
     expect(mockDom.addButton.hidden).toBe(false);
     expect(mockDom.addButton.attributes['aria-hidden']).toBeUndefined();
   });
+
+  test.each(['dxCode', 'faxNumber'] as const)(
+    'groups all %s fields and preserves numbered legends after removal and re-addition',
+    type => {
+      const mockDom = buildDocument(type);
+      const heading = type === 'dxCode' ? 'DX code' : 'Fax number';
+      mockDom.document.createElement = ((tagName: string) => new MockElement(tagName)) as never;
+      (globalThis as { document: Document }).document = mockDom.document as never;
+
+      initProfessionalInformationRepeatableFields();
+      mockDom.addButton.click();
+      mockDom.addButton.click();
+
+      const thirdItem = mockDom.list.querySelectorAll('[data-professional-information-item]')[2];
+      thirdItem.querySelectorAll('input').forEach((input, index) => {
+        input.value = `Saved value ${index}`;
+      });
+      expect(thirdItem.querySelector('input')?.focus).toHaveBeenCalledTimes(1);
+
+      const secondItem = mockDom.list.querySelectorAll('[data-professional-information-item]')[1];
+      secondItem.querySelector('[data-professional-information-remove]')?.click();
+      expect(thirdItem.querySelector('legend')?.textContent).toBe(`${heading} 2 (optional)`);
+      expect(thirdItem.querySelector('[data-professional-information-remove]')?.textContent).toBe(
+        `Remove ${type === 'dxCode' ? 'DX code' : 'Fax number'} 2`
+      );
+      thirdItem.querySelectorAll('input').forEach((input, index) => {
+        expect(input.value).toBe(`Saved value ${index}`);
+      });
+
+      mockDom.addButton.click();
+      const items = mockDom.list.querySelectorAll('[data-professional-information-item]');
+      expect(items).toHaveLength(3);
+      items.forEach((item, index) => {
+        expect(item.tagName).toBe('fieldset');
+        expect(item.className).toBe('govuk-fieldset professional-information-repeatable');
+        expect(item.children[0].tagName).toBe('legend');
+        expect(item.children[0].className).toBe('govuk-fieldset__legend govuk-!-margin-bottom-1');
+        expect(item.children[0].textContent).toBe(`${heading} ${index + 1} (optional)`);
+        const inputs = item.querySelectorAll('input');
+        expect(inputs).toHaveLength(3);
+        for (const [fieldIndex, field] of [type, `${type}Description`, `${type}DescriptionCy`].entries()) {
+          expect(inputs[fieldIndex].name).toBe(`${field}-${index}`);
+          expect(inputs[fieldIndex].id).toBe(`${field}-${index}`);
+          expect(item.querySelectorAll('label')[fieldIndex].htmlFor).toBe(`${field}-${index}`);
+        }
+      });
+    }
+  );
 
   test('ignores incomplete configuration safely', () => {
     const document = new MockElement('document');

@@ -55,6 +55,8 @@ describe('Audit List View', () => {
     expect(html).toContain('DELETE');
     expect(html).toContain('Download CSV');
     expect(html).toContain('/audits/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+    expect(html).toContain('govuk-grid-column-two-thirds audit-list-results');
+    expect(html).toContain('super-admin<wbr>@example.com');
   });
 
   test('renders the invalid-filter empty state when errors are present', () => {
