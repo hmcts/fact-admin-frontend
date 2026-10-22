@@ -75,6 +75,14 @@ export class ProfessionalInformationPage extends Base {
     return this.page.locator('input[name^="faxNumber-"]');
   }
 
+  dxCodeGroup(index: number): Locator {
+    return this.page.getByRole('group', { name: `DX code ${index + 1} (optional)`, exact: true });
+  }
+
+  faxNumberGroup(index: number): Locator {
+    return this.page.getByRole('group', { name: `Fax number ${index + 1} (optional)`, exact: true });
+  }
+
   dxCodeInput(index: number): Locator {
     return this.page.locator(`#dxCode-${index}`);
   }

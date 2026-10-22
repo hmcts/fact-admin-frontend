@@ -46,6 +46,7 @@ describe('Approvals routes', () => {
     expect(response.text).toContain('Email of approver');
     expect(response.text).toContain('Time and date of approval');
     expect(response.text).toContain('Reading Crown Court');
+    expect(response.text).toContain('<div class="app-table-scroll" role="region" aria-label="Approvals" tabindex="0">');
     expect(getApprovalsTrackerStub.calledWith({ name: '', status: '' })).toBe(true);
     expect(response.text).not.toContain('Undo approval');
   });

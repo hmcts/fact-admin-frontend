@@ -71,6 +71,7 @@ describe('Audit routes', () => {
     expect(response.status).toBe(HttpStatusCode.Ok);
     expect(response.text).toContain('Audits');
     expect(response.text).toContain('Audit Route Test Court');
+    expect(response.text).toContain('<div class="app-table-scroll" role="region" aria-label="Audit log" tabindex="0">');
     expect(response.text).toContain('DELETE');
     expect(response.text).toContain('/audits/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
   });

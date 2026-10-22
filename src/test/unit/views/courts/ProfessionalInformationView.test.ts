@@ -1,6 +1,33 @@
 import { courtTypeOptions } from '../../../../main/services/courts/CourtProfessionalInformationService';
 import { env } from '../../../../testUtils/nunjucksHelper';
 
+function expectRepeatableGroups(html: string, type: 'dxCode' | 'faxNumber', count: number): void {
+  const groups = [
+    ...html.matchAll(
+      /<fieldset class="govuk-fieldset professional-information-repeatable"[^>]*data-professional-information-item[^>]*>([\s\S]*?)<\/fieldset>/g
+    ),
+  ].filter(group => group[1].includes(`id="${type}-`));
+  const heading = type === 'dxCode' ? 'DX code' : 'Fax number';
+
+  expect(groups).toHaveLength(count);
+  groups.forEach((group, index) => {
+    expect(group[1]).toMatch(
+      new RegExp(
+        `^\\s*<legend class="govuk-fieldset__legend govuk-!-margin-bottom-1">\\s*${heading} ${index + 1} \\(optional\\)\\s*</legend>`
+      )
+    );
+    expect(group[1].match(/<input\b/g)).toHaveLength(3);
+    for (const field of [type, `${type}Description`, `${type}DescriptionCy`]) {
+      expect(group[1]).toContain(`id="${field}-${index}"`);
+      expect(group[1]).toContain(`name="${field}-${index}"`);
+      expect(group[1]).toContain(`for="${field}-${index}"`);
+    }
+    if (index === 0) {
+      expect(group[1]).not.toContain('data-professional-information-remove');
+    }
+  });
+}
+
 describe('Professional Information View', () => {
   const courtId = '11111111-1111-4111-8111-111111111111';
   const pagePath = `/courts/${courtId}/edit/information-for-professionals`;
@@ -34,6 +61,8 @@ describe('Professional Information View', () => {
     });
 
     expect(html).toContain('Information for professionals');
+    expectRepeatableGroups(html, 'dxCode', 1);
+    expectRepeatableGroups(html, 'faxNumber', 1);
     expect(html).not.toContain('govuk-back-link');
     expect(html).toContain('Please select the type of court you wish to provide a code for');
     expect(html).toContain('Court Types and Codes');
@@ -94,6 +123,11 @@ describe('Professional Information View', () => {
     });
 
     expect(html).toContain('There is a problem');
+    expectRepeatableGroups(html, 'dxCode', 1);
+    expectRepeatableGroups(html, 'faxNumber', 1);
+    expect(html).toContain('href="#dxCode-0"');
+    expect(html).toContain('id="dxCode-0-error"');
+    expect(html).toContain('aria-describedby="dxCode-0-hint dxCode-0-error"');
     expect(html).toContain(
       'You have entered a DX code explanation without a DX code, please add a code or remove the explanation'
     );
@@ -129,6 +163,8 @@ describe('Professional Information View', () => {
     });
 
     expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
+    expectRepeatableGroups(html, 'dxCode', 2);
+    expectRepeatableGroups(html, 'faxNumber', 2);
     expect(html).not.toContain('Add another DX code');
     expect(html).not.toContain('Add another Fax number');
     expect(html).not.toContain('Remove DX code');
@@ -170,6 +206,18 @@ describe('Professional Information View', () => {
     });
 
     expect(html).toContain('data-professional-information-add="dxCode" hidden="hidden"');
+    expectRepeatableGroups(html, 'dxCode', 5);
+    expectRepeatableGroups(html, 'faxNumber', 5);
+    const additionalGroups = [
+      ...html.matchAll(
+        /<fieldset class="govuk-fieldset professional-information-repeatable"[^>]*>([\s\S]*?)<\/fieldset>/g
+      ),
+    ].filter(group => !/(?:DX code|Fax number) 1 \(optional\)/.test(group[1]));
+    for (const group of additionalGroups) {
+      const number = group[1].match(/(?:DX code|Fax number) (\d) \(optional\)/)?.[1];
+      expect(group[1]).toContain('data-professional-information-remove');
+      expect(group[1]).toMatch(new RegExp(`Remove (?:DX code|Fax number) ${number}`));
+    }
     expect(html).toContain('data-professional-information-add="faxNumber" hidden="hidden"');
     expect(html).toContain('govuk-button--secondary govuk-!-display-none');
     expect(html).toContain('govuk-button--warning professional-information-repeatable__remove');
