@@ -147,6 +147,7 @@ describe('CourtAddressController', () => {
         courtId: COURT_ID,
         pageTitle: 'Find Address',
         error: POSTCODE_ERROR_MESSAGES.blankPostcode,
+        osOutageWarningText: null,
       });
 
     try {
@@ -543,6 +544,7 @@ describe('CourtAddressController', () => {
         courtId: COURT_ID,
         addressId: ADDRESS_ID,
         pageTitle: 'Find Address',
+        osOutageWarningText: null,
       });
 
     try {
@@ -598,6 +600,7 @@ describe('CourtAddressController', () => {
         addressId: ADDRESS_ID,
         pageTitle: 'Find Address',
         error: POSTCODE_ERROR_MESSAGES.blankPostcode,
+        osOutageWarningText: null,
       });
 
     try {
@@ -1069,6 +1072,7 @@ describe('CourtAddressController', () => {
         courtId: COURT_ID,
         pageTitle: 'Find Address',
         error: 'No addresses found',
+        osOutageWarningText: null,
       });
 
     try {
@@ -1412,6 +1416,7 @@ describe('CourtAddressController', () => {
         addressId: ADDRESS_ID,
         pageTitle: 'Find Address',
         error: 'No addresses found',
+        osOutageWarningText: null,
       });
 
     try {

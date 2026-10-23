@@ -113,6 +113,7 @@ export class CourtAddressController extends BaseController {
       courtId,
       addressId,
       pageTitle: 'Find Address',
+      osOutageWarningText,
     });
   }
 
@@ -137,6 +138,7 @@ export class CourtAddressController extends BaseController {
         courtId,
         pageTitle: 'Find Address',
         error: validatePostcodeField(postcode),
+        osOutageWarningText,
       });
       return;
     }
@@ -152,6 +154,7 @@ export class CourtAddressController extends BaseController {
         courtId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
+        osOutageWarningText,
       });
       return;
     }
@@ -190,6 +193,7 @@ export class CourtAddressController extends BaseController {
         addressId,
         pageTitle: 'Find Address',
         error: validatePostcodeField(postcode),
+        osOutageWarningText,
       });
       return;
     }
@@ -206,6 +210,7 @@ export class CourtAddressController extends BaseController {
         addressId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
+        osOutageWarningText,
       });
       return;
     }
