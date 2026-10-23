@@ -6,7 +6,7 @@ import { CourtAddressController } from '../../../../main/controllers/courts/Cour
 import { CourtAddress, CourtAddressType } from '../../../../main/schemas/courtAddressSchema';
 import { TypesService } from '../../../../main/services/TypesService';
 import { CourtAddressService } from '../../../../main/services/courts/CourtAddressService';
-import { POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/constants/messageConstants';
+import { OS_OUTAGE_WARNING_MESSAGE, POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/constants/messageConstants';
 import { mockRequest } from '../../mocks/mockRequest';
 
 const COURT_ID = '11111111-1111-4111-8111-111111111111';
@@ -963,10 +963,49 @@ describe('CourtAddressController', () => {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         pageTitle: 'Find Address',
         courtId: COURT_ID,
+        osOutageWarningText: null,
       });
 
     await controller.renderFindNew(request, response);
     responseMock.verify();
+  });
+
+  test('renders the OS outage warning when enabled for adding a new address', async () => {
+    const originalValue = process.env.DISPLAY_OS_OUTAGE_WARNING;
+    process.env.DISPLAY_OS_OUTAGE_WARNING = 'true';
+
+    try {
+      await jest.isolateModulesAsync(async () => {
+        const { CourtAddressController: IsolatedCourtAddressController } =
+          await import('../../../../main/controllers/courts/CourtAddressController');
+        const isolatedController = new IsolatedCourtAddressController(courtAddressService, typesService);
+        const response = {
+          render: () => '',
+        } as unknown as Response;
+        const responseMock = mock(response);
+        const request = mockRequest({});
+        request.params = { courtId: COURT_ID };
+
+        responseMock
+          .expects('render')
+          .once()
+          .withArgs('court-address-find', {
+            breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
+            pageTitle: 'Find Address',
+            courtId: COURT_ID,
+            osOutageWarningText: OS_OUTAGE_WARNING_MESSAGE,
+          });
+
+        await isolatedController.renderFindNew(request, response);
+        responseMock.verify();
+      });
+    } finally {
+      if (originalValue === undefined) {
+        delete process.env.DISPLAY_OS_OUTAGE_WARNING;
+      } else {
+        process.env.DISPLAY_OS_OUTAGE_WARNING = originalValue;
+      }
+    }
   });
 
   test('renders court-not-found for add find page when courtId is invalid', async () => {
