@@ -1,5 +1,6 @@
 import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
+import config from 'config';
 import { Request, Response } from 'express';
 
 import { Logger } from '../../modules/logging';
@@ -8,11 +9,16 @@ import { osAddressOptionSchema } from '../../schemas/osDataSchema';
 import { TypesService } from '../../services/TypesService';
 import { CourtAddressService, SaveCourtAddressResponse } from '../../services/courts/CourtAddressService';
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
+import { OS_OUTAGE_WARNING_MESSAGE } from '../../utils/constants/messageConstants';
 import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController, { type NotFoundTemplate } from '../BaseController';
 import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 const logger = Logger.getLogger('app');
+
+const osOutageWarningText =
+  String(config.get('displayOSOutageWarning')).trim().toLowerCase() === 'true' ? OS_OUTAGE_WARNING_MESSAGE : null;
+
 @route('/courts/:courtId/edit/address')
 export class CourtAddressController extends BaseController {
   constructor(
@@ -74,6 +80,7 @@ export class CourtAddressController extends BaseController {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
       pageTitle: 'Find Address',
       courtId,
+      osOutageWarningText,
     });
   }
 
@@ -106,6 +113,7 @@ export class CourtAddressController extends BaseController {
       courtId,
       addressId,
       pageTitle: 'Find Address',
+      osOutageWarningText,
     });
   }
 
@@ -130,6 +138,7 @@ export class CourtAddressController extends BaseController {
         courtId,
         pageTitle: 'Find Address',
         error: validatePostcodeField(postcode),
+        osOutageWarningText,
       });
       return;
     }
@@ -145,6 +154,7 @@ export class CourtAddressController extends BaseController {
         courtId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
+        osOutageWarningText,
       });
       return;
     }
@@ -183,6 +193,7 @@ export class CourtAddressController extends BaseController {
         addressId,
         pageTitle: 'Find Address',
         error: validatePostcodeField(postcode),
+        osOutageWarningText,
       });
       return;
     }
@@ -199,6 +210,7 @@ export class CourtAddressController extends BaseController {
         addressId,
         pageTitle: 'Find Address',
         error: postcodeSearchResponse['error'],
+        osOutageWarningText,
       });
       return;
     }
