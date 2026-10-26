@@ -47,7 +47,7 @@
     "helmet": "8.3.0",
     "lodash": "4.18.1",
     "moment": "2.31.0",
-    "multer": "2.4.0",
+    "multer": "2.5.0",
     "nunjucks": "3.2.4",
     "redis": "6.3.0",
     "ts-node": "10.9.2",
@@ -71,9 +71,9 @@
     "@types/chai-as-promised": "8.0.2",
     "@types/cookie-parser": "1.4.10",
     "@types/express": "5.0.6",
-    "@types/govuk-frontend": "5.12.0",
+    "@types/govuk-frontend": "6.0.0",
     "@types/jest": "30.0.0",
-    "@types/lodash": "4.17.26",
+    "@types/lodash": "4.17.27",
     "@types/moment-timezone": "0.5.30",
     "@types/multer": "2.3.0",
     "@types/node": "^24.19.2",
@@ -106,7 +106,7 @@
     "playwright-core": "1.64.1",
     "playwright-lighthouse": "4.0.0",
     "prettier": "3.9.10",
-    "sass": "1.105.2",
+    "sass": "1.106.1",
     "sass-loader": "17.0.1",
     "sinon": "22.1.0",
     "style-loader": "4.0.0",
@@ -114,7 +114,7 @@
     "supertest": "7.3.1",
     "ts-jest": "29.4.15",
     "ts-loader": "9.6.2",
-    "webpack": "5.112.0",
+    "webpack": "5.112.2",
     "webpack-cli": "7.2.3",
     "webpack-dev-middleware": "8.5.0"
   },
@@ -126,7 +126,9 @@
     "ip-address": "10.7.4",
     "moment": "2.31.0",
     "qs": "6.16.1",
-    "follow-redirects": "1.16.1"
+    "follow-redirects": "1.16.1",
+    "@azure/msal-node": "7.1.0",
+    "body-parser": "2.4.0"
   },
   "packageManager": "yarn@4.18.1"
 }
