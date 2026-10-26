@@ -49,10 +49,9 @@ test.describe('Warning Notice Page Tests', () => {
       await expect(warningNoticePage.mainContent.content).toContainText(
         `Warning notice for ${createdCourt.name} has been successfully updated.`
       );
-      await expect(warningNoticePage.page.getByRole('link', { name: 'Back to warning notice' })).toHaveAttribute(
-        'href',
-        `/courts/${createdCourt.id}/edit/warning-notice`
-      );
+      await expect(
+        warningNoticePage.page.getByRole('link', { name: `Continue updating ${createdCourt.name}` })
+      ).toHaveAttribute('href', `/courts/${createdCourt.id}/edit`);
       await expect(warningNoticePage.mainContent.content.getByRole('link', { name: 'Home' })).toHaveAttribute(
         'href',
         '/'
