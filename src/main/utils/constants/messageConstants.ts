@@ -184,15 +184,13 @@ export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct form
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
 export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a phone number in the correct format';
 export const CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = `Explanation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
-export const CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
-  'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+export const TEXT_FIELD_INVALID_CHARACTERS_MESSAGE =
+  'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 export const WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in Welsh, the English translation is now mandatory';
 export const CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = `Welsh translation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
-export const CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
-  'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
 
 // Court opening hours service
 export const ALLOWED_OPENING_HOUR_TYPES = [
@@ -275,10 +273,6 @@ export const TELEPHONE_NUMBER_INVALID_MESSAGE = 'Enter a telephone number in the
 export const WARNING_NOTICE_MAX_LENGTH = 700;
 export const WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Welsh warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
-export const WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
-  'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
-export const WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
-  'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 export const ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE =
   'Because you provided a warning notice in Welsh, the English translation is now mandatory';
 export const WELSH_WARNING_NOTICE_REQUIRED_MESSAGE =

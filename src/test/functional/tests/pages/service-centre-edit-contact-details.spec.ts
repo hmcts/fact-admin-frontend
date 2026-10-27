@@ -344,7 +344,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+            'Explanation must must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
@@ -375,7 +375,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Welsh explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+            'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);

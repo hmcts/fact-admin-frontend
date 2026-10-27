@@ -5,14 +5,13 @@ import { isHttpStatusCode, toSingleValidationErrorRecord } from '../../utils/api
 import { validateBilingualTextPair } from '../../utils/bilingualTextValidation';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
-  WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
   WARNING_NOTICE_MAX_LENGTH,
   WARNING_NOTICE_MAX_LENGTH_MESSAGE,
-  WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
   WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
+import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
 import { toErrorSummary } from '../../utils/formHelpers';
 
 export type WarningNoticeForm = {
@@ -126,18 +125,18 @@ export class CourtWarningNoticeService {
     const { warningNotice, warningNoticeCy } = form;
     return validateBilingualTextPair(warningNotice, warningNoticeCy, {
       englishKey: 'warningNotice',
-      englishPattern: ENGLISH_WARNING_NOTICE_REGEX,
+      englishPattern: ENGLISH_TEXT_REGEX,
       maximumLength: WARNING_NOTICE_MAX_LENGTH,
       messages: {
-        englishInvalidCharacters: WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+        englishInvalidCharacters: 'Warning notice ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
         englishMaximumLength: WARNING_NOTICE_MAX_LENGTH_MESSAGE,
         englishRequired: ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
-        welshInvalidCharacters: WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE,
+        welshInvalidCharacters: 'Welsh translation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
         welshMaximumLength: WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE,
         welshRequired: WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
       },
       welshKey: 'warningNoticeCy',
-      welshPattern: WELSH_WARNING_NOTICE_REGEX,
+      welshPattern: WELSH_TEXT_REGEX,
     });
   }
 }
