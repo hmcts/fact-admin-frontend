@@ -200,7 +200,7 @@ describe('accessibilityValidationConfig.validate', () => {
     expect(result).toEqual(
       expect.objectContaining({
         accessibleToiletDescriptionCy: [
-          'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         ],
       })
     );

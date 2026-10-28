@@ -346,10 +346,6 @@ export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE =
   'Enter a description of the accessible toilet facilities';
 export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE =
   'Enter a Welsh description of the accessible toilet facilities';
-export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE =
-  'Accessible toilet description in English must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
-export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE =
-  'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE =
   'Select what hearing enhancement equipment is available';
 
