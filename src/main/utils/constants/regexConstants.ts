@@ -25,7 +25,6 @@ export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,'\-()&+]+$/u;
 // Court professional information service
 export const INTEGER_REGEX = /^\d+$/;
 export const PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 ()':,\-&]+$/;
-export const PROFESSIONAL_INFO_WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 ()':,\-&]+$/u;
 export const GBS_CODE_REGEX = /^[A-Za-z0-9]*$/;
 
 // Add service centre service

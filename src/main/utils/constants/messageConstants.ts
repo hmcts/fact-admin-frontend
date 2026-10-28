@@ -238,8 +238,6 @@ export const FAX_NUMBER_VALIDATION_ERROR =
   'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
 export const GBS_VALIDATION_ERROR = 'GBS code must only include letters and numbers, with a max of 10 characters';
 export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms between 1 and 150, or select No';
-export const DX_VALIDATION_ERROR =
-  'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE =
   'You have entered a DX code explanation without a DX code, please add a code or remove the explanation';
 export const DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE =

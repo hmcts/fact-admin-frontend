@@ -10,7 +10,6 @@ import {
   DX_CODE_MAX_LENGTH,
   DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE,
   DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE,
-  DX_VALIDATION_ERROR,
   FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE,
   FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   FAX_NUMBER_VALIDATION_ERROR,
@@ -29,7 +28,7 @@ import {
   GBS_CODE_REGEX,
   INTEGER_REGEX,
   PHONE_NUMBER_REGEX,
-  PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
+  WELSH_TEXT_REGEX,
 } from '../../utils/constants/regexConstants';
 import { collectValidationErrors } from '../../utils/validation';
 
@@ -464,7 +463,7 @@ export class CourtProfessionalInformationService {
       codeFieldId: 'dxCode',
       englishDescriptionFieldId: 'dxCodeDescription',
       welshDescriptionFieldId: 'dxCodeDescriptionCy',
-      codePattern: PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
+      codePattern: ENGLISH_TEXT_REGEX,
       codeMaxLength: DX_CODE_MAX_LENGTH,
       descriptionMaxLength: REPEATABLE_DESCRIPTION_MAX_LENGTH,
       messages: {
@@ -476,7 +475,7 @@ export class CourtProfessionalInformationService {
           `DX code ${displayIndex}: ${DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
         welshDescriptionNeedsEnglish: displayIndex =>
           `DX code ${displayIndex}: ${DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
-        invalidCode: displayIndex => `DX code ${displayIndex}: ${DX_VALIDATION_ERROR}`,
+        invalidCode: displayIndex => `DX code ${displayIndex}: ${TEXT_FIELD_INVALID_CHARACTERS_MESSAGE}`,
         codeTooLong: (displayIndex, maxLength) =>
           `DX code ${displayIndex}: DX code must be ${maxLength} characters or fewer`,
         englishDescriptionTooLong: (displayIndex, maxLength) =>
@@ -581,7 +580,7 @@ export class CourtProfessionalInformationService {
         when: context =>
           context.descriptionCy.length <= config.descriptionMaxLength &&
           Boolean(context.descriptionCy) &&
-          !ENGLISH_TEXT_REGEX.test(context.descriptionCy),
+          !WELSH_TEXT_REGEX.test(context.descriptionCy),
       },
     ];
   }
@@ -738,7 +737,7 @@ export class CourtProfessionalInformationService {
       if (normalizedFieldName === 'explanationcy') {
         return {
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          label: `DX code ${displayIndex} Welsh explanation`,
+          label: `DX code ${displayIndex} Welsh translation`,
         };
       }
       return {
@@ -756,7 +755,7 @@ export class CourtProfessionalInformationService {
     if (normalizedFieldName === 'descriptioncy') {
       return {
         href: `#faxNumberDescriptionCy-${formIndex}`,
-        label: `Fax number ${displayIndex} Welsh description`,
+        label: `Fax number ${displayIndex} Welsh translation`,
       };
     }
     return {
@@ -790,7 +789,7 @@ export class CourtProfessionalInformationService {
     }
     if (normalizedText.includes('invalid characters')) {
       if (href?.startsWith('#dxCode')) {
-        return DX_VALIDATION_ERROR;
+        return TEXT_FIELD_INVALID_CHARACTERS_MESSAGE;
       }
       if (href === '#gbs') {
         return GBS_VALIDATION_ERROR;
