@@ -126,7 +126,7 @@
     "ip-address": "10.7.4",
     "moment": "2.31.0",
     "qs": "6.16.1",
-    "follow-redirects": "1.16.1",
+    "follow-redirects": "1.16.2",
     "@azure/msal-node": "7.1.0",
     "body-parser": "2.4.0"
   },
