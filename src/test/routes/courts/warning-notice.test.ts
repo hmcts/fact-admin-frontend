@@ -78,7 +78,7 @@ describe('Warning notice page', () => {
     expect(response.text).toContain('Warning notice saved');
     expect(response.text).toContain('Warning notice for Reading Crown Court has been successfully updated.');
     expect(response.text).toContain(
-      `<a href="/courts/${COURT_ID}/edit/warning-notice" class="govuk-link govuk-link--no-visited-state">Back to warning notice</a>`
+      `<a href="/courts/${COURT_ID}/edit" class="govuk-link govuk-link--no-visited-state">Continue updating Reading Crown Court</a>`
     );
     expect(updateCourtStub.calledOnce).toBe(true);
     expect(updateCourtStub.firstCall.args[0]).toMatchObject({
