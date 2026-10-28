@@ -1,4 +1,5 @@
 {
+  "displayOSOutageWarning": "DISPLAY_OS_OUTAGE_WARNING",
   "secrets": {
     "fact-kv": {
       "API_APP_REG_ID": "API_APP_REG_ID",
