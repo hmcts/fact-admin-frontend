@@ -177,8 +177,8 @@ describe('CourtWarningNoticeController', () => {
       pageTitle: 'Warning notice saved',
       successPanelTitle: 'Warning notice saved',
       successPanelBody: `Warning notice for ${viewModel.courtName} has been successfully updated.`,
-      continueUpdatingHref: `/courts/${courtId}/edit/warning-notice`,
-      continueUpdatingText: 'Back to warning notice',
+      continueUpdatingHref: `/courts/${courtId}/edit`,
+      continueUpdatingText: `Continue updating ${viewModel.courtName}`,
       breadcrumbs: [
         { href: '/', text: 'Home' },
         { href: `/courts/${courtId}/edit`, text: `Edit ${viewModel.courtName}` },

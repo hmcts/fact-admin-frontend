@@ -69,8 +69,8 @@ export default class CourtWarningNoticeController extends BaseController {
       pageTitle: 'Warning notice saved',
       successPanelTitle: 'Warning notice saved',
       successPanelBody: `Warning notice for ${courtName} has been successfully updated.`,
-      continueUpdatingHref: `/courts/${saveResult.viewModel.courtId}/edit/warning-notice`,
-      continueUpdatingText: 'Back to warning notice',
+      continueUpdatingHref: `/courts/${saveResult.viewModel.courtId}/edit`,
+      continueUpdatingText: `Continue updating ${courtName}`,
       breadcrumbs: this.buildWarningNoticeBreadcrumbs(saveResult.viewModel.courtId, courtName, 'Warning notice saved'),
     });
   }
