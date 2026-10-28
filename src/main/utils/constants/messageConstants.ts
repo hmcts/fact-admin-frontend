@@ -381,3 +381,6 @@ export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
   jerseyPostcode: 'Jersey postcodes are not supported for this service',
   isleOfManPostcode: 'Isle of man postcodes are not supported for this service',
 };
+
+export const OS_OUTAGE_WARNING_MESSAGE =
+  'Our postcode searches rely on Ordnance Survey. Ordnance Survey is currently down. We are working to fix this quickly.';
