@@ -1,5 +1,6 @@
 import { GET, POST, route } from 'awilix-express';
 import { HttpStatusCode } from 'axios';
+import config from 'config';
 import { Request, Response } from 'express';
 
 import { Logger } from '../../modules/logging';
@@ -8,11 +9,15 @@ import { ServiceCentreAddress } from '../../schemas/serviceCentreAddressSchema';
 import { SubjectType } from '../../schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../../services/service-centres/ServiceCentreAddressService';
 import { isValidPostcode, validatePostcodeField } from '../../utils/addressValidation';
+import { OS_OUTAGE_WARNING_MESSAGE } from '../../utils/constants/messageConstants';
 import { normalisePostcode } from '../../utils/osAddressOptions';
 import BaseController from '../BaseController';
 import { buildSectionBreadcrumbs } from '../helpers/breadcrumbs';
 
 const logger = Logger.getLogger('app');
+
+const osOutageWarningText =
+  String(config.get('displayOSOutageWarning')).trim().toLowerCase() === 'true' ? OS_OUTAGE_WARNING_MESSAGE : null;
 
 @route('/service-centres/:serviceCentreId/edit/address')
 export default class ServiceCentreAddressController extends BaseController {
@@ -77,6 +82,7 @@ export default class ServiceCentreAddressController extends BaseController {
       serviceCentreName,
       serviceCentreId,
       isNewSC,
+      osOutageWarningText,
     });
   }
 
@@ -107,6 +113,7 @@ export default class ServiceCentreAddressController extends BaseController {
       serviceCentreName,
       serviceCentreId,
       postcode: addressResponse.postcode,
+      osOutageWarningText,
     });
   }
 
@@ -141,6 +148,7 @@ export default class ServiceCentreAddressController extends BaseController {
         serviceCentreId,
         postcode,
         isNewSC,
+        osOutageWarningText,
       });
       return;
     }
@@ -164,6 +172,7 @@ export default class ServiceCentreAddressController extends BaseController {
         serviceCentreId,
         postcode,
         isNewSC,
+        osOutageWarningText,
       });
       return;
     }
@@ -209,6 +218,7 @@ export default class ServiceCentreAddressController extends BaseController {
         serviceCentreName,
         serviceCentreId,
         postcode,
+        osOutageWarningText,
       });
       return;
     }
@@ -227,6 +237,7 @@ export default class ServiceCentreAddressController extends BaseController {
         serviceCentreId,
         postcode,
         pageTitle: 'Find Address',
+        osOutageWarningText,
       });
       return;
     }
