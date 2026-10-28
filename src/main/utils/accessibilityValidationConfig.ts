@@ -23,7 +23,8 @@ import {
   MAX_LIFT_DOOR_WIDTH_CM,
   MAX_LIFT_WEIGHT_LIMIT_KG,
   MIN_LIFT_DOOR_WIDTH_CM,
-  MIN_LIFT_WEIGHT_LIMIT_KG, TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
+  MIN_LIFT_WEIGHT_LIMIT_KG,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
 } from './constants/messageConstants';
 import { PHONE_NUMBER_REGEX, TOILET_DESC_REGEX, TOILET_DESC_REGEX_WELSH } from './constants/regexConstants';
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
