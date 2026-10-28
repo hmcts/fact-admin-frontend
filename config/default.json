@@ -1,5 +1,6 @@
 {
   "useCSRFProtection": true,
+  "displayOSOutageWarning": false,
   "appInsights": {
     "instrumentationKey": false
   },
