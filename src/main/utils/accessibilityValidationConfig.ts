@@ -26,7 +26,7 @@ import {
   MIN_LIFT_WEIGHT_LIMIT_KG,
   TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
 } from './constants/messageConstants';
-import { PHONE_NUMBER_REGEX, TOILET_DESC_REGEX, TOILET_DESC_REGEX_WELSH } from './constants/regexConstants';
+import { ENGLISH_TEXT_REGEX, PHONE_NUMBER_REGEX, WELSH_TEXT_REGEX } from './constants/regexConstants';
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
@@ -152,12 +152,12 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
     // Toilet description pattern
     patternRule(
       'accessibleToiletDescription',
-      TOILET_DESC_REGEX,
+      ENGLISH_TEXT_REGEX,
       'Accessible toilet description ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE
     ),
     patternRule(
       'accessibleToiletDescriptionCy',
-      TOILET_DESC_REGEX_WELSH,
+      WELSH_TEXT_REGEX,
       'Welsh translation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE
     ),
 
