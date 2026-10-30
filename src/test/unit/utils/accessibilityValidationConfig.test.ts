@@ -205,4 +205,66 @@ describe('accessibilityValidationConfig.validate', () => {
       })
     );
   });
+
+  test('rejects English accessible toilet description longer than 250 characters', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: '01234567890',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '01234567891',
+      lift: true,
+      liftDoorWidth: 100,
+      liftDoorLimit: 500,
+      quietRoom: true,
+      accessibleToiletDescription: 'a'.repeat(251),
+      accessibleToiletDescriptionCy: 'Disgrifiad Cymraeg dilys',
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        accessibleToiletDescription: ['Accessible toilet description must not exceed 250 characters'],
+      })
+    );
+  });
+
+  test('rejects Welsh accessible toilet description longer than 250 characters', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: '01234567890',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '01234567891',
+      lift: true,
+      liftDoorWidth: 100,
+      liftDoorLimit: 500,
+      quietRoom: true,
+      accessibleToiletDescription: 'Valid English description',
+      accessibleToiletDescriptionCy: 'a'.repeat(251),
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        accessibleToiletDescriptionCy: ['Welsh accessible toilet description must not exceed 250 characters'],
+      })
+    );
+  });
+
+  test('accepts accessible toilet descriptions at exactly 250 characters', () => {
+    const result = validate({
+      accessibleParking: true,
+      accessibleParkingPhoneNumber: '01234567890',
+      accessibleEntrance: false,
+      accessibleEntrancePhoneNumber: '01234567891',
+      lift: true,
+      liftDoorWidth: 100,
+      liftDoorLimit: 500,
+      quietRoom: true,
+      accessibleToiletDescription: 'a'.repeat(250),
+      accessibleToiletDescriptionCy: 'b'.repeat(250),
+      hearingEnhancementEquipment: 'infrared',
+    });
+
+    expect(result).toBeUndefined();
+  });
 });

@@ -2,6 +2,8 @@
 import type { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
 
 import {
+  ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH,
+  ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE,
   COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE,
@@ -25,6 +27,7 @@ import {
   MIN_LIFT_DOOR_WIDTH_CM,
   MIN_LIFT_WEIGHT_LIMIT_KG,
   TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
+  WELSH_ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE,
 } from './constants/messageConstants';
 import { ENGLISH_TEXT_REGEX, PHONE_NUMBER_REGEX, WELSH_TEXT_REGEX } from './constants/regexConstants';
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
@@ -35,6 +38,8 @@ const isBelowMin = (value: number | null | undefined, min: number): boolean =>
   typeof value === 'number' && !Number.isNaN(value) && value < min;
 const isAboveMax = (value: number | null | undefined, max: number): boolean =>
   typeof value === 'number' && !Number.isNaN(value) && value > max;
+const isTooLong = (value: string | null | undefined, max: number): boolean =>
+  typeof value === 'string' && value?.length > max;
 
 export const validate = (model: AccessibilityModel): Record<string, string[]> | undefined => {
   const errors: Record<string, string[]> = {};
@@ -146,6 +151,22 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
       validate: m =>
         !m.accessibleToiletDescriptionCy?.trim()
           ? [COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE]
+          : undefined,
+    },
+
+    // Toilet description length
+    {
+      key: 'accessibleToiletDescription',
+      validate: m =>
+        isTooLong(m.accessibleToiletDescription, ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH)
+          ? [ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE]
+          : undefined,
+    },
+    {
+      key: 'accessibleToiletDescriptionCy',
+      validate: m =>
+        isTooLong(m.accessibleToiletDescriptionCy, ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH)
+          ? [WELSH_ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE]
           : undefined,
     },
 

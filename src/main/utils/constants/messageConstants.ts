@@ -317,6 +317,7 @@ export const SAFE_RETURN_KEYS = new Set([
 export const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
 
 // Court accessibility validation Config
+export const ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH = 250;
 export const MIN_LIFT_DOOR_WIDTH_CM = 1;
 export const MAX_LIFT_DOOR_WIDTH_CM = 1000;
 export const MIN_LIFT_WEIGHT_LIMIT_KG = 1;
@@ -345,6 +346,8 @@ export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE =
   'Enter a Welsh description of the accessible toilet facilities';
 export const COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE =
   'Select what hearing enhancement equipment is available';
+export const ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE = `Accessible toilet description must not exceed ${ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH} characters`;
+export const WELSH_ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE = `Welsh accessible toilet description must not exceed ${ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH} characters`;
 
 // Address validation
 export const ADDRESS_LINE_MAX_LENGTH = 250;

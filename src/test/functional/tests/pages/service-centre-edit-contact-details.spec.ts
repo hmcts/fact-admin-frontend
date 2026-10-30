@@ -344,7 +344,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Explanation must must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
+            'Explanation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
