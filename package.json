@@ -119,7 +119,7 @@
     "webpack-dev-middleware": "8.5.0"
   },
   "resolutions": {
-    "@grpc/grpc-js": "1.14.6",
+    "@grpc/grpc-js": "1.14.7",
     "@opentelemetry/core": "2.12.0",
     "proxy-addr": "2.0.8",
     "@opentelemetry/sdk-node": "0.223.0",
