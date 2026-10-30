@@ -6,16 +6,7 @@ import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtCon
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { isHttpStatusCode } from '../../utils/apiResponses';
-import {
-  CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
-  CONTACT_TYPE_REQUIRED_MESSAGE,
-  CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-  MAX_EXPLANATION_LENGTH,
-  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
-  WELSH_TRANSLATION_REQUIRED_MESSAGE,
-} from '../../utils/constants/messageConstants';
-import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
+import { CONTACT_TYPE_REQUIRED_MESSAGE } from '../../utils/constants/messageConstants';
 import {
   ContactApiFieldMapping,
   ContactDescriptionTypeItem,
@@ -182,17 +173,7 @@ export class CourtContactService {
 
     validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
-    validateContactExplanationFields(formValues, formErrors, errorSummary, {
-      englishInvalidCharacters: 'Explanation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
-      englishPattern: ENGLISH_TEXT_REGEX,
-      englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-      englishTooLong: CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
-      maximumLength: MAX_EXPLANATION_LENGTH,
-      welshInvalidCharacters: 'Welsh translation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
-      welshPattern: WELSH_TEXT_REGEX,
-      welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
-      welshTooLong: CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-    });
+    validateContactExplanationFields(formValues, formErrors, errorSummary);
 
     return {
       errorSummary,
