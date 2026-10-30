@@ -284,8 +284,7 @@ describe('CourtProfessionalInformationService', () => {
           'dxCode-0':
             'DX code 1: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
           familyCourtCode: 'Enter a family court code',
-          'faxNumber-0':
-            'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          'faxNumber-0': 'Fax number 1: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           'faxNumber-1':
             'Fax number 2: You have entered a description without a fax number, please add a number or remove the description',
           gbs: 'GBS code must only include letters and numbers, with a max of 10 characters',
@@ -356,7 +355,7 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#faxNumber-0',
-            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 1: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumberDescription-0',
@@ -487,7 +486,7 @@ describe('CourtProfessionalInformationService', () => {
           { href: '#interviewRoomCount', text: 'Enter a number of interview rooms between 1 and 150, or select No' },
           {
             href: '#faxNumber-0',
-            text: 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
         ],
       },
@@ -581,7 +580,7 @@ describe('CourtProfessionalInformationService', () => {
           { href: '#interviewRooms', text: 'Interview rooms must be true or false' },
           {
             href: '#faxNumber-0',
-            text: 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumberDescription-0',
@@ -649,7 +648,7 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#faxNumber-1',
-            text: 'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 2: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumberDescription-1',
@@ -661,8 +660,7 @@ describe('CourtProfessionalInformationService', () => {
             'DX code 2: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           'dxCodeDescription-1':
             'DX code 2 explanation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
-          'faxNumber-1':
-            'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          'faxNumber-1': 'Fax number 2: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           'faxNumberDescription-1':
             'Fax number 2 description: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         },
@@ -763,11 +761,11 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#faxNumber-0',
-            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 1: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumber-4',
-            text: 'Fax number 5: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 5: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
         ],
       },
@@ -811,7 +809,7 @@ describe('CourtProfessionalInformationService', () => {
           },
           {
             href: '#faxNumber-4',
-            text: 'Fax number 5: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 5: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
         ],
       },
@@ -1045,7 +1043,7 @@ describe('CourtProfessionalInformationService', () => {
     );
     expect(serviceTestAccess.apiErrorHref('otherField', 'phone must match the regex')).toBe('#faxNumber-0');
     expect(serviceTestAccess.apiErrorText('fax', 'invalid characters', '#other')).toBe(
-      'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000'
+      'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)'
     );
     expect(serviceTestAccess.toString(['value-one', 'value-two'])).toBe('value-one');
     expect(serviceTestAccess.toString([])).toBe('');

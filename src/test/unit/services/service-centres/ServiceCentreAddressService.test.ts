@@ -154,11 +154,11 @@ describe('ServiceCentreAddressService', () => {
             'Only a single address can be added for a service centre, and this service centre already has an address assigned.',
           ],
           addressLine1: [
-            'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'Address line 1 must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           ],
           addressLine2: [
             'Address line 2 must be 250 characters or less',
-            'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'Address line 2 must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           ],
           county: [
             'County must be 100 characters or less',

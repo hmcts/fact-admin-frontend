@@ -29,10 +29,10 @@ describe('contactDetailsValidation', () => {
     const invalidEmailSummary: ContactValidationError[] = [];
     validateContactDetailsMethods(['email'], 'invalid-email', '', invalidEmailErrors, invalidEmailSummary);
 
-    expect(invalidEmailErrors.contactEmail).toBe('Enter an email address in the correct format');
+    expect(invalidEmailErrors.contactEmail).toBe('Enter a valid email address');
     expect(invalidEmailSummary).toContainEqual({
       href: '#contact-email',
-      text: 'Enter an email address in the correct format',
+      text: 'Enter a valid email address',
     });
   });
 
@@ -48,10 +48,12 @@ describe('contactDetailsValidation', () => {
     const invalidPhoneSummary: ContactValidationError[] = [];
     validateContactDetailsMethods(['phone'], '', 'not-a-phone', invalidPhoneErrors, invalidPhoneSummary);
 
-    expect(invalidPhoneErrors.contactTelephone).toBe('Enter a phone number in the correct format');
+    expect(invalidPhoneErrors.contactTelephone).toBe(
+      'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
+    );
     expect(invalidPhoneSummary).toContainEqual({
       href: '#contact-telephone',
-      text: 'Enter a phone number in the correct format',
+      text: 'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)',
     });
   });
 });

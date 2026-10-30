@@ -171,7 +171,6 @@ export const AREA_OF_LAW_VALIDATION_MESSAGE = 'Select at least one type of case 
 // Court counter service opening hours service
 export const COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE = 'Select what the counter can assist with';
 export const COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE = 'Select yes if an appointment is needed';
-export const COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter a valid contact email address';
 export const COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
   'Select whether the counter opens and closes at the same time Monday to Friday';
 
@@ -180,9 +179,9 @@ export const MAX_EXPLANATION_LENGTH = 250;
 export const CONTACT_TYPE_REQUIRED_MESSAGE = 'Select a contact type';
 export const CONTACT_METHOD_REQUIRED_MESSAGE = 'Select at least one contact method';
 export const EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
-export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
+export const EMAIL_INVALID_MESSAGE = 'Enter a valid email address';
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
-export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a phone number in the correct format';
+export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)';
 export const CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = `Explanation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
 export const TEXT_FIELD_INVALID_CHARACTERS_MESSAGE =
   'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
@@ -234,8 +233,7 @@ export const DX_CODE_MAX_LENGTH = 200;
 export const REPEATABLE_DESCRIPTION_MAX_LENGTH = 250;
 export const INTERVIEW_ROOM_COUNT_REQUIRED_ERROR = 'Enter the number of interview rooms';
 export const INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR = 'Enter the number of interview rooms using numbers only';
-export const FAX_NUMBER_VALIDATION_ERROR =
-  'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
+export const FAX_NUMBER_VALIDATION_ERROR = 'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)';
 export const GBS_VALIDATION_ERROR = 'GBS code must only include letters and numbers, with a max of 10 characters';
 export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms between 1 and 150, or select No';
 export const DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE =
@@ -265,7 +263,8 @@ export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
 
 // Court translation and interpretation service
 export const TELEPHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a telephone number';
-export const TELEPHONE_NUMBER_INVALID_MESSAGE = 'Enter a telephone number in the correct format';
+export const TELEPHONE_NUMBER_INVALID_MESSAGE =
+  'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)';
 
 // Court warning notice service
 export const WARNING_NOTICE_MAX_LENGTH = 700;

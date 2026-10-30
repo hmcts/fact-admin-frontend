@@ -362,7 +362,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
         },
         courtId
       ).formErrors.contactEmail
-    ).toBe('Enter an email address in the correct format');
+    ).toBe('Enter a valid email address');
 
     expect(
       service.validate(
@@ -373,7 +373,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
         },
         courtId
       ).formErrors.contactTelephone
-    ).toBe('Enter a phone number in the correct format');
+    ).toBe('Enter a valid phone number (10-20 digits, optional +44, spaces allowed)');
 
     expect(
       service.validate(

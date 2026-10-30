@@ -221,7 +221,7 @@ describe('ServiceCentreContactService', () => {
     }
 
     expect(missingEmail.formViewModel.formErrors.contactEmail).toBe('Enter an email address');
-    expect(malformedEmail.formViewModel.formErrors.contactEmail).toBe('Enter an email address in the correct format');
+    expect(malformedEmail.formViewModel.formErrors.contactEmail).toBe('Enter a valid email address');
   });
 
   test('submitContactDetailFlow validates explanation format, length and translation dependencies', async () => {

@@ -179,10 +179,10 @@ test.describe(
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(
-            'Enter an email address in the correct format'
+            'Enter a valid email address'
           );
           await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(
-            'Enter a phone number in the correct format'
+            'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
           );
         }
       );
