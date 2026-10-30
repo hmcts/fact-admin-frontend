@@ -171,7 +171,6 @@ export const AREA_OF_LAW_VALIDATION_MESSAGE = 'Select at least one type of case 
 // Court counter service opening hours service
 export const COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE = 'Select what the counter can assist with';
 export const COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE = 'Select yes if an appointment is needed';
-export const COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter a valid contact email address';
 export const COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
   'Select whether the counter opens and closes at the same time Monday to Friday';
 
@@ -180,19 +179,17 @@ export const MAX_EXPLANATION_LENGTH = 250;
 export const CONTACT_TYPE_REQUIRED_MESSAGE = 'Select a contact type';
 export const CONTACT_METHOD_REQUIRED_MESSAGE = 'Select at least one contact method';
 export const EMAIL_REQUIRED_MESSAGE = 'Enter an email address';
-export const EMAIL_INVALID_MESSAGE = 'Enter an email address in the correct format';
+export const EMAIL_INVALID_MESSAGE = 'Enter a valid email address';
 export const PHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a phone number';
-export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a phone number in the correct format';
-export const COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = 'Explanation must be 250 characters or fewer';
-export const COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
-  'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+export const PHONE_NUMBER_INVALID_MESSAGE = 'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)';
+export const CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE = `Explanation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
+export const TEXT_FIELD_INVALID_CHARACTERS_MESSAGE =
+  'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 export const WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in Welsh, the English translation is now mandatory';
-export const COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = 'Welsh translation must be 250 characters or fewer';
-export const COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE =
-  'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+export const CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE = `Welsh translation must be ${MAX_EXPLANATION_LENGTH} characters or fewer`;
 
 // Court opening hours service
 export const ALLOWED_OPENING_HOUR_TYPES = [
@@ -236,12 +233,9 @@ export const DX_CODE_MAX_LENGTH = 200;
 export const REPEATABLE_DESCRIPTION_MAX_LENGTH = 250;
 export const INTERVIEW_ROOM_COUNT_REQUIRED_ERROR = 'Enter the number of interview rooms';
 export const INTERVIEW_ROOM_COUNT_NUMBERS_ONLY_ERROR = 'Enter the number of interview rooms using numbers only';
-export const FAX_NUMBER_VALIDATION_ERROR =
-  'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000';
+export const FAX_NUMBER_VALIDATION_ERROR = 'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)';
 export const GBS_VALIDATION_ERROR = 'GBS code must only include letters and numbers, with a max of 10 characters';
 export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms between 1 and 150, or select No';
-export const DX_VALIDATION_ERROR =
-  'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE =
   'You have entered a DX code explanation without a DX code, please add a code or remove the explanation';
 export const DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE =
@@ -269,16 +263,13 @@ export const SUPPORTED_SINGLE_POINT_OF_ENTRY_SERVICES = [
 
 // Court translation and interpretation service
 export const TELEPHONE_NUMBER_REQUIRED_MESSAGE = 'Enter a telephone number';
-export const TELEPHONE_NUMBER_INVALID_MESSAGE = 'Enter a telephone number in the correct format';
+export const TELEPHONE_NUMBER_INVALID_MESSAGE =
+  'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)';
 
 // Court warning notice service
 export const WARNING_NOTICE_MAX_LENGTH = 700;
 export const WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
 export const WELSH_WARNING_NOTICE_MAX_LENGTH_MESSAGE = `Welsh warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or less`;
-export const WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
-  'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
-export const WELSH_WARNING_NOTICE_INVALID_CHARACTERS_MESSAGE =
-  'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses';
 export const ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE =
   'Because you provided a warning notice in Welsh, the English translation is now mandatory';
 export const WELSH_WARNING_NOTICE_REQUIRED_MESSAGE =
@@ -326,6 +317,7 @@ export const SAFE_RETURN_KEYS = new Set([
 export const SAFE_RETURN_HASHES = new Set(['', '#courts', '#favourites']);
 
 // Court accessibility validation Config
+export const ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH = 250;
 export const MIN_LIFT_DOOR_WIDTH_CM = 1;
 export const MAX_LIFT_DOOR_WIDTH_CM = 1000;
 export const MIN_LIFT_WEIGHT_LIMIT_KG = 1;
@@ -352,12 +344,10 @@ export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE =
   'Enter a description of the accessible toilet facilities';
 export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE =
   'Enter a Welsh description of the accessible toilet facilities';
-export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE =
-  'Accessible toilet description in English must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
-export const COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE =
-  'Accessible toilet description in Welsh must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE =
   'Select what hearing enhancement equipment is available';
+export const ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE = `Accessible toilet description must not exceed ${ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH} characters`;
+export const WELSH_ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE = `Welsh accessible toilet description must not exceed ${ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH} characters`;
 
 // Address validation
 export const ADDRESS_LINE_MAX_LENGTH = 250;

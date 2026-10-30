@@ -240,10 +240,10 @@ test.describe(
 
           await expect(translationAndInterpretationPage.mainContent.content).toContainText('There is a problem');
           await expect(translationAndInterpretationPage.mainContent.content).toContainText(
-            'Enter an email address in the correct format'
+            'Enter a valid email address'
           );
           await expect(translationAndInterpretationPage.mainContent.content).toContainText(
-            'Enter a telephone number in the correct format'
+            'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
           );
           await expect(translationAndInterpretationPage.emailCheckbox).toBeChecked();
           await expect(translationAndInterpretationPage.phoneNumberCheckbox).toBeChecked();

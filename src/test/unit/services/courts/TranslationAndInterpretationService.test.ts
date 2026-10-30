@@ -155,8 +155,8 @@ describe('CourtTranslationAndInterpretationService', () => {
       status: 'validationError',
       viewModel: {
         errorSummary: [
-          { href: '#email', text: 'Enter an email address in the correct format' },
-          { href: '#phoneNumber', text: 'Enter a telephone number in the correct format' },
+          { href: '#email', text: 'Enter a valid email address' },
+          { href: '#phoneNumber', text: 'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)' },
         ],
       },
     });
@@ -178,7 +178,7 @@ describe('CourtTranslationAndInterpretationService', () => {
     expect(result).toMatchObject({
       status: 'validationError',
       viewModel: {
-        errorSummary: [{ href: '#email', text: 'Enter an email address in the correct format' }],
+        errorSummary: [{ href: '#email', text: 'Enter a valid email address' }],
       },
     });
     expect(saveTranslationServicesStub.notCalled).toBe(true);
@@ -199,7 +199,7 @@ describe('CourtTranslationAndInterpretationService', () => {
     expect(result).toMatchObject({
       status: 'validationError',
       viewModel: {
-        errorSummary: [{ href: '#email', text: 'Enter an email address in the correct format' }],
+        errorSummary: [{ href: '#email', text: 'Enter a valid email address' }],
       },
     });
     expect(saveTranslationServicesStub.notCalled).toBe(true);

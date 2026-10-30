@@ -5,10 +5,11 @@ import { isHttpStatusCode, toValidationErrorRecord } from '../../utils/apiRespon
 import { validateBilingualTextPair } from '../../utils/bilingualTextValidation';
 import {
   ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
   WARNING_NOTICE_MAX_LENGTH,
   WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { ENGLISH_WARNING_NOTICE_REGEX, WELSH_WARNING_NOTICE_REGEX } from '../../utils/constants/regexConstants';
+import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
 
 export type ServiceCentreWarningNoticeViewModel = {
   errors?: Record<string, string[]>;
@@ -113,21 +114,19 @@ export class ServiceCentreWarningNoticeService {
   private validateWarningNotices(warningNotice: string, warningNoticeCy: string): Record<string, string[]> | undefined {
     const errors = validateBilingualTextPair(warningNotice, warningNoticeCy, {
       englishKey: 'warningNotice',
-      englishPattern: ENGLISH_WARNING_NOTICE_REGEX,
+      englishPattern: ENGLISH_TEXT_REGEX,
       maximumLength: WARNING_NOTICE_MAX_LENGTH,
       messages: {
-        englishInvalidCharacters:
-          'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+        englishInvalidCharacters: 'Warning notice ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
         englishMaximumLength: `Warning notice must be ${WARNING_NOTICE_MAX_LENGTH} characters or fewer`,
         englishRequired: ENGLISH_WARNING_NOTICE_REQUIRED_MESSAGE,
-        welshInvalidCharacters:
-          'Warning notice in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+        welshInvalidCharacters: 'Welsh translation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
         welshMaximumLength: `Warning notice in Welsh must be ${WARNING_NOTICE_MAX_LENGTH} characters or fewer`,
         welshRequired: WELSH_WARNING_NOTICE_REQUIRED_MESSAGE,
       },
       validatePatternWhenTooLong: false,
       welshKey: 'warningNoticeCy',
-      welshPattern: WELSH_WARNING_NOTICE_REGEX,
+      welshPattern: WELSH_TEXT_REGEX,
     });
 
     return Object.keys(errors).length > 0

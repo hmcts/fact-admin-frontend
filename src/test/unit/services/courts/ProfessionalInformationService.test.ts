@@ -284,8 +284,7 @@ describe('CourtProfessionalInformationService', () => {
           'dxCode-0':
             'DX code 1: You have entered a DX code explanation without a DX code, please add a code or remove the explanation',
           familyCourtCode: 'Enter a family court code',
-          'faxNumber-0':
-            'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+          'faxNumber-0': 'Fax number 1: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           'faxNumber-1':
             'Fax number 2: You have entered a description without a fax number, please add a number or remove the description',
           gbs: 'GBS code must only include letters and numbers, with a max of 10 characters',
@@ -315,9 +314,9 @@ describe('CourtProfessionalInformationService', () => {
       viewModel: {
         fieldErrors: {
           'dxCodeDescriptionCy-0':
-            'DX code 1 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'DX code 1 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           'faxNumberDescriptionCy-0':
-            'Fax number 1 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'Fax number 1 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         },
       },
     });
@@ -344,27 +343,27 @@ describe('CourtProfessionalInformationService', () => {
         errorSummary: [
           {
             href: '#dxCode-0',
-            text: 'DX code 1: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 1: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#dxCodeDescription-0',
-            text: 'DX code 1 explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 1 explanation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#dxCodeDescriptionCy-0',
-            text: 'DX code 1 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 1 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#faxNumber-0',
-            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 1: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumberDescription-0',
-            text: 'Fax number 1 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'Fax number 1 description: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#faxNumberDescriptionCy-0',
-            text: 'Fax number 1 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'Fax number 1 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
         ],
       },
@@ -487,7 +486,7 @@ describe('CourtProfessionalInformationService', () => {
           { href: '#interviewRoomCount', text: 'Enter a number of interview rooms between 1 and 150, or select No' },
           {
             href: '#faxNumber-0',
-            text: 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
         ],
       },
@@ -581,19 +580,19 @@ describe('CourtProfessionalInformationService', () => {
           { href: '#interviewRooms', text: 'Interview rooms must be true or false' },
           {
             href: '#faxNumber-0',
-            text: 'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumberDescription-0',
-            text: 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#dxCodeDescription-0',
-            text: 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#dxCode-0',
-            text: 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#gbs',
@@ -610,10 +609,13 @@ describe('CourtProfessionalInformationService', () => {
     const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+          [
+            'dxCodes[1].dxCode',
+            'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+          ],
           [
             'dxCodes[1].explanation',
-            'Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           ],
           ['faxNumbers[1].faxNumber', 'Fax number contains invalid characters'],
           ['faxNumbers[1].description', 'Description contains invalid characters'],
@@ -638,29 +640,29 @@ describe('CourtProfessionalInformationService', () => {
         errorSummary: [
           {
             href: '#dxCode-1',
-            text: 'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 2: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#dxCodeDescription-1',
-            text: 'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 2 explanation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#faxNumber-1',
-            text: 'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 2: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumberDescription-1',
-            text: 'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'Fax number 2 description: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
         ],
         fieldErrors: {
-          'dxCode-1': 'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'dxCode-1':
+            'DX code 2: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           'dxCodeDescription-1':
-            'DX code 2 explanation: Explanation must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
-          'faxNumber-1':
-            'Fax number 2: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            'DX code 2 explanation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+          'faxNumber-1': 'Fax number 2: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           'faxNumberDescription-1':
-            'Fax number 2 description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'Fax number 2 description: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         },
       },
     });
@@ -697,18 +699,18 @@ describe('CourtProfessionalInformationService', () => {
         errorSummary: [
           {
             href: '#dxCodeDescriptionCy-1',
-            text: 'DX code 2 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 2 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#faxNumberDescriptionCy-1',
-            text: 'Fax number 2 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'Fax number 2 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
         ],
         fieldErrors: {
           'dxCodeDescriptionCy-1':
-            'DX code 2 Welsh explanation: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'DX code 2 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           'faxNumberDescriptionCy-1':
-            'Fax number 2 Welsh description: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'Fax number 2 Welsh translation: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         },
       },
     });
@@ -718,8 +720,14 @@ describe('CourtProfessionalInformationService', () => {
     const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          ['dxCodes[0].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
-          ['dxCodes[3].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+          [
+            'dxCodes[0].dxCode',
+            'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+          ],
+          [
+            'dxCodes[3].dxCode',
+            'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+          ],
           ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
           ['faxNumbers[4].faxNumber', 'Value contains invalid characters'],
         ])
@@ -745,19 +753,19 @@ describe('CourtProfessionalInformationService', () => {
         errorSummary: [
           {
             href: '#dxCode-0',
-            text: 'DX code 1: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 1: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#dxCode-3',
-            text: 'DX code 4: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 4: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#faxNumber-0',
-            text: 'Fax number 1: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 1: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
           {
             href: '#faxNumber-4',
-            text: 'Fax number 5: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 5: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
         ],
       },
@@ -768,7 +776,10 @@ describe('CourtProfessionalInformationService', () => {
     const courtApi = buildCourtApi({
       saveCourtProfessionalInformation: jest.fn().mockResolvedValue(
         new Map([
-          ['dxCodes[0].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+          [
+            'dxCodes[0].dxCode',
+            'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+          ],
           ['faxNumbers[0].faxNumber', 'Value contains invalid characters'],
         ])
       ),
@@ -794,11 +805,11 @@ describe('CourtProfessionalInformationService', () => {
         errorSummary: [
           {
             href: '#dxCode-3',
-            text: 'DX code 4: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            text: 'DX code 4: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
           {
             href: '#faxNumber-4',
-            text: 'Fax number 5: Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000',
+            text: 'Fax number 5: Enter a valid fax number (10-20 digits, optional +44, spaces allowed)',
           },
         ],
       },
@@ -1032,7 +1043,7 @@ describe('CourtProfessionalInformationService', () => {
     );
     expect(serviceTestAccess.apiErrorHref('otherField', 'phone must match the regex')).toBe('#faxNumber-0');
     expect(serviceTestAccess.apiErrorText('fax', 'invalid characters', '#other')).toBe(
-      'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000'
+      'Enter a valid fax number (10-20 digits, optional +44, spaces allowed)'
     );
     expect(serviceTestAccess.toString(['value-one', 'value-two'])).toBe('value-one');
     expect(serviceTestAccess.toString([])).toBe('');

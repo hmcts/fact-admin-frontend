@@ -6,17 +6,7 @@ import { SaveCourtContactDetailRequest } from '../../requests/types/SaveCourtCon
 import { CourtContactDetail } from '../../schemas/courtContactDetailSchema';
 import { CourtEntity } from '../../schemas/courtEntitySchema';
 import { isHttpStatusCode } from '../../utils/apiResponses';
-import {
-  CONTACT_TYPE_REQUIRED_MESSAGE,
-  COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
-  COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
-  COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
-  COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-  MAX_EXPLANATION_LENGTH,
-  WELSH_TRANSLATION_REQUIRED_MESSAGE,
-} from '../../utils/constants/messageConstants';
-import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
+import { CONTACT_TYPE_REQUIRED_MESSAGE } from '../../utils/constants/messageConstants';
 import {
   ContactApiFieldMapping,
   ContactDescriptionTypeItem,
@@ -31,6 +21,7 @@ import {
   validateContactDetailsMethods,
   validateContactExplanationFields,
 } from '../../utils/contactDetailsValidation';
+import { getContactTypeName } from '../../utils/contactTypes';
 import { parseString } from '../../utils/valueParsers';
 import { ContactSubmitFlowOutcome, runContactWorkflow } from '../shared/ContactWorkflow';
 
@@ -182,17 +173,7 @@ export class CourtContactService {
 
     validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
-    validateContactExplanationFields(formValues, formErrors, errorSummary, {
-      englishInvalidCharacters: COURT_CONTACT_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
-      englishPattern: ENGLISH_TEXT_REGEX,
-      englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-      englishTooLong: COURT_CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
-      maximumLength: MAX_EXPLANATION_LENGTH,
-      welshInvalidCharacters: COURT_CONTACT_WELSH_EXPLANATION_INVALID_CHARACTERS_MESSAGE,
-      welshPattern: WELSH_TEXT_REGEX,
-      welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
-      welshTooLong: COURT_CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
-    });
+    validateContactExplanationFields(formValues, formErrors, errorSummary);
 
     return {
       errorSummary,
@@ -240,13 +221,7 @@ export class CourtContactService {
   }
 
   public async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await referenceDataApi.getContactDescriptionTypes();
-    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
-      return 'Contact details';
-    }
-
-    const matchedType = contactDescriptionTypesResponse.find(type => type.id === contactDescriptionTypeId);
-    return matchedType?.name ?? 'Contact details';
+    return getContactTypeName(referenceDataApi, contactDescriptionTypeId);
   }
 
   public async resolveContactDetailDescription(contactDetail: CourtContactDetail): Promise<string> {

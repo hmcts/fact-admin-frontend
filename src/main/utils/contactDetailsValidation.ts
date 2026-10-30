@@ -1,12 +1,30 @@
 import { toValidationErrorEntries } from './apiResponses';
 import {
+  CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
   CONTACT_METHOD_REQUIRED_MESSAGE,
+  CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
   EMAIL_INVALID_MESSAGE,
   EMAIL_REQUIRED_MESSAGE,
+  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  MAX_EXPLANATION_LENGTH,
   PHONE_NUMBER_INVALID_MESSAGE,
   PHONE_NUMBER_REQUIRED_MESSAGE,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
+  WELSH_TRANSLATION_REQUIRED_MESSAGE,
 } from './constants/messageConstants';
-import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from './constants/regexConstants';
+import { EMAIL_REGEX, ENGLISH_TEXT_REGEX, PHONE_NUMBER_REGEX, WELSH_TEXT_REGEX } from './constants/regexConstants';
+
+export const CONTACT_EXPLANATION_VALIDATION_CONFIG: ContactExplanationValidationConfig = {
+  englishInvalidCharacters: 'Explanation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
+  englishPattern: ENGLISH_TEXT_REGEX,
+  englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
+  englishTooLong: CONTACT_EXPLANATION_MAX_LENGTH_MESSAGE,
+  maximumLength: MAX_EXPLANATION_LENGTH,
+  welshInvalidCharacters: 'Welsh translation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
+  welshPattern: WELSH_TEXT_REGEX,
+  welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
+  welshTooLong: CONTACT_WELSH_TRANSLATION_MAX_LENGTH_MESSAGE,
+};
 
 export type ContactValidationError = {
   href: string;
@@ -124,7 +142,7 @@ export const validateContactExplanationFields = (
   formValues: ContactFormValues,
   formErrors: ContactFormErrors,
   errorSummary: ContactValidationError[],
-  config: ContactExplanationValidationConfig
+  config: ContactExplanationValidationConfig = CONTACT_EXPLANATION_VALIDATION_CONFIG
 ): void => {
   const { contactExplanation, contactExplanationCy } = formValues;
 

@@ -202,8 +202,8 @@ describe('CourtWarningNoticeService', () => {
     const { updateCourt, service } = buildService();
 
     const result = await service.save(courtId, {
-      warningNotice: 'Temporary closure @ 5pm',
-      warningNoticeCy: 'Cau_dros_dro @ 5pm',
+      warningNotice: 'Temporary closure 5pm',
+      warningNoticeCy: 'Cau_dros_dro 5pm',
     });
 
     expect(result).toEqual({
@@ -212,17 +212,17 @@ describe('CourtWarningNoticeService', () => {
         courtId,
         courtName: 'Reading Crown Court',
         form: {
-          warningNotice: 'Temporary closure @ 5pm',
-          warningNoticeCy: 'Cau_dros_dro @ 5pm',
+          warningNotice: 'Temporary closure 5pm',
+          warningNoticeCy: 'Cau_dros_dro 5pm',
         },
         errors: {
           warningNoticeCy:
-            'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+            'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         },
         errorSummary: [
           {
             href: '#warningNoticeCy',
-            text: 'Welsh warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+            text: 'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
@@ -237,14 +237,14 @@ describe('CourtWarningNoticeService', () => {
     });
 
     const result = await service.save(courtId, {
-      warningNotice: 'Temporary closure @ 5pm / lift outage',
-      warningNoticeCy: 'Cau dros dro @ 5pm / diffyg lifft gyda ŵ ŷ â ê î ô û',
+      warningNotice: 'Temporary closure 5pm lift outage',
+      warningNoticeCy: 'Cau dros dro 5pm diffyg lifft gyda ŵ ŷ â ê î ô û',
     });
 
     expect(updateCourt).toHaveBeenCalledWith(
       expect.objectContaining({
-        warningNotice: 'Temporary closure @ 5pm / lift outage',
-        warningNoticeCy: 'Cau dros dro @ 5pm / diffyg lifft gyda ŵ ŷ â ê î ô û',
+        warningNotice: 'Temporary closure 5pm lift outage',
+        warningNoticeCy: 'Cau dros dro 5pm diffyg lifft gyda ŵ ŷ â ê î ô û',
       })
     );
     expect(result.type).toBe('success');
@@ -269,12 +269,12 @@ describe('CourtWarningNoticeService', () => {
         },
         errors: {
           warningNotice:
-            'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+            'Warning notice must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         },
         errorSummary: [
           {
             href: '#warningNotice',
-            text: 'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses',
+            text: 'Warning notice must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           },
         ],
         pageTitle: 'Error: Warning notice - Reading Crown Court',
