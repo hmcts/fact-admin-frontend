@@ -30,6 +30,7 @@ import {
   validateContactDetailsMethods,
   validateContactExplanationFields,
 } from '../../utils/contactDetailsValidation';
+import { getContactTypeName } from '../../utils/contactTypes';
 import { parseString } from '../../utils/valueParsers';
 import { ContactSubmitFlowOutcome, runContactWorkflow } from '../shared/ContactWorkflow';
 
@@ -191,13 +192,7 @@ export class ServiceCentreContactService {
   }
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
-    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
-      return 'Contact details';
-    }
-
-    const matchedType = contactDescriptionTypesResponse.find(type => type.id === contactDescriptionTypeId);
-    return matchedType?.name ?? 'Contact details';
+    return getContactTypeName(this.referenceDataApi, contactDescriptionTypeId);
   }
 
   private validate(body: Record<string, unknown>, serviceCentreId: string): ServiceCentreContactSubmission {
