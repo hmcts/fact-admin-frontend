@@ -367,7 +367,10 @@ describe('Information for professionals page', () => {
     stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
     stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
-        ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+        [
+          'dxCodes[1].dxCode',
+          'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+        ],
       ])
     );
 
@@ -382,7 +385,7 @@ describe('Information for professionals page', () => {
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('href="#dxCode-1"');
     expect(response.text).toContain(
-      'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+      'DX code 2: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
   });
 

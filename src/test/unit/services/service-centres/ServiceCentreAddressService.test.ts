@@ -162,12 +162,12 @@ describe('ServiceCentreAddressService', () => {
           ],
           county: [
             'County must be 100 characters or less',
-            'County must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'County must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           ],
           postcode: ['Postcode format is invalid'],
           townCity: [
             'Town or city must be 100 characters or less',
-            'Town or city must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+            'Town or city must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
           ],
         }),
       }),

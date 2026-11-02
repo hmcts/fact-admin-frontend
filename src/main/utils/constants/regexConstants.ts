@@ -19,8 +19,8 @@ export const EMAIL_REGEX =
 
 // Court contact details service
 export const PHONE_NUMBER_REGEX = /^(?:\+44)?[0-9 ()-]{10,20}$/;
-export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,'\-()&+]+$/;
-export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,'\-()&+]+$/u;
+export const ENGLISH_TEXT_REGEX = /^[A-Za-z0-9 .,'\-()&]+$/;
+export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,'\-()&]+$/u;
 
 // Court professional information service
 export const INTEGER_REGEX = /^\d+$/;
@@ -34,7 +34,6 @@ export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;
 
 // Address validation
 export const VALID_POSTCODE_REGEX = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i;
-export const VALID_ADDRESS_LINE_REGEX = /^[A-Z0-9 ()':,&-]+$/i;
 export const JURISDICTION_ERROR_REGEXES = {
   northernIrelandPostcode: /^(BT)/i,
   guernseyPostcode: /^(GY)/i,

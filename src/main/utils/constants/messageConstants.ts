@@ -355,18 +355,10 @@ export const TOWN_CITY_MAX_LENGTH = 100;
 export const COUNTY_MAX_LENGTH = 100;
 export const ADDRESS_LINE_1_REQUIRED_MESSAGE = 'Enter address line 1, typically the building and street';
 export const ADDRESS_LINE_1_MAX_LENGTH_MESSAGE = `Address line 1 must be ${ADDRESS_LINE_MAX_LENGTH} characters or less`;
-export const ADDRESS_LINE_1_INVALID_CHARACTERS_MESSAGE =
-  'Address line 1 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const ADDRESS_LINE_2_MAX_LENGTH_MESSAGE = `Address line 2 must be ${ADDRESS_LINE_MAX_LENGTH} characters or less`;
-export const ADDRESS_LINE_2_INVALID_CHARACTERS_MESSAGE =
-  'Address line 2 must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const TOWN_CITY_REQUIRED_MESSAGE = 'Enter a town or city';
 export const TOWN_CITY_MAX_LENGTH_MESSAGE = `Town or city must be ${TOWN_CITY_MAX_LENGTH} characters or less`;
-export const TOWN_CITY_INVALID_CHARACTERS_MESSAGE =
-  'Town or city must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 export const COUNTY_MAX_LENGTH_MESSAGE = `County must be ${COUNTY_MAX_LENGTH} characters or less`;
-export const COUNTY_INVALID_CHARACTERS_MESSAGE =
-  'County must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses';
 
 export const POSTCODE_ERROR_MESSAGES: Record<string, string> = {
   blankPostcode: 'Enter a postcode',
