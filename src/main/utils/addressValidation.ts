@@ -14,11 +14,7 @@ import {
   TOWN_CITY_MAX_LENGTH_MESSAGE,
   TOWN_CITY_REQUIRED_MESSAGE,
 } from './constants/messageConstants';
-import {
-  ENGLISH_TEXT_REGEX,
-  JURISDICTION_ERROR_REGEXES,
-  VALID_POSTCODE_REGEX,
-} from './constants/regexConstants';
+import { ENGLISH_TEXT_REGEX, JURISDICTION_ERROR_REGEXES, VALID_POSTCODE_REGEX } from './constants/regexConstants';
 import { addError } from './validation';
 
 export type AddressFields = {
