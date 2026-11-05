@@ -120,11 +120,11 @@ describe('CourtContactService submitContactDetailFlow', () => {
     }
 
     expect(result.formViewModel.formErrors.contactExplanation).toBe(
-      'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+      'Explanation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
     expect(result.formViewModel.errorSummary).toContainEqual({
       href: '#contact-explanation',
-      text: 'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
+      text: 'Explanation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
     });
     expect(getContactDescriptionTypesSpy).toHaveBeenCalledTimes(1);
     expect(createCourtContactDetailSpy).not.toHaveBeenCalled();
@@ -362,7 +362,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
         },
         courtId
       ).formErrors.contactEmail
-    ).toBe('Enter an email address in the correct format');
+    ).toBe('Enter a valid email address');
 
     expect(
       service.validate(
@@ -373,7 +373,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
         },
         courtId
       ).formErrors.contactTelephone
-    ).toBe('Enter a phone number in the correct format');
+    ).toBe('Enter a valid phone number (10-20 digits, optional +44, spaces allowed)');
 
     expect(
       service.validate(
@@ -403,7 +403,7 @@ describe('CourtContactService submitContactDetailFlow', () => {
       'Because you provided an explanation in Welsh, the English translation is now mandatory'
     );
     expect(welshOnly.formErrors.contactExplanationCy).toBe(
-      'Welsh Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+      'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
 
     const welshTooLong = service.validate(

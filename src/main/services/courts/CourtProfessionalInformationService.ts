@@ -10,7 +10,6 @@ import {
   DX_CODE_MAX_LENGTH,
   DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE,
   DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE,
-  DX_VALIDATION_ERROR,
   FAX_NUMBER_DESCRIPTION_WITHOUT_NUMBER_MESSAGE,
   FAX_NUMBER_ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
   FAX_NUMBER_VALIDATION_ERROR,
@@ -22,13 +21,14 @@ import {
   INTERVIEW_ROOM_COUNT_REQUIRED_ERROR,
   MAX_REPEATABLE_ENTRIES,
   REPEATABLE_DESCRIPTION_MAX_LENGTH,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
 } from '../../utils/constants/messageConstants';
 import {
+  ENGLISH_TEXT_REGEX,
   GBS_CODE_REGEX,
   INTEGER_REGEX,
   PHONE_NUMBER_REGEX,
-  PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
-  PROFESSIONAL_INFO_WELSH_TEXT_REGEX,
+  WELSH_TEXT_REGEX,
 } from '../../utils/constants/regexConstants';
 import { collectValidationErrors } from '../../utils/validation';
 
@@ -449,11 +449,11 @@ export class CourtProfessionalInformationService {
         englishDescriptionTooLong: (displayIndex, maxLength) =>
           `Fax number ${displayIndex} description: Fax description must be ${maxLength} characters or fewer`,
         englishDescriptionInvalidCharacters: displayIndex =>
-          `Fax number ${displayIndex} description: ${DX_VALIDATION_ERROR}`,
+          `Fax number ${displayIndex} description: ${TEXT_FIELD_INVALID_CHARACTERS_MESSAGE}`,
         welshDescriptionTooLong: (displayIndex, maxLength) =>
           `Fax number ${displayIndex} Welsh description: Fax description must be ${maxLength} characters or fewer`,
         welshDescriptionInvalidCharacters: displayIndex =>
-          `Fax number ${displayIndex} Welsh description: ${DX_VALIDATION_ERROR}`,
+          `Fax number ${displayIndex} Welsh translation: ${TEXT_FIELD_INVALID_CHARACTERS_MESSAGE}`,
       },
     });
   }
@@ -463,7 +463,7 @@ export class CourtProfessionalInformationService {
       codeFieldId: 'dxCode',
       englishDescriptionFieldId: 'dxCodeDescription',
       welshDescriptionFieldId: 'dxCodeDescriptionCy',
-      codePattern: PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX,
+      codePattern: ENGLISH_TEXT_REGEX,
       codeMaxLength: DX_CODE_MAX_LENGTH,
       descriptionMaxLength: REPEATABLE_DESCRIPTION_MAX_LENGTH,
       messages: {
@@ -475,17 +475,17 @@ export class CourtProfessionalInformationService {
           `DX code ${displayIndex}: ${DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE}`,
         welshDescriptionNeedsEnglish: displayIndex =>
           `DX code ${displayIndex}: ${DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE}`,
-        invalidCode: displayIndex => `DX code ${displayIndex}: ${DX_VALIDATION_ERROR}`,
+        invalidCode: displayIndex => `DX code ${displayIndex}: ${TEXT_FIELD_INVALID_CHARACTERS_MESSAGE}`,
         codeTooLong: (displayIndex, maxLength) =>
           `DX code ${displayIndex}: DX code must be ${maxLength} characters or fewer`,
         englishDescriptionTooLong: (displayIndex, maxLength) =>
           `DX code ${displayIndex} explanation: DX explanation must be ${maxLength} characters or fewer`,
         englishDescriptionInvalidCharacters: displayIndex =>
-          `DX code ${displayIndex} explanation: ${DX_VALIDATION_ERROR}`,
+          `DX code ${displayIndex} explanation: ${TEXT_FIELD_INVALID_CHARACTERS_MESSAGE}`,
         welshDescriptionTooLong: (displayIndex, maxLength) =>
           `DX code ${displayIndex} Welsh explanation: DX Welsh explanation must be ${maxLength} characters or fewer`,
         welshDescriptionInvalidCharacters: displayIndex =>
-          `DX code ${displayIndex} Welsh explanation: ${DX_VALIDATION_ERROR}`,
+          `DX code ${displayIndex} Welsh translation: ${TEXT_FIELD_INVALID_CHARACTERS_MESSAGE}`,
       },
     });
   }
@@ -567,7 +567,7 @@ export class CourtProfessionalInformationService {
         when: context =>
           context.description.length <= config.descriptionMaxLength &&
           Boolean(context.description) &&
-          !PROFESSIONAL_INFO_ENGLISH_TEXT_REGEX.test(context.description),
+          !ENGLISH_TEXT_REGEX.test(context.description),
       },
       {
         fieldId: context => `${config.welshDescriptionFieldId}-${context.formIndex}`,
@@ -580,7 +580,7 @@ export class CourtProfessionalInformationService {
         when: context =>
           context.descriptionCy.length <= config.descriptionMaxLength &&
           Boolean(context.descriptionCy) &&
-          !PROFESSIONAL_INFO_WELSH_TEXT_REGEX.test(context.descriptionCy),
+          !WELSH_TEXT_REGEX.test(context.descriptionCy),
       },
     ];
   }
@@ -737,7 +737,7 @@ export class CourtProfessionalInformationService {
       if (normalizedFieldName === 'explanationcy') {
         return {
           href: `#dxCodeDescriptionCy-${formIndex}`,
-          label: `DX code ${displayIndex} Welsh explanation`,
+          label: `DX code ${displayIndex} Welsh translation`,
         };
       }
       return {
@@ -755,7 +755,7 @@ export class CourtProfessionalInformationService {
     if (normalizedFieldName === 'descriptioncy') {
       return {
         href: `#faxNumberDescriptionCy-${formIndex}`,
-        label: `Fax number ${displayIndex} Welsh description`,
+        label: `Fax number ${displayIndex} Welsh translation`,
       };
     }
     return {
@@ -789,20 +789,22 @@ export class CourtProfessionalInformationService {
     }
     if (normalizedText.includes('invalid characters')) {
       if (href?.startsWith('#dxCode')) {
-        return DX_VALIDATION_ERROR;
+        return TEXT_FIELD_INVALID_CHARACTERS_MESSAGE;
       }
       if (href === '#gbs') {
         return GBS_VALIDATION_ERROR;
       }
       if (href?.startsWith('#faxNumberDescription')) {
-        return DX_VALIDATION_ERROR;
+        return TEXT_FIELD_INVALID_CHARACTERS_MESSAGE;
       }
       if (href?.startsWith('#faxNumber')) {
         return FAX_NUMBER_VALIDATION_ERROR;
       }
     }
     if (this.isFaxNumberInvalidCharactersApiError(normalizedField, normalizedText)) {
-      return href?.startsWith('#faxNumberDescription') ? DX_VALIDATION_ERROR : FAX_NUMBER_VALIDATION_ERROR;
+      return href?.startsWith('#faxNumberDescription')
+        ? TEXT_FIELD_INVALID_CHARACTERS_MESSAGE
+        : FAX_NUMBER_VALIDATION_ERROR;
     }
     return text;
   }

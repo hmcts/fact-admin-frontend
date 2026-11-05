@@ -6,8 +6,8 @@ import { isHttpStatusCode, isSuccessfulHttpStatus } from '../../utils/apiRespons
 import {
   COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
   COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
-  COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
   COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
+  EMAIL_INVALID_MESSAGE,
   OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
   OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
   OPENING_HOUR_CLOSING_EQUALS_OPENING_MESSAGE,
@@ -326,7 +326,7 @@ export class CounterServiceOpeningHoursService {
     }
 
     if (form.appointmentNeeded === 'yes' && (!form.appointmentContact || !EMAIL_REGEX.test(form.appointmentContact))) {
-      errors.appointmentContact = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;
+      errors.appointmentContact = EMAIL_INVALID_MESSAGE;
     }
 
     return errors;

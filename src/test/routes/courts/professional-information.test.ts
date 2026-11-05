@@ -300,9 +300,7 @@ describe('Information for professionals page', () => {
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('href="#faxNumber-0"');
-    expect(response.text).toContain(
-      'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000'
-    );
+    expect(response.text).toContain('Enter a valid fax number (10-20 digits, optional +44, spaces allowed)');
     expect(response.text).not.toContain('Phone Number must match');
     expect(saveStub.notCalled).toBe(true);
   });
@@ -329,9 +327,7 @@ describe('Information for professionals page', () => {
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('href="#faxNumber-0"');
-    expect(response.text).toContain(
-      'Enter a fax number in the correct format, for example 01273 800 900 or 020 7450 4000'
-    );
+    expect(response.text).toContain('Enter a valid fax number (10-20 digits, optional +44, spaces allowed)');
     expect(response.text).not.toContain('2026-06-12T10:24:23.354464');
   });
 
@@ -371,7 +367,10 @@ describe('Information for professionals page', () => {
     stub(CourtApi.prototype, 'getCourtProfessionalInformation').resolves(null);
     stub(CourtApi.prototype, 'saveCourtProfessionalInformation').resolves(
       new Map([
-        ['dxCodes[1].dxCode', 'Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'],
+        [
+          'dxCodes[1].dxCode',
+          'must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
+        ],
       ])
     );
 
@@ -386,7 +385,7 @@ describe('Information for professionals page', () => {
     expect(response.status).toBe(HttpStatusCode.BadRequest);
     expect(response.text).toContain('href="#dxCode-1"');
     expect(response.text).toContain(
-      'DX code 2: Must only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+      'DX code 2: must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
   });
 

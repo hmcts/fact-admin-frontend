@@ -72,7 +72,7 @@ test.describe(
 
       await expect(addServiceCentrePage.errorSummary).toBeVisible();
       await expect(addServiceCentrePage.mainContent.content).toContainText(
-        'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses'
+        'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets'
       );
     });
 

@@ -116,16 +116,16 @@ describe('ServiceCentreWarningNoticeService', () => {
     const service = new ServiceCentreWarningNoticeService();
     const result = await service.save(
       serviceCentreId,
-      'English warning @ 5pm / lift outage',
-      'Rhybudd gyda @ 5pm / diffyg lifft ŵ ŷ â ê î ô û'
+      'English warning 5pm lift outage',
+      'Rhybudd gyda 5pm diffyg lifft ŵ ŷ â ê î ô û'
     );
 
     expect(result.type).toBe('saved');
     expect(getServiceCentreByIdStub.calledOnce).toBe(true);
     expect(updateServiceCentreStub.calledOnce).toBe(true);
     expect(updateServiceCentreStub.firstCall.args[0]).toMatchObject({
-      warningNotice: 'English warning @ 5pm / lift outage',
-      warningNoticeCy: 'Rhybudd gyda @ 5pm / diffyg lifft ŵ ŷ â ê î ô û',
+      warningNotice: 'English warning 5pm lift outage',
+      warningNoticeCy: 'Rhybudd gyda 5pm diffyg lifft ŵ ŷ â ê î ô û',
     });
   });
 
@@ -254,7 +254,7 @@ describe('ServiceCentreWarningNoticeService', () => {
 
     expect(result.type).toBe('validation-error');
     expect(result['viewModel']?.errors?.warningNotice?.[0]).toBe(
-      'Warning notice must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses'
+      'Warning notice must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
     expect(updateServiceCentreStub.notCalled).toBe(true);
   });
@@ -276,7 +276,7 @@ describe('ServiceCentreWarningNoticeService', () => {
 
     expect(result.type).toBe('validation-error');
     expect(result['viewModel']?.errors?.warningNoticeCy?.[0]).toBe(
-      'Warning notice in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, and parentheses'
+      'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
     expect(updateServiceCentreStub.notCalled).toBe(true);
   });

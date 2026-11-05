@@ -127,8 +127,8 @@ describe('Translation and interpretation page', () => {
       });
 
     expect(response.status).toBe(HttpStatusCode.BadRequest);
-    expect(response.text).toContain('Enter an email address in the correct format');
-    expect(response.text).toContain('Enter a telephone number in the correct format');
+    expect(response.text).toContain('Enter a valid email address');
+    expect(response.text).toContain('Enter a valid phone number (10-20 digits, optional +44, spaces allowed)');
     expect(saveStub.notCalled).toBe(true);
   });
 

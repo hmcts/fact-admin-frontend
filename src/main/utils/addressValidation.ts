@@ -2,22 +2,19 @@
 // Address & Postcode Validation
 
 import {
-  ADDRESS_LINE_1_INVALID_CHARACTERS_MESSAGE,
   ADDRESS_LINE_1_MAX_LENGTH_MESSAGE,
   ADDRESS_LINE_1_REQUIRED_MESSAGE,
-  ADDRESS_LINE_2_INVALID_CHARACTERS_MESSAGE,
   ADDRESS_LINE_2_MAX_LENGTH_MESSAGE,
   ADDRESS_LINE_MAX_LENGTH,
-  COUNTY_INVALID_CHARACTERS_MESSAGE,
   COUNTY_MAX_LENGTH,
   COUNTY_MAX_LENGTH_MESSAGE,
   POSTCODE_ERROR_MESSAGES,
-  TOWN_CITY_INVALID_CHARACTERS_MESSAGE,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
   TOWN_CITY_MAX_LENGTH,
   TOWN_CITY_MAX_LENGTH_MESSAGE,
   TOWN_CITY_REQUIRED_MESSAGE,
 } from './constants/messageConstants';
-import { JURISDICTION_ERROR_REGEXES, VALID_ADDRESS_LINE_REGEX, VALID_POSTCODE_REGEX } from './constants/regexConstants';
+import { ENGLISH_TEXT_REGEX, JURISDICTION_ERROR_REGEXES, VALID_POSTCODE_REGEX } from './constants/regexConstants';
 import { addError } from './validation';
 
 export type AddressFields = {
@@ -80,8 +77,8 @@ export const validateAddressLine1Field = (value: string | undefined): string[] =
     errors.push(ADDRESS_LINE_1_MAX_LENGTH_MESSAGE);
   }
 
-  if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push(ADDRESS_LINE_1_INVALID_CHARACTERS_MESSAGE);
+  if (value && !ENGLISH_TEXT_REGEX.test(value.trim())) {
+    errors.push('Address line 1 ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;
@@ -94,8 +91,8 @@ export const validateAddressLine2Field = (value: string | undefined): string[] =
     errors.push(ADDRESS_LINE_2_MAX_LENGTH_MESSAGE);
   }
 
-  if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push(ADDRESS_LINE_2_INVALID_CHARACTERS_MESSAGE);
+  if (value && !ENGLISH_TEXT_REGEX.test(value.trim())) {
+    errors.push('Address line 2 ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;
@@ -110,8 +107,8 @@ export const validateTownCityField = (value: string | undefined): string[] => {
     errors.push(TOWN_CITY_MAX_LENGTH_MESSAGE);
   }
 
-  if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push(TOWN_CITY_INVALID_CHARACTERS_MESSAGE);
+  if (value && !ENGLISH_TEXT_REGEX.test(value.trim())) {
+    errors.push('Town or city ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;
@@ -124,8 +121,8 @@ export const validateCountyField = (value: string | undefined): string[] => {
     errors.push(COUNTY_MAX_LENGTH_MESSAGE);
   }
 
-  if (value && !VALID_ADDRESS_LINE_REGEX.test(value.trim())) {
-    errors.push(COUNTY_INVALID_CHARACTERS_MESSAGE);
+  if (value && !ENGLISH_TEXT_REGEX.test(value.trim())) {
+    errors.push('County ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE);
   }
 
   return errors;

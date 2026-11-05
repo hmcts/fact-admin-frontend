@@ -110,7 +110,7 @@ describe('CourtGeneralService', () => {
       regions,
       errors: {
         name: [
-          'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets',
         ],
       },
     });
@@ -140,7 +140,7 @@ describe('CourtGeneralService', () => {
       regions,
       errors: {
         name: [
-          'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets',
         ],
       },
     });
