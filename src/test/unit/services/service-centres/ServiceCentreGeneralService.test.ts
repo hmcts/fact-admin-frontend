@@ -312,7 +312,7 @@ describe('ServiceCentreGeneralService', () => {
 
     expect(result.viewModel.errors?.name).toEqual([
       'Service centre name should be between 5 and 200 characters',
-      'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+      'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets',
     ]);
     expect(requests.updateServiceCentre).not.toHaveBeenCalled();
   });
