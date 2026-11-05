@@ -26,7 +26,7 @@
     "playwright:report": "yarn playwright show-report test-results/odhin-report --host 0.0.0.0"
   },
   "dependencies": {
-    "@azure/identity": "4.14.0",
+    "@azure/identity": "4.14.1",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/nodejs-logging": "4.0.4",
