@@ -548,7 +548,7 @@ describe('CounterServiceOpeningHoursService', () => {
     expect(saveCounterServiceOpeningHours).not.toHaveBeenCalled();
     expect((result as ValidationErrorResult).viewModel.errorSummary).toContainEqual({
       href: '#appointmentContact',
-      text: 'Enter a valid contact email address',
+      text: 'Enter a valid email address',
     });
   });
 

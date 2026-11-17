@@ -422,7 +422,7 @@ describe('HomePageService', () => {
       onlyServiceCentres: false,
       pageNumber: 0,
       pageSize: 25,
-      partialCourtName: 'London 123',
+      partialCourtName: 'London@',
       regionId: '',
       sortBy: '',
       sortOrder: 'asc',
@@ -438,7 +438,7 @@ describe('HomePageService', () => {
     expect(viewModel.errorSummary).toEqual([
       {
         href: '#partialCourtName',
-        text: 'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.',
+        text: 'Court, tribunal or service centre name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
       },
     ]);
   });

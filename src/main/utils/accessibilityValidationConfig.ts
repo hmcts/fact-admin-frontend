@@ -2,6 +2,8 @@
 import type { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
 
 import {
+  ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH,
+  ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE,
   COURT_ACCESSIBILITY_ENTRANCE_PHONE_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_ENTRANCE_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_HEARING_EQUIPMENT_REQUIRED_MESSAGE,
@@ -18,16 +20,16 @@ import {
   COURT_ACCESSIBILITY_PARKING_REQUIRED_MESSAGE,
   COURT_ACCESSIBILITY_PHONE_NUMBER_INVALID_MESSAGE,
   COURT_ACCESSIBILITY_QUIET_ROOM_REQUIRED_MESSAGE,
-  COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE,
   COURT_ACCESSIBILITY_TOILET_DESCRIPTION_REQUIRED_MESSAGE,
-  COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE,
   COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_REQUIRED_MESSAGE,
   MAX_LIFT_DOOR_WIDTH_CM,
   MAX_LIFT_WEIGHT_LIMIT_KG,
   MIN_LIFT_DOOR_WIDTH_CM,
   MIN_LIFT_WEIGHT_LIMIT_KG,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
+  WELSH_ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE,
 } from './constants/messageConstants';
-import { PHONE_NUMBER_REGEX, TOILET_DESC_REGEX, TOILET_DESC_REGEX_WELSH } from './constants/regexConstants';
+import { ENGLISH_TEXT_REGEX, PHONE_NUMBER_REGEX, WELSH_TEXT_REGEX } from './constants/regexConstants';
 import { Rule, addError, patternRule, validateBooleanField } from './validation';
 
 const isMissing = (value: number | null | undefined): boolean => value === undefined || value === null;
@@ -36,6 +38,8 @@ const isBelowMin = (value: number | null | undefined, min: number): boolean =>
   typeof value === 'number' && !Number.isNaN(value) && value < min;
 const isAboveMax = (value: number | null | undefined, max: number): boolean =>
   typeof value === 'number' && !Number.isNaN(value) && value > max;
+const isTooLong = (value: string | null | undefined, max: number): boolean =>
+  typeof value === 'string' && value?.length > max;
 
 export const validate = (model: AccessibilityModel): Record<string, string[]> | undefined => {
   const errors: Record<string, string[]> = {};
@@ -150,16 +154,32 @@ export const validate = (model: AccessibilityModel): Record<string, string[]> | 
           : undefined,
     },
 
+    // Toilet description length
+    {
+      key: 'accessibleToiletDescription',
+      validate: m =>
+        isTooLong(m.accessibleToiletDescription, ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH)
+          ? [ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE]
+          : undefined,
+    },
+    {
+      key: 'accessibleToiletDescriptionCy',
+      validate: m =>
+        isTooLong(m.accessibleToiletDescriptionCy, ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH)
+          ? [WELSH_ACCESSIBLE_TOILET_DESCRIPTION_MAX_LENGTH_MESSAGE]
+          : undefined,
+    },
+
     // Toilet description pattern
     patternRule(
       'accessibleToiletDescription',
-      TOILET_DESC_REGEX,
-      COURT_ACCESSIBILITY_TOILET_DESCRIPTION_INVALID_CHARACTERS_MESSAGE
+      ENGLISH_TEXT_REGEX,
+      'Accessible toilet description ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE
     ),
     patternRule(
       'accessibleToiletDescriptionCy',
-      TOILET_DESC_REGEX_WELSH,
-      COURT_ACCESSIBILITY_TOILET_DESCRIPTION_WELSH_INVALID_CHARACTERS_MESSAGE
+      WELSH_TEXT_REGEX,
+      'Welsh translation ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE
     ),
 
     // Hearing equipment

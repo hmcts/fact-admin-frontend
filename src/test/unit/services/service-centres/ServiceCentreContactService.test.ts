@@ -221,7 +221,7 @@ describe('ServiceCentreContactService', () => {
     }
 
     expect(missingEmail.formViewModel.formErrors.contactEmail).toBe('Enter an email address');
-    expect(malformedEmail.formViewModel.formErrors.contactEmail).toBe('Enter an email address in the correct format');
+    expect(malformedEmail.formViewModel.formErrors.contactEmail).toBe('Enter a valid email address');
   });
 
   test('submitContactDetailFlow validates explanation format, length and translation dependencies', async () => {
@@ -299,7 +299,7 @@ describe('ServiceCentreContactService', () => {
     }
 
     expect(englishInvalid.formViewModel.formErrors.contactExplanation).toBe(
-      'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+      'Explanation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
     expect(englishMissingWelsh.formViewModel.formErrors.contactExplanationCy).toBe(
       'Because you provided an explanation in English, the Welsh translation is now mandatory'
@@ -308,10 +308,10 @@ describe('ServiceCentreContactService', () => {
       'Because you provided an explanation in Welsh, the English translation is now mandatory'
     );
     expect(welshInvalid.formViewModel.formErrors.contactExplanationCy).toBe(
-      'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs'
+      'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
     );
     expect(welshTooLong.formViewModel.formErrors.contactExplanationCy).toBe(
-      'Explanation in Welsh must be 250 characters or fewer'
+      'Welsh translation must be 250 characters or fewer'
     );
   });
 

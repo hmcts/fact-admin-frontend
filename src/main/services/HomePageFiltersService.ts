@@ -15,11 +15,11 @@ import {
   PAGE_NUMBER_MIN_ERROR,
   PAGE_SIZE_MAX_ERROR,
   PAGE_SIZE_MIN_ERROR,
-  PARTIAL_COURT_NAME_ERROR,
   SORT_ORDER_WITHOUT_SORT_BY_ERROR,
+  TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
   VALID_SORT_BY_VALUES,
 } from '../utils/constants/messageConstants';
-import { PARTIAL_COURT_NAME_REGEX } from '../utils/constants/regexConstants';
+import { ENGLISH_TEXT_REGEX } from '../utils/constants/regexConstants';
 import {
   parseClampedNumber,
   validateIntegerQueryParameter,
@@ -70,10 +70,10 @@ export class HomePageFiltersService {
     const errors: HomePageValidationError[] = [];
 
     // Partial court name
-    if (!PARTIAL_COURT_NAME_REGEX.test(filters.partialCourtName)) {
+    if (filters.partialCourtName && !ENGLISH_TEXT_REGEX.test(filters.partialCourtName)) {
       errors.push({
         href: '#partialCourtName',
-        text: PARTIAL_COURT_NAME_ERROR,
+        text: 'Court, tribunal or service centre name ' + TEXT_FIELD_INVALID_CHARACTERS_MESSAGE,
       });
     }
 

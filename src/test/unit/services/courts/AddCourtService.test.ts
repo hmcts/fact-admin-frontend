@@ -79,17 +79,17 @@ describe('AddCourtService', () => {
 
     expect(service.validate({ name: 'Court #1', regionId: regions[0].id })).toEqual({
       name: [
-        'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+        'Court name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
       ],
     });
   });
 
-  test('validates that court name includes at least one letter', () => {
+  test('returns an error when court name contains invalid characters', () => {
     const service = new AddCourtService();
 
-    expect(service.validate({ name: '-----', regionId: regions[0].id })).toEqual({
+    expect(service.validate({ name: 'Court@Name', regionId: regions[0].id })).toEqual({
       name: [
-        'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+        'Court name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
       ],
     });
   });

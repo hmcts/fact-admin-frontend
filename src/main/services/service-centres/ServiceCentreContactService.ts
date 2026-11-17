@@ -6,13 +6,7 @@ import { SaveServiceCentreContactDetailRequest } from '../../requests/types/Save
 import { ServiceCentreContactDetail } from '../../schemas/serviceCentreContactDetailSchema';
 import { ServiceCentre } from '../../schemas/serviceCentreSchema';
 import { isHttpStatusCode } from '../../utils/apiResponses';
-import {
-  CONTACT_TYPE_REQUIRED_MESSAGE,
-  ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-  MAX_EXPLANATION_LENGTH,
-  WELSH_TRANSLATION_REQUIRED_MESSAGE,
-} from '../../utils/constants/messageConstants';
-import { ENGLISH_TEXT_REGEX, WELSH_TEXT_REGEX } from '../../utils/constants/regexConstants';
+import { CONTACT_TYPE_REQUIRED_MESSAGE } from '../../utils/constants/messageConstants';
 import {
   ContactApiFieldMapping,
   ContactDescriptionTypeItem,
@@ -27,6 +21,7 @@ import {
   validateContactDetailsMethods,
   validateContactExplanationFields,
 } from '../../utils/contactDetailsValidation';
+import { getContactTypeName } from '../../utils/contactTypes';
 import { parseString } from '../../utils/valueParsers';
 import { ContactSubmitFlowOutcome, runContactWorkflow } from '../shared/ContactWorkflow';
 
@@ -188,13 +183,7 @@ export class ServiceCentreContactService {
   }
 
   private async resolveContactTypeName(contactDescriptionTypeId: string): Promise<string> {
-    const contactDescriptionTypesResponse = await this.referenceDataApi.getContactDescriptionTypes();
-    if (isHttpStatusCode(contactDescriptionTypesResponse)) {
-      return 'Contact details';
-    }
-
-    const matchedType = contactDescriptionTypesResponse.find(type => type.id === contactDescriptionTypeId);
-    return matchedType?.name ?? 'Contact details';
+    return getContactTypeName(this.referenceDataApi, contactDescriptionTypeId);
   }
 
   private validate(body: Record<string, unknown>, serviceCentreId: string): ServiceCentreContactSubmission {
@@ -221,19 +210,7 @@ export class ServiceCentreContactService {
 
     validateContactDetailsMethods(selectedContactMethods, contactEmail, contactTelephone, formErrors, errorSummary);
 
-    validateContactExplanationFields(formValues, formErrors, errorSummary, {
-      englishInvalidCharacters:
-        'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
-      englishPattern: ENGLISH_TEXT_REGEX,
-      englishRequired: ENGLISH_TRANSLATION_REQUIRED_MESSAGE,
-      englishTooLong: 'Explanation must be 250 characters or fewer',
-      maximumLength: MAX_EXPLANATION_LENGTH,
-      welshInvalidCharacters:
-        'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs',
-      welshPattern: WELSH_TEXT_REGEX,
-      welshRequired: WELSH_TRANSLATION_REQUIRED_MESSAGE,
-      welshTooLong: 'Explanation in Welsh must be 250 characters or fewer',
-    });
+    validateContactExplanationFields(formValues, formErrors, errorSummary);
 
     return {
       errorSummary,
