@@ -91,8 +91,6 @@ export const FACILITY_LABELS = {
 
 // Home page filters service
 export const DEFAULT_SORT_ORDER = 'asc';
-export const PARTIAL_COURT_NAME_ERROR =
-  'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.';
 export const VALID_SORT_BY_VALUES = ['lastUpdated', 'name'] as const;
 export const VALID_SORT_ORDER_VALUES = ['asc', 'desc'] as const;
 export const HOME_PAGE_INCLUDE_CLOSED_BOOLEAN_ERROR = 'includeClosed must be true or false';
@@ -136,8 +134,6 @@ export const UK_TIME_ZONE = 'Europe/London';
 export const COURT_NAME_MIN_LENGTH = 5;
 export const COURT_NAME_MAX_LENGTH = 200;
 export const COURT_NAME_LENGTH_ERROR = `Court name should be between ${COURT_NAME_MIN_LENGTH} and ${COURT_NAME_MAX_LENGTH} characters`;
-export const COURT_NAME_ALLOWED_CHARACTERS_ERROR =
-  'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets';
 export const COURT_NAME_MESSAGE = 'Enter a name for the court';
 export const COURT_REGION_MESSAGE = 'Select a region for the court';
 export const COURT_OPEN_MESSAGE = 'Select whether the court is open or closed';
@@ -239,7 +235,7 @@ export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms bet
 export const DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE =
   'You have entered a DX code explanation without a DX code, please add a code or remove the explanation';
 export const DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE =
-  'You have entered a DX code Welsh explanation without a DX code, please add a code or remove the Welsh explanation';
+  'You have entered a DX code Welsh translation without a DX code, please add a code or remove the Welsh explanation';
 export const DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
@@ -280,8 +276,6 @@ export const SERVICE_CENTRE_NAME_MIN_LENGTH = 5;
 export const SERVICE_CENTRE_NAME_MAX_LENGTH = 200;
 export const SERVICE_CENTRE_NAME_MESSAGE = 'Enter a name for the service centre';
 export const SERVICE_CENTRE_NAME_LENGTH_ERROR = `Service centre name should be between ${SERVICE_CENTRE_NAME_MIN_LENGTH} and ${SERVICE_CENTRE_NAME_MAX_LENGTH} characters`;
-export const SERVICE_CENTRE_NAME_ALLOWED_CHARACTERS_ERROR =
-  'Service centre name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets';
 export const SERVICE_CENTRE_REGION_MESSAGE = 'Select a region for the service centre';
 export const SERVICE_CENTRE_REGION_INVALID_MESSAGE = 'Please specify the region for this service centre';
 export const SERVICE_CENTRE_SERVICE_AREA_MESSAGE = 'Please specify the service areas of the service centre';

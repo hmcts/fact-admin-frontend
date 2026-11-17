@@ -1,14 +1,8 @@
 // Audit service
 export const EMAIL_PARTIAL_REGEX = /^[a-z0-9._+-]*(?:@[a-z0-9._+-]*)?$/i;
 
-// Home page filters service
-export const PARTIAL_COURT_NAME_REGEX = /^[A-Za-z&'()\- ]*$/;
-
 // Users page filters service
 export const SEARCH_REGEX = /^[A-Za-z0-9._+\-@]*$/;
-
-// Add court service
-export const VALID_COURT_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
 
 //Court address service
 export const VALID_EPIM_ID_REGEX = /^[A-Z0-9 -]+$/i;
@@ -25,9 +19,6 @@ export const WELSH_TEXT_REGEX = /^[\p{L}\p{M}0-9 .,'\-()&]+$/u;
 // Court professional information service
 export const INTEGER_REGEX = /^\d+$/;
 export const GBS_CODE_REGEX = /^[A-Za-z0-9]*$/;
-
-// Add service centre service
-export const VALID_SERVICE_CENTRE_NAME_REGEX = /^(?=.*[A-Z])[A-Z&'()\- ]+$/i;
 
 // Favourite controller
 export const COURT_NAME_PATTERN = /^[A-Za-z&'()\- ]*$/;

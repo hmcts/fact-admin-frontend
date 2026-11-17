@@ -602,7 +602,7 @@ test.describe(
 
       await expect(homePage.mainContent.content).toContainText('There is a problem');
       await expect(homePage.mainContent.content).toContainText(
-        'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.'
+        'Court, tribunal or service centre name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
       );
       await expect(homePage.partialCourtNameInput).toHaveValue('Invalid#Court');
     });

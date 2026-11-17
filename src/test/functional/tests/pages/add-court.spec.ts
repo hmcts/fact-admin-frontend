@@ -95,7 +95,7 @@ test.describe(
 
       await expect(addCourtPage.errorSummary).toBeVisible();
       await expect(addCourtPage.mainContent.content).toContainText(
-        'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and brackets'
+        'Court name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets'
       );
     });
 
