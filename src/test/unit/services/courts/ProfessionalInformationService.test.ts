@@ -428,7 +428,7 @@ describe('CourtProfessionalInformationService', () => {
       viewModel: {
         fieldErrors: {
           'dxCode-0':
-            'DX code 1: You have entered a DX code Welsh translation without a DX code, please add a code or remove the Welsh explanation',
+            'DX code 1: You have entered a DX code Welsh translation without a DX code, please add a code or remove the Welsh translation',
           'dxCodeDescription-1': 'DX code 2 explanation: DX explanation must be 250 characters or fewer',
           'dxCodeDescriptionCy-2': 'DX code 3 Welsh explanation: DX Welsh explanation must be 250 characters or fewer',
           'faxNumber-0':

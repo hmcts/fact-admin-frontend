@@ -235,7 +235,7 @@ export const INTERVIEW_ROOM_COUNT_ERROR = 'Enter a number of interview rooms bet
 export const DX_CODE_EXPLANATION_WITHOUT_CODE_MESSAGE =
   'You have entered a DX code explanation without a DX code, please add a code or remove the explanation';
 export const DX_CODE_WELSH_EXPLANATION_WITHOUT_CODE_MESSAGE =
-  'You have entered a DX code Welsh translation without a DX code, please add a code or remove the Welsh explanation';
+  'You have entered a DX code Welsh translation without a DX code, please add a code or remove the Welsh translation';
 export const DX_CODE_WELSH_TRANSLATION_REQUIRED_MESSAGE =
   'Because you provided an explanation in English, the Welsh translation is now mandatory';
 export const DX_CODE_ENGLISH_TRANSLATION_REQUIRED_MESSAGE =
