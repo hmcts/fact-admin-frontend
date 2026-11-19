@@ -27,6 +27,8 @@ import {
   PAGE_NUMBER_RANGE_ERROR,
   PAGE_SIZE_MIN,
   PAGE_SIZE_RANGE_ERROR,
+  SEARCH_TEXT_MIN_LENGTH,
+  SEARCH_TEXT_MIN_LENGTH_ERROR,
   TO_DATE_BEFORE_FROM_DATE_MESSAGE,
 } from '../utils/constants/messageConstants';
 import { EMAIL_PARTIAL_REGEX } from '../utils/constants/regexConstants';
@@ -242,6 +244,10 @@ export class AuditService {
     // page size bounds check
     if (params.pageSize < PAGE_SIZE_MIN || params.pageSize > MAX_PAGE_PARAM) {
       errors.pageSize = [PAGE_SIZE_RANGE_ERROR];
+    }
+    // free text search minimum length check
+    if (params.searchText && params.searchText.length < SEARCH_TEXT_MIN_LENGTH) {
+      errors.searchText = [SEARCH_TEXT_MIN_LENGTH_ERROR];
     }
     // partial email format check
     if (params.email && !EMAIL_PARTIAL_REGEX.test(params.email)) {
