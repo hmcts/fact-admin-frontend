@@ -112,6 +112,23 @@
 
   {{ govukInput({
     label: {
+      text: "Search text",
+      classes: "govuk-label--m"
+    },
+    hint: {
+      text: "This is a free text search, you need to click into details if you want to see more."
+    },
+    id: "searchText",
+    name: "searchText",
+    spellcheck: "false",
+    value: filters.searchText,
+    errorMessage: {
+      text: errors.searchText[0]
+    } if errors.searchText else null
+  }) }}
+
+  {{ govukInput({
+    label: {
       text: "Email address",
       classes: "govuk-label--m"
     },
