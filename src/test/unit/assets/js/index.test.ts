@@ -31,7 +31,6 @@ describe('index', () => {
     });
 
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('../../../../main/assets/js/index');
     });
 
