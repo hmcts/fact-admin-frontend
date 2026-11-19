@@ -34,12 +34,13 @@ module.exports = defineConfig([
       globals: {
         ...globals.browser,
         ...globals.node,
+        ...globals.es2026,
         Atomics: 'readonly',
         SharedArrayBuffer: 'readonly',
       },
 
       parser: tsParser,
-      ecmaVersion: 2018,
+      ecmaVersion: 2026,
       sourceType: 'module',
 
       parserOptions: {
