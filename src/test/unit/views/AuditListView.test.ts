@@ -98,4 +98,86 @@ describe('Audit List View', () => {
     expect(html).toContain('No audits returned; there is an unresolved issue with the search parameters.');
     expect(html).toContain('Error: Audits');
   });
+
+  test('renders the search text input with hint and current value', () => {
+    const html = env.render('audit-list.njk', {
+      audits: {
+        content: [],
+        page: {
+          number: 1,
+          size: 25,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+      basePagerUrl: '/audits?pageNumber=',
+      downloadUrl: undefined,
+      errors: undefined,
+      filterCategories: [],
+      pagePath: '/audits',
+      filters: {
+        pageNumber: 1,
+        pageSize: 25,
+        searchText: 'clarewood',
+        email: undefined,
+        subjectType: undefined,
+        courtId: undefined,
+        serviceCentreId: undefined,
+        fromDate: '26/6/2026',
+        toDate: undefined,
+      },
+      pageTitle: 'Audits',
+      subjects: new Map([
+        ['COURT', new Map()],
+        ['SERVICE_CENTRE', new Map()],
+      ]),
+    });
+
+    expect(html).toContain('Search text');
+    expect(html).toContain('This is a free text search');
+    expect(html).toContain('id="searchText"');
+    expect(html).toContain('value="clarewood"');
+    expect(html.indexOf('id="searchText"')).toBeLessThan(html.indexOf('id="email"'));
+  });
+
+  test('renders the search text error when the search text is too short', () => {
+    const html = env.render('audit-list.njk', {
+      audits: {
+        content: [],
+        page: {
+          number: 1,
+          size: 25,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+      basePagerUrl: '/audits?pageNumber=',
+      downloadUrl: undefined,
+      errors: {
+        searchText: ['Search text must be 3 characters or more'],
+      },
+      filterCategories: [],
+      pagePath: '/audits',
+      filters: {
+        pageNumber: 1,
+        pageSize: 25,
+        searchText: 'ab',
+        email: undefined,
+        subjectType: undefined,
+        courtId: undefined,
+        serviceCentreId: undefined,
+        fromDate: '26/6/2026',
+        toDate: undefined,
+      },
+      pageTitle: 'Error: Audits',
+      subjects: new Map([
+        ['COURT', new Map()],
+        ['SERVICE_CENTRE', new Map()],
+      ]),
+    });
+
+    expect(html).toContain('There is a problem');
+    expect(html).toContain('Search text must be 3 characters or more');
+    expect(html).toContain('value="ab"');
+  });
 });
