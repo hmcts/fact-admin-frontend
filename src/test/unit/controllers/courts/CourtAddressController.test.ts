@@ -67,6 +67,57 @@ describe('CourtAddressController', () => {
     retrieveCourtNameStub.restore();
   });
 
+  test.each([undefined, 'BS1 6GR'])(
+    'renders manual address details with lookup postcode %s while preserving other fields',
+    async postcode => {
+      const render = stub();
+      const response = { render } as unknown as Response;
+      const request = mockRequest({});
+      request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+      request.body = { postcode };
+      const existingAddress = buildAddress({
+        addressLine2: '30 Castle Street',
+        county: 'Berkshire',
+        areasOfLaw: [AREA_OF_LAW_ID],
+        courtTypes: [COURT_TYPE_ID],
+        osAddressDataset: 'LPI',
+        osAddressUprn: '100',
+        osAddressLpiKey: 'lpi-100',
+        osAddressSelectionPostcode: 'RG12AA',
+      });
+      const retrieveStub = stub(courtAddressService, 'retrieve').resolves(existingAddress);
+      const areasStub = stub(typesService, 'listAreasOfLaw').resolves([]);
+      const typesStub = stub(typesService, 'listCourtTypes').resolves([]);
+
+      try {
+        await controller.editAddress(request, response);
+        const viewModel = render.firstCall.args[1];
+        expect(viewModel.address).toEqual({
+          ...existingAddress,
+          ...(postcode === undefined
+            ? {}
+            : {
+                postcode,
+                osAddressDataset: undefined,
+                osAddressUprn: undefined,
+                osAddressLpiKey: undefined,
+                osAddressSelectionPostcode: undefined,
+              }),
+        });
+        expect(viewModel.aolSelected).toBe(AREA_OF_LAW_ID);
+        expect(viewModel.ctSelected).toBe(COURT_TYPE_ID);
+        expect(existingAddress.postcode).toBe('RG1 2AA');
+
+        await controller.addAddress(request, response);
+        expect(render.secondCall.args[1].address.postcode).toBe(postcode);
+      } finally {
+        retrieveStub.restore();
+        areasStub.restore();
+        typesStub.restore();
+      }
+    }
+  );
+
   test('renders the address list sorted by address type rank', async () => {
     const response = {
       render: () => '',
@@ -664,6 +715,7 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
     request.body = {
+      postcode: 'BS1 6GR',
       address: JSON.stringify({
         dataset: 'DPA',
         uprn: '100',

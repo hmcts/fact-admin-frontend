@@ -66,6 +66,7 @@
 
       <form method="POST" action="{{ actionUrl }}">
         {{ csrfProtection(csrfToken) }}
+        <input type="hidden" name="postcode" value="{{ postcode }}">
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"

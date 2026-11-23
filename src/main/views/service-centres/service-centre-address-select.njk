@@ -68,6 +68,7 @@
 
       <form method="POST" action="{{ actionUrl }}">
         {{ csrfProtection(csrfToken) }}
+        <input type="hidden" name="postcode" value="{{ postcode }}">
 
         {% if isNewSC %}
           <input type="hidden" name="isNewSC" value="true">

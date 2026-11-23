@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import { assert, match, mock, stub } from 'sinon';
 
 import ServiceCentreAddressController from '../../../../main/controllers/service-centres/ServiceCentreAddressController';
+import { ServiceCentreAddress } from '../../../../main/schemas/serviceCentreAddressSchema';
 import { SubjectType } from '../../../../main/schemas/subjectTypeSchema';
 import { ServiceCentreAddressService } from '../../../../main/services/service-centres/ServiceCentreAddressService';
 import * as addressValidation from '../../../../main/utils/addressValidation';
@@ -19,6 +20,59 @@ describe('ServiceCentreAddressController', () => {
     serviceCentreAddressService = new ServiceCentreAddressService();
     controller = new ServiceCentreAddressController(serviceCentreAddressService);
   });
+
+  test.each([undefined, 'BS1 6GR'])(
+    'renders manual address details with lookup postcode %s while preserving other fields',
+    async postcode => {
+      const render = stub();
+      const response = { render } as unknown as Response;
+      const request = mockRequest({});
+      request.params = { serviceCentreId: SERVICE_CENTRE_ID, addressId: ADDRESS_ID };
+      request.body = { postcode, isNewSC: 'true' };
+      const existingAddress: ServiceCentreAddress = {
+        id: ADDRESS_ID,
+        serviceCentreId: SERVICE_CENTRE_ID,
+        addressLine1: '1 Test Street',
+        addressLine2: 'Westminster',
+        townCity: 'London',
+        county: 'Greater London',
+        postcode: 'SW1A 1AA',
+        addressType: 'VISIT_US',
+        lat: null,
+        lon: null,
+        osAddressDataset: 'LPI',
+        osAddressUprn: '100',
+        osAddressLpiKey: 'lpi-100',
+        osAddressSelectionPostcode: 'SW1A1AA',
+      };
+      const retrieveStub = stub(serviceCentreAddressService, 'retrieve').resolves(existingAddress);
+      const nameStub = stub(serviceCentreAddressService, 'retrieveServiceCentreName').resolves('Service Centre');
+
+      try {
+        await controller.editAddress(request, response);
+        expect(render.firstCall.args[1].address).toEqual({
+          ...existingAddress,
+          ...(postcode === undefined
+            ? {}
+            : {
+                postcode,
+                osAddressDataset: undefined,
+                osAddressUprn: undefined,
+                osAddressLpiKey: undefined,
+                osAddressSelectionPostcode: undefined,
+              }),
+        });
+        expect(existingAddress.postcode).toBe('SW1A 1AA');
+
+        await controller.addAddress(request, response);
+        expect(render.secondCall.args[1].address.postcode).toBe(postcode);
+        expect(render.secondCall.args[1].isNewSC).toBe(true);
+      } finally {
+        retrieveStub.restore();
+        nameStub.restore();
+      }
+    }
+  );
 
   test('renders address list when data loads', async () => {
     const response = { render: () => '' } as unknown as Response;
@@ -718,6 +772,7 @@ describe('ServiceCentreAddressController', () => {
     const request = mockRequest({});
     request.params = { serviceCentreId: SERVICE_CENTRE_ID };
     request.body = {
+      postcode: 'BS1 6GR',
       address: JSON.stringify({
         dataset: 'DPA',
         uprn: '100',

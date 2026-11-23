@@ -59,6 +59,33 @@ describe.each(['court-address-select.njk', 'service-centre-address-select.njk'])
     const pagePath = template.startsWith('court-')
       ? `/courts/${ids.courtId}/edit/address/select`
       : `/service-centres/${ids.courtId}/edit/address/select`;
+    test.each([
+      { addresses: [], addressId: undefined },
+      { addresses: [], addressId: ids.addressId },
+      { addresses: [{ address: '1 High Street' }], addressId: undefined },
+      { addresses: [{ address: '1 High Street' }], addressId: ids.addressId },
+    ])('submits the lookup postcode only from the manual-entry form for %j', ({ addresses, addressId }) => {
+      const html = env.render(template, {
+        courtId: ids.courtId,
+        serviceCentreId: ids.courtId,
+        addressId,
+        addresses,
+        postcode: 'BS1 6GR',
+        isNewSC: true,
+        pagePath,
+      });
+      const forms = html.match(/<form\b[\s\S]*?<\/form>/g) ?? [];
+      const manualForm = forms.find(form => form.includes('Enter address manually'));
+      expect(manualForm).toContain('<input type="hidden" name="postcode" value="BS1 6GR">');
+      expect(manualForm).toContain(`/edit/address/details${addressId ? `/${addressId}` : ''}`);
+      expect(manualForm?.includes('<input type="hidden" name="isNewSC" value="true">')).toBe(
+        template.startsWith('service-centre-')
+      );
+      const selectForm = forms.find(form => form.includes('Choose an address'));
+      expect(Boolean(selectForm)).toBe(addresses.length > 0);
+      expect(selectForm ?? '').not.toContain('name="postcode"');
+    });
+
     const terminatedMessage = 'The postcode you have entered is a terminated postcode.';
     const largeUserMessage =
       'The postcode you have entered is a large user postcode. A large user postcode covers a large rural area or is used by a location that receives large volumes of mail.';

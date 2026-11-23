@@ -239,7 +239,16 @@ export class CourtAddressController extends BaseController {
     if (!this.validateServiceResponse(courtName, res, 'not-found')) {
       return;
     }
-    await this.renderAddAddress(res, courtId, courtName as string, false, false, undefined, req.body?.address);
+    await this.renderAddAddress(
+      res,
+      courtId,
+      courtName as string,
+      false,
+      false,
+      undefined,
+      req.body?.address,
+      req.body?.postcode
+    );
   }
 
   @route('/details/success')
@@ -287,7 +296,8 @@ export class CourtAddressController extends BaseController {
     aolSelected: boolean,
     ctSelected: boolean,
     courtAddress?: CourtAddress,
-    addressOptionData?: string
+    addressOptionData?: string,
+    postcode?: string
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -300,6 +310,13 @@ export class CourtAddressController extends BaseController {
     }
 
     const address = addressOptionData ? this.buildAddressData(addressOptionData) : (courtAddress ?? {});
+    if (!addressOptionData && typeof postcode === 'string') {
+      address.postcode = postcode;
+      address.osAddressDataset = undefined;
+      address.osAddressUprn = undefined;
+      address.osAddressLpiKey = undefined;
+      address.osAddressSelectionPostcode = undefined;
+    }
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
@@ -346,6 +363,7 @@ export class CourtAddressController extends BaseController {
       aolSelected,
       ctSelected,
       addressOptionData: req.body?.address,
+      postcode: req.body?.postcode,
     });
   }
 
@@ -415,6 +433,7 @@ export class CourtAddressController extends BaseController {
       aolSelected: boolean;
       ctSelected: boolean;
       addressOptionData?: string;
+      postcode?: string;
     }
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
@@ -429,7 +448,14 @@ export class CourtAddressController extends BaseController {
 
     const address = context.addressOptionData
       ? this.buildAddressData(context.addressOptionData, context.courtAddress)
-      : context.courtAddress;
+      : { ...context.courtAddress };
+    if (!context.addressOptionData && typeof context.postcode === 'string') {
+      address.postcode = context.postcode;
+      address.osAddressDataset = undefined;
+      address.osAddressUprn = undefined;
+      address.osAddressLpiKey = undefined;
+      address.osAddressSelectionPostcode = undefined;
+    }
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(context.courtId, context.courtName, 'Edit address'),

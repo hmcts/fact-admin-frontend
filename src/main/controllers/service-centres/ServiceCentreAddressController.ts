@@ -276,7 +276,8 @@ export default class ServiceCentreAddressController extends BaseController {
       undefined,
       undefined,
       req.body?.address,
-      req.body?.isNewSC === 'true'
+      req.body?.isNewSC === 'true',
+      req.body?.postcode
     );
   }
 
@@ -362,7 +363,9 @@ export default class ServiceCentreAddressController extends BaseController {
       serviceCentreName,
       addressId,
       addressResponse,
-      req.body?.address
+      req.body?.address,
+      false,
+      req.body?.postcode
     );
   }
 
@@ -473,9 +476,17 @@ export default class ServiceCentreAddressController extends BaseController {
     addressId?: string,
     addressModel?: Partial<ServiceCentreAddress>,
     addressOptionData?: string,
-    isNewSC: boolean = false
+    isNewSC: boolean = false,
+    postcode?: string
   ): Promise<void> {
-    const address = addressOptionData ? this.buildAddressData(addressOptionData, addressModel) : (addressModel ?? {});
+    const address = addressOptionData ? this.buildAddressData(addressOptionData, addressModel) : { ...addressModel };
+    if (!addressOptionData && typeof postcode === 'string') {
+      address.postcode = postcode;
+      address.osAddressDataset = undefined;
+      address.osAddressUprn = undefined;
+      address.osAddressLpiKey = undefined;
+      address.osAddressSelectionPostcode = undefined;
+    }
 
     res.render('service-centre-address-edit', {
       address,
