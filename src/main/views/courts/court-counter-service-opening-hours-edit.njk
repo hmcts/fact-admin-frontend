@@ -92,6 +92,15 @@
       <h2 class="govuk-heading-m">Counter service details</h2>
 
       {% set appointmentContact %}
+        {# Group error ("enter an email or a phone") sits on the fieldset; format errors stay on each input #}
+        <div class="govuk-form-group{% if errors.appointmentContact %} govuk-form-group--error{% endif %}" id="appointmentContact-group">
+          <fieldset class="govuk-fieldset"{% if errors.appointmentContact %} aria-describedby="appointmentContact-error"{% endif %}>
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">How can people book an appointment?</legend>
+          {% if errors.appointmentContact %}
+            <p class="govuk-error-message" id="appointmentContact-error">
+              <span class="govuk-visually-hidden">Error:</span> {{ errors.appointmentContact }}
+            </p>
+          {% endif %}
           {{ govukInput({
             classes: "govuk-input--width-20",
             id: "appointmentEmail",
@@ -127,6 +136,8 @@
               text: errors.appointmentPhone
             } if errors.appointmentPhone else null
           }) }}
+          </fieldset>
+        </div>
       {% endset %}
 
       {% set yesConditional %}

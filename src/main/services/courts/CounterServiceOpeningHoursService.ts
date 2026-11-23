@@ -158,7 +158,10 @@ export class CounterServiceOpeningHoursService {
         viewModel: {
           ...baseModel,
           errors,
-          errorSummary: toErrorSummary(errors),
+          // The group error has no input of its own, so link it to the first field in the group.
+          errorSummary: toErrorSummary(errors, field =>
+            field === 'appointmentContact' ? '#appointmentEmail' : `#${field}`
+          ),
           pageTitle: `Error: Edit counter service details and opening hours - ${baseModel.courtName}`,
         },
       };
@@ -335,7 +338,7 @@ export class CounterServiceOpeningHoursService {
       const { appointmentEmail, appointmentPhone } = form;
 
       if (!appointmentEmail && !appointmentPhone) {
-        errors.appointmentEmail = COUNTER_SERVICE_CONTACT_REQUIRED_MESSAGE;
+        errors.appointmentContact = COUNTER_SERVICE_CONTACT_REQUIRED_MESSAGE;
       }
       if (appointmentEmail && !EMAIL_REGEX.test(appointmentEmail)) {
         errors.appointmentEmail = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;

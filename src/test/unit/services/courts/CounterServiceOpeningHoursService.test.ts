@@ -591,6 +591,9 @@ describe('CounterServiceOpeningHoursService', () => {
     expect((result as ValidationErrorResult).viewModel.errorSummary).toEqual([
       { href: '#appointmentEmail', text: 'Enter an email address or phone number for booking' },
     ]);
+    expect((result as ValidationErrorResult).viewModel.errors).toEqual({
+      appointmentContact: 'Enter an email address or phone number for booking',
+    });
   });
 
   test('rejects invalid phone number for appointment contact', async () => {
