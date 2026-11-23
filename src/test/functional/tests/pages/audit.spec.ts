@@ -49,6 +49,38 @@ test.describe(
         },
       });
     });
+
+    test('filters audits by search text', async ({
+      addCourtPage,
+      auditListPage,
+      courtAddressDeletePage,
+      generalPage,
+      page,
+      playwright,
+    }) => {
+      await seedAuditTrailViaUi({
+        addCourtPage,
+        courtAddressDeletePage,
+        generalPage,
+        page,
+        playwright,
+        run: async ({ courtId, updatedCourtName }) => {
+          await auditListPage.goto();
+          await auditListPage.filterByCourt(courtId, updatedCourtName.toUpperCase());
+
+          await expect(auditListPage.auditTable).toContainText('UPDATE');
+          await expect(auditListPage.auditTable).toContainText(updatedCourtName);
+        },
+      });
+    });
+
+    test('shows an error when search text is shorter than 3 characters', async ({ auditListPage }) => {
+      await auditListPage.goto();
+      await auditListPage.searchByText('ab');
+
+      await expect(auditListPage.errorSummary).toContainText('Search text must be 3 characters or more');
+      await expect(auditListPage.auditTable).toHaveCount(0);
+    });
   }
 );
 

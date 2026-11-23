@@ -73,6 +73,60 @@ describe('AuditService', () => {
     expect(operationsApi.getAudits).not.toHaveBeenCalled();
   });
 
+  test('getAudits returns validation error when search text is shorter than 3 characters', async () => {
+    const operationsApi = {
+      getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
+      getAudits: jest.fn(),
+    };
+    const service = new AuditService(operationsApi as never);
+
+    const response = await service.getAudits({
+      searchText: 'ab',
+      fromDate: '2026-06-26',
+      pageNumber: 0,
+      pageSize: 25,
+    });
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected validation response object');
+    }
+
+    expect(response.errors?.searchText).toEqual(['Search text must be 3 characters or more']);
+    expect(operationsApi.getAudits).not.toHaveBeenCalled();
+  });
+
+  test('getAudits accepts search text of 3 characters and passes it to the audits API', async () => {
+    const operationsApi = {
+      getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),
+      getAudits: jest.fn().mockResolvedValue({
+        content: [{ ...baseAudit }],
+        page: {
+          number: 0,
+          size: 25,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      }),
+    };
+    const service = new AuditService(operationsApi as never);
+
+    const response = await service.getAudits({
+      searchText: 'abc',
+      fromDate: '2026-06-26',
+      pageNumber: 0,
+      pageSize: 25,
+    });
+
+    expect(typeof response).toBe('object');
+    if (typeof response === 'number') {
+      throw new Error('Expected successful response object');
+    }
+
+    expect(response.errors).toBeUndefined();
+    expect(operationsApi.getAudits).toHaveBeenCalledWith(expect.objectContaining({ searchText: 'abc' }));
+  });
+
   test('getAudits maps subject names into each audit record', async () => {
     const operationsApi = {
       getAuditSubjectOptionsMap: jest.fn().mockResolvedValue(auditSubjectOptions),

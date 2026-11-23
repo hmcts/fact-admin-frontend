@@ -21,7 +21,7 @@ export const AUDIT_FILTER_CATEGORY_LABELS: Record<string, string> = {
   toDate: 'Between',
 };
 export const AUDIT_FILTER_ITEM_LABELS: Record<string, string> = {
-  'searchText': 'Search text',
+  searchText: 'Search text',
   email: 'Email address',
   subjectType: 'Type',
   courtId: 'Court Name',
