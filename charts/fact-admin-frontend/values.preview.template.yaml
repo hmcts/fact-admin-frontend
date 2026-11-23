@@ -28,3 +28,6 @@ nodejs:
           alias: API_APP_REG_ID
   environment:
     FRONTEND_URL: 'https://${SERVICE_NAME}.preview.platform.hmcts.net' # Override in Flux for Prod
+    # FACT-3338: point preview at the API and public frontend PRs. Remove before merging.
+    DATA_API_URL: 'https://fact-data-api-pr-529.preview.platform.hmcts.net'
+    PUBLIC_FRONTEND_URL: 'https://fact-public-frontend-pr-367.preview.platform.hmcts.net'
