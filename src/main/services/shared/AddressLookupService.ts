@@ -1,13 +1,16 @@
 import { HttpStatusCode } from 'axios';
 
 import { ReferenceDataApi } from '../../requests/ReferenceDataApi';
-import { OsAddressOption } from '../../schemas/osDataSchema';
+import { OsAddressOption, OsData } from '../../schemas/osDataSchema';
 import { isHttpStatusCode } from '../../utils/apiResponses';
 import { POSTCODE_ERROR_MESSAGES } from '../../utils/constants/messageConstants';
 import { buildOsAddressOptions } from '../../utils/osAddressOptions';
 
 export type AddressLookupResponse =
-  | OsAddressOption[]
+  | {
+      addresses: OsAddressOption[];
+      postcodeMetadata: OsData['postcodeMetadata'];
+    }
   | {
       status: 'invalid';
       error: string;
@@ -28,6 +31,9 @@ export class AddressLookupService {
         : HttpStatusCode.BadRequest;
     }
 
-    return buildOsAddressOptions(result, postcode);
+    return {
+      addresses: buildOsAddressOptions(result, postcode),
+      postcodeMetadata: result.postcodeMetadata,
+    };
   }
 }

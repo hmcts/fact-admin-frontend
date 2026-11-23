@@ -44,6 +44,52 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    for (const { postcode, largeUser } of [
+      { postcode: 'NG8 5RN', largeUser: true },
+      { postcode: 'NG8 5JX', largeUser: false },
+    ]) {
+      test(`shows postcode guidance and allows manual entry for ${postcode}`, async ({
+        playwright,
+        serviceCentreAddressSelectPage,
+        serviceCentreAddressEditPage,
+      }) => {
+        await withCreatedServiceCentre(
+          playwright,
+          'Service Centre Address Metadata Functional Test',
+          { open: true },
+          async ({ createdServiceCentre }) => {
+            await serviceCentreAddressSelectPage.goto(createdServiceCentre.id, postcode);
+
+            const content = serviceCentreAddressSelectPage.mainContent.content;
+            await expect(content).not.toContainText('No addresses were found for this postcode.');
+            await expect(content).toContainText('The postcode you have entered is a terminated postcode.');
+            await expect(
+              content.getByText(
+                'You can still enter an address using this postcode, but you will need to enter the address manually.',
+                { exact: true }
+              )
+            ).toHaveCount(1);
+            const largeUserMessage =
+              'The postcode you have entered is a large user postcode. A large user postcode covers a large rural area or is used by a location that receives large volumes of mail.';
+            if (largeUser) {
+              await expect(content).toContainText(largeUserMessage);
+            } else {
+              await expect(content).not.toContainText(largeUserMessage);
+            }
+            await expect(serviceCentreAddressSelectPage.addressSelect).toHaveCount(0);
+            await expect(serviceCentreAddressSelectPage.continueButton).toHaveCount(0);
+            await expect(serviceCentreAddressSelectPage.enterAddressManuallyButton).toBeVisible();
+            await serviceCentreAddressSelectPage.clickEnterAddressManually();
+
+            await expect(serviceCentreAddressEditPage.page).toHaveURL(
+              new RegExp(`/service-centres/${createdServiceCentre.id}/edit/address/details$`)
+            );
+            await expect(serviceCentreAddressEditPage.heading).toContainText('Address');
+          }
+        );
+      });
+    }
+
     test('LPI selection is carried to the address details form', async ({
       playwright,
       serviceCentreAddressEditPage,

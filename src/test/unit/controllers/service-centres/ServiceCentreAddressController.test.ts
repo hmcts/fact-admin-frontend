@@ -398,11 +398,15 @@ describe('ServiceCentreAddressController', () => {
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
     const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
-    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves([
-      { ADDRESS: '1 Test Street' },
-    ]);
+    const lookupResponse = { addresses: [], postcodeMetadata: { largeUser: true, terminated: true } };
+    const retrieveAddressOptionsStub = stub(ServiceCentreAddressService.prototype, 'retrieveAddressOptions').resolves(
+      lookupResponse
+    );
 
-    responseMock.expects('render').once().withArgs('service-centre-address-select', match.has('postcode', 'SW1A 1AA'));
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('service-centre-address-select', match({ ...lookupResponse, postcode: 'SW1A 1AA' }));
 
     try {
       await controller.renderSelectNew(request, response);
@@ -569,13 +573,15 @@ describe('ServiceCentreAddressController', () => {
       'retrieveServiceCentreName'
     ).resolves('Reading Service Centre');
     const isValidPostcodeStub = stub(addressValidation, 'isValidPostcode').returns(true);
-    const retrieveAddressOptionsStub = stub(serviceCentreAddressService, 'retrieveAddressOptions').resolves([
-      {
-        ADDRESS: '1 Test Street',
-      },
-    ]);
+    const lookupResponse = { addresses: [], postcodeMetadata: { largeUser: false, terminated: true } };
+    const retrieveAddressOptionsStub = stub(serviceCentreAddressService, 'retrieveAddressOptions').resolves(
+      lookupResponse
+    );
 
-    responseMock.expects('render').once().withArgs('service-centre-address-select', match.has('addressId', ADDRESS_ID));
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs('service-centre-address-select', match({ ...lookupResponse, addressId: ADDRESS_ID }));
 
     try {
       await controller.renderSelectForUpdate(request, response);

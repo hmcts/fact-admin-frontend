@@ -4,6 +4,7 @@ import { assert, match, mock, stub } from 'sinon';
 
 import { CourtAddressController } from '../../../../main/controllers/courts/CourtAddressController';
 import { CourtAddress, CourtAddressType } from '../../../../main/schemas/courtAddressSchema';
+import { OsAddressOption } from '../../../../main/schemas/osDataSchema';
 import { TypesService } from '../../../../main/services/TypesService';
 import { CourtAddressService } from '../../../../main/services/courts/CourtAddressService';
 import { OS_OUTAGE_WARNING_MESSAGE, POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/constants/messageConstants';
@@ -181,7 +182,11 @@ describe('CourtAddressController', () => {
         selectionPostcode: 'RG12AA',
       },
     ];
-    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves(addressOptions);
+    const postcodeMetadata = { largeUser: true, terminated: true };
+    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves({
+      addresses: addressOptions,
+      postcodeMetadata,
+    });
 
     responseMock
       .expects('render')
@@ -189,6 +194,7 @@ describe('CourtAddressController', () => {
       .withArgs('court-address-select', {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         addresses: addressOptions,
+        postcodeMetadata,
         postcode: 'RG1 2AA',
         courtId: COURT_ID,
         pageTitle: 'Select Address',
@@ -621,21 +627,12 @@ describe('CourtAddressController', () => {
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
     request.query = { postcode: 'RG1 2AA' };
 
-    const addressOptions = [
-      {
-        ADDRESS: 'Reading Crown Court, RG1 2AA',
-        BUILDING_NUMBER: '1',
-        THOROUGHFARE_NAME: 'Main Street',
-        POST_TOWN: 'Reading',
-        POSTCODE: 'RG1 2AA',
-        LAT: 51.4543,
-        LNG: -0.9781,
-      },
-    ];
-
-    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves(
-      addressOptions as never
-    );
+    const addressOptions: OsAddressOption[] = [];
+    const postcodeMetadata = { largeUser: false, terminated: true };
+    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves({
+      addresses: addressOptions,
+      postcodeMetadata,
+    });
 
     responseMock
       .expects('render')
@@ -643,6 +640,7 @@ describe('CourtAddressController', () => {
       .withArgs('court-address-select', {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         addresses: addressOptions,
+        postcodeMetadata,
         postcode: 'RG1 2AA',
         courtId: COURT_ID,
         addressId: ADDRESS_ID,

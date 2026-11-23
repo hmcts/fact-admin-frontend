@@ -10,6 +10,47 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    for (const { postcode, largeUser } of [
+      { postcode: 'NG8 5RN', largeUser: true },
+      { postcode: 'NG8 5JX', largeUser: false },
+    ]) {
+      test(`shows postcode guidance and allows manual entry for ${postcode}`, async ({
+        courtAddressSelectPage,
+        courtAddressEditPage,
+        playwright,
+      }) => {
+        await withCreatedCourt(playwright, 'Court Address Metadata Functional Test', {}, async ({ createdCourt }) => {
+          await courtAddressSelectPage.goto(createdCourt.id, postcode);
+
+          const content = courtAddressSelectPage.mainContent.content;
+          await expect(content).not.toContainText('No addresses were found for this postcode.');
+          await expect(content).toContainText('The postcode you have entered is a terminated postcode.');
+          await expect(
+            content.getByText(
+              'You can still enter an address using this postcode, but you will need to enter the address manually.',
+              { exact: true }
+            )
+          ).toHaveCount(1);
+          const largeUserMessage =
+            'The postcode you have entered is a large user postcode. A large user postcode covers a large rural area or is used by a location that receives large volumes of mail.';
+          if (largeUser) {
+            await expect(content).toContainText(largeUserMessage);
+          } else {
+            await expect(content).not.toContainText(largeUserMessage);
+          }
+          await expect(courtAddressSelectPage.addressSelect).toHaveCount(0);
+          await expect(courtAddressSelectPage.continueButton).toHaveCount(0);
+          await expect(courtAddressSelectPage.enterAddressManuallyButton).toBeVisible();
+          await courtAddressSelectPage.clickEnterAddressManually();
+
+          await expect(courtAddressEditPage.page).toHaveURL(
+            new RegExp(`/courts/${createdCourt.id}/edit/address/details$`)
+          );
+          await expect(courtAddressEditPage.heading).toContainText('Address');
+        });
+      });
+    }
+
     test('visibility test', async ({ courtAddressSelectPage, playwright }) => {
       await withCreatedCourt(playwright, 'Court Address Select Functional Test', {}, async ({ createdCourt }) => {
         await courtAddressSelectPage.goto(createdCourt.id, TEST_POSTCODE);

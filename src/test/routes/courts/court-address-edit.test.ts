@@ -94,20 +94,23 @@ describe('Court address edit routes', () => {
   });
 
   test('renders select address page for a valid postcode search', async () => {
-    stub(CourtAddressService.prototype, 'retrieveAddressOptions').resolves([
-      {
-        dataset: 'DPA',
-        uprn: '100',
-        lpiKey: null,
-        address: '10 High Street, Bristol, BS1 6GR',
-        addressLine1: '10 High Street',
-        addressLine2: null,
-        townCity: 'Bristol',
-        county: null,
-        postcode: 'BS1 6GR',
-        selectionPostcode: 'BS16GR',
-      },
-    ] as never);
+    stub(CourtAddressService.prototype, 'retrieveAddressOptions').resolves({
+      addresses: [
+        {
+          dataset: 'DPA',
+          uprn: '100',
+          lpiKey: null,
+          address: '10 High Street, Bristol, BS1 6GR',
+          addressLine1: '10 High Street',
+          addressLine2: null,
+          townCity: 'Bristol',
+          county: null,
+          postcode: 'BS1 6GR',
+          selectionPostcode: 'BS16GR',
+        },
+      ],
+      postcodeMetadata: undefined,
+    });
 
     const response = await request(app).get(`/courts/${courtId}/edit/address/select?postcode=BS1%206GR`);
 

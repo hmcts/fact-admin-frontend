@@ -158,7 +158,7 @@ export default class ServiceCentreAddressController extends BaseController {
       return;
     }
 
-    if ('status' in searchResponse && searchResponse.status === 'invalid') {
+    if ('status' in searchResponse) {
       res.render('service-centre-address-find', {
         error: searchResponse.error,
         pageTitle: 'Find Address',
@@ -178,7 +178,8 @@ export default class ServiceCentreAddressController extends BaseController {
     }
 
     res.render('service-centre-address-select', {
-      addresses: searchResponse,
+      addresses: searchResponse.addresses,
+      postcodeMetadata: searchResponse.postcodeMetadata,
       breadcrumbs: this.buildAddressBreadcrumbs(
         serviceCentreId,
         serviceCentreName,
@@ -228,7 +229,7 @@ export default class ServiceCentreAddressController extends BaseController {
       return;
     }
 
-    if ('status' in searchResponse && searchResponse.status === 'invalid') {
+    if ('status' in searchResponse) {
       res.render('service-centre-address-find', {
         addressId,
         error: searchResponse.error,
@@ -243,7 +244,8 @@ export default class ServiceCentreAddressController extends BaseController {
     }
 
     res.render('service-centre-address-select', {
-      addresses: searchResponse,
+      addresses: searchResponse.addresses,
+      postcodeMetadata: searchResponse.postcodeMetadata,
       breadcrumbs: this.buildAddressBreadcrumbs(serviceCentreId, serviceCentreName, 'Find address by postcode'),
       serviceCentreName,
       addressId,
