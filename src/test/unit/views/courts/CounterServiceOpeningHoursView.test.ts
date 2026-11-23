@@ -59,7 +59,8 @@ describe('Counter Service Opening Hours View', () => {
       errors: {},
       errorSummary: [],
       form: {
-        appointmentContact: 'counter@example.test',
+        appointmentEmail: 'counter@example.test',
+        appointmentPhone: '01234 567890',
         appointmentNeeded: 'yes',
         assistWith: ['forms'],
         sameClosingHour: '17',
@@ -78,6 +79,12 @@ describe('Counter Service Opening Hours View', () => {
     expect(html).toContain('Save');
     expect(html).toContain('What can the counter assist with?');
     expect(html).toContain('Is an appointment needed?');
+    expect(html).toContain('Enter the email address for booking');
+    expect(html).toContain('Provide the email address they can use to book appointments. Use lower case.');
+    expect(html).toMatch(/id="appointmentEmail"[^>]*value="counter@example.test"/);
+    expect(html).toContain('Enter the phone number for booking');
+    expect(html).toContain('Provide the phone number they can use to book appointments.');
+    expect(html).toMatch(/id="appointmentPhone"[^>]*value="01234 567890"/);
     expect(html).toContain('Does the counter open and close at the same time Monday to Friday?');
     expect(html).toContain('id="sameOpeningTimeContext">Opening time</p>');
     expect(html).toMatch(/id="sameOpeningHour"[^>]*aria-describedby="sameOpeningTimeContext"/);

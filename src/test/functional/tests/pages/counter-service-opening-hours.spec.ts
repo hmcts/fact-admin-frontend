@@ -123,7 +123,8 @@ test.describe(
           await counterServiceOpeningHoursPage.selectAssistWith('Forms');
           await counterServiceOpeningHoursPage.selectAssistWith('Documents');
           await counterServiceOpeningHoursPage.selectAppointmentNeeded('yes');
-          await counterServiceOpeningHoursPage.fillAppointmentContact('test@test.com');
+          await counterServiceOpeningHoursPage.fillAppointmentEmail('test@test.com');
+          await counterServiceOpeningHoursPage.fillAppointmentPhone('01234 567890');
           await counterServiceOpeningHoursPage.selectSameTime();
           await counterServiceOpeningHoursPage.fillSameOpeningTimes('9', '00', '17', '00');
           await counterServiceOpeningHoursPage.save();

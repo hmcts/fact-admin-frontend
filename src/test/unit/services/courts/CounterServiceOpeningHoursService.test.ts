@@ -23,6 +23,7 @@ describe('CounterServiceOpeningHoursService', () => {
     assistWithSupport: false,
     appointmentNeeded: false,
     appointmentContact: null,
+    appointmentPhone: null,
     openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00:00', closingTime: '17:00:00' }],
   };
 
@@ -178,7 +179,8 @@ describe('CounterServiceOpeningHoursService', () => {
       form: {
         assistWith: ['documents', 'support'],
         appointmentNeeded: 'yes',
-        appointmentContact: 'appointments@example.test',
+        appointmentEmail: 'appointments@example.test',
+        appointmentPhone: '',
         sameTime: 'no',
         selectedDays: ['MONDAY', 'WEDNESDAY'],
         mondayOpeningHour: '10',
@@ -213,6 +215,7 @@ describe('CounterServiceOpeningHoursService', () => {
       assistWithSupport: false,
       appointmentNeeded: false,
       appointmentContact: null,
+      appointmentPhone: null,
       openingTimesDetails: [{ dayOfWeek: 'EVERYDAY', openingTime: '09:00', closingTime: '17:00' }],
     });
   });
@@ -246,6 +249,7 @@ describe('CounterServiceOpeningHoursService', () => {
       assistWithSupport: false,
       appointmentNeeded: false,
       appointmentContact: null,
+      appointmentPhone: null,
       openingTimesDetails: [{ dayOfWeek: 'MONDAY', openingTime: '10:15', closingTime: '16:45' }],
     });
   });
@@ -262,7 +266,7 @@ describe('CounterServiceOpeningHoursService', () => {
     const result = await service.save(courtId, undefined, {
       assistWith: ['forms'],
       appointmentNeeded: 'yes',
-      appointmentContact: 'test@test.com',
+      appointmentEmail: 'test@test.com',
       sameTime: 'yes',
       selectedDays: [],
       sameOpeningHour: '9',
@@ -293,6 +297,7 @@ describe('CounterServiceOpeningHoursService', () => {
       expect.objectContaining({
         appointmentNeeded: false,
         appointmentContact: null,
+        appointmentPhone: null,
       })
     );
   });
@@ -541,13 +546,13 @@ describe('CounterServiceOpeningHoursService', () => {
     const result = await service.save(courtId, undefined, {
       ...validSameTimeForm(),
       appointmentNeeded: 'yes',
-      appointmentContact: 'not-a-valid-email',
+      appointmentEmail: 'not-a-valid-email',
     });
 
     expect(result.type).toBe('validation_error');
     expect(saveCounterServiceOpeningHours).not.toHaveBeenCalled();
     expect((result as ValidationErrorResult).viewModel.errorSummary).toContainEqual({
-      href: '#appointmentContact',
+      href: '#appointmentEmail',
       text: 'Enter a valid contact email address',
     });
   });
@@ -564,10 +569,123 @@ describe('CounterServiceOpeningHoursService', () => {
     const result = await service.save(courtId, undefined, {
       ...validSameTimeForm(),
       appointmentNeeded: 'yes',
-      appointmentContact: 'test@test.com',
+      appointmentEmail: 'test@test.com',
     });
 
     expect(result.type).toBe('success');
     expect(saveCounterServiceOpeningHours).toHaveBeenCalled();
+  });
+
+  test('requires an email address or phone number when appointment is needed', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'yes',
+      appointmentEmail: '',
+      appointmentPhone: '',
+    });
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCounterServiceOpeningHours).not.toHaveBeenCalled();
+    expect((result as ValidationErrorResult).viewModel.errorSummary).toEqual([
+      { href: '#appointmentEmail', text: 'Enter an email address or phone number for booking' },
+    ]);
+  });
+
+  test('rejects invalid phone number for appointment contact', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService();
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'yes',
+      appointmentPhone: 'not-a-phone',
+    });
+
+    expect(result.type).toBe('validation_error');
+    expect(saveCounterServiceOpeningHours).not.toHaveBeenCalled();
+    expect((result as ValidationErrorResult).viewModel.errorSummary).toEqual([
+      { href: '#appointmentPhone', text: 'Enter a phone number in the correct format' },
+    ]);
+  });
+
+  test('saves phone number only when no email address is given', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService({
+      saveCounterServiceOpeningHours: jest.fn().mockResolvedValue(existingRecord),
+    });
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'yes',
+      appointmentEmail: '',
+      appointmentPhone: '01234 567890',
+    });
+
+    expect(result.type).toBe('success');
+    expect(saveCounterServiceOpeningHours).toHaveBeenCalledWith(
+      courtId,
+      expect.objectContaining({
+        appointmentNeeded: true,
+        appointmentContact: null,
+        appointmentPhone: '01234 567890',
+      })
+    );
+  });
+
+  test('saves both email address and phone number', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService({
+      saveCounterServiceOpeningHours: jest.fn().mockResolvedValue(existingRecord),
+    });
+
+    const result = await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'yes',
+      appointmentEmail: 'test@test.com',
+      appointmentPhone: '+44 1234 567890',
+    });
+
+    expect(result.type).toBe('success');
+    expect(saveCounterServiceOpeningHours).toHaveBeenCalledWith(
+      courtId,
+      expect.objectContaining({
+        appointmentContact: 'test@test.com',
+        appointmentPhone: '+44 1234 567890',
+      })
+    );
+  });
+
+  test('does not save contact details when appointment is not needed', async () => {
+    const { saveCounterServiceOpeningHours, service } = buildService({
+      saveCounterServiceOpeningHours: jest.fn().mockResolvedValue(existingRecord),
+    });
+
+    await service.save(courtId, undefined, {
+      ...validSameTimeForm(),
+      appointmentNeeded: 'no',
+      appointmentEmail: 'test@test.com',
+      appointmentPhone: '01234 567890',
+    });
+
+    expect(saveCounterServiceOpeningHours).toHaveBeenCalledWith(
+      courtId,
+      expect.objectContaining({ appointmentContact: null, appointmentPhone: null })
+    );
+  });
+
+  test('getEditPage pre-fills the phone number from the saved record', async () => {
+    const { service } = buildService({
+      getCounterServiceOpeningHoursById: jest.fn().mockResolvedValue({
+        ...existingRecord,
+        appointmentNeeded: true,
+        appointmentContact: null,
+        appointmentPhone: '01234 567890',
+      }),
+    });
+
+    const result = await service.getEditPage(courtId, counterServiceId);
+
+    expect(result).toMatchObject({
+      form: { appointmentNeeded: 'yes', appointmentEmail: '', appointmentPhone: '01234 567890' },
+    });
   });
 });

@@ -172,6 +172,7 @@ export const AREA_OF_LAW_VALIDATION_MESSAGE = 'Select at least one type of case 
 export const COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE = 'Select what the counter can assist with';
 export const COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE = 'Select yes if an appointment is needed';
 export const COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE = 'Enter a valid contact email address';
+export const COUNTER_SERVICE_CONTACT_REQUIRED_MESSAGE = 'Enter an email address or phone number for booking';
 export const COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE =
   'Select whether the counter opens and closes at the same time Monday to Friday';
 

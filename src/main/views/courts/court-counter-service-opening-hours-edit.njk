@@ -94,18 +94,38 @@
       {% set appointmentContact %}
           {{ govukInput({
             classes: "govuk-input--width-20",
-            id: "appointmentContact",
-            name: "appointmentContact",
+            id: "appointmentEmail",
+            name: "appointmentEmail",
+            type: "email",
+            autocomplete: "off",
+            spellcheck: false,
             label: {
-              text: "Enter contact details for booking"
+              text: "Enter the email address for booking"
             },
             hint: {
-              text: "Provide the email adddress they can use to book appointments. Use lower case."
+              text: "Provide the email address they can use to book appointments. Use lower case."
             },
-            value: form.appointmentContact,
+            value: form.appointmentEmail,
             errorMessage: {
-              text: errors.appointmentContact
-            } if errors.appointmentContact else null
+              text: errors.appointmentEmail
+            } if errors.appointmentEmail else null
+          }) }}
+          {{ govukInput({
+            classes: "govuk-input--width-20",
+            id: "appointmentPhone",
+            name: "appointmentPhone",
+            type: "tel",
+            autocomplete: "off",
+            label: {
+              text: "Enter the phone number for booking"
+            },
+            hint: {
+              text: "Provide the phone number they can use to book appointments."
+            },
+            value: form.appointmentPhone,
+            errorMessage: {
+              text: errors.appointmentPhone
+            } if errors.appointmentPhone else null
           }) }}
       {% endset %}
 
