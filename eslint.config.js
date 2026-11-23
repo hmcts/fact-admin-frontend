@@ -1,16 +1,14 @@
-/*
- * From EsLint V9 onwards, there has been a move from .eslintrc and .eslintignore to
- * a flat config format, which is structured as below.
- * Docs: https://eslint.org/docs/latest/use/configure/configuration-files
- * For migration: https://eslint.org/docs/latest/use/configure/migration-guide
- * Exceptions: TS linting uses the project config, JS linting is limited to src,
- * Jest rules are scoped to tests under src/test, and a single require() is
- * allowed to lazy-load the webpack config in development.
- */
+const { defineConfig, globalIgnores } = require('eslint/config');
+
+const globals = require('globals');
+const tsParser = require('@typescript-eslint/parser');
+const _import = require('eslint-plugin-import');
+
+const { fixupPluginRules, fixupConfigRules } = require('@eslint/compat');
+
+const js = require('@eslint/js');
 
 const { FlatCompat } = require('@eslint/eslintrc');
-const js = require('@eslint/js');
-const globals = require('globals');
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -18,65 +16,21 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-const globalIgnores = [
-  '.yarn/**',
-  '.pnp.*',
-  'dist/**',
-  'coverage/**',
-  '**/*.d.ts',
-  'src/main/views/govuk/**',
-  'src/main/public/**',
-  'src/main/assets/js/accessible-autocomplete.min.js',
-  'src/main/types/**',
-  'src/test/config.ts',
-  'jest.*config.js',
-  // playwright additions
-  'playwright.config.ts',
-  'playwright-report/**',
-  'test-results/**',
-  'functional-output/**',
-];
-const tsFiles = ['**/*.ts'];
-const testFiles = ['src/test/**/*.{js,ts}'];
-const jsFiles = ['src/**/*.js'];
-
-const withFiles = files => config => ({
-  ...config,
-  files,
-});
-
-module.exports = [
-  { ignores: globalIgnores },
-  {
-    files: tsFiles,
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off',
-    },
-  },
-  ...compat
-    .extends(
+module.exports = defineConfig([
+  ...fixupConfigRules(
+    compat.extends(
       'eslint:recommended',
       'plugin:import/errors',
       'plugin:import/warnings',
       'plugin:import/typescript',
+      'plugin:jest/recommended',
+      'plugin:@typescript-eslint/eslint-recommended',
+      'plugin:@typescript-eslint/recommended',
       'prettier'
     )
-    .map(withFiles(tsFiles)),
-  ...compat
-    .extends('plugin:@typescript-eslint/eslint-recommended', 'plugin:@typescript-eslint/recommended')
-    .map(withFiles(tsFiles)),
-  ...compat.extends('plugin:jest/recommended').map(withFiles(testFiles)),
-  ...compat.extends('eslint:recommended', 'prettier').map(withFiles(jsFiles)),
+  ),
   {
-    files: tsFiles,
     languageOptions: {
-      ecmaVersion: 2026,
-      sourceType: 'module',
-      parser: require('@typescript-eslint/parser'),
-      parserOptions: {
-        project: './tsconfig.eslint.json',
-        tsconfigRootDir: __dirname,
-      },
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -84,23 +38,26 @@ module.exports = [
         Atomics: 'readonly',
         SharedArrayBuffer: 'readonly',
       },
+
+      parser: tsParser,
+      ecmaVersion: 2026,
+      sourceType: 'module',
+
+      parserOptions: {
+        project: './tsconfig.eslint.json',
+      },
     },
+
     plugins: {
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
-      import: require('eslint-plugin-import'),
+      import: fixupPluginRules(_import),
     },
+
     rules: {
       '@typescript-eslint/array-type': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
-      // This can be changed to error once we move to webpackdevmiddleware
-      '@typescript-eslint/no-require-imports': [
-        'warn',
-        {
-          allow: ['^\\.\\./\\.\\./webpack\\.config(\\.js)?$'],
-        },
-      ],
       '@typescript-eslint/no-shadow': 'error',
+
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -108,11 +65,14 @@ module.exports = [
           argsIgnorePattern: '^_',
         },
       ],
+
+      '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       curly: 'error',
       eqeqeq: 'error',
       'import/no-duplicates': 'error',
       'import/no-named-as-default': 'error',
+
       'import/order': [
         'error',
         {
@@ -120,21 +80,30 @@ module.exports = [
             caseInsensitive: false,
             order: 'asc',
           },
+
           'newlines-between': 'always',
         },
       ],
+
+      'jest/prefer-to-have-length': 'error',
+      'jest/valid-expect': 'off',
+      'jest/expect-expect': 'off',
       'linebreak-style': ['error', 'unix'],
       'no-console': 'warn',
       'no-prototype-builtins': 'off',
       'no-return-await': 'error',
+      'preserve-caught-error': 'off',
+
       'no-unneeded-ternary': [
         'error',
         {
           defaultAssignment: false,
         },
       ],
+
       'object-curly-spacing': ['error', 'always'],
       'object-shorthand': ['error', 'properties'],
+
       quotes: [
         'error',
         'single',
@@ -143,7 +112,9 @@ module.exports = [
           avoidEscape: true,
         },
       ],
+
       semi: ['error', 'always'],
+
       'sort-imports': [
         'error',
         {
@@ -153,49 +124,30 @@ module.exports = [
           ignoreMemberSort: false,
         },
       ],
-      // playwright additions
-      '@typescript-eslint/no-floating-promises': 'error',
     },
   },
-  {
-    files: testFiles,
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
-    },
-    plugins: {
-      jest: require('eslint-plugin-jest'),
-    },
-    rules: {
-      'jest/prefer-to-have-length': 'error',
-      'jest/valid-expect': 'off',
-    },
-  },
-  {
-    files: ['src/test/unit/controllers/**/*.test.ts', 'src/test/routes/**/*.ts'],
-    rules: {
-      'jest/expect-expect': 'off',
-    },
-  },
-  {
-    files: jsFiles,
-    languageOptions: {
-      ecmaVersion: 2026,
-      sourceType: 'script',
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    files: ['src/main/assets/js/**/*.js'],
-    languageOptions: {
-      ecmaVersion: 2026,
-      sourceType: 'script',
-      globals: {
-        ...globals.browser,
-      },
-    },
-  },
-];
+  globalIgnores(['src/main/views/govuk/**/*']),
+  globalIgnores([
+    'dist/*',
+    'coverage/*',
+    '**/*.d.ts',
+    'src/main/public/',
+    'src/main/types/',
+    '**/jest.*config.js',
+    '**/.eslintrc.js',
+    '**/.stylelintrc.cjs',
+    '**/babel.config.cjs',
+    '**/tsconfig.eslint.json',
+    'src/test/*/codecept.conf.js',
+    'src/test/config.ts',
+    '**/*.js',
+    '**/*.mjs',
+    '**/.pnp.*',
+    '.yarn/*',
+    // playwright additions
+    'playwright.config.ts',
+    'playwright-report/**',
+    'test-results/**',
+    'functional-output/**',
+  ]),
+]);

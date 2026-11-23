@@ -6,7 +6,6 @@ import InfoController from '../../../main/controllers/InfoController';
 import { OperationsApi } from '../../../main/requests/OperationsApi';
 
 jest.mock('@hmcts/info-provider', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const sinonLib = require('sinon');
   return {
     InfoContributor: sinonLib.stub().callsFake((url: string) => ({ url })),
@@ -24,7 +23,6 @@ describe('InfoController', () => {
   });
 
   test('delegates to infoRequestHandler', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const infoProvider = require('@hmcts/info-provider');
     const infoRequestHandlerStub = infoProvider.infoRequestHandler as SinonStub;
     const infoContributorStub = infoProvider.InfoContributor as SinonStub;

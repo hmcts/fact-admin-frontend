@@ -4,7 +4,6 @@ describe('contact-type-autocomplete', () => {
 
   const executeScript = () => {
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('../../../../main/assets/js/contact-type-autocomplete.js');
     });
   };
