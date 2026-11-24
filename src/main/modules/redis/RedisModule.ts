@@ -105,7 +105,7 @@ export class RedisModule {
       throw new Error('REDIS_HOST and REDIS_PORT must be set as environment variables or mounted Key Vault secrets');
     }
 
-    let connectionString = '';
+    let connectionString: string;
     if (process.env.REDIS_LOCAL) {
       // for running local dev environment (i.e. 'start:dev' profile)
       connectionString = `redis://:${password}@${host}:${port}`;

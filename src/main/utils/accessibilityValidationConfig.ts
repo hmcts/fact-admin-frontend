@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/namespace
 import type { AccessibilityModel } from '../services/courts/CourtAccessibilityService';
 
 import {
