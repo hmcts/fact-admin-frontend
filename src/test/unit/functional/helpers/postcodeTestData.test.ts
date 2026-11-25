@@ -49,7 +49,7 @@ describe('postcodeTestData', () => {
     await expect(seedTestPostcodes(apiContext)).resolves.toBeUndefined();
 
     expect(apiContext.post).toHaveBeenCalledTimes(1);
-    expect(apiContext.post).toHaveBeenCalledWith('/testing-support/postcodes/terminated', {
+    expect(apiContext.post).toHaveBeenCalledWith('/testing-support/postcodes', {
       data: TEST_POSTCODE_REFERENCES,
     });
     expect(response.text).not.toHaveBeenCalled();
