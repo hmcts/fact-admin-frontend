@@ -197,6 +197,15 @@ yarn test:unit
 
 Functional tests are end-to-end tests run with Playwright.
 
+Playwright setup seeds three synthetic `ZZ99` postcode references through
+`POST /testing-support/postcodes/terminated` on the configured `DATA_API_URL`.
+The Data API must support this endpoint for both current and terminated records and replace
+existing references on repeated runs. Records must have `status: "terminated"` or `largeUser: true`.
+These shared records cover current large-user, terminated non-large-user, and terminated large-user
+postcodes in court and service-centre address tests; `largeUser: false` represents a
+null `is_large_user` value. They remain in the test database and are replaced on each setup run.
+Real-address lookup and LPI selection tests continue to use their existing postcodes.
+
 Run the main functional suite (excludes `@smoke` tests):
 
 ```bash

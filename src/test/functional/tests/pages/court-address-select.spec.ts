@@ -1,4 +1,5 @@
 import { expect, test } from '../../fixtures';
+import { TEST_POSTCODE_REFERENCES } from '../../helpers/postcodeTestData';
 import { withCreatedCourt } from '../../helpers/testSupport';
 
 const TEST_POSTCODE = 'RG1 2AA';
@@ -10,10 +11,7 @@ test.describe(
     tag: '@functional',
   },
   () => {
-    for (const { postcode, largeUser } of [
-      { postcode: 'NG8 5RN', largeUser: true },
-      { postcode: 'NG8 5JX', largeUser: false },
-    ]) {
+    for (const { postcode, largeUser, status } of TEST_POSTCODE_REFERENCES) {
       test(`shows postcode guidance and allows manual entry for ${postcode}`, async ({
         courtAddressSelectPage,
         courtAddressEditPage,
@@ -23,14 +21,20 @@ test.describe(
           await courtAddressSelectPage.goto(createdCourt.id, postcode);
 
           const content = courtAddressSelectPage.mainContent.content;
-          await expect(content).not.toContainText('No addresses were found for this postcode.');
-          await expect(content).toContainText('The postcode you have entered is a terminated postcode.');
+          const terminatedMessage = 'The postcode you have entered is a terminated postcode.';
+          if (status === 'terminated') {
+            await expect(content).toContainText(terminatedMessage);
+          } else {
+            await expect(content).not.toContainText(terminatedMessage);
+          }
           await expect(
             content.getByText(
               'You can still enter an address using this postcode, but you will need to enter the address manually.',
               { exact: true }
             )
           ).toHaveCount(1);
+          const noAddressesMessage = 'No addresses were found for this postcode. Enter the address manually.';
+          await expect(content).not.toContainText(noAddressesMessage);
           const largeUserMessage =
             'The postcode you have entered is a large user postcode. A large user postcode covers a large rural area or is used by a location that receives large volumes of mail.';
           if (largeUser) {
@@ -47,6 +51,7 @@ test.describe(
             new RegExp(`/courts/${createdCourt.id}/edit/address/details$`)
           );
           await expect(courtAddressEditPage.heading).toContainText('Address');
+          await expect(courtAddressEditPage.postcodeInput).toHaveValue(postcode);
         });
       });
     }
