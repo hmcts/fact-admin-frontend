@@ -7299,9 +7299,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:4.2.4":
-  version: 4.2.4
-  resolution: "codeceptjs@npm:4.2.4"
+"codeceptjs@npm:4.2.5":
+  version: 4.2.5
+  resolution: "codeceptjs@npm:4.2.5"
   dependencies:
     "@codeceptjs/configure": "npm:^4.0.0-beta.4"
     "@codeceptjs/helper": "npm:2.0.4"
@@ -7359,7 +7359,7 @@ __metadata:
     codeceptjs: bin/codecept.js
     codeceptjs-mcp: bin/mcp-server.js
     codeceptq: bin/codeceptq.js
-  checksum: 10/e8b98709b89cc9889d8bf84931430304eebeec9e82a9780c85844ba005fecad53e3f0233981c04091c4439b0c5b31f26df7e1ec4161bc169dab03f212b516f84
+  checksum: 10/1b9525099b4ab1489f4eb9b4f1b71139a26b467bb3773210fe4e8afa833b7b52b160256e261a6937be092591e545bbe3ad5106b757a3a359fd57990621962f63
   languageName: node
   linkType: hard
 
@@ -9258,7 +9258,7 @@ __metadata:
     axios: "npm:1.21.1"
     babel-jest: "npm:30.5.2"
     chai: "npm:6.3.0"
-    codeceptjs: "npm:4.2.4"
+    codeceptjs: "npm:4.2.5"
     config: "npm:5.0.1"
     cookie-parser: "npm:1.4.7"
     copy-webpack-plugin: "npm:14.0.0"
