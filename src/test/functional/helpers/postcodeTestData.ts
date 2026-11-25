@@ -46,7 +46,7 @@ export const TEST_POSTCODE_REFERENCES: TestPostcodeReference[] = [
 ];
 
 export async function seedTestPostcodes(apiContext: Pick<APIRequestContext, 'post'>): Promise<void> {
-  const response = await apiContext.post('/testing-support/postcodes/terminated', {
+  const response = await apiContext.post('/testing-support/postcodes', {
     data: TEST_POSTCODE_REFERENCES,
   });
 
