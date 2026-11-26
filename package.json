@@ -22,6 +22,7 @@
     "test:functional:no-performance": "NODE_OPTIONS=--no-deprecation yarn playwright test --grep-invert='@smoke|@performance'",
     "test:performance": "yarn playwright test --grep='@performance'",
     "test:a11y": "echo 'a11y tests run as part of test:functional' && exit 0",
+    "fortifyScan": "./java/gradlew -p java fortifyScan",
     "cichecks": "yarn install && yarn build && yarn rebuild puppeteer && yarn lint && yarn test && yarn test:routes && yarn test:a11y",
     "playwright:report": "yarn playwright show-report test-results/odhin-report --host 0.0.0.0"
   },
