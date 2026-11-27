@@ -133,7 +133,7 @@
     "@humanfs/node": "0.17.0",
     "@ungap/structured-clone": "1.4.0",
     "axios": "1.21.1",
-    "baseline-browser-mapping": "2.11.39",
+    "baseline-browser-mapping": "2.11.40",
     "browserslist": "4.29.6",
     "eslint": "10.15.0",
     "glob": "14.0.6",
