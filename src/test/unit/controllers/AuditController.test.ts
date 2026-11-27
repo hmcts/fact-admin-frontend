@@ -124,6 +124,7 @@ describe('AuditController', () => {
     assert.calledWith(auditService.getAudits, {
       pageNumber: 1,
       pageSize: 25,
+      searchText: undefined,
       email: 'admin@example.com',
       subjectType: 'COURT',
       courtId: '11111111-1111-4111-8111-111111111111',
@@ -527,6 +528,7 @@ describe('AuditController', () => {
     assert.calledWith(auditService.getAudits, {
       pageNumber: 0,
       pageSize: 25,
+      searchText: undefined,
       email: 'admin@example.com',
       subjectType: 'SERVICE_CENTRE',
       courtId: undefined,
@@ -534,6 +536,87 @@ describe('AuditController', () => {
       fromDate: '2026-06-25',
       toDate: undefined,
     });
+    responseMock.verify();
+  });
+
+  test('passes trimmed search text to the service and keeps it in pager and download URLs', async () => {
+    const viewModel: AuditListViewModel = {
+      filters: {
+        pageNumber: 1,
+        pageSize: 25,
+        searchText: 'search text',
+        fromDate: '2026-06-25',
+      },
+      audits: {
+        content: [
+          {
+            id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+            subjectId: '22222222-2222-4222-8222-222222222222',
+            subjectType: 'COURT',
+            subjectName: 'Search Text Court',
+            userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+            user: {
+              email: 'admin@example.com',
+              id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+              lastLogin: '2026-06-25T10:00:00Z',
+              role: 'SUPER_ADMIN',
+              ssoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            },
+            actionType: 'UPDATE',
+            actionEntity: 'court',
+            actionDataDiff: null,
+            createdAt: '2026-06-26T09:10:11.123Z',
+          },
+        ],
+        page: {
+          number: 1,
+          size: 25,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+      subjects: new Map(),
+    };
+
+    const auditService = {
+      getAudits: stub().resolves(viewModel),
+    };
+    const auditFilterCategoriesService = {
+      buildFilterCategories: stub().returns([]),
+    };
+
+    const controller = new AuditController(auditService as never, auditFilterCategoriesService as never);
+    const response = {
+      render: () => '',
+    } as unknown as Response;
+    const request = mockRequest({});
+    request.query = {
+      searchText: '  search text  ',
+      fromDate: '25/6/2026',
+    };
+
+    const responseMock = mock(response);
+    responseMock
+      .expects('render')
+      .once()
+      .withArgs(
+        'audit-list',
+        match((renderModel: Record<string, unknown>) => {
+          const basePagerUrl = renderModel.basePagerUrl as string;
+          const downloadUrl = renderModel.downloadUrl as string;
+          return basePagerUrl.includes('searchText=search+text') && downloadUrl.includes('searchText=search+text');
+        })
+      );
+
+    await controller.renderAuditSearchPage(request, response);
+
+    assert.calledWith(
+      auditService.getAudits,
+      match({
+        searchText: 'search text',
+        fromDate: '2026-06-25',
+      })
+    );
     responseMock.verify();
   });
 

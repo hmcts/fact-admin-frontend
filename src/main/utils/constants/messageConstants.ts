@@ -3,6 +3,7 @@ export const APPROVAL_DATE_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 
 // Audit filter categories service
 export const INCLUDED_AUDIT_FILTER_CATEGORIES = new Set([
+  'searchText',
   'email',
   'subjectType',
   'courtId',
@@ -11,6 +12,7 @@ export const INCLUDED_AUDIT_FILTER_CATEGORIES = new Set([
   'toDate',
 ]);
 export const AUDIT_FILTER_CATEGORY_LABELS: Record<string, string> = {
+  searchText: 'Search text',
   email: 'Email address',
   subjectType: 'Subject',
   courtId: 'Subject',
@@ -19,6 +21,7 @@ export const AUDIT_FILTER_CATEGORY_LABELS: Record<string, string> = {
   toDate: 'Between',
 };
 export const AUDIT_FILTER_ITEM_LABELS: Record<string, string> = {
+  searchText: 'Search text',
   email: 'Email address',
   subjectType: 'Type',
   courtId: 'Court Name',
@@ -35,6 +38,8 @@ export const CSV_PAGE_SIZE = 1000;
 export const MAX_CSV_PAGES = 1;
 export const PAGE_NUMBER_MIN = 0;
 export const PAGE_NUMBER_MAX = 100000;
+export const SEARCH_TEXT_MIN_LENGTH = 3;
+export const SEARCH_TEXT_MIN_LENGTH_ERROR = `Search text must be ${SEARCH_TEXT_MIN_LENGTH} characters or more`;
 export const PAGE_NUMBER_RANGE_ERROR = `Page number must be between ${PAGE_NUMBER_MIN} and ${PAGE_NUMBER_MAX}`;
 export const PAGE_SIZE_MIN = 1;
 export const PAGE_SIZE_RANGE_ERROR = `Page size must be between ${PAGE_SIZE_MIN} and ${MAX_PAGE_PARAM}`;

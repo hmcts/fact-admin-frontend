@@ -135,6 +135,7 @@ export default class AuditController extends BaseController {
     return {
       pageNumber: parseNumber(query?.pageNumber, 1) - 1, // UI is 1-based, service is 0-based
       pageSize: parseNumber(query?.pageSize, 25),
+      searchText: parseOptionalString(query?.searchText)?.trim() || undefined,
       email: parseOptionalString(query?.email),
       subjectType,
       courtId: subjectType === 'COURT' && isUuid(query?.courtId as string) ? parseString(query.courtId) : undefined,
