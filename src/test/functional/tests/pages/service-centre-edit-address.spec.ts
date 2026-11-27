@@ -1,4 +1,5 @@
 import { expect, test } from '../../fixtures';
+import { TEST_POSTCODE_REFERENCES } from '../../helpers/postcodeTestData';
 import { withCreatedServiceCentre } from '../../helpers/testSupport';
 
 import {
@@ -44,6 +45,56 @@ test.describe(
     tag: '@functional',
   },
   () => {
+    for (const { postcode, largeUser, status } of TEST_POSTCODE_REFERENCES) {
+      test(`shows postcode guidance and allows manual entry for ${postcode}`, async ({
+        playwright,
+        serviceCentreAddressSelectPage,
+        serviceCentreAddressEditPage,
+      }) => {
+        await withCreatedServiceCentre(
+          playwright,
+          'Service Centre Address Metadata Functional Test',
+          { open: true },
+          async ({ createdServiceCentre }) => {
+            await serviceCentreAddressSelectPage.goto(createdServiceCentre.id, postcode);
+
+            const content = serviceCentreAddressSelectPage.mainContent.content;
+            const terminatedMessage = 'The postcode you have entered is a terminated postcode.';
+            if (status === 'terminated') {
+              await expect(content).toContainText(terminatedMessage);
+            } else {
+              await expect(content).not.toContainText(terminatedMessage);
+            }
+            await expect(
+              content.getByText(
+                'You can still enter an address using this postcode, but you will need to enter the address manually.',
+                { exact: true }
+              )
+            ).toHaveCount(1);
+            const noAddressesMessage = 'No addresses were found for this postcode. Enter the address manually.';
+            await expect(content).not.toContainText(noAddressesMessage);
+            const largeUserMessage =
+              'The postcode you have entered is a large user postcode. A large user postcode covers a large rural area or is used by a location that receives large volumes of mail.';
+            if (largeUser) {
+              await expect(content).toContainText(largeUserMessage);
+            } else {
+              await expect(content).not.toContainText(largeUserMessage);
+            }
+            await expect(serviceCentreAddressSelectPage.addressSelect).toHaveCount(0);
+            await expect(serviceCentreAddressSelectPage.continueButton).toHaveCount(0);
+            await expect(serviceCentreAddressSelectPage.enterAddressManuallyButton).toBeVisible();
+            await serviceCentreAddressSelectPage.clickEnterAddressManually();
+
+            await expect(serviceCentreAddressEditPage.page).toHaveURL(
+              new RegExp(`/service-centres/${createdServiceCentre.id}/edit/address/details$`)
+            );
+            await expect(serviceCentreAddressEditPage.heading).toContainText('Address');
+            await expect(serviceCentreAddressEditPage.postcodeInput).toHaveValue(postcode);
+          }
+        );
+      });
+    }
+
     test('LPI selection is carried to the address details form', async ({
       playwright,
       serviceCentreAddressEditPage,

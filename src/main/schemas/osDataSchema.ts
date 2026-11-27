@@ -45,8 +45,14 @@ const resultItemSchema = z.object({
   LPI: lpiAddressSchema.nullable().optional(),
 });
 
+const osPostcodeMetadataSchema = z.object({
+  largeUser: z.boolean(),
+  terminated: z.boolean(),
+});
+
 export const osDataSchema = z.object({
   results: z.array(resultItemSchema),
+  postcodeMetadata: osPostcodeMetadataSchema.nullable().optional(),
 });
 
 export const osAddressOptionSchema = z.object({

@@ -144,16 +144,16 @@ export class CourtAddressController extends BaseController {
     }
 
     const postcodeSearchResponse = await this.courtAddressService.retrieveAddressOptions(postcode);
-    if (!this.validateServiceResponse(postcodeSearchResponse, res, 'not-found')) {
+    if (this.renderStatusResponse(res, postcodeSearchResponse, 'not-found')) {
       return;
     }
 
-    if (postcodeSearchResponse['status'] === 'invalid') {
+    if ('status' in postcodeSearchResponse) {
       res.render('court-address-find', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         pageTitle: 'Find Address',
-        error: postcodeSearchResponse['error'],
+        error: postcodeSearchResponse.error,
         osOutageWarningText,
       });
       return;
@@ -161,7 +161,8 @@ export class CourtAddressController extends BaseController {
 
     res.render('court-address-select', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
-      addresses: postcodeSearchResponse,
+      addresses: postcodeSearchResponse.addresses,
+      postcodeMetadata: postcodeSearchResponse.postcodeMetadata,
       postcode,
       courtId,
       pageTitle: 'Select Address',
@@ -199,17 +200,17 @@ export class CourtAddressController extends BaseController {
     }
 
     const postcodeSearchResponse = await this.courtAddressService.retrieveAddressOptions(postcode);
-    if (!this.validateServiceResponse(postcodeSearchResponse, res, 'not-found')) {
+    if (this.renderStatusResponse(res, postcodeSearchResponse, 'not-found')) {
       return;
     }
 
-    if (postcodeSearchResponse['status'] === 'invalid') {
+    if ('status' in postcodeSearchResponse) {
       res.render('court-address-find', {
         breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
         courtId,
         addressId,
         pageTitle: 'Find Address',
-        error: postcodeSearchResponse['error'],
+        error: postcodeSearchResponse.error,
         osOutageWarningText,
       });
       return;
@@ -217,7 +218,8 @@ export class CourtAddressController extends BaseController {
 
     res.render('court-address-select', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName as string, 'Find address by postcode'),
-      addresses: postcodeSearchResponse,
+      addresses: postcodeSearchResponse.addresses,
+      postcodeMetadata: postcodeSearchResponse.postcodeMetadata,
       postcode,
       courtId,
       addressId,
@@ -237,7 +239,16 @@ export class CourtAddressController extends BaseController {
     if (!this.validateServiceResponse(courtName, res, 'not-found')) {
       return;
     }
-    await this.renderAddAddress(res, courtId, courtName as string, false, false, undefined, req.body?.address);
+    await this.renderAddAddress(
+      res,
+      courtId,
+      courtName as string,
+      false,
+      false,
+      undefined,
+      req.body?.address,
+      req.body?.postcode
+    );
   }
 
   @route('/details/success')
@@ -285,7 +296,8 @@ export class CourtAddressController extends BaseController {
     aolSelected: boolean,
     ctSelected: boolean,
     courtAddress?: CourtAddress,
-    addressOptionData?: string
+    addressOptionData?: string,
+    postcode?: string
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
     if (!this.validateServiceResponse(areasOfLaw, res, 'not-found')) {
@@ -298,6 +310,13 @@ export class CourtAddressController extends BaseController {
     }
 
     const address = addressOptionData ? this.buildAddressData(addressOptionData) : (courtAddress ?? {});
+    if (!addressOptionData && typeof postcode === 'string') {
+      address.postcode = postcode;
+      address.osAddressDataset = undefined;
+      address.osAddressUprn = undefined;
+      address.osAddressLpiKey = undefined;
+      address.osAddressSelectionPostcode = undefined;
+    }
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(courtId, courtName, 'Edit address'),
@@ -344,6 +363,7 @@ export class CourtAddressController extends BaseController {
       aolSelected,
       ctSelected,
       addressOptionData: req.body?.address,
+      postcode: req.body?.postcode,
     });
   }
 
@@ -413,6 +433,7 @@ export class CourtAddressController extends BaseController {
       aolSelected: boolean;
       ctSelected: boolean;
       addressOptionData?: string;
+      postcode?: string;
     }
   ): Promise<void> {
     const areasOfLaw = await this.typesService.listAreasOfLaw();
@@ -427,7 +448,14 @@ export class CourtAddressController extends BaseController {
 
     const address = context.addressOptionData
       ? this.buildAddressData(context.addressOptionData, context.courtAddress)
-      : context.courtAddress;
+      : { ...context.courtAddress };
+    if (!context.addressOptionData && typeof context.postcode === 'string') {
+      address.postcode = context.postcode;
+      address.osAddressDataset = undefined;
+      address.osAddressUprn = undefined;
+      address.osAddressLpiKey = undefined;
+      address.osAddressSelectionPostcode = undefined;
+    }
 
     res.render('court-address-edit', {
       breadcrumbs: this.buildAddressBreadcrumbs(context.courtId, context.courtName, 'Edit address'),

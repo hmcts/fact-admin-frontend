@@ -4,6 +4,7 @@ import { assert, match, mock, stub } from 'sinon';
 
 import { CourtAddressController } from '../../../../main/controllers/courts/CourtAddressController';
 import { CourtAddress, CourtAddressType } from '../../../../main/schemas/courtAddressSchema';
+import { OsAddressOption } from '../../../../main/schemas/osDataSchema';
 import { TypesService } from '../../../../main/services/TypesService';
 import { CourtAddressService } from '../../../../main/services/courts/CourtAddressService';
 import { OS_OUTAGE_WARNING_MESSAGE, POSTCODE_ERROR_MESSAGES } from '../../../../main/utils/constants/messageConstants';
@@ -65,6 +66,57 @@ describe('CourtAddressController', () => {
   afterEach(() => {
     retrieveCourtNameStub.restore();
   });
+
+  test.each([undefined, 'BS1 6GR'])(
+    'renders manual address details with lookup postcode %s while preserving other fields',
+    async postcode => {
+      const render = stub();
+      const response = { render } as unknown as Response;
+      const request = mockRequest({});
+      request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
+      request.body = { postcode };
+      const existingAddress = buildAddress({
+        addressLine2: '30 Castle Street',
+        county: 'Berkshire',
+        areasOfLaw: [AREA_OF_LAW_ID],
+        courtTypes: [COURT_TYPE_ID],
+        osAddressDataset: 'LPI',
+        osAddressUprn: '100',
+        osAddressLpiKey: 'lpi-100',
+        osAddressSelectionPostcode: 'RG12AA',
+      });
+      const retrieveStub = stub(courtAddressService, 'retrieve').resolves(existingAddress);
+      const areasStub = stub(typesService, 'listAreasOfLaw').resolves([]);
+      const typesStub = stub(typesService, 'listCourtTypes').resolves([]);
+
+      try {
+        await controller.editAddress(request, response);
+        const viewModel = render.firstCall.args[1];
+        expect(viewModel.address).toEqual({
+          ...existingAddress,
+          ...(postcode === undefined
+            ? {}
+            : {
+                postcode,
+                osAddressDataset: undefined,
+                osAddressUprn: undefined,
+                osAddressLpiKey: undefined,
+                osAddressSelectionPostcode: undefined,
+              }),
+        });
+        expect(viewModel.aolSelected).toBe(AREA_OF_LAW_ID);
+        expect(viewModel.ctSelected).toBe(COURT_TYPE_ID);
+        expect(existingAddress.postcode).toBe('RG1 2AA');
+
+        await controller.addAddress(request, response);
+        expect(render.secondCall.args[1].address.postcode).toBe(postcode);
+      } finally {
+        retrieveStub.restore();
+        areasStub.restore();
+        typesStub.restore();
+      }
+    }
+  );
 
   test('renders the address list sorted by address type rank', async () => {
     const response = {
@@ -181,7 +233,11 @@ describe('CourtAddressController', () => {
         selectionPostcode: 'RG12AA',
       },
     ];
-    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves(addressOptions);
+    const postcodeMetadata = { largeUser: true, terminated: true };
+    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves({
+      addresses: addressOptions,
+      postcodeMetadata,
+    });
 
     responseMock
       .expects('render')
@@ -189,6 +245,7 @@ describe('CourtAddressController', () => {
       .withArgs('court-address-select', {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         addresses: addressOptions,
+        postcodeMetadata,
         postcode: 'RG1 2AA',
         courtId: COURT_ID,
         pageTitle: 'Select Address',
@@ -621,21 +678,12 @@ describe('CourtAddressController', () => {
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
     request.query = { postcode: 'RG1 2AA' };
 
-    const addressOptions = [
-      {
-        ADDRESS: 'Reading Crown Court, RG1 2AA',
-        BUILDING_NUMBER: '1',
-        THOROUGHFARE_NAME: 'Main Street',
-        POST_TOWN: 'Reading',
-        POSTCODE: 'RG1 2AA',
-        LAT: 51.4543,
-        LNG: -0.9781,
-      },
-    ];
-
-    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves(
-      addressOptions as never
-    );
+    const addressOptions: OsAddressOption[] = [];
+    const postcodeMetadata = { largeUser: false, terminated: true };
+    const retrieveAddressOptionsStub = stub(courtAddressService, 'retrieveAddressOptions').resolves({
+      addresses: addressOptions,
+      postcodeMetadata,
+    });
 
     responseMock
       .expects('render')
@@ -643,6 +691,7 @@ describe('CourtAddressController', () => {
       .withArgs('court-address-select', {
         breadcrumbs: buildAddressBreadcrumbs('Court', 'Find address by postcode'),
         addresses: addressOptions,
+        postcodeMetadata,
         postcode: 'RG1 2AA',
         courtId: COURT_ID,
         addressId: ADDRESS_ID,
@@ -666,6 +715,7 @@ describe('CourtAddressController', () => {
     const request = mockRequest({});
     request.params = { courtId: COURT_ID, addressId: ADDRESS_ID };
     request.body = {
+      postcode: 'BS1 6GR',
       address: JSON.stringify({
         dataset: 'DPA',
         uprn: '100',

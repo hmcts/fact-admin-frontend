@@ -94,20 +94,23 @@ describe('Court address edit routes', () => {
   });
 
   test('renders select address page for a valid postcode search', async () => {
-    stub(CourtAddressService.prototype, 'retrieveAddressOptions').resolves([
-      {
-        dataset: 'DPA',
-        uprn: '100',
-        lpiKey: null,
-        address: '10 High Street, Bristol, BS1 6GR',
-        addressLine1: '10 High Street',
-        addressLine2: null,
-        townCity: 'Bristol',
-        county: null,
-        postcode: 'BS1 6GR',
-        selectionPostcode: 'BS16GR',
-      },
-    ] as never);
+    stub(CourtAddressService.prototype, 'retrieveAddressOptions').resolves({
+      addresses: [
+        {
+          dataset: 'DPA',
+          uprn: '100',
+          lpiKey: null,
+          address: '10 High Street, Bristol, BS1 6GR',
+          addressLine1: '10 High Street',
+          addressLine2: null,
+          townCity: 'Bristol',
+          county: null,
+          postcode: 'BS1 6GR',
+          selectionPostcode: 'BS16GR',
+        },
+      ],
+      postcodeMetadata: undefined,
+    });
 
     const response = await request(app).get(`/courts/${courtId}/edit/address/select?postcode=BS1%206GR`);
 
@@ -120,12 +123,32 @@ describe('Court address edit routes', () => {
     stub(TypesService.prototype, 'listAreasOfLaw').resolves([{ id: 'aol-1', name: 'Civil' }] as never);
     stub(TypesService.prototype, 'listCourtTypes').resolves([{ id: 'ct-1', name: 'County Court' }] as never);
 
-    const response = await request(app).post(`/courts/${courtId}/edit/address/details`).send({ manual: 'true' });
+    const response = await request(app).post(`/courts/${courtId}/edit/address/details`).send({ postcode: 'BS1 6GR' });
 
     expect(response.status).toBe(200);
     expect(response.text).toContain('Enter an address');
     expect(response.text).toContain('Address line 1');
     expect(response.text).toContain('Areas of law');
+    expect(response.text).toContain('value="BS1 6GR"');
+  });
+
+  test('manual entry replaces an existing postcode without replacing other address fields', async () => {
+    stub(CourtAddressService.prototype, 'retrieve').resolves(address as never);
+    stub(TypesService.prototype, 'listAreasOfLaw').resolves([{ id: 'aol-1', name: 'Civil' }] as never);
+    stub(TypesService.prototype, 'listCourtTypes').resolves([{ id: 'ct-1', name: 'County Court' }] as never);
+    const saveStub = stub(CourtAddressService.prototype, 'save');
+
+    const response = await request(app)
+      .post(`/courts/${courtId}/edit/address/details/${addressId}`)
+      .send({ postcode: 'BS1 6GR' });
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('value="BS1 6GR"');
+    expect(response.text).not.toContain(`value="${address.postcode}"`);
+    for (const value of [address.addressLine1, address.addressLine2, address.townCity, address.county]) {
+      expect(response.text).toContain(`value="${value}"`);
+    }
+    expect(saveStub.notCalled).toBe(true);
   });
 
   test('renders success page when creating a new address succeeds', async () => {

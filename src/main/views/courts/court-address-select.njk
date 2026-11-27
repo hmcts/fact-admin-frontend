@@ -51,11 +51,22 @@
 
         </form>
       {% else %}
-        <p class="govuk-body">No addresses were found for this postcode. Enter the address manually.</p>
+        {% if postcodeMetadata.terminated %}
+          <p class="govuk-body">The postcode you have entered is a terminated postcode.</p>
+        {% endif %}
+        {% if postcodeMetadata.largeUser %}
+          <p class="govuk-body">The postcode you have entered is a large user postcode. A large user postcode covers a large rural area or is used by a location that receives large volumes of mail.</p>
+        {% endif %}
+        {% if postcodeMetadata.terminated or postcodeMetadata.largeUser %}
+          <p class="govuk-body">You can still enter an address using this postcode, but you will need to enter the address manually.</p>
+        {% else %}
+          <p class="govuk-body">No addresses were found for this postcode. Enter the address manually.</p>
+        {% endif %}
       {% endif %}
 
       <form method="POST" action="{{ actionUrl }}">
         {{ csrfProtection(csrfToken) }}
+        <input type="hidden" name="postcode" value="{{ postcode }}">
         {{ govukButton({
           text: "Enter address manually",
           classes: "govuk-button--secondary"

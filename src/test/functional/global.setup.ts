@@ -1,8 +1,10 @@
 import { test as setup } from './fixtures';
+import { createTestingSupportApiContext } from './helpers/courtTestData';
+import { seedTestPostcodes } from './helpers/postcodeTestData';
 import { config, createSession, requireEnvVar } from './utils';
 
 /**
- * Creates browser sessions for the SSO test users before the browser projects run.
+ * Seeds postcode references and creates SSO sessions before the browser projects run.
  */
 setup.describe('Global playwright setup', () => {
   setup.describe.configure({ mode: 'serial' });
@@ -32,5 +34,15 @@ setup.describe('Global playwright setup', () => {
 
   setup('Create viewer session', async ({ page }) => {
     await createSession(page, config.users.viewer);
+  });
+
+  setup('Seed postcode references', async ({ playwright }) => {
+    const apiContext = await createTestingSupportApiContext(playwright);
+
+    try {
+      await seedTestPostcodes(apiContext);
+    } finally {
+      await apiContext.dispose();
+    }
   });
 });

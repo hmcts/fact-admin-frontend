@@ -197,6 +197,10 @@ yarn test:unit
 
 Functional tests are end-to-end tests run with Playwright.
 
+Playwright setup seeds three synthetic `ZZ99` postcode references through
+`POST /testing-support/postcodes` on the configured `DATA_API_URL`.
+The Data API must support the testing endpoints for functional tests to run successfully.
+
 Run the main functional suite (excludes `@smoke` tests):
 
 ```bash

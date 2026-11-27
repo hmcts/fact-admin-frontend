@@ -70,6 +70,7 @@ describe('CourtAddressService', () => {
 
   test('maps postcode search result DPA entries and removes null values', async () => {
     jest.spyOn(ReferenceDataApi.prototype, 'getAddressesForPostcode').mockResolvedValue({
+      postcodeMetadata: { largeUser: false, terminated: true },
       results: [
         {
           DPA: {
@@ -95,13 +96,16 @@ describe('CourtAddressService', () => {
     const service = new CourtAddressService();
     const result = await service.retrieveAddressOptions('SW1A 1AA');
 
-    expect(result).toEqual([
-      expect.objectContaining({
-        address: '1 High Street, London, SW1A 1AA',
-        dataset: 'DPA',
-        selectionPostcode: 'SW1A1AA',
-      }),
-    ]);
+    expect(result).toEqual({
+      addresses: [
+        expect.objectContaining({
+          address: '1 High Street, London, SW1A 1AA',
+          dataset: 'DPA',
+          selectionPostcode: 'SW1A1AA',
+        }),
+      ],
+      postcodeMetadata: { largeUser: false, terminated: true },
+    });
   });
 
   test('returns a user-friendly error without exposing the postcode search API message', async () => {

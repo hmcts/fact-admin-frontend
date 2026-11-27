@@ -4,12 +4,46 @@ import request from 'supertest';
 
 import { app } from '../../../main/app';
 import { ServiceCentreApi } from '../../../main/requests/ServiceCentreApi';
+import { ServiceCentreAddress } from '../../../main/schemas/serviceCentreAddressSchema';
+import { ServiceCentreAddressService } from '../../../main/services/service-centres/ServiceCentreAddressService';
 
 describe('Service centre address routes', () => {
   const serviceCentreId = '11111111-1111-4111-8111-111111111111';
 
   beforeEach(() => {
     restore();
+  });
+
+  test.each([false, true])('manual entry uses the lookup postcode for an existing address: %s', async existing => {
+    const addressId = '22222222-2222-4222-8222-222222222222';
+    const address: ServiceCentreAddress = {
+      id: addressId,
+      serviceCentreId,
+      addressLine1: '1 Test Street',
+      addressLine2: 'Westminster',
+      townCity: 'London',
+      county: 'Greater London',
+      postcode: 'SW1A 1AA',
+      lat: null,
+      lon: null,
+      addressType: 'VISIT_US',
+    };
+    stub(ServiceCentreAddressService.prototype, 'retrieveServiceCentreName').resolves('Reading Service Centre');
+    stub(ServiceCentreAddressService.prototype, 'retrieve').resolves(address);
+    const saveStub = stub(ServiceCentreAddressService.prototype, 'save');
+
+    const response = await request(app)
+      .post(`/service-centres/${serviceCentreId}/edit/address/details${existing ? `/${addressId}` : ''}`)
+      .send({ postcode: 'BS1 6GR', isNewSC: 'true' });
+
+    expect(response.status).toBe(HttpStatusCode.Ok);
+    expect(response.text).toContain('value="BS1 6GR"');
+    expect(response.text).not.toContain(`value="${address.postcode}"`);
+    for (const value of [address.addressLine1, address.addressLine2, address.townCity, address.county]) {
+      expect(response.text.includes(`value="${value}"`)).toBe(existing);
+    }
+    expect(response.text.includes('<input type="hidden" name="isNewSC" value="true">')).toBe(!existing);
+    expect(saveStub.notCalled).toBe(true);
   });
 
   test('renders address list with add button when no addresses exist', async () => {
