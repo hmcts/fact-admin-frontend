@@ -91,6 +91,7 @@ const courtCounterServiceOpeningHourSchema = z.object({
   assistWithSupport: z.boolean(),
   appointmentNeeded: z.boolean(),
   appointmentContact: z.string().nullable(),
+  appointmentPhone: z.string().nullable().optional(),
   openingTimesDetails: z.array(openingTimesDetailSchema),
   courtTypes: z.array(courtTypeSchema).nullable().optional(),
 });

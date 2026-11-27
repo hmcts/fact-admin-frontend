@@ -34,6 +34,8 @@ withPipeline(type, product, component) {
 
   onPR() {
     env.ENV = 'preview'
+    // FACT-3338: tests must use the same API PR as the preview app. REVERT BEFORE MERGE.
+    env.DATA_API_URL = 'https://fact-data-api-pr-529.preview.platform.hmcts.net/'
   }
 
   loadVaultSecrets(secrets)

@@ -59,7 +59,8 @@ describe('Counter Service Opening Hours View', () => {
       errors: {},
       errorSummary: [],
       form: {
-        appointmentContact: 'counter@example.test',
+        appointmentEmail: 'counter@example.test',
+        appointmentPhone: '01234 567890',
         appointmentNeeded: 'yes',
         assistWith: ['forms'],
         sameClosingHour: '17',
@@ -78,6 +79,12 @@ describe('Counter Service Opening Hours View', () => {
     expect(html).toContain('Save');
     expect(html).toContain('What can the counter assist with?');
     expect(html).toContain('Is an appointment needed?');
+    expect(html).toContain('Enter the email address for booking');
+    expect(html).toContain('Provide the email address they can use to book appointments. Use lower case.');
+    expect(html).toMatch(/id="appointmentEmail"[^>]*value="counter@example.test"/);
+    expect(html).toContain('Enter the phone number for booking');
+    expect(html).toContain('Provide the phone number they can use to book appointments.');
+    expect(html).toMatch(/id="appointmentPhone"[^>]*value="01234 567890"/);
     expect(html).toContain('Does the counter open and close at the same time Monday to Friday?');
     expect(html).toContain('id="sameOpeningTimeContext">Opening time</p>');
     expect(html).toMatch(/id="sameOpeningHour"[^>]*aria-describedby="sameOpeningTimeContext"/);
@@ -114,6 +121,28 @@ describe('Counter Service Opening Hours View', () => {
     expect(html).toContain('View counter service details and opening hours');
     expect(html).toContain('<fieldset class="govuk-fieldset" disabled>');
     expect(html).not.toContain('>Save<');
+  });
+
+  test('shows the missing booking contact error on the group, not on the email field', () => {
+    const html = env.render('court-counter-service-opening-hours-edit.njk', {
+      courtId,
+      days: [],
+      errors: { appointmentContact: 'Enter an email address or phone number for booking' },
+      errorSummary: [{ href: '#appointmentEmail', text: 'Enter an email address or phone number for booking' }],
+      form: { appointmentNeeded: 'yes', assistWith: ['forms'], selectedDays: [] },
+      pagePath: `/courts/${courtId}/edit/counter-service-opening-hours/add`,
+      pageTitle: 'Counter service opening hours',
+    });
+
+    expect(html).toContain('How can people book an appointment?');
+    expect(html).toContain('class="govuk-form-group govuk-form-group--error" id="appointmentContact-group"');
+    expect(html).toContain('aria-describedby="appointmentContact-error"');
+    expect(html).toMatch(
+      /id="appointmentContact-error">\s*<span class="govuk-visually-hidden">Error:<\/span> Enter an email address or phone number for booking/
+    );
+    expect(html).toContain('href="#appointmentEmail"');
+    expect(html).not.toContain('id="appointmentEmail-error"');
+    expect(html).not.toContain('id="appointmentPhone-error"');
   });
 
   test('renders validation summary and field messages on edit page', () => {

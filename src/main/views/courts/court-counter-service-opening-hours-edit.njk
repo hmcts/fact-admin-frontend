@@ -92,21 +92,52 @@
       <h2 class="govuk-heading-m">Counter service details</h2>
 
       {% set appointmentContact %}
+        {# Group error ("enter an email or a phone") sits on the fieldset; format errors stay on each input #}
+        <div class="govuk-form-group{% if errors.appointmentContact %} govuk-form-group--error{% endif %}" id="appointmentContact-group">
+          <fieldset class="govuk-fieldset"{% if errors.appointmentContact %} aria-describedby="appointmentContact-error"{% endif %}>
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">How can people book an appointment?</legend>
+          {% if errors.appointmentContact %}
+            <p class="govuk-error-message" id="appointmentContact-error">
+              <span class="govuk-visually-hidden">Error:</span> {{ errors.appointmentContact }}
+            </p>
+          {% endif %}
           {{ govukInput({
             classes: "govuk-input--width-20",
-            id: "appointmentContact",
-            name: "appointmentContact",
+            id: "appointmentEmail",
+            name: "appointmentEmail",
+            type: "email",
+            autocomplete: "off",
+            spellcheck: false,
             label: {
-              text: "Enter contact details for booking"
+              text: "Enter the email address for booking"
             },
             hint: {
-              text: "Provide the email adddress they can use to book appointments. Use lower case."
+              text: "Provide the email address they can use to book appointments. Use lower case."
             },
-            value: form.appointmentContact,
+            value: form.appointmentEmail,
             errorMessage: {
-              text: errors.appointmentContact
-            } if errors.appointmentContact else null
+              text: errors.appointmentEmail
+            } if errors.appointmentEmail else null
           }) }}
+          {{ govukInput({
+            classes: "govuk-input--width-20",
+            id: "appointmentPhone",
+            name: "appointmentPhone",
+            type: "tel",
+            autocomplete: "off",
+            label: {
+              text: "Enter the phone number for booking"
+            },
+            hint: {
+              text: "Provide the phone number they can use to book appointments."
+            },
+            value: form.appointmentPhone,
+            errorMessage: {
+              text: errors.appointmentPhone
+            } if errors.appointmentPhone else null
+          }) }}
+          </fieldset>
+        </div>
       {% endset %}
 
       {% set yesConditional %}

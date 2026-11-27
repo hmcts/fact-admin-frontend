@@ -43,8 +43,12 @@ export class CounterServiceOpeningHoursPage extends Base {
     await this.page.locator(`input[name="appointmentNeeded"][value="${value}"]`).check();
   }
 
-  async fillAppointmentContact(contact: string): Promise<void> {
-    await this.page.locator('#appointmentContact').fill(contact);
+  async fillAppointmentEmail(email: string): Promise<void> {
+    await this.page.locator('#appointmentEmail').fill(email);
+  }
+
+  async fillAppointmentPhone(phone: string): Promise<void> {
+    await this.page.locator('#appointmentPhone').fill(phone);
   }
 
   counterServiceRow(assistanceAvailable: string): Locator {

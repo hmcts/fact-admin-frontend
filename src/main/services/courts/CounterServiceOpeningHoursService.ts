@@ -7,6 +7,7 @@ import {
   COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE,
   COUNTER_SERVICE_ASSISTANCE_REQUIRED_MESSAGE,
   COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE,
+  COUNTER_SERVICE_CONTACT_REQUIRED_MESSAGE,
   COUNTER_SERVICE_SAME_TIMES_SELECTION_REQUIRED_MESSAGE,
   OPENING_HOUR_AT_LEAST_ONE_DAY_REQUIRED_MESSAGE,
   OPENING_HOUR_CLOSING_BEFORE_OPENING_MESSAGE,
@@ -14,8 +15,9 @@ import {
   OPENING_HOUR_DAYS,
   OPENING_HOUR_OPENING_AFTER_CLOSING_MESSAGE,
   OPENING_HOUR_OPENING_EQUALS_CLOSING_MESSAGE,
+  PHONE_NUMBER_INVALID_MESSAGE,
 } from '../../utils/constants/messageConstants';
-import { EMAIL_REGEX } from '../../utils/constants/regexConstants';
+import { EMAIL_REGEX, PHONE_NUMBER_REGEX } from '../../utils/constants/regexConstants';
 import { normaliseSelectedValues, toErrorSummary } from '../../utils/formHelpers';
 import {
   WeekdayConfig,
@@ -31,7 +33,8 @@ type Day = WeekdayConfig;
 export type CounterServiceOpeningHoursForm = {
   assistWith: string[];
   appointmentNeeded?: string;
-  appointmentContact?: string;
+  appointmentEmail?: string;
+  appointmentPhone?: string;
   sameTime?: string;
   selectedDays: string[];
   sameOpeningHour?: string;
@@ -155,13 +158,17 @@ export class CounterServiceOpeningHoursService {
         viewModel: {
           ...baseModel,
           errors,
-          errorSummary: toErrorSummary(errors),
+          // The group error has no input of its own, so link it to the first field in the group.
+          errorSummary: toErrorSummary(errors, field =>
+            field === 'appointmentContact' ? '#appointmentEmail' : `#${field}`
+          ),
           pageTitle: `Error: Edit counter service details and opening hours - ${baseModel.courtName}`,
         },
       };
     }
 
     const assistWith = this.getSelectedDays(form.assistWith);
+    const appointmentNeeded = form.appointmentNeeded === 'yes';
 
     const payload = {
       courtId,
@@ -170,8 +177,10 @@ export class CounterServiceOpeningHoursService {
       assistWithForms: assistWith.includes('forms'),
       assistWithDocuments: assistWith.includes('documents'),
       assistWithSupport: assistWith.includes('support'),
-      appointmentNeeded: form.appointmentNeeded === 'yes',
-      appointmentContact: form.appointmentNeeded === 'yes' ? form.appointmentContact : null,
+      appointmentNeeded,
+      // The API keeps the email under its original "appointmentContact" property name.
+      appointmentContact: appointmentNeeded ? form.appointmentEmail || null : null,
+      appointmentPhone: appointmentNeeded ? form.appointmentPhone || null : null,
       openingTimesDetails: this.toOpeningTimesDetails(form),
     };
 
@@ -325,8 +334,18 @@ export class CounterServiceOpeningHoursService {
       errors.appointmentNeeded = COUNTER_SERVICE_APPOINTMENT_NEEDED_REQUIRED_MESSAGE;
     }
 
-    if (form.appointmentNeeded === 'yes' && (!form.appointmentContact || !EMAIL_REGEX.test(form.appointmentContact))) {
-      errors.appointmentContact = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;
+    if (form.appointmentNeeded === 'yes') {
+      const { appointmentEmail, appointmentPhone } = form;
+
+      if (!appointmentEmail && !appointmentPhone) {
+        errors.appointmentContact = COUNTER_SERVICE_CONTACT_REQUIRED_MESSAGE;
+      }
+      if (appointmentEmail && !EMAIL_REGEX.test(appointmentEmail)) {
+        errors.appointmentEmail = COUNTER_SERVICE_CONTACT_EMAIL_INVALID_MESSAGE;
+      }
+      if (appointmentPhone && !PHONE_NUMBER_REGEX.test(appointmentPhone)) {
+        errors.appointmentPhone = PHONE_NUMBER_INVALID_MESSAGE;
+      }
     }
 
     return errors;
@@ -363,7 +382,8 @@ export class CounterServiceOpeningHoursService {
     const form: CounterServiceOpeningHoursForm = {
       assistWith,
       appointmentNeeded: existingRecord.appointmentNeeded ? 'yes' : 'no',
-      appointmentContact: existingRecord.appointmentContact ?? '',
+      appointmentEmail: existingRecord.appointmentContact ?? '',
+      appointmentPhone: existingRecord.appointmentPhone ?? '',
       sameTime,
       selectedDays: sameTime === 'no' ? daysList : [],
     };

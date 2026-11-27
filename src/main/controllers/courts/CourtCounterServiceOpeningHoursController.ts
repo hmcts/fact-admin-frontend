@@ -213,7 +213,8 @@ export default class CourtCounterServiceOpeningHoursController extends BaseContr
       ...body,
       assistWith: this.counterServiceOpeningHoursService.getSelectedDays(body.assistWith),
       appointmentNeeded: parseOptionalString(body.appointmentNeeded),
-      appointmentContact: parseOptionalString(body.appointmentContact),
+      appointmentEmail: parseOptionalString(body.appointmentEmail),
+      appointmentPhone: parseOptionalString(body.appointmentPhone),
       sameTime: parseOptionalString(body.sameTime),
       selectedDays: this.counterServiceOpeningHoursService.getSelectedDays(body.selectedDays),
     } as CounterServiceOpeningHoursForm;
