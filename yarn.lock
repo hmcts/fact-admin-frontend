@@ -42,14 +42,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@axe-core/playwright@npm:4.14.0":
-  version: 4.14.0
-  resolution: "@axe-core/playwright@npm:4.14.0"
+"@axe-core/playwright@npm:4.14.1":
+  version: 4.14.1
+  resolution: "@axe-core/playwright@npm:4.14.1"
   dependencies:
-    axe-core: "npm:~4.14.0"
+    axe-core: "npm:~4.14.1"
   peerDependencies:
     playwright-core: ">= 1.0.0"
-  checksum: 10/ee72bd4a961758b069e444d8fbf944a3deb9721d758cf720399b46af8196262d8fbf496e3bc410bf5b66f718376d6ffbe9167ea7487426071c653c63620da7f6
+  checksum: 10/44ee307625f0ccb70678e2fe55f140e14434535319d0744fd4e79f2ce67fd2ef6db9c230334ccf8f3c120087cdf7bff0d7e11056d5d6c8d76779e616de1cd1d1
   languageName: node
   linkType: hard
 
@@ -5092,20 +5092,20 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=13.7.0":
-  version: 26.6.6
-  resolution: "@types/node@npm:26.6.6"
+  version: 26.6.11
+  resolution: "@types/node@npm:26.6.11"
   dependencies:
     undici-types: "npm:~8.9.0"
-  checksum: 10/07c6c6fc1f5cc89c700ac9ebcebd42b000fef234bf0b80e9461a8f077105f15faf16df95b83745e0c0e37338d1fbc28cb402ef27b5787fd7a57b492c926ff7ae
+  checksum: 10/684887f6f6d1fec32605d9707a11614ededc482b270708d7da0aad6ef2a8641d3aad52c060178450373f88d770743cd43f0d43f9d977da6813b020639e800f58
   languageName: node
   linkType: hard
 
 "@types/node@npm:^24.19.2":
-  version: 24.19.2
-  resolution: "@types/node@npm:24.19.2"
+  version: 24.19.4
+  resolution: "@types/node@npm:24.19.4"
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10/5bc31df093f2866db0a2f9df0a1e99c2a46c3154ca2dc62ee14bde7af216d6361e4737e1023880921007ccb326b8559980e239e18a6fa927cda507da9383225c
+  checksum: 10/90981db59db96ea77cddcbd044de244e17f5c063e32ee303d396ae0af48c8e69a4004711b337f611ad9f47937b59fa5efe3130c94a7d9d3f58b5193f4889b66f
   languageName: node
   linkType: hard
 
@@ -6615,7 +6615,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:4.14.0, axe-core@npm:~4.14.0":
+"axe-core@npm:4.14.0":
   version: 4.14.0
   resolution: "axe-core@npm:4.14.0"
   checksum: 10/b41f9c5fb670b3e1812ba203b17570efa026071e6c722cd8384bacbe5f2be1578fc5d7544acf06df7758eb755c7d23629df922e86cc0655d656784157c0d8df5
@@ -6633,6 +6633,13 @@ __metadata:
   version: 4.13.0
   resolution: "axe-core@npm:4.13.0"
   checksum: 10/b9319bedc705fde00e4abd981d8724202cc20102e4ae6d8edfde33cb5265e0fb8f67f32adcb4ad33fbd4a2c8d7ad7ef5af1d933d9ad859bed90e3eae0ee8c52f
+  languageName: node
+  linkType: hard
+
+"axe-core@npm:~4.14.1":
+  version: 4.14.1
+  resolution: "axe-core@npm:4.14.1"
+  checksum: 10/45c81d29170809bf48b0b34061f6f12bad27872695d3cbf83aacf7fe7d0d6c997214dff9c063c5e1ddc76e2de544da749eba518bc4c17494e79c56e93571888c
   languageName: node
   linkType: hard
 
@@ -9283,7 +9290,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fact-admin-frontend@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:4.14.0"
+    "@axe-core/playwright": "npm:4.14.1"
     "@azure/identity": "npm:4.14.1"
     "@babel/core": "npm:8.1.3"
     "@babel/plugin-proposal-decorators": "npm:8.0.2"
