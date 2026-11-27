@@ -53,7 +53,7 @@ describe('HomePageFiltersService', () => {
     expect(service.validateFilters(filters, regions)).toEqual([
       {
         href: '#partialCourtName',
-        text: 'Court or tribunal name must only include letters, spaces, brackets, apostrophes, hyphens and ampersands.',
+        text: 'Court, tribunal or service centre name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
       },
       { href: '#main-content', text: 'includeClosed must be true or false' },
       { href: '#main-content', text: 'onlyServiceCentres must be true or false' },

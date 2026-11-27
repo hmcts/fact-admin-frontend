@@ -179,10 +179,10 @@ test.describe(
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(
-            'Enter an email address in the correct format'
+            'Enter a valid email address'
           );
           await expect(serviceCentreContactDetailsPage.mainContent.content).toContainText(
-            'Enter a phone number in the correct format'
+            'Enter a valid phone number (10-20 digits, optional +44, spaces allowed)'
           );
         }
       );
@@ -313,7 +313,7 @@ test.describe(
           await serviceCentreContactDetailsPage.explanationCyInput.fill(tooLongExplanation);
           await serviceCentreContactDetailsPage.save();
 
-          const expectedError = 'Explanation in Welsh must be 250 characters or fewer';
+          const expectedError = 'Welsh translation must be 250 characters or fewer';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
@@ -344,7 +344,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Explanation must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+            'Explanation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);
@@ -375,7 +375,7 @@ test.describe(
           await serviceCentreContactDetailsPage.save();
 
           const expectedError =
-            'Explanation in Welsh must only include letters, numbers, spaces, apostrophes, hyphens, parentheses, ampersands, and plus signs';
+            'Welsh translation must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets';
 
           await expect(serviceCentreContactDetailsPage.errorSummary).toBeVisible();
           await expect(serviceCentreContactDetailsPage.errorSummary).toContainText(expectedError);

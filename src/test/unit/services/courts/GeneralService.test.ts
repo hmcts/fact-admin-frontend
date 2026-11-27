@@ -110,14 +110,14 @@ describe('CourtGeneralService', () => {
       regions,
       errors: {
         name: [
-          'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'Court name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         ],
       },
     });
     expect(requests.updateCourt).not.toHaveBeenCalled();
   });
 
-  test('save returns validation errors when court name has no letters', async () => {
+  test('save returns validation errors when court name has invalid characters', async () => {
     const requests = {
       getCourtById: jest.fn().mockResolvedValue(courtEntity),
       getRegions: jest.fn().mockResolvedValue(regions),
@@ -128,19 +128,19 @@ describe('CourtGeneralService', () => {
 
     const result = await service.save({
       id: courtEntity.id,
-      name: '-----',
+      name: 'Court@Name',
       regionId: courtEntity.regionId,
       open: true,
     });
 
     expect(result).toEqual({
       ...courtEntity,
-      name: '-----',
+      name: 'Court@Name',
       originalName: courtEntity.name,
       regions,
       errors: {
         name: [
-          'Court name must include at least one letter and only include letters, spaces, apostrophes, hyphens, ampersands, and parentheses',
+          'Court name must only include letters, numbers, spaces, apostrophes, commas, full stops, hyphens, ampersands, and brackets',
         ],
       },
     });
